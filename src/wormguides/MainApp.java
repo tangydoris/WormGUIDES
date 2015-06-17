@@ -35,6 +35,8 @@ public class MainApp extends Application {
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            
             primaryStage.show();
             
         } catch (IOException e) {
@@ -45,5 +47,10 @@ public class MainApp extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
+		
+		//String classpath = System.getProperty("java.class.path");
+		//System.out.println("Classpath: " + classpath);
+		//TableLineageData tableData = AceTreeLoader.loadNucFiles("nuclei_files");
+		AceTreeLoader.loadNucFiles("./nuclei_files");
 	}
 }
