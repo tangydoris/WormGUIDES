@@ -22,10 +22,13 @@ public class AceTreeLoader {
 			JarFile jarFile = new JarFile(new File(filePath));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
-			for (JarEntry entry = entries.nextElement(); entries.hasMoreElements(); entry = entries.nextElement()) {
+			int time = 1;
+			
+			JarEntry entry;
+			while (entries.hasMoreElements()){
+				entry = entries.nextElement();
 				String name = entry.getName();
 				
-				int time = 1;
 				if (entry.getName().startsWith(ENTRY_PREFIX)) {
 					InputStream input = jarFile.getInputStream(entry);
 					process(tld, time++, input);
@@ -48,16 +51,34 @@ public class AceTreeLoader {
 		BufferedReader reader = new BufferedReader(isr);
 		String line;
 		while ((line = reader.readLine()) != null) {
-			String[] tokens = new String[20];
+			String[] tokens = new String[21];
 			StringTokenizer tokenizer = new StringTokenizer(line, ",");
 	        int k = 0;
-	        while (tokenizer.hasMoreTokens()) {
+	        while (tokenizer.hasMoreTokens())
 	            tokens[k++] = tokenizer.nextToken().trim();
-	        }
 	        
+	        int valid = Integer.parseInt(tokens[VALID]);
+	        if (valid == 1) {
+	        	makeNucleus(tld, time, tokens);
+	        }
 		}
 		
 		reader.close();
+	}
+	
+	private static void makeNucleus(TableLineageData tld, int time, String[] tokens) {
+		try {
+			String name = tokens[IDENTITY];
+	        int x = Integer.parseInt(tokens[XCOR]);
+	        int y = Integer.parseInt(tokens[YCOR]);
+	        int z = (int) Math.round(Double.parseDouble(tokens[ZCOR]));
+	        int diameter = Integer.parseInt(tokens[DIAMETER]);
+	
+	        tld.addNucleus(time, name, x, y, z, diameter);
+		}
+		catch (NumberFormatException nfe) {
+			System.out.println("Incorrect format in nucleus file for time " + time + ".");
+		}
 	}
 	
 	public static void main (String[] args) {

@@ -43,15 +43,27 @@ public class TableLineageData implements LineageData{
 		timeFrames.add(frame);
 	}
 	
-	private void addNucleus(int time, String name, int x, int y, int z, int diameter) {
-		int index = time - 1;
-		timeFrames.get(index).addName(name);
-		Integer[] position = new Integer[]{x, y, z};
-		timeFrames.get(index).addPosition(position);
-		timeFrames.get(index).addDiameter(diameter);
+	public void addNucleus(int time, String name, int x, int y, int z, int diameter) {
+		//System.out.println("time"+time+",size:"+getSize());
+		if (time <= getSize()) {
+			int index = time - 1;
+			Frame frame = timeFrames.get(index);
+			frame.addName(name);
+			Integer[] position = new Integer[]{x, y, z};
+			frame.addPosition(position);
+			frame.addDiameter(diameter);
+		}
+	}
+	
+	public String toString() {
+		String out = "";
+		int totalFrames = getSize();
+		for (int i = 0; i < totalFrames; i++)
+			out += i + Frame.NEWLINE + timeFrames.get(i).toString() + Frame.NEWLINE;
+		
+		return out;
 	}
 
-	
 	private class Frame {
 		private ArrayList<String> names;
 		private ArrayList<Integer[]> positions;
@@ -98,6 +110,17 @@ public class TableLineageData implements LineageData{
 		private Integer[] getDiameters() {
 			return diameters.toArray(new Integer[diameters.size()]);
 		}
+		
+		public String toString() {
+			String out = "";
+			String[] names = getNames();
+			for (int i = 0; i < names.length; i++) {
+				out += names[i] + NEWLINE;
+			}
+			return out;
+		}
+		
+		private final static String NEWLINE = "\n";
 	}
 
 }

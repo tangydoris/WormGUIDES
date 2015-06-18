@@ -47,10 +47,8 @@ public class MainApp extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
-		
-		//String classpath = System.getProperty("java.class.path");
-		//System.out.println("Classpath: " + classpath);
-		//TableLineageData tableData = AceTreeLoader.loadNucFiles("nuclei_files");
-		AceTreeLoader.loadNucFiles("./nuclei_files");
+		AceTreeLoader.loadNucFiles(JAR_NAME);
 	}
+	
+	private static final String JAR_NAME = "WormGUIDES.jar";
 }
