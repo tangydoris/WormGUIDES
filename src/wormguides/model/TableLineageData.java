@@ -59,7 +59,7 @@ public class TableLineageData implements LineageData{
 		String out = "";
 		int totalFrames = getSize();
 		for (int i = 0; i < totalFrames; i++)
-			out += i + Frame.NEWLINE + timeFrames.get(i).toString() + Frame.NEWLINE;
+			out += (i+1) + Frame.NEWLINE + timeFrames.get(i).toString() + Frame.NEWLINE;
 		
 		return out;
 	}
