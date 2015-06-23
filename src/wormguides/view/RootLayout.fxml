@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.*?>
@@ -75,7 +76,7 @@
                   <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                </padding>
                <center>
-                  <AnchorPane fx:id="window3DContainer" style="-fx-border-color: grey;" BorderPane.alignment="CENTER" />
+                  <AnchorPane fx:id="modelAnchorPane" style="-fx-border-color: grey;" BorderPane.alignment="CENTER" />
                </center>
 				</BorderPane>
 			</children>
