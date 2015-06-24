@@ -4,7 +4,7 @@
 // 3D Graphics tutorial. The method allows you to add your own transforms and rotation.
 // 
 
-package wormguides.model;
+package wormguides.view;
 
 import javafx.scene.Group;
 import javafx.scene.transform.Rotate;

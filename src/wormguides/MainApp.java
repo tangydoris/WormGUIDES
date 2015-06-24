@@ -3,8 +3,8 @@ package wormguides;
 import java.io.IOException;
 
 import wormguides.model.TableLineageData;
-import wormguides.model.Xform;
 import wormguides.view.Window3DSubScene;
+import wormguides.view.Xform;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -21,7 +21,7 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
-	private AnchorPane subSceneContainer;
+	private AnchorPane subsceneContainer;
 	private SubScene subscene;
 
 	public MainApp() {
@@ -51,8 +51,8 @@ public class MainApp extends Application {
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             
-            this.subSceneContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
-            if (subSceneContainer == null) {
+            this.subsceneContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
+            if (subsceneContainer == null) {
             	System.out.println("Cannot get 3D model container");
             }
 
@@ -64,14 +64,12 @@ public class MainApp extends Application {
 	
 	public void init3DWindow() {
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		Window3DSubScene window3D = new Window3DSubScene(data);
-		SubScene subScene = window3D.getSubScene();
 		
-		subSceneContainer.getChildren().add(subScene);
-		AnchorPane.setTopAnchor(subScene,  5.0);
-		AnchorPane.setLeftAnchor(subScene,  5.0);
-		AnchorPane.setRightAnchor(subScene,  5.0);
-		AnchorPane.setBottomAnchor(subScene,  5.0);
+		Double width = subsceneContainer.prefWidth(-1);
+		Double height = subsceneContainer.prefHeight(-1);
+		
+		Window3DSubScene window3D = new Window3DSubScene(width, height, data);
+		subsceneContainer.getChildren().add(window3D.getSubScene());
 	}
 	
 	public static void main(String[] args) {
@@ -80,4 +78,5 @@ public class MainApp extends Application {
 	
 	private static final String JAR_NAME = "WormGUIDES.jar";
 	private static final String MODEL_COTNAINER_ID = "#modelAnchorPane";
+	private static final String CS = ", ";
 }
