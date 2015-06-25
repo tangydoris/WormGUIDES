@@ -1,16 +1,15 @@
 package wormguides.view;
 
 import wormguides.model.TableLineageData;
-import javafx.scene.Camera;
+import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -41,13 +40,24 @@ public class Window3DSubScene {
 	}
 	
 	private SubScene createSubScene(Double width, Double height) {
-		this.subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
+		this.subscene = new SubScene(root, width+5, height+9, true, SceneAntialiasing.DISABLED);
 		AnchorPane.setTopAnchor(subscene,  0.0);
 		AnchorPane.setLeftAnchor(subscene,  0.0);
 		AnchorPane.setRightAnchor(subscene,  0.0);
 		AnchorPane.setBottomAnchor(subscene,  0.0);
 		subscene.setFill(Color.GREY);
-		subscene.setCursor(Cursor.OPEN_HAND);
+		subscene.setCursor(Cursor.HAND);
+		
+		subscene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent me) {
+				subscene.setCursor(Cursor.CLOSED_HAND);
+			}
+		});
+		subscene.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent me) {
+				subscene.setCursor(Cursor.HAND);
+			}
+		});
 		
 		buildCamera();
 		
@@ -56,8 +66,6 @@ public class Window3DSubScene {
 		//addCylinder();
 		addSphere();
 
-		System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());
-		
 		return subscene;
 	}
 	

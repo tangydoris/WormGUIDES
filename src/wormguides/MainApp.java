@@ -4,16 +4,12 @@ import java.io.IOException;
 
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
-import wormguides.view.Xform;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -35,7 +31,6 @@ public class MainApp extends Application {
 		this.primaryStage.setTitle("WormGUIDES");
 
 		initRootLayout();
-		init3DWindow();
 		
 		primaryStage.setResizable(false);
 		primaryStage.show();
@@ -55,6 +50,9 @@ public class MainApp extends Application {
             if (subsceneContainer == null) {
             	System.out.println("Cannot get 3D model container");
             }
+            else {
+            	init3DWindow();
+            }
 
         } catch (IOException e) {
         	System.out.println("Could not initialize root layout.");
@@ -69,7 +67,9 @@ public class MainApp extends Application {
 		Double height = subsceneContainer.prefHeight(-1);
 		
 		Window3DSubScene window3D = new Window3DSubScene(width, height, data);
-		subsceneContainer.getChildren().add(window3D.getSubScene());
+		SubScene subscene = window3D.getSubScene();
+		subsceneContainer.getChildren().add(subscene);
+		System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());
 	}
 	
 	public static void main(String[] args) {
