@@ -22,7 +22,7 @@ public class AceTreeLoader {
 			JarFile jarFile = new JarFile(new File(filePath));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
-			int time = 1;
+			int time = 0;
 			
 			JarEntry entry;
 			while (entries.hasMoreElements()){

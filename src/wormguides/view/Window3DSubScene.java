@@ -13,7 +13,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
@@ -106,10 +105,10 @@ public class Window3DSubScene {
 		Integer[] diameters = data.getDiameters(time);
 		
 		int totalCells = names.length;
-		System.out.println(totalCells);
+		//System.out.println(totalCells);
 		
 		for (int i = 0; i < totalCells; i++) {
-			System.out.println(names[i]);
+			//System.out.println(names[i]);
 			addCellToScene(names[i], positions[i], diameters[i]);
 		}
 	}
@@ -126,7 +125,7 @@ public class Window3DSubScene {
         sphere.setTranslateZ(position[Z_COR]);
         
         root.getChildren().add(sphere);
-        System.out.println("added "+name);
+        System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
 	}
 	
 	private Color getColorRule(String name) {
@@ -223,12 +222,12 @@ public class Window3DSubScene {
 	
 	private static final String CS = ", ";
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -500;
+	private static final double CAMERA_INITIAL_DISTANCE = -3000;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     
     private static final double CAMERA_NEAR_CLIP = 0.1;
-    private static final double CAMERA_FAR_CLIP = 10000.0;
+    private static final double CAMERA_FAR_CLIP = 1000000.0;
     
     private static final double AXIS_LENGTH = 250.0;
     

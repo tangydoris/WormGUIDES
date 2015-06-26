@@ -15,12 +15,7 @@ public class TableLineageData implements LineageData{
 		if (time >= getTotalTimePoints() || time < 0)
 			return null;
 		else {
-			//return timeFrames.get(time).getNames();
-			
-			String[] names = timeFrames.get(time).getNames();
-			for (int i = 0; i < names.length; i++)
-				System.out.println(names[i]);
-			return names;
+			return timeFrames.get(time).getNames();
 		}
 	}
 
@@ -106,12 +101,15 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private String[] getNames() {
-			//return names.toArray(new String[names.size()]);
+			return names.toArray(new String[names.size()]);
+			/*
+			System.out.println("1"+CS+names.size());
 			String[] out = new String[names.size()];
 			names.toArray(out);
-			System.out.println(out.length);
+			System.out.println("2"+CS+out.length);
 			
 			return out;
+			*/
 		}
 		
 		private Integer[][] getPositions() {
@@ -132,6 +130,7 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private final static String NEWLINE = "\n";
+		private final static String CS = ", ";
 	}
 
 }
