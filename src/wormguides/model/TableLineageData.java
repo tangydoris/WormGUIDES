@@ -12,7 +12,7 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public String[] getNames(int time) {
-		if (time >= getSize() || time < 0)
+		if (time >= getTotalTimePoints() || time < 0)
 			return null;
 		else
 			return timeFrames.get(time).getNames();
@@ -20,7 +20,7 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public Integer[][] getPositions(int time) {
-		if (time >= getSize() || time < 0)
+		if (time >= getTotalTimePoints() || time < 0)
 			return null;
 		else
 			return timeFrames.get(time).getPositions();
@@ -28,13 +28,13 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public Integer[] getDiameters(int time) {
-		if (time >= getSize() || time < 0)
+		if (time >= getTotalTimePoints() || time < 0)
 			return null;
 		else
 			return timeFrames.get(time).getDiameters();
 	}
 	
-	public int getSize() {
+	public int getTotalTimePoints() {
 		return timeFrames.size();
 	}
 	
@@ -45,7 +45,7 @@ public class TableLineageData implements LineageData{
 	
 	public void addNucleus(int time, String name, int x, int y, int z, int diameter) {
 		//System.out.println("time"+time+",size:"+getSize());
-		if (time <= getSize()) {
+		if (time <= getTotalTimePoints()) {
 			int index = time - 1;
 			Frame frame = timeFrames.get(index);
 			frame.addName(name);
@@ -57,7 +57,7 @@ public class TableLineageData implements LineageData{
 	
 	public String toString() {
 		String out = "";
-		int totalFrames = getSize();
+		int totalFrames = getTotalTimePoints();
 		for (int i = 0; i < totalFrames; i++)
 			out += (i+1) + Frame.NEWLINE + timeFrames.get(i).toString() + Frame.NEWLINE;
 		

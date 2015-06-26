@@ -4,7 +4,7 @@
 // 3D Graphics tutorial. The method allows you to add your own transforms and rotation.
 // 
 
-package wormguides.view;
+package wormguides;
 
 import javafx.scene.Group;
 import javafx.scene.transform.Rotate;
@@ -91,6 +91,9 @@ public class Xform extends Group {
     public void setRx(double x) { rx.setAngle(x); }
     public void setRy(double y) { ry.setAngle(y); }
     public void setRz(double z) { rz.setAngle(z); }
+    
+    public double getRotateX() { return rx.getAngle(); }
+    public double getRotateY() { return ry.getAngle(); }
 
     public void setScale(double scaleFactor) {
         s.setX(scaleFactor);

@@ -1,5 +1,6 @@
 package wormguides.view;
 
+import wormguides.Xform;
 import wormguides.model.TableLineageData;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -24,33 +25,46 @@ public class Window3DSubScene {
 	private Group root;
 	private PerspectiveCamera camera;
 	
-	private Xform world;
+	private double mousePosX, mousePosY;
+	private double mouseOldX, mouseOldY;
+	private double mouseDeltaX, mouseDeltaY;
 	
-	private Xform cameraXform = new Xform();
-    private Xform cameraXform2 = new Xform();
-    private Xform cameraXform3 = new Xform();
+	private Xform cameraXform;
     
     private Xform axisGroup = new Xform();
 	
 	public Window3DSubScene(Double width, Double height, TableLineageData data) {
 		this.data = data;
 		this.root = new Group();
-		this.world = new Xform();
 		this.subscene = createSubScene(width, height);
+		
+		this.mousePosX = 0;
+		this.mousePosY = 0;
 	}
 	
 	private SubScene createSubScene(Double width, Double height) {
-		this.subscene = new SubScene(root, width+5, height+9, true, SceneAntialiasing.DISABLED);
+		this.subscene = new SubScene(root, width, height-40, true, SceneAntialiasing.DISABLED);
 		AnchorPane.setTopAnchor(subscene,  0.0);
 		AnchorPane.setLeftAnchor(subscene,  0.0);
 		AnchorPane.setRightAnchor(subscene,  0.0);
-		AnchorPane.setBottomAnchor(subscene,  0.0);
 		subscene.setFill(Color.GREY);
 		subscene.setCursor(Cursor.HAND);
 		
 		subscene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
 				subscene.setCursor(Cursor.CLOSED_HAND);
+				
+				mouseOldX = mousePosX;
+                mouseOldY = mousePosY;
+                mousePosX = me.getX();
+                mousePosY = me.getY();
+                mouseDeltaX = (mousePosX - mouseOldX)/2;
+                mouseDeltaY = (mousePosY - mouseOldY)/2;
+                
+                double ryAngle = cameraXform.getRotateX();
+                cameraXform.setRotateY(ryAngle - mouseDeltaX);
+                double rxAngle = cameraXform.getRotateY();
+                cameraXform.setRotateX(rxAngle + mouseDeltaY);
 			}
 		});
 		subscene.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -58,17 +72,34 @@ public class Window3DSubScene {
 				subscene.setCursor(Cursor.HAND);
 			}
 		});
+		subscene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent me) {
+				// TODO implement mouse click action
+			}
+		});
+		subscene.setOnMousePressed(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent me) {
+				mousePosX = me.getX();
+				mousePosY = me.getY();
+			}
+		});
 		
 		buildCamera();
-		
-		//buildAxes();
-		
-		//addCylinder();
-		addSphere();
-
+		addLight();
+		buildScene(START_TIME);
 		return subscene;
 	}
 	
+	// Builds subscene for a given timpoint
+	public void buildScene(int time) {
+		String[] names = data.getNames(time);
+		Integer[][] positions = data.getPositions(time);
+		Integer[] diameters = data.getDiameters(time);
+		
+		
+	}
+	
+	// Builds subscene with x- y- z-axes
 	private void buildAxes() {
 		PhongMaterial redMaterial = new PhongMaterial();
         redMaterial.setDiffuseColor(Color.DARKRED);
@@ -90,19 +121,16 @@ public class Window3DSubScene {
         yAxis.setMaterial(greenMaterial);
         zAxis.setMaterial(blueMaterial);
  
-        axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
-        axisGroup.setVisible(true);
-        world.getChildren().addAll(axisGroup);
+        root.getChildren().addAll(xAxis, yAxis, zAxis);
 	}
 	
 	private void buildCamera() {
 		this.camera = new PerspectiveCamera(true);
+		this.cameraXform = new Xform();
+		cameraXform.reset();
 		
 		root.getChildren().add(cameraXform);
-        cameraXform.getChildren().add(cameraXform2);
-        cameraXform2.getChildren().add(cameraXform3);
-        cameraXform3.getChildren().add(camera);
-        cameraXform3.setRotateZ(0.0);
+		cameraXform.getChildren().add(camera);
         
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
@@ -126,6 +154,9 @@ public class Window3DSubScene {
 		pinkMaterial.setSpecularColor(Color.ORCHID);
 		Cylinder cylinder = new Cylinder(1, 20);
 		cylinder.setMaterial(pinkMaterial);
+		cylinder.setTranslateX(10);
+		cylinder.setTranslateY(5);
+		cylinder.setTranslateZ(20);
 		root.getChildren().add(cylinder);
 	}
 	
@@ -136,7 +167,7 @@ public class Window3DSubScene {
         material.setSpecularColor(Color.WHITE);
         sphere.setMaterial(material);
         sphere.setTranslateX(10);
-        //sphere.setTranslateY(30);
+        sphere.setTranslateY(30);
         root.getChildren().add(sphere);
 	}
 	
@@ -150,7 +181,7 @@ public class Window3DSubScene {
 	
 	private static final String CS = ", ";
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -400;
+	private static final double CAMERA_INITIAL_DISTANCE = -500;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     
@@ -158,4 +189,6 @@ public class Window3DSubScene {
     private static final double CAMERA_FAR_CLIP = 10000.0;
     
     private static final double AXIS_LENGTH = 250.0;
+    
+    private static final int START_TIME = 0;
 }

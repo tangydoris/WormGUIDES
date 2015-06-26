@@ -8,16 +8,21 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
 	
+	private Scene scene;
+	
 	private Stage primaryStage;
 	private BorderPane rootLayout;
+
+	private AnchorPane modelContainer;
+	private Slider timeSlider;
 	
-	private AnchorPane subsceneContainer;
 	private SubScene subscene;
 
 	public MainApp() {
@@ -43,16 +48,11 @@ public class MainApp extends Application {
             loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
             rootLayout = (BorderPane) loader.load();
             
-            Scene scene = new Scene(rootLayout);
+            this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             
-            this.subsceneContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
-            if (subsceneContainer == null) {
-            	System.out.println("Cannot get 3D model container");
-            }
-            else {
-            	init3DWindow();
-            }
+            fetchUIComponents();
+            init3DWindow();
 
         } catch (IOException e) {
         	System.out.println("Could not initialize root layout.");
@@ -60,16 +60,25 @@ public class MainApp extends Application {
         }
 	}
 	
+	private void fetchUIComponents() {
+		this.modelContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
+		this.timeSlider = (Slider)(scene.lookup(SLIDER_ID));
+	}
+	
 	public void init3DWindow() {
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
 		
-		Double width = subsceneContainer.prefWidth(-1);
-		Double height = subsceneContainer.prefHeight(-1);
-		
-		Window3DSubScene window3D = new Window3DSubScene(width, height, data);
-		SubScene subscene = window3D.getSubScene();
-		subsceneContainer.getChildren().add(subscene);
-		System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());
+		try {
+			Double width = modelContainer.prefWidth(-1);
+			Double height = modelContainer.prefHeight(-1);
+			
+			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
+			SubScene subscene = window3D.getSubScene();
+			modelContainer.getChildren().add(subscene);
+			//System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());
+		} catch (NullPointerException npe) {
+			System.out.println("Cannot display 3D model view - could not fetch view container.");
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -77,6 +86,9 @@ public class MainApp extends Application {
 	}
 	
 	private static final String JAR_NAME = "WormGUIDES.jar";
+	
 	private static final String MODEL_COTNAINER_ID = "#modelAnchorPane";
+	private static final String SLIDER_ID = "#timeSlider";
+	
 	private static final String CS = ", ";
 }
