@@ -14,8 +14,14 @@ public class TableLineageData implements LineageData{
 	public String[] getNames(int time) {
 		if (time >= getTotalTimePoints() || time < 0)
 			return null;
-		else
-			return timeFrames.get(time).getNames();
+		else {
+			//return timeFrames.get(time).getNames();
+			
+			String[] names = timeFrames.get(time).getNames();
+			for (int i = 0; i < names.length; i++)
+				System.out.println(names[i]);
+			return names;
+		}
 	}
 
 	@Override
@@ -64,7 +70,7 @@ public class TableLineageData implements LineageData{
 		return out;
 	}
 
-	private class Frame {
+	public class Frame {
 		private ArrayList<String> names;
 		private ArrayList<Integer[]> positions;
 		private ArrayList<Integer> diameters;
@@ -100,7 +106,12 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private String[] getNames() {
-			return names.toArray(new String[names.size()]);
+			//return names.toArray(new String[names.size()]);
+			String[] out = new String[names.size()];
+			names.toArray(out);
+			System.out.println(out.length);
+			
+			return out;
 		}
 		
 		private Integer[][] getPositions() {

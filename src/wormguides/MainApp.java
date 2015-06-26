@@ -72,7 +72,7 @@ public class MainApp extends Application {
 			Double width = modelContainer.prefWidth(-1);
 			Double height = modelContainer.prefHeight(-1);
 			
-			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
+			Window3DSubScene window3D = new Window3DSubScene(width, height, data, timeSlider);
 			SubScene subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
 			//System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());

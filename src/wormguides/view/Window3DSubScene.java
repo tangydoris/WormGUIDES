@@ -9,9 +9,11 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
@@ -22,6 +24,7 @@ public class Window3DSubScene {
 	
 	private TableLineageData data;
 	private SubScene subscene;
+	private Slider timeSlider;
 	private Group root;
 	private PerspectiveCamera camera;
 	
@@ -33,13 +36,19 @@ public class Window3DSubScene {
     
     private Xform axisGroup = new Xform();
 	
-	public Window3DSubScene(Double width, Double height, TableLineageData data) {
-		this.data = data;
+	public Window3DSubScene(Double width, Double height, TableLineageData data, Slider timeSlider) {
 		this.root = new Group();
+		this.data = data;
+		//System.out.println(this.data.toString());
 		this.subscene = createSubScene(width, height);
+		this.timeSlider = timeSlider;
 		
 		this.mousePosX = 0;
 		this.mousePosY = 0;
+		this.mouseOldX = 0;
+		this.mouseOldY = 0;
+		this.mouseDeltaX = 0;
+		this.mouseDeltaY = 0;
 	}
 	
 	private SubScene createSubScene(Double width, Double height) {
@@ -91,12 +100,45 @@ public class Window3DSubScene {
 	}
 	
 	// Builds subscene for a given timpoint
-	public void buildScene(int time) {
+	private void buildScene(int time) {
 		String[] names = data.getNames(time);
 		Integer[][] positions = data.getPositions(time);
 		Integer[] diameters = data.getDiameters(time);
 		
+		int totalCells = names.length;
+		System.out.println(totalCells);
 		
+		for (int i = 0; i < totalCells; i++) {
+			System.out.println(names[i]);
+			addCellToScene(names[i], positions[i], diameters[i]);
+		}
+	}
+	
+	private void addCellToScene(String name, Integer[] position, Integer diameter) {
+		Sphere sphere = new Sphere(diameter/2);
+		Color color = getColorRule(name);
+		PhongMaterial material = new PhongMaterial();
+        material.setDiffuseColor(color);
+        material.setSpecularColor(color);
+        sphere.setMaterial(material);
+        sphere.setTranslateX(position[X_COR]);
+        sphere.setTranslateY(position[Y_COR]);
+        sphere.setTranslateZ(position[Z_COR]);
+        
+        root.getChildren().add(sphere);
+        System.out.println("added "+name);
+	}
+	
+	private Color getColorRule(String name) {
+		name = name.toLowerCase();
+		if (name.startsWith("aba"))
+			return Color.RED;
+		else if (name.startsWith("abp"))
+			return Color.BLUE;
+		else if (name.startsWith("p"))
+			return Color.YELLOW;
+		
+		return Color.WHITE;
 	}
 	
 	// Builds subscene with x- y- z-axes
@@ -191,4 +233,7 @@ public class Window3DSubScene {
     private static final double AXIS_LENGTH = 250.0;
     
     private static final int START_TIME = 0;
+    private static final int X_COR = 0;
+    private static final int Y_COR = 1;
+    private static final int Z_COR = 2;
 }

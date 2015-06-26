@@ -51,7 +51,7 @@ public class AceTreeLoader {
 		BufferedReader reader = new BufferedReader(isr);
 		String line;
 		while ((line = reader.readLine()) != null) {
-			String[] tokens = new String[21];
+			String[] tokens = new String[TOKEN_ARRAY_SIZE];
 			StringTokenizer tokenizer = new StringTokenizer(line, ",");
 	        int k = 0;
 	        while (tokenizer.hasMoreTokens())
@@ -85,9 +85,10 @@ public class AceTreeLoader {
 		loadNucFiles(JAR_NAME);
 	}
 	
-	final private static String ENTRY_PREFIX = "wormguides/nuclei_files/";
-	final private static String JAR_NAME = "WormGUIDES.jar";
-	final private static int
+	private static final String ENTRY_PREFIX = "wormguides/nuclei_files/";
+	private static final String JAR_NAME = "WormGUIDES.jar";
+	private static final int TOKEN_ARRAY_SIZE = 21;
+	private static int
 		VALID = 1,
 		XCOR = 5,
 		YCOR = 6,
