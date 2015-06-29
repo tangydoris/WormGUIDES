@@ -17,7 +17,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -100,10 +99,7 @@ public class Window3DSubScene implements Runnable{
 	
 	private SubScene createSubScene(Double width, Double height) {
 		this.subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
-		AnchorPane.setTopAnchor(subscene,  0.0);
-		AnchorPane.setLeftAnchor(subscene,  0.0);
-		AnchorPane.setRightAnchor(subscene,  0.0);
-		AnchorPane.setBottomAnchor(subscene,  40.0);
+
 		subscene.setFill(Color.GREY);
 		subscene.setCursor(Cursor.HAND);
 		

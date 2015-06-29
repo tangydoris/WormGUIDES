@@ -5,8 +5,6 @@ import java.io.IOException;
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -36,8 +34,7 @@ public class MainApp extends Application {
 	
 	private SubScene subscene;
 	private ObservableValue<Number> subsceneWidth;
-
-	private ObservableValue<Integer> subsceneHeight;
+	private ObservableValue<Number> subsceneHeight;
 
 	public MainApp() {
 	}
@@ -103,16 +100,27 @@ public class MainApp extends Application {
 			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
 			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
-			
-			//subscene.heightProperty().bind(modelContainer.heightProperty());
-			//subscene.widthProperty().bind(modelContainer.widthProperty());
-			
+			sizeSubsceneRelativeToParent();
 			window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton);
 			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
 			npe.printStackTrace();
 		}
+	}
+	
+	private void sizeSubsceneRelativeToParent() {
+		this.subsceneWidth = (ObservableValue<Number>)(modelContainer.widthProperty());
+		this.subsceneHeight = (ObservableValue<Number>)(modelContainer.heightProperty().subtract(38));
+		
+		AnchorPane.setTopAnchor(subscene,  0.0);
+		AnchorPane.setLeftAnchor(subscene,  0.0);
+		AnchorPane.setRightAnchor(subscene,  0.0);
+		AnchorPane.setBottomAnchor(subscene,  38.0);
+		
+		subscene.widthProperty().bind(subsceneWidth);
+		subscene.heightProperty().bind(subsceneHeight);
+		subscene.setManaged(false);
 	}
 	
 	public static void main(String[] args) {
