@@ -5,6 +5,10 @@ import java.io.IOException;
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
@@ -13,6 +17,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class MainApp extends Application {
 	
@@ -30,6 +35,9 @@ public class MainApp extends Application {
 	private Button playButton;
 	
 	private SubScene subscene;
+	private ObservableValue<Number> subsceneWidth;
+
+	private ObservableValue<Integer> subsceneHeight;
 
 	public MainApp() {
 	}
@@ -43,8 +51,16 @@ public class MainApp extends Application {
 
 		initRootLayout();
 		
-		primaryStage.setResizable(false);
+		primaryStage.setResizable(true);
 		primaryStage.show();
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				System.out.println("exiting...");
+				System.exit(0);
+			}
+		});
 	}
 	
 	public void initRootLayout() {
@@ -56,6 +72,9 @@ public class MainApp extends Application {
             
             this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
+            
+            primaryStage.minWidthProperty().bind(scene.heightProperty());
+            primaryStage.minHeightProperty().bind(scene.widthProperty());
             
             fetchUIComponents();
             init3DWindow();
@@ -84,6 +103,10 @@ public class MainApp extends Application {
 			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
 			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
+			
+			//subscene.heightProperty().bind(modelContainer.heightProperty());
+			//subscene.widthProperty().bind(modelContainer.widthProperty());
+			
 			window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton);
 			
 		} catch (NullPointerException npe) {

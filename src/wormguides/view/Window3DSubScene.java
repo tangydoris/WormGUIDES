@@ -99,10 +99,11 @@ public class Window3DSubScene implements Runnable{
 	}
 	
 	private SubScene createSubScene(Double width, Double height) {
-		this.subscene = new SubScene(root, width, height-40, true, SceneAntialiasing.DISABLED);
+		this.subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
 		AnchorPane.setTopAnchor(subscene,  0.0);
 		AnchorPane.setLeftAnchor(subscene,  0.0);
 		AnchorPane.setRightAnchor(subscene,  0.0);
+		AnchorPane.setBottomAnchor(subscene,  40.0);
 		subscene.setFill(Color.GREY);
 		subscene.setCursor(Cursor.HAND);
 		
@@ -315,7 +316,8 @@ public class Window3DSubScene implements Runnable{
             while (playingMovie) {
                 try {
                 	Thread.sleep(500);
-                	timeSlider.setValue(++time);
+                	//timeSlider.setValue(++time);
+                	System.out.println("hello");
                 } catch (Exception e) {
                 	e.printStackTrace();
                 }

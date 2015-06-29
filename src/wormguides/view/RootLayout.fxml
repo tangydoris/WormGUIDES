@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" BorderPane.alignment="CENTER">
         <menus>
@@ -37,7 +37,7 @@
 			        <tabs>
 			          <Tab text="Data">
 			            <content>
-			              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+			              <AnchorPane prefHeight="180.0" prefWidth="200.0" />
 			            </content>
 			          </Tab>
 			          <Tab text="Search">
@@ -72,12 +72,12 @@
                   <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                </padding>
                <center>
-                  <AnchorPane fx:id="modelAnchorPane" maxHeight="608.0" maxWidth="554.0" minHeight="608.0" minWidth="554.0" prefHeight="608.0" prefWidth="554.0" BorderPane.alignment="CENTER">
+                  <AnchorPane fx:id="modelAnchorPane" prefHeight="608.0" prefWidth="554.0" BorderPane.alignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                      <children>
-                        <Slider fx:id="timeSlider" layoutX="50.0" layoutY="580.0" prefHeight="23.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="5.0" />
+                        <Slider fx:id="timeSlider" layoutX="50.0" layoutY="580.0" prefHeight="23.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="129.0" AnchorPane.rightAnchor="5.0" />
                         <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                         <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="43.0" />
                         <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="86.0" />
