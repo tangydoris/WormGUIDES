@@ -6,6 +6,7 @@ import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -58,6 +59,7 @@ public class MainApp extends Application {
 				System.exit(0);
 			}
 		});
+		
 	}
 	
 	public void initRootLayout() {
@@ -111,12 +113,12 @@ public class MainApp extends Application {
 	
 	private void sizeSubsceneRelativeToParent() {
 		this.subsceneWidth = (ObservableValue<Number>)(modelContainer.widthProperty());
-		this.subsceneHeight = (ObservableValue<Number>)(modelContainer.heightProperty().subtract(38));
+		this.subsceneHeight = (ObservableValue<Number>)(modelContainer.heightProperty().subtract(33));
 		
 		AnchorPane.setTopAnchor(subscene,  0.0);
 		AnchorPane.setLeftAnchor(subscene,  0.0);
 		AnchorPane.setRightAnchor(subscene,  0.0);
-		AnchorPane.setBottomAnchor(subscene,  38.0);
+		AnchorPane.setBottomAnchor(subscene,  33.0);
 		
 		subscene.widthProperty().bind(subsceneWidth);
 		subscene.heightProperty().bind(subsceneHeight);

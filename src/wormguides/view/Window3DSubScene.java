@@ -4,6 +4,7 @@ import wormguides.Xform;
 import wormguides.model.TableLineageData;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -22,7 +23,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Translate;
 
-public class Window3DSubScene implements Runnable{
+public class Window3DSubScene{
 	
 	private TableLineageData data;
 	private SubScene subscene;
@@ -45,12 +46,14 @@ public class Window3DSubScene implements Runnable{
 	private boolean playingMovie;
 	private Image playIcon, pauseIcon;
 	
-	private Thread thread;
-	private final Object waitLock = new Object();
+	//private Thread thread;
+	//private final Object waitLock = new Object();
+	private Task<Void> task;
+	
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
-		this.thread = new Thread(this);
-		thread.start();
+		//this.thread = new Thread(this);
+		//thread.start();
 		
 		this.root = new Group();
 		this.data = data;
@@ -66,6 +69,25 @@ public class Window3DSubScene implements Runnable{
 		
 		this.playingMovie = false;
 		loadPlayPauseIcons();
+		
+		this.task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				System.out.println("start");
+				while (true) {
+					timeSlider.setValue(++time);
+					try {
+	                    Thread.sleep(500);
+	                 } catch (InterruptedException interrupted) {
+	                     if (isCancelled()) {
+	                         System.out.println("Cancelled");
+	                         break;
+	                     }
+	                 }
+				}
+				return null;
+			}
+		};
 	}
 	
 	private void loadPlayPauseIcons() {
@@ -279,17 +301,18 @@ public class Window3DSubScene implements Runnable{
 					playingMovie = !playingMovie;
 					if (playingMovie) {
 						playButton.setGraphic(new ImageView(pauseIcon));
-						start();
+						task.run();
 					}
 					else {
 						playButton.setGraphic(new ImageView(playIcon));
-						pause();
+						task.cancel();
 					}
 				}
 			});
 		}
 	}
 	
+	/*
     public void start() {
     	System.out.println("start thread");
         synchronized (waitLock) {
@@ -326,6 +349,7 @@ public class Window3DSubScene implements Runnable{
             }
         }
 	}
+	*/
 	
 	// Accessor methods
 	public SubScene getSubScene() {
