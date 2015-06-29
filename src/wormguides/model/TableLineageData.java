@@ -13,7 +13,7 @@ public class TableLineageData implements LineageData{
 	@Override
 	public String[] getNames(int time) {
 		if (time >= getTotalTimePoints() || time < 0)
-			return null;
+			return new String[1];
 		else {
 			return timeFrames.get(time).getNames();
 		}
@@ -22,7 +22,7 @@ public class TableLineageData implements LineageData{
 	@Override
 	public Integer[][] getPositions(int time) {
 		if (time >= getTotalTimePoints() || time < 0)
-			return null;
+			return new Integer[1][3];
 		else
 			return timeFrames.get(time).getPositions();
 	}
@@ -30,7 +30,7 @@ public class TableLineageData implements LineageData{
 	@Override
 	public Integer[] getDiameters(int time) {
 		if (time >= getTotalTimePoints() || time < 0)
-			return null;
+			return new Integer[1];
 		else
 			return timeFrames.get(time).getDiameters();
 	}
@@ -102,14 +102,6 @@ public class TableLineageData implements LineageData{
 		
 		private String[] getNames() {
 			return names.toArray(new String[names.size()]);
-			/*
-			System.out.println("1"+CS+names.size());
-			String[] out = new String[names.size()];
-			names.toArray(out);
-			System.out.println("2"+CS+out.length);
-			
-			return out;
-			*/
 		}
 		
 		private Integer[][] getPositions() {

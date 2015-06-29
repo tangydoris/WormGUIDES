@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -21,7 +22,12 @@ public class MainApp extends Application {
 	private BorderPane rootLayout;
 
 	private AnchorPane modelContainer;
+
 	private Slider timeSlider;
+	
+	private Button backwardButton;
+	private Button forwardButton;
+	private Button playButton;
 	
 	private SubScene subscene;
 
@@ -63,6 +69,9 @@ public class MainApp extends Application {
 	private void fetchUIComponents() {
 		this.modelContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
 		this.timeSlider = (Slider)(scene.lookup(SLIDER_ID));
+		this.backwardButton = (Button)(scene.lookup(BACKWARD_BUTTON_ID));
+		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
+		this.playButton = (Button)(scene.lookup(PLAY_BUTTON_ID));
 	}
 	
 	public void init3DWindow() {
@@ -72,10 +81,13 @@ public class MainApp extends Application {
 			Double width = modelContainer.prefWidth(-1);
 			Double height = modelContainer.prefHeight(-1);
 			
-			Window3DSubScene window3D = new Window3DSubScene(width, height, data, timeSlider);
-			SubScene subscene = window3D.getSubScene();
+			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
+			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
-			//System.out.println("subScene"+CS+subscene.getHeight()+CS+subscene.getWidth());
+			
+			RootLayoutController controller = new RootLayoutController();
+			window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton);
+			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
 		}
@@ -87,8 +99,12 @@ public class MainApp extends Application {
 	
 	private static final String JAR_NAME = "WormGUIDES.jar";
 	
-	private static final String MODEL_COTNAINER_ID = "#modelAnchorPane";
-	private static final String SLIDER_ID = "#timeSlider";
+	// FXML id's
+	private static final String MODEL_COTNAINER_ID = "#modelAnchorPane",
+			SLIDER_ID = "#timeSlider",
+			BACKWARD_BUTTON_ID = "#backwardButton",
+			FORWARD_BUTTON_ID = "#forwardButton",
+			PLAY_BUTTON_ID = "#playButton";
 	
 	private static final String CS = ", ";
 }
