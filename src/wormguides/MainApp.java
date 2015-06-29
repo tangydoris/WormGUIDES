@@ -84,12 +84,11 @@ public class MainApp extends Application {
 			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
 			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
-			
-			RootLayoutController controller = new RootLayoutController();
 			window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton);
 			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
+			npe.printStackTrace();
 		}
 	}
 	

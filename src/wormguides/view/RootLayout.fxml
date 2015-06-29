@@ -78,7 +78,7 @@
                      </cursor>
                      <children>
                         <Slider fx:id="timeSlider" layoutX="50.0" layoutY="580.0" prefHeight="23.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="5.0" />
-                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                         <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="43.0" />
                         <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="86.0" />
                      </children></AnchorPane>

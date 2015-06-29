@@ -4,6 +4,7 @@ import wormguides.Xform;
 import wormguides.model.TableLineageData;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -13,6 +14,8 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -20,7 +23,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Translate;
 
-public class Window3DSubScene {
+public class Window3DSubScene implements Runnable{
 	
 	private TableLineageData data;
 	private SubScene subscene;
@@ -40,7 +43,16 @@ public class Window3DSubScene {
 	private Slider timeSlider;
 	private Button forwardButton, backwardButton, playButton;
 	
+	private boolean playingMovie;
+	private Image playIcon, pauseIcon;
+	
+	private Thread thread;
+	private final Object waitLock = new Object();
+	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
+		this.thread = new Thread(this);
+		thread.start();
+		
 		this.root = new Group();
 		this.data = data;
 		this.time = START_TIME;
@@ -52,6 +64,18 @@ public class Window3DSubScene {
 		this.mouseOldY = 0;
 		this.mouseDeltaX = 0;
 		this.mouseDeltaY = 0;
+		
+		this.playingMovie = false;
+		loadPlayPauseIcons();
+	}
+	
+	private void loadPlayPauseIcons() {
+		try {
+			this.playIcon = new Image(getClass().getResourceAsStream("./icons/play.png"));
+			this.pauseIcon = new Image(getClass().getResourceAsStream("./icons/pause.png"));
+		} catch (NullPointerException npe) {
+			System.out.println("cannot load icons");
+		}
 	}
 	
 	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton) {
@@ -232,18 +256,80 @@ public class Window3DSubScene {
 		}
 		
 		if (backwardButton != null) {
-			
+			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					if (!playingMovie)
+						timeSlider.setValue(--time);
+				}
+			});
 		}
 		
 		if (forwardButton != null) {
-			
+			forwardButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					if (!playingMovie)
+						timeSlider.setValue(++time);
+				}
+			});
 		}
 		
 		if (playButton != null) {
-			
+			playButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public synchronized void handle(ActionEvent event) {
+					playingMovie = !playingMovie;
+					if (playingMovie) {
+						playButton.setGraphic(new ImageView(pauseIcon));
+						start();
+					}
+					else {
+						playButton.setGraphic(new ImageView(playIcon));
+						pause();
+					}
+				}
+			});
 		}
 	}
 	
+    public void start() {
+    	System.out.println("start thread");
+        synchronized (waitLock) {
+            playingMovie = true;
+            waitLock.notify();
+        }
+    }
+    
+    public void pause() {
+    	System.out.println("pause thread");
+        synchronized (waitLock) {
+            playingMovie = false;
+            waitLock.notify();
+        }
+    }
+    
+	@Override
+	public void run() {
+		while (true) {
+            while (playingMovie) {
+                try {
+                	Thread.sleep(500);
+                	timeSlider.setValue(++time);
+                } catch (Exception e) {
+                	e.printStackTrace();
+                }
+            }
+            try {
+                synchronized (waitLock) {
+                    waitLock.wait();
+                }
+            } catch (Exception e) {
+            }
+        }
+	}
+	
+	// Accessor methods
 	public SubScene getSubScene() {
 		return subscene;
 	}
@@ -251,6 +337,7 @@ public class Window3DSubScene {
 	public Group getRoot() {
 		return root;
 	}
+	
 	
 	private static final String CS = ", ";
 	
