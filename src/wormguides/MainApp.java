@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -32,6 +33,8 @@ public class MainApp extends Application {
 	private Button backwardButton;
 	private Button forwardButton;
 	private Button playButton;
+	
+	private TextField searchTextField;
 	
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
@@ -90,6 +93,7 @@ public class MainApp extends Application {
 		this.backwardButton = (Button)(scene.lookup(BACKWARD_BUTTON_ID));
 		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
 		this.playButton = (Button)(scene.lookup(PLAY_BUTTON_ID));
+		this.searchTextField = (TextField)(scene.lookup(SEARCH_TEXTFIELD_ID));
 	}
 	
 	public void init3DWindow() {
@@ -103,7 +107,9 @@ public class MainApp extends Application {
 			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
 			sizeSubsceneRelativeToParent();
-			window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton);
+			//window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton, searchTextField);
+			
+			timeSlider.valueProperty().addListener(window3D.getSliderListener());
 			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
@@ -138,7 +144,8 @@ public class MainApp extends Application {
 			SLIDER_ID = "#timeSlider",
 			BACKWARD_BUTTON_ID = "#backwardButton",
 			FORWARD_BUTTON_ID = "#forwardButton",
-			PLAY_BUTTON_ID = "#playButton";
+			PLAY_BUTTON_ID = "#playButton",
+			SEARCH_TEXTFIELD_ID = "#searchTextField";
 	
 	private static final String CS = ", ";
 }

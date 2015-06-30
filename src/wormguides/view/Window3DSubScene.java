@@ -20,6 +20,7 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -49,6 +50,7 @@ public class Window3DSubScene{
     
 	private Slider timeSlider;
 	private Button forwardButton, backwardButton, playButton;
+	private TextField searchTextField;
 	
 	private BooleanProperty playingMovie;
 	private ImageView playIcon, pauseIcon;
@@ -111,11 +113,13 @@ public class Window3DSubScene{
 		}
 	}
 	
-	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton) {
+	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton,
+			TextField searchTextField) {
 		this.timeSlider = timeSlider;
 		this.backwardButton = backwardButton;
 		this.forwardButton = forwardButton;
 		this.playButton = playButton;
+		this.searchTextField = searchTextField;
 		
 		setSliderProperties();
 		addListeners();
@@ -321,17 +325,6 @@ public class Window3DSubScene{
 	
 	// Add listeners to UI components
 	private void addListeners() {
-		if (timeSlider != null) {
-			timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> value, Number oldValue, Number newValue) {
-					time = newValue.intValue();
-					buildScene(time);
-					//System.out.println(newValue.intValue());
-				}
-			});
-		}
-		
 		if (backwardButton != null) {
 			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
@@ -381,6 +374,19 @@ public class Window3DSubScene{
 		return root;
 	}
 	
+	public ChangeListener<Number> getSliderListener() {
+		return new SliderListener();
+	}
+	
+	public class SliderListener implements ChangeListener<Number> {
+		@Override
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			time = newValue.intValue();
+			if (time > 0 & time <= endTime)
+				buildScene(time);
+		}
+	}
+	
 	private class PlayService extends Service<Void>{
 		@Override
 		protected Task<Void> createTask() {
@@ -398,7 +404,7 @@ public class Window3DSubScene{
 							}
 						});
 						try {
-							Thread.sleep(500);
+							Thread.sleep(WAIT_TIME_MILLI);
 						} catch (InterruptedException ie) {
 							break;
 						}
@@ -412,7 +418,9 @@ public class Window3DSubScene{
 	
 	private static final String CS = ", ";
 	
-	private static final String FILL_COLOR_HEX = "#555555";
+	private static final String FILL_COLOR_HEX = "#353535";
+	
+	private static final long WAIT_TIME_MILLI = 400;
 	
 	private static final double CAMERA_INITIAL_DISTANCE = -1000;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
