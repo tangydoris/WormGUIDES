@@ -9,7 +9,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -53,8 +52,6 @@ public class Window3DSubScene{
 	
 	private BooleanProperty playingMovie;
 	private ImageView playIcon, pauseIcon;
-	//private Task<Void> playTask;
-	//private Task<Void> pauseTask;
 	private PlayService playService;
 	
 	private Sphere[] cells;
@@ -137,7 +134,7 @@ public class Window3DSubScene{
 	private SubScene createSubScene(Double width, Double height) {
 		this.subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
 
-		subscene.setFill(Color.GREY);
+		subscene.setFill(Color.web(FILL_COLOR_HEX, 1.0));
 		subscene.setCursor(Cursor.HAND);
 		
 		subscene.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -246,7 +243,7 @@ public class Window3DSubScene{
 			Color color = getColorRule(names[i]);
 			PhongMaterial material = new PhongMaterial();
 	        material.setDiffuseColor(color);
-	        material.setSpecularColor(color);
+	        //material.setSpecularColor(color);
 	        sphere.setMaterial(material);
 	        sphere.setTranslateX(positions[i][X_COR]);
 	        sphere.setTranslateY(positions[i][Y_COR]);
@@ -262,13 +259,13 @@ public class Window3DSubScene{
 	private Color getColorRule(String name) {
 		name = name.toLowerCase();
 		if (name.startsWith("aba"))
-			return Color.RED;
+			return Color.RED.brighter();
 		else if (name.startsWith("abp"))
-			return Color.BLUE;
+			return Color.BLUE.brighter();
 		else if (name.startsWith("p"))
-			return Color.YELLOW;
+			return Color.YELLOW.brighter();
 		else if (name.startsWith("ems"))
-			return Color.GREEN;
+			return Color.GREEN.brighter();
 		
 		return Color.WHITE;
 	}
@@ -284,8 +281,9 @@ public class Window3DSubScene{
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-        cameraXform.ry.setAngle(CAMERA_INITIAL_Y_ANGLE);
-        cameraXform.rx.setAngle(CAMERA_INITIAL_X_ANGLE);     
+        cameraXform.setRotateX(CAMERA_INITIAL_X_ANGLE); 
+        cameraXform.setRotateY(CAMERA_INITIAL_Y_ANGLE);
+            
         setNewOrigin();
         
         subscene.setCamera(camera);
@@ -364,18 +362,6 @@ public class Window3DSubScene{
 					else
 						playButton.setGraphic(pauseIcon);
 					playingMovie.set(!playingMovie.get());
-					/*
-					if (!playingMovie) {
-						playingMovie = true;
-						playButton.setGraphic(pauseIcon);
-						playTask.run();
-					}
-					else {
-						playingMovie = false;
-						playButton.setGraphic(playIcon);
-						pauseTask.run();
-					}
-					*/
 				}
 			});
 		}
@@ -426,12 +412,14 @@ public class Window3DSubScene{
 	
 	private static final String CS = ", ";
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -900;
+	private static final String FILL_COLOR_HEX = "#555555";
+	
+	private static final double CAMERA_INITIAL_DISTANCE = -1000;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     
     private static final double CAMERA_NEAR_CLIP = 0.1;
-    private static final double CAMERA_FAR_CLIP = 10000;
+    private static final double CAMERA_FAR_CLIP = 100000;
     
     private static final int START_TIME = 5;
     private static final int X_COR = 0;
