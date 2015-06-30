@@ -2,13 +2,19 @@ package wormguides.view;
 
 import wormguides.Xform;
 import wormguides.model.TableLineageData;
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
@@ -18,6 +24,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -37,19 +44,38 @@ public class Window3DSubScene{
 	private int newOriginX, newOriginY, newOriginZ;
 	
 	private int time;
+	private int endTime;
 	
 	private Xform cameraXform;
     
 	private Slider timeSlider;
 	private Button forwardButton, backwardButton, playButton;
 	
-	private boolean playingMovie;
-	private Image playIcon, pauseIcon;
+	private BooleanProperty playingMovie;
+	private ImageView playIcon, pauseIcon;
+	//private Task<Void> playTask;
+	//private Task<Void> pauseTask;
+	private PlayService playService;
+	
+	private Sphere[] cells;
+	private String[] names;
+	private Integer[][] positions;
+	private Integer[] diameters;
+	
+	private int selectedIndex;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		this.root = new Group();
 		this.data = data;
 		this.time = START_TIME;
+		
+		this.cells = new Sphere[1];
+		this.names = new String[1];
+		this.positions = new Integer[1][3];
+		this.diameters = new Integer[1];
+		this.selectedIndex = -1;
+		
+		this.endTime = data.getTotalTimePoints();
 		this.subscene = createSubScene(width, height);
 		
 		this.mousePosX = 0;
@@ -59,16 +85,32 @@ public class Window3DSubScene{
 		this.mouseDeltaX = 0;
 		this.mouseDeltaY = 0;
 		
-		this.playingMovie = false;
 		loadPlayPauseIcons();
+		
+		this.playService = new PlayService();
+		
+		this.playingMovie = new SimpleBooleanProperty();
+		playingMovie.set(false);
+		playingMovie.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (observable.getValue()) {
+					playService.restart();
+				}
+				else {
+					playService.cancel();
+				}
+			}
+		});
+		
 	}
 	
 	private void loadPlayPauseIcons() {
 		try {
-			this.playIcon = new Image(getClass().getResourceAsStream("./icons/play.png"));
-			this.pauseIcon = new Image(getClass().getResourceAsStream("./icons/pause.png"));
+			this.playIcon = new ImageView(new Image(getClass().getResourceAsStream("./icons/play.png")));
+			this.pauseIcon = new ImageView(new Image(getClass().getResourceAsStream("./icons/pause.png")));
 		} catch (NullPointerException npe) {
-			System.out.println("cannot load icons");
+			System.out.println("cannot load play/pause icons");
 		}
 	}
 	
@@ -86,7 +128,7 @@ public class Window3DSubScene{
 		try {
 			timeSlider.setMin(1);
 			timeSlider.setMax(data.getTotalTimePoints()-1);
-			timeSlider.setValue(1);
+			timeSlider.setValue(START_TIME);
 		} catch (NullPointerException npe) {
 			System.out.println("null time slider");
 		}
@@ -124,7 +166,36 @@ public class Window3DSubScene{
 		
 		subscene.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
-				System.out.println("clicked "+me.getX()+CS+me.getY());
+				PickResult result = me.getPickResult();
+				//System.out.println(result.toString());
+				Node node = result.getIntersectedNode();
+				//System.out.println(node.toString());
+				if (node instanceof Sphere) {
+					int index = fetchPickedSphereIndex((Sphere)node);
+					selectedIndex = index;
+					/*
+					if (index != -1) {
+						if (selectedIndex != -1) {
+							PhongMaterial material = (PhongMaterial)(cells[selectedIndex].getMaterial());
+							Color color = material.getDiffuseColor();
+							Color darkerColor = color.darker();
+							material.setDiffuseColor(darkerColor);
+							material.setSpecularColor(darkerColor);
+							cells[selectedIndex].setMaterial(material);
+						}
+						
+						selectedIndex = index;
+						PhongMaterial material = (PhongMaterial)(cells[selectedIndex].getMaterial());
+						Color color = material.getDiffuseColor();
+						Color brighterColor = color.brighter();
+						material.setDiffuseColor(brighterColor);
+						material.setSpecularColor(brighterColor);
+						cells[selectedIndex].setMaterial(material);
+					}
+					*/
+				}
+				else
+					selectedIndex = -1;
 			}
 		});
 		subscene.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -136,7 +207,18 @@ public class Window3DSubScene{
 		
 		buildCamera();
 		buildScene(time);
+		
 		return subscene;
+	}
+	
+	private int fetchPickedSphereIndex(Sphere picked) {
+		for (int i = 0; i < names.length; i++) {
+			if (cells[i].equals(picked)) {
+				
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	// Builds subscene for a given timepoint
@@ -144,13 +226,12 @@ public class Window3DSubScene{
 		// Frame is indexed 1 less than the time requested
 		time--;
 		refreshScene();
-		String[] names = data.getNames(time);
-		Integer[][] positions = data.getPositions(time);
-		Integer[] diameters = data.getDiameters(time);
+		this.names = data.getNames(time);
+		this.positions = data.getPositions(time);
+		this.diameters = data.getDiameters(time);
+		this.cells = new Sphere[names.length];
 		
-		for (int i = 0; i < names.length; i++) {
-			addCellToScene(names[i], positions[i], diameters[i]);
-		}
+		addCellsToScene();
 	}
 	
 	private void refreshScene() {
@@ -159,19 +240,23 @@ public class Window3DSubScene{
 		subscene.setRoot(root);
 	}
 	
-	private void addCellToScene(String name, Integer[] position, Integer diameter) {
-		Sphere sphere = new Sphere(diameter/2);
-		Color color = getColorRule(name);
-		PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(color);
-        material.setSpecularColor(color);
-        sphere.setMaterial(material);
-        sphere.setTranslateX(position[X_COR]);
-        sphere.setTranslateY(position[Y_COR]);
-        sphere.setTranslateZ(position[Z_COR]*Z_SCALE);
-        
-        root.getChildren().add(sphere);
-        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
+	private void addCellsToScene() {
+		for (int i = 0; i < names.length; i ++) {
+			Sphere sphere = new Sphere(diameters[i]/2);
+			Color color = getColorRule(names[i]);
+			PhongMaterial material = new PhongMaterial();
+	        material.setDiffuseColor(color);
+	        material.setSpecularColor(color);
+	        sphere.setMaterial(material);
+	        sphere.setTranslateX(positions[i][X_COR]);
+	        sphere.setTranslateY(positions[i][Y_COR]);
+	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
+	        
+	        cells[i] = sphere;
+	        root.getChildren().add(sphere);
+	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
+		}
+		
 	}
 	
 	private Color getColorRule(String name) {
@@ -182,6 +267,8 @@ public class Window3DSubScene{
 			return Color.BLUE;
 		else if (name.startsWith("p"))
 			return Color.YELLOW;
+		else if (name.startsWith("ems"))
+			return Color.GREEN;
 		
 		return Color.WHITE;
 	}
@@ -251,7 +338,7 @@ public class Window3DSubScene{
 			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					if (!playingMovie)
+					if (!playingMovie.get())
 						timeSlider.setValue(--time);
 				}
 			});
@@ -261,7 +348,7 @@ public class Window3DSubScene{
 			forwardButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					if (!playingMovie)
+					if (!playingMovie.get())
 						timeSlider.setValue(++time);
 				}
 			});
@@ -271,78 +358,33 @@ public class Window3DSubScene{
 			playButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public synchronized void handle(ActionEvent event) {
-					Task<Void> task = new Task<Void>() {
-						@Override
-						protected Void call() throws Exception {
-							System.out.println("start");
-							while (playingMovie) {
-								if (isCancelled()) {
-			                    	 playingMovie = false;
-			                         System.out.println("Cancelled");
-			                         break;
-			                     }
-								try {
-									System.out.println("hello");
-									//timeSlider.setValue(++time);
-				                    Thread.sleep(600);
-				                 } catch (InterruptedException interrupted) {
-				                     System.out.println("interrupted");
-				                 }
-							}
-							return null;
-						}
-					};
-					if (playingMovie) {
-						playButton.setGraphic(new ImageView(pauseIcon));
-						task.run();
+					boolean playing = playingMovie.get();
+					if (playing)
+						playButton.setGraphic(playIcon);
+					else
+						playButton.setGraphic(pauseIcon);
+					playingMovie.set(!playingMovie.get());
+					/*
+					if (!playingMovie) {
+						playingMovie = true;
+						playButton.setGraphic(pauseIcon);
+						playTask.run();
 					}
 					else {
-						playButton.setGraphic(new ImageView(playIcon));
-						task.cancel();
+						playingMovie = false;
+						playButton.setGraphic(playIcon);
+						pauseTask.run();
 					}
+					*/
 				}
 			});
 		}
 	}
 	
-	/*
-    public void start() {
-    	System.out.println("start thread");
-        synchronized (waitLock) {
-            playingMovie = true;
-            waitLock.notify();
-        }
-    }
-    
-    public void pause() {
-    	System.out.println("pause thread");
-        synchronized (waitLock) {
-            playingMovie = false;
-            waitLock.notify();
-        }
-    }
-    
-	@Override
-	public void run() {
-		while (true) {
-            while (playingMovie) {
-                try {
-                	Thread.sleep(500);
-                	//timeSlider.setValue(++time);
-                	System.out.println("hello");
-                } catch (Exception e) {
-                	e.printStackTrace();
-                }
-            }
-            try {
-                synchronized (waitLock) {
-                    waitLock.wait();
-                }
-            } catch (Exception e) {
-            }
-        }
+	public void printCellNames() {
+		for (int i = 0; i < names.length; i++)
+			System.out.println(names[i]+CS+cells[i]);
 	}
-	*/
 	
 	// Accessor methods
 	public SubScene getSubScene() {
@@ -353,6 +395,34 @@ public class Window3DSubScene{
 		return root;
 	}
 	
+	private class PlayService extends Service<Void>{
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					while (true) {
+						if (isCancelled()) {
+							break;
+						}
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								timeSlider.setValue(++time);
+							}
+						});
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException ie) {
+							break;
+						}
+					}
+					return null;
+				}
+			};
+		}
+		
+	}
 	
 	private static final String CS = ", ";
 	
@@ -363,7 +433,7 @@ public class Window3DSubScene{
     private static final double CAMERA_NEAR_CLIP = 0.1;
     private static final double CAMERA_FAR_CLIP = 10000;
     
-    private static final int START_TIME = 1;
+    private static final int START_TIME = 5;
     private static final int X_COR = 0;
     private static final int Y_COR = 1;
     private static final int Z_COR = 2;

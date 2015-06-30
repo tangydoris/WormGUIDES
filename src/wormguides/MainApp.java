@@ -5,6 +5,9 @@ import java.io.IOException;
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -33,8 +36,8 @@ public class MainApp extends Application {
 	private Button playButton;
 	
 	private SubScene subscene;
-	private ObservableValue<Number> subsceneWidth;
-	private ObservableValue<Number> subsceneHeight;
+	private DoubleProperty subsceneWidth;
+	private DoubleProperty subsceneHeight;
 
 	public MainApp() {
 	}
@@ -111,8 +114,10 @@ public class MainApp extends Application {
 	}
 	
 	private void sizeSubsceneRelativeToParent() {
-		this.subsceneWidth = (ObservableValue<Number>)(modelContainer.widthProperty());
-		this.subsceneHeight = (ObservableValue<Number>)(modelContainer.heightProperty().subtract(33));
+		this.subsceneWidth = new SimpleDoubleProperty();
+		subsceneWidth.bind(modelContainer.widthProperty());
+		this.subsceneHeight = new SimpleDoubleProperty();
+		subsceneHeight.bind(modelContainer.heightProperty().subtract(33));
 		
 		AnchorPane.setTopAnchor(subscene,  0.0);
 		AnchorPane.setLeftAnchor(subscene,  0.0);
