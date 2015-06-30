@@ -6,7 +6,6 @@ import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

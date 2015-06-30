@@ -46,15 +46,7 @@ public class Window3DSubScene{
 	private boolean playingMovie;
 	private Image playIcon, pauseIcon;
 	
-	//private Thread thread;
-	//private final Object waitLock = new Object();
-	private Task<Void> task;
-	
-	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
-		//this.thread = new Thread(this);
-		//thread.start();
-		
 		this.root = new Group();
 		this.data = data;
 		this.time = START_TIME;
@@ -69,25 +61,6 @@ public class Window3DSubScene{
 		
 		this.playingMovie = false;
 		loadPlayPauseIcons();
-		
-		this.task = new Task<Void>() {
-			@Override
-			protected Void call() throws Exception {
-				System.out.println("start");
-				while (true) {
-					timeSlider.setValue(++time);
-					try {
-	                    Thread.sleep(500);
-	                 } catch (InterruptedException interrupted) {
-	                     if (isCancelled()) {
-	                         System.out.println("Cancelled");
-	                         break;
-	                     }
-	                 }
-				}
-				return null;
-			}
-		};
 	}
 	
 	private void loadPlayPauseIcons() {
@@ -298,7 +271,27 @@ public class Window3DSubScene{
 			playButton.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public synchronized void handle(ActionEvent event) {
-					playingMovie = !playingMovie;
+					Task<Void> task = new Task<Void>() {
+						@Override
+						protected Void call() throws Exception {
+							System.out.println("start");
+							while (playingMovie) {
+								if (isCancelled()) {
+			                    	 playingMovie = false;
+			                         System.out.println("Cancelled");
+			                         break;
+			                     }
+								try {
+									System.out.println("hello");
+									//timeSlider.setValue(++time);
+				                    Thread.sleep(600);
+				                 } catch (InterruptedException interrupted) {
+				                     System.out.println("interrupted");
+				                 }
+							}
+							return null;
+						}
+					};
 					if (playingMovie) {
 						playButton.setGraphic(new ImageView(pauseIcon));
 						task.run();
