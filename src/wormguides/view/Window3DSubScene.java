@@ -4,7 +4,9 @@ import wormguides.Xform;
 import wormguides.model.TableLineageData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
@@ -43,7 +45,7 @@ public class Window3DSubScene{
 	
 	private int newOriginX, newOriginY, newOriginZ;
 	
-	private int time;
+	private IntegerProperty time;
 	private int endTime;
 	
 	private Xform cameraXform;
@@ -66,7 +68,8 @@ public class Window3DSubScene{
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		this.root = new Group();
 		this.data = data;
-		this.time = START_TIME;
+		this.time = new SimpleIntegerProperty();
+		time.set(START_TIME);
 		
 		this.cells = new Sphere[1];
 		this.names = new String[1];
@@ -113,6 +116,7 @@ public class Window3DSubScene{
 		}
 	}
 	
+	/*
 	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton,
 			TextField searchTextField) {
 		this.timeSlider = timeSlider;
@@ -122,8 +126,8 @@ public class Window3DSubScene{
 		this.searchTextField = searchTextField;
 		
 		setSliderProperties();
-		addListeners();
 	}
+	*/
 	
 	private void setSliderProperties() {
 		try {
@@ -207,7 +211,7 @@ public class Window3DSubScene{
 		});
 		
 		buildCamera();
-		buildScene(time);
+		buildScene(time.get());
 		
 		return subscene;
 	}
@@ -323,43 +327,6 @@ public class Window3DSubScene{
         root.getChildren().add(light);
 	}
 	
-	// Add listeners to UI components
-	private void addListeners() {
-		if (backwardButton != null) {
-			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					if (!playingMovie.get())
-						timeSlider.setValue(--time);
-				}
-			});
-		}
-		
-		if (forwardButton != null) {
-			forwardButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					if (!playingMovie.get())
-						timeSlider.setValue(++time);
-				}
-			});
-		}
-		
-		if (playButton != null) {
-			playButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public synchronized void handle(ActionEvent event) {
-					boolean playing = playingMovie.get();
-					if (playing)
-						playButton.setGraphic(playIcon);
-					else
-						playButton.setGraphic(pauseIcon);
-					playingMovie.set(!playingMovie.get());
-				}
-			});
-		}
-	}
-	
 	public void printCellNames() {
 		for (int i = 0; i < names.length; i++)
 			System.out.println(names[i]+CS+cells[i]);
@@ -374,8 +341,69 @@ public class Window3DSubScene{
 		return root;
 	}
 	
+	public ChangeListener<String> getSearchFieldListener() {
+		return new SearchFieldListener();
+	}
+	
+	public EventHandler<ActionEvent> getPlayButtonListener() {
+		return new PlayButtonListener();
+	}
+	
+	public EventHandler<ActionEvent> getBackwardButtonListener() {
+		return new BackwardButtonListener();
+	}
+	
+	public EventHandler<ActionEvent> getForwardButtonListener() {
+		return new ForwardButtonListener();
+	}
+	
 	public ChangeListener<Number> getSliderListener() {
 		return new SliderListener();
+	}
+	
+	public class SearchFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+			if (newValue.isEmpty())
+				buildScene(time);
+			else {
+				String searched = newValue.toLowerCase();
+				for (int i = 0; i < names.length; i++) {
+					if (names[i].startsWith(searched))
+						System.out.println(names[i]);
+				}
+			}
+		}
+	}
+	
+	public class PlayButtonListener implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			Button playButton = (Button) event.getSource();
+			boolean playing = playingMovie.get();
+			if (playing)
+				playButton.setGraphic(playIcon);
+			else
+				playButton.setGraphic(pauseIcon);
+			playingMovie.set(!playingMovie.get());
+		}
+		
+	}
+	
+	public class BackwardButtonListener implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			if (!playingMovie.get())
+				timeSlider.setValue(--time);
+		}
+	}
+	
+	public class ForwardButtonListener implements EventHandler<ActionEvent>{
+		@Override
+		public void handle(ActionEvent event) {
+			if (!playingMovie.get())
+				timeSlider.setValue(++time);
+		}
 	}
 	
 	public class SliderListener implements ChangeListener<Number> {

@@ -4,9 +4,6 @@ import javafx.fxml.FXML;
 
 public class RootLayoutController {
 	
-	public RootLayoutController() {
-	}
-	
 	@FXML
 	protected void menuCloseAction() {
 		System.out.println("exiting...");

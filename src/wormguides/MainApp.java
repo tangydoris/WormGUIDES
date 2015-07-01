@@ -36,6 +36,7 @@ public class MainApp extends Application {
 	
 	private TextField searchTextField;
 	
+	private Window3DSubScene window3D;
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
@@ -94,27 +95,37 @@ public class MainApp extends Application {
 		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
 		this.playButton = (Button)(scene.lookup(PLAY_BUTTON_ID));
 		this.searchTextField = (TextField)(scene.lookup(SEARCH_TEXTFIELD_ID));
+		
+		if (searchTextField == null)
+			System.out.println("cannot fetch text field");
 	}
 	
 	public void init3DWindow() {
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		
 		try {
 			Double width = modelContainer.prefWidth(-1);
 			Double height = modelContainer.prefHeight(-1);
 			
-			Window3DSubScene window3D = new Window3DSubScene(width, height, data);
+			this.window3D = new Window3DSubScene(width, height, data);
 			this.subscene = window3D.getSubScene();
 			modelContainer.getChildren().add(subscene);
 			sizeSubsceneRelativeToParent();
 			//window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton, searchTextField);
 			
-			timeSlider.valueProperty().addListener(window3D.getSliderListener());
+			addListeners();
 			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
 			npe.printStackTrace();
 		}
+	}
+	
+	private void addListeners() {
+		timeSlider.valueProperty().addListener(window3D.getSliderListener());
+		backwardButton.setOnAction(window3D.getBackwardButtonListener());
+		forwardButton.setOnAction(window3D.getForwardButtonListener());
+		playButton.setOnAction(window3D.getPlayButtonListener());
+		searchTextField.textProperty().addListener(window3D.getSearchFieldListener());
 	}
 	
 	private void sizeSubsceneRelativeToParent() {
