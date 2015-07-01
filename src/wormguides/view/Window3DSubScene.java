@@ -20,18 +20,13 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
@@ -40,6 +35,7 @@ public class Window3DSubScene{
 	private SubScene subscene;
 	private Group root;
 	private PerspectiveCamera camera;
+	private Xform cameraXform;
 	
 	private double mousePosX, mousePosY;
 	private double mouseOldX, mouseOldY;
@@ -48,14 +44,11 @@ public class Window3DSubScene{
 	private int newOriginX, newOriginY, newOriginZ;
 	
 	private IntegerProperty time;
+	private IntegerProperty totalNuclei;
+	
 	private int endTime;
 	
-	private Xform cameraXform;
-    
 	private Slider timeSlider;
-	//private Button forwardButton, backwardButton, playButton;
-	//private TextField searchTextField;
-	private Label timeLabel;
 	
 	private BooleanProperty playingMovie;
 	private ImageView playIcon, pauseIcon;
@@ -63,6 +56,7 @@ public class Window3DSubScene{
 	
 	private Sphere[] cells;
 	private String[] names;
+	private String[] namesLowerCase;
 	private Integer[][] positions;
 	private Integer[] diameters;
 	
@@ -73,26 +67,15 @@ public class Window3DSubScene{
 		this.data = data;
 		this.time = new SimpleIntegerProperty();
 		time.set(START_TIME);
-		time.addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				int newTime = (int)newValue;
-				if (newTime < 1)
-					newTime = 1;
-				else if (newTime > endTime)
-					newTime = endTime;
-				
-				time.set(newTime);
-				timeSlider.setValue(newTime);
-				timeLabel.setText("Time "+makePaddedTime(newTime));
-			}
-		});
 		
 		this.cells = new Sphere[1];
 		this.names = new String[1];
 		this.positions = new Integer[1][3];
 		this.diameters = new Integer[1];
 		this.selectedIndex = -1;
+		
+		this.totalNuclei = new SimpleIntegerProperty();
+		totalNuclei.set(0);
 		
 		this.endTime = data.getTotalTimePoints();
 		this.subscene = createSubScene(width, height);
@@ -104,7 +87,7 @@ public class Window3DSubScene{
 		this.mouseDeltaX = 0;
 		this.mouseDeltaY = 0;
 		
-		loadPlayPauseIcons();
+		//loadPlayPauseIcons();
 		
 		this.playService = new PlayService();
 		this.playingMovie = new SimpleBooleanProperty();
@@ -112,7 +95,7 @@ public class Window3DSubScene{
 		playingMovie.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (observable.getValue()) {
+				if (newValue) {
 					playService.restart();
 				}
 				else {
@@ -122,25 +105,24 @@ public class Window3DSubScene{
 		});
 	}
 	
+	public IntegerProperty getTimeProperty() {
+		return this.time;
+	}
+	
+	public IntegerProperty getTotalNucleiProperty() {
+		return this.totalNuclei;
+	}
+	
+	public BooleanProperty getPlayingMovieProperty() {
+		return this.playingMovie;
+	}
+	
 	public void setSlider(Slider timeSlider) {
 		this.timeSlider = timeSlider;
 		setSliderProperties();
 	}
 	
-	public void setTimeLabel(Label timeLabel) {
-		this.timeLabel = timeLabel;
-		timeLabel.setText("Time "+makePaddedTime(START_TIME));
-	}
-	
-	private String makePaddedTime(int time) {
-		if (time < 10)
-			return "00"+time;
-		else if (time < 100)
-			return "0"+time;
-		else
-			return ""+time;
-	}
-	
+	/*
 	private void loadPlayPauseIcons() {
 		try {
 			this.playIcon = new ImageView(new Image(getClass().getResourceAsStream("./icons/play.png")));
@@ -149,6 +131,7 @@ public class Window3DSubScene{
 			System.out.println("cannot load play/pause icons");
 		}
 	}
+	*/
 	
 	/*
 	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton,
@@ -266,11 +249,21 @@ public class Window3DSubScene{
 		time--;
 		refreshScene();
 		this.names = data.getNames(time);
+		this.namesLowerCase = toLowerCaseAll(names);
+		this.totalNuclei.set(names.length);
 		this.positions = data.getPositions(time);
 		this.diameters = data.getDiameters(time);
 		this.cells = new Sphere[names.length];
 		
 		addCellsToScene();
+	}
+	
+	private String[] toLowerCaseAll(String[] in) {
+		int length = in.length;
+		String[] out = new String[length];
+		for (int i = 0; i < length; i++)
+			out[i] = in[i].toLowerCase();
+		return out;
 	}
 	
 	private void refreshScene() {
@@ -379,10 +372,6 @@ public class Window3DSubScene{
 		return new SearchFieldListener();
 	}
 	
-	public EventHandler<ActionEvent> getPlayButtonListener() {
-		return new PlayButtonListener();
-	}
-	
 	public EventHandler<ActionEvent> getBackwardButtonListener() {
 		return new BackwardButtonListener();
 	}
@@ -395,6 +384,12 @@ public class Window3DSubScene{
 		return new SliderListener();
 	}
 	
+	public int getEndTime() {
+		return this.endTime;
+	}
+	
+	
+	// Listener classes
 	public class SearchFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -403,25 +398,11 @@ public class Window3DSubScene{
 			else {
 				String searched = newValue.toLowerCase();
 				for (int i = 0; i < names.length; i++) {
-					if (names[i].startsWith(searched))
+					if (namesLowerCase[i].startsWith(searched))
 						System.out.println(names[i]);
 				}
 			}
 		}
-	}
-	
-	public class PlayButtonListener implements EventHandler<ActionEvent> {
-		@Override
-		public void handle(ActionEvent event) {
-			Button playButton = (Button) event.getSource();
-			boolean playing = playingMovie.get();
-			if (playing)
-				playButton.setGraphic(playIcon);
-			else
-				playButton.setGraphic(pauseIcon);
-			playingMovie.set(!playingMovie.get());
-		}
-		
 	}
 	
 	public class BackwardButtonListener implements EventHandler<ActionEvent> {
@@ -482,7 +463,7 @@ public class Window3DSubScene{
 	
 	private static final String CS = ", ";
 	
-	private static final String FILL_COLOR_HEX = "#353535";
+	private static final String FILL_COLOR_HEX = "#272727";
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	

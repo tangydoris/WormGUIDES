@@ -67,7 +67,7 @@
 			            <Insets />
 			         </GridPane.margin>
 			         <bottom>
-			            <Pane prefHeight="158.0" prefWidth="554.0" style="-fx-border-color: grey;" BorderPane.alignment="BOTTOM_CENTER">
+			            <Pane prefHeight="145.0" prefWidth="554.0" style="-fx-border-color: grey;" BorderPane.alignment="BOTTOM_CENTER">
                      <BorderPane.margin>
                         <Insets top="3.0" />
                      </BorderPane.margin></Pane>
@@ -81,11 +81,16 @@
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                      <children>
-                        <Slider fx:id="timeSlider" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="62.0" />
-                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                        <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="37.0" />
-                        <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../MainApp.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="73.0" />
-                        <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" prefHeight="30.0" text="Time 001" textAlignment="RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <Slider fx:id="timeSlider" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="0.0" />
+                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                        <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="37.0" />
+                        <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="73.0" />
+                        <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="35.0" AnchorPane.rightAnchor="5.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="totalNucleiLabel" layoutX="1.0" layoutY="558.0" text="0 nuclei" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="5.0">
                            <font>
                               <Font size="14.0" />
                            </font>

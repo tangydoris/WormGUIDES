@@ -1,0 +1,11 @@
+#backwardButton {
+	-fx-graphic: url("./icons/backward.png");
+}
+
+#forwardButton {
+	-fx-graphic: url("./icons/forward.png");
+}
+
+#playButton {
+	-fx-graphic: url("./icons/play.png");
+}

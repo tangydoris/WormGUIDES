@@ -15,11 +15,11 @@ import wormguides.model.TableLineageData;
 // Loader class to read nuclei files
 public class AceTreeLoader {
 	
-	public static TableLineageData loadNucFiles(String filePath) {
+	public static TableLineageData loadNucFiles(String jarPath) {
 		TableLineageData tld = new TableLineageData();
 		
 		try {
-			JarFile jarFile = new JarFile(new File(filePath));
+			JarFile jarFile = new JarFile(new File(jarPath));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
 			int time = 0;
@@ -81,15 +81,9 @@ public class AceTreeLoader {
 		}
 	}
 	
-	public static void main (String[] args) {
-		loadNucFiles(JAR_NAME);
-	}
-	
 	private static final String ENTRY_PREFIX = "wormguides/nuclei_files/";
-	private static final String JAR_NAME = "WormGUIDES.jar";
 	private static final int TOKEN_ARRAY_SIZE = 21;
-	private static int
-		VALID = 1,
+	private static final int VALID = 1,
 		XCOR = 5,
 		YCOR = 6,
 		ZCOR = 7,
