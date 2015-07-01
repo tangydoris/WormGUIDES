@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -24,17 +25,15 @@ public class MainApp extends Application {
 	private Scene scene;
 	
 	private Stage primaryStage;
-	private BorderPane rootLayout;
-
-	private AnchorPane modelContainer;
-
-	private Slider timeSlider;
 	
+	private BorderPane rootLayout;
+	private AnchorPane modelContainer;
+	private Slider timeSlider;
 	private Button backwardButton;
 	private Button forwardButton;
 	private Button playButton;
-	
 	private TextField searchTextField;
+	private Label timeLabel;
 	
 	private Window3DSubScene window3D;
 	private SubScene subscene;
@@ -95,9 +94,9 @@ public class MainApp extends Application {
 		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
 		this.playButton = (Button)(scene.lookup(PLAY_BUTTON_ID));
 		this.searchTextField = (TextField)(scene.lookup(SEARCH_TEXTFIELD_ID));
-		
 		if (searchTextField == null)
 			System.out.println("cannot fetch text field");
+		this.timeLabel = (Label)(scene.lookup(TIME_LABEL_ID));
 	}
 	
 	public void init3DWindow() {
@@ -113,6 +112,8 @@ public class MainApp extends Application {
 			//window3D.setUIComponents(timeSlider, backwardButton, forwardButton, playButton, searchTextField);
 			
 			addListeners();
+			window3D.setSlider(timeSlider);
+			window3D.setTimeLabel(timeLabel);
 			
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot display 3D model view - could not fetch view container.");
@@ -125,7 +126,7 @@ public class MainApp extends Application {
 		backwardButton.setOnAction(window3D.getBackwardButtonListener());
 		forwardButton.setOnAction(window3D.getForwardButtonListener());
 		playButton.setOnAction(window3D.getPlayButtonListener());
-		searchTextField.textProperty().addListener(window3D.getSearchFieldListener());
+		//searchTextField.textProperty().addListener(window3D.getSearchFieldListener());
 	}
 	
 	private void sizeSubsceneRelativeToParent() {
@@ -156,7 +157,8 @@ public class MainApp extends Application {
 			BACKWARD_BUTTON_ID = "#backwardButton",
 			FORWARD_BUTTON_ID = "#forwardButton",
 			PLAY_BUTTON_ID = "#playButton",
-			SEARCH_TEXTFIELD_ID = "#searchTextField";
+			SEARCH_TEXTFIELD_ID = "#searchTextField",
+			TIME_LABEL_ID = "#timeLabel";
 	
 	private static final String CS = ", ";
 }

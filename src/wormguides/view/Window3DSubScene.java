@@ -21,6 +21,7 @@ import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -30,6 +31,7 @@ import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
@@ -51,8 +53,9 @@ public class Window3DSubScene{
 	private Xform cameraXform;
     
 	private Slider timeSlider;
-	private Button forwardButton, backwardButton, playButton;
-	private TextField searchTextField;
+	//private Button forwardButton, backwardButton, playButton;
+	//private TextField searchTextField;
+	private Label timeLabel;
 	
 	private BooleanProperty playingMovie;
 	private ImageView playIcon, pauseIcon;
@@ -70,6 +73,20 @@ public class Window3DSubScene{
 		this.data = data;
 		this.time = new SimpleIntegerProperty();
 		time.set(START_TIME);
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				int newTime = (int)newValue;
+				if (newTime < 1)
+					newTime = 1;
+				else if (newTime > endTime)
+					newTime = endTime;
+				
+				time.set(newTime);
+				timeSlider.setValue(newTime);
+				timeLabel.setText("Time "+makePaddedTime(newTime));
+			}
+		});
 		
 		this.cells = new Sphere[1];
 		this.names = new String[1];
@@ -90,7 +107,6 @@ public class Window3DSubScene{
 		loadPlayPauseIcons();
 		
 		this.playService = new PlayService();
-		
 		this.playingMovie = new SimpleBooleanProperty();
 		playingMovie.set(false);
 		playingMovie.addListener(new ChangeListener<Boolean>() {
@@ -104,7 +120,25 @@ public class Window3DSubScene{
 				}
 			}
 		});
-		
+	}
+	
+	public void setSlider(Slider timeSlider) {
+		this.timeSlider = timeSlider;
+		setSliderProperties();
+	}
+	
+	public void setTimeLabel(Label timeLabel) {
+		this.timeLabel = timeLabel;
+		timeLabel.setText("Time "+makePaddedTime(START_TIME));
+	}
+	
+	private String makePaddedTime(int time) {
+		if (time < 10)
+			return "00"+time;
+		else if (time < 100)
+			return "0"+time;
+		else
+			return ""+time;
 	}
 	
 	private void loadPlayPauseIcons() {
@@ -128,7 +162,7 @@ public class Window3DSubScene{
 		setSliderProperties();
 	}
 	*/
-	
+
 	private void setSliderProperties() {
 		try {
 			timeSlider.setMin(1);
@@ -157,9 +191,9 @@ public class Window3DSubScene{
                 mouseDeltaY = (mousePosY - mouseOldY)/2;
                 
                 double ryAngle = cameraXform.getRotateY();
-                cameraXform.setRotateY(ryAngle - mouseDeltaX);
+                cameraXform.setRotateY(ryAngle + mouseDeltaX);
                 double rxAngle = cameraXform.getRotateX();
-                cameraXform.setRotateX(rxAngle + mouseDeltaY);
+                cameraXform.setRotateX(rxAngle - mouseDeltaY);
 			}
 		});
 		
@@ -365,7 +399,7 @@ public class Window3DSubScene{
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 			if (newValue.isEmpty())
-				buildScene(time);
+				buildScene(time.get());
 			else {
 				String searched = newValue.toLowerCase();
 				for (int i = 0; i < names.length; i++) {
@@ -394,7 +428,7 @@ public class Window3DSubScene{
 		@Override
 		public void handle(ActionEvent event) {
 			if (!playingMovie.get())
-				timeSlider.setValue(--time);
+				time.set(time.get()-1);
 		}
 	}
 	
@@ -402,16 +436,17 @@ public class Window3DSubScene{
 		@Override
 		public void handle(ActionEvent event) {
 			if (!playingMovie.get())
-				timeSlider.setValue(++time);
+				time.set(time.get()+1);
 		}
 	}
 	
 	public class SliderListener implements ChangeListener<Number> {
 		@Override
 		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-			time = newValue.intValue();
-			if (time > 0 & time <= endTime)
-				buildScene(time);
+			time.set(newValue.intValue());
+			int t = time.get();
+			if (t > 0 & t <= endTime)
+				buildScene(t);
 		}
 	}
 	
@@ -428,7 +463,8 @@ public class Window3DSubScene{
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								timeSlider.setValue(++time);
+								//timeSlider.setValue(++time);
+								time.set(time.get()+1);
 							}
 						});
 						try {
@@ -457,7 +493,7 @@ public class Window3DSubScene{
     private static final double CAMERA_NEAR_CLIP = 0.1;
     private static final double CAMERA_FAR_CLIP = 100000;
     
-    private static final int START_TIME = 5;
+    private static final int START_TIME = 1;
     private static final int X_COR = 0;
     private static final int Y_COR = 1;
     private static final int Z_COR = 2;
