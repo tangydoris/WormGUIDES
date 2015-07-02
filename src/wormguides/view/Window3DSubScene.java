@@ -22,6 +22,7 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -62,6 +63,8 @@ public class Window3DSubScene{
 	
 	private int selectedIndex;
 	
+	private SphereDragHandler sphereDragHandler;
+	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		this.root = new Group();
 		this.data = data;
@@ -73,6 +76,8 @@ public class Window3DSubScene{
 		this.positions = new Integer[1][3];
 		this.diameters = new Integer[1];
 		this.selectedIndex = -1;
+		
+		this.sphereDragHandler = new SphereDragHandler();
 		
 		this.totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
@@ -173,10 +178,15 @@ public class Window3DSubScene{
                 mouseDeltaX = (mousePosX - mouseOldX)/2;
                 mouseDeltaY = (mousePosY - mouseOldY)/2;
                 
+                System.out.println("dX "+mouseDeltaX);
+                System.out.println("dY "+mouseDeltaY);
+                
                 double ryAngle = cameraXform.getRotateY();
                 cameraXform.setRotateY(ryAngle + mouseDeltaX);
+                //System.out.println("Y: "+(ryAngle + mouseDeltaX));
                 double rxAngle = cameraXform.getRotateX();
-                cameraXform.setRotateX(rxAngle - mouseDeltaY);
+                cameraXform.setRotateX(rxAngle + mouseDeltaY);
+                //System.out.println("X: "+(rxAngle + mouseDeltaY));
 			}
 		});
 		
@@ -274,15 +284,19 @@ public class Window3DSubScene{
 	
 	private void addCellsToScene() {
 		for (int i = 0; i < names.length; i ++) {
-			Sphere sphere = new Sphere(diameters[i]/2);
+			Sphere sphere = new Sphere(SIZE_SCALE*diameters[i]/2);
 			Color color = getColorRule(names[i]);
 			PhongMaterial material = new PhongMaterial();
 	        material.setDiffuseColor(color);
-	        //material.setSpecularColor(color);
 	        sphere.setMaterial(material);
 	        sphere.setTranslateX(positions[i][X_COR]);
 	        sphere.setTranslateY(positions[i][Y_COR]);
 	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
+	        
+	        sphere.setOnMouseDragOver(sphereDragHandler);
+	        sphere.setOnMouseDragEntered(sphereDragHandler);
+	        sphere.setOnMouseDragExited(sphereDragHandler);
+	        //sphere.setOnMouseDragged(sphereDragHandler);
 	        
 	        cells[i] = sphere;
 	        root.getChildren().add(sphere);
@@ -318,6 +332,9 @@ public class Window3DSubScene{
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
         cameraXform.setRotateX(CAMERA_INITIAL_X_ANGLE); 
         cameraXform.setRotateY(CAMERA_INITIAL_Y_ANGLE);
+        
+        cameraXform.setScaleX(X_SCALE);
+        cameraXform.setScaleY(Y_SCALE);
             
         setNewOrigin();
         
@@ -413,7 +430,7 @@ public class Window3DSubScene{
 		}
 	}
 	
-	public class ForwardButtonListener implements EventHandler<ActionEvent>{
+	public class ForwardButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
 			if (!playingMovie.get())
@@ -428,6 +445,14 @@ public class Window3DSubScene{
 			int t = time.get();
 			if (t > 0 & t <= endTime)
 				buildScene(t);
+		}
+	}
+	
+	private class SphereDragHandler implements EventHandler<MouseDragEvent> {
+		@Override
+		public void handle(MouseDragEvent event) {
+			System.out.println("dragged over sphere");
+			return;
 		}
 	}
 	
@@ -467,17 +492,21 @@ public class Window3DSubScene{
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -1000;
+	private static final double CAMERA_INITIAL_DISTANCE = -900;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     
-    private static final double CAMERA_NEAR_CLIP = 0.1;
-    private static final double CAMERA_FAR_CLIP = 100000;
+    private static final double CAMERA_NEAR_CLIP = 0.01;
+    private static final double CAMERA_FAR_CLIP = 1000;
     
     private static final int START_TIME = 1;
     private static final int X_COR = 0;
     private static final int Y_COR = 1;
     private static final int Z_COR = 2;
     
-    private static final double Z_SCALE = 5;
+    private static final double Z_SCALE = 5,
+    		X_SCALE = 1,
+    		Y_SCALE = 1;
+    private static final double SIZE_SCALE = .8;
+
 }

@@ -171,10 +171,14 @@ public class MainApp extends Application {
 	}
 	
 	private void addListenersFrom3DWindow() {
-		timeSlider.valueProperty().addListener(window3D.getSliderListener());
-		backwardButton.setOnAction(window3D.getBackwardButtonListener());
-		forwardButton.setOnAction(window3D.getForwardButtonListener());
-		searchTextField.textProperty().addListener(window3D.getSearchFieldListener());
+		try {
+			timeSlider.valueProperty().addListener(window3D.getSliderListener());
+			backwardButton.setOnAction(window3D.getBackwardButtonListener());
+			forwardButton.setOnAction(window3D.getForwardButtonListener());
+			searchTextField.textProperty().addListener(window3D.getSearchFieldListener());
+		} catch (NullPointerException npe) {
+			System.out.println("cannot add listener for oen or more UI components");
+		}
 	}
 	
 	private void setLabels() {
