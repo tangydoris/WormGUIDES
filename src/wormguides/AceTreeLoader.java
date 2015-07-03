@@ -27,7 +27,7 @@ public class AceTreeLoader {
 			JarEntry entry;
 			while (entries.hasMoreElements()){
 				entry = entries.nextElement();
-				String name = entry.getName();
+				//String name = entry.getName();
 				
 				if (entry.getName().startsWith(ENTRY_PREFIX)) {
 					InputStream input = jarFile.getInputStream(entry);

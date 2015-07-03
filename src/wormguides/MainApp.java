@@ -186,7 +186,7 @@ public class MainApp extends Application {
 			time.addListener(new ChangeListener<Number>() {
 				@Override
 				public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-					int newTime = (int)newValue;
+					int newTime = newValue.intValue();
 					if (newTime < 1)
 						newTime = 1;
 					else if (newTime > window3D.getEndTime())
@@ -205,7 +205,7 @@ public class MainApp extends Application {
 			totalNuclei.addListener(new ChangeListener<Number>() {
 				@Override
 				public void changed(ObservableValue<? extends Number> observable,Number oldValue, Number newValue) {
-					totalNucleiLabel.setText((int)newValue+" Nuclei");
+					totalNucleiLabel.setText(newValue.intValue()+" Nuclei");
 				}
 			});
 			totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");

@@ -169,17 +169,17 @@ public class Window3DSubScene{
 		
 		subscene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
-				subscene.setCursor(Cursor.CLOSED_HAND);
+				subscene.setCursor(Cursor.MOVE);
 				
 				mouseOldX = mousePosX;
                 mouseOldY = mousePosY;
-                mousePosX = me.getX();
-                mousePosY = me.getY();
+                mousePosX = me.getSceneX();
+                mousePosY = me.getSceneY();
                 mouseDeltaX = (mousePosX - mouseOldX)/2;
                 mouseDeltaY = (mousePosY - mouseOldY)/2;
                 
-                System.out.println("dX "+mouseDeltaX);
-                System.out.println("dY "+mouseDeltaY);
+                System.out.println("X "+mousePosX);
+                System.out.println("Y "+mousePosY);
                 
                 double ryAngle = cameraXform.getRotateY();
                 cameraXform.setRotateY(ryAngle + mouseDeltaX);
@@ -232,8 +232,8 @@ public class Window3DSubScene{
 		});
 		subscene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
-				mousePosX = me.getX();
-				mousePosY = me.getY();
+				mousePosX = me.getSceneX();
+				mousePosY = me.getSceneY();
 			}
 		});
 		

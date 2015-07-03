@@ -20,7 +20,7 @@ public class ImageLoader {
 			this.jarFile = new JarFile(new File(jarPath));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
-			int time = 0;
+			//int time = 0;
 			
 			JarEntry entry;
 			while (entries.hasMoreElements()){
