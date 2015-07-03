@@ -178,9 +178,6 @@ public class Window3DSubScene{
                 mouseDeltaX = (mousePosX - mouseOldX)/2;
                 mouseDeltaY = (mousePosY - mouseOldY)/2;
                 
-                System.out.println("X "+mousePosX);
-                System.out.println("Y "+mousePosY);
-                
                 double ryAngle = cameraXform.getRotateY();
                 cameraXform.setRotateY(ryAngle + mouseDeltaX);
                 //System.out.println("Y: "+(ryAngle + mouseDeltaX));
