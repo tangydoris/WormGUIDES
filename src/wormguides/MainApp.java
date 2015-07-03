@@ -117,15 +117,27 @@ public class MainApp extends Application {
 		this.backwardButton = (Button)(scene.lookup(BACKWARD_BUTTON_ID));
 		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
 		this.playButton = (Button)(scene.lookup(PLAY_BUTTON_ID));
-		this.searchTextField = (TextField)(scene.lookup(SEARCH_TEXTFIELD_ID));
-		if (searchTextField == null)
-			System.out.println("cannot fetch text field");
 		this.timeLabel = (Label)(scene.lookup(TIME_LABEL_ID));
 		this.totalNucleiLabel = (Label)(scene.lookup(TOTAL_NUCLEI_LABEL_ID));
-		if (totalNucleiLabel == null)
-			System.out.println("cannot get total nuclei label");
 		
+		createSearchField();
 		setIcons();
+	}
+	
+	private void createSearchField() {
+		try {
+			this.searchTextField = new TextField();
+			AnchorPane.setTopAnchor(searchTextField,  10.0);
+			AnchorPane.setLeftAnchor(searchTextField,  10.0);
+			AnchorPane.setRightAnchor(searchTextField,  10.0);
+			searchTextField.setPrefHeight(TextField.USE_COMPUTED_SIZE);
+			searchTextField.setPrefWidth(TextField.USE_COMPUTED_SIZE);
+			
+			AnchorPane parent = (AnchorPane)(scene.lookup(SEARCH_TAB_PANE_ID));
+			parent.getChildren().add(searchTextField);
+		} catch (NullPointerException npe) {
+			System.out.println("could not instantiate search text field");
+		}
 	}
 	
 	public void setIcons() {
@@ -266,7 +278,8 @@ public class MainApp extends Application {
 			PLAY_BUTTON_ID = "#playButton",
 			SEARCH_TEXTFIELD_ID = "#searchTextField",
 			TIME_LABEL_ID = "#timeLabel",
-			TOTAL_NUCLEI_LABEL_ID = "#totalNucleiLabel";
+			TOTAL_NUCLEI_LABEL_ID = "#totalNucleiLabel",
+			SEARCH_TAB_PANE_ID = "#searchTabAnchorPane";
 	
 	private static final String CS = ", ";
 }

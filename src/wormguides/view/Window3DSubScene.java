@@ -63,6 +63,8 @@ public class Window3DSubScene{
 	
 	private int selectedIndex;
 	
+	private String selectedPrefix;
+	
 	private SphereDragHandler sphereDragHandler;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
@@ -75,7 +77,9 @@ public class Window3DSubScene{
 		this.names = new String[1];
 		this.positions = new Integer[1][3];
 		this.diameters = new Integer[1];
+		
 		this.selectedIndex = -1;
+		this.selectedPrefix = "";
 		
 		this.sphereDragHandler = new SphereDragHandler();
 		
@@ -169,7 +173,7 @@ public class Window3DSubScene{
 		
 		subscene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
-				subscene.setCursor(Cursor.MOVE);
+				subscene.setCursor(Cursor.CLOSED_HAND);
 				
 				mouseOldX = mousePosX;
                 mouseOldY = mousePosY;
@@ -202,12 +206,15 @@ public class Window3DSubScene{
 				if (node instanceof Sphere) {
 					int index = fetchPickedSphereIndex((Sphere)node);
 					selectedIndex = index;
+					
+					System.out.println(names[selectedIndex]);
+					
 					/*
 					if (index != -1) {
 						if (selectedIndex != -1) {
 							PhongMaterial material = (PhongMaterial)(cells[selectedIndex].getMaterial());
 							Color color = material.getDiffuseColor();
-							Color darkerColor = color.darker();
+							Color darkerC`olor = color.darker();
 							material.setDiffuseColor(darkerColor);
 							material.setSpecularColor(darkerColor);
 							cells[selectedIndex].setMaterial(material);
@@ -282,10 +289,16 @@ public class Window3DSubScene{
 	private void addCellsToScene() {
 		for (int i = 0; i < names.length; i ++) {
 			Sphere sphere = new Sphere(SIZE_SCALE*diameters[i]/2);
-			Color color = getColorRule(names[i]);
+			
+			Color color = getColorRule(namesLowerCase[i]);
 			PhongMaterial material = new PhongMaterial();
 	        material.setDiffuseColor(color);
 	        sphere.setMaterial(material);
+	        if (!namesLowerCase[i].startsWith(selectedPrefix)) {
+	        	System.out.println(names[i]);
+	        	sphere.setOpacity(0.05);
+	        }
+	        
 	        sphere.setTranslateX(positions[i][X_COR]);
 	        sphere.setTranslateY(positions[i][Y_COR]);
 	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
@@ -304,16 +317,26 @@ public class Window3DSubScene{
 	
 	private Color getColorRule(String name) {
 		name = name.toLowerCase();
-		if (name.startsWith("aba"))
-			return Color.RED.brighter();
-		else if (name.startsWith("abp"))
-			return Color.BLUE.brighter();
-		else if (name.startsWith("p"))
-			return Color.YELLOW.brighter();
-		else if (name.startsWith("ems"))
-			return Color.GREEN.brighter();
-		
-		return Color.WHITE;
+		if (selectedPrefix.isEmpty()) {
+			if (name.startsWith("aba"))
+				return Color.RED.brighter();
+			else if (name.startsWith("abp"))
+				return Color.BLUE.brighter();
+			else if (name.startsWith("p"))
+				return Color.YELLOW.brighter();
+			else if (name.startsWith("ems"))
+				return Color.GREEN.brighter();
+			
+			return Color.WHITE;
+		}
+		else {
+			if (name.startsWith(selectedPrefix))
+				return Color.GOLD.brighter();
+			else {
+				//return Color.TRANSPARENT;
+				return Color.web(UNSELECTED_COLOR_HEX);
+			}
+		}
 	}
 	
 	private void buildCamera() {
@@ -402,20 +425,25 @@ public class Window3DSubScene{
 		return this.endTime;
 	}
 	
-	
 	// Listener classes
 	public class SearchFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-			if (newValue.isEmpty())
-				buildScene(time.get());
+			selectedPrefix = newValue.toLowerCase();
+			buildScene(time.get());
+			/*
+			if (newValue.isEmpty()) {
+				buildScene(time.get());	
+			}
 			else {
-				String searched = newValue.toLowerCase();
 				for (int i = 0; i < names.length; i++) {
-					if (namesLowerCase[i].startsWith(searched))
+					if (namesLowerCase[i].startsWith(selectedPrefix)) {
 						System.out.println(names[i]);
+						
+					}
 				}
 			}
+			*/
 		}
 	}
 	
@@ -485,7 +513,8 @@ public class Window3DSubScene{
 	
 	private static final String CS = ", ";
 	
-	private static final String FILL_COLOR_HEX = "#272727";
+	private static final String FILL_COLOR_HEX = "#272727",
+			UNSELECTED_COLOR_HEX = "#333333";
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	

@@ -43,10 +43,7 @@
 			          </Tab>
 			          <Tab text="Search">
 			            <content>
-			              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <TextField fx:id="searchTextField" layoutX="14.0" layoutY="14.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                           </children></AnchorPane>
+			              <AnchorPane fx:id="searchTabAnchorPane" />
 			            </content>
 			          </Tab>
 			            <Tab text="Layers">
