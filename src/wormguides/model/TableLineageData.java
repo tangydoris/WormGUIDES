@@ -88,6 +88,7 @@ public class TableLineageData implements LineageData{
 			diameters.add(diameter);
 		}
 		
+		/*
 		private void setNames(ArrayList<String> names) {
 			this.names = names;
 		}
@@ -99,6 +100,7 @@ public class TableLineageData implements LineageData{
 		private void setSizes(ArrayList<Integer> sizes) {
 			this.diameters = sizes;
 		}
+		*/
 		
 		private String[] getNames() {
 			return names.toArray(new String[names.size()]);
@@ -122,7 +124,7 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private final static String NEWLINE = "\n";
-		private final static String CS = ", ";
+		//private final static String CS = ", ";
 	}
 
 }

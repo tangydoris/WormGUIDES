@@ -6,15 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class RootLayoutController {
-	
-	//@FXML private MenuItem menuAbout;
-	@FXML
-	private TextArea aboutText;
 	
 	private Stage aboutStage;
 	private Parent aboutRoot;
@@ -34,6 +29,7 @@ public class RootLayoutController {
 				aboutStage.setScene(new Scene(aboutRoot));
 				aboutStage.setTitle("About WormGUIDES");
 				aboutStage.initModality(Modality.APPLICATION_MODAL);
+				
 				aboutStage.show();
 			} catch (IOException e) {
 				System.out.println("cannot load about page.");

@@ -276,10 +276,10 @@ public class MainApp extends Application {
 			BACKWARD_BUTTON_ID = "#backwardButton",
 			FORWARD_BUTTON_ID = "#forwardButton",
 			PLAY_BUTTON_ID = "#playButton",
-			SEARCH_TEXTFIELD_ID = "#searchTextField",
+			//SEARCH_TEXTFIELD_ID = "#searchTextField",
 			TIME_LABEL_ID = "#timeLabel",
 			TOTAL_NUCLEI_LABEL_ID = "#totalNucleiLabel",
 			SEARCH_TAB_PANE_ID = "#searchTabAnchorPane";
 	
-	private static final String CS = ", ";
+	//private static final String CS = ", ";
 }

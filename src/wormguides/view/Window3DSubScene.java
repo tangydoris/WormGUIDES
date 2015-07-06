@@ -17,18 +17,15 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
-import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
 	
@@ -52,7 +49,6 @@ public class Window3DSubScene{
 	private Slider timeSlider;
 	
 	private BooleanProperty playingMovie;
-	private ImageView playIcon, pauseIcon;
 	private PlayService playService;
 	
 	private Sphere[] cells;
@@ -179,8 +175,8 @@ public class Window3DSubScene{
                 mouseOldY = mousePosY;
                 mousePosX = me.getSceneX();
                 mousePosY = me.getSceneY();
-                mouseDeltaX = (mousePosX - mouseOldX)/2;
-                mouseDeltaY = (mousePosY - mouseOldY)/2;
+                mouseDeltaX = (mousePosX - mouseOldX)/3;
+                mouseDeltaY = (mousePosY - mouseOldY)/3;
                 
                 double ryAngle = cameraXform.getRotateY();
                 cameraXform.setRotateY(ryAngle + mouseDeltaX);
@@ -295,7 +291,6 @@ public class Window3DSubScene{
 	        material.setDiffuseColor(color);
 	        sphere.setMaterial(material);
 	        if (!namesLowerCase[i].startsWith(selectedPrefix)) {
-	        	System.out.println(names[i]);
 	        	sphere.setOpacity(0.05);
 	        }
 	        
@@ -384,12 +379,14 @@ public class Window3DSubScene{
 		System.out.println("origin "+newOriginX+CS+newOriginY+CS+newOriginZ);
 	}
 	
+	/*
 	private void addLight() {
 		PointLight light = new PointLight(Color.WHITE);
         // JavaFX axis: left-top-near is minus, right-bottom-far is plus
         light.getTransforms().addAll(new Translate(-100, -100, -100));
         root.getChildren().add(light);
 	}
+	*/
 	
 	public void printCellNames() {
 		for (int i = 0; i < names.length; i++)
