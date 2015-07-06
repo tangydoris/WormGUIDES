@@ -520,7 +520,7 @@ public class Window3DSubScene{
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     
     private static final double CAMERA_NEAR_CLIP = 0.01;
-    private static final double CAMERA_FAR_CLIP = 1000;
+    private static final double CAMERA_FAR_CLIP = 50000;
     
     private static final int START_TIME = 1;
     private static final int X_COR = 0;

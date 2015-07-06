@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="deploy_app" name="WormGUIDES" xmlns:fx="javafx:com.sun.javafx.tools.ant">
+
+	<target name="default">
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
+                uri="javafx:com.sun.javafx.tools.ant"
+                classpath="C:/Program Files/Java/jdk1.8.0_45/lib/ant-javafx.jar"/>
+	</target>
+
+	<target name="create_jar" depends="default">
+		<fx:application name="WormGUIDES" mainClass="wormguides.MainApp" id="wormApp"/>
+
+		<fx:jar destfile="C:/cygwin64/home/tangh/WormGUIDES/WormGUIDES.jar">
+			<!-- Details about application -->
+		    <fx:application refId="wormApp" />
+		    <fileset dir="./bin/"/>
+		    <!-- Customize jar manifest (optional) -->
+		    <manifest>
+		        <attribute name="Class-Path" value="."/>
+		        <attribute name="Rsrc-Class-Path" value="./"/>
+		        <attribute name="Rsrc-Main-Class" value="wormguides.MainApp"/>
+		    </manifest>
+		</fx:jar>
+	</target>
+	<target name="deploy_app" depends="create_jar">
+	    <fx:deploy width="600" height="600" outdir="WormGUIDES" outfile="wormguides">
+	        <fx:info title="WormGUIDES"/>
+	        <fx:application refId="wormApp" />
+	    </fx:deploy>
+	</target>
+
+</project>
