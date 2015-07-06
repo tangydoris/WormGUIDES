@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="outfile.jnlp">
+  <information>
+    <title>Sample JavaFX Application</title>
+    <vendor>Unknown vendor</vendor>
+    <description>Sample JavaFX 2.0 application.</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="TestApp.jar" size="2951660" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="400" height="400" main-class="testApplet.TestApp"  name="TestApp" />
+  <update check="background"/>
+</jnlp>

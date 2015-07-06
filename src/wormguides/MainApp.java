@@ -1,6 +1,11 @@
 package wormguides;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
@@ -83,8 +88,29 @@ public class MainApp extends Application {
 		try {
             // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-            rootLayout = (BorderPane) loader.load();
+            //loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            
+            // Try this for applet loading
+            //loader.setLocation(MainApp.class.getResource("RootLayout.fxml"));
+            //rootLayout = (BorderPane) loader.load();
+            //InputStream input = XMLLoader.loadFXML(JAR_NAME);
+            
+            InputStream stream = null;
+			JarFile jarFile = new JarFile(new File(JAR_NAME));
+
+			Enumeration<JarEntry> entries = jarFile.entries();
+			
+			JarEntry entry;
+			while (entries.hasMoreElements()){
+				entry = entries.nextElement();
+				if (entry.getName().equals(FXML_ENTRY_NAME)) {
+					stream = jarFile.getInputStream(entry);
+				}
+			}
+	
+            if (stream == null)
+            	System.out.println("null input stream for fxml");
+            rootLayout = (BorderPane) loader.load(stream);
             
             this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
@@ -98,6 +124,7 @@ public class MainApp extends Application {
             getPropertiesFrom3DWindow();
             setLabels();
             
+            jarFile.close();
             
         } catch (IOException e) {
         	System.out.println("Could not initialize root layout.");
@@ -280,6 +307,8 @@ public class MainApp extends Application {
 			TIME_LABEL_ID = "#timeLabel",
 			TOTAL_NUCLEI_LABEL_ID = "#totalNucleiLabel",
 			SEARCH_TAB_PANE_ID = "#searchTabAnchorPane";
+	
+	private static final String FXML_ENTRY_NAME = "wormguides/view/RootLayout.fxml";
 	
 	//private static final String CS = ", ";
 }

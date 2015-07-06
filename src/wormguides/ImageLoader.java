@@ -25,8 +25,6 @@ public class ImageLoader {
 			JarEntry entry;
 			while (entries.hasMoreElements()){
 				entry = entries.nextElement();
-				//String name = entry.getName();
-				//System.out.println(name);
 				if (entry.getName().startsWith(ENTRY_PREFIX)) {
 					processImage(entry);
 				}
