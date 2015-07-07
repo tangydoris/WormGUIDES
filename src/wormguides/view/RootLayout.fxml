@@ -9,7 +9,7 @@
 
 <BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
-      <MenuBar fx:id="menu" BorderPane.alignment="CENTER">
+      <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -25,7 +25,7 @@
       </MenuBar>
    </top>
    <center>
-		<GridPane fx:id="mainGridPane" prefHeight="589.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+		<GridPane fx:id="mainGridPane" BorderPane.alignment="CENTER">
 			  <columnConstraints>
 			    <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
 			    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="100.0" />
@@ -64,16 +64,17 @@
 			            <Insets />
 			         </GridPane.margin>
 			         <bottom>
-			            <Pane prefHeight="160.0" prefWidth="554.0" style="-fx-border-color: grey;" BorderPane.alignment="BOTTOM_CENTER">
+			            <Pane prefHeight="158.0" style="-fx-border-color: grey;" BorderPane.alignment="BOTTOM_CENTER">
                      <BorderPane.margin>
                         <Insets top="3.0" />
-                     </BorderPane.margin></Pane>
+                     </BorderPane.margin>
+                  </Pane>
 			         </bottom>
                <padding>
                   <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                </padding>
                <center>
-                  <AnchorPane fx:id="modelAnchorPane" prefHeight="608.0" prefWidth="554.0" BorderPane.alignment="CENTER">
+                  <AnchorPane fx:id="modelAnchorPane" prefHeight="608.0" prefWidth="619.0" BorderPane.alignment="CENTER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -92,7 +93,8 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                     </children></AnchorPane>
+                     </children>
+                  </AnchorPane>
                </center>
 				</BorderPane>
 			</children>

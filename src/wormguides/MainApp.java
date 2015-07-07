@@ -115,8 +115,9 @@ public class MainApp extends Application {
             this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             
-            primaryStage.minWidthProperty().bind(scene.heightProperty());
-            primaryStage.minHeightProperty().bind(scene.widthProperty());
+            //primaryStage.minWidthProperty().bind(scene.heightProperty());
+            //primaryStage.minHeightProperty().bind(scene.widthProperty());
+            primaryStage.setResizable(true);
             
             fetchUIComponents();
             init3DWindow();
