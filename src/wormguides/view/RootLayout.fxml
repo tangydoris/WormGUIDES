@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.*?>
 <?import java.lang.*?>
@@ -48,7 +49,64 @@
 			          </Tab>
 			            <Tab text="Layers">
 			              <content>
-			                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+			                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="67.0" layoutY="1.0" prefHeight="739.0" prefWidth="240.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                 <children>
+                                    <HBox prefHeight="10.0" prefWidth="220.0">
+                                       <children>
+                                          <Label prefHeight="19.0" text="Search Layers:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="19.0" text="ABa cell, ancestors">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label prefHeight="19.0" text="ABp">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-border-radius: 3; -fx-background-radius: ;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label prefHeight="19.0" text="EMS">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-background-radius: ; -fx-border-radius: 3;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children></AnchorPane>
 			              </content>
 			            </Tab>
 			        </tabs>
@@ -63,13 +121,6 @@
 			         <GridPane.margin>
 			            <Insets />
 			         </GridPane.margin>
-			         <bottom>
-			            <Pane prefHeight="158.0" style="-fx-border-color: grey;" BorderPane.alignment="BOTTOM_CENTER">
-                     <BorderPane.margin>
-                        <Insets top="3.0" />
-                     </BorderPane.margin>
-                  </Pane>
-			         </bottom>
                <padding>
                   <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                </padding>
@@ -96,6 +147,16 @@
                      </children>
                   </AnchorPane>
                </center>
+               <bottom>
+                  <ScrollPane fx:id="informationPane" prefHeight="159.0" BorderPane.alignment="BOTTOM_CENTER">
+                    <content>
+                      <AnchorPane />
+                    </content>
+                     <BorderPane.margin>
+                        <Insets top="3.0" />
+                     </BorderPane.margin>
+                  </ScrollPane>
+               </bottom>
 				</BorderPane>
 			</children>
 		</GridPane>

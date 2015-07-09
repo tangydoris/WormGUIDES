@@ -19,10 +19,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -34,11 +36,15 @@ import javafx.stage.WindowEvent;
 public class MainApp extends Application {
 	
 	private Scene scene;
-	
 	private Stage primaryStage;
 	
+	private Stage aboutStage;
+	private Parent aboutRoot;
+	
 	private BorderPane rootLayout;
+	private BorderPane displayPanel;
 	private AnchorPane modelContainer;
+	private ScrollPane infoPane;
 	private Slider timeSlider;
 	private Button backwardButton;
 	private Button forwardButton;
@@ -51,6 +57,7 @@ public class MainApp extends Application {
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
+	private DoubleProperty infoPanelHeight;
 	
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
@@ -88,13 +95,10 @@ public class MainApp extends Application {
 		try {
             // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
-            //loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            this.rootLayout = (BorderPane) loader.load();
             
-            // Try this for applet loading
-            //loader.setLocation(MainApp.class.getResource("RootLayout.fxml"));
-            //rootLayout = (BorderPane) loader.load();
-            //InputStream input = XMLLoader.loadFXML(JAR_NAME);
-            
+            /*
             InputStream stream = null;
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 
@@ -108,9 +112,13 @@ public class MainApp extends Application {
 				}
 			}
 	
-            if (stream == null)
-            	System.out.println("null input stream for fxml");
-            rootLayout = (BorderPane) loader.load(stream);
+            if (stream == null) {
+            	rootLayout = null;
+            	System.out.println("no input stream for fxml file");
+            }
+            else 
+            	rootLayout = (BorderPane) loader.load(stream);
+        	*/
             
             this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
@@ -125,10 +133,10 @@ public class MainApp extends Application {
             getPropertiesFrom3DWindow();
             setLabels();
             
-            jarFile.close();
+            //jarFile.close();
             
         } catch (IOException e) {
-        	System.out.println("Could not initialize root layout.");
+        	System.out.println("could not initialize root layout.");
             e.printStackTrace();
         }
 	}
@@ -141,6 +149,8 @@ public class MainApp extends Application {
 	
 	private void fetchUIComponents() {
 		this.modelContainer = (AnchorPane)(scene.lookup(MODEL_COTNAINER_ID));
+		this.displayPanel = (BorderPane)(scene.lookup(DISPLAY_PANEL_ID));
+		this.infoPane = (ScrollPane)(scene.lookup(INFORMATION_PANE_ID));
 		this.timeSlider = (Slider)(scene.lookup(SLIDER_ID));
 		this.backwardButton = (Button)(scene.lookup(BACKWARD_BUTTON_ID));
 		this.forwardButton = (Button)(scene.lookup(FORWARD_BUTTON_ID));
@@ -150,6 +160,7 @@ public class MainApp extends Application {
 		
 		createSearchField();
 		setIcons();
+		sizeInfoPane();
 	}
 	
 	private void createSearchField() {
@@ -202,8 +213,7 @@ public class MainApp extends Application {
 			//window3D.setTimeLabel(timeLabel);
 			//window3D.setTotalNucleiLabel(totalNucleiLabel);
 			
-			sizeSubsceneRelativeToParent();
-			
+			sizeSubscene();
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot insatntiate 3D view.");
 			npe.printStackTrace();
@@ -276,20 +286,30 @@ public class MainApp extends Application {
 			return ""+time;
 	}
 	
-	private void sizeSubsceneRelativeToParent() {
+	private void sizeSubscene() {
 		this.subsceneWidth = new SimpleDoubleProperty();
 		subsceneWidth.bind(modelContainer.widthProperty());
 		this.subsceneHeight = new SimpleDoubleProperty();
 		subsceneHeight.bind(modelContainer.heightProperty().subtract(33));
 		
-		AnchorPane.setTopAnchor(subscene,  0.0);
-		AnchorPane.setLeftAnchor(subscene,  0.0);
-		AnchorPane.setRightAnchor(subscene,  0.0);
-		AnchorPane.setBottomAnchor(subscene,  33.0);
+		AnchorPane.setTopAnchor(subscene, 0.0);
+		AnchorPane.setLeftAnchor(subscene, 0.0);
+		AnchorPane.setRightAnchor(subscene, 0.0);
+		AnchorPane.setBottomAnchor(subscene, 33.0);
 		
 		subscene.widthProperty().bind(subsceneWidth);
 		subscene.heightProperty().bind(subsceneHeight);
 		subscene.setManaged(false);
+	}
+	
+	private void sizeInfoPane() {
+		try {
+			this.infoPanelHeight = new SimpleDoubleProperty();
+			infoPanelHeight.bind(displayPanel.heightProperty().divide(5));
+			infoPane.maxHeightProperty().bind(infoPanelHeight);
+		} catch (Exception e) {
+			System.out.println("canoot size information panel");
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -304,10 +324,11 @@ public class MainApp extends Application {
 			BACKWARD_BUTTON_ID = "#backwardButton",
 			FORWARD_BUTTON_ID = "#forwardButton",
 			PLAY_BUTTON_ID = "#playButton",
-			//SEARCH_TEXTFIELD_ID = "#searchTextField",
 			TIME_LABEL_ID = "#timeLabel",
 			TOTAL_NUCLEI_LABEL_ID = "#totalNucleiLabel",
-			SEARCH_TAB_PANE_ID = "#searchTabAnchorPane";
+			SEARCH_TAB_PANE_ID = "#searchTabAnchorPane",
+			DISPLAY_PANEL_ID = "#displayPanel",
+			INFORMATION_PANE_ID = "#informationPane";
 	
 	private static final String FXML_ENTRY_NAME = "wormguides/view/RootLayout.fxml";
 	
