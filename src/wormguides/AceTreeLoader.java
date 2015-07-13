@@ -17,7 +17,6 @@ public class AceTreeLoader {
 	
 	public static TableLineageData loadNucFiles(String jarPath) {
 		TableLineageData tld = new TableLineageData();
-		
 		try {
 			JarFile jarFile = new JarFile(new File(jarPath));
 
@@ -81,7 +80,7 @@ public class AceTreeLoader {
 		}
 	}
 	
-	private static final String ENTRY_PREFIX = "wormguides/nuclei_files/";
+	private static final String ENTRY_PREFIX = "wormguides/model/nuclei_files/";
 	private static final int TOKEN_ARRAY_SIZE = 21;
 	private static final int VALID = 1,
 		XCOR = 5,

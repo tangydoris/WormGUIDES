@@ -8,18 +8,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane prefHeight="800.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Close" />
+              <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem fx:id="menuAbout" mnemonicParsing="false" onAction="#menuAboutAction" text="About" />
+              <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About" />
             </items>
           </Menu>
         </menus>
@@ -28,14 +28,14 @@
    <center>
 		<GridPane fx:id="mainGridPane" BorderPane.alignment="CENTER">
 			  <columnConstraints>
-			    <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
-			    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="100.0" />
+			    <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" percentWidth="34.0" prefWidth="100.0" />
+			    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="66.0" prefWidth="100.0" />
 			  </columnConstraints>
 			  <rowConstraints>
 			    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 			  </rowConstraints>
 			   <children>
-			      <TabPane fx:id="dataPanel" minWidth="25.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="23.0" tabMinWidth="45.0">
+			      <TabPane fx:id="dataPanel" minWidth="25.0" prefHeight="771.0" prefWidth="258.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="23.0" tabMinWidth="45.0">
 			        <tabs>
 			          <Tab text="Data">
 			            <content>
@@ -44,18 +44,157 @@
 			          </Tab>
 			          <Tab text="Search">
 			            <content>
-			              <AnchorPane fx:id="searchTabAnchorPane" />
+			              <AnchorPane fx:id="searchTabAnchorPane">
+                           <children>
+                              <ScrollPane layoutX="1.0" layoutY="-18.0" prefViewportHeight="719.0" prefViewportWidth="269.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <content>
+                                    <VBox maxWidth="270.0" minWidth="270.0" prefWidth="270.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                       <children>
+                                          <Pane prefHeight="80.0" prefWidth="269.0" style="-fx-border-color: grey;" />
+                                          <Region prefHeight="5.0" />
+                                          <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="Search">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                <TextField fx:id="searchField" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" prefWidth="175.0" />
+                                             </children>
+                                          </HBox>
+                                          <Region prefHeight="5.0" prefWidth="250.0" />
+                                          <Label text="Search Type:" />
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Region prefHeight="22.0" prefWidth="40.0" />
+                                                <Label prefHeight="22.0" text="Systematic" />
+                                                <Region prefHeight="22.0" prefWidth="35.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0">
+                                                   <toggleGroup>
+                                                      <ToggleGroup fx:id="type" />
+                                                   </toggleGroup>
+                                                </RadioButton>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Region prefHeight="22.0" prefWidth="40.0" />
+                                                <Label prefHeight="22.0" text="Functional" />
+                                                <Region prefHeight="22.0" prefWidth="40.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Region prefHeight="22.0" prefWidth="40.0" />
+                                                <Label prefHeight="22.0" text="Description" />
+                                                <Region prefHeight="22.0" prefWidth="34.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Region prefHeight="22.0" prefWidth="40.0" />
+                                                <Label prefHeight="22.0" text="Gene" />
+                                                <Region prefHeight="22.0" prefWidth="70.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                             </children>
+                                          </HBox>
+                                          <Region prefHeight="15.0" />
+                                          <Label text="Search Options:" />
+                                          <Label text="     Cell Ancestry" />
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Cell" />
+                                                <Region prefHeight="22.0" prefWidth="82.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Ancestor" />
+                                                <Region prefHeight="22.0" prefWidth="52.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Descendant" />
+                                                <Region prefHeight="22.0" prefWidth="34.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <Label text="     Interactors" />
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Wired to" />
+                                                <Region prefHeight="22.0" prefWidth="77.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          L/R homologues" />
+                                                <Region prefHeight="22.0" prefWidth="29.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <Label text="     Geometry" />
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Nucleus" />
+                                                <Region prefHeight="22.0" prefWidth="57.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="200.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="          Cell shape" />
+                                                <Region prefHeight="22.0" prefWidth="43.0" />
+                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                             </children>
+                                          </HBox>
+                                          <Region prefHeight="15.0" />
+                                          <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
+                                             <children>
+                                                <Label prefHeight="22.0" text="Search Results:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" text="Add" />
+                                             </children>
+                                          </HBox>
+                                          <Region prefHeight="3.0" prefWidth="200.0" />
+                                          <AnchorPane fx:id="searchResultsPane" prefHeight="140.0" prefWidth="250.0" style="-fx-border-color: grey;">
+                                             <children>
+                                                <ListView fx:id="searchResultsList" layoutX="-12.0" layoutY="-22.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <padding>
+                                          <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
+                                       </padding>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
 			            </content>
 			          </Tab>
 			            <Tab text="Layers">
 			              <content>
 			                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <VBox layoutX="67.0" layoutY="1.0" prefHeight="739.0" prefWidth="240.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                              <VBox spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <HBox prefHeight="10.0" prefWidth="220.0">
                                        <children>
-                                          <Label prefHeight="19.0" text="Search Layers:">
+                                          <Label prefHeight="22.0" text="Search Layers:">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -64,49 +203,290 @@
                                     </HBox>
                                     <HBox spacing="2.0">
                                        <children>
-                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="19.0" text="ABa cell, ancestors">
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="ABa cell, ancestors">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
+                                          <Button fx:id="editAbaButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="abaEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="abaCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="2.0">
                                        <children>
-                                          <Label prefHeight="19.0" text="ABp">
+                                          <Label prefHeight="22.0" text="ABp">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-border-radius: 3; -fx-background-radius: ;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
+                                          <Button fx:id="editAbpButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="abpEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="abpCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="2.0">
                                        <children>
-                                          <Label prefHeight="19.0" text="EMS">
+                                          <Label prefHeight="22.0" text="EMS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
-                                          <Region prefHeight="19.0" prefWidth="19.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: red; -fx-background-radius: ; -fx-border-radius: 3;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" style="-fx-background-color: transparent;" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="19.0" maxWidth="19.0" minHeight="19.0" minWidth="19.0" mnemonicParsing="false" prefHeight="19.0" prefWidth="19.0" />
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
+                                          <Button fx:id="editEmsButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="emsEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button fx:id="emsCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                       </children>
+                                    </HBox>
+                                    <Region prefHeight="22.0" prefWidth="242.0" />
+                                    <Label prefHeight="22.0" text="Cell Shapes Available:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="-VNC">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="editAbaIcon1" alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="vncEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="     DD1...">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="dd1EyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="+Nerve Ring">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="nerveRingEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding></Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <Region prefHeight="22.0" prefWidth="242.0" />
+                                    <Label prefHeight="22.0" text="Tissue Type Layers:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="-Muscle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="musEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="     Body Wall">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="bodEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="     Pharyngeal">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="editAbaIcon11" alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="phaEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="+Neuronal">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="editAbaIcon111" alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="neuEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="+Alimentary">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="aliEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <Region prefHeight="22.0" prefWidth="242.0" />
+                                    <Label prefHeight="22.0" text="Tags:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="VNC Formation">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="tagVncEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="Nerve Ring Timeline">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                          <Button fx:id="tagNerEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox spacing="2.0">
+                                       <children>
+                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="Gastrulation Events">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="editAbaIcon12" alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: transparent;" visible="false" />
+                                          <Button fx:id="tagGasEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                             <padding>
+                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                             </padding>
+                                          </Button>
+                                          <Button alignment="CENTER_RIGHT" disable="true" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
                                        </children>
                                     </HBox>
                                  </children>
                               </VBox>
-                           </children></AnchorPane>
+                           </children>
+                        </AnchorPane>
 			              </content>
 			            </Tab>
 			        </tabs>
@@ -126,14 +506,11 @@
                </padding>
                <center>
                   <AnchorPane fx:id="modelAnchorPane" prefHeight="608.0" prefWidth="619.0" BorderPane.alignment="CENTER">
-                     <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                     </cursor>
                      <children>
-                        <Slider fx:id="timeSlider" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="0.0" />
-                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                        <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="37.0" />
-                        <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="73.0" />
+                        <Slider fx:id="timeSlider" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="0.0" />
+                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                        <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="32.0" />
+                        <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="66.0" />
                         <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="35.0" AnchorPane.rightAnchor="5.0">
                            <font>
                               <Font size="14.0" />
@@ -148,14 +525,38 @@
                   </AnchorPane>
                </center>
                <bottom>
-                  <ScrollPane fx:id="informationPane" prefHeight="159.0" BorderPane.alignment="BOTTOM_CENTER">
-                    <content>
-                      <AnchorPane />
-                    </content>
+                  <AnchorPane>
+                     <children>
+                        <ScrollPane fx:id="infoPane" prefHeight="159.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="BOTTOM_CENTER">
+                           <BorderPane.margin>
+                              <Insets top="3.0" />
+                           </BorderPane.margin>
+                           <content>
+                              <VBox prefWidth="550.0" spacing="5.0">
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                                 <children>
+                                    <Label fx:id="cellName">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="cellDescription">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    
+                                 </children>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </children>
                      <BorderPane.margin>
-                        <Insets top="3.0" />
+                        <Insets top="5.0" />
                      </BorderPane.margin>
-                  </ScrollPane>
+                  </AnchorPane>
                </bottom>
 				</BorderPane>
 			</children>

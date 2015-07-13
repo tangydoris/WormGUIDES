@@ -7,8 +7,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -20,7 +24,6 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -57,42 +60,44 @@ public class Window3DSubScene{
 	private Integer[][] positions;
 	private Integer[] diameters;
 	
-	private int selectedIndex;
+	private IntegerProperty selectedIndex;
+	private StringProperty selectedName;
 	
-	private String selectedPrefix;
-	
-	private SphereDragHandler sphereDragHandler;
+	private StringProperty searchedPrefix;
+	private ObservableList<String> searchResults;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
-		this.root = new Group();
+		root = new Group();
 		this.data = data;
-		this.time = new SimpleIntegerProperty();
+		time = new SimpleIntegerProperty();
 		time.set(START_TIME);
 		
-		this.cells = new Sphere[1];
-		this.names = new String[1];
-		this.positions = new Integer[1][3];
-		this.diameters = new Integer[1];
+		cells = new Sphere[1];
+		names = new String[1];
+		positions = new Integer[1][3];
+		diameters = new Integer[1];
 		
-		this.selectedIndex = -1;
-		this.selectedPrefix = "";
+		selectedIndex = new SimpleIntegerProperty();
+		selectedIndex.set(-1);
+		selectedName = new SimpleStringProperty();
+		selectedName.set("");
 		
-		this.sphereDragHandler = new SphereDragHandler();
+		searchedPrefix = new SimpleStringProperty();
+		searchedPrefix.set("");
+		searchResults = FXCollections.observableArrayList();
 		
-		this.totalNuclei = new SimpleIntegerProperty();
+		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
 		
-		this.endTime = data.getTotalTimePoints();
-		this.subscene = createSubScene(width, height);
+		endTime = data.getTotalTimePoints();
+		subscene = createSubScene(width, height);
 		
-		this.mousePosX = 0;
-		this.mousePosY = 0;
-		this.mouseOldX = 0;
-		this.mouseOldY = 0;
-		this.mouseDeltaX = 0;
-		this.mouseDeltaY = 0;
-		
-		//loadPlayPauseIcons();
+		mousePosX = 0;
+		mousePosY = 0;
+		mouseOldX = 0;
+		mouseOldY = 0;
+		mouseDeltaX = 0;
+		mouseDeltaY = 0;
 		
 		this.playService = new PlayService();
 		this.playingMovie = new SimpleBooleanProperty();
@@ -110,16 +115,32 @@ public class Window3DSubScene{
 		});
 	}
 	
+	public ObservableList<String> getSearchResults() {
+		return searchResults;
+	}
+	
 	public IntegerProperty getTimeProperty() {
-		return this.time;
+		return time;
+	}
+	
+	public IntegerProperty getSelectedIndex() {
+		return selectedIndex;
+	}
+	
+	public StringProperty getSelectedName() {
+		return selectedName;
+	}
+	
+	public StringProperty getSearchedPrefix() {
+		return searchedPrefix;
 	}
 	
 	public IntegerProperty getTotalNucleiProperty() {
-		return this.totalNuclei;
+		return totalNuclei;
 	}
 	
 	public BooleanProperty getPlayingMovieProperty() {
-		return this.playingMovie;
+		return playingMovie;
 	}
 	
 	public void setSlider(Slider timeSlider) {
@@ -127,30 +148,6 @@ public class Window3DSubScene{
 		setSliderProperties();
 	}
 	
-	/*
-	private void loadPlayPauseIcons() {
-		try {
-			this.playIcon = new ImageView(new Image(getClass().getResourceAsStream("./icons/play.png")));
-			this.pauseIcon = new ImageView(new Image(getClass().getResourceAsStream("./icons/pause.png")));
-		} catch (NullPointerException npe) {
-			System.out.println("cannot load play/pause icons");
-		}
-	}
-	*/
-	
-	/*
-	public void setUIComponents(Slider timeSlider, Button backwardButton, Button forwardButton, Button playButton,
-			TextField searchTextField) {
-		this.timeSlider = timeSlider;
-		this.backwardButton = backwardButton;
-		this.forwardButton = forwardButton;
-		this.playButton = playButton;
-		this.searchTextField = searchTextField;
-		
-		setSliderProperties();
-	}
-	*/
-
 	private void setSliderProperties() {
 		try {
 			timeSlider.setMin(1);
@@ -162,7 +159,7 @@ public class Window3DSubScene{
 	}
 	
 	private SubScene createSubScene(Double width, Double height) {
-		this.subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
+		subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
 
 		subscene.setFill(Color.web(FILL_COLOR_HEX, 1.0));
 		subscene.setCursor(Cursor.HAND);
@@ -180,10 +177,8 @@ public class Window3DSubScene{
                 
                 double ryAngle = cameraXform.getRotateY();
                 cameraXform.setRotateY(ryAngle + mouseDeltaX);
-                //System.out.println("Y: "+(ryAngle + mouseDeltaX));
                 double rxAngle = cameraXform.getRotateX();
                 cameraXform.setRotateX(rxAngle + mouseDeltaY);
-                //System.out.println("X: "+(rxAngle + mouseDeltaY));
 			}
 		});
 		
@@ -196,38 +191,13 @@ public class Window3DSubScene{
 		subscene.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
 				PickResult result = me.getPickResult();
-				//System.out.println(result.toString());
 				Node node = result.getIntersectedNode();
-				//System.out.println(node.toString());
 				if (node instanceof Sphere) {
-					int index = fetchPickedSphereIndex((Sphere)node);
-					selectedIndex = index;
-					
-					System.out.println(names[selectedIndex]);
-					
-					/*
-					if (index != -1) {
-						if (selectedIndex != -1) {
-							PhongMaterial material = (PhongMaterial)(cells[selectedIndex].getMaterial());
-							Color color = material.getDiffuseColor();
-							Color darkerC`olor = color.darker();
-							material.setDiffuseColor(darkerColor);
-							material.setSpecularColor(darkerColor);
-							cells[selectedIndex].setMaterial(material);
-						}
-						
-						selectedIndex = index;
-						PhongMaterial material = (PhongMaterial)(cells[selectedIndex].getMaterial());
-						Color color = material.getDiffuseColor();
-						Color brighterColor = color.brighter();
-						material.setDiffuseColor(brighterColor);
-						material.setSpecularColor(brighterColor);
-						cells[selectedIndex].setMaterial(material);
-					}
-					*/
+					selectedIndex.set(fetchPickedSphereIndex((Sphere)node));
+					selectedName.set(names[selectedIndex.get()]);
 				}
 				else
-					selectedIndex = -1;
+					selectedIndex.set(-1);
 			}
 		});
 		subscene.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -241,6 +211,10 @@ public class Window3DSubScene{
 		buildScene(time.get());
 		
 		return subscene;
+	}
+	
+	private String getDescription(String name) {
+		return "fetch cell description...";
 	}
 	
 	private int fetchPickedSphereIndex(Sphere picked) {
@@ -258,12 +232,12 @@ public class Window3DSubScene{
 		// Frame is indexed 1 less than the time requested
 		time--;
 		refreshScene();
-		this.names = data.getNames(time);
-		this.namesLowerCase = toLowerCaseAll(names);
-		this.totalNuclei.set(names.length);
-		this.positions = data.getPositions(time);
-		this.diameters = data.getDiameters(time);
-		this.cells = new Sphere[names.length];
+		names = data.getNames(time);
+		namesLowerCase = toLowerCaseAll(names);
+		totalNuclei.set(names.length);
+		positions = data.getPositions(time);
+		diameters = data.getDiameters(time);
+		cells = new Sphere[names.length];
 		
 		addCellsToScene();
 	}
@@ -290,18 +264,13 @@ public class Window3DSubScene{
 			PhongMaterial material = new PhongMaterial();
 	        material.setDiffuseColor(color);
 	        sphere.setMaterial(material);
-	        if (!namesLowerCase[i].startsWith(selectedPrefix)) {
+	        if (!namesLowerCase[i].startsWith(searchedPrefix.get())) {
 	        	sphere.setOpacity(0.05);
 	        }
 	        
 	        sphere.setTranslateX(positions[i][X_COR]);
 	        sphere.setTranslateY(positions[i][Y_COR]);
 	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
-	        
-	        sphere.setOnMouseDragOver(sphereDragHandler);
-	        sphere.setOnMouseDragEntered(sphereDragHandler);
-	        sphere.setOnMouseDragExited(sphereDragHandler);
-	        //sphere.setOnMouseDragged(sphereDragHandler);
 	        
 	        cells[i] = sphere;
 	        root.getChildren().add(sphere);
@@ -312,7 +281,8 @@ public class Window3DSubScene{
 	
 	private Color getColorRule(String name) {
 		name = name.toLowerCase();
-		if (selectedPrefix.isEmpty()) {
+		String prefix = searchedPrefix.get();
+		if (prefix.isEmpty()) {
 			if (name.startsWith("aba"))
 				return Color.RED.brighter();
 			else if (name.startsWith("abp"))
@@ -325,8 +295,8 @@ public class Window3DSubScene{
 			return Color.WHITE;
 		}
 		else {
-			if (name.startsWith(selectedPrefix))
-				return Color.GOLD.brighter();
+			if (name.startsWith(prefix))
+				return Color.GOLD.brighter().brighter();
 			else {
 				//return Color.TRANSPARENT;
 				return Color.web(UNSELECTED_COLOR_HEX);
@@ -418,6 +388,12 @@ public class Window3DSubScene{
 		return new SliderListener();
 	}
 	
+	/*
+	public ChangeListener<Number> getSelectedNameListener() {
+		return new SelectedNameListener();
+	}
+	*/
+	
 	public int getEndTime() {
 		return this.endTime;
 	}
@@ -426,21 +402,20 @@ public class Window3DSubScene{
 	public class SearchFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-			selectedPrefix = newValue.toLowerCase();
-			buildScene(time.get());
-			/*
-			if (newValue.isEmpty()) {
-				buildScene(time.get());	
-			}
-			else {
+			searchedPrefix.set(newValue.toLowerCase());
+			 
+			searchResults.clear();
+			if (!searchedPrefix.get().isEmpty()) {
 				for (int i = 0; i < names.length; i++) {
-					if (namesLowerCase[i].startsWith(selectedPrefix)) {
-						System.out.println(names[i]);
-						
+					//System.out.println(names[i]);
+					if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
+						//System.out.println(names[i]);
+						searchResults.add(names[i]);
 					}
 				}
 			}
-			*/
+			
+			buildScene(time.get());
 		}
 	}
 	
@@ -470,13 +445,14 @@ public class Window3DSubScene{
 		}
 	}
 	
-	private class SphereDragHandler implements EventHandler<MouseDragEvent> {
+	/*
+	public class SelectedNameListener implements ChangeListener<Number> {
 		@Override
-		public void handle(MouseDragEvent event) {
-			System.out.println("dragged over sphere");
-			return;
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			
 		}
 	}
+	*/
 	
 	private class PlayService extends Service<Void>{
 		@Override

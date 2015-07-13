@@ -12,7 +12,8 @@ import javafx.scene.image.ImageView;
 
 public class ImageLoader {
 	
-	public ImageView forward, backward, play, pause;
+	private ImageView forward, backward, play, pause;
+	private Image edit, eye, close;
 	JarFile jarFile;
 	
 	public ImageLoader(String jarPath) {
@@ -39,7 +40,19 @@ public class ImageLoader {
 	
 	public void processImage(JarEntry entry) throws IOException {
 		InputStream input = jarFile.getInputStream(entry);
-		ImageView icon = new ImageView(new Image(input));
+		Image image = new Image(input);
+		switch (entry.getName()) {
+			case EDIT_PNG:
+				this.edit = image;
+				return;
+			case EYE_PNG:
+				this.eye = image;
+				return;
+			case CLOSE_PNG:
+				this.close = image;
+				return;
+		}
+		ImageView icon = new ImageView(image);
 		switch (entry.getName()) {
 			case BACKWARD_PNG:
 				this.backward = icon;
@@ -72,10 +85,24 @@ public class ImageLoader {
 		return this.pause;
 	}
 	
+	public ImageView getEditIcon() {
+		return new ImageView(edit);
+	}
+	
+	public ImageView getEyeIcon() {
+		return new ImageView(eye);
+	}
+	
+	public ImageView getCloseIcon() {
+		return new ImageView(close);
+	}
+	
 	private static final String ENTRY_PREFIX = "wormguides/view/icons/",
 			BACKWARD_PNG = ENTRY_PREFIX+"backward.png",
 			FORWARD_PNG = ENTRY_PREFIX+"forward.png",
 			PAUSE_PNG = ENTRY_PREFIX+"pause.png",
-			PLAY_PNG = ENTRY_PREFIX+"play.png";
-	
+			PLAY_PNG = ENTRY_PREFIX+"play.png",
+			EDIT_PNG = ENTRY_PREFIX+"edit.png",
+			EYE_PNG = ENTRY_PREFIX+"eye.png",
+			CLOSE_PNG = ENTRY_PREFIX+"close.png";
 }
