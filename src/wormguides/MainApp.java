@@ -1,12 +1,6 @@
 package wormguides;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 import wormguides.model.TableLineageData;
 import wormguides.view.Window3DSubScene;
 import javafx.application.Application;

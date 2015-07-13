@@ -13,8 +13,6 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -30,6 +28,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
  
 /** Example of how Rotation Transforms work in JavaFX */
+@SuppressWarnings("deprecation")
 public class RotationTransformExample extends Application {
   @Override public void start(final Stage stage) throws Exception {
     stage.setTitle("Rotation Transform Example");
