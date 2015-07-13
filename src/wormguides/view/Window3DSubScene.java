@@ -79,8 +79,29 @@ public class Window3DSubScene{
 		
 		selectedIndex = new SimpleIntegerProperty();
 		selectedIndex.set(-1);
+		/*
+		selectedIndex.addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		*/
+		
 		selectedName = new SimpleStringProperty();
 		selectedName.set("");
+		selectedName.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				int selected = getIndexByName(newValue);
+				if (selected != -1)
+					selectedIndex.set(selected);
+			}
+		});
 		
 		searchedPrefix = new SimpleStringProperty();
 		searchedPrefix.set("");
@@ -194,7 +215,7 @@ public class Window3DSubScene{
 				PickResult result = me.getPickResult();
 				Node node = result.getIntersectedNode();
 				if (node instanceof Sphere) {
-					selectedIndex.set(fetchPickedSphereIndex((Sphere)node));
+					selectedIndex.set(getPickedSphereIndex((Sphere)node));
 					selectedName.set(names[selectedIndex.get()]);
 				}
 				else
@@ -214,10 +235,17 @@ public class Window3DSubScene{
 		return subscene;
 	}
 	
-	private int fetchPickedSphereIndex(Sphere picked) {
+	private int getIndexByName(String name) {
+		for (int i = 0; i < names.length; i++) {
+			if (names[i].equals(name))
+				return i;
+		}
+		return -1;
+	}
+	
+	private int getPickedSphereIndex(Sphere picked) {
 		for (int i = 0; i < names.length; i++) {
 			if (cells[i].equals(picked)) {
-				
 				return i;
 			}
 		}
@@ -342,18 +370,8 @@ public class Window3DSubScene{
 		// Set new origin to average X Y positions
 		cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
-		
-		System.out.println("origin "+newOriginX+CS+newOriginY+CS+newOriginZ);
+		//System.out.println("origin "+newOriginX+CS+newOriginY+CS+newOriginZ);
 	}
-	
-	/*
-	private void addLight() {
-		PointLight light = new PointLight(Color.WHITE);
-        // JavaFX axis: left-top-near is minus, right-bottom-far is plus
-        light.getTransforms().addAll(new Translate(-100, -100, -100));
-        root.getChildren().add(light);
-	}
-	*/
 	
 	public void printCellNames() {
 		for (int i = 0; i < names.length; i++)
@@ -384,12 +402,6 @@ public class Window3DSubScene{
 	public ChangeListener<Number> getSliderListener() {
 		return new SliderListener();
 	}
-	
-	/*
-	public ChangeListener<Number> getSelectedNameListener() {
-		return new SelectedNameListener();
-	}
-	*/
 	
 	public int getEndTime() {
 		return this.endTime;

@@ -43,7 +43,7 @@ public class PartsList {
 						sulstonNames.add(lineArray[1]);
 						descriptions.add(lineArray[2]);
 					}
-					System.out.println("partslist size "+properNames.size());
+					//System.out.println("partslist size "+properNames.size());
 					break;
 				}
 			}

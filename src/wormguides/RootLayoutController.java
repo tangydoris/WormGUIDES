@@ -3,6 +3,7 @@ package wormguides;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
@@ -25,6 +26,7 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -133,8 +135,6 @@ public class RootLayoutController implements Initializable{
 		time = window3D.getTimeProperty();
 		totalNuclei = window3D.getTotalNucleiProperty();
 		playingMovie = window3D.getPlayingMovieProperty();
-		//searchResults = window3D.getSearchResults();
-		//selectedIndex = window3D.getSelectedIndex();
 		selectedName = window3D.getSelectedName();
 	}
 	
@@ -158,10 +158,38 @@ public class RootLayoutController implements Initializable{
 							if (name.toLowerCase().startsWith(searched))
 								searchResults.add(name);
 						}
+						searchResults.sort(new Comparator<String>() {
+							@Override
+							public int compare(String s0, String s1) {
+								return s0.compareTo(s1);
+							}
+						});
 					}
 				}
 			});
 			searchResultsList.setItems(searchResults);
+			searchResultsList.getSelectionModel().selectedItemProperty().addListener(
+					new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					setSelectedInfo(newValue);
+					selectedName.set(newValue);
+				}
+			});
+			searchResultsList.selectionModelProperty().addListener(
+					new ChangeListener<MultipleSelectionModel<String>>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends MultipleSelectionModel<String>> observable,
+						MultipleSelectionModel<String> oldValue,
+						MultipleSelectionModel<String> newValue) {
+					String sulston = newValue.getSelectedItem();
+					System.out.println(sulston);
+					setSelectedInfo(sulston);
+				}
+			});
 			
 			// Add selected index manipulation of cell name/description here
 			selectedName.addListener(new ChangeListener<String> () {
@@ -169,20 +197,24 @@ public class RootLayoutController implements Initializable{
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
 					String sulston = selectedName.get();
-					String proper = partsList.getProperName(sulston);
-					if (proper == null) {
-						cellName.setText(sulston);
-						cellDescription.setText("");
-					}
-					else {
-						cellName.setText(sulston+" ("+proper+")");
-						cellDescription.setText(partsList.getDescription(sulston));
-					}
+					setSelectedInfo(sulston);
 				}
 			});
 			
 		} catch (NullPointerException npe) {
 			System.out.println("cannot add listener for oen or more UI components");
+		}
+	}
+	
+	private void setSelectedInfo(String sulston) {
+		String proper = partsList.getProperName(sulston);
+		if (proper == null) {
+			cellName.setText(sulston);
+			cellDescription.setText("");
+		}
+		else {
+			cellName.setText(sulston+" ("+proper+")");
+			cellDescription.setText(partsList.getDescription(sulston));
 		}
 	}
 	
