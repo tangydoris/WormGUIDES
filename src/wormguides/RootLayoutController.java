@@ -148,8 +148,7 @@ public class RootLayoutController implements Initializable{
 			searchResults = FXCollections.observableArrayList();
 			searchField.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(
-						ObservableValue<? extends String> observable,
+				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
 					String searched = newValue.toLowerCase();
 					searchResults.clear();

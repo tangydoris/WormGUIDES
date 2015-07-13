@@ -26,7 +26,7 @@
       </MenuBar>
    </top>
    <center>
-		<GridPane fx:id="mainGridPane" BorderPane.alignment="CENTER">
+		<GridPane fx:id="mainGridPane" pickOnBounds="false" BorderPane.alignment="CENTER">
 			  <columnConstraints>
 			    <ColumnConstraints hgrow="SOMETIMES" maxWidth="256.0" minWidth="10.0" percentWidth="34.0" prefWidth="100.0" />
 			    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="66.0" prefWidth="100.0" />
@@ -35,7 +35,7 @@
 			    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 			  </rowConstraints>
 			   <children>
-			      <TabPane fx:id="dataPanel" minWidth="25.0" prefHeight="771.0" prefWidth="258.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="23.0" tabMinWidth="45.0">
+			      <TabPane fx:id="dataPanel" maxWidth="289.0" prefWidth="289.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="23.0" tabMinWidth="45.0">
 			        <tabs>
 			          <Tab text="Data">
 			            <content>
