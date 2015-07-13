@@ -11,6 +11,6 @@ public class XMLLoader {
 		return stream;
 	}
 	
-	private static final String ENTRY_NAME = "wormguides/view/RootLayout.fxml";
+	//private static final String ENTRY_NAME = "wormguides/view/RootLayout.fxml";
 	
 }

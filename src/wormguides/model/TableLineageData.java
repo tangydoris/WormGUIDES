@@ -5,9 +5,16 @@ import java.util.ArrayList;
 public class TableLineageData implements LineageData{
 	
 	private ArrayList<Frame> timeFrames;
+	private ArrayList<String> allCellNames;
 	
 	public TableLineageData() {
 		timeFrames = new ArrayList<Frame>();
+		allCellNames = new ArrayList<String>();
+	}
+	
+	@Override
+	public ArrayList<String> getAllCellNames() {
+		return allCellNames;
 	}
 
 	@Override
@@ -53,6 +60,9 @@ public class TableLineageData implements LineageData{
 			Integer[] position = new Integer[]{x, y, z};
 			frame.addPosition(position);
 			frame.addDiameter(diameter);
+			
+			if (!allCellNames.contains(name))
+				allCellNames.add(name);
 		}
 	}
 	

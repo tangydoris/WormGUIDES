@@ -25,7 +25,7 @@ public class PartsList {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 	
 			Enumeration<JarEntry> entries = jarFile.entries();
-			int time = 0;
+			//int time = 0;
 			
 			JarEntry entry;
 			while (entries.hasMoreElements()){

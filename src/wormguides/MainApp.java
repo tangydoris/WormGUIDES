@@ -102,7 +102,7 @@ public class MainApp extends Application {
 			TAG_GAS_EYE_ICON_ID = "#tagGasEyeIcon";
 	*/
 	
-	private static final String FXML_ENTRY_NAME = "wormguides/view/RootLayout.fxml";
+	//private static final String FXML_ENTRY_NAME = "wormguides/view/RootLayout.fxml";
 	
 	//private static final String CS = ", ";
 }

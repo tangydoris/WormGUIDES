@@ -64,7 +64,7 @@ public class Window3DSubScene{
 	private StringProperty selectedName;
 	
 	private StringProperty searchedPrefix;
-	private ObservableList<String> searchResults;
+	private ObservableList<String> subSceneSearchResults;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -84,7 +84,7 @@ public class Window3DSubScene{
 		
 		searchedPrefix = new SimpleStringProperty();
 		searchedPrefix.set("");
-		searchResults = FXCollections.observableArrayList();
+		subSceneSearchResults = FXCollections.observableArrayList();
 		
 		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
@@ -104,7 +104,8 @@ public class Window3DSubScene{
 		playingMovie.set(false);
 		playingMovie.addListener(new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
 				if (newValue) {
 					playService.restart();
 				}
@@ -116,7 +117,7 @@ public class Window3DSubScene{
 	}
 	
 	public ObservableList<String> getSearchResults() {
-		return searchResults;
+		return subSceneSearchResults;
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -211,10 +212,6 @@ public class Window3DSubScene{
 		buildScene(time.get());
 		
 		return subscene;
-	}
-	
-	private String getDescription(String name) {
-		return "fetch cell description...";
 	}
 	
 	private int fetchPickedSphereIndex(Sphere picked) {
@@ -401,16 +398,17 @@ public class Window3DSubScene{
 	// Listener classes
 	public class SearchFieldListener implements ChangeListener<String> {
 		@Override
-		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+		public void changed(ObservableValue<? extends String> observable,
+				String oldValue, String newValue) {
 			searchedPrefix.set(newValue.toLowerCase());
 			 
-			searchResults.clear();
+			subSceneSearchResults.clear();
 			if (!searchedPrefix.get().isEmpty()) {
 				for (int i = 0; i < names.length; i++) {
 					//System.out.println(names[i]);
 					if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
 						//System.out.println(names[i]);
-						searchResults.add(names[i]);
+						subSceneSearchResults.add(names[i]);
 					}
 				}
 			}
@@ -437,22 +435,14 @@ public class Window3DSubScene{
 	
 	public class SliderListener implements ChangeListener<Number> {
 		@Override
-		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+		public void changed(ObservableValue<? extends Number> observable,
+				Number oldValue, Number newValue) {
 			time.set(newValue.intValue());
 			int t = time.get();
 			if (t > 0 & t <= endTime)
 				buildScene(t);
 		}
 	}
-	
-	/*
-	public class SelectedNameListener implements ChangeListener<Number> {
-		@Override
-		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-			
-		}
-	}
-	*/
 	
 	private class PlayService extends Service<Void>{
 		@Override

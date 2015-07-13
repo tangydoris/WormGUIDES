@@ -2,6 +2,7 @@ package wormguides;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
@@ -11,6 +12,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -60,12 +62,12 @@ public class RootLayoutController implements Initializable{
 	
 	// Search controls
 	@FXML public TextField searchField;
+	private ArrayList<String> allCellNames;
 	private ObservableList<String> searchResults;
 	@FXML public ListView<String> searchResultsList;
 	
 	// Cell selection
 	private StringProperty selectedName;
-	//private StringProperty selectedDescription;
 	
 	// Layers controls
 	@FXML public Button editAbaButton, editAbpButton, editEmsButton;
@@ -113,14 +115,11 @@ public class RootLayoutController implements Initializable{
 			aboutStage.show();
 	}
 	
-	public void init3DWindow() {
-		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
+	public void init3DWindow(TableLineageData data) {
 		try {
-			Double width = modelAnchorPane.prefWidth(-1);
-			Double height = modelAnchorPane.prefHeight(-1);
-			
-			this.window3D = new Window3DSubScene(width, height, data);
-			this.subscene = window3D.getSubScene();
+			window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
+					modelAnchorPane.prefHeight(-1), data);
+			subscene = window3D.getSubScene();
 			modelAnchorPane.getChildren().add(subscene);
 			
 			window3D.setSlider(timeSlider);
@@ -134,10 +133,9 @@ public class RootLayoutController implements Initializable{
 		time = window3D.getTimeProperty();
 		totalNuclei = window3D.getTotalNucleiProperty();
 		playingMovie = window3D.getPlayingMovieProperty();
-		searchResults = window3D.getSearchResults();
+		//searchResults = window3D.getSearchResults();
 		//selectedIndex = window3D.getSelectedIndex();
 		selectedName = window3D.getSelectedName();
-		//selectedDescription = window3D.getSelectedDescription();
 	}
 	
 	private void addListeners() {
@@ -147,12 +145,29 @@ public class RootLayoutController implements Initializable{
 			forwardButton.setOnAction(window3D.getForwardButtonListener());
 			
 			searchField.textProperty().addListener(window3D.getSearchFieldListener());
+			searchResults = FXCollections.observableArrayList();
+			searchField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(
+						ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+					String searched = newValue.toLowerCase();
+					searchResults.clear();
+					if (!searched.isEmpty()) {
+						for (String name : allCellNames) {
+							if (name.toLowerCase().startsWith(searched))
+								searchResults.add(name);
+						}
+					}
+				}
+			});
 			searchResultsList.setItems(searchResults);
 			
 			// Add selected index manipulation of cell name/description here
 			selectedName.addListener(new ChangeListener<String> () {
 				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				public void changed(ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
 					String sulston = selectedName.get();
 					String proper = partsList.getProperName(sulston);
 					if (proper == null) {
@@ -202,7 +217,8 @@ public class RootLayoutController implements Initializable{
 		try {
 			time.addListener(new ChangeListener<Number>() {
 				@Override
-				public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				public void changed(ObservableValue<? extends Number> observable,
+						Number oldValue, Number newValue) {
 					int newTime = newValue.intValue();
 					if (newTime < 1)
 						newTime = 1;
@@ -221,7 +237,8 @@ public class RootLayoutController implements Initializable{
 		try {
 			totalNuclei.addListener(new ChangeListener<Number>() {
 				@Override
-				public void changed(ObservableValue<? extends Number> observable,Number oldValue, Number newValue) {
+				public void changed(ObservableValue<? extends Number> observable,
+						Number oldValue, Number newValue) {
 					totalNucleiLabel.setText(newValue.intValue()+" Nuclei");
 				}
 			});
@@ -307,8 +324,10 @@ public class RootLayoutController implements Initializable{
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		partsList = new PartsList();
+		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
+		allCellNames = data.getAllCellNames();
 		
-		init3DWindow();
+		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
         addListeners();
