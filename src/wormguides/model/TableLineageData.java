@@ -1,6 +1,7 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class TableLineageData implements LineageData{
 	
@@ -14,6 +15,12 @@ public class TableLineageData implements LineageData{
 	
 	@Override
 	public ArrayList<String> getAllCellNames() {
+		allCellNames.sort(new Comparator<String>() {
+			@Override
+			public int compare(String s0, String s1) {
+				return s0.compareTo(s1);
+			}
+		});
 		return allCellNames;
 	}
 

@@ -3,7 +3,6 @@ package wormguides;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,8 +12,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -62,10 +59,12 @@ public class RootLayoutController implements Initializable{
 	@FXML public Label timeLabel, totalNucleiLabel;
 	@FXML public Slider timeSlider;
 	
-	// Search controls
+	// Search
+	private Search search;
+	private ArrayList<String> cellNames;
 	@FXML public TextField searchField;
-	private ArrayList<String> allCellNames;
-	private ObservableList<String> searchResults;
+	//private ArrayList<String> allCellNames;
+	//private ObservableList<String> searchResults;
 	@FXML public ListView<String> searchResultsList;
 	
 	// Cell selection
@@ -145,28 +144,6 @@ public class RootLayoutController implements Initializable{
 			forwardButton.setOnAction(window3D.getForwardButtonListener());
 			
 			searchField.textProperty().addListener(window3D.getSearchFieldListener());
-			searchResults = FXCollections.observableArrayList();
-			searchField.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					String searched = newValue.toLowerCase();
-					searchResults.clear();
-					if (!searched.isEmpty()) {
-						for (String name : allCellNames) {
-							if (name.toLowerCase().startsWith(searched))
-								searchResults.add(name);
-						}
-						searchResults.sort(new Comparator<String>() {
-							@Override
-							public int compare(String s0, String s1) {
-								return s0.compareTo(s1);
-							}
-						});
-					}
-				}
-			});
-			searchResultsList.setItems(searchResults);
 			searchResultsList.getSelectionModel().selectedItemProperty().addListener(
 					new ChangeListener<String>() {
 				@Override
@@ -354,12 +331,29 @@ public class RootLayoutController implements Initializable{
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		long start_time = System.nanoTime();
 		partsList = new PartsList();
+		long end_time = System.nanoTime();
+		double difference = (end_time - start_time)/1e6;
+		System.out.println("parts list init "+difference+"ms");
+		
+		start_time = System.nanoTime();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		allCellNames = data.getAllCellNames();
+		end_time = System.nanoTime();
+		difference = (end_time - start_time)/1e6;
+		System.out.println("process nuc files "+difference+"ms");
+		
+		//start_time = System.nanoTime();
+		cellNames = data.getAllCellNames();
+		//end_time = System.nanoTime();
+		//difference = (end_time - start_time)/1e6;
+		//System.out.println("get cell names "+difference+"ms");
 		
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
+		
+		search = new Search(window3D, searchField, searchResultsList);
+		search.setCellNames(cellNames);
 		
         addListeners();
         

@@ -24,8 +24,12 @@ public class MainApp extends Application {
 		
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("WormGUIDES");
-
+		
+		long start_time = System.nanoTime();
 		initRootLayout();
+		long end_time = System.nanoTime();
+		double difference = (end_time - start_time)/1e6;
+		System.out.println("root layout init "+difference+"ms");
 		
 		primaryStage.setResizable(true);
 		primaryStage.show();
