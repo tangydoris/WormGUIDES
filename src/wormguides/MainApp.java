@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import wormguides.view.RootLayout;
 
 public class MainApp extends Application {
 	
@@ -45,6 +46,7 @@ public class MainApp extends Application {
 	}
 	
 	public void initRootLayout() {
+		/*
 		try {
             // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
@@ -59,6 +61,13 @@ public class MainApp extends Application {
         	System.out.println("could not initialize root layout.");
             e.printStackTrace();
         }
+        */
+		
+		rootLayout = (new RootLayout()).load();
+		
+		scene = new Scene(rootLayout);
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(true);
 	}
 	
 	public static void main(String[] args) {

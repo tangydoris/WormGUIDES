@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="800.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane prefHeight="800.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -70,11 +70,7 @@
                                                 <Region prefHeight="22.0" prefWidth="40.0" />
                                                 <Label prefHeight="22.0" text="Systematic" />
                                                 <Region prefHeight="22.0" prefWidth="35.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0">
-                                                   <toggleGroup>
-                                                      <ToggleGroup fx:id="type" />
-                                                   </toggleGroup>
-                                                </RadioButton>
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
@@ -82,7 +78,7 @@
                                                 <Region prefHeight="22.0" prefWidth="40.0" />
                                                 <Label prefHeight="22.0" text="Functional" />
                                                 <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
@@ -90,7 +86,7 @@
                                                 <Region prefHeight="22.0" prefWidth="40.0" />
                                                 <Label prefHeight="22.0" text="Description" />
                                                 <Region prefHeight="22.0" prefWidth="34.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
@@ -98,7 +94,7 @@
                                                 <Region prefHeight="22.0" prefWidth="40.0" />
                                                 <Label prefHeight="22.0" text="Gene" />
                                                 <Region prefHeight="22.0" prefWidth="70.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                              </children>
                                           </HBox>
                                           <Region prefHeight="15.0" />

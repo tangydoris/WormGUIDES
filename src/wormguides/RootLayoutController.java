@@ -1,6 +1,5 @@
 package wormguides;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -15,7 +14,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,6 +32,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
+import wormguides.view.About;
 import wormguides.view.Window3DSubScene;
 
 public class RootLayoutController implements Initializable{
@@ -100,20 +99,12 @@ public class RootLayoutController implements Initializable{
 	public void menuAboutAction() {
 		if (aboutStage == null) {
 			aboutStage = new Stage();
-			try {
-				aboutRoot = FXMLLoader.load(getClass().getResource("view/About.fxml"));
-				aboutStage.setScene(new Scene(aboutRoot));
-				aboutStage.setTitle("About WormGUIDES");
-				aboutStage.initModality(Modality.APPLICATION_MODAL);
-				
-				aboutStage.show();
-			} catch (IOException e) {
-				System.out.println("cannot load about page.");
-				e.printStackTrace();
-			}
+			aboutRoot = new About();
+			aboutStage.setScene(new Scene(aboutRoot));
+			aboutStage.setTitle("About WormGUIDES");
+			aboutStage.initModality(Modality.APPLICATION_MODAL);
 		}
-		else
-			aboutStage.show();
+		aboutStage.show();
 	}
 	
 	public void init3DWindow(TableLineageData data) {

@@ -1,0 +1,27 @@
+<project default="test">
+  <path id="fxcompile">
+    <filelist>
+      <file name="build/classes"/>
+      <file name="build-libs/org.eclipse.fx.fxml.compiler_0.9.0.jar"/>
+    </filelist>
+  </path>
+     
+  <path id="buildpath">
+    <filelist>
+      <file name="build/classes"/>
+      <file name="libs/org.eclipse.fx.core_0.9.0.201308281625.jar"/>
+    </filelist>
+  </path>
+     
+ <target name="test">
+   <delete dir="build" />
+   <mkdir dir="build/classes"/>
+         
+   <taskdef name="fxml-compiler" classpathref="fxcompile" classname="org.eclipse.fx.ide.fxml.compiler.ant.FXMLCompilerTask" />
+         
+   <javac srcdir="src" destdir="build/classes" classpathref="buildpath"></javac>
+         
+   <fxml-compiler sourcedir="src" destdir="build/gen-src"/>
+   <javac srcdir="build/gen-src" destdir="build/classes" classpathref="buildpath"></javac>
+  </target>
+</project>
