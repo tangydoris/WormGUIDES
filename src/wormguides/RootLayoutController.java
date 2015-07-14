@@ -22,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -49,7 +50,7 @@ public class RootLayoutController implements Initializable{
 	private DoubleProperty infoPanelHeight;
 	
 	// Panels stuff
-	@FXML public BorderPane displayPanel;
+	public BorderPane displayPanel;
 	@FXML public AnchorPane modelAnchorPane;
 	@FXML public ScrollPane infoPane;
 	
@@ -65,6 +66,7 @@ public class RootLayoutController implements Initializable{
 	//private ArrayList<String> allCellNames;
 	//private ObservableList<String> searchResults;
 	@FXML public ListView<String> searchResultsList;
+	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	
 	// Cell selection
 	private StringProperty selectedName;
@@ -99,7 +101,7 @@ public class RootLayoutController implements Initializable{
 	public void menuAboutAction() {
 		if (aboutStage == null) {
 			aboutStage = new Stage();
-			aboutRoot = new About();
+			aboutRoot = (new About()).load();
 			aboutStage.setScene(new Scene(aboutRoot));
 			aboutStage.setTitle("About WormGUIDES");
 			aboutStage.initModality(Modality.APPLICATION_MODAL);
@@ -287,13 +289,15 @@ public class RootLayoutController implements Initializable{
 		}
 		
 		// Add close icon
-				try {
-					abaCloseButton.setGraphic(loader.getCloseIcon());
-					abpCloseButton.setGraphic(loader.getCloseIcon());
-					emsCloseButton.setGraphic(loader.getCloseIcon());
-				} catch (NullPointerException npe) {
-					System.out.println("cannot set layers close icon");
-				}
+		/*
+		try {
+			abaCloseButton.setGraphic(loader.getCloseIcon());
+			abpCloseButton.setGraphic(loader.getCloseIcon());
+			emsCloseButton.setGraphic(loader.getCloseIcon());
+		} catch (NullPointerException npe) {
+			System.out.println("cannot set layers close icon");
+		}
+		*/
 		
 		// Add eye icon
 		try {
@@ -343,8 +347,9 @@ public class RootLayoutController implements Initializable{
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
-		search = new Search(window3D, searchField, searchResultsList);
+		search = new Search(searchField, searchResultsList);
 		search.setCellNames(cellNames);
+		search.setRadioButons(sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn);
 		
         addListeners();
         

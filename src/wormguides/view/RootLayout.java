@@ -95,6 +95,7 @@ public class RootLayout extends BorderPane {
 			}
 			{
 				TabPane e_10 = new TabPane();
+				e_10.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 				e_10.setId("dataPanel");
 				e_10.setMaxWidth(289.0);
 				e_10.setPrefWidth(289.0);
@@ -212,6 +213,7 @@ public class RootLayout extends BorderPane {
 									}
 									{
 										RadioButton e_30 = new RadioButton();
+										e_30.setId("");
 										e_30.setContentDisplay(javafx.scene.control.ContentDisplay.GRAPHIC_ONLY);
 										e_30.setMnemonicParsing(false);
 										e_30.setPrefHeight(22.0);

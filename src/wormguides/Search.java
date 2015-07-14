@@ -1,13 +1,17 @@
 package wormguides;
 
 import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Group;
 import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import wormguides.view.Window3DSubScene;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 
 public class Search {
 	
@@ -16,20 +20,44 @@ public class Search {
 	private TextField searchField;
 	private ListView<String> searchResultsList;
 	
-	private Window3DSubScene window3D;
+	private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	private ToggleGroup typeGroup;
 
-	public Search(Window3DSubScene window3D, TextField searchField, ListView<String> searchResultsList) {
-		this.window3D = window3D;
+	public Search(TextField searchField, ListView<String> searchResultsList) {
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
-		addListeners();
+		addTextListener();
+		addRadioButtonsListener();
+	}
+	
+	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
+			RadioButton desRadioBtn, RadioButton genRadioBtn) {
+		this.sysRadioBtn = sysRadioBtn;
+		sysRadioBtn.setSelected(true);
+		this.funRadioBtn = funRadioBtn;
+		this.desRadioBtn = desRadioBtn;
+		this.genRadioBtn = genRadioBtn;
+		
+		typeGroup = sysRadioBtn.getToggleGroup();
 	}
 	
 	public void setCellNames(ArrayList<String> cellNames) {
 		this.cellNames = cellNames;
 	}
 	
-	private void addListeners() {
+	private void addRadioButtonsListener() {
+		typeGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable,
+					Toggle oldValue, Toggle newValue) {
+				if (typeGroup.getSelectedToggle() != null) {
+					System.out.println("radio toggled");
+				}
+			}
+		});
+	}
+	
+	private void addTextListener() {
 		searchResults = FXCollections.observableArrayList();
 		searchField.textProperty().addListener(new ChangeListener<String>() {
 			@Override

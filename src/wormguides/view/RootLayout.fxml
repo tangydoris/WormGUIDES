@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="800.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="800.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -51,7 +51,7 @@
                                     <VBox maxWidth="270.0" minWidth="270.0" prefWidth="270.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <children>
                                           <Pane prefHeight="80.0" prefWidth="269.0" style="-fx-border-color: grey;" />
-                                          <Region prefHeight="5.0" />
+                                          <Region prefHeight="10.0" />
                                           <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
                                              <children>
                                                 <Label prefHeight="22.0" text="Search">
@@ -63,95 +63,149 @@
                                                 <TextField fx:id="searchField" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" prefWidth="175.0" />
                                              </children>
                                           </HBox>
-                                          <Region prefHeight="5.0" prefWidth="250.0" />
+                                          <Region prefHeight="10.0" prefWidth="250.0" />
                                           <Label text="Search Type:" />
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <Label prefHeight="22.0" text="Systematic" />
-                                                <Region prefHeight="22.0" prefWidth="35.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                <HBox prefWidth="160.0" HBox.hgrow="NEVER">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Systematic" />
+                                                      <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
+                                                      <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0">
+                                                         <toggleGroup>
+                                                            <ToggleGroup fx:id="type" />
+                                                         </toggleGroup></RadioButton>
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <Label prefHeight="22.0" text="Functional" />
-                                                <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                <HBox prefWidth="160.0" HBox.hgrow="NEVER">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Functional" />
+                                                      <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
+                                                      <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <Label prefHeight="22.0" text="Description" />
-                                                <Region prefHeight="22.0" prefWidth="34.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                <HBox prefWidth="160.0" HBox.hgrow="NEVER">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Description" />
+                                                      <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
+                                                      <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Region prefHeight="22.0" prefWidth="40.0" />
-                                                <Label prefHeight="22.0" text="Gene" />
-                                                <Region prefHeight="22.0" prefWidth="70.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                <HBox prefWidth="160.0" HBox.hgrow="NEVER">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Gene" />
+                                                      <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
+                                                      <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" toggleGroup="$type" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
-                                          <Region prefHeight="15.0" />
+                                          <Region prefHeight="10.0" />
                                           <Label text="Search Options:" />
                                           <Label text="     Cell Ancestry" />
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Cell" />
-                                                <Region prefHeight="22.0" prefWidth="82.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Cell" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Ancestor" />
-                                                <Region prefHeight="22.0" prefWidth="52.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Ancestor" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Descendant" />
-                                                <Region prefHeight="22.0" prefWidth="34.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Descendant" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <Label text="     Interactors" />
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Wired to" />
-                                                <Region prefHeight="22.0" prefWidth="77.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Wired to" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          L/R homologues" />
-                                                <Region prefHeight="22.0" prefWidth="29.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="L/R homologues" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <Label text="     Geometry" />
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Nucleus" />
-                                                <Region prefHeight="22.0" prefWidth="57.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Nucleus" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="          Cell shape" />
-                                                <Region prefHeight="22.0" prefWidth="43.0" />
-                                                <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                <HBox prefWidth="170.0">
+                                                   <children>
+                                                      <Region prefHeight="22.0" prefWidth="40.0" />
+                                                      <Label prefHeight="22.0" text="Cell Shape" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                           </HBox>
-                                          <Region prefHeight="15.0" />
+                                          <Region prefHeight="10.0" />
                                           <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
                                              <children>
                                                 <Label prefHeight="22.0" text="Search Results:">
@@ -163,8 +217,8 @@
                                                 <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" text="Add" />
                                              </children>
                                           </HBox>
-                                          <Region prefHeight="3.0" prefWidth="200.0" />
-                                          <AnchorPane fx:id="searchResultsPane" prefHeight="140.0" prefWidth="250.0" style="-fx-border-color: grey;">
+                                          <Region prefHeight="10.0" prefWidth="200.0" />
+                                          <AnchorPane fx:id="searchResultsPane" prefHeight="140.0" prefWidth="250.0" style="-fx-border-color: grey;" VBox.vgrow="ALWAYS">
                                              <children>
                                                 <ListView fx:id="searchResultsList" layoutX="-12.0" layoutY="-22.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                              </children>
@@ -214,10 +268,13 @@
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                              </padding></Button>
-                                          <Button fx:id="abaCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER">
+                                          <Button fx:id="abaCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding></Button>
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="2.0">
@@ -237,10 +294,13 @@
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                              </padding></Button>
-                                          <Button fx:id="abpCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                          <Button fx:id="abpCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding></Button>
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="2.0">
@@ -260,10 +320,13 @@
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                              </padding></Button>
-                                          <Button fx:id="emsCloseButton" alignment="CENTER_RIGHT" contentDisplay="GRAPHIC_ONLY" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
+                                          <Button fx:id="emsCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
                                              <padding>
                                                 <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding></Button>
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                     <Region prefHeight="22.0" prefWidth="242.0" />
