@@ -15,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
@@ -40,7 +39,6 @@ public class RootLayoutController implements Initializable{
 	
 	// About popup dialog
 	private Stage aboutStage;
-	private Parent aboutRoot;
 	
 	// 3D subscene stuff
 	private Window3DSubScene window3D;
@@ -50,6 +48,7 @@ public class RootLayoutController implements Initializable{
 	private DoubleProperty infoPanelHeight;
 	
 	// Panels stuff
+	@FXML public BorderPane rootBorderPane;
 	public BorderPane displayPanel;
 	@FXML public AnchorPane modelAnchorPane;
 	@FXML public ScrollPane infoPane;
@@ -101,8 +100,8 @@ public class RootLayoutController implements Initializable{
 	public void menuAboutAction() {
 		if (aboutStage == null) {
 			aboutStage = new Stage();
-			aboutRoot = (new About()).load();
-			aboutStage.setScene(new Scene(aboutRoot));
+			aboutStage.setScene(new Scene(new About()));
+			//aboutStage.setScene(new Scene((new About()).load()));
 			aboutStage.setTitle("About WormGUIDES");
 			aboutStage.initModality(Modality.APPLICATION_MODAL);
 		}
@@ -323,6 +322,12 @@ public class RootLayoutController implements Initializable{
 			System.out.println("cannot set layers visibility icon");
 		}
 	}
+	
+	private void initSearch() {
+		search = new Search(searchField, searchResultsList);
+		search.setCellNames(cellNames);
+		search.setRadioButons(sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn);
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
@@ -347,9 +352,7 @@ public class RootLayoutController implements Initializable{
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
-		search = new Search(searchField, searchResultsList);
-		search.setCellNames(cellNames);
-		search.setRadioButons(sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn);
+		initSearch();
 		
         addListeners();
         

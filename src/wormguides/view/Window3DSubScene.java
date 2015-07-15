@@ -79,17 +79,6 @@ public class Window3DSubScene{
 		
 		selectedIndex = new SimpleIntegerProperty();
 		selectedIndex.set(-1);
-		/*
-		selectedIndex.addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> observable,
-					Number oldValue, Number newValue) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		*/
 		
 		selectedName = new SimpleStringProperty();
 		selectedName.set("");
@@ -279,6 +268,12 @@ public class Window3DSubScene{
 		root = new Group();
 		root.getChildren().add(cameraXform);
 		subscene.setRoot(root);
+	}
+	
+	// for testing purposes
+	@SuppressWarnings("unused")
+	private void addStripedCellsToScene() {
+		
 	}
 	
 	private void addCellsToScene() {

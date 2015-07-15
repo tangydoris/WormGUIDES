@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import wormguides.view.RootLayout;
+//import wormguides.view.RootLayout;
 
 public class MainApp extends Application {
 	

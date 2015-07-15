@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Group;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -20,25 +19,37 @@ public class Search {
 	private TextField searchField;
 	private ListView<String> searchResultsList;
 	
-	private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
-	private ToggleGroup typeGroup;
+	//private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	private ToggleGroup searchType;
 
 	public Search(TextField searchField, ListView<String> searchResultsList) {
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
 		addTextListener();
-		addRadioButtonsListener();
 	}
 	
 	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
 			RadioButton desRadioBtn, RadioButton genRadioBtn) {
+		/*
 		this.sysRadioBtn = sysRadioBtn;
-		sysRadioBtn.setSelected(true);
 		this.funRadioBtn = funRadioBtn;
 		this.desRadioBtn = desRadioBtn;
 		this.genRadioBtn = genRadioBtn;
+		*/
 		
-		typeGroup = sysRadioBtn.getToggleGroup();
+		searchType = new ToggleGroup();
+		sysRadioBtn.setToggleGroup(searchType);
+		sysRadioBtn.setUserData(SYSTEMATIC);
+		funRadioBtn.setToggleGroup(searchType);
+		funRadioBtn.setUserData(FUNCTIONAL);
+		desRadioBtn.setToggleGroup(searchType);
+		desRadioBtn.setUserData(DESCRIPTION);
+		genRadioBtn.setToggleGroup(searchType);
+		genRadioBtn.setUserData(GENE);
+		
+		sysRadioBtn.setSelected(true);
+		
+		addRadioButtonsListener();
 	}
 	
 	public void setCellNames(ArrayList<String> cellNames) {
@@ -46,12 +57,24 @@ public class Search {
 	}
 	
 	private void addRadioButtonsListener() {
-		typeGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+		searchType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable,
-					Toggle oldValue, Toggle newValue) {
-				if (typeGroup.getSelectedToggle() != null) {
-					System.out.println("radio toggled");
+					Toggle arg1, Toggle arg2) {	
+				// TODO implement type functionality
+				switch ((String) searchType.getSelectedToggle().getUserData()) {
+					case SYSTEMATIC:
+						System.out.println("systematic search selected");
+						break;
+					case FUNCTIONAL:
+						System.out.println("functional search selected");
+						break;
+					case DESCRIPTION:
+						System.out.println("description search selected");
+						break;
+					case GENE:
+						System.out.println("gene search selected");
+						break;
 				}
 			}
 		});
@@ -82,6 +105,9 @@ public class Search {
 		
 	}
 	
-	
+	private static final String SYSTEMATIC = "systemastic",
+			FUNCTIONAL = "functional",
+			DESCRIPTION = "description",
+			GENE = "gene";
 	
 }
