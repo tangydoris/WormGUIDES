@@ -1,7 +1,11 @@
 package wormguides.view;
 
+import java.util.function.Function;
+
 import wormguides.Xform;
 import wormguides.model.TableLineageData;
+import wormguides.model.fxyz.geometry.Point3D;
+import wormguides.model.fxyz.shapes.primitives.SegmentedSphereMesh;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -253,7 +257,8 @@ public class Window3DSubScene{
 		diameters = data.getDiameters(time);
 		cells = new Sphere[names.length];
 		
-		addCellsToScene();
+		//addCellsToScene();
+		addStripedCellsToScene();
 	}
 	
 	private String[] toLowerCaseAll(String[] in) {
@@ -273,9 +278,22 @@ public class Window3DSubScene{
 	// for testing purposes
 	@SuppressWarnings("unused")
 	private void addStripedCellsToScene() {
-		
+		for (int i = 0; i < names.length; i ++) {
+			SegmentedSphereMesh sphere = new SegmentedSphereMesh(200,00,00,SIZE_SCALE*diameters[i]/2);
+			Function<Point3D, Number> dens = p->p.y>0?1:0;
+			sphere.setTextureModeVertices3D(3,dens);
+			
+	        sphere.setTranslateX(positions[i][X_COR]);
+	        sphere.setTranslateY(positions[i][Y_COR]);
+	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
+	        
+	        //cells[i] = sphere;
+	        root.getChildren().add(sphere);
+	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
+		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void addCellsToScene() {
 		for (int i = 0; i < names.length; i ++) {
 			Sphere sphere = new Sphere(SIZE_SCALE*diameters[i]/2);
@@ -296,7 +314,6 @@ public class Window3DSubScene{
 	        root.getChildren().add(sphere);
 	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
 		}
-		
 	}
 	
 	private Color getColorRule(String name) {
@@ -503,6 +520,6 @@ public class Window3DSubScene{
     private static final double Z_SCALE = 5,
     		X_SCALE = 1,
     		Y_SCALE = 1;
-    private static final double SIZE_SCALE = .8;
+    private static final double SIZE_SCALE = 1.25;
 
 }

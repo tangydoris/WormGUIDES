@@ -571,7 +571,7 @@ public abstract class TexturedMesh extends MeshView implements TextureMode {
             triangleMesh.getFaceSmoothingGroups().addAll(faceSmoothingGroups);
         }
         
-        System.out.println("nodes: "+listVertices.size()+", faces: "+listFaces.size());
+//        System.out.println("nodes: "+listVertices.size()+", faces: "+listFaces.size());
 //        System.out.println("area: "+helper.getMeshArea(listVertices, listFaces));
         return triangleMesh;
     }
