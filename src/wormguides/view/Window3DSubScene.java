@@ -2,6 +2,8 @@ package wormguides.view;
 
 import java.util.function.Function;
 
+import wormguides.model.fxyz.shapes.SphereSegment;
+
 import wormguides.Xform;
 import wormguides.model.TableLineageData;
 import wormguides.model.fxyz.geometry.Point3D;
@@ -21,6 +23,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.AmbientLight;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -257,8 +260,8 @@ public class Window3DSubScene{
 		diameters = data.getDiameters(time);
 		cells = new Sphere[names.length];
 		
-		//addCellsToScene();
-		addStripedCellsToScene();
+		addCellsToScene();
+		//addStripedCellsToScene();
 	}
 	
 	private String[] toLowerCaseAll(String[] in) {
@@ -276,7 +279,7 @@ public class Window3DSubScene{
 	}
 	
 	// for testing purposes
-	@SuppressWarnings("unused")
+	/*
 	private void addStripedCellsToScene() {
 		for (int i = 0; i < names.length; i ++) {
 			SegmentedSphereMesh sphere = new SegmentedSphereMesh(200,00,00,SIZE_SCALE*diameters[i]/2);
@@ -292,28 +295,49 @@ public class Window3DSubScene{
 	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
 		}
 	}
+	*/
 	
-	@SuppressWarnings("unused")
 	private void addCellsToScene() {
 		for (int i = 0; i < names.length; i ++) {
-			Sphere sphere = new Sphere(SIZE_SCALE*diameters[i]/2);
+			double radius = SIZE_SCALE*diameters[i]/2;
+			Sphere sphere = new Sphere(radius);
+			
+			SphereSegment sphereSegment = new SphereSegment(radius+1, Color.PURPLE,
+	                Math.toRadians(0), Math.toRadians(360),
+	                Math.toRadians(-30), Math.toRadians(30),
+	                50, false, true);
 			
 			Color color = getColorRule(namesLowerCase[i]);
 			PhongMaterial material = new PhongMaterial();
 	        material.setDiffuseColor(color);
 	        sphere.setMaterial(material);
+	        /*
 	        if (!namesLowerCase[i].startsWith(searchedPrefix.get())) {
 	        	sphere.setOpacity(0.05);
 	        }
+	        */
 	        
-	        sphere.setTranslateX(positions[i][X_COR]);
-	        sphere.setTranslateY(positions[i][Y_COR]);
-	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
+	        /*
+	        AmbientLight light = new AmbientLight(Color.WHITE);
+            light.getScope().addAll(sphere, sphereSegment);
+	        */
+	        
+	        double x = positions[i][X_COR];
+	        double y = positions[i][Y_COR];
+	        double z = positions[i][Z_COR]*Z_SCALE;
+	        translate(sphere, x, y, z);
+	        translate(sphereSegment, x, y, z);
 	        
 	        cells[i] = sphere;
-	        root.getChildren().add(sphere);
+	        root.getChildren().addAll(sphereSegment, sphere);//, light);
 	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
 		}
+	}
+	
+	private void translate(Node sphere, double x, double y, double z) {
+		sphere.setTranslateX(x);
+        sphere.setTranslateY(y);
+        sphere.setTranslateZ(z);
 	}
 	
 	private Color getColorRule(String name) {
@@ -520,6 +544,6 @@ public class Window3DSubScene{
     private static final double Z_SCALE = 5,
     		X_SCALE = 1,
     		Y_SCALE = 1;
-    private static final double SIZE_SCALE = 1.25;
+    private static final double SIZE_SCALE = .9;
 
 }

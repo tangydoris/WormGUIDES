@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/cygwin64/home/tangh/WormGUIDES/Fxyz-libs/JCSG.jar"/>
-	<classpathentry kind="lib" path="C:/cygwin64/home/tangh/WormGUIDES/Fxyz-libs/poly2tri-core-0.1.0.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/Fxyz"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

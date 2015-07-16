@@ -86,14 +86,12 @@ public class SegmentedSphereMesh extends TexturedMesh {
     }
     
     private final IntegerProperty radiusDivisions = new SimpleIntegerProperty(DEFAULT_DIVISIONS) {
-
         @Override
         protected void invalidated() {
             if(mesh!=null){
                 updateMesh();
             }
         }
-
     };
 
     public final int getRadiusDivisions() {
