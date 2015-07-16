@@ -85,7 +85,7 @@ public class SphereSegment extends Group {
         double theta;
 
         PhongMaterial maxPhong = new PhongMaterial();
-        maxPhong.setSpecularColor(color);
+        //maxPhong.setSpecularColor(color);
         maxPhong.setDiffuseColor(color);
 
         for (int i = 0; i < granularity + 1; i++) {
