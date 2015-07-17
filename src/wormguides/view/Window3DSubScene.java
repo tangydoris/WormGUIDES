@@ -1,13 +1,7 @@
 package wormguides.view;
 
-import java.util.function.Function;
-
-import wormguides.model.fxyz.shapes.SphereSegment;
-
 import wormguides.Xform;
 import wormguides.model.TableLineageData;
-import wormguides.model.fxyz.geometry.Point3D;
-import wormguides.model.fxyz.shapes.primitives.SegmentedSphereMesh;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -23,7 +17,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.AmbientLight;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -31,9 +24,12 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 
@@ -298,19 +294,52 @@ public class Window3DSubScene{
 	*/
 	
 	private void addCellsToScene() {
+		WritableImage wImage = new WritableImage(80, 80);
+		PixelWriter writer = wImage.getPixelWriter();
+		Color color = Color.TRANSPARENT;
+		// test one stripe3
+		for (int j = 0; j < wImage.getHeight(); j++) {
+			for (int k = 0; k < wImage.getWidth(); k++) {
+				 if (j < 20 | j > 60)
+					 color = Color.RED;
+				 else
+					 color = Color.WHITE;
+				 writer.setColor(k, j, color);
+			}
+		}
+		Material material = new PhongMaterial();
+		((PhongMaterial) material).setDiffuseMap(wImage);
 		for (int i = 0; i < names.length; i ++) {
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
 			
+			/*
 			SphereSegment sphereSegment = new SphereSegment(radius+1, Color.PURPLE,
 	                Math.toRadians(0), Math.toRadians(360),
 	                Math.toRadians(-30), Math.toRadians(30),
 	                50, false, true);
+			*/
 			
-			Color color = getColorRule(namesLowerCase[i]);
-			PhongMaterial material = new PhongMaterial();
-	        material.setDiffuseColor(color);
+			/*
+			Paint color = getColorRule(namesLowerCase[i]);
+			Material material = new PhongMaterial();
+	        ((PhongMaterial) material).setDiffuseColor((Color)color);
 	        sphere.setMaterial(material);
+	        */
+			
+			// Test multiple-colored spheres
+			/*
+			Palette palette = new Palette(2);
+			palette.createPalette(true);
+			Image image = palette.getPaletteImage();
+			Material material = new PhongMaterial();
+			((PhongMaterial) material).setDiffuseMap(image);
+			sphere.setMaterial(material);
+			*/
+			
+			// Test stripes with writableimage
+			sphere.setMaterial(material);
+			
 	        /*
 	        if (!namesLowerCase[i].startsWith(searchedPrefix.get())) {
 	        	sphere.setOpacity(0.05);
@@ -322,14 +351,20 @@ public class Window3DSubScene{
             light.getScope().addAll(sphere, sphereSegment);
 	        */
 	        
+	        /*
+	        Stop[] stops = { new Stop(0, Color.WHITE), new Stop(1, Color.BLACK)};
+			LinearGradient lg = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+			*/
+	        
 	        double x = positions[i][X_COR];
 	        double y = positions[i][Y_COR];
 	        double z = positions[i][Z_COR]*Z_SCALE;
 	        translate(sphere, x, y, z);
-	        translate(sphereSegment, x, y, z);
+	        //translate(sphereSegment, x, y, z);
 	        
 	        cells[i] = sphere;
-	        root.getChildren().addAll(sphereSegment, sphere);//, light);
+	        root.getChildren().add(sphere);
+	        //root.getChildren().addAll(sphereSegment, sphere);//, light);
 	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
 		}
 	}
@@ -360,7 +395,7 @@ public class Window3DSubScene{
 				return Color.GOLD.brighter().brighter();
 			else {
 				//return Color.TRANSPARENT;
-				return Color.web(UNSELECTED_COLOR_HEX);
+				return Color.web(UNSELECTED_COLOR_HEX, 0.5d);
 			}
 		}
 	}

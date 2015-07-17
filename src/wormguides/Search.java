@@ -30,13 +30,6 @@ public class Search {
 	
 	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
 			RadioButton desRadioBtn, RadioButton genRadioBtn) {
-		/*
-		this.sysRadioBtn = sysRadioBtn;
-		this.funRadioBtn = funRadioBtn;
-		this.desRadioBtn = desRadioBtn;
-		this.genRadioBtn = genRadioBtn;
-		*/
-		
 		searchType = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(searchType);
 		sysRadioBtn.setUserData(SYSTEMATIC);

@@ -205,7 +205,7 @@ public class RootLayoutController implements Initializable{
 	private void sizeInfoPane() {
 		try {
 			this.infoPanelHeight = new SimpleDoubleProperty();
-			infoPanelHeight.bind(displayPanel.heightProperty().divide(5));
+			infoPanelHeight.bind(displayPanel.heightProperty().divide(8));
 			infoPane.maxHeightProperty().bind(infoPanelHeight);
 		} catch (Exception e) {
 			System.out.println("canoot size information panel");
