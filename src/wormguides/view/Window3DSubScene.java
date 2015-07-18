@@ -15,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -77,6 +76,13 @@ public class Window3DSubScene{
 		this.data = data;
 		time = new SimpleIntegerProperty();
 		time.set(START_TIME);
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, 
+					Number oldValue, Number newValue) {
+				buildScene(time.get());
+			}
+		});
 		
 		cells = new Sphere[1];
 		names = new String[1];
@@ -132,11 +138,13 @@ public class Window3DSubScene{
 			}
 		});
 		
-		//renderService = new RenderService();
 		renderRunnable = new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("render called");
+				//System.out.println("render called");
+				refreshScene();
+				addCellsToScene();
+				
 				// render opaque spheres first
 				for (int i = 0; i < cells.length; i++) {
 					if (searched[i])
@@ -150,6 +158,7 @@ public class Window3DSubScene{
 			}
 		};
 		
+		buildScene(time.get());
 	}
 	
 	public ObservableList<String> getSearchResults() {
@@ -180,20 +189,12 @@ public class Window3DSubScene{
 		return playingMovie;
 	}
 	
+	/*
 	public void setSlider(Slider timeSlider) {
 		this.timeSlider = timeSlider;
 		setSliderProperties();
 	}
-	
-	private void setSliderProperties() {
-		try {
-			timeSlider.setMin(1);
-			timeSlider.setMax(data.getTotalTimePoints()-1);
-			timeSlider.setValue(START_TIME);
-		} catch (NullPointerException npe) {
-			System.out.println("null time slider");
-		}
-	}
+	*/
 	
 	private SubScene createSubScene(Double width, Double height) {
 		subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
@@ -245,7 +246,6 @@ public class Window3DSubScene{
 		});
 		
 		buildCamera();
-		buildScene(time.get());
 		
 		return subscene;
 	}
@@ -271,7 +271,7 @@ public class Window3DSubScene{
 	private void buildScene(int time) {
 		// Frame is indexed 1 less than the time requested
 		time--;
-		refreshScene();
+		
 		names = data.getNames(time);
 		namesLowerCase = toLowerCaseAll(names);
 		positions = data.getPositions(time);
@@ -279,8 +279,6 @@ public class Window3DSubScene{
 		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
 		searched = new boolean[names.length];
-		
-		addCellsToScene();
 		
 		// render spheres
 		Platform.runLater(renderRunnable);
@@ -317,14 +315,6 @@ public class Window3DSubScene{
 	        	searched[i] = true;
 	        else
 	        	searched[i] = false;
-	        
-	        /*
-	        if (renderService == null)
-	        	System.out.println("no render service");
-	        else
-	        	renderService.start();
-        	*/
-	        
 		}
 	}
 	
@@ -454,23 +444,14 @@ public class Window3DSubScene{
 		return new SearchFieldListener();
 	}
 	
-	public EventHandler<ActionEvent> getBackwardButtonListener() {
-		return new BackwardButtonListener();
-	}
-	
-	public EventHandler<ActionEvent> getForwardButtonListener() {
-		return new ForwardButtonListener();
-	}
-	
-	public ChangeListener<Number> getSliderListener() {
-		return new SliderListener();
-	}
-	
 	public int getEndTime() {
-		return this.endTime;
+		return endTime;
 	}
 	
-	// Listener classes
+	public int getStartTime() {
+		return START_TIME;
+	}
+	
 	public class SearchFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable,
@@ -491,71 +472,6 @@ public class Window3DSubScene{
 			buildScene(time.get());
 		}
 	}
-	
-	public class BackwardButtonListener implements EventHandler<ActionEvent> {
-		@Override
-		public void handle(ActionEvent event) {
-			if (!playingMovie.get())
-				time.set(time.get()-1);
-		}
-	}
-	
-	public class ForwardButtonListener implements EventHandler<ActionEvent> {
-		@Override
-		public void handle(ActionEvent event) {
-			if (!playingMovie.get())
-				time.set(time.get()+1);
-		}
-	}
-	
-	public class SliderListener implements ChangeListener<Number> {
-		@Override
-		public void changed(ObservableValue<? extends Number> observable,
-				Number oldValue, Number newValue) {
-			time.set(newValue.intValue());
-			int t = time.get();
-			if (t > 0 & t <= endTime)
-				buildScene(t);
-		}
-	}
-	
-	/*
-	private class RenderService extends Service<Void> {
-		@Override
-		protected Task<Void> createTask() {
-			return new Task<Void>() {
-				@Override
-				protected Void call() throws Exception {
-					
-					while (true) {
-						if (isCancelled()) {
-							break;
-						}
-						// Code used to be here
-					}
-					
-					// code pasted here
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							// render opaque spheres first
-							for (int i = 0; i < cells.length; i++) {
-								if (searched[i])
-									root.getChildren().add(cells[i]);
-							}
-							// then render opaque spheres
-							for (int i = 0; i < cells.length; i++) {
-								if (!searched[i])
-									root.getChildren().add(cells[i]);
-							}
-						}
-					});
-					return null;
-				}
-			};
-		}
-	}
-	*/
 	
 	private class PlayService extends Service<Void>{
 		@Override

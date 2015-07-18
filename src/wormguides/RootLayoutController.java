@@ -115,7 +115,7 @@ public class RootLayoutController implements Initializable{
 			subscene = window3D.getSubScene();
 			modelAnchorPane.getChildren().add(subscene);
 			
-			window3D.setSlider(timeSlider);
+			//window3D.setSlider(timeSlider);
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot insatntiate 3D view.");
 			npe.printStackTrace();
@@ -131,9 +131,44 @@ public class RootLayoutController implements Initializable{
 	
 	private void addListeners() {
 		try {
-			timeSlider.valueProperty().addListener(window3D.getSliderListener());
-			backwardButton.setOnAction(window3D.getBackwardButtonListener());
-			forwardButton.setOnAction(window3D.getForwardButtonListener());
+			//timeSlider.valueProperty().addListener(window3D.getSliderListener());
+			//backwardButton.setOnAction(window3D.getBackwardButtonListener());
+			//forwardButton.setOnAction(window3D.getForwardButtonListener());
+			
+			time.addListener(new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> observable, 
+						Number oldValue, Number newValue) {
+					timeSlider.setValue(time.get());
+				}
+			});
+			
+			timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> observable, 
+						Number oldValue, Number newValue) {
+					if (newValue.intValue() != timeSlider.getValue())
+						time.set(newValue.intValue());
+				}
+			});
+			
+			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					int t = time.get();
+					if (t > 1 && t <= window3D.getEndTime())
+						time.set(t-1);
+				}
+			});
+			
+			forwardButton.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					int t = time.get();
+					if (t >= 1 && t < window3D.getEndTime())
+						time.set(t+1);
+				}
+			});
 			
 			searchField.textProperty().addListener(window3D.getSearchFieldListener());
 			searchResultsList.getSelectionModel().selectedItemProperty().addListener(
@@ -219,14 +254,18 @@ public class RootLayoutController implements Initializable{
 				@Override
 				public void changed(ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
+					
+					/*
 					int newTime = newValue.intValue();
 					if (newTime < 1)
 						newTime = 1;
 					else if (newTime > window3D.getEndTime())
 						newTime = window3D.getEndTime();
-					time.set(newTime);
-					timeSlider.setValue(newTime);
-					timeLabel.setText("Time "+makePaddedTime(newTime));
+					*/
+					//time.set(newTime);
+					
+					//timeSlider.setValue(newTime);
+					timeLabel.setText("Time "+makePaddedTime(time.get()));
 				}
 			});
 			timeLabel.setText("Time "+makePaddedTime(time.get()));
@@ -234,6 +273,7 @@ public class RootLayoutController implements Initializable{
 		} catch (NullPointerException npe) {
 			System.out.println("Cannot set time label");
 		}
+		
 		try {
 			totalNuclei.addListener(new ChangeListener<Number>() {
 				@Override
@@ -323,6 +363,16 @@ public class RootLayoutController implements Initializable{
 		}
 	}
 	
+	private void setSliderProperties() {
+		try {
+			timeSlider.setMin(1);
+			timeSlider.setMax(window3D.getEndTime());
+			timeSlider.setValue(window3D.getStartTime());
+		} catch (NullPointerException npe) {
+			System.out.println("null time slider");
+		}
+	}
+	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsList);
 		search.setCellNames(cellNames);
@@ -352,6 +402,7 @@ public class RootLayoutController implements Initializable{
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
+		setSliderProperties();
 		initSearch();
 		
         addListeners();
