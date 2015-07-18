@@ -56,10 +56,13 @@ public class Window3DSubScene{
 	
 	private BooleanProperty playingMovie;
 	private PlayService playService;
+	//private RenderService renderService;
+	private Runnable renderRunnable;
 	
 	private Sphere[] cells;
 	private String[] names;
 	private String[] namesLowerCase;
+	private boolean[] searched;
 	private Integer[][] positions;
 	private Integer[] diameters;
 	
@@ -79,6 +82,7 @@ public class Window3DSubScene{
 		names = new String[1];
 		positions = new Integer[1][3];
 		diameters = new Integer[1];
+		searched = new boolean[1];
 		
 		selectedIndex = new SimpleIntegerProperty();
 		selectedIndex.set(-1);
@@ -112,8 +116,8 @@ public class Window3DSubScene{
 		mouseDeltaX = 0;
 		mouseDeltaY = 0;
 		
-		this.playService = new PlayService();
-		this.playingMovie = new SimpleBooleanProperty();
+		playService = new PlayService();
+		playingMovie = new SimpleBooleanProperty();
 		playingMovie.set(false);
 		playingMovie.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -127,6 +131,25 @@ public class Window3DSubScene{
 				}
 			}
 		});
+		
+		//renderService = new RenderService();
+		renderRunnable = new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("render called");
+				// render opaque spheres first
+				for (int i = 0; i < cells.length; i++) {
+					if (searched[i])
+						root.getChildren().add(cells[i]);
+				}
+				// then render opaque spheres
+				for (int i = 0; i < cells.length; i++) {
+					if (!searched[i])
+						root.getChildren().add(cells[i]);
+				}
+			}
+		};
+		
 	}
 	
 	public ObservableList<String> getSearchResults() {
@@ -251,13 +274,16 @@ public class Window3DSubScene{
 		refreshScene();
 		names = data.getNames(time);
 		namesLowerCase = toLowerCaseAll(names);
-		totalNuclei.set(names.length);
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
+		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
+		searched = new boolean[names.length];
 		
 		addCellsToScene();
-		//addStripedCellsToScene();
+		
+		// render spheres
+		Platform.runLater(renderRunnable);
 	}
 	
 	private String[] toLowerCaseAll(String[] in) {
@@ -274,99 +300,39 @@ public class Window3DSubScene{
 		subscene.setRoot(root);
 	}
 	
-	// for testing purposes
-	/*
-	private void addStripedCellsToScene() {
-		for (int i = 0; i < names.length; i ++) {
-			SegmentedSphereMesh sphere = new SegmentedSphereMesh(200,00,00,SIZE_SCALE*diameters[i]/2);
-			Function<Point3D, Number> dens = p->p.y>0?1:0;
-			sphere.setTextureModeVertices3D(3,dens);
-			
-	        sphere.setTranslateX(positions[i][X_COR]);
-	        sphere.setTranslateY(positions[i][Y_COR]);
-	        sphere.setTranslateZ(positions[i][Z_COR]*Z_SCALE);
-	        
-	        //cells[i] = sphere;
-	        root.getChildren().add(sphere);
-	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
-		}
-	}
-	*/
-	
 	private void addCellsToScene() {
-		WritableImage wImage = new WritableImage(80, 80);
-		PixelWriter writer = wImage.getPixelWriter();
-		Color color = Color.TRANSPARENT;
-		// test one stripe3
-		for (int j = 0; j < wImage.getHeight(); j++) {
-			for (int k = 0; k < wImage.getWidth(); k++) {
-				 if (j < 20 | j > 60)
-					 color = Color.RED;
-				 else
-					 color = Color.WHITE;
-				 writer.setColor(k, j, color);
-			}
-		}
-		Material material = new PhongMaterial();
-		((PhongMaterial) material).setDiffuseMap(wImage);
 		for (int i = 0; i < names.length; i ++) {
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
 			
-			/*
-			SphereSegment sphereSegment = new SphereSegment(radius+1, Color.PURPLE,
-	                Math.toRadians(0), Math.toRadians(360),
-	                Math.toRadians(-30), Math.toRadians(30),
-	                50, false, true);
-			*/
-			
-			/*
-			Paint color = getColorRule(namesLowerCase[i]);
-			Material material = new PhongMaterial();
-	        ((PhongMaterial) material).setDiffuseColor((Color)color);
-	        sphere.setMaterial(material);
-	        */
-			
-			// Test multiple-colored spheres
-			/*
-			Palette palette = new Palette(2);
-			palette.createPalette(true);
-			Image image = palette.getPaletteImage();
-			Material material = new PhongMaterial();
-			((PhongMaterial) material).setDiffuseMap(image);
-			sphere.setMaterial(material);
-			*/
-			
-			// Test stripes with writableimage
-			sphere.setMaterial(material);
-			
-	        /*
-	        if (!namesLowerCase[i].startsWith(searchedPrefix.get())) {
-	        	sphere.setOpacity(0.05);
-	        }
-	        */
-	        
-	        /*
-	        AmbientLight light = new AmbientLight(Color.WHITE);
-            light.getScope().addAll(sphere, sphereSegment);
-	        */
-	        
-	        /*
-	        Stop[] stops = { new Stop(0, Color.WHITE), new Stop(1, Color.BLACK)};
-			LinearGradient lg = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
-			*/
+			sphere.setMaterial(getMaterial(namesLowerCase[i]));
 	        
 	        double x = positions[i][X_COR];
 	        double y = positions[i][Y_COR];
 	        double z = positions[i][Z_COR]*Z_SCALE;
 	        translate(sphere, x, y, z);
-	        //translate(sphereSegment, x, y, z);
 	        
 	        cells[i] = sphere;
-	        root.getChildren().add(sphere);
-	        //root.getChildren().addAll(sphereSegment, sphere);//, light);
-	        //System.out.println(name+CS+position[X_COR]+CS+position[Y_COR]+CS+position[Z_COR]);
+	        if (isSearched(namesLowerCase[i]))
+	        	searched[i] = true;
+	        else
+	        	searched[i] = false;
+	        
+	        /*
+	        if (renderService == null)
+	        	System.out.println("no render service");
+	        else
+	        	renderService.start();
+        	*/
+	        
 		}
+	}
+	
+	private boolean isSearched(String name) {
+		if (name.startsWith(searchedPrefix.get().toLowerCase()))
+			return true;
+		else
+			return false;
 	}
 	
 	private void translate(Node sphere, double x, double y, double z) {
@@ -374,6 +340,32 @@ public class Window3DSubScene{
         sphere.setTranslateY(y);
         sphere.setTranslateZ(z);
 	}
+	
+	private Material getMaterial(String name) {
+		name = name.toLowerCase();
+		String prefix = searchedPrefix.get();
+		
+		WritableImage wImage = new WritableImage(80, 80);
+		PixelWriter writer = wImage.getPixelWriter();
+		Color color = getColorRule(name);
+		// test one stripe3
+		for (int j = 0; j < wImage.getHeight(); j++) {
+			for (int k = 0; k < wImage.getWidth(); k++) {
+				/*
+				 if (j < 20 | j > 60)
+					 color = Color.RED;
+				 else
+					 color = Color.WHITE;
+				 */
+				 //color = Color.web(UNSELECTED_COLOR_HEX, 0.5d);
+				 writer.setColor(k, j, color);
+			}
+		}
+		Material material = new PhongMaterial();
+		((PhongMaterial) material).setDiffuseMap(wImage);
+		return material;
+	}
+	
 	
 	private Color getColorRule(String name) {
 		name = name.toLowerCase();
@@ -394,11 +386,11 @@ public class Window3DSubScene{
 			if (name.startsWith(prefix))
 				return Color.GOLD.brighter().brighter();
 			else {
-				//return Color.TRANSPARENT;
-				return Color.web(UNSELECTED_COLOR_HEX, 0.5d);
+				return Color.web(UNSELECTED_COLOR_HEX, 0.45d);
 			}
 		}
 	}
+	
 	
 	private void buildCamera() {
 		this.camera = new PerspectiveCamera(true);
@@ -527,6 +519,44 @@ public class Window3DSubScene{
 		}
 	}
 	
+	/*
+	private class RenderService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					
+					while (true) {
+						if (isCancelled()) {
+							break;
+						}
+						// Code used to be here
+					}
+					
+					// code pasted here
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							// render opaque spheres first
+							for (int i = 0; i < cells.length; i++) {
+								if (searched[i])
+									root.getChildren().add(cells[i]);
+							}
+							// then render opaque spheres
+							for (int i = 0; i < cells.length; i++) {
+								if (!searched[i])
+									root.getChildren().add(cells[i]);
+							}
+						}
+					});
+					return null;
+				}
+			};
+		}
+	}
+	*/
+	
 	private class PlayService extends Service<Void>{
 		@Override
 		protected Task<Void> createTask() {
@@ -540,7 +570,6 @@ public class Window3DSubScene{
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								//timeSlider.setValue(++time);
 								time.set(time.get()+1);
 							}
 						});

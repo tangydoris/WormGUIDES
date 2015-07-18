@@ -95,7 +95,6 @@ public class Search {
 			}
 		});
 		searchResultsList.setItems(searchResults);
-		
 	}
 	
 	private static final String SYSTEMATIC = "systemastic",
