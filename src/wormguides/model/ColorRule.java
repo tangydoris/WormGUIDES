@@ -1,17 +1,30 @@
 package wormguides.model;
 
-import javafx.scene.image.WritableImage;
+import java.util.ArrayList;
+import javafx.scene.paint.Color;
 
+// Every cell has a color rule consisting of its name and the color(s)
+// its cell should be
 public class ColorRule {
 	
-	// Prefix that was searched
-	private String prefix;
+	private String cellName;
+	private ArrayList<Color> colors;
 	
-	// Ticked boxes used to modify search
-	private String[] modifiers;
-		
-	// Customized image for the sphere material
-	private WritableImage image;
+	public ColorRule(String cellName, Color color) {
+		this.cellName = cellName;
+		colors = new ArrayList<Color>();
+		colors.add(color);
+	}
 	
+	public void addColor(Color color) {
+		colors.add(color);
+	}
 	
+	public String getName() {
+		return cellName;
+	}
+	
+	public Color[] getColors() {
+		return colors.toArray(new Color[colors.size()]);
+	}
 }
