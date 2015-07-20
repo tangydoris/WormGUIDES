@@ -11,7 +11,7 @@ public class ColorRule {
 	private ArrayList<Color> colors;
 	
 	public ColorRule(String cellName, Color color) {
-		this.cellName = cellName;
+		this.cellName = cellName.toLowerCase();
 		colors = new ArrayList<Color>();
 		colors.add(color);
 	}
@@ -26,5 +26,9 @@ public class ColorRule {
 	
 	public Color[] getColors() {
 		return colors.toArray(new Color[colors.size()]);
+	}
+	
+	public String toString() {
+		return cellName
 	}
 }

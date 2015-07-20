@@ -1,6 +1,7 @@
 package wormguides.view;
 
 import wormguides.Xform;
+import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -70,6 +71,8 @@ public class Window3DSubScene{
 	
 	private StringProperty searchedPrefix;
 	private ObservableList<String> subSceneSearchResults;
+	
+	private ColorHash colorHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -158,6 +161,7 @@ public class Window3DSubScene{
 			}
 		};
 		
+		colorHash = new ColorHash();
 		buildScene(time.get());
 	}
 	
@@ -303,7 +307,8 @@ public class Window3DSubScene{
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
 			
-			sphere.setMaterial(getMaterial(namesLowerCase[i]));
+			//sphere.setMaterial(getMaterial(namesLowerCase[i]));
+			Material material = colorHash.getMaterial(namesLowerCase[i]);
 	        
 	        double x = positions[i][X_COR];
 	        double y = positions[i][Y_COR];
