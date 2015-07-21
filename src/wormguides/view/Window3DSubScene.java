@@ -309,6 +309,7 @@ public class Window3DSubScene{
 			
 			//sphere.setMaterial(getMaterial(namesLowerCase[i]));
 			Material material = colorHash.getMaterial(namesLowerCase[i]);
+			sphere.setMaterial(material);
 	        
 	        double x = positions[i][X_COR];
 	        double y = positions[i][Y_COR];
