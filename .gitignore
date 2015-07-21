@@ -4,3 +4,6 @@ build/*
 build-libs/*
 java.hprof.txt
 /bin/
+/TestApp.jar
+/compiledTest/
+/deployedTest/

@@ -29,6 +29,6 @@ public class ColorRule {
 	}
 	
 	public String toString() {
-		return cellName
+		return cellName;
 	}
 }
