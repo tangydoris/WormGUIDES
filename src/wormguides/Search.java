@@ -25,6 +25,7 @@ public class Search {
 	public Search(TextField searchField, ListView<String> searchResultsList) {
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
+		//searchResultsList.setFocusTraversable(false);
 		addTextListener();
 	}
 	

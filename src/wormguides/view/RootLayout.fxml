@@ -60,7 +60,7 @@
                                                    </font>
                                                 </Label>
                                                 <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                <TextField fx:id="searchField" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" prefWidth="175.0" />
+                                                <TextField fx:id="searchField" focusTraversable="false" maxHeight="22.0" minHeight="22.0" prefHeight="22.0" prefWidth="175.0" />
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" prefWidth="250.0" />
@@ -72,7 +72,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Systematic" />
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
-                                                      <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                      <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -84,7 +84,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Functional" />
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
-                                                      <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                      <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -96,7 +96,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Description" />
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
-                                                      <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                      <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -108,7 +108,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Gene" />
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
-                                                      <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                      <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -123,7 +123,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Cell" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="cellTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="cellTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -135,7 +135,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Ancestor" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="ancestorTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="ancestorTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -147,7 +147,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Descendant" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="descendantTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="descendantTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -160,7 +160,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Wired to" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="wiredTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="wiredTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -172,7 +172,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="L/R homologues" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="lrTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="lrTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -185,7 +185,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Nucleus" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="nucleusTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="nucleusTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -197,7 +197,7 @@
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Cell Shape" />
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="cellShapeTick" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="cellShapeTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -205,7 +205,7 @@
                                           <Region prefHeight="10.0" />
                                           <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
                                              <children>
-                                                <Label prefHeight="22.0" text="Search Results:">
+                                                <Label focusTraversable="false" prefHeight="22.0" text="Search Results:">
                                                    <font>
                                                       <Font size="14.0" />
                                                    </font>
@@ -582,9 +582,9 @@
                <center>
                   <AnchorPane fx:id="modelAnchorPane" BorderPane.alignment="CENTER">
                      <children>
-                        <Slider fx:id="timeSlider" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="0.0" />
-                        <Button id="backwardButton" fx:id="backwardButton" layoutX="14.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                        <Button id="playButton" fx:id="playButton" layoutX="38.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="32.0" />
+                        <Slider fx:id="timeSlider" focusTraversable="false" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="0.0" />
+                        <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" layoutX="14.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                        <Button id="playButton" fx:id="playButton" focusTraversable="false" layoutX="38.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="32.0" />
                         <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="66.0" />
                         <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="35.0" AnchorPane.rightAnchor="5.0">
                            <font>
@@ -602,7 +602,7 @@
                <bottom>
                   <AnchorPane>
                      <children>
-                        <ScrollPane fx:id="infoPane" prefHeight="159.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="BOTTOM_CENTER">
+                        <ScrollPane fx:id="infoPane" focusTraversable="false" prefHeight="159.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="BOTTOM_CENTER">
                            <BorderPane.margin>
                               <Insets top="3.0" />
                            </BorderPane.margin>

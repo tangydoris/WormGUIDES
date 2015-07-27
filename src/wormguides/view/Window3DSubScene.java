@@ -31,6 +31,7 @@ import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 
 public class Window3DSubScene{
@@ -306,6 +307,7 @@ public class Window3DSubScene{
 		for (int i = 0; i < names.length; i ++) {
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
+			sphere.setDrawMode(DrawMode.FILL);
 			
 			//sphere.setMaterial(getMaterial(namesLowerCase[i]));
 			Material material = colorHash.getMaterial(namesLowerCase[i]);
@@ -515,7 +517,7 @@ public class Window3DSubScene{
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -900;
+	private static final double CAMERA_INITIAL_DISTANCE = -800;
     private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
     private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
     

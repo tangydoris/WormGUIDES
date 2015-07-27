@@ -31,17 +31,17 @@ public class ColorHash extends Hashtable<ColorRule, Material> {
 		addRule("abp", Color.BLUE.brighter());
 		addRule("p", Color.GREEN.brighter());
 		addRule("ems", Color.YELLOW.brighter());
-		//addRule("", Color.WHITE);
 		
-		addRule("abal", Color.GREY);
-		//addRule("abal", Color.PURPLE);
+		addRule("abal", Color.GREY.brighter());
+		addRule("abal", Color.PURPLE.brighter());
+		
 		System.out.println(toString());
 		//System.out.println("constructor done");
 	}
 	
 	public void addRule(String cellName, Color color) {
 		cellName = cellName.toLowerCase();
-		System.out.println("adding rule for "+cellName);
+		//System.out.println("adding rule for "+cellName);
 		
 		// Iterate through hash to see if there is already a rule
 		// for cell name
@@ -83,23 +83,43 @@ public class ColorHash extends Hashtable<ColorRule, Material> {
 	}
 	
 	private Material makeMaterial(Color[] colors) {
-		WritableImage wImage = new WritableImage(120, 120);
+		WritableImage wImage = new WritableImage(240, 240);
 		PixelWriter writer = wImage.getPixelWriter();
 		
 		// for more than two colors, we want segments
+		
 		int segmentLength = (int) wImage.getHeight()/colors.length;
 		Color color = Color.BLACK;
+		
 		for (int i = 0; i < colors.length; i++) {
 			for (int j = i*segmentLength; j < (i+1)*segmentLength; j++) {
 				for (int k = 0; k < wImage.getWidth(); k++) {
 					 if (j < (i+1)*segmentLength)
 						 color = colors[i];
-					 //color = Color.web(UNSELECTED_COLOR_HEX, 0.5d);
 					 writer.setColor(k, j, color);
 				}
 			}
 		}
-		// Rotate image so there is no wrapping error at the poles
+		
+		/*
+		int centerX = (int) wImage.getHeight()/2;
+		int centerY = (int) wImage.getWidth()/2;
+		for (int i=0; i<wImage.getHeight(); i++) {
+			for (int j=0; j<wImage.getWidth(); j++) {
+				color = Color.BLACK;
+				int distance = (int) Math.sqrt(Math.pow(i-centerX, 2) + Math.pow(j-centerY, 2));
+				// see which segment the color belongs in
+				for (int s=0; s<colors.length; s++) {
+					if (distance < ((s+1)*segmentLength)/2) {
+						color = colors[s];
+						break;
+					}
+				}
+				writer.setColor(j, i, color);
+			}
+		}
+		*/
+		
 		File file = new File("test2.png");
 		RenderedImage renderedImage = SwingFXUtils.fromFXImage(wImage, null);
 		try {
@@ -108,8 +128,7 @@ public class ColorHash extends Hashtable<ColorRule, Material> {
 			        "png",
 			        file);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("error in writing diffusemap for sphere");
 		}
 		
 		PhongMaterial material = new PhongMaterial();

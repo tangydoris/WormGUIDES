@@ -5,6 +5,8 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -57,6 +59,13 @@ public class MainApp extends Application {
             this.scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
+            
+            Parent root = scene.getRoot();
+            for (Node node : root.getChildrenUnmodifiable()) {
+            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
+            					"-fx-faint-focus-color: transparent;");
+            	
+            }
             
         } catch (IOException e) {
         	System.out.println("could not initialize root layout.");
