@@ -152,56 +152,6 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <Label text="     Interactors" />
-                                          <HBox prefHeight="22.0" prefWidth="200.0">
-                                             <children>
-                                                <HBox prefWidth="180.0">
-                                                   <children>
-                                                      <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Wired to" />
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="wiredTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox prefHeight="22.0" prefWidth="200.0">
-                                             <children>
-                                                <HBox prefWidth="180.0">
-                                                   <children>
-                                                      <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="L/R homologues" />
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="lrTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <Label text="     Geometry" />
-                                          <HBox prefHeight="22.0" prefWidth="200.0">
-                                             <children>
-                                                <HBox prefWidth="180.0">
-                                                   <children>
-                                                      <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Nucleus" />
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="nucleusTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox prefHeight="22.0" prefWidth="200.0">
-                                             <children>
-                                                <HBox prefWidth="180.0">
-                                                   <children>
-                                                      <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Cell Shape" />
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="cellShapeTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
                                           <Region prefHeight="10.0" />
                                           <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
                                              <children>

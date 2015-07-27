@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -14,13 +15,24 @@ import javafx.scene.control.ToggleGroup;
 
 public class Search {
 	
+	public enum Type {
+		SYSTEMATIC, FUNCTIONAL, DESCRIPTION, GENE;
+	}
+	
+	public enum Ancestry {
+		CELL, ANCESTOR, DESCENDANT;
+	}
+	
 	private ArrayList<String> cellNames;
 	private ObservableList<String> searchResults;
 	private TextField searchField;
 	private ListView<String> searchResultsList;
 	
-	//private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	private ToggleGroup searchType;
+	
+	private CheckBox cellTick;
+	private CheckBox ancestorTick;
+	private CheckBox descendantTick;
 
 	public Search(TextField searchField, ListView<String> searchResultsList) {
 		this.searchField = searchField;
@@ -33,13 +45,13 @@ public class Search {
 			RadioButton desRadioBtn, RadioButton genRadioBtn) {
 		searchType = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(searchType);
-		sysRadioBtn.setUserData(SYSTEMATIC);
+		sysRadioBtn.setUserData(Type.SYSTEMATIC);
 		funRadioBtn.setToggleGroup(searchType);
-		funRadioBtn.setUserData(FUNCTIONAL);
+		funRadioBtn.setUserData(Type.FUNCTIONAL);
 		desRadioBtn.setToggleGroup(searchType);
-		desRadioBtn.setUserData(DESCRIPTION);
+		desRadioBtn.setUserData(Type.DESCRIPTION);
 		genRadioBtn.setToggleGroup(searchType);
-		genRadioBtn.setUserData(GENE);
+		genRadioBtn.setUserData(Type.GENE);
 		
 		sysRadioBtn.setSelected(true);
 		
@@ -56,7 +68,7 @@ public class Search {
 			public void changed(ObservableValue<? extends Toggle> observable,
 					Toggle arg1, Toggle arg2) {	
 				// TODO implement type functionality
-				switch ((String) searchType.getSelectedToggle().getUserData()) {
+				switch ((Type) searchType.getSelectedToggle().getUserData()) {
 					case SYSTEMATIC:
 						System.out.println("systematic search selected");
 						break;
@@ -98,9 +110,9 @@ public class Search {
 		searchResultsList.setItems(searchResults);
 	}
 	
-	private static final String SYSTEMATIC = "systemastic",
-			FUNCTIONAL = "functional",
-			DESCRIPTION = "description",
-			GENE = "gene";
+//	private static final String SYSTEMATIC = "systemastic",
+//			FUNCTIONAL = "functional",
+//			DESCRIPTION = "description",
+//			GENE = "gene";
 	
 }
