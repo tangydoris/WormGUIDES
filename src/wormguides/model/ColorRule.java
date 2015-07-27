@@ -16,8 +16,22 @@ public class ColorRule {
 		colors.add(color);
 	}
 	
+	public ColorRule(String cellName, Color[] colors) {
+		this.cellName = cellName.toLowerCase();
+		this.colors = new ArrayList<Color>();
+		for (int i = 0; i < colors.length; i ++)
+			this.colors.add(colors[i]);
+	}
+	
 	public void addColor(Color color) {
 		colors.add(color);
+	}
+	
+	public void addColor(Color[] colors) {
+		for (int i = 0; i < colors.length; i++) {
+			if (!this.colors.contains(colors[i]))
+				this.colors.add(colors[i]);
+		}
 	}
 	
 	public String getName() {
@@ -29,6 +43,13 @@ public class ColorRule {
 	}
 	
 	public String toString() {
-		return cellName;
+		return cellName+" "+colorsToString();
+	}
+	
+	private String colorsToString() {
+		String out = "";
+		for (int i = 0; i < colors.size(); i++)
+			out += colors.get(i).toString()+" ";
+		return out;
 	}
 }
