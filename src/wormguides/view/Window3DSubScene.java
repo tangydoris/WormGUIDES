@@ -73,7 +73,7 @@ public class Window3DSubScene{
 	private StringProperty searchedPrefix;
 	private ObservableList<String> subSceneSearchResults;
 	
-	private ColorHash colorHash;
+	//private ColorHash colorHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -162,7 +162,7 @@ public class Window3DSubScene{
 			}
 		};
 		
-		colorHash = new ColorHash();
+		//colorHash = new ColorHash();
 		buildScene(time.get());
 	}
 	
@@ -310,8 +310,8 @@ public class Window3DSubScene{
 			sphere.setDrawMode(DrawMode.FILL);
 			
 			//sphere.setMaterial(getMaterial(namesLowerCase[i]));
-			Material material = colorHash.getMaterial(namesLowerCase[i]);
-			sphere.setMaterial(material);
+			//Material material = colorHash.getMaterial(namesLowerCase[i]);
+			sphere.setMaterial(new PhongMaterial());
 	        
 	        double x = positions[i][X_COR];
 	        double y = positions[i][Y_COR];

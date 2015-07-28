@@ -1,6 +1,8 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+
+import wormguides.Search;
 import javafx.scene.paint.Color;
 
 // Every cell has a color rule consisting of its name and the color(s)
@@ -8,48 +10,61 @@ import javafx.scene.paint.Color;
 public class ColorRule {
 	
 	private String cellName;
-	private ArrayList<Color> colors;
+	private String cellNameLowerCase;
+	private ArrayList<Search.Option> options;
+	private Color color;
 	
-	public ColorRule(String cellName, Color color) {
-		this.cellName = cellName.toLowerCase();
-		colors = new ArrayList<Color>();
-		colors.add(color);
+	public ColorRule() {
+		this("", Color.WHITE, Search.Option.CELL);
 	}
 	
-	public ColorRule(String cellName, Color[] colors) {
-		this.cellName = cellName.toLowerCase();
-		this.colors = new ArrayList<Color>();
-		for (int i = 0; i < colors.length; i ++)
-			this.colors.add(colors[i]);
+	public ColorRule(String cellName, Color color, Search.Option...options) {
+		System.out.println("making colorrule for "+cellName);
+		setCellName(cellName);
+		setColor(color);
+		setOptions(options);
+	}
+
+	public void setCellName(String cellName) {
+		this.cellName = cellName;
+		this.cellNameLowerCase = cellName.toLowerCase();
 	}
 	
-	public void addColor(Color color) {
-		colors.add(color);
+	public void setColor(Color color) {
+		this.color = color;
 	}
 	
-	public void addColor(Color[] colors) {
-		for (int i = 0; i < colors.length; i++) {
-			if (!this.colors.contains(colors[i]))
-				this.colors.add(colors[i]);
-		}
+	public void setOptions(Search.Option...options){
+		this.options = new ArrayList<Search.Option>();
+		for (Search.Option option : options)
+			if (!this.options.contains(option))
+				this.options.add(option);
 	}
 	
 	public String getName() {
 		return cellName;
 	}
 	
-	public Color[] getColors() {
-		return colors.toArray(new Color[colors.size()]);
+	public String getNameLowerCase() {
+		return cellNameLowerCase;
+	}
+	
+	public Color getColor() {
+		return color;
+	}
+	
+	public Search.Option[] getOptions() {
+		return options.toArray(new Search.Option[options.size()]);
 	}
 	
 	public String toString() {
-		return cellName+" "+colorsToString();
-	}
-	
-	private String colorsToString() {
-		String out = "";
-		for (int i = 0; i < colors.size(); i++)
-			out += colors.get(i).toString()+" ";
+		String out = cellName+", ";
+		for (int i=0; i<options.size(); i++) {
+			out += options.get(i).getDescription();
+			if (i != options.size()-1)
+				out += ", ";
+		}
 		return out;
 	}
+
 }

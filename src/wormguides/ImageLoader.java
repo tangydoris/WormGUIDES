@@ -12,18 +12,14 @@ import javafx.scene.image.ImageView;
 
 public class ImageLoader {
 	
-	private ImageView forward, backward, play, pause;
-	private Image edit, eye; 
-	//private Image close;
-	JarFile jarFile;
+	private static ImageView forward, backward, play, pause;
+	private static Image edit, eye; 
+	private static JarFile jarFile;
 	
-	public ImageLoader(String jarPath) {
+	public static void loadImages(String jarPath) {
 		try {
-			this.jarFile = new JarFile(new File(jarPath));
-
+			jarFile = new JarFile(new File(jarPath));
 			Enumeration<JarEntry> entries = jarFile.entries();
-			//int time = 0;
-			
 			JarEntry entry;
 			while (entries.hasMoreElements()){
 				entry = entries.nextElement();
@@ -31,7 +27,6 @@ public class ImageLoader {
 					processImage(entry);
 				}
 			}
-
 			jarFile.close();
 			
 		} catch (IOException ioe) {
@@ -39,68 +34,51 @@ public class ImageLoader {
 		}
 	}
 	
-	public void processImage(JarEntry entry) throws IOException {
+	public static void processImage(JarEntry entry) throws IOException {
 		InputStream input = jarFile.getInputStream(entry);
 		Image image = new Image(input);
 		switch (entry.getName()) {
-			case EDIT_PNG:
-				this.edit = image;
-				return;
-			case EYE_PNG:
-				this.eye = image;
-				return;
-			/*
-			case CLOSE_PNG:
-				this.close = image;
-				return;
-			 */
+			case EDIT_PNG:	edit = image;
+							return;
+			case EYE_PNG:	eye = image;
+							return;
 		}
 		ImageView icon = new ImageView(image);
 		switch (entry.getName()) {
-			case BACKWARD_PNG:
-				this.backward = icon;
-				break;
-			case FORWARD_PNG:
-				this.forward = icon;
-				break;
-			case PLAY_PNG:
-				this.play = icon;
-				break;
-			case PAUSE_PNG:
-				this.pause = icon;
-				break;
+			case BACKWARD_PNG:	backward = icon;
+								break;
+			case FORWARD_PNG:	forward = icon;
+								break;
+			case PLAY_PNG:		play = icon;
+								break;
+			case PAUSE_PNG:		pause = icon;
+								break;
 		}
 	}
 
-	public ImageView getForwardIcon() {
-		return this.forward;
+	public static ImageView getForwardIcon() {
+		return forward;
 	}
 	
-	public ImageView getBackwardIcon() {
-		return this.backward;
+	public static ImageView getBackwardIcon() {
+		return backward;
 	}
 	
-	public ImageView getPlayIcon() {
-		return this.play;
+	public static ImageView getPlayIcon() {
+		return play;
 	}
 	
-	public ImageView getPauseIcon() {
-		return this.pause;
+	public static ImageView getPauseIcon() {
+		return pause;
 	}
 	
-	public ImageView getEditIcon() {
+	public static ImageView getEditIcon() {
 		return new ImageView(edit);
 	}
 	
-	public ImageView getEyeIcon() {
+	public static ImageView getEyeIcon() {
 		return new ImageView(eye);
 	}
-	
-	/*
-	public ImageView getCloseIcon() {
-		return new ImageView(close);
-	}
-	*/
 	
 	private static final String ENTRY_PREFIX = "wormguides/view/icons/",
 			BACKWARD_PNG = ENTRY_PREFIX+"backward.png",
@@ -109,5 +87,4 @@ public class ImageLoader {
 			PLAY_PNG = ENTRY_PREFIX+"play.png",
 			EDIT_PNG = ENTRY_PREFIX+"edit.png",
 			EYE_PNG = ENTRY_PREFIX+"eye.png";
-			//CLOSE_PNG = ENTRY_PREFIX+"close.png";
 }

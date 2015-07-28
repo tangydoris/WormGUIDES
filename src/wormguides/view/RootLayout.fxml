@@ -35,7 +35,7 @@
 			    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
 			  </rowConstraints>
 			   <children>
-			      <TabPane fx:id="dataPanel" maxWidth="289.0" prefWidth="289.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="23.0" tabMinWidth="45.0">
+			      <TabPane fx:id="dataPanel" focusTraversable="false" maxWidth="289.0" prefWidth="289.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="27.0" tabMinWidth="50.0">
 			        <tabs>
 			          <Tab text="Data">
 			            <content>
@@ -64,13 +64,19 @@
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" prefWidth="250.0" />
-                                          <Label text="Search Type:" />
+                                          <Label text="Search Type:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Label>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
                                                 <HBox prefWidth="170.0" HBox.hgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Systematic" />
+                                                      <Label prefHeight="22.0" text="Systematic">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
                                                       <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
@@ -82,7 +88,10 @@
                                                 <HBox prefWidth="170.0" HBox.hgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Functional" />
+                                                      <Label prefHeight="22.0" text="Functional">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
                                                       <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
@@ -94,7 +103,10 @@
                                                 <HBox prefWidth="170.0" HBox.hgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Description" />
+                                                      <Label prefHeight="22.0" text="Description">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
                                                       <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
@@ -106,7 +118,10 @@
                                                 <HBox prefWidth="170.0" HBox.hgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Gene" />
+                                                      <Label prefHeight="22.0" text="Gene">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" prefWidth="35.0" HBox.hgrow="ALWAYS" />
                                                       <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
@@ -114,14 +129,23 @@
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" />
-                                          <Label text="Search Options:" />
-                                          <Label text="     Cell Ancestry" />
+                                          <Label text="Search Options:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Label>
+                                          <Label text="     Cell Ancestry">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></Label>
                                           <HBox prefHeight="22.0" prefWidth="200.0">
                                              <children>
                                                 <HBox prefWidth="180.0">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Cell" />
+                                                      <Label prefHeight="22.0" text="Cell">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
                                                       <CheckBox fx:id="cellTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
@@ -133,7 +157,10 @@
                                                 <HBox prefWidth="180.0">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Ancestor" />
+                                                      <Label prefHeight="22.0" text="Ancestor">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
                                                       <CheckBox fx:id="ancestorTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
@@ -145,7 +172,10 @@
                                                 <HBox prefWidth="180.0">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Descendant" />
+                                                      <Label prefHeight="22.0" text="Descendant">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font></Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
                                                       <CheckBox fx:id="descendantTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
@@ -153,15 +183,18 @@
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" />
-                                          <HBox maxHeight="22.0" minHeight="22.0" prefHeight="22.0">
+                                          <HBox>
                                              <children>
-                                                <Label focusTraversable="false" prefHeight="22.0" text="Search Results:">
+                                                <Label focusTraversable="false" prefHeight="30.0" text="Search Results:">
                                                    <font>
                                                       <Font size="14.0" />
                                                    </font>
                                                 </Label>
                                                 <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="addSearchBtn" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" text="Add" />
+                                                <Button fx:id="addSearchBtn" focusTraversable="false" graphicTextGap="5.0" mnemonicParsing="false" prefWidth="100.0" text="Add" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font></Button>
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" />

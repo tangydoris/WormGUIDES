@@ -32,6 +32,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import wormguides.model.ColorRule;
 import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
 import wormguides.view.About;
@@ -71,7 +72,7 @@ public class RootLayoutController implements Initializable{
 	
 	// Layers tab
 	private Layers layers;
-	@FXML public ListView<String> colorRulesList;
+	@FXML public ListView<ColorRule> colorRulesList;
 	@FXML public Button addSearchBtn;
 	
 	// Layers controls
@@ -296,13 +297,13 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	public void setIcons() {
-		ImageLoader loader = new ImageLoader(JAR_NAME);
+		ImageLoader.loadImages(JAR_NAME);
 		
-		backwardButton.setGraphic(loader.getBackwardIcon());
-		forwardButton.setGraphic(loader.getForwardIcon());
+		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
+		forwardButton.setGraphic(ImageLoader.getForwardIcon());
 		
-		this.playIcon = loader.getPlayIcon();
-		this.pauseIcon = loader.getPauseIcon();
+		this.playIcon = ImageLoader.getPlayIcon();
+		this.pauseIcon = ImageLoader.getPauseIcon();
 		playButton.setGraphic(playIcon);
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -314,52 +315,6 @@ public class RootLayoutController implements Initializable{
 				playingMovie.set(!playingMovie.get());
 			}
 		});
-		
-		// Add edit icon
-		try {
-			editAbaButton.setGraphic(loader.getEditIcon());
-			editAbpButton.setGraphic(loader.getEditIcon());
-			editEmsButton.setGraphic(loader.getEditIcon());
-		} catch (NullPointerException npe) {
-			System.out.println("cannot set layers edit icon");
-		}
-		
-		// Add close icon
-		/*
-		try {
-			abaCloseButton.setGraphic(loader.getCloseIcon());
-			abpCloseButton.setGraphic(loader.getCloseIcon());
-			emsCloseButton.setGraphic(loader.getCloseIcon());
-		} catch (NullPointerException npe) {
-			System.out.println("cannot set layers close icon");
-		}
-		*/
-		
-		// Add eye icon
-		try {
-			abaEyeButton.setGraphic(loader.getEyeIcon());
-			abpEyeButton.setGraphic(loader.getEyeIcon());
-			emsEyeButton.setGraphic(loader.getEyeIcon());
-			
-			/*
-			vncEyeButton.setGraphic(loader.getEyeIcon());
-			dd1EyeButton.setGraphic(loader.getEyeIcon());
-			nerveRingEyeButton.setGraphic(loader.getEyeIcon());
-			
-			musEyeButton.setGraphic(loader.getEyeIcon());
-			bodEyeButton.setGraphic(loader.getEyeIcon());
-			phaEyeButton.setGraphic(loader.getEyeIcon());
-			neuEyeButton.setGraphic(loader.getEyeIcon());
-			aliEyeButton.setGraphic(loader.getEyeIcon());
-			
-			tagVncEyeButton.setGraphic(loader.getEyeIcon());
-			tagNerEyeButton.setGraphic(loader.getEyeIcon());
-			tagGasEyeButton.setGraphic(loader.getEyeIcon());
-			*/
-			
-		} catch (NullPointerException npe) {
-			System.out.println("cannot set layers visibility icon");
-		}
 	}
 	
 	private void setSliderProperties() {

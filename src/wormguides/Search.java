@@ -19,8 +19,22 @@ public class Search {
 		SYSTEMATIC, FUNCTIONAL, DESCRIPTION, GENE;
 	}
 	
-	public enum Ancestry {
-		CELL, ANCESTOR, DESCENDANT;
+	public enum Option {
+		CELL("cell"),
+		ANCESTOR("ancestor"),
+		DESCENDANT("descendants");
+		
+		private String description;
+		
+		Option() {
+			this("");
+		}
+		Option(String description) {
+			this.description = description;
+		}
+		public String getDescription() {
+			return description;
+		}
 	}
 	
 	private ArrayList<String> cellNames;
