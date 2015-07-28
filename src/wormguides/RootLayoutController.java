@@ -25,9 +25,11 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.PartsList;
@@ -45,7 +47,6 @@ public class RootLayoutController implements Initializable{
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
-	private DoubleProperty infoPanelHeight;
 	
 	// Panels stuff
 	@FXML public BorderPane rootBorderPane;
@@ -58,29 +59,34 @@ public class RootLayoutController implements Initializable{
 	@FXML public Label timeLabel, totalNucleiLabel;
 	@FXML public Slider timeSlider;
 	
-	// Search
+	// Search tab
 	private Search search;
 	private ArrayList<String> cellNames;
 	@FXML public TextField searchField;
-	//private ArrayList<String> allCellNames;
-	//private ObservableList<String> searchResults;
 	@FXML public ListView<String> searchResultsList;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	
 	// Cell selection
 	private StringProperty selectedName;
 	
+	// Layers tab
+	private Layers layers;
+	@FXML public ListView<String> colorRulesList;
+	@FXML public Button addSearchBtn;
+	
 	// Layers controls
 	@FXML public Button editAbaButton, editAbpButton, editEmsButton;
 	@FXML public Button abaEyeButton, abpEyeButton, emsEyeButton;
 	@FXML public Button abaCloseButton, abpCloseButton, emsCloseButton;
+	/*
 	@FXML public Button vncEyeButton, dd1EyeButton, nerveRingEyeButton;
 	@FXML public Button musEyeButton, bodEyeButton, phaEyeButton, neuEyeButton, aliEyeButton;
 	@FXML public Button tagVncEyeButton, tagNerEyeButton, tagGasEyeButton;
+	*/
 	
 	// Cell information
-	@FXML public Label cellName;
-	@FXML public Label cellDescription;
+	@FXML public Text cellName;
+	@FXML public Text cellDescription;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -135,6 +141,7 @@ public class RootLayoutController implements Initializable{
 			//backwardButton.setOnAction(window3D.getBackwardButtonListener());
 			//forwardButton.setOnAction(window3D.getForwardButtonListener());
 			
+			// time integer property that dictates the current time point
 			time.addListener(new ChangeListener<Number>() {
 				@Override
 				public void changed(ObservableValue<? extends Number> observable, 
@@ -194,7 +201,7 @@ public class RootLayoutController implements Initializable{
 				}
 			});
 			
-			// Add selected index manipulation of cell name/description here
+			// selectedName string property that has the name of the clicked sphere
 			selectedName.addListener(new ChangeListener<String> () {
 				@Override
 				public void changed(ObservableValue<? extends String> observable,
@@ -205,7 +212,7 @@ public class RootLayoutController implements Initializable{
 			});
 			
 		} catch (NullPointerException npe) {
-			System.out.println("cannot add listener for oen or more UI components");
+			System.out.println("cannot add listener for one or more UI components");
 		}
 	}
 	
@@ -239,9 +246,10 @@ public class RootLayoutController implements Initializable{
 	
 	private void sizeInfoPane() {
 		try {
-			this.infoPanelHeight = new SimpleDoubleProperty();
-			infoPanelHeight.bind(displayPanel.heightProperty().divide(8));
-			infoPane.maxHeightProperty().bind(infoPanelHeight);
+			infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(5));
+			
+			cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+			cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 		} catch (Exception e) {
 			System.out.println("canoot size information panel");
 		}
@@ -254,17 +262,6 @@ public class RootLayoutController implements Initializable{
 				@Override
 				public void changed(ObservableValue<? extends Number> observable,
 						Number oldValue, Number newValue) {
-					
-					/*
-					int newTime = newValue.intValue();
-					if (newTime < 1)
-						newTime = 1;
-					else if (newTime > window3D.getEndTime())
-						newTime = window3D.getEndTime();
-					*/
-					//time.set(newTime);
-					
-					//timeSlider.setValue(newTime);
 					timeLabel.setText("Time "+makePaddedTime(time.get()));
 				}
 			});
@@ -344,6 +341,7 @@ public class RootLayoutController implements Initializable{
 			abpEyeButton.setGraphic(loader.getEyeIcon());
 			emsEyeButton.setGraphic(loader.getEyeIcon());
 			
+			/*
 			vncEyeButton.setGraphic(loader.getEyeIcon());
 			dd1EyeButton.setGraphic(loader.getEyeIcon());
 			nerveRingEyeButton.setGraphic(loader.getEyeIcon());
@@ -357,6 +355,7 @@ public class RootLayoutController implements Initializable{
 			tagVncEyeButton.setGraphic(loader.getEyeIcon());
 			tagNerEyeButton.setGraphic(loader.getEyeIcon());
 			tagGasEyeButton.setGraphic(loader.getEyeIcon());
+			*/
 			
 		} catch (NullPointerException npe) {
 			System.out.println("cannot set layers visibility icon");
@@ -376,34 +375,36 @@ public class RootLayoutController implements Initializable{
 	private void initSearch() {
 		search = new Search(searchField, searchResultsList);
 		search.setCellNames(cellNames);
-		search.setRadioButons(sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn);
+		
+		ToggleGroup typeGroup = search.getTypeToggleGroup();
+		sysRadioBtn.setToggleGroup(typeGroup);
+		sysRadioBtn.setUserData(Search.Type.SYSTEMATIC);
+		funRadioBtn.setToggleGroup(typeGroup);
+		funRadioBtn.setUserData(Search.Type.FUNCTIONAL);
+		desRadioBtn.setToggleGroup(typeGroup);
+		desRadioBtn.setUserData(Search.Type.DESCRIPTION);
+		genRadioBtn.setToggleGroup(typeGroup);
+		genRadioBtn.setUserData(Search.Type.GENE);
+		search.addTypeToggleGroupListener(typeGroup);
+	}
+	
+	private void initLayers() {
+		layers = new Layers(colorRulesList);
+		addSearchBtn.setOnAction(layers.getAddSearchListener());
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
-		long start_time = System.nanoTime();
 		partsList = new PartsList();
-		long end_time = System.nanoTime();
-		double difference = (end_time - start_time)/1e6;
-		System.out.println("parts list init "+difference+"ms");
-		
-		start_time = System.nanoTime();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		end_time = System.nanoTime();
-		difference = (end_time - start_time)/1e6;
-		System.out.println("process nuc files "+difference+"ms");
-		
-		//start_time = System.nanoTime();
 		cellNames = data.getAllCellNames();
-		//end_time = System.nanoTime();
-		//difference = (end_time - start_time)/1e6;
-		//System.out.println("get cell names "+difference+"ms");
 		
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
 		setSliderProperties();
 		initSearch();
+		initLayers();
 		
         addListeners();
         

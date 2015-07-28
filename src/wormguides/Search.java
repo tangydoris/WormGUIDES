@@ -33,42 +33,35 @@ public class Search {
 	private CheckBox cellTick;
 	private CheckBox ancestorTick;
 	private CheckBox descendantTick;
-
+	
+	public Search() {
+		this(new TextField(), new ListView<String>());
+	}
+	
 	public Search(TextField searchField, ListView<String> searchResultsList) {
+		if (searchField==null)
+			searchField = new TextField();
+		if (searchResultsList==null)
+			searchResultsList = new ListView<String>();
+		
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
-		//searchResultsList.setFocusTraversable(false);
+		
+		searchType = new ToggleGroup();
+		
 		addTextListener();
 	}
 	
-	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
-			RadioButton desRadioBtn, RadioButton genRadioBtn) {
-		searchType = new ToggleGroup();
-		sysRadioBtn.setToggleGroup(searchType);
-		sysRadioBtn.setUserData(Type.SYSTEMATIC);
-		funRadioBtn.setToggleGroup(searchType);
-		funRadioBtn.setUserData(Type.FUNCTIONAL);
-		desRadioBtn.setToggleGroup(searchType);
-		desRadioBtn.setUserData(Type.DESCRIPTION);
-		genRadioBtn.setToggleGroup(searchType);
-		genRadioBtn.setUserData(Type.GENE);
-		
-		sysRadioBtn.setSelected(true);
-		
-		addRadioButtonsListener();
+	public ToggleGroup getTypeToggleGroup() {
+		return searchType;
 	}
 	
-	public void setCellNames(ArrayList<String> cellNames) {
-		this.cellNames = cellNames;
-	}
-	
-	private void addRadioButtonsListener() {
-		searchType.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+	public void addTypeToggleGroupListener(ToggleGroup group) {
+		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable,
 					Toggle arg1, Toggle arg2) {	
-				// TODO implement type functionality
-				switch ((Type) searchType.getSelectedToggle().getUserData()) {
+				switch ((Type) group.getSelectedToggle().getUserData()) {
 					case SYSTEMATIC:
 						System.out.println("systematic search selected");
 						break;
@@ -86,6 +79,31 @@ public class Search {
 		});
 	}
 	
+	/*
+	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
+			RadioButton desRadioBtn, RadioButton genRadioBtn) {
+		if (sysRadioBtn==null || funRadioBtn==null || desRadioBtn==null || genRadioBtn==null)
+			throw new IllegalArgumentException("cannot set radio buttons in Search");
+		
+		
+		sysRadioBtn.setToggleGroup(searchType);
+		sysRadioBtn.setUserData(Type.SYSTEMATIC);
+		funRadioBtn.setToggleGroup(searchType);
+		funRadioBtn.setUserData(Type.FUNCTIONAL);
+		desRadioBtn.setToggleGroup(searchType);
+		desRadioBtn.setUserData(Type.DESCRIPTION);
+		genRadioBtn.setToggleGroup(searchType);
+		genRadioBtn.setUserData(Type.GENE);
+		
+		sysRadioBtn.setSelected(true);
+	}
+	*/
+	
+	public void setCellNames(ArrayList<String> cellNames) {
+		this.cellNames = cellNames;
+	}
+
+	
 	private void addTextListener() {
 		searchResults = FXCollections.observableArrayList();
 		searchField.textProperty().addListener(new ChangeListener<String>() {
@@ -100,7 +118,6 @@ public class Search {
 							if (name.toLowerCase().startsWith(searched))
 								searchResults.add(name);
 						}
-
 					} catch (NullPointerException npe) {
 						System.out.println("cannot set cell names for search");
 					}
@@ -109,10 +126,5 @@ public class Search {
 		});
 		searchResultsList.setItems(searchResults);
 	}
-	
-//	private static final String SYSTEMATIC = "systemastic",
-//			FUNCTIONAL = "functional",
-//			DESCRIPTION = "description",
-//			GENE = "gene";
 	
 }
