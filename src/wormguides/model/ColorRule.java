@@ -54,9 +54,10 @@ public class ColorRule {
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
-		label.setText(toStringFull());
+		//label.setText(toStringFull());
+		label.setText(toString());
 		label.prefHeightProperty().bind(sideLength);
-		label.setMaxWidth(180);
+		label.setMaxWidth(140);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		
 		colorBtn.prefHeightProperty().bind(sideLength);
@@ -66,7 +67,9 @@ public class ColorRule {
 		colorBtn.minHeightProperty().bind(sideLength);
 		colorBtn.minWidthProperty().bind(sideLength);
 		colorBtn.setGraphicTextGap(0);
-		colorBtn.setGraphic(new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color));
+		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
+		rect.setStroke(Color.LIGHTGREY);
+		colorBtn.setGraphic(rect);
 		
 		editBtn.prefHeightProperty().bind(sideLength);
 		editBtn.prefWidthProperty().bind(sideLength);

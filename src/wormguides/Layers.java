@@ -1,6 +1,6 @@
 package wormguides;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import wormguides.model.ColorRule;
 import javafx.collections.FXCollections;
@@ -17,7 +17,7 @@ import javafx.util.Callback;
 public class Layers {
 	
 	private ObservableList<ColorRule> rulesList;
-	private ArrayList<Button> closeButtonsList;
+	private HashMap<ColorRule, Button> buttonMap;
 	private ListView<ColorRule> rulesListView;
 	
 	public Layers() {
@@ -29,7 +29,7 @@ public class Layers {
 			listView = new ListView<ColorRule>();
 		rulesListView = listView;
 		
-		closeButtonsList = new ArrayList<Button>();
+		buttonMap = new HashMap<ColorRule, Button>();
 		
 		rulesList = FXCollections.observableArrayList();
 		rulesList.addListener(new ListChangeListener<ColorRule>() {
@@ -41,37 +41,24 @@ public class Layers {
 						// added to list
 						for (ColorRule rule : change.getAddedSubList()) {
 							System.out.println("added rule "+rule.toStringFull());
+							ColorRule ruleToRemove = rule;
+							buttonMap.put(ruleToRemove, rule.getDeleteButton());
+							
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(ActionEvent event) {
-									int index = -1;
-									for (Button button : closeButtonsList) {
-										if (button==(Button)event.getSource()) {
-											index = closeButtonsList.indexOf(button);
-											break;
-										}
-									}
-									if (index != -1) {
-										closeButtonsList.remove(index);
-										rulesList.remove(index);
-									}
+									rulesList.remove(ruleToRemove);
+									buttonMap.remove(ruleToRemove);
 								}
 							});
-							closeButtonsList.add(rule.getDeleteButton());
-						}
-						// removed from list (need to implement?)
-						for (ColorRule rule : change.getRemoved()) {
-							rulesList.remove(rule);
 						}
 					}
 				}
 			}
 		});
+		
 		addDefaultRules();	
-		
-		rulesListView.setStyle("-fx-background-insets: 1 ;");
 		rulesListView.setItems(rulesList);
-		
 		makeCellFactory();
 	}
 	
@@ -99,23 +86,15 @@ public class Layers {
                     @Override
                     protected void updateItem(ColorRule item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (item != null) {
+                        if (item != null) 
                             setGraphic(item.getHBox());
-                        }
+                        else
+                        	setGraphic(null);
                     }
                 };
                 return cell;
 			}
 		});
-	}
-	
-	public EventHandler<ActionEvent> getDeleteButtonListener() {
-		return new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				
-			}
-		};
 	}
 	
 }

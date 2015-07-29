@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,11 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -43,7 +41,7 @@ public class Search {
 		}
 	}
 	
-	private ArrayList<String> cellNames;
+	private ArrayList<String> allCellNames;
 	private ObservableList<String> searchResults;
 	private TextField searchField;
 	private ListView<String> searchResultsList;
@@ -71,7 +69,6 @@ public class Search {
 		
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
-		this.searchResultsList.setStyle("-fx-background-insets: 1 ;");
 		
 		searchType = new ToggleGroup();
 		
@@ -189,8 +186,8 @@ public class Search {
 		};
 	}
 	
-	public void setCellNames(ArrayList<String> cellNames) {
-		this.cellNames = cellNames;
+	public void setCellNames(String[] cellNamesArr) {
+		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArr));
 	}
 
 	
@@ -204,7 +201,7 @@ public class Search {
 				searchResults.clear();
 				if (!searched.isEmpty()) {
 					try {
-						for (String name : cellNames) {
+						for (String name : allCellNames) {
 							if (name.toLowerCase().startsWith(searched))
 								searchResults.add(name);
 						}

@@ -1,9 +1,9 @@
 package wormguides;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -28,23 +28,26 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.ColorRule;
+import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
-import wormguides.view.About;
+import wormguides.view.AboutPane;
+import wormguides.view.TreePane;
 import wormguides.view.Window3DSubScene;
 
 public class RootLayoutController implements Initializable{
 	
-	// About popup dialog
+	// popup windows
 	private Stage aboutStage;
+	private Stage treeStage;
 	
 	// 3D subscene stuff
 	private Window3DSubScene window3D;
@@ -65,13 +68,16 @@ public class RootLayoutController implements Initializable{
 	
 	// Search tab
 	private Search search;
-	private ArrayList<String> cellNames;
+	private String[] allCellNames;
 	@FXML public TextField searchField;
 	@FXML public ListView<String> searchResultsList;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	@FXML public CheckBox cellTick, ancestorTick, descendantTick;
 	@FXML public AnchorPane colorPickerPane;
 	@FXML public ColorPicker colorPicker;
+	
+	// Lineage tree
+	private TreeItem<String> lineageTreeRoot;
 	
 	// Cell selection
 	private StringProperty selectedName;
@@ -80,16 +86,6 @@ public class RootLayoutController implements Initializable{
 	private Layers layers;
 	@FXML public ListView<ColorRule> colorRulesList;
 	@FXML public Button addSearchBtn;
-	
-	// Layers controls
-	@FXML public Button editAbaButton, editAbpButton, editEmsButton;
-	@FXML public Button abaEyeButton, abpEyeButton, emsEyeButton;
-	@FXML public Button abaCloseButton, abpCloseButton, emsCloseButton;
-	/*
-	@FXML public Button vncEyeButton, dd1EyeButton, nerveRingEyeButton;
-	@FXML public Button musEyeButton, bodEyeButton, phaEyeButton, neuEyeButton, aliEyeButton;
-	@FXML public Button tagVncEyeButton, tagNerEyeButton, tagGasEyeButton;
-	*/
 	
 	// Cell information
 	@FXML public Text cellName;
@@ -111,14 +107,24 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void menuAboutAction() {
-		if (aboutStage == null) {
+		if (aboutStage==null) {
 			aboutStage = new Stage();
-			aboutStage.setScene(new Scene(new About()));
-			//aboutStage.setScene(new Scene((new About()).load()));
+			aboutStage.setScene(new Scene(new AboutPane()));
 			aboutStage.setTitle("About WormGUIDES");
-			aboutStage.initModality(Modality.APPLICATION_MODAL);
+			aboutStage.initModality(Modality.NONE);
 		}
 		aboutStage.show();
+	}
+	
+	@FXML
+	public void viewTreeAction() {
+		if (treeStage==null) {
+			treeStage = new Stage();
+			treeStage.setScene(new Scene(new TreePane(lineageTreeRoot)));
+			treeStage.setTitle("LineageTree");
+			treeStage.initModality(Modality.NONE);
+		}
+		treeStage.show();
 	}
 	
 	public void init3DWindow(TableLineageData data) {
@@ -195,6 +201,13 @@ public class RootLayoutController implements Initializable{
 					selectedName.set(newValue);
 				}
 			});
+			
+			// TODO
+			/*
+			 * Should we be able to select a cell from the search results
+			 * and have the name show up in the search text field?
+			 */
+			
 			searchResultsList.selectionModelProperty().addListener(
 					new ChangeListener<MultipleSelectionModel<String>>() {
 				@Override
@@ -213,8 +226,7 @@ public class RootLayoutController implements Initializable{
 				@Override
 				public void changed(ObservableValue<? extends String> observable,
 						String oldValue, String newValue) {
-					String sulston = selectedName.get();
-					setSelectedInfo(sulston);
+					setSelectedInfo(selectedName.get());
 				}
 			});
 			
@@ -253,7 +265,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void sizeInfoPane() {
 		try {
-			infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(5));
+			infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(6));
 			
 			cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 			cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
@@ -303,8 +315,6 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	public void setIcons() {
-		//ImageLoader.loadImages(JAR_NAME);
-		
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());
 		
@@ -335,7 +345,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsList);
-		search.setCellNames(cellNames);
+		search.setCellNames(allCellNames);
 		
 		ToggleGroup typeGroup = search.getTypeToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
@@ -347,32 +357,39 @@ public class RootLayoutController implements Initializable{
 		genRadioBtn.setToggleGroup(typeGroup);
 		genRadioBtn.setUserData(Search.Type.GENE);
 		typeGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
-		//search.addTypeToggleGroupListener(typeGroup);
 		
 		cellTick.selectedProperty().addListener(search.getCellTickListner());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
-		
 		colorPicker.setOnAction(search.getColorPickerListener());
-		
 		addSearchBtn.setOnAction(search.getAddButtonListener());
 	}
 	
 	private void initLayers() {
 		layers = new Layers(colorRulesList);
-		//addSearchBtn.setOnAction(layers.getAddSearchListener());
+	}
+	
+	private void initLineageTree() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				lineageTreeRoot = (new LineageTree(allCellNames)).getRoot();
+			}
+		});
+		
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		partsList = new PartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		cellNames = data.getAllCellNames();
+		allCellNames = AceTreeLoader.getAllCellNames();
 		
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
 		setSliderProperties();
+		initLineageTree();
 		initSearch();
 		initLayers();
 		search.setRulesList(layers.getRulesList());

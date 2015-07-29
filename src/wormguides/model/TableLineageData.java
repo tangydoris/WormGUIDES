@@ -9,8 +9,12 @@ public class TableLineageData implements LineageData{
 	private ArrayList<String> allCellNames;
 	
 	public TableLineageData() {
+		this(new ArrayList<String>());
+	}
+	
+	public TableLineageData(ArrayList<String> allCellNames) {
 		timeFrames = new ArrayList<Frame>();
-		allCellNames = new ArrayList<String>();
+		this.allCellNames = allCellNames;
 	}
 	
 	@Override
@@ -59,7 +63,6 @@ public class TableLineageData implements LineageData{
 	}
 	
 	public void addNucleus(int time, String name, int x, int y, int z, int diameter) {
-		//System.out.println("time"+time+",size:"+getSize());
 		if (time <= getTotalTimePoints()) {
 			int index = time - 1;
 			Frame frame = timeFrames.get(index);
@@ -105,20 +108,6 @@ public class TableLineageData implements LineageData{
 			diameters.add(diameter);
 		}
 		
-		/*
-		private void setNames(ArrayList<String> names) {
-			this.names = names;
-		}
-		
-		private void setPositions(ArrayList<Integer[]> positions) {
-			this.positions = positions;
-		}
-		
-		private void setSizes(ArrayList<Integer> sizes) {
-			this.diameters = sizes;
-		}
-		*/
-		
 		private String[] getNames() {
 			return names.toArray(new String[names.size()]);
 		}
@@ -141,7 +130,6 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private final static String NEWLINE = "\n";
-		//private final static String CS = ", ";
 	}
 
 }

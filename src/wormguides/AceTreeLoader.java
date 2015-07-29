@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
@@ -15,8 +17,10 @@ import wormguides.model.TableLineageData;
 // Loader class to read nuclei files
 public class AceTreeLoader {
 	
+	private static ArrayList<String> allCellNames = new ArrayList<String>();
+	
 	public static TableLineageData loadNucFiles(String jarPath) {
-		TableLineageData tld = new TableLineageData();
+		TableLineageData tld = new TableLineageData(allCellNames);
 		try {
 			JarFile jarFile = new JarFile(new File(jarPath));
 
@@ -26,8 +30,6 @@ public class AceTreeLoader {
 			JarEntry entry;
 			while (entries.hasMoreElements()){
 				entry = entries.nextElement();
-				//String name = entry.getName();
-				
 				if (entry.getName().startsWith(ENTRY_PREFIX)) {
 					InputStream input = jarFile.getInputStream(entry);
 					process(tld, time++, input);
@@ -80,13 +82,23 @@ public class AceTreeLoader {
 		}
 	}
 	
+	public static String[] getAllCellNames() {
+		allCellNames.sort(new Comparator<String>() {
+			@Override
+			public int compare(String s1, String s2) {
+				return s1.compareTo(s2);
+			}
+		});
+		return allCellNames.toArray(new String[allCellNames.size()]);
+	}
+	
 	private static final String ENTRY_PREFIX = "wormguides/model/nuclei_files/";
 	private static final int TOKEN_ARRAY_SIZE = 21;
 	private static final int VALID = 1,
-		XCOR = 5,
-		YCOR = 6,
-		ZCOR = 7,
-		DIAMETER = 8,
-		IDENTITY = 9;
+							XCOR = 5,
+							YCOR = 6,
+							ZCOR = 7,
+							DIAMETER = 8,
+							IDENTITY = 9;
 
 }

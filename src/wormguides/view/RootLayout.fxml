@@ -22,20 +22,25 @@
               <MenuItem fx:id="menuAbout" mnemonicParsing="false" onAction="#menuAboutAction" text="About" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="View">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
+              </items>
+            </Menu>
         </menus>
       </MenuBar>
    </top>
    <center>
 		<GridPane fx:id="mainGridPane" pickOnBounds="false" BorderPane.alignment="CENTER">
 			  <columnConstraints>
-			    <ColumnConstraints hgrow="ALWAYS" maxWidth="320.0" minWidth="100.0" prefWidth="320.0" />
+			    <ColumnConstraints hgrow="ALWAYS" maxWidth="300.0" minWidth="100.0" prefWidth="300.0" />
 			    <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="580.0" />
 			  </columnConstraints>
 			  <rowConstraints>
 			    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
 			  </rowConstraints>
 			   <children>
-			      <TabPane fx:id="dataPanel" focusTraversable="false" maxWidth="320.0" prefHeight="775.0" prefWidth="320.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="27.0" tabMinWidth="50.0">
+			      <TabPane fx:id="dataPanel" focusTraversable="false" maxWidth="300.0" prefHeight="775.0" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="27.0" tabMinWidth="50.0">
 			        <tabs>
 			          <Tab text="Data">
 			            <content>
@@ -48,11 +53,11 @@
                            <children>
                               <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="11.0" layoutY="11.0" prefViewportHeight="723.0" prefViewportWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <VBox maxWidth="300.0" prefWidth="300.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                    <VBox maxWidth="280.0" prefWidth="280.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <children>
-                                          <AnchorPane fx:id="colorPickerPane" maxHeight="80.0" minHeight="60.0" prefHeight="60.0" prefWidth="270.0">
+                                          <AnchorPane fx:id="colorPickerPane" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" prefWidth="270.0">
                                              <children>
-                                                <ColorPicker fx:id="colorPicker" prefHeight="80.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <ColorPicker fx:id="colorPicker" prefHeight="50.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
                                           <Region prefHeight="10.0" />
@@ -218,7 +223,7 @@
 			          </Tab>
 			            <Tab text="Layers">
 			              <content>
-			                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+			                <AnchorPane>
                            <children>
                               <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <children>

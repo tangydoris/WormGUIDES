@@ -1,7 +1,6 @@
 package wormguides.view;
 
 import wormguides.Xform;
-import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -23,13 +22,9 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.control.Slider;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
@@ -53,11 +48,8 @@ public class Window3DSubScene{
 	
 	private int endTime;
 	
-	private Slider timeSlider;
-	
 	private BooleanProperty playingMovie;
 	private PlayService playService;
-	//private RenderService renderService;
 	private Runnable renderRunnable;
 	
 	private Sphere[] cells;
@@ -145,7 +137,6 @@ public class Window3DSubScene{
 		renderRunnable = new Runnable() {
 			@Override
 			public void run() {
-				//System.out.println("render called");
 				refreshScene();
 				addCellsToScene();
 				
@@ -193,13 +184,6 @@ public class Window3DSubScene{
 	public BooleanProperty getPlayingMovieProperty() {
 		return playingMovie;
 	}
-	
-	/*
-	public void setSlider(Slider timeSlider) {
-		this.timeSlider = timeSlider;
-		setSliderProperties();
-	}
-	*/
 	
 	private SubScene createSubScene(Double width, Double height) {
 		subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
@@ -313,9 +297,9 @@ public class Window3DSubScene{
 			//Material material = colorHash.getMaterial(namesLowerCase[i]);
 			sphere.setMaterial(new PhongMaterial());
 	        
-	        double x = positions[i][X_COR];
-	        double y = positions[i][Y_COR];
-	        double z = positions[i][Z_COR]*Z_SCALE;
+	        double x = positions[i][X_COR_INDEX];
+	        double y = positions[i][Y_COR_INDEX];
+	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
 	        translate(sphere, x, y, z);
 	        
 	        cells[i] = sphere;
@@ -339,6 +323,7 @@ public class Window3DSubScene{
         sphere.setTranslateZ(z);
 	}
 	
+	/*
 	private Material getMaterial(String name) {
 		name = name.toLowerCase();
 		String prefix = searchedPrefix.get();
@@ -349,13 +334,6 @@ public class Window3DSubScene{
 		// test one stripe3
 		for (int j = 0; j < wImage.getHeight(); j++) {
 			for (int k = 0; k < wImage.getWidth(); k++) {
-				/*
-				 if (j < 20 | j > 60)
-					 color = Color.RED;
-				 else
-					 color = Color.WHITE;
-				 */
-				 //color = Color.web(UNSELECTED_COLOR_HEX, 0.5d);
 				 writer.setColor(k, j, color);
 			}
 		}
@@ -363,8 +341,9 @@ public class Window3DSubScene{
 		((PhongMaterial) material).setDiffuseMap(wImage);
 		return material;
 	}
+	*/
 	
-	
+	/*
 	private Color getColorRule(String name) {
 		name = name.toLowerCase();
 		String prefix = searchedPrefix.get();
@@ -388,6 +367,7 @@ public class Window3DSubScene{
 			}
 		}
 	}
+	*/
 	
 	
 	private void buildCamera() {
@@ -420,9 +400,9 @@ public class Window3DSubScene{
 		int sumY = 0;
 		int sumZ = 0;
 		for (int i = 0; i < numCells; i++) {
-			sumX += positions[i][X_COR];
-			sumY += positions[i][Y_COR];
-			sumZ += positions[i][Z_COR];
+			sumX += positions[i][X_COR_INDEX];
+			sumY += positions[i][Y_COR_INDEX];
+			sumZ += positions[i][Z_COR_INDEX];
 		}
 		this.newOriginX = Math.round(sumX/numCells);
 		this.newOriginY = Math.round(sumY/numCells);
@@ -431,7 +411,6 @@ public class Window3DSubScene{
 		// Set new origin to average X Y positions
 		cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
-		//System.out.println("origin "+newOriginX+CS+newOriginY+CS+newOriginZ);
 	}
 	
 	public void printCellNames() {
@@ -439,7 +418,6 @@ public class Window3DSubScene{
 			System.out.println(names[i]+CS+cells[i]);
 	}
 	
-	// Accessor methods
 	public SubScene getSubScene() {
 		return subscene;
 	}
@@ -469,7 +447,6 @@ public class Window3DSubScene{
 			subSceneSearchResults.clear();
 			if (!searchedPrefix.get().isEmpty()) {
 				for (int i = 0; i < names.length; i++) {
-					//System.out.println(names[i]);
 					if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
 						//System.out.println(names[i]);
 						subSceneSearchResults.add(names[i]);
@@ -507,31 +484,32 @@ public class Window3DSubScene{
 				}
 			};
 		}
-		
 	}
 	
 	private static final String CS = ", ";
 	
-	private static final String FILL_COLOR_HEX = "#272727",
-			UNSELECTED_COLOR_HEX = "#333333";
+	private static final String FILL_COLOR_HEX = "#272727";
+	//private static final String	UNSELECTED_COLOR_HEX = "#333333";
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -800;
-    private static final double CAMERA_INITIAL_X_ANGLE = 0.0;
-    private static final double CAMERA_INITIAL_Y_ANGLE = 0.0;
+	private static final double CAMERA_INITIAL_DISTANCE = -800,
+								CAMERA_INITIAL_X_ANGLE = 0.0,
+								CAMERA_INITIAL_Y_ANGLE = 0.0;
     
-    private static final double CAMERA_NEAR_CLIP = 0.01;
-    private static final double CAMERA_FAR_CLIP = 50000;
+    private static final double CAMERA_NEAR_CLIP = 0.01,
+    							CAMERA_FAR_CLIP = 50000;
     
     private static final int START_TIME = 1;
-    private static final int X_COR = 0;
-    private static final int Y_COR = 1;
-    private static final int Z_COR = 2;
+    
+    private static final int X_COR_INDEX = 0,
+    						Y_COR_INDEX = 1,
+    						Z_COR_INDEX = 2;
     
     private static final double Z_SCALE = 5,
-    		X_SCALE = 1,
-    		Y_SCALE = 1;
+					    		X_SCALE = 1,
+					    		Y_SCALE = 1;
+    
     private static final double SIZE_SCALE = .9;
 
 }
