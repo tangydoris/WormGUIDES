@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView;
 public class ImageLoader {
 	
 	private static ImageView forward, backward, play, pause;
-	private static Image edit, eye; 
+	private static Image edit, eye, close; 
 	private static JarFile jarFile;
 	
 	public static void loadImages(String jarPath) {
@@ -41,6 +41,8 @@ public class ImageLoader {
 			case EDIT_PNG:	edit = image;
 							return;
 			case EYE_PNG:	eye = image;
+							return;
+			case CLOSE_PNG:	close = image;
 							return;
 		}
 		ImageView icon = new ImageView(image);
@@ -80,11 +82,16 @@ public class ImageLoader {
 		return new ImageView(eye);
 	}
 	
+	public static ImageView getCloseIcon() {
+		return new ImageView(close);
+	}
+	
 	private static final String ENTRY_PREFIX = "wormguides/view/icons/",
 			BACKWARD_PNG = ENTRY_PREFIX+"backward.png",
 			FORWARD_PNG = ENTRY_PREFIX+"forward.png",
 			PAUSE_PNG = ENTRY_PREFIX+"pause.png",
 			PLAY_PNG = ENTRY_PREFIX+"play.png",
 			EDIT_PNG = ENTRY_PREFIX+"edit.png",
-			EYE_PNG = ENTRY_PREFIX+"eye.png";
+			EYE_PNG = ENTRY_PREFIX+"eye.png",
+			CLOSE_PNG = ENTRY_PREFIX+"close.png";
 }

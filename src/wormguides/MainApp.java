@@ -19,12 +19,14 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	
-	public MainApp() {
-	}
+	public MainApp() { }
 	
 	@Override
 	public void start(Stage primaryStage) {
 		System.out.println("start");
+		
+		System.out.println("loading icons");
+		ImageLoader.loadImages(JAR_NAME);
 		
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("WormGUIDES");
@@ -49,7 +51,6 @@ public class MainApp extends Application {
 	}
 	
 	public void initRootLayout() {
-		
 		try {
             // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
@@ -64,26 +65,18 @@ public class MainApp extends Application {
             for (Node node : root.getChildrenUnmodifiable()) {
             	node.setStyle("-fx-focus-color: -fx-outer-border; "+
             					"-fx-faint-focus-color: transparent;");
-            	
             }
-            
         } catch (IOException e) {
         	System.out.println("could not initialize root layout.");
             e.printStackTrace();
         }
-        
-		/*
-		rootLayout = (new RootLayout()).load();
-		
-		scene = new Scene(rootLayout);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(true);
-        */
 	}
 	
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	private static final String JAR_NAME = "WormGUIDES.jar";
 	
 	//private static final String JAR_NAME = "WormGUIDES.jar";
 	

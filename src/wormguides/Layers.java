@@ -1,7 +1,6 @@
 package wormguides;
 
 import wormguides.model.ColorRule;
-import wormguides.model.ColorRuleCell;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,31 +20,40 @@ public class Layers {
 	}
 
 	public Layers(ListView<ColorRule> listView) {
-		rulesList = FXCollections.observableArrayList();
-		addDefaultRules();
-		
 		if (listView==null)
 			listView = new ListView<ColorRule>();
-
 		rulesListView = listView;
+		
+		rulesList = FXCollections.observableArrayList();
+		addDefaultRules();	
+		
+		rulesListView.setStyle("-fx-background-insets: 0 ;");
 		rulesListView.setItems(rulesList);
 		
 		makeCellFactory();
 	}
 	
 	private void addDefaultRules() {
-		rulesList.addAll(
-				new ColorRule("ABa", Color.RED, Search.Option.CELL, Search.Option.DESCENDANT),
-				new ColorRule("ABp", Color.BLUE, Search.Option.CELL, Search.Option.DESCENDANT),
-				new ColorRule("P", Color.GREEN, Search.Option.CELL, Search.Option.DESCENDANT)
-		);
+		rulesList.add(new ColorRule("ABa", Color.RED, Search.Option.CELL, Search.Option.DESCENDANT, Search.Option.ANCESTOR));
+		rulesList.add(new ColorRule("ABp", Color.BLUE, Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("P", Color.GREEN, Search.Option.CELL, Search.Option.DESCENDANT));
 	}
 	
 	private void makeCellFactory() {
 		rulesListView.setCellFactory(new Callback<ListView<ColorRule>, ListCell<ColorRule>>() {
 			@Override
 			public ListCell<ColorRule> call(ListView<ColorRule> listView) {
-				return new ColorRuleCell();
+				ListCell<ColorRule> cell = new ListCell<ColorRule>(){
+                    @Override
+                    protected void updateItem(ColorRule item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setGraphic(item.getHBox());
+                        }
+                    }
+                };
+                 
+                return cell;
 			}
 		});
 	}

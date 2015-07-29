@@ -297,7 +297,7 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	public void setIcons() {
-		ImageLoader.loadImages(JAR_NAME);
+		//ImageLoader.loadImages(JAR_NAME);
 		
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());

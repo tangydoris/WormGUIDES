@@ -218,102 +218,11 @@
                            <children>
                               <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
-                                    <HBox prefHeight="10.0" prefWidth="220.0">
-                                       <children>
-                                          <Label prefHeight="22.0" text="Search Layers:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                       </children>
-                                    </HBox>
-                                    <HBox spacing="2.0">
-                                       <children>
-                                          <Label layoutX="10.0" layoutY="10.0" prefHeight="22.0" text="ABa cell, ancestors">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
-                                          <Button fx:id="editAbaButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="abaEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="abaCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Button>
-                                       </children>
-                                    </HBox>
-                                    <HBox spacing="2.0">
-                                       <children>
-                                          <Label prefHeight="22.0" text="ABp">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
-                                          <Button fx:id="editAbpButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="abpEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="abpCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Button>
-                                       </children>
-                                    </HBox>
-                                    <HBox spacing="2.0">
-                                       <children>
-                                          <Label prefHeight="22.0" text="EMS">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                          <Button alignment="CENTER_RIGHT" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" style="-fx-background-color: red; -fx-border-radius: 3;" />
-                                          <Button fx:id="editEmsButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" textAlignment="CENTER" textOverrun="CLIP">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="emsEyeButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                          </Button>
-                                          <Button fx:id="emsCloseButton" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" maxHeight="22.0" maxWidth="22.0" minHeight="22.0" minWidth="22.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" text="x">
-                                             <padding>
-                                                <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                             </padding>
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Button>
-                                       </children>
-                                    </HBox>
+                                    <Label prefHeight="22.0" text="Search Layers:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
                                     <ListView fx:id="colorRulesList" focusTraversable="false" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
