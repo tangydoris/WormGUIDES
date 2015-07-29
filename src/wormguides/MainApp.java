@@ -25,7 +25,6 @@ public class MainApp extends Application {
 	public void start(Stage primaryStage) {
 		System.out.println("start");
 		
-		System.out.println("loading icons");
 		ImageLoader.loadImages(JAR_NAME);
 		
 		this.primaryStage = primaryStage;

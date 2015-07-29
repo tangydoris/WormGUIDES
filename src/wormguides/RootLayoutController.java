@@ -77,6 +77,7 @@ public class RootLayoutController implements Initializable{
 	@FXML public ColorPicker colorPicker;
 	
 	// Lineage tree
+	private LineageTree lineageTree;
 	private TreeItem<String> lineageTreeRoot;
 	
 	// Cell selection
@@ -130,7 +131,7 @@ public class RootLayoutController implements Initializable{
 	public void init3DWindow(TableLineageData data) {
 		try {
 			window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
-					modelAnchorPane.prefHeight(-1), data);
+					modelAnchorPane.prefHeight(-1), data, lineageTree);
 			subscene = window3D.getSubScene();
 			modelAnchorPane.getChildren().add(subscene);
 			
@@ -150,10 +151,6 @@ public class RootLayoutController implements Initializable{
 	
 	private void addListeners() {
 		try {
-			//timeSlider.valueProperty().addListener(window3D.getSliderListener());
-			//backwardButton.setOnAction(window3D.getBackwardButtonListener());
-			//forwardButton.setOnAction(window3D.getForwardButtonListener());
-			
 			// time integer property that dictates the current time point
 			time.addListener(new ChangeListener<Number>() {
 				@Override
@@ -373,7 +370,8 @@ public class RootLayoutController implements Initializable{
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				lineageTreeRoot = (new LineageTree(allCellNames)).getRoot();
+				lineageTree = new LineageTree(allCellNames);
+				lineageTreeRoot = lineageTree.getRoot();
 			}
 		});
 		

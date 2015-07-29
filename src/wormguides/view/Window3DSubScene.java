@@ -1,6 +1,7 @@
 package wormguides.view;
 
 import wormguides.Xform;
+import wormguides.model.LineageTree;
 import wormguides.model.TableLineageData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -22,6 +23,7 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -67,7 +69,7 @@ public class Window3DSubScene{
 	
 	//private ColorHash colorHash;
 	
-	public Window3DSubScene(double width, double height, TableLineageData data) {
+	public Window3DSubScene(double width, double height, TableLineageData data, LineageTree tree) {
 		root = new Group();
 		this.data = data;
 		time = new SimpleIntegerProperty();

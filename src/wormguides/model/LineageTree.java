@@ -128,6 +128,10 @@ public class LineageTree {
 		return new TreeItem<String>(name);
 	}
 	
+	public isDescendant(String desc, String ances) {
+		
+	}
+	
 	public TreeItem<String> getRoot() {
 		return root;
 	}
