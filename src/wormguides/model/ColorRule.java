@@ -50,30 +50,30 @@ public class ColorRule {
 		setOptions(options);
 		
 		// format UI elements
-		DoubleProperty height = new SimpleDoubleProperty(HEIGHT);
+		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
 		label.setText(toStringFull());
-		label.prefHeightProperty().bind(height);
+		label.prefHeightProperty().bind(sideLength);
 		label.setMaxWidth(180);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		
-		colorBtn.prefHeightProperty().bind(height);
-		colorBtn.prefWidthProperty().bind(height);
-		colorBtn.maxHeightProperty().bind(height);
-		colorBtn.maxWidthProperty().bind(height);
-		colorBtn.minHeightProperty().bind(height);
-		colorBtn.minWidthProperty().bind(height);
+		colorBtn.prefHeightProperty().bind(sideLength);
+		colorBtn.prefWidthProperty().bind(sideLength);
+		colorBtn.maxHeightProperty().bind(sideLength);
+		colorBtn.maxWidthProperty().bind(sideLength);
+		colorBtn.minHeightProperty().bind(sideLength);
+		colorBtn.minWidthProperty().bind(sideLength);
 		colorBtn.setGraphicTextGap(0);
-		colorBtn.setGraphic(new Rectangle(HEIGHT, HEIGHT, color));
+		colorBtn.setGraphic(new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color));
 		
-		editBtn.prefHeightProperty().bind(height);
-		editBtn.prefWidthProperty().bind(height);
-		editBtn.maxHeightProperty().bind(height);
-		editBtn.maxWidthProperty().bind(height);
-		editBtn.minHeightProperty().bind(height);
-		editBtn.minWidthProperty().bind(height);
+		editBtn.prefHeightProperty().bind(sideLength);
+		editBtn.prefWidthProperty().bind(sideLength);
+		editBtn.maxHeightProperty().bind(sideLength);
+		editBtn.maxWidthProperty().bind(sideLength);
+		editBtn.minHeightProperty().bind(sideLength);
+		editBtn.minWidthProperty().bind(sideLength);
 		editBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		editBtn.setGraphic(ImageLoader.getEditIcon());
 		editBtn.setGraphicTextGap(0);
@@ -84,12 +84,12 @@ public class ColorRule {
 			}
 		});
 		
-		visibleBtn.prefHeightProperty().bind(height);
-		visibleBtn.prefWidthProperty().bind(height);
-		visibleBtn.maxHeightProperty().bind(height);
-		visibleBtn.maxWidthProperty().bind(height);
-		visibleBtn.minHeightProperty().bind(height);
-		visibleBtn.minWidthProperty().bind(height);
+		visibleBtn.prefHeightProperty().bind(sideLength);
+		visibleBtn.prefWidthProperty().bind(sideLength);
+		visibleBtn.maxHeightProperty().bind(sideLength);
+		visibleBtn.maxWidthProperty().bind(sideLength);
+		visibleBtn.minHeightProperty().bind(sideLength);
+		visibleBtn.minWidthProperty().bind(sideLength);
 		visibleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		visibleBtn.setGraphic(ImageLoader.getEyeIcon());
 		visibleBtn.setGraphicTextGap(0);
@@ -100,25 +100,20 @@ public class ColorRule {
 			}
 		});
 		
-		deleteBtn.prefHeightProperty().bind(height);
-		deleteBtn.prefWidthProperty().bind(height);
-		deleteBtn.maxHeightProperty().bind(height);
-		deleteBtn.maxWidthProperty().bind(height);
-		deleteBtn.minHeightProperty().bind(height);
-		deleteBtn.minWidthProperty().bind(height);
+		deleteBtn.prefHeightProperty().bind(sideLength);
+		deleteBtn.prefWidthProperty().bind(sideLength);
+		deleteBtn.maxHeightProperty().bind(sideLength);
+		deleteBtn.maxWidthProperty().bind(sideLength);
+		deleteBtn.minHeightProperty().bind(sideLength);
+		deleteBtn.minWidthProperty().bind(sideLength);
 		deleteBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		deleteBtn.setGraphic(ImageLoader.getCloseIcon());
-		deleteBtn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				System.out.println("delete button pressed");
-			}
-		});
 		
 		HBox.setHgrow(region, Priority.ALWAYS);
-		hbox.getChildren().addAll(label, region, colorBtn, editBtn, visibleBtn, deleteBtn);
+		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
+									visibleBtn, deleteBtn);
 		
-		System.out.println("made colorrule for "+toStringFull());
+		//System.out.println("made colorrule for "+toStringFull());
 	}
 
 	public void setCellName(String cellName) {
@@ -153,12 +148,20 @@ public class ColorRule {
 		return hbox;
 	}
 	
+	public Button getDeleteButton() {
+		return deleteBtn;
+	}
+	
 	public Search.Option[] getOptions() {
 		return options.toArray(new Search.Option[options.size()]);
 	}
 	
 	public String toString() {
 		return cellName;
+	}
+	
+	public boolean equals(ColorRule other) {
+		return cellName.equals(other.getName());
 	}
 	
 	// this tostring takes up too much horizontal space
@@ -172,5 +175,6 @@ public class ColorRule {
 		return out;
 	}
 
-	private static final int HEIGHT = 22;
+	// length and width of color rule ui buttons
+	private static final int UI_SIDE_LENGTH = 22;
 }

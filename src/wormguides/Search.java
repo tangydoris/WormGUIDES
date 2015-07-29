@@ -71,7 +71,7 @@ public class Search {
 		
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
-		this.searchResultsList.setStyle("-fx-background-insets: 0 ;");
+		this.searchResultsList.setStyle("-fx-background-insets: 1 ;");
 		
 		searchType = new ToggleGroup();
 		
@@ -88,6 +88,14 @@ public class Search {
 	
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
+	}
+	
+	public boolean containsRule(ColorRule other) {
+		for (ColorRule rule : rulesList) {
+			if (rule.equals(other))
+				return true;
+		}
+		return false;
 	}
 	
 	public EventHandler<ActionEvent> getColorPickerListener() {
@@ -118,7 +126,9 @@ public class Search {
 				String cellName = searchResults.get(0);
 				
 				ColorRule rule = new ColorRule(cellName, selectedColor, options);
-				rulesList.add(rule);
+				
+				if (!containsRule(rule))
+					rulesList.add(rule);
 			}
 		};
 	}
