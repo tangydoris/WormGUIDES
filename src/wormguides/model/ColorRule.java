@@ -3,6 +3,7 @@ package wormguides.model;
 import java.util.ArrayList;
 
 import wormguides.ImageLoader;
+import wormguides.Layers;
 import wormguides.Search;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -39,8 +40,11 @@ public class ColorRule {
 		this("", Color.WHITE, Search.Option.CELL);
 	}
 	
+	public ColorRule(String cellName, Color color, ArrayList<Search.Option> options) {
+		this(cellName, color, options.toArray(new Search.Option[options.size()]));
+	}
+	
 	public ColorRule(String cellName, Color color, Search.Option...options) {
-		System.out.println("making colorrule for "+cellName);
 		setCellName(cellName);
 		setColor(color);
 		setOptions(options);
@@ -118,6 +122,8 @@ public class ColorRule {
 		
 		HBox.setHgrow(region, Priority.ALWAYS);
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, visibleBtn, deleteBtn);
+		
+		System.out.println("made colorrule for "+toStringFull());
 	}
 
 	public void setCellName(String cellName) {
@@ -161,8 +167,7 @@ public class ColorRule {
 	}
 	
 	// this tostring takes up too much horizontal space
-	/*
-	public String toString() {
+	public String toStringFull() {
 		String out = cellName+", ";
 		for (int i=0; i<options.size(); i++) {
 			out += options.get(i).getDescription();
@@ -171,7 +176,6 @@ public class ColorRule {
 		}
 		return out;
 	}
-	*/
 
 	private static final int HEIGHT = 22;
 }

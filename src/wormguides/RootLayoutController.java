@@ -18,6 +18,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -66,6 +67,7 @@ public class RootLayoutController implements Initializable{
 	@FXML public TextField searchField;
 	@FXML public ListView<String> searchResultsList;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	@FXML public CheckBox cellTick, ancestorTick, descendantTick;
 	
 	// Cell selection
 	private StringProperty selectedName;
@@ -340,12 +342,19 @@ public class RootLayoutController implements Initializable{
 		desRadioBtn.setUserData(Search.Type.DESCRIPTION);
 		genRadioBtn.setToggleGroup(typeGroup);
 		genRadioBtn.setUserData(Search.Type.GENE);
-		search.addTypeToggleGroupListener(typeGroup);
+		typeGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
+		//search.addTypeToggleGroupListener(typeGroup);
+		
+		cellTick.selectedProperty().addListener(search.getCellTickListner());
+		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
+		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
+		
+		addSearchBtn.setOnAction(search.getAddButtonListener());
 	}
 	
 	private void initLayers() {
 		layers = new Layers(colorRulesList);
-		addSearchBtn.setOnAction(layers.getAddSearchListener());
+		//addSearchBtn.setOnAction(layers.getAddSearchListener());
 	}
 
 	@Override
@@ -360,6 +369,7 @@ public class RootLayoutController implements Initializable{
 		setSliderProperties();
 		initSearch();
 		initLayers();
+		search.setRulesList(layers.getRulesList());
 		
         addListeners();
         

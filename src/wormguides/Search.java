@@ -6,12 +6,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.paint.Color;
+import wormguides.model.ColorRule;
 
 public class Search {
 	
@@ -22,7 +27,7 @@ public class Search {
 	public enum Option {
 		CELL("cell"),
 		ANCESTOR("ancestor"),
-		DESCENDANT("descendants");
+		DESCENDANT("descendant");
 		
 		private String description;
 		
@@ -44,9 +49,11 @@ public class Search {
 	
 	private ToggleGroup searchType;
 	
-	private CheckBox cellTick;
-	private CheckBox ancestorTick;
-	private CheckBox descendantTick;
+	private boolean cellTicked;
+	private boolean ancestorTicked;
+	private boolean descendantTicked;
+	
+	private ObservableList<ColorRule> rulesList;
 	
 	public Search() {
 		this(new TextField(), new ListView<String>());
@@ -63,6 +70,10 @@ public class Search {
 		
 		searchType = new ToggleGroup();
 		
+		cellTicked = false;
+		ancestorTicked = false;
+		descendantTicked = false;
+		
 		addTextListener();
 	}
 	
@@ -70,48 +81,117 @@ public class Search {
 		return searchType;
 	}
 	
-	public void addTypeToggleGroupListener(ToggleGroup group) {
-		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+	public void setRulesList(ObservableList<ColorRule> rulesList) {
+		this.rulesList = rulesList;
+	}
+	
+	public EventHandler<ActionEvent> getAddButtonListener() {
+		return new EventHandler<ActionEvent>() {
 			@Override
-			public void changed(ObservableValue<? extends Toggle> observable,
-					Toggle arg1, Toggle arg2) {	
-				switch ((Type) group.getSelectedToggle().getUserData()) {
-					case SYSTEMATIC:
-						System.out.println("systematic search selected");
-						break;
-					case FUNCTIONAL:
-						System.out.println("functional search selected");
-						break;
-					case DESCRIPTION:
-						System.out.println("description search selected");
-						break;
-					case GENE:
-						System.out.println("gene search selected");
-						break;
-				}
+			public void handle(ActionEvent event) {
+				// do not add new ColorRule if search has no matches
+				if (searchResults.isEmpty())
+					return;
+				
+				ArrayList<Option> options = new ArrayList<Option>();
+				if (cellTicked)
+					options.add(Option.CELL);
+				if (ancestorTicked)
+					options.add(Option.ANCESTOR);
+				if (descendantTicked)
+					options.add(Option.DESCENDANT);
+				// first element should be string with correct capitalization
+				String cellName = searchResults.get(0);
+				Color color = Color.RED;
+				
+				ColorRule rule = new ColorRule(cellName, color, options);
+				rulesList.add(rule);
 			}
-		});
+		};
 	}
 	
 	/*
-	public void setRadioButons(RadioButton sysRadioBtn, RadioButton funRadioBtn,
-			RadioButton desRadioBtn, RadioButton genRadioBtn) {
-		if (sysRadioBtn==null || funRadioBtn==null || desRadioBtn==null || genRadioBtn==null)
-			throw new IllegalArgumentException("cannot set radio buttons in Search");
-		
-		
-		sysRadioBtn.setToggleGroup(searchType);
-		sysRadioBtn.setUserData(Type.SYSTEMATIC);
-		funRadioBtn.setToggleGroup(searchType);
-		funRadioBtn.setUserData(Type.FUNCTIONAL);
-		desRadioBtn.setToggleGroup(searchType);
-		desRadioBtn.setUserData(Type.DESCRIPTION);
-		genRadioBtn.setToggleGroup(searchType);
-		genRadioBtn.setUserData(Type.GENE);
-		
-		sysRadioBtn.setSelected(true);
+	public void addAddButtonListener(Button button) {
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// do not add new ColorRule if search has no matches
+				if (searchResults.isEmpty())
+					return;
+				
+				ArrayList<Option> options = new ArrayList<Option>();
+				if (cellTicked)
+					options.add(Option.CELL);
+				if (ancestorTicked)
+					options.add(Option.ANCESTOR);
+				if (descendantTicked)
+					options.add(Option.DESCENDANT);
+				// first element should be string with correct capitalization
+				String cellName = searchResults.get(0);
+				Color color = Color.RED;
+				
+				ColorRule rule = new ColorRule(cellName, color, options);
+				rulesList.add(rule);
+			}
+		});
 	}
 	*/
+	
+	public ChangeListener<Boolean> getCellTickListner() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				cellTicked = newValue;
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getAncestorTickListner() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				ancestorTicked = newValue;
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getDescendantTickListner() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				descendantTicked = newValue;
+			}
+		};
+	}
+	
+	public ChangeListener<Toggle> getTypeToggleListener() {
+		return new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable, 
+					Toggle oldValue, Toggle newValue) {
+				switch ((Type) observable.getValue()
+						.getToggleGroup()
+						.getSelectedToggle()
+						.getUserData()) {
+						case SYSTEMATIC:
+							System.out.println("systematic search selected");
+							break;
+						case FUNCTIONAL:
+							System.out.println("functional search selected");
+							break;
+						case DESCRIPTION:
+							System.out.println("description search selected");
+							break;
+						case GENE:
+							System.out.println("gene search selected");
+							break;
+				}
+			}
+		};
+	}
 	
 	public void setCellNames(ArrayList<String> cellNames) {
 		this.cellNames = cellNames;

@@ -33,6 +33,10 @@ public class Layers {
 		makeCellFactory();
 	}
 	
+	public ObservableList<ColorRule> getRulesList() {
+		return rulesList;
+	}
+	
 	private void addDefaultRules() {
 		rulesList.add(new ColorRule("ABa", Color.RED, Search.Option.CELL, Search.Option.DESCENDANT, Search.Option.ANCESTOR));
 		rulesList.add(new ColorRule("ABp", Color.BLUE, Search.Option.CELL, Search.Option.DESCENDANT));
@@ -58,15 +62,13 @@ public class Layers {
 		});
 	}
 	
-	public AddSearchListener getAddSearchListener() {
-		return new AddSearchListener();
+	public EventHandler<ActionEvent> getDeleteButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				
+			}
+		};
 	}
 	
-	private class AddSearchListener implements EventHandler<ActionEvent> {
-		@Override
-		public void handle(ActionEvent arg0) {
-			System.out.println("adding search...");
-		}
-	}
-
 }
