@@ -3,7 +3,6 @@ package wormguides.model;
 import java.util.ArrayList;
 
 import wormguides.ImageLoader;
-import wormguides.Layers;
 import wormguides.Search;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -12,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -54,9 +54,10 @@ public class ColorRule {
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
-		label.setText(toString());
-		
+		label.setText(toStringFull());
 		label.prefHeightProperty().bind(height);
+		label.setMaxWidth(180);
+		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		
 		colorBtn.prefHeightProperty().bind(height);
 		colorBtn.prefWidthProperty().bind(height);
@@ -66,12 +67,6 @@ public class ColorRule {
 		colorBtn.minWidthProperty().bind(height);
 		colorBtn.setGraphicTextGap(0);
 		colorBtn.setGraphic(new Rectangle(HEIGHT, HEIGHT, color));
-		colorBtn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				System.out.println("color button pressed");
-			}
-		});
 		
 		editBtn.prefHeightProperty().bind(height);
 		editBtn.prefWidthProperty().bind(height);
@@ -168,7 +163,7 @@ public class ColorRule {
 	
 	// this tostring takes up too much horizontal space
 	public String toStringFull() {
-		String out = cellName+", ";
+		String out = cellName+" ";
 		for (int i=0; i<options.size(); i++) {
 			out += options.get(i).getDescription();
 			if (i != options.size()-1)

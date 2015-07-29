@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -54,6 +55,7 @@ public class Search {
 	private boolean descendantTicked;
 	
 	private ObservableList<ColorRule> rulesList;
+	private Color selectedColor;
 	
 	public Search() {
 		this(new TextField(), new ListView<String>());
@@ -65,8 +67,11 @@ public class Search {
 		if (searchResultsList==null)
 			searchResultsList = new ListView<String>();
 		
+		selectedColor = Color.WHITE;
+		
 		this.searchField = searchField;
 		this.searchResultsList = searchResultsList;
+		this.searchResultsList.setStyle("-fx-background-insets: 0 ;");
 		
 		searchType = new ToggleGroup();
 		
@@ -83,6 +88,15 @@ public class Search {
 	
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
+	}
+	
+	public EventHandler<ActionEvent> getColorPickerListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				selectedColor = ((ColorPicker)event.getSource()).getValue();
+			}
+		};
 	}
 	
 	public EventHandler<ActionEvent> getAddButtonListener() {
@@ -102,40 +116,12 @@ public class Search {
 					options.add(Option.DESCENDANT);
 				// first element should be string with correct capitalization
 				String cellName = searchResults.get(0);
-				Color color = Color.RED;
 				
-				ColorRule rule = new ColorRule(cellName, color, options);
+				ColorRule rule = new ColorRule(cellName, selectedColor, options);
 				rulesList.add(rule);
 			}
 		};
 	}
-	
-	/*
-	public void addAddButtonListener(Button button) {
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				// do not add new ColorRule if search has no matches
-				if (searchResults.isEmpty())
-					return;
-				
-				ArrayList<Option> options = new ArrayList<Option>();
-				if (cellTicked)
-					options.add(Option.CELL);
-				if (ancestorTicked)
-					options.add(Option.ANCESTOR);
-				if (descendantTicked)
-					options.add(Option.DESCENDANT);
-				// first element should be string with correct capitalization
-				String cellName = searchResults.get(0);
-				Color color = Color.RED;
-				
-				ColorRule rule = new ColorRule(cellName, color, options);
-				rulesList.add(rule);
-			}
-		});
-	}
-	*/
 	
 	public ChangeListener<Boolean> getCellTickListner() {
 		return new ChangeListener<Boolean>() {
