@@ -19,28 +19,6 @@ import wormguides.model.ColorRule;
 
 public class Search {
 	
-	public enum Type {
-		SYSTEMATIC, FUNCTIONAL, DESCRIPTION, GENE;
-	}
-	
-	public enum Option {
-		CELL("cell"),
-		ANCESTOR("ancestor"),
-		DESCENDANT("descendant");
-		
-		private String description;
-		
-		Option() {
-			this("");
-		}
-		Option(String description) {
-			this.description = description;
-		}
-		public String getDescription() {
-			return description;
-		}
-	}
-	
 	private ArrayList<String> allCellNames;
 	private ObservableList<String> searchResults;
 	private TextField searchField;
@@ -112,13 +90,13 @@ public class Search {
 				if (searchResults.isEmpty())
 					return;
 				
-				ArrayList<Option> options = new ArrayList<Option>();
+				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 				if (cellTicked)
-					options.add(Option.CELL);
+					options.add(SearchOption.CELL);
 				if (ancestorTicked)
-					options.add(Option.ANCESTOR);
+					options.add(SearchOption.ANCESTOR);
 				if (descendantTicked)
-					options.add(Option.DESCENDANT);
+					options.add(SearchOption.DESCENDANT);
 				// first element should be string with correct capitalization
 				String cellName = searchResults.get(0);
 				
@@ -165,7 +143,7 @@ public class Search {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, 
 					Toggle oldValue, Toggle newValue) {
-				switch ((Type) observable.getValue()
+				switch ((SearchType) observable.getValue()
 						.getToggleGroup()
 						.getSelectedToggle()
 						.getUserData()) {

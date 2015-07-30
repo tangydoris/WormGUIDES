@@ -311,13 +311,13 @@ public class RootLayoutController implements Initializable{
 		
 		ToggleGroup typeGroup = search.getTypeToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
-		sysRadioBtn.setUserData(Search.Type.SYSTEMATIC);
+		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
 		funRadioBtn.setToggleGroup(typeGroup);
-		funRadioBtn.setUserData(Search.Type.FUNCTIONAL);
+		funRadioBtn.setUserData(SearchType.FUNCTIONAL);
 		desRadioBtn.setToggleGroup(typeGroup);
-		desRadioBtn.setUserData(Search.Type.DESCRIPTION);
+		desRadioBtn.setUserData(SearchType.DESCRIPTION);
 		genRadioBtn.setToggleGroup(typeGroup);
-		genRadioBtn.setUserData(Search.Type.GENE);
+		genRadioBtn.setUserData(SearchType.GENE);
 		typeGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
 		
 		cellTick.selectedProperty().addListener(search.getCellTickListner());

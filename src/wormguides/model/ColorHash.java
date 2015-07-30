@@ -55,10 +55,12 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 							put(soloColorSet, makeMaterial(rule.getColor()));
 							
 							// for debugging
+							/*
 							for (TreeSet<Color> set : keySet()) {
 								System.out.println("color set "+set.first().toString());
 							}
 							System.out.println("");
+							*/
 						}
 					}
 				}

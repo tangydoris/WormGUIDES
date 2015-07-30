@@ -66,14 +66,24 @@ public class Layers {
 	}
 	
 	public void addDefaultRules() {
-		rulesList.add(new ColorRule("ABa", Color.RED, Search.Option.CELL, 
-						Search.Option.DESCENDANT, Search.Option.ANCESTOR));
-		rulesList.add(new ColorRule("ABp", Color.BLUE, Search.Option.CELL, 
-						Search.Option.DESCENDANT));
-		rulesList.add(new ColorRule("P", Color.GREEN, Search.Option.CELL, 
-						Search.Option.DESCENDANT));
-		rulesList.add(new ColorRule("EMS", Color.YELLOW, Search.Option.CELL, 
-						Search.Option.DESCENDANT));
+		/*
+		rulesList.add(new ColorRule("ABa", Color.web("#D11E1E"),
+					Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("ABp", Color.web("#D1601E"),
+					Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("EMS", Color.web("#1729E5"),
+					Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("C", Color.web("#41C125"),
+					Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("D", Color.web("#1ECDD1"),
+				Search.Option.CELL, Search.Option.DESCENDANT));
+		rulesList.add(new ColorRule("P4", Color.web("#9F1ED1"),
+				Search.Option.CELL, Search.Option.DESCENDANT));
+		*/
+		rulesList.add(new ColorRule("ABa", Color.RED));
+		rulesList.add(new ColorRule("ABp", Color.BLUE));
+		rulesList.add(new ColorRule("EMS", Color.GREEN));
+		rulesList.add(new ColorRule("P2", Color.YELLOW));
 	}
 	
 	private void makeCellFactory() {

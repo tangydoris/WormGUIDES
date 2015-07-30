@@ -3,7 +3,7 @@ package wormguides.model;
 import java.util.ArrayList;
 
 import wormguides.ImageLoader;
-import wormguides.Search;
+import wormguides.SearchOption;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
@@ -25,7 +25,7 @@ public class ColorRule {
 	
 	private String cellName;
 	private String cellNameLowerCase;
-	private ArrayList<Search.Option> options;
+	private ArrayList<SearchOption> options;
 	private Color color;
 	
 	private HBox hbox = new HBox();
@@ -37,14 +37,18 @@ public class ColorRule {
 	private Button deleteBtn = new Button();
 	
 	public ColorRule() {
-		this("", Color.WHITE, Search.Option.CELL);
+		this("", Color.WHITE);
 	}
 	
-	public ColorRule(String cellName, Color color, ArrayList<Search.Option> options) {
-		this(cellName, color, options.toArray(new Search.Option[options.size()]));
+	public ColorRule(String cellName, Color color) {
+		this(cellName, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
 	}
 	
-	public ColorRule(String cellName, Color color, Search.Option...options) {
+	public ColorRule(String cellName, Color color, ArrayList<SearchOption> options) {
+		this(cellName, color, options.toArray(new SearchOption[options.size()]));
+	}
+	
+	public ColorRule(String cellName, Color color, SearchOption...options) {
 		setCellName(cellName);
 		setColor(color);
 		setOptions(options);
@@ -128,9 +132,9 @@ public class ColorRule {
 		this.color = color;
 	}
 	
-	public void setOptions(Search.Option...options){
-		this.options = new ArrayList<Search.Option>();
-		for (Search.Option option : options)
+	public void setOptions(SearchOption...options){
+		this.options = new ArrayList<SearchOption>();
+		for (SearchOption option : options)
 			if (!this.options.contains(option))
 				this.options.add(option);
 	}
@@ -155,8 +159,8 @@ public class ColorRule {
 		return deleteBtn;
 	}
 	
-	public Search.Option[] getOptions() {
-		return options.toArray(new Search.Option[options.size()]);
+	public SearchOption[] getOptions() {
+		return options.toArray(new SearchOption[options.size()]);
 	}
 	
 	public String toString() {
