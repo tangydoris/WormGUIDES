@@ -85,7 +85,7 @@ public class RootLayoutController implements Initializable{
 	
 	// Layers tab
 	private Layers layers;
-	@FXML public ListView<ColorRule> colorRulesList;
+	@FXML public ListView<ColorRule> colorRulesListView;
 	@FXML public Button addSearchBtn;
 	
 	// Cell information
@@ -129,17 +129,10 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	public void init3DWindow(TableLineageData data) {
-		try {
-			window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
-					modelAnchorPane.prefHeight(-1), data, lineageTree);
-			subscene = window3D.getSubScene();
-			modelAnchorPane.getChildren().add(subscene);
-			
-			//window3D.setSlider(timeSlider);
-		} catch (NullPointerException npe) {
-			System.out.println("Cannot insatntiate 3D view.");
-			npe.printStackTrace();
-		}
+		window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
+				modelAnchorPane.prefHeight(-1), data, lineageTree);
+		subscene = window3D.getSubScene();
+		modelAnchorPane.getChildren().add(subscene);
 	}
 	
 	private void getPropertiesFrom3DWindow() {
@@ -150,86 +143,75 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void addListeners() {
-		try {
-			// time integer property that dictates the current time point
-			time.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable, 
-						Number oldValue, Number newValue) {
-					timeSlider.setValue(time.get());
-				}
-			});
-			
-			timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable, 
-						Number oldValue, Number newValue) {
-					if (newValue.intValue() != timeSlider.getValue())
-						time.set(newValue.intValue());
-				}
-			});
-			
-			backwardButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					int t = time.get();
-					if (t > 1 && t <= window3D.getEndTime())
-						time.set(t-1);
-				}
-			});
-			
-			forwardButton.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					int t = time.get();
-					if (t >= 1 && t < window3D.getEndTime())
-						time.set(t+1);
-				}
-			});
-			
-			searchField.textProperty().addListener(window3D.getSearchFieldListener());
-			searchResultsList.getSelectionModel().selectedItemProperty().addListener(
-					new ChangeListener<String>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					setSelectedInfo(newValue);
-					selectedName.set(newValue);
-				}
-			});
-			
-			// TODO
-			/*
-			 * Should we be able to select a cell from the search results
-			 * and have the name show up in the search text field?
-			 */
-			
-			searchResultsList.selectionModelProperty().addListener(
-					new ChangeListener<MultipleSelectionModel<String>>() {
-				@Override
-				public void changed(
-						ObservableValue<? extends MultipleSelectionModel<String>> observable,
-						MultipleSelectionModel<String> oldValue,
-						MultipleSelectionModel<String> newValue) {
-					String sulston = newValue.getSelectedItem();
-					System.out.println(sulston);
-					setSelectedInfo(sulston);
-				}
-			});
-			
-			// selectedName string property that has the name of the clicked sphere
-			selectedName.addListener(new ChangeListener<String> () {
-				@Override
-				public void changed(ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-					setSelectedInfo(selectedName.get());
-				}
-			});
-			
-		} catch (NullPointerException npe) {
-			System.out.println("cannot add listener for one or more UI components");
-		}
+		// time integer property that dictates the current time point
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, 
+					Number oldValue, Number newValue) {
+				timeSlider.setValue(time.get());
+			}
+		});
+		
+		timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, 
+					Number oldValue, Number newValue) {
+				if (newValue.intValue() != timeSlider.getValue())
+					time.set(newValue.intValue());
+			}
+		});
+		
+		backwardButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				int t = time.get();
+				if (t > 1 && t <= window3D.getEndTime())
+					time.set(t-1);
+			}
+		});
+		
+		forwardButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				int t = time.get();
+				if (t >= 1 && t < window3D.getEndTime()-1)
+					time.set(t+1);
+			}
+		});
+		
+		searchField.textProperty().addListener(window3D.getSearchFieldListener());
+		searchResultsList.getSelectionModel().selectedItemProperty().addListener(
+				new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				setSelectedInfo(newValue);
+				selectedName.set(newValue);
+			}
+		});
+		
+		searchResultsList.selectionModelProperty().addListener(
+				new ChangeListener<MultipleSelectionModel<String>>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends MultipleSelectionModel<String>> observable,
+					MultipleSelectionModel<String> oldValue,
+					MultipleSelectionModel<String> newValue) {
+				String sulston = newValue.getSelectedItem();
+				System.out.println(sulston);
+				setSelectedInfo(sulston);
+			}
+		});
+		
+		// selectedName string property that has the name of the clicked sphere
+		selectedName.addListener(new ChangeListener<String> () {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				setSelectedInfo(selectedName.get());
+			}
+		});
 	}
 	
 	private void setSelectedInfo(String sulston) {
@@ -261,45 +243,32 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void sizeInfoPane() {
-		try {
-			infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(6));
-			
-			cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-			cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-		} catch (Exception e) {
-			System.out.println("canoot size information panel");
-		}
+		infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(7));
+		cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 	}
 	
 	
 	private void setLabels() {
-		try {
-			time.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					timeLabel.setText("Time "+makePaddedTime(time.get()));
-				}
-			});
-			timeLabel.setText("Time "+makePaddedTime(time.get()));
-			timeLabel.toFront();
-		} catch (NullPointerException npe) {
-			System.out.println("Cannot set time label");
-		}
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				timeLabel.setText("Time "+makePaddedTime(time.get()));
+			}
+		});
+		timeLabel.setText("Time "+makePaddedTime(time.get()));
+		timeLabel.toFront();
 		
-		try {
-			totalNuclei.addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable,
-						Number oldValue, Number newValue) {
-					totalNucleiLabel.setText(newValue.intValue()+" Nuclei");
-				}
-			});
-			totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
-			totalNucleiLabel.toFront();
-		} catch (NullPointerException npe) {
-			System.out.println("Cannot set total nuclei label");
-		}
+		totalNuclei.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				totalNucleiLabel.setText(newValue.intValue()+" Nuclei");
+			}
+		});
+		totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
+		totalNucleiLabel.toFront();
 	}
 	
 	private String makePaddedTime(int time) {
@@ -331,13 +300,9 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void setSliderProperties() {
-		try {
-			timeSlider.setMin(1);
-			timeSlider.setMax(window3D.getEndTime());
-			timeSlider.setValue(window3D.getStartTime());
-		} catch (NullPointerException npe) {
-			System.out.println("null time slider");
-		}
+		timeSlider.setMin(1);
+		timeSlider.setMax(window3D.getEndTime()+1);
+		timeSlider.setValue(window3D.getStartTime());
 	}
 	
 	private void initSearch() {
@@ -363,7 +328,7 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initLayers() {
-		layers = new Layers(colorRulesList);
+		layers = new Layers(colorRulesListView);
 	}
 	
 	private void initLineageTree() {
@@ -376,12 +341,45 @@ public class RootLayoutController implements Initializable{
 		});
 		
 	}
+	
+	private void assertFXMLNodes() {
+		assert (rootBorderPane != null);
+		assert (modelAnchorPane != null);
+		assert (infoPane != null);
+		
+		assert (timeSlider != null);
+		assert (backwardButton != null);
+		assert (forwardButton != null);
+		assert (playButton != null);
+		assert (timeLabel != null);
+		assert (totalNucleiLabel != null);
+		
+		assert (searchField != null);
+		assert (searchResultsList != null);
+		assert (sysRadioBtn != null);
+		assert (desRadioBtn != null);
+		assert (genRadioBtn != null);
+		
+		assert (cellTick != null);
+		assert (ancestorTick != null);
+		assert (descendantTick != null);
+		assert (colorPickerPane != null);
+		assert (colorPicker != null);
+		
+		assert (colorRulesListView != null);
+		assert (addSearchBtn != null);
+		
+		assert (cellName != null);
+		assert (cellDescription != null);
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		partsList = new PartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
 		allCellNames = AceTreeLoader.getAllCellNames();
+		
+		assertFXMLNodes();
 		
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();

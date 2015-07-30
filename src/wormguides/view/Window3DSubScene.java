@@ -34,26 +34,23 @@ import javafx.scene.shape.Sphere;
 public class Window3DSubScene{
 	
 	private TableLineageData data;
+	private LineageTree tree;
+	
 	private SubScene subscene;
+	
+	// transformation stuff
 	private Group root;
 	private PerspectiveCamera camera;
 	private Xform cameraXform;
-	
 	private double mousePosX, mousePosY;
 	private double mouseOldX, mouseOldY;
 	private double mouseDeltaX, mouseDeltaY;
-	
 	private int newOriginX, newOriginY, newOriginZ;
 	
+	// housekeeping stuff
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
-	
 	private int endTime;
-	
-	private BooleanProperty playingMovie;
-	private PlayService playService;
-	private Runnable renderRunnable;
-	
 	private Sphere[] cells;
 	private String[] names;
 	private String[] namesLowerCase;
@@ -61,17 +58,27 @@ public class Window3DSubScene{
 	private Integer[][] positions;
 	private Integer[] diameters;
 	
+	// switching timepoints stuff
+	private BooleanProperty playingMovie;
+	private PlayService playService;
+	private Runnable renderRunnable;
+	
+	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
 	
+	// searched highlighting stuff
 	private StringProperty searchedPrefix;
 	private ObservableList<String> subSceneSearchResults;
 	
+	// color rules stuff
 	//private ColorHash colorHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data, LineageTree tree) {
 		root = new Group();
 		this.data = data;
+		this.tree = tree;
+		
 		time = new SimpleIntegerProperty();
 		time.set(START_TIME);
 		time.addListener(new ChangeListener<Number>() {

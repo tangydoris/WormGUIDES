@@ -232,7 +232,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <ListView fx:id="colorRulesList" focusTraversable="false" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="colorRulesListView" focusTraversable="false" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>

@@ -2,11 +2,15 @@ package wormguides.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
 import javafx.scene.control.TreeItem;
 
 public class LineageTree {
 	
 	private ArrayList<String> treeBaseNames;
+	
+	private HashMap<String, TreeItem<String>> nameNodeHash;
 	
 	private String[] allCellNames;
 	private TreeItem<String> root;
@@ -19,7 +23,7 @@ public class LineageTree {
 	@SuppressWarnings("unchecked")
 	public LineageTree(String[] allCellNames) {
 		this.allCellNames = allCellNames;
-		
+		nameNodeHash = new HashMap<String, TreeItem<String>>();
 		// names of the cell added to tree upon initialization
 		String[] baseNames = {"p0", "ab", "aba", "abal", "abar",
 								"abp", "abpl", "abpr", "p1",
@@ -125,11 +129,40 @@ public class LineageTree {
 	}
 	
 	private TreeItem<String> makeTreeItem(String name) {
-		return new TreeItem<String>(name);
+		TreeItem<String> node = new TreeItem<String>(name);
+		nameNodeHash.put(name.toLowerCase(), node);
+		return node;
 	}
 	
-	public isDescendant(String desc, String ances) {
+	// returns true if desc is a descendant of ances
+	public boolean isDescendant(String desc, String ances) {
+		desc = desc.toLowerCase();
+		ances = ances.toLowerCase();
 		
+		if (desc.startsWith(ances))
+			return true;
+		
+		return isDescendant(findNode(desc), findNode(ances));
+	}
+	
+	// returns true if ances is the ancestor of desc
+	public boolean isAncestor(String ances, String desc) {
+		return isDescendant(desc, ances);
+	}
+	
+	private TreeItem<String> findNode(String name) {
+		// name should already be lower case
+		return nameNodeHash.get(name);
+	}
+	
+	private boolean isDescendant(TreeItem<String> node, TreeItem<String> ances) {
+		if (node==root)
+			return false;
+		
+		if (node==ances)
+			return true;
+
+		return isDescendant(node.getParent(), ances);
 	}
 	
 	public TreeItem<String> getRoot() {
