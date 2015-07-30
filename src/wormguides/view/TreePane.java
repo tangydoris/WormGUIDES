@@ -14,7 +14,7 @@ public class TreePane extends AnchorPane {
 		super();
 		
 		setPrefHeight(500.0);
-		setPrefWidth(350.0);
+		setPrefWidth(250.0);
 		
 		TreeView<String> view = new TreeView<String>(root);
 		AnchorPane.setTopAnchor(view, 0d);
@@ -26,7 +26,7 @@ public class TreePane extends AnchorPane {
 				"-fx-faint-focus-color: transparent;");
 		
 		getChildren().add(view);
-		this.setStyle("-fx-focus-color: -fx-outer-border; "+
+		setStyle("-fx-focus-color: -fx-outer-border; "+
 				"-fx-faint-focus-color: transparent;");
 	}
 	

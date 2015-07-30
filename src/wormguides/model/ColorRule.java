@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
+import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -18,10 +20,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 // Every cell has a color rule consisting of its name and the color(s)
 // its cell should be
 public class ColorRule {
+	
+	private Stage editStage;
 	
 	private String cellName;
 	private String cellNameLowerCase;
@@ -35,6 +41,8 @@ public class ColorRule {
 	private Button editBtn = new Button();
 	private Button visibleBtn = new Button();
 	private Button deleteBtn = new Button();
+	
+	private RuleInfoPacket infoPacket;
 	
 	public ColorRule() {
 		this("", Color.WHITE);
@@ -58,8 +66,8 @@ public class ColorRule {
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
-		//label.setText(toStringFull());
-		label.setText(toString());
+		label.setText(toStringFull());
+		//label.setText(toString());
 		label.prefHeightProperty().bind(sideLength);
 		label.setMaxWidth(140);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
@@ -87,7 +95,16 @@ public class ColorRule {
 		editBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("edit button pressed");
+				if (editStage==null) {
+					editStage = new Stage();
+					editStage.setScene(new Scene(
+							new ColorRuleEditPane(
+									infoPacket, getSubmitHandler())));
+					editStage.setTitle("LineageTree");
+					editStage.initModality(Modality.NONE);
+					editStage.setResizable(false);
+				}
+				editStage.show();
 			}
 		});
 		
@@ -120,7 +137,7 @@ public class ColorRule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		//System.out.println("made colorrule for "+toStringFull());
+		infoPacket = new RuleInfoPacket(cellName, color, options);
 	}
 
 	public void setCellName(String cellName) {
@@ -134,9 +151,14 @@ public class ColorRule {
 	
 	public void setOptions(SearchOption...options){
 		this.options = new ArrayList<SearchOption>();
-		for (SearchOption option : options)
+		for (SearchOption option : options) {
+			if (option == null)
+				continue;
+			if (option.getDescription().isEmpty())
+				continue;
 			if (!this.options.contains(option))
 				this.options.add(option);
+		}
 	}
 	
 	public String getName() {
@@ -180,6 +202,18 @@ public class ColorRule {
 				out += ", ";
 		}
 		return out;
+	}
+	
+	private EventHandler<ActionEvent> getSubmitHandler() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				setColor(infoPacket.getColor());
+				setOptions(infoPacket.getOptions().toArray(
+						new SearchOption[infoPacket.getOptions().size()]));
+				editStage.hide();
+			}
+		};
 	}
 
 	// length and width of color rule ui buttons

@@ -150,7 +150,7 @@
                                              <children>
                                                 <HBox prefWidth="180.0">
                                                    <children>
-                                                      <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
+                                                      <Region maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
                                                       <Label prefHeight="22.0" text="Cell">
                                                          <font>
                                                             <Font size="14.0" />

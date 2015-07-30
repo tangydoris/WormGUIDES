@@ -18,6 +18,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -435,6 +436,14 @@ public class Window3DSubScene{
 	
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
+		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
+			@Override
+			public void onChanged(
+					ListChangeListener.Change<? extends ColorRule> change) {
+				while (change.next())
+					buildScene(time.get());
+			}
+		});
 		colorHash = new ColorHash(rulesList);
 	}
 	
