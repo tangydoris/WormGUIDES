@@ -1,88 +1,72 @@
 package wormguides.model;
 
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
 
-import javax.imageio.ImageIO;
-
-import javafx.embed.swing.SwingFXUtils;
+import wormguides.ColorComparator;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
-public class ColorHash extends Hashtable<ColorRule, Material> {
+public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
-	private final Material defaultMaterial;
+	private ObservableList<ColorRule> rulesList;
+	private TreeSet<Color> allColors;
 	
-	public ColorHash() {
+	private final Material defaultMaterial = makeMaterial(Color.WHITE);
+	
+	public ColorHash(ObservableList<ColorRule> rulesList) {
 		super();
 		
-		// make default white material
-		Color[] white = {Color.WHITE};
-		defaultMaterial = makeMaterial(white);
+		allColors = new TreeSet<Color>(new ColorComparator());
+		allColors.add(Color.WHITE);
 		
-		// Defaults upon startup
-		addRule("aba", Color.RED.brighter());
-		addRule("abp", Color.BLUE.brighter());
-		addRule("p", Color.GREEN.brighter());
-		addRule("ems", Color.YELLOW.brighter());
-		
-		addRule("abal", Color.GREY.brighter());
-		addRule("abal", Color.PURPLE.brighter());
-		
-		System.out.println(toString());
-		//System.out.println("constructor done");
-	}
-	
-	public void addRule(String cellName, Color color) {
-		cellName = cellName.toLowerCase();
-		//System.out.println("adding rule for "+cellName);
-		
-		// Iterate through hash to see if there is already a rule
-		// for cell name
-		boolean found = false;
-		boolean replace = false;
-		ColorRule newRule = null;
-		ColorRule oldRule = null;
-		for (ColorRule rule : keySet()) {
-			// this MAY cause some issues later on with string matching
-			// just the prefixes...we will see
-			if (!cellName.isEmpty() && cellName.startsWith(rule.getName())) {
-				if (!found) {
-					found = true;
-					newRule = new ColorRule(cellName, rule.getColors());
-					if (cellName.equals(rule.getName())) {
-						replace = true;
-						oldRule = rule;
+		this.rulesList = rulesList;
+		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
+			@Override
+			public void onChanged(
+					ListChangeListener.Change<? extends ColorRule> change) {
+				while (change.next()) {
+					for (ColorRule rule : change.getAddedSubList()) {
+						// add color to list if not in list already
+						if (!allColors.contains(rule.getColor())) {
+							allColors.add(rule.getColor());
+							
+							// add new sets of colors that are the original
+							// sets with the new color appended
+							ArrayList<TreeSet<Color>> newSets = new ArrayList<TreeSet<Color>>();
+							for (TreeSet<Color> set : keySet()) {
+								TreeSet<Color> copy = copy(set);
+								copy.add(rule.getColor());
+								newSets.add(copy);
+							}
+							
+							for (TreeSet<Color> set : newSets)
+								put(set, makeMaterial(set.toArray(new Color[set.size()])));
+							
+							TreeSet<Color> soloColorSet = new TreeSet<Color>(new ColorComparator());
+							soloColorSet.add(rule.getColor());
+							put(soloColorSet, makeMaterial(rule.getColor()));
+							
+							// for debugging
+							for (TreeSet<Color> set : keySet()) {
+								System.out.println("color set "+set.first().toString());
+							}
+							System.out.println("");
+						}
 					}
 				}
-				else
-					newRule.addColor(rule.getColors());
 			}
-		}
-		
-		if (found) {
-			if (replace)
-				remove(oldRule);
-			//System.out.println("make material for "+cellName);
-			newRule.addColor(color);
-			Material material = makeMaterial(newRule.getColors());
-			put(newRule, material);
-		}
-		else {
-			ColorRule rule = new ColorRule(cellName, color);
-			//System.out.println("make material for "+cellName);
-			Material material = makeMaterial(rule.getColors());
-			put(rule, material);
-		}
+		});
 	}
 	
-	private Material makeMaterial(Color[] colors) {
+	private Material makeMaterial(Color...colors) {
 		WritableImage wImage = new WritableImage(240, 240);
 		PixelWriter writer = wImage.getPixelWriter();
 		
@@ -101,75 +85,24 @@ public class ColorHash extends Hashtable<ColorRule, Material> {
 			}
 		}
 		
-		/*
-		int centerX = (int) wImage.getHeight()/2;
-		int centerY = (int) wImage.getWidth()/2;
-		for (int i=0; i<wImage.getHeight(); i++) {
-			for (int j=0; j<wImage.getWidth(); j++) {
-				color = Color.BLACK;
-				int distance = (int) Math.sqrt(Math.pow(i-centerX, 2) + Math.pow(j-centerY, 2));
-				// see which segment the color belongs in
-				for (int s=0; s<colors.length; s++) {
-					if (distance < ((s+1)*segmentLength)/2) {
-						color = colors[s];
-						break;
-					}
-				}
-				writer.setColor(j, i, color);
-			}
-		}
-		*/
-		
-		File file = new File("test2.png");
-		RenderedImage renderedImage = SwingFXUtils.fromFXImage(wImage, null);
-		try {
-			ImageIO.write(
-			        renderedImage, 
-			        "png",
-			        file);
-		} catch (IOException e) {
-			System.out.println("error in writing diffusemap for sphere");
-		}
-		
 		PhongMaterial material = new PhongMaterial();
 		material.setDiffuseMap(wImage);
 		return material;
 	}
 	
-	public Material getMaterial(String cellName) {
-		//System.out.println("getting material for "+cellName);
-		cellName = cellName.toLowerCase();
-		String longestMatch = "";
-		ColorRule ruleNeeded = null;
-		for (ColorRule rule : keySet()) {
-			// may have to change this matching later
-			if (cellName.startsWith(rule.getName())) {
-				String currentName = rule.getName();
-				if (longestMatch.isEmpty()) {
-					longestMatch = currentName;
-					ruleNeeded = rule;
-				}
-				else {
-					if (currentName.length() > longestMatch.length()) {
-						ruleNeeded = rule;
-						longestMatch = currentName;
-					}
-				}
-			}
-		}
-		
-		if (ruleNeeded != null)
-			return get(ruleNeeded);
-		
+	public Material getMaterial(TreeSet<Color> set) {
+		return get(set);
+	}
+	
+	public Material getDefaultMaterial() {
 		return defaultMaterial;
 	}
 	
-	public String toString() {
-		String out = "";
-		for (ColorRule rule : keySet()) {
-			out += rule.toString()+"\n";
-		}
-		return out;
-	}
-	
+	public TreeSet<Color> copy(TreeSet<Color> orig) {
+		TreeSet<Color> copy = new TreeSet<Color>(new ColorComparator());
+		Iterator<Color> iterator = orig.iterator();
+		while (iterator.hasNext())
+			copy.add(iterator.next());
+		return copy;
+    }
 }

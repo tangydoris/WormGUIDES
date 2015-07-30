@@ -56,8 +56,7 @@ public class Layers {
 				}
 			}
 		});
-		
-		addDefaultRules();	
+			
 		rulesListView.setItems(rulesList);
 		makeCellFactory();
 	}
@@ -66,7 +65,7 @@ public class Layers {
 		return rulesList;
 	}
 	
-	private void addDefaultRules() {
+	public void addDefaultRules() {
 		rulesList.add(new ColorRule("ABa", Color.RED, Search.Option.CELL, 
 						Search.Option.DESCENDANT, Search.Option.ANCESTOR));
 		rulesList.add(new ColorRule("ABp", Color.BLUE, Search.Option.CELL, 

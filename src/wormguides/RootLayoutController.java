@@ -57,7 +57,7 @@ public class RootLayoutController implements Initializable{
 	
 	// Panels stuff
 	@FXML public BorderPane rootBorderPane;
-	public BorderPane displayPanel;
+	@FXML public BorderPane displayPanel;
 	@FXML public AnchorPane modelAnchorPane;
 	@FXML public ScrollPane infoPane;
 	
@@ -130,7 +130,7 @@ public class RootLayoutController implements Initializable{
 	
 	public void init3DWindow(TableLineageData data) {
 		window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
-				modelAnchorPane.prefHeight(-1), data, lineageTree);
+				modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
 	}
@@ -301,7 +301,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void setSliderProperties() {
 		timeSlider.setMin(1);
-		timeSlider.setMax(window3D.getEndTime()+1);
+		timeSlider.setMax(window3D.getEndTime());
 		timeSlider.setValue(window3D.getStartTime());
 	}
 	
@@ -345,6 +345,7 @@ public class RootLayoutController implements Initializable{
 	private void assertFXMLNodes() {
 		assert (rootBorderPane != null);
 		assert (modelAnchorPane != null);
+		assert (displayPanel != null);
 		assert (infoPane != null);
 		
 		assert (timeSlider != null);
@@ -378,6 +379,7 @@ public class RootLayoutController implements Initializable{
 		partsList = new PartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
 		allCellNames = AceTreeLoader.getAllCellNames();
+		initLineageTree();
 		
 		assertFXMLNodes();
 		
@@ -385,10 +387,14 @@ public class RootLayoutController implements Initializable{
 		getPropertiesFrom3DWindow();
 		
 		setSliderProperties();
-		initLineageTree();
+		
 		initSearch();
 		initLayers();
+		
 		search.setRulesList(layers.getRulesList());
+		assert (lineageTree != null) : "lineage tree has not finished loading";
+		window3D.setRulesList(layers.getRulesList());
+		layers.addDefaultRules();
 		
         addListeners();
         

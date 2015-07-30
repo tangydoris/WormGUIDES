@@ -1,8 +1,13 @@
 package wormguides.view;
 
+import java.util.TreeSet;
+
+import wormguides.ColorComparator;
 import wormguides.Xform;
+import wormguides.model.ColorHash;
 import wormguides.model.LineageTree;
 import wormguides.model.TableLineageData;
+import wormguides.model.ColorRule;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -23,18 +28,15 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.DrawMode;
+import javafx.scene.paint.Material;
 import javafx.scene.shape.Sphere;
 
 public class Window3DSubScene{
 	
 	private TableLineageData data;
-	private LineageTree tree;
 	
 	private SubScene subscene;
 	
@@ -72,12 +74,12 @@ public class Window3DSubScene{
 	private ObservableList<String> subSceneSearchResults;
 	
 	// color rules stuff
-	//private ColorHash colorHash;
+	private ColorHash colorHash;
+	private ObservableList<ColorRule> rulesList;
 	
-	public Window3DSubScene(double width, double height, TableLineageData data, LineageTree tree) {
+	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
 		this.data = data;
-		this.tree = tree;
 		
 		time = new SimpleIntegerProperty();
 		time.set(START_TIME);
@@ -147,8 +149,7 @@ public class Window3DSubScene{
 			@Override
 			public void run() {
 				refreshScene();
-				addCellsToScene();
-				
+				addCellsToScene();	
 				// render opaque spheres first
 				for (int i = 0; i < cells.length; i++) {
 					if (searched[i])
@@ -300,11 +301,16 @@ public class Window3DSubScene{
 		for (int i = 0; i < names.length; i ++) {
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
-			sphere.setDrawMode(DrawMode.FILL);
 			
-			//sphere.setMaterial(getMaterial(namesLowerCase[i]));
-			//Material material = colorHash.getMaterial(namesLowerCase[i]);
-			sphere.setMaterial(new PhongMaterial());
+			// TODO implement color rules consultation
+			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+			for (ColorRule rule : rulesList) {
+				if (LineageTree.isDescendant(namesLowerCase[i], 
+						rule.getNameLowerCase()))
+					colors.add(rule.getColor());
+			}
+			Material material = colorHash.getMaterial(colors);
+			sphere.setMaterial(material);
 	        
 	        double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
@@ -425,6 +431,11 @@ public class Window3DSubScene{
 	public void printCellNames() {
 		for (int i = 0; i < names.length; i++)
 			System.out.println(names[i]+CS+cells[i]);
+	}
+	
+	public void setRulesList(ObservableList<ColorRule> rulesList) {
+		this.rulesList = rulesList;
+		colorHash = new ColorHash(rulesList);
 	}
 	
 	public SubScene getSubScene() {

@@ -10,10 +10,10 @@ public class LineageTree {
 	
 	private ArrayList<String> treeBaseNames;
 	
-	private HashMap<String, TreeItem<String>> nameNodeHash;
+	private static HashMap<String, TreeItem<String>> nameNodeHash;
 	
 	private String[] allCellNames;
-	private TreeItem<String> root;
+	private static TreeItem<String> root;
 	private TreeItem<String> ab;
 	private TreeItem<String> ms;
 	private TreeItem<String> e;
@@ -57,7 +57,7 @@ public class LineageTree {
 		TreeItem<String> abpr = makeTreeItem("ABpr");
 		abp.getChildren().addAll(abpl, abpr);
 		
-		TreeItem<String> ms = makeTreeItem("MS");
+		ms = makeTreeItem("MS");
 		e = makeTreeItem("E");
 		ems.getChildren().addAll(ms, e);
 		
@@ -104,6 +104,7 @@ public class LineageTree {
 			case "d":	startingNode = d;
 						break;
 		}
+		
 		if (startingNode != null) {
 			parent = addCellHelper(newName, startingNode);
 			parent.getChildren().add(makeTreeItem(newName));
@@ -135,7 +136,7 @@ public class LineageTree {
 	}
 	
 	// returns true if desc is a descendant of ances
-	public boolean isDescendant(String desc, String ances) {
+	public static boolean isDescendant(String desc, String ances) {
 		desc = desc.toLowerCase();
 		ances = ances.toLowerCase();
 		
@@ -146,23 +147,30 @@ public class LineageTree {
 	}
 	
 	// returns true if ances is the ancestor of desc
-	public boolean isAncestor(String ances, String desc) {
+	public static boolean isAncestor(String ances, String desc) {
 		return isDescendant(desc, ances);
 	}
 	
-	private TreeItem<String> findNode(String name) {
+	private static TreeItem<String> findNode(String name) {
 		// name should already be lower case
 		return nameNodeHash.get(name);
 	}
 	
-	private boolean isDescendant(TreeItem<String> node, TreeItem<String> ances) {
+	private static boolean isDescendant(TreeItem<String> node, TreeItem<String> ances) {
+		if (node==null)
+			return false;
+		
 		if (node==root)
 			return false;
 		
-		if (node==ances)
+		if (node.getValue().toLowerCase().equals("nuc"))
+			return false;
+		
+		if (node.getParent()==ances)
 			return true;
-
+		
 		return isDescendant(node.getParent(), ances);
+
 	}
 	
 	public TreeItem<String> getRoot() {
