@@ -77,6 +77,9 @@ public class Window3DSubScene{
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<ColorRule> rulesList;
+	//private ObservableList<BooleanProperty> updatedPropertyList;
+	private BooleanProperty updated;
+	private ObservableList<Color> colorsToHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -164,7 +167,6 @@ public class Window3DSubScene{
 			}
 		};
 		
-		//colorHash = new ColorHash();
 		buildScene(time.get());
 	}
 	
@@ -303,7 +305,6 @@ public class Window3DSubScene{
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
 			
-			// TODO implement color rules consultation
 			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 			for (ColorRule rule : rulesList) {
 				if (LineageTree.isDescendant(namesLowerCase[i], 
@@ -338,53 +339,6 @@ public class Window3DSubScene{
         sphere.setTranslateY(y);
         sphere.setTranslateZ(z);
 	}
-	
-	/*
-	private Material getMaterial(String name) {
-		name = name.toLowerCase();
-		String prefix = searchedPrefix.get();
-		
-		WritableImage wImage = new WritableImage(80, 80);
-		PixelWriter writer = wImage.getPixelWriter();
-		Color color = getColorRule(name);
-		// test one stripe3
-		for (int j = 0; j < wImage.getHeight(); j++) {
-			for (int k = 0; k < wImage.getWidth(); k++) {
-				 writer.setColor(k, j, color);
-			}
-		}
-		Material material = new PhongMaterial();
-		((PhongMaterial) material).setDiffuseMap(wImage);
-		return material;
-	}
-	*/
-	
-	/*
-	private Color getColorRule(String name) {
-		name = name.toLowerCase();
-		String prefix = searchedPrefix.get();
-		if (prefix.isEmpty()) {
-			if (name.startsWith("aba"))
-				return Color.RED.brighter();
-			else if (name.startsWith("abp"))
-				return Color.BLUE.brighter();
-			else if (name.startsWith("p"))
-				return Color.YELLOW.brighter();
-			else if (name.startsWith("ems"))
-				return Color.GREEN.brighter();
-			
-			return Color.WHITE;
-		}
-		else {
-			if (name.startsWith(prefix))
-				return Color.GOLD.brighter().brighter();
-			else {
-				return Color.web(UNSELECTED_COLOR_HEX, 0.45d);
-			}
-		}
-	}
-	*/
-	
 	
 	private void buildCamera() {
 		this.camera = new PerspectiveCamera(true);
@@ -434,17 +388,33 @@ public class Window3DSubScene{
 			System.out.println(names[i]+CS+cells[i]);
 	}
 	
+	// sets everything associated with color rules
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
+		colorHash = new ColorHash(rulesList);
+		updated = new SimpleBooleanProperty(false);
+		colorsToHash = FXCollections.observableArrayList();
+		
 		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
 			@Override
 			public void onChanged(
 					ListChangeListener.Change<? extends ColorRule> change) {
-				while (change.next())
-					buildScene(time.get());
+				while (change.next()) {
+					for (ColorRule rule : change.getAddedSubList()) {
+						colorHash.addColorToHash(rule.getColor());
+						rule.getColorProperty().addListener(new ChangeListener<Color>() {
+							@Override
+							public void changed(ObservableValue<? extends Color> observable, 
+									Color oldValue, Color newValue) {
+								colorHash.addColorToHash(newValue);
+								buildScene(time.get());
+							}
+						});
+						buildScene(time.get());
+					}
+				}
 			}
 		});
-		colorHash = new ColorHash(rulesList);
 	}
 	
 	public SubScene getSubScene() {
@@ -456,7 +426,24 @@ public class Window3DSubScene{
 	}
 	
 	public ChangeListener<String> getSearchFieldListener() {
-		return new SearchFieldListener();
+		return new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				searchedPrefix.set(newValue.toLowerCase());
+				 
+				subSceneSearchResults.clear();
+				if (!searchedPrefix.get().isEmpty()) {
+					for (int i = 0; i < names.length; i++) {
+						if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
+							//System.out.println(names[i]);
+							subSceneSearchResults.add(names[i]);
+						}
+					}
+				}
+				
+				buildScene(time.get());
+			}
+		};
 	}
 	
 	public int getEndTime() {
@@ -465,26 +452,6 @@ public class Window3DSubScene{
 	
 	public int getStartTime() {
 		return START_TIME;
-	}
-	
-	public class SearchFieldListener implements ChangeListener<String> {
-		@Override
-		public void changed(ObservableValue<? extends String> observable,
-				String oldValue, String newValue) {
-			searchedPrefix.set(newValue.toLowerCase());
-			 
-			subSceneSearchResults.clear();
-			if (!searchedPrefix.get().isEmpty()) {
-				for (int i = 0; i < names.length; i++) {
-					if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
-						//System.out.println(names[i]);
-						subSceneSearchResults.add(names[i]);
-					}
-				}
-			}
-			
-			buildScene(time.get());
-		}
 	}
 	
 	private class PlayService extends Service<Void>{

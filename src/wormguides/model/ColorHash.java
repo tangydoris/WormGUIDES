@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -16,7 +15,7 @@ import javafx.scene.paint.PhongMaterial;
 
 public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
-	private ObservableList<ColorRule> rulesList;
+	//private ObservableList<ColorRule> rulesList;
 	private TreeSet<Color> allColors;
 	
 	private final Material defaultMaterial = makeMaterial(Color.WHITE);
@@ -27,45 +26,30 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		allColors = new TreeSet<Color>(new ColorComparator());
 		allColors.add(Color.WHITE);
 		
-		this.rulesList = rulesList;
-		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
-			@Override
-			public void onChanged(
-					ListChangeListener.Change<? extends ColorRule> change) {
-				while (change.next()) {
-					for (ColorRule rule : change.getAddedSubList()) {
-						// add color to list if not in list already
-						if (!allColors.contains(rule.getColor())) {
-							allColors.add(rule.getColor());
-							
-							// add new sets of colors that are the original
-							// sets with the new color appended
-							ArrayList<TreeSet<Color>> newSets = new ArrayList<TreeSet<Color>>();
-							for (TreeSet<Color> set : keySet()) {
-								TreeSet<Color> copy = copy(set);
-								copy.add(rule.getColor());
-								newSets.add(copy);
-							}
-							
-							for (TreeSet<Color> set : newSets)
-								put(set, makeMaterial(set.toArray(new Color[set.size()])));
-							
-							TreeSet<Color> soloColorSet = new TreeSet<Color>(new ColorComparator());
-							soloColorSet.add(rule.getColor());
-							put(soloColorSet, makeMaterial(rule.getColor()));
-							
-							// for debugging
-							/*
-							for (TreeSet<Color> set : keySet()) {
-								System.out.println("color set "+set.first().toString());
-							}
-							System.out.println("");
-							*/
-						}
-					}
-				}
+	}
+	
+	public void addColorToHash(Color color) {
+		// add color to list if not in list already
+		if (!allColors.contains(color)) {
+			//System.out.println("adding color "+color.toString()+" to hash");
+			allColors.add(color);
+			
+			// add new sets of colors that are the original
+			// sets with the new color appended
+			ArrayList<TreeSet<Color>> newSets = new ArrayList<TreeSet<Color>>();
+			for (TreeSet<Color> set : keySet()) {
+				TreeSet<Color> copy = copy(set);
+				copy.add(color);
+				newSets.add(copy);
 			}
-		});
+			
+			for (TreeSet<Color> set : newSets)
+				put(set, makeMaterial(set.toArray(new Color[set.size()])));
+			
+			TreeSet<Color> soloColorSet = new TreeSet<Color>(new ColorComparator());
+			soloColorSet.add(color);
+			put(soloColorSet, makeMaterial(color));
+		}
 	}
 	
 	private Material makeMaterial(Color...colors) {

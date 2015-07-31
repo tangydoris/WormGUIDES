@@ -3,21 +3,23 @@ package wormguides.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import wormguides.SearchOption;
 
 public class RuleInfoPacket {
 	private final String name;
-	private Color color;
+	private ObjectProperty<Color> colorProperty;
 	private ArrayList<SearchOption> options;
 	
 	public RuleInfoPacket() {
-		this("", Color.WHITE, null);
+		this("", new SimpleObjectProperty<Color>(Color.WHITE), null);
 	}
 	
-	public RuleInfoPacket(String name, Color color, SearchOption[] options) {
+	public RuleInfoPacket(String name, ObjectProperty<Color> colorProperty, SearchOption[] options) {
 		this.name = name;
-		this.color = color;
+		this.colorProperty = colorProperty;
 		this.options = new ArrayList<SearchOption>(Arrays.asList(options));
 	}
 	
@@ -26,7 +28,11 @@ public class RuleInfoPacket {
 	}
 	
 	public Color getColor() {
-		return color;
+		return colorProperty.get();
+	}
+	
+	public ObjectProperty<Color> getColorProperty() {
+		return colorProperty;
 	}
 	
 	public ArrayList<SearchOption> getOptions() {
@@ -34,7 +40,7 @@ public class RuleInfoPacket {
 	}
 	
 	public void setColor(Color color) {
-		this.color = color;
+		colorProperty.set(color);
 	}
 	
 	public void setOptions(ArrayList<SearchOption> options) {
@@ -78,5 +84,14 @@ public class RuleInfoPacket {
 	
 	public boolean isAncestorSelected() {
 		return options.contains(SearchOption.ANCESTOR);
+	}
+	
+	public String toString() {
+		String out = "packet info: ";
+		out += getName()+" "
+				+ getColor()+" ";
+		for (SearchOption option : getOptions())
+			out += option+" ";
+		return out;
 	}
 }

@@ -6,7 +6,11 @@ import wormguides.ImageLoader;
 import wormguides.SearchOption;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -14,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -32,7 +37,7 @@ public class ColorRule {
 	private String cellName;
 	private String cellNameLowerCase;
 	private ArrayList<SearchOption> options;
-	private Color color;
+	private ObjectProperty<Color> colorProperty;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -41,6 +46,8 @@ public class ColorRule {
 	private Button editBtn = new Button();
 	private Button visibleBtn = new Button();
 	private Button deleteBtn = new Button();
+	
+	private Tooltip toolTip = new Tooltip();
 	
 	private RuleInfoPacket infoPacket;
 	
@@ -58,7 +65,7 @@ public class ColorRule {
 	
 	public ColorRule(String cellName, Color color, SearchOption...options) {
 		setCellName(cellName);
-		setColor(color);
+		colorProperty = new SimpleObjectProperty<Color>(color);
 		setOptions(options);
 		
 		// format UI elements
@@ -66,11 +73,11 @@ public class ColorRule {
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
-		label.setText(toStringFull());
 		//label.setText(toString());
 		label.prefHeightProperty().bind(sideLength);
 		label.setMaxWidth(140);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
+		resetLabel();
 		
 		colorBtn.prefHeightProperty().bind(sideLength);
 		colorBtn.prefWidthProperty().bind(sideLength);
@@ -79,9 +86,15 @@ public class ColorRule {
 		colorBtn.minHeightProperty().bind(sideLength);
 		colorBtn.minWidthProperty().bind(sideLength);
 		colorBtn.setGraphicTextGap(0);
-		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
-		rect.setStroke(Color.LIGHTGREY);
-		colorBtn.setGraphic(rect);
+		setColorButton(color);
+		
+		colorProperty.addListener(new ChangeListener<Color>() {
+			@Override
+			public void changed(ObservableValue<? extends Color> observable, 
+					Color oldValue, Color newValue) {
+				setColorButton(newValue);
+			}
+		});
 		
 		editBtn.prefHeightProperty().bind(sideLength);
 		editBtn.prefWidthProperty().bind(sideLength);
@@ -97,12 +110,14 @@ public class ColorRule {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editStage = new Stage();
+					//System.out.println(infoPacket.toString());
 					editStage.setScene(new Scene(
 							new ColorRuleEditPane(
 									infoPacket, getSubmitHandler())));
-					editStage.setTitle("LineageTree");
+					editStage.setTitle("Edit Color Rule");
 					editStage.initModality(Modality.NONE);
 					editStage.setResizable(false);
+					//updated.set(false);
 				}
 				editStage.show();
 			}
@@ -133,11 +148,24 @@ public class ColorRule {
 		deleteBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		deleteBtn.setGraphic(ImageLoader.getCloseIcon());
 		
+		toolTip.setText(toStringFull());
+		label.setTooltip(toolTip);
+		
 		HBox.setHgrow(region, Priority.ALWAYS);
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(cellName, color, options);
+		infoPacket = new RuleInfoPacket(cellName, colorProperty, options);
+	}
+	
+	private void setColorButton(Color color) {
+		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
+		rect.setStroke(Color.LIGHTGREY);
+		colorBtn.setGraphic(rect);
+	}
+	
+	private void resetLabel() {
+		label.setText(toStringFull());
 	}
 
 	public void setCellName(String cellName) {
@@ -146,7 +174,7 @@ public class ColorRule {
 	}
 	
 	public void setColor(Color color) {
-		this.color = color;
+		colorProperty.set(color);
 	}
 	
 	public void setOptions(SearchOption...options){
@@ -161,6 +189,13 @@ public class ColorRule {
 		}
 	}
 	
+	public void setOptions(ArrayList<SearchOption> options) {
+		this.options = new ArrayList<SearchOption>();
+		for (SearchOption option : options)
+			if (option != null)
+				this.options.add(option);
+	}
+	
 	public String getName() {
 		return cellName;
 	}
@@ -170,7 +205,11 @@ public class ColorRule {
 	}
 	
 	public Color getColor() {
-		return color;
+		return colorProperty.get();
+	}
+	
+	public ObjectProperty<Color> getColorProperty() {
+		return colorProperty;
 	}
 	
 	public HBox getHBox() {
@@ -212,6 +251,9 @@ public class ColorRule {
 				setOptions(infoPacket.getOptions().toArray(
 						new SearchOption[infoPacket.getOptions().size()]));
 				editStage.hide();
+				setOptions(infoPacket.getOptions());
+				resetLabel();
+				toolTip.setText(toStringFull());
 			}
 		};
 	}

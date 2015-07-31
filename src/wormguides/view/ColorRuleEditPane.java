@@ -1,6 +1,5 @@
 package wormguides.view;
 
-import wormguides.SearchOption;
 import wormguides.model.RuleInfoPacket;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,6 +46,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		
 		Label cellLabel = new Label("Cell");
 		CheckBox cellTick = new CheckBox();
+		cellTick.setSelected(infoPacket.isCellSelected());
 		cellTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
@@ -55,30 +55,30 @@ public class ColorRuleEditPane extends AnchorPane{
 			}
 		});
 		HBox cellRow = makeEditRow(cellLabel, cellTick);
+		
 		Label ancLabel = new Label("Ancestor");
 		CheckBox ancTick = new CheckBox();
+		ancTick.setSelected(infoPacket.isAncestorSelected());
 		ancTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable,
-					Boolean oldValue, Boolean newValue) {
-				infoPacket.setDescendantSelected(newValue);
-			}
-		});
-		HBox ancRow = makeEditRow(ancLabel, ancTick);
-		Label desLabel = new Label("Descendant");
-		CheckBox desTick = new CheckBox();
-		desTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
 					Boolean oldValue, Boolean newValue) {
 				infoPacket.setAncestorSelected(newValue);
 			}
 		});
-		HBox desRow = makeEditRow(desLabel, desTick);
+		HBox ancRow = makeEditRow(ancLabel, ancTick);
 		
-		cellTick.setSelected(infoPacket.isCellSelected());
+		Label desLabel = new Label("Descendant");
+		CheckBox desTick = new CheckBox();
 		desTick.setSelected(infoPacket.isDescendantSelected());
-		ancTick.setSelected(infoPacket.isAncestorSelected());
+		desTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				infoPacket.setDescendantSelected(newValue);
+			}
+		});
+		HBox desRow = makeEditRow(desLabel, desTick);
 		
 		Region separator1 = new Region();
 		separator1.setPrefHeight(10);
