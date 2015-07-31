@@ -42,7 +42,7 @@ public class Layers {
 					if (!change.wasUpdated()) {
 						// added to list
 						for (ColorRule rule : change.getAddedSubList()) {
-							System.out.println("added rule "+rule.toStringFull());
+							//System.out.println("added rule "+rule.toStringFull());
 							ColorRule ruleToRemove = rule;
 							buttonMap.put(ruleToRemove, rule.getDeleteButton());
 							

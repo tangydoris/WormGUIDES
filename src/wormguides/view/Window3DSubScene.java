@@ -3,6 +3,7 @@ package wormguides.view;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
+import wormguides.SearchOption;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.LineageTree;
@@ -307,9 +308,26 @@ public class Window3DSubScene{
 			
 			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 			for (ColorRule rule : rulesList) {
-				if (LineageTree.isDescendant(namesLowerCase[i], 
-						rule.getNameLowerCase()))
-					colors.add(rule.getColor());
+				SearchOption[] options = rule.getOptions();
+				for (SearchOption option : options) {
+					switch (option) {
+						case CELL:
+								if (namesLowerCase[i].equals(
+										rule.getNameLowerCase()))
+									colors.add(rule.getColor());
+								break;
+						case DESCENDANT:	
+								if (LineageTree.isDescendant(namesLowerCase[i], 
+										rule.getNameLowerCase()))
+									colors.add(rule.getColor());
+								break;
+						case ANCESTOR:
+							if (LineageTree.isAncestor(namesLowerCase[i], 
+									rule.getNameLowerCase()))
+								colors.add(rule.getColor());
+							break;
+					}
+				}
 			}
 			Material material = colorHash.getMaterial(colors);
 			sphere.setMaterial(material);
