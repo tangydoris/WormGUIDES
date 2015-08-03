@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
 import wormguides.view.ColorRuleEditPane;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -37,7 +39,9 @@ public class ColorRule {
 	private String cellName;
 	private String cellNameLowerCase;
 	private ArrayList<SearchOption> options;
+	private BooleanProperty ruleChanged;
 	private ObjectProperty<Color> colorProperty;
+	
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -119,6 +123,7 @@ public class ColorRule {
 					editStage.setResizable(false);
 					//updated.set(false);
 				}
+				ruleChanged.set(false);
 				editStage.show();
 			}
 		});
@@ -156,6 +161,7 @@ public class ColorRule {
 									visibleBtn, deleteBtn);
 		
 		infoPacket = new RuleInfoPacket(cellName, colorProperty, options);
+		ruleChanged = new SimpleBooleanProperty(false);
 	}
 	
 	private void setColorButton(Color color) {
@@ -224,6 +230,10 @@ public class ColorRule {
 		return options.toArray(new SearchOption[options.size()]);
 	}
 	
+	public BooleanProperty getRuleChangedProperty() {
+		return ruleChanged;
+	}
+	
 	public String toString() {
 		return cellName;
 	}
@@ -254,6 +264,7 @@ public class ColorRule {
 				setOptions(infoPacket.getOptions());
 				resetLabel();
 				toolTip.setText(toStringFull());
+				ruleChanged.set(true);
 			}
 		};
 	}

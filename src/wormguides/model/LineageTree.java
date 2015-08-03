@@ -140,7 +140,7 @@ public class LineageTree {
 		desc = desc.toLowerCase();
 		ances = ances.toLowerCase();
 		
-		if (desc.startsWith(ances))
+		if (desc.length()>ances.length() && desc.startsWith(ances))
 			return true;
 		
 		return isDescendant(findNode(desc), findNode(ances));
@@ -163,11 +163,15 @@ public class LineageTree {
 		if (node==root)
 			return false;
 		
+		if (node==ances)
+			return false;
+		
 		if (node.getValue().toLowerCase().equals("nuc"))
 			return false;
 		
-		if (node.getParent()==ances)
+		if (node.getParent()==ances) {
 			return true;
+		}
 		
 		return isDescendant(node.getParent(), ances);
 

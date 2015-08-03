@@ -79,8 +79,8 @@ public class Window3DSubScene{
 	private ColorHash colorHash;
 	private ObservableList<ColorRule> rulesList;
 	//private ObservableList<BooleanProperty> updatedPropertyList;
-	private BooleanProperty updated;
-	private ObservableList<Color> colorsToHash;
+	//private BooleanProperty updated;
+	//private ObservableList<Color> colorsToHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -312,20 +312,23 @@ public class Window3DSubScene{
 				for (SearchOption option : options) {
 					switch (option) {
 						case CELL:
+								//System.out.println("cell selected");
 								if (namesLowerCase[i].equals(
 										rule.getNameLowerCase()))
 									colors.add(rule.getColor());
 								break;
-						case DESCENDANT:	
+						case DESCENDANT:
+								//System.out.println("descendant selected");
 								if (LineageTree.isDescendant(namesLowerCase[i], 
 										rule.getNameLowerCase()))
 									colors.add(rule.getColor());
 								break;
 						case ANCESTOR:
-							if (LineageTree.isAncestor(namesLowerCase[i], 
-									rule.getNameLowerCase()))
-								colors.add(rule.getColor());
-							break;
+								//System.out.println("ancestor selected");
+								if (LineageTree.isAncestor(namesLowerCase[i], 
+										rule.getNameLowerCase()))
+									colors.add(rule.getColor());
+								break;
 					}
 				}
 			}
@@ -410,8 +413,8 @@ public class Window3DSubScene{
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
 		colorHash = new ColorHash(rulesList);
-		updated = new SimpleBooleanProperty(false);
-		colorsToHash = FXCollections.observableArrayList();
+		//updated = new SimpleBooleanProperty(false);
+		//colorsToHash = FXCollections.observableArrayList();
 		
 		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
 			@Override
@@ -419,7 +422,33 @@ public class Window3DSubScene{
 					ListChangeListener.Change<? extends ColorRule> change) {
 				while (change.next()) {
 					for (ColorRule rule : change.getAddedSubList()) {
+						/*
+						rule.getOptions().addListener(new ListChangeListener<SearchOption>() {
+							@Override
+							public void onChanged(
+									ListChangeListener.Change<? extends SearchOption> change) {
+								while (change.next()) {
+									System.out.println("rule changed");
+									buildScene(time.get());
+								}
+							}
+						});
+						*/
 						colorHash.addColorToHash(rule.getColor());
+						
+						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+							@Override
+							public void changed(
+									ObservableValue<? extends Boolean> observable,
+									Boolean oldValue, Boolean newValue) {
+								if (newValue) {
+									colorHash.addColorToHash(rule.getColor());
+									buildScene(time.get());
+								}
+							}
+						});
+						
+						/*
 						rule.getColorProperty().addListener(new ChangeListener<Color>() {
 							@Override
 							public void changed(ObservableValue<? extends Color> observable, 
@@ -428,8 +457,13 @@ public class Window3DSubScene{
 								buildScene(time.get());
 							}
 						});
-						buildScene(time.get());
+						*/
 					}
+					/*
+					if (change.getRemovedSize() > 0)
+						buildScene(time.get());
+					*/
+					buildScene(time.get());
 				}
 			}
 		});
