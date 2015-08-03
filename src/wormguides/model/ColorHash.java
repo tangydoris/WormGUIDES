@@ -15,10 +15,10 @@ import javafx.scene.paint.PhongMaterial;
 
 public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
-	//private ObservableList<ColorRule> rulesList;
 	private TreeSet<Color> allColors;
 	
-	private final Material defaultMaterial = makeMaterial(Color.WHITE);
+	private Material highlightMaterial = makeMaterial(Color.GOLD);
+	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.5));
 	
 	public ColorHash(ObservableList<ColorRule> rulesList) {
 		super();
@@ -80,8 +80,12 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		return get(set);
 	}
 	
-	public Material getDefaultMaterial() {
-		return defaultMaterial;
+	public Material getHighlightMaterial() {
+		return highlightMaterial;
+	}
+	
+	public Material getTranslucentMaterial() {
+		return translucentMaterial;
 	}
 	
 	public TreeSet<Color> copy(TreeSet<Color> orig) {

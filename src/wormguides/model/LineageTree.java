@@ -159,22 +159,8 @@ public class LineageTree {
 	}
 	
 	private static boolean isDescendant(TreeItem<String> node, TreeItem<String> ances) {
-		if (node==null)
-			return false;
-		
-		if (ances==null)
-			return false;
-		
-		if (node==root)
-			return false;
-		
-		if (node==ances)
-			return false;
-		
-		if (node.getChildren().contains(ances))
-			return false;
-		
-		if (node.getValue().toLowerCase().equals("nuc"))
+		if (node==null || ances==null || node==root || node==ances 
+				|| node.getValue().toLowerCase().equals("nuc"))
 			return false;
 		
 		if (node.getParent()==ances)

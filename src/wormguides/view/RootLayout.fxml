@@ -207,7 +207,7 @@
                                              </children>
                                           </HBox>
                                           <Region prefHeight="10.0" />
-                                          <ListView fx:id="searchResultsList" minHeight="240.0" prefHeight="100.0" VBox.vgrow="ALWAYS" />
+                                          <ListView fx:id="searchResultsListView" minHeight="240.0" prefHeight="100.0" VBox.vgrow="ALWAYS" />
                                        </children>
                                        <opaqueInsets>
                                           <Insets />

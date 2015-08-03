@@ -71,7 +71,7 @@ public class RootLayoutController implements Initializable{
 	private Search search;
 	private String[] allCellNames;
 	@FXML public TextField searchField;
-	@FXML public ListView<String> searchResultsList;
+	@FXML public ListView<String> searchResultsListView;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	@FXML public CheckBox cellTick, ancestorTick, descendantTick;
 	@FXML public AnchorPane colorPickerPane;
@@ -201,7 +201,7 @@ public class RootLayoutController implements Initializable{
 		});
 		
 		searchField.textProperty().addListener(window3D.getSearchFieldListener());
-		searchResultsList.getSelectionModel().selectedItemProperty().addListener(
+		searchResultsListView.getSelectionModel().selectedItemProperty().addListener(
 				new ChangeListener<String>() {
 			@Override
 			public void changed(
@@ -212,7 +212,7 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
-		searchResultsList.selectionModelProperty().addListener(
+		searchResultsListView.selectionModelProperty().addListener(
 				new ChangeListener<MultipleSelectionModel<String>>() {
 			@Override
 			public void changed(
@@ -225,6 +225,7 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
+		
 		// selectedName string property that has the name of the clicked sphere
 		selectedName.addListener(new ChangeListener<String> () {
 			@Override
@@ -233,6 +234,10 @@ public class RootLayoutController implements Initializable{
 				setSelectedInfo(selectedName.get());
 			}
 		});
+		
+		cellTick.selectedProperty().addListener(window3D.getTickListener());
+		descendantTick.selectedProperty().addListener(window3D.getTickListener());
+		ancestorTick.selectedProperty().addListener(window3D.getTickListener());
 	}
 	
 	private void setSelectedInfo(String sulston) {
@@ -327,7 +332,7 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initSearch() {
-		search = new Search(searchField, searchResultsList);
+		search = new Search(searchField, searchResultsListView);
 		search.setCellNames(allCellNames);
 		
 		ToggleGroup typeGroup = search.getTypeToggleGroup();
@@ -379,7 +384,7 @@ public class RootLayoutController implements Initializable{
 		assert (zoomOutButton != null);
 		
 		assert (searchField != null);
-		assert (searchResultsList != null);
+		assert (searchResultsListView != null);
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
 		assert (genRadioBtn != null);
@@ -418,6 +423,7 @@ public class RootLayoutController implements Initializable{
 		assert (lineageTree != null) : "lineage tree has not finished loading";
 		window3D.setRulesList(layers.getRulesList());
 		layers.addDefaultRules();
+		window3D.setSearchResultsList(search.getSearchResultsList());
 		
         addListeners();
         

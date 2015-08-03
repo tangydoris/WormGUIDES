@@ -175,7 +175,10 @@ public class Search {
 	public void setCellNames(String[] cellNamesArr) {
 		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArr));
 	}
-
+	
+	public ObservableList<String> getSearchResultsList() {
+		return searchResults;
+	}
 	
 	private void addTextListener() {
 		searchResults = FXCollections.observableArrayList();
