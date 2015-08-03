@@ -92,6 +92,7 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
+				System.out.println("time changed, building scene...");
 				buildScene(time.get());
 			}
 		});
@@ -164,7 +165,7 @@ public class Window3DSubScene{
 					if (searched[i])
 						root.getChildren().add(cells[i]);
 				}
-				// then render opaque spheres
+				// then render translucent ones
 				for (int i = 0; i < cells.length; i++) {
 					if (!searched[i])
 						root.getChildren().add(cells[i]);
@@ -177,10 +178,12 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
 				cameraXform.setScale(zoom.get());
+				System.out.println("zoom changed, building scene...");
 				buildScene(time.get());
 			}
 		});
 		
+		System.out.println("subscene constructor building scene...");
 		buildScene(time.get());
 	}
 	
@@ -427,8 +430,6 @@ public class Window3DSubScene{
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
 		this.rulesList = rulesList;
 		colorHash = new ColorHash(rulesList);
-		//updated = new SimpleBooleanProperty(false);
-		//colorsToHash = FXCollections.observableArrayList();
 		
 		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
 			@Override
@@ -436,18 +437,6 @@ public class Window3DSubScene{
 					ListChangeListener.Change<? extends ColorRule> change) {
 				while (change.next()) {
 					for (ColorRule rule : change.getAddedSubList()) {
-						/*
-						rule.getOptions().addListener(new ListChangeListener<SearchOption>() {
-							@Override
-							public void onChanged(
-									ListChangeListener.Change<? extends SearchOption> change) {
-								while (change.next()) {
-									System.out.println("rule changed");
-									buildScene(time.get());
-								}
-							}
-						});
-						*/
 						colorHash.addColorToHash(rule.getColor());
 						
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
@@ -457,26 +446,15 @@ public class Window3DSubScene{
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
 									colorHash.addColorToHash(rule.getColor());
+									System.out.println("rule changed, building scene...");
 									buildScene(time.get());
 								}
 							}
 						});
-						
-						/*
-						rule.getColorProperty().addListener(new ChangeListener<Color>() {
-							@Override
-							public void changed(ObservableValue<? extends Color> observable, 
-									Color oldValue, Color newValue) {
-								colorHash.addColorToHash(newValue);
-								buildScene(time.get());
-							}
-						});
-						*/
+
 					}
-					/*
-					if (change.getRemovedSize() > 0)
-						buildScene(time.get());
-					*/
+					
+					System.out.println("list chagned, building scene...");
 					buildScene(time.get());
 				}
 			}
@@ -494,19 +472,19 @@ public class Window3DSubScene{
 	public ChangeListener<String> getSearchFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> observable, 
+								String oldValue, String newValue) {
 				searchedPrefix.set(newValue.toLowerCase());
-				 
+				
 				subSceneSearchResults.clear();
 				if (!searchedPrefix.get().isEmpty()) {
 					for (int i = 0; i < names.length; i++) {
-						if (namesLowerCase[i].startsWith(searchedPrefix.get())) {
-							//System.out.println(names[i]);
+						if (namesLowerCase[i].startsWith(searchedPrefix.get()))
 							subSceneSearchResults.add(names[i]);
-						}
 					}
 				}
 				
+				System.out.println("search field changed, building scene...");
 				buildScene(time.get());
 			}
 		};

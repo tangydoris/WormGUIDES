@@ -16,6 +16,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
+import wormguides.model.LineageTree;
 
 public class Search {
 	
@@ -100,8 +101,12 @@ public class Search {
 				// first element should be string with correct capitalization
 				String cellName = searchResults.get(0);
 				
+				// default search options is cell and descendant
+				if (options.isEmpty()) {
+					options.add(SearchOption.CELL);
+					options.add(SearchOption.DESCENDANT);
+				}
 				ColorRule rule = new ColorRule(cellName, selectedColor, options);
-				
 				if (!containsRule(rule))
 					rulesList.add(rule);
 			}
@@ -114,6 +119,7 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellTicked = newValue;
+				refreshSearchResultsList(searchField.getText());
 			}
 		};
 	}
@@ -124,6 +130,7 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				ancestorTicked = newValue;
+				refreshSearchResultsList(searchField.getText());
 			}
 		};
 	}
@@ -134,6 +141,7 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				descendantTicked = newValue;
+				refreshSearchResultsList(searchField.getText());
 			}
 		};
 	}
@@ -175,21 +183,38 @@ public class Search {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				String searched = newValue.toLowerCase();
-				searchResults.clear();
-				if (!searched.isEmpty()) {
-					try {
-						for (String name : allCellNames) {
-							if (name.toLowerCase().startsWith(searched))
-								searchResults.add(name);
-						}
-					} catch (NullPointerException npe) {
-						System.out.println("cannot set cell names for search");
-					}
-				}
+				refreshSearchResultsList(newValue);
 			}
 		});
 		searchResultsList.setItems(searchResults);
+	}
+	
+	private void refreshSearchResultsList(String newValue) {
+		String searched = newValue.toLowerCase();
+		searchResults.clear();
+		if (!searched.isEmpty()) {
+			for (String name : allCellNames) {
+				String nameLowerCase = name.toLowerCase();
+				if (!cellTicked && !descendantTicked && !ancestorTicked) {
+					if (nameLowerCase.startsWith(searched))
+						searchResults.add(name);
+				}
+				else {
+					if (descendantTicked) {
+						if (LineageTree.isDescendant(name, searched))
+							searchResults.add(name);
+					}
+					if (cellTicked) {
+						if (nameLowerCase.equals(searched))
+							searchResults.add(name);
+					}
+					if (ancestorTicked) {
+						if (LineageTree.isAncestor(name, searched))
+							searchResults.add(name);
+					}
+				}
+			}
+		}
 	}
 	
 }

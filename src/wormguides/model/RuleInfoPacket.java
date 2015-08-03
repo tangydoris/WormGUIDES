@@ -3,23 +3,22 @@ package wormguides.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import wormguides.SearchOption;
 
 public class RuleInfoPacket {
 	private final String name;
-	private ObjectProperty<Color> colorProperty;
+	//private ObjectProperty<Color> colorProperty;
+	private Color color;
 	private ArrayList<SearchOption> options;
 	
 	public RuleInfoPacket() {
-		this("", new SimpleObjectProperty<Color>(Color.WHITE), null);
+		this("", Color.WHITE, null);
 	}
 	
-	public RuleInfoPacket(String name, ObjectProperty<Color> colorProperty, SearchOption[] options) {
+	public RuleInfoPacket(String name, Color color, SearchOption[] options) {
 		this.name = name;
-		this.colorProperty = colorProperty;
+		this.color = color;
 		this.options = new ArrayList<SearchOption>(Arrays.asList(options));
 	}
 	
@@ -28,19 +27,21 @@ public class RuleInfoPacket {
 	}
 	
 	public Color getColor() {
-		return colorProperty.get();
+		return color;
 	}
 	
+	/*
 	public ObjectProperty<Color> getColorProperty() {
 		return colorProperty;
 	}
+	*/
 	
 	public ArrayList<SearchOption> getOptions() {
 		return options;
 	}
 	
 	public void setColor(Color color) {
-		colorProperty.set(color);
+		this.color = color;
 	}
 	
 	public void setOptions(ArrayList<SearchOption> options) {

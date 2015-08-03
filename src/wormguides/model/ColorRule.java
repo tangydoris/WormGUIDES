@@ -7,10 +7,8 @@ import wormguides.SearchOption;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -40,7 +38,7 @@ public class ColorRule {
 	private String cellNameLowerCase;
 	private ArrayList<SearchOption> options;
 	private BooleanProperty ruleChanged;
-	private ObjectProperty<Color> colorProperty;
+	private Color color;
 	
 	
 	private HBox hbox = new HBox();
@@ -69,7 +67,8 @@ public class ColorRule {
 	
 	public ColorRule(String cellName, Color color, SearchOption...options) {
 		setCellName(cellName);
-		colorProperty = new SimpleObjectProperty<Color>(color);
+		//colorProperty = new SimpleObjectProperty<Color>(color);
+		this.color = color;
 		setOptions(options);
 		
 		// format UI elements
@@ -92,6 +91,7 @@ public class ColorRule {
 		colorBtn.setGraphicTextGap(0);
 		setColorButton(color);
 		
+		/*
 		colorProperty.addListener(new ChangeListener<Color>() {
 			@Override
 			public void changed(ObservableValue<? extends Color> observable, 
@@ -99,6 +99,7 @@ public class ColorRule {
 				setColorButton(newValue);
 			}
 		});
+		*/
 		
 		editBtn.prefHeightProperty().bind(sideLength);
 		editBtn.prefWidthProperty().bind(sideLength);
@@ -160,8 +161,17 @@ public class ColorRule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(cellName, colorProperty, options);
+		infoPacket = new RuleInfoPacket(cellName, this.color, options);
 		ruleChanged = new SimpleBooleanProperty(false);
+		ruleChanged.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					setColorButton(infoPacket.getColor());
+				}
+			}
+		});
 	}
 	
 	private void setColorButton(Color color) {
@@ -180,7 +190,7 @@ public class ColorRule {
 	}
 	
 	public void setColor(Color color) {
-		colorProperty.set(color);
+		this.color = color;
 	}
 	
 	public void setOptions(SearchOption...options){
@@ -211,12 +221,14 @@ public class ColorRule {
 	}
 	
 	public Color getColor() {
-		return colorProperty.get();
+		return color;
 	}
 	
+	/*
 	public ObjectProperty<Color> getColorProperty() {
 		return colorProperty;
 	}
+	*/
 	
 	public HBox getHBox() {
 		return hbox;

@@ -70,7 +70,7 @@ public class LineageTree {
 		TreeItem<String> p4 = makeTreeItem("P4");
 		p3.getChildren().addAll(d, p4);
 		
-		// firth layer (rightmost branch)
+		// fifth layer (rightmost branch)
 		TreeItem<String> z2 = makeTreeItem("Z2");
 		TreeItem<String> z3 = makeTreeItem("Z3");
 		p4.getChildren().addAll(z2, z3);
@@ -140,8 +140,10 @@ public class LineageTree {
 		desc = desc.toLowerCase();
 		ances = ances.toLowerCase();
 		
-		if (desc.length()>ances.length() && desc.startsWith(ances))
-			return true;
+		if (desc.length()>ances.length() && desc.startsWith(ances)) {
+			if (!desc.startsWith("e"))
+				return true;
+		}
 		
 		return isDescendant(findNode(desc), findNode(ances));
 	}
@@ -160,10 +162,16 @@ public class LineageTree {
 		if (node==null)
 			return false;
 		
+		if (ances==null)
+			return false;
+		
 		if (node==root)
 			return false;
 		
 		if (node==ances)
+			return false;
+		
+		if (node.getChildren().contains(ances))
 			return false;
 		
 		if (node.getValue().toLowerCase().equals("nuc"))
