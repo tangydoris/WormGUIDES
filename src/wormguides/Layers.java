@@ -71,6 +71,7 @@ public class Layers {
 		rulesList.add(new ColorRule("ABa", Color.RED));
 		rulesList.add(new ColorRule("ABp", Color.BLUE));
 		rulesList.add(new ColorRule("EMS", Color.GREEN));
+		rulesList.add(new ColorRule("P1", Color.YELLOW, SearchOption.CELL));
 		rulesList.add(new ColorRule("P2", Color.YELLOW));
 	}
 	
