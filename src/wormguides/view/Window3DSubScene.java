@@ -11,8 +11,10 @@ import wormguides.model.TableLineageData;
 import wormguides.model.ColorRule;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -61,6 +63,8 @@ public class Window3DSubScene{
 	private boolean[] searched;
 	private Integer[][] positions;
 	private Integer[] diameters;
+	private DoubleProperty zoom;
+	private double zScale;
 	
 	// switching timepoints stuff
 	private BooleanProperty playingMovie;
@@ -78,16 +82,12 @@ public class Window3DSubScene{
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<ColorRule> rulesList;
-	//private ObservableList<BooleanProperty> updatedPropertyList;
-	//private BooleanProperty updated;
-	//private ObservableList<Color> colorsToHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
 		this.data = data;
 		
-		time = new SimpleIntegerProperty();
-		time.set(START_TIME);
+		time = new SimpleIntegerProperty(START_TIME);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
@@ -95,6 +95,9 @@ public class Window3DSubScene{
 				buildScene(time.get());
 			}
 		});
+		
+		zoom = new SimpleDoubleProperty(1d);
+		zScale = Z_SCALE;
 		
 		cells = new Sphere[1];
 		names = new String[1];
@@ -125,7 +128,8 @@ public class Window3DSubScene{
 		totalNuclei.set(0);
 		
 		endTime = data.getTotalTimePoints();
-		subscene = createSubScene(width, height);
+		
+		createSubScene(width, height);
 		
 		mousePosX = 0;
 		mousePosY = 0;
@@ -168,6 +172,15 @@ public class Window3DSubScene{
 			}
 		};
 		
+		zoom.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+					Number oldValue, Number newValue) {
+				cameraXform.setScale(zoom.get());
+				buildScene(time.get());
+			}
+		});
+		
 		buildScene(time.get());
 	}
 	
@@ -177,6 +190,10 @@ public class Window3DSubScene{
 	
 	public IntegerProperty getTimeProperty() {
 		return time;
+	}
+	
+	public DoubleProperty getZoomProperty() {
+		return zoom;
 	}
 	
 	public IntegerProperty getSelectedIndex() {
@@ -312,19 +329,16 @@ public class Window3DSubScene{
 				for (SearchOption option : options) {
 					switch (option) {
 						case CELL:
-								//System.out.println("cell selected");
 								if (namesLowerCase[i].equals(
 										rule.getNameLowerCase()))
 									colors.add(rule.getColor());
 								break;
 						case DESCENDANT:
-								//System.out.println("descendant selected");
 								if (LineageTree.isDescendant(namesLowerCase[i], 
 										rule.getNameLowerCase()))
 									colors.add(rule.getColor());
 								break;
 						case ANCESTOR:
-								//System.out.println("ancestor selected");
 								if (LineageTree.isAncestor(namesLowerCase[i], 
 										rule.getNameLowerCase()))
 									colors.add(rule.getColor());
@@ -337,7 +351,7 @@ public class Window3DSubScene{
 	        
 	        double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
-	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
+	        double z = positions[i][Z_COR_INDEX]*zScale;
 	        translate(sphere, x, y, z);
 	        
 	        cells[i] = sphere;
@@ -546,7 +560,7 @@ public class Window3DSubScene{
 								CAMERA_INITIAL_Y_ANGLE = 0.0;
     
     private static final double CAMERA_NEAR_CLIP = 0.01,
-    							CAMERA_FAR_CLIP = 50000;
+    							CAMERA_FAR_CLIP = 10000;
     
     private static final int START_TIME = 1;
     

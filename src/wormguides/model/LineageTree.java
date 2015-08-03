@@ -169,9 +169,8 @@ public class LineageTree {
 		if (node.getValue().toLowerCase().equals("nuc"))
 			return false;
 		
-		if (node.getParent()==ances) {
+		if (node.getParent()==ances)
 			return true;
-		}
 		
 		return isDescendant(node.getParent(), ances);
 

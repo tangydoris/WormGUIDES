@@ -65,6 +65,7 @@ public class RootLayoutController implements Initializable{
 	@FXML public Button backwardButton, forwardButton, playButton;
 	@FXML public Label timeLabel, totalNucleiLabel;
 	@FXML public Slider timeSlider;
+	@FXML public Button zoomInButton, zoomOutButton;
 	
 	// Search tab
 	private Search search;
@@ -97,6 +98,7 @@ public class RootLayoutController implements Initializable{
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
+	private DoubleProperty zoom;
 	
 	private PartsList partsList;
 	
@@ -137,6 +139,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void getPropertiesFrom3DWindow() {
 		time = window3D.getTimeProperty();
+		zoom = window3D.getZoomProperty();
 		totalNuclei = window3D.getTotalNucleiProperty();
 		playingMovie = window3D.getPlayingMovieProperty();
 		selectedName = window3D.getSelectedName();
@@ -176,6 +179,24 @@ public class RootLayoutController implements Initializable{
 				int t = time.get();
 				if (t >= 1 && t < window3D.getEndTime()-1)
 					time.set(t+1);
+			}
+		});
+		
+		zoomOutButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				double z = zoom.get();
+				if (z < 5 && z >= 0.25)
+					zoom.set(z+.25);
+			}
+		});
+		
+		zoomInButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				double z = zoom.get();
+				if (z <= 5 && z > 0.25)
+					zoom.set(z-.25);
 			}
 		});
 		
@@ -354,6 +375,8 @@ public class RootLayoutController implements Initializable{
 		assert (playButton != null);
 		assert (timeLabel != null);
 		assert (totalNucleiLabel != null);
+		assert (zoomInButton != null);
+		assert (zoomOutButton != null);
 		
 		assert (searchField != null);
 		assert (searchResultsList != null);

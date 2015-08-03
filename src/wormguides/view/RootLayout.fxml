@@ -256,7 +256,7 @@
                      <center>
                         <AnchorPane fx:id="modelAnchorPane" BorderPane.alignment="CENTER">
                            <children>
-                              <Slider fx:id="timeSlider" focusTraversable="false" layoutX="111.0" layoutY="574.0" prefHeight="30.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="0.0" />
+                              <Slider fx:id="timeSlider" focusTraversable="false" layoutX="111.0" layoutY="574.0" prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="65.0" />
                               <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" layoutX="14.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                               <Button id="playButton" fx:id="playButton" focusTraversable="false" layoutX="38.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="32.0" />
                               <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="66.0" />
@@ -270,6 +270,8 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
+                              <Button fx:id="zoomOutButton" layoutX="550.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                              <Button fx:id="zoomInButton" layoutX="502.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="34.0" />
                            </children>
                         </AnchorPane>
                      </center>
