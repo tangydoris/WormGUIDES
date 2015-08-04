@@ -4,6 +4,7 @@ import java.util.TreeSet;
 
 import wormguides.ColorComparator;
 import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.LineageTree;
@@ -339,27 +340,45 @@ public class Window3DSubScene{
 			}
 			else {
 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+				if (rulesList==null)
+					return;
 				for (ColorRule rule : rulesList) {
+					if (rule==null)
+						continue;
 					SearchOption[] options = rule.getOptions();
-					for (SearchOption option : options) {
-						switch (option) {
-							case CELL:
-									if (namesLowerCase[i].equals(
-											rule.getSearchedTextLowerCase()))
-										colors.add(rule.getColor());
-									break;
-							case DESCENDANT:
-									if (LineageTree.isDescendant(namesLowerCase[i], 
-											rule.getSearchedTextLowerCase()))
-										colors.add(rule.getColor());
-									break;
-							case ANCESTOR:
-									if (LineageTree.isAncestor(namesLowerCase[i], 
-											rule.getSearchedTextLowerCase()))
-										colors.add(rule.getColor());
-									break;
-						}
+					switch ((SearchType) rule.getSearchType()) {
+						case SYSTEMATIC: 
+								for (SearchOption option : options) {
+									switch (option) {
+										case CELL:
+												if (namesLowerCase[i].equals(
+														rule.getSearchedTextLowerCase()))
+													colors.add(rule.getColor());
+												break;
+										case DESCENDANT:
+												if (LineageTree.isDescendant(namesLowerCase[i], 
+														rule.getSearchedTextLowerCase()))
+													colors.add(rule.getColor());
+												break;
+										case ANCESTOR:
+												if (LineageTree.isAncestor(namesLowerCase[i], 
+														rule.getSearchedTextLowerCase()))
+													colors.add(rule.getColor());
+												break;
+									}
+								}
+								break;
+						case FUNCTIONAL:
+								System.out.println("functional search");
+								break;
+						case DESCRIPTION:
+								System.out.println("description search");
+								break;
+						case GENE:
+								System.out.println("gene search");
+								break;
 					}
+					
 				}
 				material = colorHash.getMaterial(colors);
 			}

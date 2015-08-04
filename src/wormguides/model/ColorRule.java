@@ -1,8 +1,10 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import wormguides.ImageLoader;
+import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.view.ColorRuleEditPane;
@@ -42,6 +44,7 @@ public class ColorRule {
 	private BooleanProperty ruleChanged;
 	private Color color;
 	
+	private SearchType type;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -55,18 +58,26 @@ public class ColorRule {
 	
 	private RuleInfoPacket infoPacket;
 	
+	private ArrayList<String> searchResultsList;
+	
 	public ColorRule(SearchType type, String searched, Color color) {
-		this(type, searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
+		this(type, searched, color, 
+				new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
 	}
 	
-	public ColorRule(SearchType type, String searched, Color color, ArrayList<SearchOption> options) {
-		this(type, searched, color, options.toArray(new SearchOption[options.size()]));
+	public ColorRule(SearchType type, String searched, Color color,
+						ArrayList<SearchOption> options) {
+		this(type, searched, color, 
+				options.toArray(new SearchOption[options.size()]));
 	}
 	
 	public ColorRule(SearchType type, String searched, Color color, SearchOption...options) {
+		this.type = type;
 		setSearchedText(searched);
 		this.color = color;
 		setOptions(options);
+		
+		searchResultsList = Search.getResultsListBySearch(searched, type, options);
 		
 		// format UI elements
 		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
@@ -101,14 +112,12 @@ public class ColorRule {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editStage = new Stage();
-					//System.out.println(infoPacket.toString());
 					editStage.setScene(new Scene(
 							new ColorRuleEditPane(
 									infoPacket, getSubmitHandler())));
 					editStage.setTitle("Edit Color Rule");
 					editStage.initModality(Modality.NONE);
 					editStage.setResizable(false);
-					//updated.set(false);
 				}
 				ruleChanged.set(false);
 				editStage.show();
@@ -147,7 +156,7 @@ public class ColorRule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(searchedText, this.color, options);
+		infoPacket = new RuleInfoPacket(searchedText, this.color, this.searchResultsList, options);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -200,6 +209,10 @@ public class ColorRule {
 	
 	public String getSearchedText() {
 		return searchedText;
+	}
+	
+	public SearchType getSearchType() {
+		return type;
 	}
 	
 	public String getSearchedTextLowerCase() {

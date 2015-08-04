@@ -54,8 +54,13 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		PixelWriter writer = wImage.getPixelWriter();
 		
 		// for two colors, we want a center stripe
-		if (colors.length==2)
-			colors = new Color[] {colors[0], colors[1], colors[0]};
+		if (colors.length>=2) {
+			Color[] copy = new Color[colors.length+1];
+			for (int i=0; i<colors.length; i++)
+				copy[i]=colors[i];
+			copy[colors.length]=colors[0];
+			colors = copy;
+		}
 		
 		// for more than two colors, we want segments
 		int segmentLength = (int) wImage.getHeight()/colors.length;

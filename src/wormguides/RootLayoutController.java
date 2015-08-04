@@ -242,14 +242,14 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void setSelectedInfo(String lineageName) {
-		String proper = PartsList.getFunctionalName(lineageName);
+		String proper = PartsList.getFunctionalNameByLineageName(lineageName);
 		if (proper == null) {
 			cellName.setText(lineageName);
 			cellDescription.setText("");
 		}
 		else {
 			cellName.setText(lineageName+" ("+proper+")");
-			cellDescription.setText(PartsList.getDescription(lineageName));
+			cellDescription.setText(PartsList.getDescriptionByLineageName(lineageName));
 		}
 	}
 	
@@ -310,6 +310,8 @@ public class RootLayoutController implements Initializable{
 	public void setIcons() {
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());
+		zoomInButton.setGraphic(ImageLoader.getPlusIcon());
+		zoomOutButton.setGraphic(ImageLoader.getMinusIcon());
 		
 		this.playIcon = ImageLoader.getPlayIcon();
 		this.pauseIcon = ImageLoader.getPauseIcon();
@@ -336,7 +338,7 @@ public class RootLayoutController implements Initializable{
 		search = new Search(searchField, searchResultsListView);
 		search.setCellNames(allCellNames);
 		
-		ToggleGroup typeGroup = search.getTypeToggleGroup();
+		ToggleGroup typeGroup = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
 		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
 		funRadioBtn.setToggleGroup(typeGroup);

@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 public class ImageLoader {
 	
 	private static ImageView forward, backward, play, pause;
+	private static ImageView plus, minus;
 	private static Image edit, eye, close; 
 	private static JarFile jarFile;
 	
@@ -55,6 +56,10 @@ public class ImageLoader {
 								break;
 			case PAUSE_PNG:		pause = icon;
 								break;
+			case PLUS_PNG:		plus = icon;
+								break;
+			case MINUS_PNG:		minus = icon;
+								break;
 		}
 	}
 
@@ -72,6 +77,14 @@ public class ImageLoader {
 	
 	public static ImageView getPauseIcon() {
 		return pause;
+	}
+	
+	public static ImageView getPlusIcon() {
+		return plus;
+	}
+	
+	public static ImageView getMinusIcon() {
+		return minus;
 	}
 	
 	public static ImageView getEditIcon() {
@@ -93,5 +106,7 @@ public class ImageLoader {
 			PLAY_PNG = ENTRY_PREFIX+"play.png",
 			EDIT_PNG = ENTRY_PREFIX+"edit.png",
 			EYE_PNG = ENTRY_PREFIX+"eye.png",
-			CLOSE_PNG = ENTRY_PREFIX+"close.png";
+			CLOSE_PNG = ENTRY_PREFIX+"close.png",
+			PLUS_PNG = ENTRY_PREFIX+"plus.png",
+			MINUS_PNG = ENTRY_PREFIX+"minus.png";
 }

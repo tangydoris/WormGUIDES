@@ -54,15 +54,7 @@ public class PartsList {
 		return lineageNames.contains(name);
 	}
 	
-	public static String getFunctionalName(int i) {
-		try {
-			return functionalNames.get(i);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
-	}
-	
-	public static String getLineageName(int i) {
+	public static String getLineageNameByIndex(int i) {
 		try {
 			return lineageNames.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -70,15 +62,29 @@ public class PartsList {
 		}
 	}
 	
-	public static String getFunctionalName(String lineageName) {
+	public static String getLineageNameByFunctionalName(String functionalName) {
+		if (functionalName==null || functionalName.isEmpty())
+			return null;
+		
+		return getLineageNameByIndex(functionalNames.indexOf(functionalName));
+	}
+	
+	public static String getFunctionalNameByIndex(int i) {
 		try {
-			return functionalNames.get(lineageNames.indexOf(lineageName));
+			return functionalNames.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
 	}
 	
-	public static String getDescription(int i) {
+	public static String getFunctionalNameByLineageName(String lineageName) {
+		if (lineageName==null || lineageName.isEmpty())
+			return null;
+		
+		return getFunctionalNameByIndex(lineageNames.indexOf(lineageName));
+	}
+	
+	public static String getDescriptionByIndex(int i) {
 		try {
 			return descriptions.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -86,12 +92,18 @@ public class PartsList {
 		}
 	}
 	
-	public static String getDescription(String sulstonName) {
-		try {
-			return descriptions.get(lineageNames.indexOf(sulstonName));
-		} catch (ArrayIndexOutOfBoundsException e) {
+	public static String getDescriptionByLineageName(String lineageName) {
+		if (lineageName==null || lineageName.isEmpty())
 			return null;
-		}
+		
+		return getDescriptionByIndex(lineageNames.indexOf(lineageName));
+	}
+	
+	public static String getDescriptionByFunctionalName(String functionalName) {
+		if (functionalName==null || functionalName.isEmpty())
+			return null;
+		
+		return getDescriptionByIndex(functionalNames.indexOf(functionalName));
 	}
 	
 	private final static String JAR_NAME = "WormGUIDES.jar",

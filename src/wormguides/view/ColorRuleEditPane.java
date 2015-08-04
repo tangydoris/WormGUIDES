@@ -1,5 +1,7 @@
 package wormguides.view;
 
+import java.util.ArrayList;
+
 import wormguides.model.RuleInfoPacket;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,12 +23,9 @@ import javafx.scene.text.Font;
 public class ColorRuleEditPane extends AnchorPane{
 	
 	private RuleInfoPacket infoPacket;
-
-	public ColorRuleEditPane() {
-		this(new RuleInfoPacket(), null);
-	}
 		
-	public ColorRuleEditPane(RuleInfoPacket packet, EventHandler<ActionEvent> handler) {
+	public ColorRuleEditPane(RuleInfoPacket packet, 
+								EventHandler<ActionEvent> handler) {
 		super();
 		
 		infoPacket = packet;
