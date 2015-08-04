@@ -101,7 +101,7 @@ public class RootLayoutController implements Initializable{
 	private BooleanProperty playingMovie;
 	private DoubleProperty zoom;
 	
-	private PartsList partsList;
+	//private PartsList partsList;
 	
 	@FXML
 	public void menuCloseAction() {
@@ -241,15 +241,15 @@ public class RootLayoutController implements Initializable{
 		ancestorTick.selectedProperty().addListener(window3D.getTickListener());
 	}
 	
-	private void setSelectedInfo(String sulston) {
-		String proper = partsList.getProperName(sulston);
+	private void setSelectedInfo(String lineageName) {
+		String proper = PartsList.getFunctionalName(lineageName);
 		if (proper == null) {
-			cellName.setText(sulston);
+			cellName.setText(lineageName);
 			cellDescription.setText("");
 		}
 		else {
-			cellName.setText(sulston+" ("+proper+")");
-			cellDescription.setText(partsList.getDescription(sulston));
+			cellName.setText(lineageName+" ("+proper+")");
+			cellDescription.setText(PartsList.getDescription(lineageName));
 		}
 	}
 	
@@ -353,11 +353,11 @@ public class RootLayoutController implements Initializable{
 				SearchType type = (SearchType) observable.getValue().getToggleGroup()
 						.getSelectedToggle().getUserData();
 				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
-					ancestorTick.setSelected(false);
-					ancestorTick.disableProperty().set(true);
+					descendantTick.setSelected(false);
+					descendantTick.disableProperty().set(true);
 				}
 				else
-					ancestorTick.disableProperty().set(false);
+					descendantTick.disableProperty().set(false);
 			}
 		});
 		sysRadioBtn.setSelected(true);
@@ -420,7 +420,8 @@ public class RootLayoutController implements Initializable{
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
-		partsList = new PartsList();
+		//partsList = new PartsList();
+		new PartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
 		allCellNames = AceTreeLoader.getAllCellNames();
 		initLineageTree();

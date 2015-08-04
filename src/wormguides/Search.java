@@ -172,8 +172,8 @@ public class Search {
 		};
 	}
 	
-	public void setCellNames(String[] cellNamesArr) {
-		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArr));
+	public void setCellNames(String[] cellNamesArray) {
+		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArray));
 	}
 	
 	public ObservableList<String> getSearchResultsList() {

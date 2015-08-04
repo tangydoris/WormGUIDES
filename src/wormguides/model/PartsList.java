@@ -12,25 +12,22 @@ import java.util.jar.JarFile;
 
 public class PartsList {
 	
-	private ArrayList<String> properNames;
-	private ArrayList<String> sulstonNames;
-	private ArrayList<String> descriptions;
+	private static ArrayList<String> functionalNames;
+	private static ArrayList<String> lineageNames;
+	private static ArrayList<String> descriptions;
 	
 	public PartsList() {
-		properNames = new ArrayList<String>();
-		sulstonNames = new ArrayList<String>();
+		functionalNames = new ArrayList<String>();
+		lineageNames = new ArrayList<String>();
 		descriptions = new ArrayList<String>();
 		
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 	
 			Enumeration<JarEntry> entries = jarFile.entries();
-			//int time = 0;
-			
 			JarEntry entry;
 			while (entries.hasMoreElements()){
 				entry = entries.nextElement();
-				//System.out.println(entry.getName());
 				if (entry.getName().equals(PARTSLIST_NAME)) {
 					InputStream input = jarFile.getInputStream(entry);
 					InputStreamReader isr = new InputStreamReader(input);
@@ -39,11 +36,11 @@ public class PartsList {
 					String line;
 					while ((line = br.readLine()) != null) {
 						String[] lineArray = line.split("\t");
-						properNames.add(lineArray[0]);
-						sulstonNames.add(lineArray[1]);
+						functionalNames.add(lineArray[0]);
+						lineageNames.add(lineArray[1]);
 						descriptions.add(lineArray[2]);
 					}
-					//System.out.println("partslist size "+properNames.size());
+
 					break;
 				}
 			}
@@ -53,33 +50,45 @@ public class PartsList {
 		}
 	}
 	
-	public boolean contains(String name) {
-		return sulstonNames.contains(name);
+	public static boolean contains(String name) {
+		return lineageNames.contains(name);
 	}
 	
-	public String getProperName(int i) {
-		return properNames.get(i);
-	}
-	
-	public String getSulstonName(int i) {
-		return sulstonNames.get(i);
-	}
-	
-	public String getProperName(String sulstonName) {
+	public static String getFunctionalName(int i) {
 		try {
-			return properNames.get(sulstonNames.indexOf(sulstonName));
+			return functionalNames.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
 	}
 	
-	public String getDescription(int i) {
-		return descriptions.get(i);
+	public static String getLineageName(int i) {
+		try {
+			return lineageNames.get(i);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 	
-	public String getDescription(String sulstonName) {
+	public static String getFunctionalName(String lineageName) {
 		try {
-			return descriptions.get(sulstonNames.indexOf(sulstonName));
+			return functionalNames.get(lineageNames.indexOf(lineageName));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
+	}
+	
+	public static String getDescription(int i) {
+		try {
+			return descriptions.get(i);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
+	}
+	
+	public static String getDescription(String sulstonName) {
+		try {
+			return descriptions.get(lineageNames.indexOf(sulstonName));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
