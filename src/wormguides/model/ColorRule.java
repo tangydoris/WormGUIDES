@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -34,8 +35,9 @@ public class ColorRule {
 	
 	private Stage editStage;
 	
-	private String cellName;
-	private String cellNameLowerCase;
+	private String searchedText;
+	private String searchedTextLowerCase;
+	
 	private ArrayList<SearchOption> options;
 	private BooleanProperty ruleChanged;
 	private Color color;
@@ -53,21 +55,16 @@ public class ColorRule {
 	
 	private RuleInfoPacket infoPacket;
 	
-	public ColorRule() {
-		this("", Color.WHITE);
+	public ColorRule(SearchType type, String searched, Color color) {
+		this(type, searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
 	}
 	
-	public ColorRule(String cellName, Color color) {
-		this(cellName, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
+	public ColorRule(SearchType type, String searched, Color color, ArrayList<SearchOption> options) {
+		this(type, searched, color, options.toArray(new SearchOption[options.size()]));
 	}
 	
-	public ColorRule(String cellName, Color color, ArrayList<SearchOption> options) {
-		this(cellName, color, options.toArray(new SearchOption[options.size()]));
-	}
-	
-	public ColorRule(String cellName, Color color, SearchOption...options) {
-		setCellName(cellName);
-		//colorProperty = new SimpleObjectProperty<Color>(color);
+	public ColorRule(SearchType type, String searched, Color color, SearchOption...options) {
+		setSearchedText(searched);
 		this.color = color;
 		setOptions(options);
 		
@@ -76,9 +73,8 @@ public class ColorRule {
 		
 		hbox.setSpacing(2);	
 		label.setFont(new Font(14));
-		//label.setText(toString());
 		label.prefHeightProperty().bind(sideLength);
-		label.setMaxWidth(140);
+		label.setMaxWidth(150);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		resetLabel();
 		
@@ -90,16 +86,6 @@ public class ColorRule {
 		colorBtn.minWidthProperty().bind(sideLength);
 		colorBtn.setGraphicTextGap(0);
 		setColorButton(color);
-		
-		/*
-		colorProperty.addListener(new ChangeListener<Color>() {
-			@Override
-			public void changed(ObservableValue<? extends Color> observable, 
-					Color oldValue, Color newValue) {
-				setColorButton(newValue);
-			}
-		});
-		*/
 		
 		editBtn.prefHeightProperty().bind(sideLength);
 		editBtn.prefWidthProperty().bind(sideLength);
@@ -161,7 +147,7 @@ public class ColorRule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(cellName, this.color, options);
+		infoPacket = new RuleInfoPacket(searchedText, this.color, options);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -184,9 +170,9 @@ public class ColorRule {
 		label.setText(toStringFull());
 	}
 
-	public void setCellName(String cellName) {
-		this.cellName = cellName;
-		this.cellNameLowerCase = cellName.toLowerCase();
+	public void setSearchedText(String name) {
+		this.searchedText = name;
+		this.searchedTextLowerCase = name.toLowerCase();
 	}
 	
 	public void setColor(Color color) {
@@ -212,23 +198,17 @@ public class ColorRule {
 				this.options.add(option);
 	}
 	
-	public String getName() {
-		return cellName;
+	public String getSearchedText() {
+		return searchedText;
 	}
 	
-	public String getNameLowerCase() {
-		return cellNameLowerCase;
+	public String getSearchedTextLowerCase() {
+		return searchedTextLowerCase;
 	}
 	
 	public Color getColor() {
 		return color;
 	}
-	
-	/*
-	public ObjectProperty<Color> getColorProperty() {
-		return colorProperty;
-	}
-	*/
 	
 	public HBox getHBox() {
 		return hbox;
@@ -247,16 +227,16 @@ public class ColorRule {
 	}
 	
 	public String toString() {
-		return cellName;
+		return searchedText;
 	}
 	
 	public boolean equals(ColorRule other) {
-		return cellName.equals(other.getName());
+		return searchedText.equals(other.getSearchedText());
 	}
 	
 	// this tostring takes up too much horizontal space
 	public String toStringFull() {
-		String out = cellName+" ";
+		String out = searchedText+" ";
 		for (int i=0; i<options.size(); i++) {
 			out += options.get(i).getDescription();
 			if (i != options.size()-1)

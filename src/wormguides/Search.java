@@ -106,7 +106,7 @@ public class Search {
 					options.add(SearchOption.CELL);
 					options.add(SearchOption.DESCENDANT);
 				}
-				ColorRule rule = new ColorRule(cellName, selectedColor, options);
+				ColorRule rule = new ColorRule(SearchType.SYSTEMATIC, cellName, selectedColor, options);
 				if (!containsRule(rule))
 					rulesList.add(rule);
 			}

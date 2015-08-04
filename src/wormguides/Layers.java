@@ -65,11 +65,11 @@ public class Layers {
 	}
 	
 	public void addDefaultRules() {
-		rulesList.add(new ColorRule("ABa", Color.RED));
-		rulesList.add(new ColorRule("ABp", Color.BLUE));
-		rulesList.add(new ColorRule("EMS", Color.GREEN));
-		rulesList.add(new ColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, 
-									SearchOption.CELL, SearchOption.DESCENDANT));
+		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "ABa", Color.RED));
+		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "ABp", Color.BLUE));
+		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "EMS", Color.GREEN));
+		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "P2", Color.YELLOW, 
+				SearchOption.ANCESTOR, SearchOption.CELL, SearchOption.DESCENDANT));
 	}
 	
 	private void makeCellFactory() {

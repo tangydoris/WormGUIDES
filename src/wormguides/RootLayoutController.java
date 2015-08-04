@@ -27,6 +27,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -345,6 +346,21 @@ public class RootLayoutController implements Initializable{
 		genRadioBtn.setToggleGroup(typeGroup);
 		genRadioBtn.setUserData(SearchType.GENE);
 		typeGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
+		typeGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable,
+								Toggle oldValue, Toggle newValue) {
+				SearchType type = (SearchType) observable.getValue().getToggleGroup()
+						.getSelectedToggle().getUserData();
+				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
+					ancestorTick.setSelected(false);
+					ancestorTick.disableProperty().set(true);
+				}
+				else
+					ancestorTick.disableProperty().set(false);
+			}
+		});
+		sysRadioBtn.setSelected(true);
 		
 		cellTick.selectedProperty().addListener(search.getCellTickListner());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());

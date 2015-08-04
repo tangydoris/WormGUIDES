@@ -345,17 +345,17 @@ public class Window3DSubScene{
 						switch (option) {
 							case CELL:
 									if (namesLowerCase[i].equals(
-											rule.getNameLowerCase()))
+											rule.getSearchedTextLowerCase()))
 										colors.add(rule.getColor());
 									break;
 							case DESCENDANT:
 									if (LineageTree.isDescendant(namesLowerCase[i], 
-											rule.getNameLowerCase()))
+											rule.getSearchedTextLowerCase()))
 										colors.add(rule.getColor());
 									break;
 							case ANCESTOR:
 									if (LineageTree.isAncestor(namesLowerCase[i], 
-											rule.getNameLowerCase()))
+											rule.getSearchedTextLowerCase()))
 										colors.add(rule.getColor());
 									break;
 						}
