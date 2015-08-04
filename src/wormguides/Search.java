@@ -99,7 +99,7 @@ public class Search {
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
 				// first element should be string with correct capitalization
-				String cellName = searchResults.get(0);
+				String cellName = LineageTree.getName(searchField.getText());
 				
 				// default search options is cell and descendant
 				if (options.isEmpty()) {

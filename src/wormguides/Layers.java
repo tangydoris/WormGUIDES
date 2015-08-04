@@ -20,8 +20,6 @@ public class Layers {
 	private HashMap<ColorRule, Button> buttonMap;
 	private ListView<ColorRule> rulesListView;
 	
-	//private BooleanProperty updated;
-	
 	public Layers() {
 		this(new ListView<ColorRule>());
 	}
@@ -42,7 +40,6 @@ public class Layers {
 					if (!change.wasUpdated()) {
 						// added to list
 						for (ColorRule rule : change.getAddedSubList()) {
-							//System.out.println("added rule "+rule.toStringFull());
 							ColorRule ruleToRemove = rule;
 							buttonMap.put(ruleToRemove, rule.getDeleteButton());
 							
@@ -71,8 +68,8 @@ public class Layers {
 		rulesList.add(new ColorRule("ABa", Color.RED));
 		rulesList.add(new ColorRule("ABp", Color.BLUE));
 		rulesList.add(new ColorRule("EMS", Color.GREEN));
-		rulesList.add(new ColorRule("P1", Color.YELLOW, SearchOption.CELL));
-		rulesList.add(new ColorRule("P2", Color.YELLOW));
+		rulesList.add(new ColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, 
+									SearchOption.CELL, SearchOption.DESCENDANT));
 	}
 	
 	private void makeCellFactory() {

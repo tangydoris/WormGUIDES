@@ -10,6 +10,7 @@ public class LineageTree {
 	
 	private ArrayList<String> treeBaseNames;
 	
+	// maps a lower case cell name to its tree node
 	private static HashMap<String, TreeItem<String>> nameNodeHash;
 	
 	private String[] allCellNames;
@@ -167,7 +168,11 @@ public class LineageTree {
 			return true;
 		
 		return isDescendant(node.getParent(), ances);
-
+	}
+	
+	public static String getName(String name) {
+		name = name.toLowerCase();
+		return nameNodeHash.get(name).getValue();
 	}
 	
 	public TreeItem<String> getRoot() {

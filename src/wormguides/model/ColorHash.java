@@ -18,20 +18,17 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	private TreeSet<Color> allColors;
 	
 	private Material highlightMaterial = makeMaterial(Color.GOLD);
-	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.5));
+	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.45));
 	
 	public ColorHash(ObservableList<ColorRule> rulesList) {
 		super();
-		
 		allColors = new TreeSet<Color>(new ColorComparator());
 		allColors.add(Color.WHITE);
-		
 	}
 	
 	public void addColorToHash(Color color) {
 		// add color to list if not in list already
 		if (!allColors.contains(color)) {
-			//System.out.println("adding color "+color.toString()+" to hash");
 			allColors.add(color);
 			
 			// add new sets of colors that are the original
@@ -56,8 +53,11 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		WritableImage wImage = new WritableImage(240, 240);
 		PixelWriter writer = wImage.getPixelWriter();
 		
-		// for more than two colors, we want segments
+		// for two colors, we want a center stripe
+		if (colors.length==2)
+			colors = new Color[] {colors[0], colors[1], colors[0]};
 		
+		// for more than two colors, we want segments
 		int segmentLength = (int) wImage.getHeight()/colors.length;
 		Color color = Color.BLACK;
 		
