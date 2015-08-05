@@ -336,7 +336,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsListView);
-		search.setCellNames(allCellNames);
+		//search.setCellNames(allCellNames);
 		
 		ToggleGroup typeGroup = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
@@ -430,19 +430,17 @@ public class RootLayoutController implements Initializable{
 		
 		assertFXMLNodes();
 		
+		initSearch();
+		initLayers();
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
 		setSliderProperties();
-		
-		initSearch();
-		initLayers();
-		
 		search.setRulesList(layers.getRulesList());
 		assert (lineageTree != null) : "lineage tree has not finished loading";
 		window3D.setRulesList(layers.getRulesList());
-		layers.addDefaultRules();
 		window3D.setSearchResultsList(search.getSearchResultsList());
+		layers.addDefaultRules();
 		
         addListeners();
         

@@ -77,7 +77,12 @@ public class ColorRule {
 		this.color = color;
 		setOptions(options);
 		
+		System.out.println(toStringFull()+" "+type);
 		searchResultsList = Search.getResultsListBySearch(searched, type, options);
+		System.out.println("rule "+searched);
+		for (String name : searchResultsList)
+			System.out.println(name);
+		System.out.println("");
 		
 		// format UI elements
 		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
@@ -156,7 +161,8 @@ public class ColorRule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(searchedText, this.color, this.searchResultsList, options);
+		//infoPacket = new RuleInfoPacket(searchedText, this.color, this.searchResultsList, options);
+		infoPacket = new RuleInfoPacket(searchedText, this.color, options);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -239,6 +245,10 @@ public class ColorRule {
 		return ruleChanged;
 	}
 	
+	public ArrayList<String> getSearchResultsList() {
+		return searchResultsList;
+	}
+	
 	public String toString() {
 		return searchedText;
 	}
@@ -269,6 +279,8 @@ public class ColorRule {
 				setOptions(infoPacket.getOptions());
 				resetLabel();
 				toolTip.setText(toStringFull());
+				//System.out.println(toStringFull()+" "+type);
+				searchResultsList = Search.getResultsListBySearch(searchedText, type, options);
 				ruleChanged.set(true);
 			}
 		};

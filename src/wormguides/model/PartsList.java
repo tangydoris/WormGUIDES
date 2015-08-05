@@ -54,6 +54,10 @@ public class PartsList {
 		return lineageNames.contains(name);
 	}
 	
+	public static String[] getLineageNames() {
+		return lineageNames.toArray(new String[lineageNames.size()]);
+	}
+	
 	public static String getLineageNameByIndex(int i) {
 		try {
 			return lineageNames.get(i);

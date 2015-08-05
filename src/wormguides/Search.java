@@ -19,11 +19,12 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
+import wormguides.model.PartsList;
 
 public class Search {
 	
 	private static ArrayList<String> allCellNames;
-	private ArrayList<String> allCellNamesLowerCase;
+	//private static ArrayList<String> allCellNamesLowerCase;
 	private static ObservableList<String> searchResults;
 	private TextField searchField;
 	private ListView<String> searchResultsList;
@@ -36,6 +37,15 @@ public class Search {
 	
 	private ObservableList<ColorRule> rulesList;
 	private Color selectedColor;
+	
+	static {
+		allCellNames = new ArrayList<String>(
+				Arrays.asList(AceTreeLoader.getAllCellNames()));
+		/*allCellNamesLowerCase = new ArrayList<String>();
+		for (String name : allCellNames)
+			allCellNamesLowerCase.add(name.toLowerCase());*/
+		searchResults = FXCollections.observableArrayList();
+	}
 	
 	public Search() {
 		this(new TextField(), new ListView<String>());
@@ -109,6 +119,7 @@ public class Search {
 					else
 						cellName = "'"+searchField.getText()+"' "+type.get()+" search";
 				}
+				System.out.println("searched "+cellName);
 				ColorRule rule = new ColorRule(type.get(),
 						cellName, selectedColor, options);
 				if (!containsRule(rule))
@@ -120,7 +131,21 @@ public class Search {
 	}
 	
 	public static ArrayList<String> getResultsListBySearch(String searchedText, 
+				SearchType type, ArrayList<SearchOption>options) {
+		return getResultsListBySearch(searchedText, type, 
+						options.toArray(new SearchOption[options.size()]));
+	}
+	
+	public static ArrayList<String> getResultsListBySearch(String searchedText, 
 							SearchType type, SearchOption...options) {
+		String optionsString = "";
+		for (SearchOption option : options)
+			optionsString += option+" ";
+		
+		searchedText = searchedText.toLowerCase();
+		
+		System.out.println("getting search results for "+searchedText
+							+" "+type+optionsString);
 		ArrayList<String> results = new ArrayList<String>();
 		if (!searchedText.isEmpty()) {
 			switch (type) {
@@ -128,7 +153,7 @@ public class Search {
 						for (String name : allCellNames) {
 							String nameLowerCase = name.toLowerCase();
 							if (!cellTicked && !descendantTicked 
-									&& !ancestorTicked) {
+											&& !ancestorTicked) {
 								if (nameLowerCase.startsWith(searchedText))
 									results.add(name);
 							}
@@ -232,6 +257,10 @@ public class Search {
 						break;
 			}
 		}
+		/*
+		for (String name : results)
+			System.out.println(name);
+		*/
 		return results;
 	}
 	
@@ -298,20 +327,11 @@ public class Search {
 		}
 	}
 	
-	// cellNamesArray must be properly capitalized
-	public void setCellNames(String[] cellNamesArray) {
-		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArray));
-		allCellNamesLowerCase = new ArrayList<String>();
-		for (String name : allCellNames)
-			allCellNamesLowerCase.add(name.toLowerCase());
-	}
-	
 	public ObservableList<String> getSearchResultsList() {
 		return searchResults;
 	}
 	
 	private void addTextListener() {
-		searchResults = FXCollections.observableArrayList();
 		searchField.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
@@ -325,31 +345,14 @@ public class Search {
 	private void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
 		searchResults.clear();
-		if (!searched.isEmpty()) {
-			if (type.get()==SearchType.SYSTEMATIC) {
-				for (String name : allCellNames) {
-					String nameLowerCase = name.toLowerCase();
-					if (!cellTicked && !descendantTicked && !ancestorTicked) {
-						if (nameLowerCase.startsWith(searched))
-							searchResults.add(name);
-					}
-					else {
-						if (descendantTicked) {
-							if (LineageTree.isDescendant(name, searched))
-								searchResults.add(name);
-						}
-						if (cellTicked) {
-							if (nameLowerCase.equals(searched))
-								searchResults.add(name);
-						}
-						if (ancestorTicked) {
-							if (LineageTree.isAncestor(name, searched))
-								searchResults.add(name);
-						}
-					}
-				}
-			}
-		}
+		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
+		if (cellTicked)
+			options.add(SearchOption.CELL);
+		if (descendantTicked)
+			options.add(SearchOption.DESCENDANT);
+		if (ancestorTicked)
+			options.add(SearchOption.ANCESTOR);
+		searchResults.setAll(getResultsListBySearch(searched, type.get(), options));
 	}
 	
 }

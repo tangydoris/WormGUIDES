@@ -12,13 +12,13 @@ public class RuleInfoPacket {
 	private final String name;
 	private Color color;
 	private ArrayList<SearchOption> optionsList;
-	private ArrayList<String> searchResultsList;
+	//private ArrayList<String> searchResultsList;
 	public RuleInfoPacket(String name, Color color, 
-							ArrayList<String> searchResultsList,
+							//ArrayList<String> searchResultsList,
 							SearchOption[] options) {
 		this.name = name;
 		this.color = color;
-		this.searchResultsList = searchResultsList;
+		//this.searchResultsList = searchResultsList;
 		optionsList = new ArrayList<SearchOption>(Arrays.asList(options));
 	}
 	

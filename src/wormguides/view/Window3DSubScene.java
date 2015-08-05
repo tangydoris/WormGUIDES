@@ -345,6 +345,10 @@ public class Window3DSubScene{
 				for (ColorRule rule : rulesList) {
 					if (rule==null)
 						continue;
+					if (rule.getSearchResultsList().contains(names[i]))
+						colors.add(rule.getColor());
+					
+					/*
 					SearchOption[] options = rule.getOptions();
 					switch ((SearchType) rule.getSearchType()) {
 						case SYSTEMATIC: 
@@ -378,7 +382,7 @@ public class Window3DSubScene{
 								System.out.println("gene search");
 								break;
 					}
-					
+					*/
 				}
 				material = colorHash.getMaterial(colors);
 			}
@@ -450,14 +454,10 @@ public class Window3DSubScene{
 	public void consultSearchResultsList() {
 		searched = new boolean[names.length];
 		for (int i=0; i<names.length; i++) {
-			if (searchResultsList.contains(names[i])) {
-				//System.out.println(names[i]+" searched");
+			if (searchResultsList.contains(names[i]))
 				searched[i] = true;
-			}
-			else {
-				//System.out.println(names[i]+" not searched");
+			else
 				searched[i] = false;
-			}
 		}
 	}
 	
@@ -506,12 +506,6 @@ public class Window3DSubScene{
 		return root;
 	}
 	
-	/*
-	public ListChangeListener<String> getSearchResultsListener() {
-		return 
-	}
-	*/
-	
 	public ChangeListener<Boolean> getTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -527,24 +521,8 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
-				
 				searchedPrefix.set(newValue.toLowerCase());
-				//System.out.println("searched "+searchedPrefix.get());
-				
 				buildScene(time.get());
-				
-				/*
-				subSceneSearchResults.clear();
-				if (!searchedPrefix.get().isEmpty()) {
-					for (int i = 0; i < names.length; i++) {
-						if (namesLowerCase[i].startsWith(searchedPrefix.get()))
-							subSceneSearchResults.add(names[i]);
-					}
-				}
-				*/
-				
-				//System.out.println("search field changed, building scene...");
-				//buildScene(time.get());
 			}
 		};
 	}
