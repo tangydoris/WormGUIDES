@@ -245,18 +245,19 @@ public class RootLayoutController implements Initializable{
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
-		cellName.setText(name);
-		if (name.indexOf("(")!=-1) {
+		
+		if (name.indexOf("(")!=-1) 
 			name = name.substring(0, name.indexOf(" "));
-			System.out.println("selected info "+name);
-			cellDescription.setText(PartsList.getDescriptionByLineageName(name));
-		}
-		else if (PartsList.getFunctionalNameByLineageName(name)!=null) {
-			cellName.setText(name+" ("+PartsList.getFunctionalNameByLineageName(name)+")");
-			cellDescription.setText(PartsList.getDescriptionByLineageName(name));
-		}
-		else
+		
+		String functionalName = PartsList.getFunctionalNameByLineageName(name);
+		if (functionalName==null) {
+			cellName.setText(name);
 			cellDescription.setText("");
+		}
+		else {
+			cellName.setText(name+" ("+functionalName+")");
+			cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+		}
 	}
 	
 	private void sizeSubscene() {
