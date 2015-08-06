@@ -69,7 +69,7 @@ public class RootLayoutController implements Initializable{
 	
 	// Search tab
 	private Search search;
-	private String[] allCellNames;
+	//private String[] allCellNames;
 	@FXML public TextField searchField;
 	@FXML public ListView<String> searchResultsListView;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
@@ -309,6 +309,8 @@ public class RootLayoutController implements Initializable{
 	public void setIcons() {
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());
+		zoomInButton.setGraphic(ImageLoader.getPlusIcon());
+		zoomOutButton.setGraphic(ImageLoader.getMinusIcon());
 		
 		this.playIcon = ImageLoader.getPlayIcon();
 		this.pauseIcon = ImageLoader.getPauseIcon();
@@ -333,7 +335,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsListView);
-		search.setCellNames(allCellNames);
+		search.setCellNames(AceTreeLoader.getAllCellNames());
 		
 		ToggleGroup typeGroup = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
@@ -377,7 +379,7 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initLineageTree() {
-		new LineageTree(allCellNames);
+		new LineageTree(AceTreeLoader.getAllCellNames());
 		lineageTreeRoot = LineageTree.getRoot();
 		/*
 		Platform.runLater(new Runnable() {
@@ -428,7 +430,6 @@ public class RootLayoutController implements Initializable{
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		allCellNames = AceTreeLoader.getAllCellNames();
 		initLineageTree();
 		
 		assertFXMLNodes();
