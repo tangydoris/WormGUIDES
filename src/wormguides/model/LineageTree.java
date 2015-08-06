@@ -172,11 +172,7 @@ public class LineageTree {
 	
 	public static String getName(String name) {
 		name = name.toLowerCase();
-		TreeItem<String> node = findNode(name);
-		if (node==null)
-			return null;
-		else
-			return node.getValue();
+		return nameNodeHash.get(name).getValue();
 	}
 	
 	public TreeItem<String> getRoot() {

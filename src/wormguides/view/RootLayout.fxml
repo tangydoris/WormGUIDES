@@ -270,8 +270,8 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" layoutX="550.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                              <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" layoutX="502.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="34.0" />
+                              <Button fx:id="zoomOutButton" layoutX="550.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                              <Button fx:id="zoomInButton" layoutX="502.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="34.0" />
                            </children>
                         </AnchorPane>
                      </center>

@@ -242,14 +242,14 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void setSelectedInfo(String lineageName) {
-		String proper = PartsList.getFunctionalNameByLineageName(lineageName);
+		String proper = PartsList.getFunctionalName(lineageName);
 		if (proper == null) {
 			cellName.setText(lineageName);
 			cellDescription.setText("");
 		}
 		else {
 			cellName.setText(lineageName+" ("+proper+")");
-			cellDescription.setText(PartsList.getDescriptionByLineageName(lineageName));
+			cellDescription.setText(PartsList.getDescription(lineageName));
 		}
 	}
 	
@@ -310,8 +310,6 @@ public class RootLayoutController implements Initializable{
 	public void setIcons() {
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());
-		zoomInButton.setGraphic(ImageLoader.getPlusIcon());
-		zoomOutButton.setGraphic(ImageLoader.getMinusIcon());
 		
 		this.playIcon = ImageLoader.getPlayIcon();
 		this.pauseIcon = ImageLoader.getPauseIcon();
@@ -336,9 +334,9 @@ public class RootLayoutController implements Initializable{
 	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsListView);
-		//search.setCellNames(allCellNames);
+		search.setCellNames(allCellNames);
 		
-		ToggleGroup typeGroup = new ToggleGroup();
+		ToggleGroup typeGroup = search.getTypeToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
 		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
 		funRadioBtn.setToggleGroup(typeGroup);
@@ -430,17 +428,19 @@ public class RootLayoutController implements Initializable{
 		
 		assertFXMLNodes();
 		
-		initSearch();
-		initLayers();
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
 		setSliderProperties();
+		
+		initSearch();
+		initLayers();
+		
 		search.setRulesList(layers.getRulesList());
 		assert (lineageTree != null) : "lineage tree has not finished loading";
 		window3D.setRulesList(layers.getRulesList());
-		window3D.setSearchResultsList(search.getSearchResultsList());
 		layers.addDefaultRules();
+		window3D.setSearchResultsList(search.getSearchResultsList());
 		
         addListeners();
         

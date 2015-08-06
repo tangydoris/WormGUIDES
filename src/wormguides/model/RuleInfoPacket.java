@@ -3,23 +3,23 @@ package wormguides.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import wormguides.SearchOption;
 
 public class RuleInfoPacket {
 	private final String name;
+	//private ObjectProperty<Color> colorProperty;
 	private Color color;
-	private ArrayList<SearchOption> optionsList;
-	//private ArrayList<String> searchResultsList;
-	public RuleInfoPacket(String name, Color color, 
-							//ArrayList<String> searchResultsList,
-							SearchOption[] options) {
+	private ArrayList<SearchOption> options;
+	
+	public RuleInfoPacket() {
+		this("", Color.WHITE, null);
+	}
+	
+	public RuleInfoPacket(String name, Color color, SearchOption[] options) {
 		this.name = name;
 		this.color = color;
-		//this.searchResultsList = searchResultsList;
-		optionsList = new ArrayList<SearchOption>(Arrays.asList(options));
+		this.options = new ArrayList<SearchOption>(Arrays.asList(options));
 	}
 	
 	public String getName() {
@@ -30,9 +30,14 @@ public class RuleInfoPacket {
 		return color;
 	}
 	
+	/*
+	public ObjectProperty<Color> getColorProperty() {
+		return colorProperty;
+	}
+	*/
+	
 	public ArrayList<SearchOption> getOptions() {
-		return new ArrayList<SearchOption>(Arrays.asList(
-				optionsList.toArray(new SearchOption[optionsList.size()])));
+		return options;
 	}
 	
 	public void setColor(Color color) {
@@ -40,53 +45,52 @@ public class RuleInfoPacket {
 	}
 	
 	public void setOptions(ArrayList<SearchOption> options) {
-		optionsList.clear();
-		optionsList.addAll(options);
+		this.options = options;
 	}
 	
 	public void setCellSelected(boolean selected) {
 		if (selected) {
-			if (!optionsList.contains(SearchOption.CELL))
-				optionsList.add(SearchOption.CELL);
+			if (!options.contains(SearchOption.CELL))
+				options.add(SearchOption.CELL);
 		}
 		else
-			optionsList.remove(SearchOption.CELL);
+			options.remove(SearchOption.CELL);
 	}
 	
 	public void setDescendantSelected(boolean selected) {
 		if (selected) {
-			if (!optionsList.contains(SearchOption.DESCENDANT))
-				optionsList.add(SearchOption.DESCENDANT);
+			if (!options.contains(SearchOption.DESCENDANT))
+				options.add(SearchOption.DESCENDANT);
 		}
 		else
-			optionsList.remove(SearchOption.DESCENDANT);
+			options.remove(SearchOption.DESCENDANT);
 	}
 	
 	public void setAncestorSelected(boolean selected) {
 		if (selected) {
-			if (!optionsList.contains(SearchOption.ANCESTOR))
-				optionsList.add(SearchOption.ANCESTOR);
+			if (!options.contains(SearchOption.ANCESTOR))
+				options.add(SearchOption.ANCESTOR);
 		}
 		else
-			optionsList.remove(SearchOption.ANCESTOR);
+			options.remove(SearchOption.ANCESTOR);
 	}
 	
 	public boolean isCellSelected() {
-		return optionsList.contains(SearchOption.CELL);
+		return options.contains(SearchOption.CELL);
 	}
 	
 	public boolean isDescendantSelected() {
-		return optionsList.contains(SearchOption.DESCENDANT);
+		return options.contains(SearchOption.DESCENDANT);
 	}
 	
 	public boolean isAncestorSelected() {
-		return optionsList.contains(SearchOption.ANCESTOR);
+		return options.contains(SearchOption.ANCESTOR);
 	}
 	
 	public String toString() {
-		String out = "packet info: "
-					+ getName()+" "
-					+ getColor()+" ";
+		String out = "packet info: ";
+		out += getName()+" "
+				+ getColor()+" ";
 		for (SearchOption option : getOptions())
 			out += option+" ";
 		return out;

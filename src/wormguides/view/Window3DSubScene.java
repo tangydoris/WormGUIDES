@@ -4,7 +4,6 @@ import java.util.TreeSet;
 
 import wormguides.ColorComparator;
 import wormguides.SearchOption;
-import wormguides.SearchType;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.LineageTree;
@@ -340,49 +339,27 @@ public class Window3DSubScene{
 			}
 			else {
 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
-				if (rulesList==null)
-					return;
 				for (ColorRule rule : rulesList) {
-					if (rule==null)
-						continue;
-					if (rule.getSearchResultsList().contains(names[i]))
-						colors.add(rule.getColor());
-					
-					/*
 					SearchOption[] options = rule.getOptions();
-					switch ((SearchType) rule.getSearchType()) {
-						case SYSTEMATIC: 
-								for (SearchOption option : options) {
-									switch (option) {
-										case CELL:
-												if (namesLowerCase[i].equals(
-														rule.getSearchedTextLowerCase()))
-													colors.add(rule.getColor());
-												break;
-										case DESCENDANT:
-												if (LineageTree.isDescendant(namesLowerCase[i], 
-														rule.getSearchedTextLowerCase()))
-													colors.add(rule.getColor());
-												break;
-										case ANCESTOR:
-												if (LineageTree.isAncestor(namesLowerCase[i], 
-														rule.getSearchedTextLowerCase()))
-													colors.add(rule.getColor());
-												break;
-									}
-								}
-								break;
-						case FUNCTIONAL:
-								System.out.println("functional search");
-								break;
-						case DESCRIPTION:
-								System.out.println("description search");
-								break;
-						case GENE:
-								System.out.println("gene search");
-								break;
+					for (SearchOption option : options) {
+						switch (option) {
+							case CELL:
+									if (namesLowerCase[i].equals(
+											rule.getSearchedTextLowerCase()))
+										colors.add(rule.getColor());
+									break;
+							case DESCENDANT:
+									if (LineageTree.isDescendant(namesLowerCase[i], 
+											rule.getSearchedTextLowerCase()))
+										colors.add(rule.getColor());
+									break;
+							case ANCESTOR:
+									if (LineageTree.isAncestor(namesLowerCase[i], 
+											rule.getSearchedTextLowerCase()))
+										colors.add(rule.getColor());
+									break;
+						}
 					}
-					*/
 				}
 				material = colorHash.getMaterial(colors);
 			}
@@ -454,10 +431,14 @@ public class Window3DSubScene{
 	public void consultSearchResultsList() {
 		searched = new boolean[names.length];
 		for (int i=0; i<names.length; i++) {
-			if (searchResultsList.contains(names[i]))
+			if (searchResultsList.contains(names[i])) {
+				//System.out.println(names[i]+" searched");
 				searched[i] = true;
-			else
+			}
+			else {
+				//System.out.println(names[i]+" not searched");
 				searched[i] = false;
+			}
 		}
 	}
 	
@@ -506,6 +487,12 @@ public class Window3DSubScene{
 		return root;
 	}
 	
+	/*
+	public ListChangeListener<String> getSearchResultsListener() {
+		return 
+	}
+	*/
+	
 	public ChangeListener<Boolean> getTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -521,8 +508,24 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
+				
 				searchedPrefix.set(newValue.toLowerCase());
+				//System.out.println("searched "+searchedPrefix.get());
+				
 				buildScene(time.get());
+				
+				/*
+				subSceneSearchResults.clear();
+				if (!searchedPrefix.get().isEmpty()) {
+					for (int i = 0; i < names.length; i++) {
+						if (namesLowerCase[i].startsWith(searchedPrefix.get()))
+							subSceneSearchResults.add(names[i]);
+					}
+				}
+				*/
+				
+				//System.out.println("search field changed, building scene...");
+				//buildScene(time.get());
 			}
 		};
 	}
