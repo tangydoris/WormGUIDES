@@ -3,7 +3,6 @@ package wormguides;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -79,7 +78,7 @@ public class RootLayoutController implements Initializable{
 	@FXML public ColorPicker colorPicker;
 	
 	// Lineage tree
-	private LineageTree lineageTree;
+	//private LineageTree lineageTree;
 	private TreeItem<String> lineageTreeRoot;
 	
 	// Cell selection
@@ -336,7 +335,7 @@ public class RootLayoutController implements Initializable{
 		search = new Search(searchField, searchResultsListView);
 		search.setCellNames(allCellNames);
 		
-		ToggleGroup typeGroup = search.getTypeToggleGroup();
+		ToggleGroup typeGroup = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(typeGroup);
 		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
 		funRadioBtn.setToggleGroup(typeGroup);
@@ -373,7 +372,14 @@ public class RootLayoutController implements Initializable{
 		layers = new Layers(colorRulesListView);
 	}
 	
+	private void initPartsList() {
+		new PartsList();
+	}
+	
 	private void initLineageTree() {
+		new LineageTree(allCellNames);
+		lineageTreeRoot = LineageTree.getRoot();
+		/*
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -381,7 +387,7 @@ public class RootLayoutController implements Initializable{
 				lineageTreeRoot = lineageTree.getRoot();
 			}
 		});
-		
+		*/
 	}
 	
 	private void assertFXMLNodes() {
@@ -420,8 +426,7 @@ public class RootLayoutController implements Initializable{
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
-		//partsList = new PartsList();
-		new PartsList();
+		initPartsList();
 		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
 		allCellNames = AceTreeLoader.getAllCellNames();
 		initLineageTree();
@@ -437,10 +442,9 @@ public class RootLayoutController implements Initializable{
 		initLayers();
 		
 		search.setRulesList(layers.getRulesList());
-		assert (lineageTree != null) : "lineage tree has not finished loading";
 		window3D.setRulesList(layers.getRulesList());
-		layers.addDefaultRules();
 		window3D.setSearchResultsList(search.getSearchResultsList());
+		search.addDefaultRules();
 		
         addListeners();
         

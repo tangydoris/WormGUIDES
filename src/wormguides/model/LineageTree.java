@@ -11,10 +11,11 @@ public class LineageTree {
 	private ArrayList<String> treeBaseNames;
 	
 	// maps a lower case cell name to its tree node
-	private static HashMap<String, TreeItem<String>> nameNodeHash;
+	private static HashMap<String, TreeItem<String>> nameNodeHash
+						= new HashMap<String, TreeItem<String>>();
+	private static TreeItem<String> root = new TreeItem<String>("P0");
 	
 	private String[] allCellNames;
-	private static TreeItem<String> root;
 	private TreeItem<String> ab;
 	private TreeItem<String> ms;
 	private TreeItem<String> e;
@@ -24,16 +25,12 @@ public class LineageTree {
 	@SuppressWarnings("unchecked")
 	public LineageTree(String[] allCellNames) {
 		this.allCellNames = allCellNames;
-		nameNodeHash = new HashMap<String, TreeItem<String>>();
 		// names of the cell added to tree upon initialization
 		String[] baseNames = {"p0", "ab", "aba", "abal", "abar",
 								"abp", "abpl", "abpr", "p1",
 								"ems", "ms", "e", "p2", "c",
 								"p3", "d", "p4", "z2", "z3"};
 		treeBaseNames = new ArrayList<String>(Arrays.asList(baseNames));
-		
-		// add zygote (beginning lineage)
-		root = new TreeItem<String>("P0");
 		
 		// first layer
 		ab = makeTreeItem("AB");
@@ -170,12 +167,16 @@ public class LineageTree {
 		return isDescendant(node.getParent(), ances);
 	}
 	
-	public static String getName(String name) {
+	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();
+		if (nameNodeHash.get(name)==null) {
+			System.out.println("no node for "+name);
+			return "null";
+		}
 		return nameNodeHash.get(name).getValue();
 	}
 	
-	public TreeItem<String> getRoot() {
+	public static TreeItem<String> getRoot() {
 		return root;
 	}
 	

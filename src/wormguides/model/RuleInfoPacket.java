@@ -1,8 +1,6 @@
 package wormguides.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import javafx.scene.paint.Color;
 import wormguides.SearchOption;
 
@@ -16,10 +14,10 @@ public class RuleInfoPacket {
 		this("", Color.WHITE, null);
 	}
 	
-	public RuleInfoPacket(String name, Color color, SearchOption[] options) {
+	public RuleInfoPacket(String name, Color color, ArrayList<SearchOption> options) {
 		this.name = name;
 		this.color = color;
-		this.options = new ArrayList<SearchOption>(Arrays.asList(options));
+		this.options = options;
 	}
 	
 	public String getName() {

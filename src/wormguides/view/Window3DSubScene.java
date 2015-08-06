@@ -3,10 +3,8 @@ package wormguides.view;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
-import wormguides.SearchOption;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
-import wormguides.model.LineageTree;
 import wormguides.model.TableLineageData;
 import wormguides.model.ColorRule;
 import javafx.application.Platform;
@@ -59,7 +57,7 @@ public class Window3DSubScene{
 	private int endTime;
 	private Sphere[] cells;
 	private String[] names;
-	private String[] namesLowerCase;
+	//private String[] namesLowerCase;
 	private boolean[] searched;
 	private Integer[][] positions;
 	private Integer[] diameters;
@@ -92,7 +90,6 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				//System.out.println("time changed, building scene...");
 				buildScene(time.get());
 			}
 		});
@@ -123,7 +120,6 @@ public class Window3DSubScene{
 		
 		searchedPrefix = new SimpleStringProperty();
 		searchedPrefix.set("");
-		//subSceneSearchResults = FXCollections.observableArrayList();
 		
 		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
@@ -184,12 +180,6 @@ public class Window3DSubScene{
 		
 		buildScene(time.get());
 	}
-	
-	/*
-	public ObservableList<String> getSearchResults() {
-		return subSceneSearchResults;
-	}
-	*/
 	
 	public IntegerProperty getTimeProperty() {
 		return time;
@@ -296,7 +286,7 @@ public class Window3DSubScene{
 		time--;
 		
 		names = data.getNames(time);
-		namesLowerCase = toLowerCaseAll(names);
+		//namesLowerCase = toLowerCaseAll(names);
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
 		totalNuclei.set(names.length);
@@ -311,6 +301,7 @@ public class Window3DSubScene{
 		Platform.runLater(renderRunnable);
 	}
 	
+	/*
 	private String[] toLowerCaseAll(String[] in) {
 		int length = in.length;
 		String[] out = new String[length];
@@ -318,6 +309,7 @@ public class Window3DSubScene{
 			out[i] = in[i].toLowerCase();
 		return out;
 	}
+	*/
 	
 	private void refreshScene() {
 		root = new Group();
@@ -340,17 +332,19 @@ public class Window3DSubScene{
 			else {
 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 				for (ColorRule rule : rulesList) {
+					// just need to consult rule's active list
+					if (rule.getActiveList().contains(names[i]))
+						colors.add(rule.getColor());
+					/*
 					SearchOption[] options = rule.getOptions();
 					for (SearchOption option : options) {
 						switch (option) {
 							case CELL:
-									if (namesLowerCase[i].equals(
-											rule.getSearchedTextLowerCase()))
+									if (rule.getCells().contains(namesLowerCase[i]))
 										colors.add(rule.getColor());
 									break;
 							case DESCENDANT:
-									if (LineageTree.isDescendant(namesLowerCase[i], 
-											rule.getSearchedTextLowerCase()))
+									if (rule.getCells().contains(namesLowerCase[i]))
 										colors.add(rule.getColor());
 									break;
 							case ANCESTOR:
@@ -360,6 +354,7 @@ public class Window3DSubScene{
 									break;
 						}
 					}
+					*/
 				}
 				material = colorHash.getMaterial(colors);
 			}
@@ -487,12 +482,6 @@ public class Window3DSubScene{
 		return root;
 	}
 	
-	/*
-	public ListChangeListener<String> getSearchResultsListener() {
-		return 
-	}
-	*/
-	
 	public ChangeListener<Boolean> getTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -508,24 +497,8 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
-				
 				searchedPrefix.set(newValue.toLowerCase());
-				//System.out.println("searched "+searchedPrefix.get());
-				
 				buildScene(time.get());
-				
-				/*
-				subSceneSearchResults.clear();
-				if (!searchedPrefix.get().isEmpty()) {
-					for (int i = 0; i < names.length; i++) {
-						if (namesLowerCase[i].startsWith(searchedPrefix.get()))
-							subSceneSearchResults.add(names[i]);
-					}
-				}
-				*/
-				
-				//System.out.println("search field changed, building scene...");
-				//buildScene(time.get());
 			}
 		};
 	}

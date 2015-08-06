@@ -1,10 +1,10 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
-import wormguides.SearchType;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -42,6 +42,10 @@ public class ColorRule {
 	private BooleanProperty ruleChanged;
 	private Color color;
 	
+	private ArrayList<String> cells;
+	private ArrayList<String> ancestors;
+	private ArrayList<String> descendants;
+	private ArrayList<String> active;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -55,17 +59,23 @@ public class ColorRule {
 	
 	private RuleInfoPacket infoPacket;
 	
-	public ColorRule(SearchType type, String searched, Color color) {
-		this(type, searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
+	public ColorRule(String searched, Color color) {
+		this(searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
 	}
 	
-	public ColorRule(SearchType type, String searched, Color color, ArrayList<SearchOption> options) {
-		this(type, searched, color, options.toArray(new SearchOption[options.size()]));
+	public ColorRule(String searched, Color color, SearchOption...options) {
+		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
 	
-	public ColorRule(SearchType type, String searched, Color color, SearchOption...options) {
+	public ColorRule(String searched, Color color, ArrayList<SearchOption> options) {
 		setSearchedText(searched);
-		this.color = color;
+		setColor(color);
+		
+		cells = new ArrayList<String>();
+		ancestors = new ArrayList<String>();
+		descendants = new ArrayList<String>();
+		active = new ArrayList<String>();
+		
 		setOptions(options);
 		
 		// format UI elements
@@ -101,14 +111,12 @@ public class ColorRule {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editStage = new Stage();
-					//System.out.println(infoPacket.toString());
 					editStage.setScene(new Scene(
 							new ColorRuleEditPane(
 									infoPacket, getSubmitHandler())));
 					editStage.setTitle("Edit Color Rule");
 					editStage.initModality(Modality.NONE);
 					editStage.setResizable(false);
-					//updated.set(false);
 				}
 				ruleChanged.set(false);
 				editStage.show();
@@ -160,6 +168,47 @@ public class ColorRule {
 		});
 	}
 	
+	public void setCells(ArrayList<String> list) {
+		cells = list;
+		resetActiveList();
+	}
+	
+	public void setAncestors(ArrayList<String> list) {
+		ancestors = list;
+		resetActiveList();
+	}
+	
+	public void setDescendants(ArrayList<String> list) {
+		descendants = list;
+		resetActiveList();
+	}
+	
+	public ArrayList<String> getCells() {
+		return cells;
+	}
+	
+	public ArrayList<String> getAncestors() {
+		return ancestors;
+	}
+	
+	public ArrayList<String> getDescendants() {
+		return descendants;
+	}
+	
+	public ArrayList<String> getActiveList() {
+		return active;
+	}
+	
+	private void resetActiveList() {
+		active.clear();
+		if (isCellSelected())
+			active.addAll(cells);
+		if (isAncestorSelected())
+			active.addAll(ancestors);
+		if (isDescendantSelected())
+			active.addAll(descendants);
+	}
+	
 	private void setColorButton(Color color) {
 		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
 		rect.setStroke(Color.LIGHTGREY);
@@ -180,15 +229,7 @@ public class ColorRule {
 	}
 	
 	public void setOptions(SearchOption...options){
-		this.options = new ArrayList<SearchOption>();
-		for (SearchOption option : options) {
-			if (option == null)
-				continue;
-			if (option.getDescription().isEmpty())
-				continue;
-			if (!this.options.contains(option))
-				this.options.add(option);
-		}
+		setOptions(new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
 	
 	public void setOptions(ArrayList<SearchOption> options) {
@@ -196,6 +237,7 @@ public class ColorRule {
 		for (SearchOption option : options)
 			if (option != null)
 				this.options.add(option);
+		resetActiveList();
 	}
 	
 	public String getSearchedText() {
@@ -216,6 +258,18 @@ public class ColorRule {
 	
 	public Button getDeleteButton() {
 		return deleteBtn;
+	}
+	
+	public boolean isCellSelected() {
+		return options.contains(SearchOption.CELL);
+	}
+	
+	public boolean isAncestorSelected() {
+		return options.contains(SearchOption.ANCESTOR);
+	}
+	
+	public boolean isDescendantSelected() {
+		return options.contains(SearchOption.DESCENDANT);
 	}
 	
 	public SearchOption[] getOptions() {

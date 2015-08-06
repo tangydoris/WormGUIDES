@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 public class Layers {
@@ -62,14 +61,6 @@ public class Layers {
 	
 	public ObservableList<ColorRule> getRulesList() {
 		return rulesList;
-	}
-	
-	public void addDefaultRules() {
-		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "ABa", Color.RED));
-		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "ABp", Color.BLUE));
-		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "EMS", Color.GREEN));
-		rulesList.add(new ColorRule(SearchType.SYSTEMATIC, "P2", Color.YELLOW, 
-				SearchOption.ANCESTOR, SearchOption.CELL, SearchOption.DESCENDANT));
 	}
 	
 	private void makeCellFactory() {

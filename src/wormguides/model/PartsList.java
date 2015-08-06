@@ -16,7 +16,10 @@ public class PartsList {
 	private static ArrayList<String> lineageNames;
 	private static ArrayList<String> descriptions;
 	
-	public PartsList() {
+	private final static String JAR_NAME = "WormGUIDES.jar";
+	private final static String PARTSLIST_NAME = "wormguides/model/partslist.txt";
+	
+	static {
 		functionalNames = new ArrayList<String>();
 		lineageNames = new ArrayList<String>();
 		descriptions = new ArrayList<String>();
@@ -93,7 +96,5 @@ public class PartsList {
 			return null;
 		}
 	}
-	
-	private final static String JAR_NAME = "WormGUIDES.jar",
-		PARTSLIST_NAME = "wormguides/model/partslist.txt";
+
 }
