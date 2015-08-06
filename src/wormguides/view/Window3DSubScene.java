@@ -3,6 +3,7 @@ package wormguides.view;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
+import wormguides.SearchType;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
@@ -29,6 +30,7 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.control.Toggle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -301,16 +303,6 @@ public class Window3DSubScene{
 		Platform.runLater(renderRunnable);
 	}
 	
-	/*
-	private String[] toLowerCaseAll(String[] in) {
-		int length = in.length;
-		String[] out = new String[length];
-		for (int i = 0; i < length; i++)
-			out[i] = in[i].toLowerCase();
-		return out;
-	}
-	*/
-	
 	private void refreshScene() {
 		root = new Group();
 		root.getChildren().add(cameraXform);
@@ -335,26 +327,6 @@ public class Window3DSubScene{
 					// just need to consult rule's active list
 					if (rule.getActiveList().contains(names[i]))
 						colors.add(rule.getColor());
-					/*
-					SearchOption[] options = rule.getOptions();
-					for (SearchOption option : options) {
-						switch (option) {
-							case CELL:
-									if (rule.getCells().contains(namesLowerCase[i]))
-										colors.add(rule.getColor());
-									break;
-							case DESCENDANT:
-									if (rule.getCells().contains(namesLowerCase[i]))
-										colors.add(rule.getColor());
-									break;
-							case ANCESTOR:
-									if (LineageTree.isAncestor(namesLowerCase[i], 
-											rule.getSearchedTextLowerCase()))
-										colors.add(rule.getColor());
-									break;
-						}
-					}
-					*/
 				}
 				material = colorHash.getMaterial(colors);
 			}
@@ -426,14 +398,10 @@ public class Window3DSubScene{
 	public void consultSearchResultsList() {
 		searched = new boolean[names.length];
 		for (int i=0; i<names.length; i++) {
-			if (searchResultsList.contains(names[i])) {
-				//System.out.println(names[i]+" searched");
+			if (searchResultsList.contains(names[i]))
 				searched[i] = true;
-			}
-			else {
-				//System.out.println(names[i]+" not searched");
+			else
 				searched[i] = false;
-			}
 		}
 	}
 	
@@ -480,6 +448,21 @@ public class Window3DSubScene{
 	
 	public Group getRoot() {
 		return root;
+	}
+	
+	public ChangeListener<Toggle> getTypeToggleListener() {
+		return new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable, 
+					Toggle oldValue, Toggle newValue) {
+				System.out.println("window3d toggle "+newValue.getUserData());
+				/*
+				for (String name : searchResultsList)
+					System.out.println(name);
+				*/
+				buildScene(time.get());
+			}
+		};
 	}
 	
 	public ChangeListener<Boolean> getTickListener() {

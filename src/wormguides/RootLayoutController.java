@@ -69,10 +69,11 @@ public class RootLayoutController implements Initializable{
 	
 	// Search tab
 	private Search search;
-	//private String[] allCellNames;
 	@FXML public TextField searchField;
 	@FXML public ListView<String> searchResultsListView;
 	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	private ToggleGroup typeToggleGroup;
+	
 	@FXML public CheckBox cellTick, ancestorTick, descendantTick;
 	@FXML public AnchorPane colorPickerPane;
 	@FXML public ColorPicker colorPicker;
@@ -135,6 +136,7 @@ public class RootLayoutController implements Initializable{
 				modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
+		typeToggleGroup.selectedToggleProperty().addListener(window3D.getTypeToggleListener());
 	}
 	
 	private void getPropertiesFrom3DWindow() {
@@ -240,16 +242,21 @@ public class RootLayoutController implements Initializable{
 		ancestorTick.selectedProperty().addListener(window3D.getTickListener());
 	}
 	
-	private void setSelectedInfo(String lineageName) {
-		String proper = PartsList.getFunctionalName(lineageName);
-		if (proper == null) {
-			cellName.setText(lineageName);
+	private void setSelectedInfo(String name) {
+		if (name==null || name.isEmpty())
+			return;
+		cellName.setText(name);
+		if (name.indexOf("(")!=-1) {
+			name = name.substring(0, name.indexOf(" "));
+			System.out.println("selected info "+name);
+			cellDescription.setText(PartsList.getDescriptionByLineageName(name));
+		}
+		else if (PartsList.getFunctionalNameByLineageName(name)!=null) {
+			cellName.setText(name+" ("+PartsList.getFunctionalNameByLineageName(name)+")");
+			cellDescription.setText(PartsList.getDescriptionByLineageName(name));
+		}
+		else
 			cellDescription.setText("");
-		}
-		else {
-			cellName.setText(lineageName+" ("+proper+")");
-			cellDescription.setText(PartsList.getDescription(lineageName));
-		}
 	}
 	
 	private void sizeSubscene() {
@@ -335,34 +342,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void initSearch() {
 		search = new Search(searchField, searchResultsListView);
-		search.setCellNames(AceTreeLoader.getAllCellNames());
-		
-		ToggleGroup typeGroup = new ToggleGroup();
-		sysRadioBtn.setToggleGroup(typeGroup);
-		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
-		funRadioBtn.setToggleGroup(typeGroup);
-		funRadioBtn.setUserData(SearchType.FUNCTIONAL);
-		desRadioBtn.setToggleGroup(typeGroup);
-		desRadioBtn.setUserData(SearchType.DESCRIPTION);
-		genRadioBtn.setToggleGroup(typeGroup);
-		genRadioBtn.setUserData(SearchType.GENE);
-		typeGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
-		typeGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-			@Override
-			public void changed(ObservableValue<? extends Toggle> observable,
-								Toggle oldValue, Toggle newValue) {
-				SearchType type = (SearchType) observable.getValue().getToggleGroup()
-						.getSelectedToggle().getUserData();
-				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
-					descendantTick.setSelected(false);
-					descendantTick.disableProperty().set(true);
-				}
-				else
-					descendantTick.disableProperty().set(false);
-			}
-		});
-		sysRadioBtn.setSelected(true);
-		
+		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
 		cellTick.selectedProperty().addListener(search.getCellTickListner());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
@@ -390,6 +370,34 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		*/
+	}
+	
+	private void initToggleGroup() {
+		typeToggleGroup = new ToggleGroup();
+		sysRadioBtn.setToggleGroup(typeToggleGroup);
+		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
+		funRadioBtn.setToggleGroup(typeToggleGroup);
+		funRadioBtn.setUserData(SearchType.FUNCTIONAL);
+		desRadioBtn.setToggleGroup(typeToggleGroup);
+		desRadioBtn.setUserData(SearchType.DESCRIPTION);
+		genRadioBtn.setToggleGroup(typeToggleGroup);
+		genRadioBtn.setUserData(SearchType.GENE);
+		
+		typeToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable,
+								Toggle oldValue, Toggle newValue) {
+				SearchType type = (SearchType) observable.getValue().getToggleGroup()
+						.getSelectedToggle().getUserData();
+				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
+					descendantTick.setSelected(false);
+					descendantTick.disableProperty().set(true);
+				}
+				else
+					descendantTick.disableProperty().set(false);
+			}
+		});
+		sysRadioBtn.setSelected(true);
 	}
 	
 	private void assertFXMLNodes() {
@@ -434,6 +442,7 @@ public class RootLayoutController implements Initializable{
 		
 		assertFXMLNodes();
 		
+		initToggleGroup();
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		

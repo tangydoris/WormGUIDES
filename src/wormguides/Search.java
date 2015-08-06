@@ -16,13 +16,21 @@ import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
+import wormguides.model.PartsList;
 
 public class Search {
 	
+	// list of every cell name that exists
 	private ArrayList<String> allCellNames;
-	private ObservableList<String> searchResults;
+	
+	// list of cells with functional names
+	private ArrayList<String> linageNames;
+	private ArrayList<String> functionalNames;
+	private ArrayList<String> descriptions;
+	
+	private ObservableList<String> searchResultsList;
 	private TextField searchField;
-	private ListView<String> searchResultsList;
+	private ListView<String> searchResultsListView;
 	
 	private SearchType type;
 	
@@ -38,6 +46,14 @@ public class Search {
 	}
 	
 	public Search(TextField searchField, ListView<String> searchResultsList) {
+		allCellNames = new ArrayList<String>(Arrays.asList(
+							AceTreeLoader.getAllCellNames()));
+		linageNames = PartsList.getLineageNames();
+		functionalNames = PartsList.getFunctionalNames();
+		descriptions = PartsList.getDescriptions();
+		
+		type = SearchType.SYSTEMATIC;
+		
 		if (searchField==null)
 			searchField = new TextField();
 		if (searchResultsList==null)
@@ -46,7 +62,7 @@ public class Search {
 		selectedColor = Color.WHITE;
 		
 		this.searchField = searchField;
-		this.searchResultsList = searchResultsList;
+		this.searchResultsListView = searchResultsList;
 		
 		cellTicked = false;
 		ancestorTicked = false;
@@ -129,17 +145,24 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-					for (String name : allCellNames) {
-						if (name.toLowerCase().equals(searched))
-							cells.add(name);
-					}
-					break;
+						for (String name : allCellNames) {
+							if (name.toLowerCase().equals(searched))
+								cells.add(name);
+						}
+						break;
+						
 			case FUNCTIONAL:
-					break;
+						for (String name : functionalNames) {
+							if (name.toLowerCase().equals(searched))
+								cells.add(PartsList.getLineageNameByFunctionalName(name));
+						}
+						break;
+						
 			case DESCRIPTION:
-					break;
+						break;
+						
 			case GENE:
-					break;
+						break;
 		}
 		
 		return cells;
@@ -174,7 +197,7 @@ public class Search {
 			@Override
 			public void handle(ActionEvent event) {
 				// do not add new ColorRule if search has no matches
-				if (searchResults.isEmpty())
+				if (searchResultsList.isEmpty())
 					return;
 				
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
@@ -236,16 +259,12 @@ public class Search {
 		};
 	}
 	
-	public void setCellNames(String[] cellNamesArray) {
-		allCellNames = new ArrayList<String>(Arrays.asList(cellNamesArray));
-	}
-	
 	public ObservableList<String> getSearchResultsList() {
-		return searchResults;
+		return searchResultsList;
 	}
 	
 	private void addTextListener() {
-		searchResults = FXCollections.observableArrayList();
+		searchResultsList = FXCollections.observableArrayList();
 		searchField.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
@@ -253,45 +272,59 @@ public class Search {
 				refreshSearchResultsList(newValue);
 			}
 		});
-		searchResultsList.setItems(searchResults);
+		searchResultsListView.setItems(searchResultsList);
 	}
 	
 	private void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
-		searchResults.clear();
+		searchResultsList.clear();
 		if (!searched.isEmpty()) {
-			switch (type) {
-				case SYSTEMATIC:
-						if (!cellTicked && !descendantTicked && !ancestorTicked) {
+			if (!cellTicked && !descendantTicked && !ancestorTicked) {
+				switch (type) {
+					case SYSTEMATIC:
 							for (String name : allCellNames) {
 							String nameLowerCase = name.toLowerCase();
-								if (nameLowerCase.startsWith(searched))
-									searchResults.add(name);
+								if (nameLowerCase.startsWith(searched)) {
+									String functionalName = PartsList
+											.getFunctionalNameByLineageName(name);
+									if (functionalName==null)
+										searchResultsList.add(name);
+									else
+										searchResultsList.add(name+" ("+functionalName+")");
+								}
 							}
-						}
-						else {
-							ArrayList<String> cells = getCellsList(searched);
-							if (descendantTicked) {
-								searchResults.addAll(getDescendantsList(cells));
-							}
-							if (cellTicked) {
-								searchResults.addAll(cells);
-							}
-							if (ancestorTicked) {
-								searchResults.addAll(getAncestorsList(cells));
-							}
-						}
-						break;
+							break;
 			
-				case FUNCTIONAL:
-						break;
+					case FUNCTIONAL:
+							for (String name : functionalNames) {
+								String nameLowerCase = name.toLowerCase();
+								if (nameLowerCase.startsWith(searched)) {
+									String lineageName = PartsList
+											.getLineageNameByFunctionalName(name);
+									searchResultsList.add(lineageName+" ("+name+")");
+								}
+							}
+							break;
 			
-				case DESCRIPTION:
-						break;
+					case DESCRIPTION:
+							break;
 						
-				case GENE:
-						break;
+					case GENE:
+							break;
 
+				}
+			}
+			else {
+				ArrayList<String> cells = getCellsList(searched);
+				if (descendantTicked) {
+					searchResultsList.addAll(getDescendantsList(cells));
+				}
+				if (cellTicked) {
+					searchResultsList.addAll(cells);
+				}
+				if (ancestorTicked) {
+					searchResultsList.addAll(getAncestorsList(cells));
+				}
 			}
 		}
 	}

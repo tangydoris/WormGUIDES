@@ -57,7 +57,7 @@ public class PartsList {
 		return lineageNames.contains(name);
 	}
 	
-	public static String getFunctionalName(int i) {
+	public static String getFunctionalNameByIndex(int i) {
 		try {
 			return functionalNames.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -65,7 +65,11 @@ public class PartsList {
 		}
 	}
 	
-	public static String getLineageName(int i) {
+	public static String getFunctionalNameByLineageName(String lineageName) {
+		return getFunctionalNameByIndex(lineageNames.indexOf(lineageName));
+	}
+	
+	public static String getLineageNameByIndex(int i) {
 		try {
 			return lineageNames.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -73,15 +77,11 @@ public class PartsList {
 		}
 	}
 	
-	public static String getFunctionalName(String lineageName) {
-		try {
-			return functionalNames.get(lineageNames.indexOf(lineageName));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
+	public static String getLineageNameByFunctionalName(String functionalName) {
+		return getLineageNameByIndex(functionalNames.indexOf(functionalName));
 	}
 	
-	public static String getDescription(int i) {
+	public static String getDescriptionByIndex(int i) {
 		try {
 			return descriptions.get(i);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -89,12 +89,24 @@ public class PartsList {
 		}
 	}
 	
-	public static String getDescription(String sulstonName) {
-		try {
-			return descriptions.get(lineageNames.indexOf(sulstonName));
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return null;
-		}
+	public static String getDescriptionByLineageName(String lineageName) {
+		return getDescriptionByIndex(lineageNames.indexOf(lineageName));
+	}
+	
+	public static String getDescriptionByFunctionalName(String functionalName) {
+		return getDescriptionByIndex(functionalNames.indexOf(functionalName));
+	}
+	
+	public static ArrayList<String> getLineageNames() {
+		return lineageNames;
+	}
+	
+	public static ArrayList<String> getFunctionalNames() {
+		return functionalNames;
+	}
+	
+	public static ArrayList<String> getDescriptions() {
+		return descriptions;
 	}
 
 }
