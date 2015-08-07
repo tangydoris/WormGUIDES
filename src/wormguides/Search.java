@@ -293,8 +293,9 @@ public class Search {
 										searchResultsList.add(name+" ("+functionalName+")");
 								}
 							}
+							System.out.println("got systematic names in search class");
 							break;
-			
+							
 					case FUNCTIONAL:
 							for (String name : functionalNames) {
 								String nameLowerCase = name.toLowerCase();
@@ -304,6 +305,7 @@ public class Search {
 									searchResultsList.add(lineageName+" ("+name+")");
 								}
 							}
+							System.out.println("got functional names in search class");
 							break;
 			
 					case DESCRIPTION:

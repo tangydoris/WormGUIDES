@@ -93,6 +93,7 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
+				System.out.println("time changed, building scene");
 				buildScene(time.get());
 			}
 		});
@@ -177,12 +178,14 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
 				cameraXform.setScale(zoom.get());
+				System.out.println("zoom changed, building scene");
 				buildScene(time.get());
 			}
 		});
 		
 		searchResultsNames = new ArrayList<String>();
 		
+		System.out.println("initiation, building scene");
 		buildScene(time.get());
 	}
 	
@@ -297,13 +300,32 @@ public class Window3DSubScene{
 		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
 		
-		if (searchResultsNames==null || searchResultsNames.isEmpty())
+		//updateLocalSearchResults();
+		
+		//if (searchResultsList==null || searchResultsList.isEmpty())
+		if (searchResultsNames.isEmpty())
 			searched = new boolean[names.length];
 		else
 			consultSearchResultsList();
 		
 		// render spheres
 		Platform.runLater(renderRunnable);
+	}
+	
+	private void updateLocalSearchResults() {
+		if (searchResultsList==null)
+			return;
+		
+		searchResultsNames.clear();
+		
+		for (String name : searchResultsList) {
+			if (name.indexOf("(")!=-1)
+				searchResultsNames.add(name.substring(0, name.indexOf(" ")));
+			else
+				searchResultsNames.add(name);
+		}
+		System.out.println("real results size "+searchResultsList.size());
+		System.out.println("local results size "+searchResultsNames.size());
 	}
 	
 	private void refreshScene() {
@@ -396,39 +418,38 @@ public class Window3DSubScene{
 	
 	public void setSearchResultsList(ObservableList<String> list) {
 		searchResultsList = list;
+		
+		/*
 		searchResultsList.addListener(new ListChangeListener<String>() {
 			@Override
 			public void onChanged(
 					ListChangeListener.Change<? extends String> change) {
 				while(change.next()) {
-					for (String added : change.getAddedSubList()) {
-						if (added.indexOf("(")!=-1)
-							searchResultsNames.add(added.substring(0, added.indexOf(" ")));
-						else
-							searchResultsNames.add(added);
-						
-						/*
-						System.out.println("search results names");
-						for (String name : searchResultsNames)
-							System.out.println(name);
-						System.out.println("");
-						*/
-					}
-					for (String removed : change.getRemoved()) {
-						if (removed.indexOf("(")!=-1)
-							removed = removed.substring(0, removed.indexOf(" "));
-						searchResultsNames.remove(removed);
-						
-						/*
-						System.out.println("search results names");
-						for (String name : searchResultsNames)
-							System.out.println(name);
-						System.out.println("");
-						*/
+					if (change.next()==false) {
+						if (change.wasAdded()) {
+							for (String added : change.getAddedSubList()) {
+								if (added.indexOf("(")!=-1)
+									searchResultsNames.add(added.substring(0, added.indexOf(" ")));
+								else
+									searchResultsNames.add(added);
+							}
+							System.out.println("added");
+							System.out.println("search results size "+searchResultsNames.size());
+						}
+						else if (change.wasRemoved()) {
+							for (String removed : change.getRemoved()) {
+								if (removed.indexOf("(")!=-1)
+									removed = removed.substring(0, removed.indexOf(" "));
+								searchResultsNames.remove(removed);
+							}
+							System.out.println("removed");
+							System.out.println("search results size "+searchResultsNames.size());
+						}
 					}
 				}
 			}
 		});
+		*/
 	}
 	
 	public void consultSearchResultsList() {
@@ -466,12 +487,14 @@ public class Window3DSubScene{
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
 									colorHash.addColorToHash(rule.getColor());
+									System.out.println("rule changed, building scene");
 									buildScene(time.get());
 								}
 							}
 						});
 					}
 					
+					System.out.println("rule list changed, building scene");
 					buildScene(time.get());
 				}
 			}
@@ -497,6 +520,8 @@ public class Window3DSubScene{
 					System.out.println(name);
 				*/
 				
+				updateLocalSearchResults();
+				System.out.println("type toggled, building scene");
 				buildScene(time.get());
 			}
 		};
@@ -507,6 +532,7 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
+				System.out.println("tick changed, building scene");
 				buildScene(time.get());
 			}
 		};
@@ -518,6 +544,8 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
 				searchedPrefix.set(newValue.toLowerCase());
+				updateLocalSearchResults();
+				System.out.println("search field changed, building scene");
 				buildScene(time.get());
 			}
 		};
@@ -531,9 +559,9 @@ public class Window3DSubScene{
 		return START_TIME;
 	}
 	
-	private class PlayService extends Service<Void>{
+	private final class PlayService extends Service<Void>{
 		@Override
-		protected Task<Void> createTask() {
+		protected final Task<Void> createTask() {
 			return new Task<Void>() {
 				@Override
 				protected Void call() throws Exception {
