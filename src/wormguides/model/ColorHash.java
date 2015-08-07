@@ -18,7 +18,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	private TreeSet<Color> allColors;
 	
 	private Material highlightMaterial = makeMaterial(Color.GOLD);
-	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.45));
+	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
 	
 	public ColorHash(ObservableList<ColorRule> rulesList) {
 		super();

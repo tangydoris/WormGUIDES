@@ -1,9 +1,9 @@
 package wormguides.view;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
-import wormguides.SearchType;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
@@ -78,6 +78,7 @@ public class Window3DSubScene{
 	// searched highlighting stuff
 	private StringProperty searchedPrefix;
 	private ObservableList<String> searchResultsList;
+	private ArrayList<String> searchResultsNames;
 	
 	// color rules stuff
 	private ColorHash colorHash;
@@ -179,6 +180,8 @@ public class Window3DSubScene{
 				buildScene(time.get());
 			}
 		});
+		
+		searchResultsNames = new ArrayList<String>();
 		
 		buildScene(time.get());
 	}
@@ -294,7 +297,7 @@ public class Window3DSubScene{
 		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
 		
-		if (searchResultsList==null || searchResultsList.isEmpty())
+		if (searchResultsNames==null || searchResultsNames.isEmpty())
 			searched = new boolean[names.length];
 		else
 			consultSearchResultsList();
@@ -393,12 +396,45 @@ public class Window3DSubScene{
 	
 	public void setSearchResultsList(ObservableList<String> list) {
 		searchResultsList = list;
+		searchResultsList.addListener(new ListChangeListener<String>() {
+			@Override
+			public void onChanged(
+					ListChangeListener.Change<? extends String> change) {
+				while(change.next()) {
+					for (String added : change.getAddedSubList()) {
+						if (added.indexOf("(")!=-1)
+							searchResultsNames.add(added.substring(0, added.indexOf(" ")));
+						else
+							searchResultsNames.add(added);
+						
+						/*
+						System.out.println("search results names");
+						for (String name : searchResultsNames)
+							System.out.println(name);
+						System.out.println("");
+						*/
+					}
+					for (String removed : change.getRemoved()) {
+						if (removed.indexOf("(")!=-1)
+							removed = removed.substring(0, removed.indexOf(" "));
+						searchResultsNames.remove(removed);
+						
+						/*
+						System.out.println("search results names");
+						for (String name : searchResultsNames)
+							System.out.println(name);
+						System.out.println("");
+						*/
+					}
+				}
+			}
+		});
 	}
 	
 	public void consultSearchResultsList() {
 		searched = new boolean[names.length];
 		for (int i=0; i<names.length; i++) {
-			if (searchResultsList.contains(names[i]))
+			if (searchResultsNames.contains(names[i]))
 				searched[i] = true;
 			else
 				searched[i] = false;
@@ -460,6 +496,7 @@ public class Window3DSubScene{
 				for (String name : searchResultsList)
 					System.out.println(name);
 				*/
+				
 				buildScene(time.get());
 			}
 		};
