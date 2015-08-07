@@ -23,6 +23,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -30,7 +31,6 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.control.Toggle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -76,13 +76,15 @@ public class Window3DSubScene{
 	private StringProperty selectedName;
 	
 	// searched highlighting stuff
-	private StringProperty searchedPrefix;
+	private boolean inSearch;
 	private ObservableList<String> searchResultsList;
-	private ArrayList<String> searchResultsNames;
+	private ArrayList<String> localSearchResults;
 	
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<ColorRule> rulesList;
+	
+	private Service<Void> searchResultsUpdateService;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -93,7 +95,7 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				System.out.println("time changed, building scene");
+				//System.out.println("time changed, building scene");
 				buildScene(time.get());
 			}
 		});
@@ -122,8 +124,9 @@ public class Window3DSubScene{
 			}
 		});
 		
-		searchedPrefix = new SimpleStringProperty();
-		searchedPrefix.set("");
+		//searchedPrefix = new SimpleStringProperty();
+		//searchedPrefix.set("");
+		inSearch = false;
 		
 		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
@@ -178,15 +181,17 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
 				cameraXform.setScale(zoom.get());
-				System.out.println("zoom changed, building scene");
+				//System.out.println("zoom changed, building scene");
 				buildScene(time.get());
 			}
 		});
 		
-		searchResultsNames = new ArrayList<String>();
+		localSearchResults = new ArrayList<String>();
 		
-		System.out.println("initiation, building scene");
+		//System.out.println("initiation, building scene");
 		buildScene(time.get());
+		
+		searchResultsUpdateService = null;
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -203,10 +208,6 @@ public class Window3DSubScene{
 	
 	public StringProperty getSelectedName() {
 		return selectedName;
-	}
-	
-	public StringProperty getSearchedPrefix() {
-		return searchedPrefix;
 	}
 	
 	public IntegerProperty getTotalNucleiProperty() {
@@ -303,7 +304,7 @@ public class Window3DSubScene{
 		//updateLocalSearchResults();
 		
 		//if (searchResultsList==null || searchResultsList.isEmpty())
-		if (searchResultsNames.isEmpty())
+		if (localSearchResults.isEmpty())
 			searched = new boolean[names.length];
 		else
 			consultSearchResultsList();
@@ -316,16 +317,16 @@ public class Window3DSubScene{
 		if (searchResultsList==null)
 			return;
 		
-		searchResultsNames.clear();
+		localSearchResults.clear();
 		
 		for (String name : searchResultsList) {
 			if (name.indexOf("(")!=-1)
-				searchResultsNames.add(name.substring(0, name.indexOf(" ")));
+				localSearchResults.add(name.substring(0, name.indexOf(" ")));
 			else
-				searchResultsNames.add(name);
+				localSearchResults.add(name);
 		}
-		System.out.println("real results size "+searchResultsList.size());
-		System.out.println("local results size "+searchResultsNames.size());
+		
+		buildScene(time.get());
 	}
 	
 	private void refreshScene() {
@@ -340,7 +341,7 @@ public class Window3DSubScene{
 			Sphere sphere = new Sphere(radius);
 			
 			Material material = new PhongMaterial();
-			if (!searchedPrefix.get().isEmpty()) {
+			if (inSearch) {
 				if (searched[i])
 					material = colorHash.getHighlightMaterial();
 				else
@@ -418,44 +419,22 @@ public class Window3DSubScene{
 	
 	public void setSearchResultsList(ObservableList<String> list) {
 		searchResultsList = list;
-		
-		/*
-		searchResultsList.addListener(new ListChangeListener<String>() {
+	}
+	
+	public void setResultsUpdateService(Service<Void> service) {
+		searchResultsUpdateService = service;
+		searchResultsUpdateService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
-			public void onChanged(
-					ListChangeListener.Change<? extends String> change) {
-				while(change.next()) {
-					if (change.next()==false) {
-						if (change.wasAdded()) {
-							for (String added : change.getAddedSubList()) {
-								if (added.indexOf("(")!=-1)
-									searchResultsNames.add(added.substring(0, added.indexOf(" ")));
-								else
-									searchResultsNames.add(added);
-							}
-							System.out.println("added");
-							System.out.println("search results size "+searchResultsNames.size());
-						}
-						else if (change.wasRemoved()) {
-							for (String removed : change.getRemoved()) {
-								if (removed.indexOf("(")!=-1)
-									removed = removed.substring(0, removed.indexOf(" "));
-								searchResultsNames.remove(removed);
-							}
-							System.out.println("removed");
-							System.out.println("search results size "+searchResultsNames.size());
-						}
-					}
-				}
+			public void handle(WorkerStateEvent event) {
+				updateLocalSearchResults();
 			}
 		});
-		*/
 	}
 	
 	public void consultSearchResultsList() {
 		searched = new boolean[names.length];
 		for (int i=0; i<names.length; i++) {
-			if (searchResultsNames.contains(names[i]))
+			if (localSearchResults.contains(names[i]))
 				searched[i] = true;
 			else
 				searched[i] = false;
@@ -487,14 +466,14 @@ public class Window3DSubScene{
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
 									colorHash.addColorToHash(rule.getColor());
-									System.out.println("rule changed, building scene");
+									//System.out.println("rule changed, building scene");
 									buildScene(time.get());
 								}
 							}
 						});
 					}
 					
-					System.out.println("rule list changed, building scene");
+					//System.out.println("rule list changed, building scene");
 					buildScene(time.get());
 				}
 			}
@@ -509,44 +488,15 @@ public class Window3DSubScene{
 		return root;
 	}
 	
-	public ChangeListener<Toggle> getTypeToggleListener() {
-		return new ChangeListener<Toggle>() {
-			@Override
-			public void changed(ObservableValue<? extends Toggle> observable, 
-					Toggle oldValue, Toggle newValue) {
-				System.out.println("window3d toggle "+newValue.getUserData());
-				/*
-				for (String name : searchResultsList)
-					System.out.println(name);
-				*/
-				
-				updateLocalSearchResults();
-				System.out.println("type toggled, building scene");
-				buildScene(time.get());
-			}
-		};
-	}
-	
-	public ChangeListener<Boolean> getTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				System.out.println("tick changed, building scene");
-				buildScene(time.get());
-			}
-		};
-	}
-	
 	public ChangeListener<String> getSearchFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
-				searchedPrefix.set(newValue.toLowerCase());
-				updateLocalSearchResults();
-				System.out.println("search field changed, building scene");
-				buildScene(time.get());
+				if (newValue.isEmpty())
+					inSearch = false;
+				else
+					inSearch = true;
 			}
 		};
 	}

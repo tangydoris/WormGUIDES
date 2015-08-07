@@ -3,10 +3,13 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
@@ -21,10 +24,10 @@ import wormguides.model.PartsList;
 public class Search {
 	
 	// list of every cell name that exists
-	private ArrayList<String> allCellNames;
+	private ArrayList<String> allLineageNames;
 	
 	// list of cells with functional names
-	private ArrayList<String> linageNames;
+	//private ArrayList<String> linageNames;
 	private ArrayList<String> functionalNames;
 	private ArrayList<String> descriptions;
 	
@@ -41,14 +44,17 @@ public class Search {
 	private ObservableList<ColorRule> rulesList;
 	private Color selectedColor;
 	
+	//private final Task<Void> resultsUpdateTask;
+	private final Service<Void> resultsUpdateService;
+	 
 	public Search() {
 		this(new TextField(), new ListView<String>());
 	}
 	
 	public Search(TextField searchField, ListView<String> searchResultsList) {
-		allCellNames = new ArrayList<String>(Arrays.asList(
+		allLineageNames = new ArrayList<String>(Arrays.asList(
 							AceTreeLoader.getAllCellNames()));
-		linageNames = PartsList.getLineageNames();
+		//linageNames = PartsList.getLineageNames();
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
 		
@@ -69,6 +75,66 @@ public class Search {
 		descendantTicked = false;
 		
 		addTextListener();
+		
+		resultsUpdateService = new Service<Void>() {
+			@Override
+			protected final Task<Void> createTask() {
+				Task<Void> task = new Task<Void>() {
+					@Override
+					protected Void call() throws Exception {
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								refreshSearchResultsList(getSearchedText());
+							}
+						});
+						return null;
+					}
+				};
+				/*
+				task.setOnScheduled(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						System.out.println("search results refresh service scheduled");
+					}
+				});
+				task.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						System.out.println("search results refresh service cancelled");
+					}
+				});
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+					@Override
+					public void handle(WorkerStateEvent event) {
+						System.out.println("search results refresh service succeeded");
+					}
+				});
+				*/
+				return task;
+			}
+		};
+		
+		/*
+		resultsUpdateTask = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				refreshSearchResultsList(getSearchedText());
+				return null;
+			}
+		};
+		resultsUpdateTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				System.out.println("finished updating results in search class");
+			}
+		});
+		*/
+	}
+	
+	private String getSearchedText() {
+		final String searched = searchField.getText();
+		return searched;
 	}
 	
 	public void setRulesList(ObservableList<ColorRule> rulesList) {
@@ -145,7 +211,7 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-						for (String name : allCellNames) {
+						for (String name : allLineageNames) {
 							if (name.toLowerCase().equals(searched))
 								cells.add(name);
 						}
@@ -172,7 +238,7 @@ public class Search {
 	private ArrayList<String> getDescendantsList(ArrayList<String> cells) {
 		ArrayList<String> descendants = new ArrayList<String>();
 		for (String cell : cells) {
-			for (String name : allCellNames) {
+			for (String name : allLineageNames) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, cell))
 					descendants.add(name);
 			}
@@ -184,7 +250,7 @@ public class Search {
 	private ArrayList<String> getAncestorsList(ArrayList<String> cells) {
 		ArrayList<String> ancestors = new ArrayList<String>();
 		for (String cell : cells) {
-			for (String name : allCellNames) {
+			for (String name : allLineageNames) {
 				if (!ancestors.contains(name) && LineageTree.isAncestor(name, cell))
 					ancestors.add(name);
 			}
@@ -221,7 +287,9 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellTicked = newValue;
-				refreshSearchResultsList(searchField.getText());
+				//refreshSearchResultsList(searchField.getText());
+				//Platform.runLater(resultsUpdateTask);
+				resultsUpdateService.restart();
 			}
 		};
 	}
@@ -232,7 +300,9 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				ancestorTicked = newValue;
-				refreshSearchResultsList(searchField.getText());
+				//refreshSearchResultsList(searchField.getText());
+				//Platform.runLater(resultsUpdateTask);
+				resultsUpdateService.restart();
 			}
 		};
 	}
@@ -243,7 +313,9 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				descendantTicked = newValue;
-				refreshSearchResultsList(searchField.getText());
+				//refreshSearchResultsList(searchField.getText());
+				//Platform.runLater(resultsUpdateTask);
+				resultsUpdateService.restart();
 			}
 		};
 	}
@@ -254,7 +326,9 @@ public class Search {
 			public void changed(ObservableValue<? extends Toggle> observable, 
 					Toggle oldValue, Toggle newValue) {
 				type = (SearchType) newValue.getUserData();
-				refreshSearchResultsList(searchField.getText());
+				//refreshSearchResultsList(searchField.getText());
+				//Platform.runLater(resultsUpdateTask);
+				resultsUpdateService.restart();
 			}
 		};
 	}
@@ -269,7 +343,9 @@ public class Search {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				refreshSearchResultsList(newValue);
+				//refreshSearchResultsList(newValue);
+				//Platform.runLater(resultsUpdateTask);
+				resultsUpdateService.restart();
 			}
 		});
 		searchResultsListView.setItems(searchResultsList);
@@ -282,7 +358,7 @@ public class Search {
 			if (!cellTicked && !descendantTicked && !ancestorTicked) {
 				switch (type) {
 					case SYSTEMATIC:
-							for (String name : allCellNames) {
+							for (String name : allLineageNames) {
 							String nameLowerCase = name.toLowerCase();
 								if (nameLowerCase.startsWith(searched)) {
 									String functionalName = PartsList
@@ -293,7 +369,6 @@ public class Search {
 										searchResultsList.add(name+" ("+functionalName+")");
 								}
 							}
-							System.out.println("got systematic names in search class");
 							break;
 							
 					case FUNCTIONAL:
@@ -305,7 +380,6 @@ public class Search {
 									searchResultsList.add(lineageName+" ("+name+")");
 								}
 							}
-							System.out.println("got functional names in search class");
 							break;
 			
 					case DESCRIPTION:
@@ -330,5 +404,15 @@ public class Search {
 			}
 		}
 	}
+	
+	public Service<Void> getResultsUpdateService() {
+		return resultsUpdateService;
+	}
+	
+	/*
+	public Task<Void> getResultsUpdateTask() {
+		return resultsUpdateTask;
+	}
+	*/
 	
 }

@@ -136,7 +136,6 @@ public class RootLayoutController implements Initializable{
 				modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
-		typeToggleGroup.selectedToggleProperty().addListener(window3D.getTypeToggleListener());
 	}
 	
 	private void getPropertiesFrom3DWindow() {
@@ -236,10 +235,6 @@ public class RootLayoutController implements Initializable{
 				setSelectedInfo(selectedName.get());
 			}
 		});
-		
-		cellTick.selectedProperty().addListener(window3D.getTickListener());
-		descendantTick.selectedProperty().addListener(window3D.getTickListener());
-		ancestorTick.selectedProperty().addListener(window3D.getTickListener());
 	}
 	
 	private void setSelectedInfo(String name) {
@@ -362,15 +357,6 @@ public class RootLayoutController implements Initializable{
 	private void initLineageTree() {
 		new LineageTree(AceTreeLoader.getAllCellNames());
 		lineageTreeRoot = LineageTree.getRoot();
-		/*
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				lineageTree = new LineageTree(allCellNames);
-				lineageTreeRoot = lineageTree.getRoot();
-			}
-		});
-		*/
 	}
 	
 	private void initToggleGroup() {
@@ -455,6 +441,7 @@ public class RootLayoutController implements Initializable{
 		search.setRulesList(layers.getRulesList());
 		window3D.setRulesList(layers.getRulesList());
 		window3D.setSearchResultsList(search.getSearchResultsList());
+		window3D.setResultsUpdateService(search.getResultsUpdateService());
 		search.addDefaultRules();
 		
         addListeners();
@@ -463,9 +450,10 @@ public class RootLayoutController implements Initializable{
         setLabels();
         
         sizeSubscene();
-        sizeInfoPane();
-        
+        sizeInfoPane();  
 	}
+	
+	
 	
 	private static final String JAR_NAME = "WormGUIDES.jar";
 	
