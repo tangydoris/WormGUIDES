@@ -142,9 +142,9 @@ public class Search {
 	}
 	
 	public void addDefaultRules() {
-		addColorRule("ABa", Color.RED);
-		addColorRule("ABp", Color.BLUE);
-		addColorRule("EMS", Color.GREEN);
+		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, 
 					SearchOption.CELL, SearchOption.DESCENDANT);
 	}
@@ -157,10 +157,6 @@ public class Search {
 		// default search options is cell and descendant
 		if (options==null)
 			options = new ArrayList<SearchOption>();
-		if (options.isEmpty()) {
-			options.add(SearchOption.CELL);
-			options.add(SearchOption.DESCENDANT);
-		}
 		
 		String label = "";
 		searched = searched.toLowerCase();

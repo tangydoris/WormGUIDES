@@ -20,6 +20,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -40,7 +41,11 @@ public class ColorRule {
 	
 	private ArrayList<SearchOption> options;
 	private BooleanProperty ruleChanged;
+	private boolean visible;
 	private Color color;
+	
+	private ImageView eyeIcon;
+	private ImageView eyeInvertIcon;
 	
 	private ArrayList<String> cells;
 	private ArrayList<String> ancestors;
@@ -123,6 +128,9 @@ public class ColorRule {
 			}
 		});
 		
+		eyeIcon = ImageLoader.getEyeIcon();
+		eyeInvertIcon = ImageLoader.getEyeInvertIcon();
+		
 		visibleBtn.prefHeightProperty().bind(sideLength);
 		visibleBtn.prefWidthProperty().bind(sideLength);
 		visibleBtn.maxHeightProperty().bind(sideLength);
@@ -130,12 +138,22 @@ public class ColorRule {
 		visibleBtn.minHeightProperty().bind(sideLength);
 		visibleBtn.minWidthProperty().bind(sideLength);
 		visibleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		visibleBtn.setGraphic(ImageLoader.getEyeIcon());
+		visibleBtn.setGraphic(eyeIcon);
 		visibleBtn.setGraphicTextGap(0);
 		visibleBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("visible button pressed");
+				ruleChanged.set(true);
+				if (visible) {
+					active.clear();
+					visibleBtn.setGraphic(eyeInvertIcon);
+				}
+				else {
+					resetActiveList();
+					visibleBtn.setGraphic(eyeIcon);
+				}
+				visible = !visible;
+				ruleChanged.set(false);
 			}
 		});
 		
@@ -166,6 +184,8 @@ public class ColorRule {
 				}
 			}
 		});
+		
+		visible = true;
 	}
 	
 	public void setCells(ArrayList<String> list) {

@@ -14,7 +14,7 @@ public class ImageLoader {
 	
 	private static ImageView forward, backward, play, pause;
 	private static ImageView plus, minus;
-	private static Image edit, eye, close; 
+	private static Image edit, eye, eyeInvert, close; 
 	private static JarFile jarFile;
 	
 	public static void loadImages(String jarPath) {
@@ -39,12 +39,14 @@ public class ImageLoader {
 		InputStream input = jarFile.getInputStream(entry);
 		Image image = new Image(input);
 		switch (entry.getName()) {
-			case EDIT_PNG:	edit = image;
-							return;
-			case EYE_PNG:	eye = image;
-							return;
-			case CLOSE_PNG:	close = image;
-							return;
+			case EDIT_PNG:		edit = image;
+								return;
+			case EYE_PNG:		eye = image;
+								return;
+			case EYE_INV_PNG:	eyeInvert = image;
+								return;
+			case CLOSE_PNG:		close = image;
+								return;
 			
 		}
 		ImageView icon = new ImageView(image);
@@ -96,6 +98,10 @@ public class ImageLoader {
 		return new ImageView(eye);
 	}
 	
+	public static ImageView getEyeInvertIcon() {
+		return new ImageView(eyeInvert);
+	}
+	
 	public static ImageView getCloseIcon() {
 		return new ImageView(close);
 	}
@@ -107,6 +113,7 @@ public class ImageLoader {
 			PLAY_PNG = ENTRY_PREFIX+"play.png",
 			EDIT_PNG = ENTRY_PREFIX+"edit.png",
 			EYE_PNG = ENTRY_PREFIX+"eye.png",
+			EYE_INV_PNG = ENTRY_PREFIX+"eye-invert.png",
 			CLOSE_PNG = ENTRY_PREFIX+"close.png",
 			PLUS_PNG = ENTRY_PREFIX+"plus.png",
 			MINUS_PNG = ENTRY_PREFIX+"minus.png";
