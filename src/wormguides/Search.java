@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
@@ -45,6 +46,7 @@ public class Search {
 	private Color selectedColor;
 	
 	private final Service<Void> resultsUpdateService;
+	private final Service<Void> geneSearchService;
 	 
 	public Search() {
 		this(new TextField(), new ListView<String>());
@@ -90,29 +92,22 @@ public class Search {
 						return null;
 					}
 				};
-				/*
-				task.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service scheduled");
-					}
-				});
-				task.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service cancelled");
-					}
-				});
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service succeeded");
-					}
-				});
-				*/
 				return task;
 			}
 		};
+		
+		geneSearchService = WormBaseQuery.getSearchService();
+		geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				System.out.println("gene search completed");
+				updateGeneResults(WormBaseQuery.getResultsList(searchField.get()));
+			}
+		});
+	}
+	
+	private void updateGeneResults(ArrayList<String> results) {
+		ArrayList<String> 
 	}
 	
 	private String getSearchedText() {
@@ -237,7 +232,8 @@ public class Search {
 						}
 						break;
 						
-			case GENE:
+			case GENE:	
+						ArrayList<String> geneResults = WormBaseQuery.getResultsList(searched);
 						break;
 		}
 		

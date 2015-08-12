@@ -2135,7 +2135,7 @@ class TouchSurfaceView extends GLSurfaceView {
 
 						////First loop, to build show and dim lists.
 						if (needToSearch) {
-							for (int l=0; l<searchLines.length; l++){
+							for (int l=0; l<searchLines.length; l++) {
 								String line = searchLines[l];
 								String lineCellEntry = "";
 								String lineTraceEntry = "";

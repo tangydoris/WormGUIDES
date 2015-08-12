@@ -436,7 +436,6 @@ public class RootLayoutController implements Initializable{
 		setSliderProperties();
 		
 		initSearch();
-		initLayers();
 		
 		search.setRulesList(layers.getRulesList());
 		window3D.setRulesList(layers.getRulesList());
