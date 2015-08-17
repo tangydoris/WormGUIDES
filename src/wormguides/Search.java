@@ -27,8 +27,6 @@ public class Search {
 	// list of every cell name that exists
 	private ArrayList<String> allLineageNames;
 	
-	// list of cells with functional names
-	//private ArrayList<String> linageNames;
 	private ArrayList<String> functionalNames;
 	private ArrayList<String> descriptions;
 	
@@ -46,7 +44,10 @@ public class Search {
 	private Color selectedColor;
 	
 	private final Service<Void> resultsUpdateService;
-	private final Service<Void> geneSearchService;
+	private final Service<ArrayList<String>> geneSearchService;
+	
+	private final Service<Void> showLoadingService;
+	private int count;
 	 
 	public Search() {
 		this(new TextField(), new ListView<String>());
@@ -55,7 +56,6 @@ public class Search {
 	public Search(TextField searchField, ListView<String> searchResultsList) {
 		allLineageNames = new ArrayList<String>(Arrays.asList(
 							AceTreeLoader.getAllCellNames()));
-		//linageNames = PartsList.getLineageNames();
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
 		
@@ -97,17 +97,37 @@ public class Search {
 		};
 		
 		geneSearchService = WormBaseQuery.getSearchService();
-		geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent event) {
-				System.out.println("gene search completed");
-				updateGeneResults(WormBaseQuery.getResultsList(searchField.get()));
-			}
-		});
+		if (geneSearchService != null) {
+			geneSearchService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					showLoadingService.restart();
+				}
+			});
+			geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					showLoadingService.cancel();
+					updateGeneResults(geneSearchService.getValue());
+				}
+			});
+		}
+		
+		showLoadingService = new ShowLoadingService();
+		count = 0;
 	}
 	
 	private void updateGeneResults(ArrayList<String> results) {
-		ArrayList<String> 
+		searchResultsList.clear();
+		if (results.isEmpty())
+			searchResultsList.add("No results found from WormBase");
+		else {
+			for (String result : results) {
+				if (!searchResultsList.contains(result))
+					searchResultsList.add(result);
+			}		
+		}
+		System.out.println("updated list with gene results");
 	}
 	
 	private String getSearchedText() {
@@ -174,26 +194,8 @@ public class Search {
 		
 		ArrayList<String> cells = getCellsList(searched);
 		rule.setCells(cells);
-		/*
-		System.out.println("color rule cells");
-		for (String name : cells) {
-			System.out.println(name);
-		}
-		*/
 		rule.setAncestors(getAncestorsList(cells));
-		/*
-		System.out.println("color rule ancestors");
-		for (String name : getAncestorsList(cells)) {
-			System.out.println(name);
-		}
-		*/
 		rule.setDescendants(getDescendantsList(cells));
-		/*
-		System.out.println("color rule descendants");
-		for (String name : getDescendantsList(cells)) {
-			System.out.println(name);
-		}
-		*/
 		if (!containsRule(rule))
 			rulesList.add(rule);
 	}
@@ -203,38 +205,41 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-						for (String name : allLineageNames) {
-							if (name.toLowerCase().equals(searched))
-								cells.add(name);
-						}
-						break;
+							for (String name : allLineageNames) {
+								if (name.toLowerCase().equals(searched))
+									cells.add(name);
+							}
+							break;
 						
 			case FUNCTIONAL:
-						for (String name : functionalNames) {
-							if (name.toLowerCase().equals(searched))
-								cells.add(PartsList.getLineageNameByFunctionalName(name));
-						}
-						break;
+							for (String name : functionalNames) {
+								if (name.toLowerCase().equals(searched))
+									cells.add(PartsList.getLineageNameByFunctionalName(name));
+							}
+							break;
 						
 			case DESCRIPTION:
-						for (String text : descriptions) {
-							String textLowerCase = text.toLowerCase();
-							String[] keywords = searched.split(" ");
-							boolean found = true;
-							for (String keyword : keywords) {
-								if (textLowerCase.indexOf(keyword)==-1) {
-									found = false;
-									break;
+							for (String text : descriptions) {
+								String textLowerCase = text.toLowerCase();
+								String[] keywords = searched.split(" ");
+								boolean found = true;
+								for (String keyword : keywords) {
+									if (textLowerCase.indexOf(keyword)==-1) {
+										found = false;
+										break;
+									}
 								}
+								if (found)
+									cells.add(PartsList.getLineageNameByIndex(
+													descriptions.indexOf(text)));
 							}
-							if (found)
-								cells.add(PartsList.getLineageNameByIndex(descriptions.indexOf(text)));
-						}
-						break;
+							break;
 						
 			case GENE:	
-						ArrayList<String> geneResults = WormBaseQuery.getResultsList(searched);
-						break;
+							if (geneSearchService != null) {
+								cells = geneSearchService.getValue();
+							}
+							break;
 		}
 		
 		return cells;
@@ -403,12 +408,16 @@ public class Search {
 							break;
 						
 					case GENE:
+							if (geneSearchService != null)
+								WormBaseQuery.doSearch(searched);
 							break;
 
 				}
 			}
 			else {
 				ArrayList<String> cells = getCellsList(searched);
+				if (cells==null)
+					return;
 				
 				if (descendantTicked) {
 					ArrayList<String> descendants = getDescendantsList(cells);
@@ -462,4 +471,56 @@ public class Search {
 		return resultsUpdateService;
 	}
 	
+	private int getCountFinal(int count) {
+		final int out = count;
+		return out;
+	}
+	
+	private final class ShowLoadingService extends Service<Void>{
+		@Override
+		protected final Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					final int modulus = 5;
+					while (true) {
+						if (isCancelled()) {
+							break;
+						}
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								searchResultsList.clear();
+								String loading = "Fetching data from WormBase";
+								int num = getCountFinal(count)%modulus;
+								switch (num) {
+									case 1:		loading+=".";
+												break;
+									case 2:		loading+="..";
+												break;
+									case 3:		loading+="...";
+												break;
+									case 4:		loading+="....";
+												break;
+									default:	break;
+								}
+								searchResultsList.add(loading);
+							}
+						});
+						try {
+							Thread.sleep(WAIT_TIME_MILLI);
+							count++;
+							if (count<0)
+								count=0;
+						} catch (InterruptedException ie) {
+							break;
+						}
+					}
+					return null;
+				}
+			};
+		}
+	}
+	
+	private static final long WAIT_TIME_MILLI = 750;
 }

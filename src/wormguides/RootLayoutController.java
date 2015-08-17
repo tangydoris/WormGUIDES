@@ -430,6 +430,7 @@ public class RootLayoutController implements Initializable{
 		assertFXMLNodes();
 		
 		initToggleGroup();
+		initLayers();
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		

@@ -82,6 +82,10 @@ public class AceTreeLoader {
 		}
 	}
 	
+	public static boolean isLineageName(String name) {
+		return allCellNames.contains(name);
+	}
+	
 	public static String[] getAllCellNames() {
 		allCellNames.sort(new Comparator<String>() {
 			@Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
+import wormguides.WormBaseQuery;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
@@ -85,6 +86,8 @@ public class Window3DSubScene{
 	private ObservableList<ColorRule> rulesList;
 	
 	private Service<Void> searchResultsUpdateService;
+	
+	//private Service<ArrayList<String>> geneSearchService;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -188,7 +191,6 @@ public class Window3DSubScene{
 		
 		localSearchResults = new ArrayList<String>();
 		
-		//System.out.println("initiation, building scene");
 		buildScene(time.get());
 		
 		searchResultsUpdateService = null;
@@ -301,9 +303,6 @@ public class Window3DSubScene{
 		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
 		
-		//updateLocalSearchResults();
-		
-		//if (searchResultsList==null || searchResultsList.isEmpty())
 		if (localSearchResults.isEmpty())
 			searched = new boolean[names.length];
 		else
@@ -522,7 +521,10 @@ public class Window3DSubScene{
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								time.set(time.get()+1);
+								if (time.get()<endTime-1)
+									time.set(time.get()+1);
+								else
+									time.set(endTime-1);
 							}
 						});
 						try {

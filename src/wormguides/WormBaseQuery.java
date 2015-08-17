@@ -7,55 +7,51 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import wormguides.model.PartsList;
-import javafx.application.Application;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
-import javafx.stage.Stage;
 
 public class WormBaseQuery{
 	
-	private static ArrayList<String> results;
-	private static Service<Void> searchService;
+	private static Service<ArrayList<String>> searchService;
 	private static String searched;
 	
 	static {
 		searched = "";
-		results = new ArrayList<String>();
-		searchService = new Service<Void>() {
+		
+		searchService = new Service<ArrayList<String>>() {
 			@Override
-			protected final Task<Void> createTask() {
-				Task<Void> task = new Task<Void>() {
+			protected final Task<ArrayList<String>> createTask() {
+				return new Task<ArrayList<String>>() {
 					@Override
-					protected Void call() throws Exception {
-						results.clear();
+					protected ArrayList<String> call() throws Exception {
+						ArrayList<String> out = new ArrayList<String>();
+						
 						String[] tokens = searched.trim().split(" ");
 						if (tokens.length!=0)
 							searched = tokens[0];
 						final String searchText = searched.trim();
 						
-						BufferedReader pageStream = openUrl("http://www.wormbase.org/db/get?name="+searchText+";class=gene");
+						BufferedReader pageStream = openUrl("http://www.wormbase.org/db/get?name="
+																		+searchText+";class=gene");
 						
 						if (pageStream!= null) {
 							String firstQueryLine = "";
 							String restString = "";
 							try {
-								while ((firstQueryLine = pageStream.readLine()) != null && restString == "") {
+								while ((firstQueryLine=pageStream.readLine()) != null && restString.isEmpty()) {
 									if (firstQueryLine.contains("wname=\"expression\"")){
 										String [] restChunks = pageStream.readLine().split("\"");
-										restString= restChunks[1];
+										restString = restChunks[1];
 									}
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-
+							
 							BufferedReader restPageStream = openUrl("http://www.wormbase.org"+ restString);
 							String wbGeneLine = "";
 							try {
@@ -65,9 +61,10 @@ public class WormBaseQuery{
 									Matcher m = p.matcher(wbGeneLine);
 									
 									while (m.find()) {
-										results.add(m.group(1));
+										String name = m.group(1);
+										if (AceTreeLoader.isLineageName(name) && !out.contains(name))
+											out.add(name);
 									}
-
 								}
 								pageStream.close();
 								restPageStream.close();
@@ -76,31 +73,16 @@ public class WormBaseQuery{
 							}
 						}
 						
-						for (String name : results) {
-							System.out.println(name);
-						}
-						return null;
+						out.sort(new Comparator<String>() {
+							@Override
+							public int compare(String o1, String o2) {
+								return o1.compareTo(o2);
+							}
+						});
+						
+						return out;
 					}
 				};
-				task.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service scheduled");
-					}
-				});
-				task.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service cancelled");
-					}
-				});
-				task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-					@Override
-					public void handle(WorkerStateEvent event) {
-						System.out.println("search results refresh service succeeded");
-					}
-				});
-				return task;
 			}
 		};
 	}
@@ -123,21 +105,13 @@ public class WormBaseQuery{
 		  }
 	}
 	
-	private static ArrayList<String> doSearch(String text) {
+	public static void doSearch(String text) {
 		searched = text;
 		searchService.restart();
-		return results;
 	}
 	
-	public static ArrayList<String> getResultsList(String text) {
-		return doSearch(text);
-	}
-	
-	public static Service<Void> getSearchService() {
+	public static Service<ArrayList<String>> getSearchService() {
 		return searchService;
 	}
 	
-	public static void main(String[] args) {
-		doSearch("pha-4");
-	}
 }
