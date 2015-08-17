@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
-import wormguides.WormBaseQuery;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.TableLineageData;
@@ -87,7 +86,8 @@ public class Window3DSubScene{
 	
 	private Service<Void> searchResultsUpdateService;
 	
-	//private Service<ArrayList<String>> geneSearchService;
+	// specific boolean listener for gene search results
+	private BooleanProperty geneResultsUpdated;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -194,6 +194,8 @@ public class Window3DSubScene{
 		buildScene(time.get());
 		
 		searchResultsUpdateService = null;
+		
+		geneResultsUpdated = new SimpleBooleanProperty();
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -425,6 +427,17 @@ public class Window3DSubScene{
 		searchResultsUpdateService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
+				updateLocalSearchResults();
+			}
+		});
+	}
+	
+	public void setGeneResultsUpdated(BooleanProperty updated) {
+		geneResultsUpdated = updated;
+		geneResultsUpdated.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+										Boolean oldValue, Boolean newValue) {
 				updateLocalSearchResults();
 			}
 		});

@@ -442,6 +442,7 @@ public class RootLayoutController implements Initializable{
 		window3D.setRulesList(layers.getRulesList());
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		window3D.setResultsUpdateService(search.getResultsUpdateService());
+		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
 		search.addDefaultRules();
 		
         addListeners();

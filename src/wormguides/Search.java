@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -45,6 +47,9 @@ public class Search {
 	
 	private final Service<Void> resultsUpdateService;
 	private final Service<ArrayList<String>> geneSearchService;
+	
+	private ArrayList<String> geneCells;
+	private BooleanProperty geneResultsUpdated;
 	
 	private final Service<Void> showLoadingService;
 	private int count;
@@ -108,13 +113,18 @@ public class Search {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					showLoadingService.cancel();
-					updateGeneResults(geneSearchService.getValue());
+					geneCells = geneSearchService.getValue();
+					updateGeneResults(geneCells);
+					geneResultsUpdated.set(!geneResultsUpdated.get());
 				}
 			});
 		}
 		
 		showLoadingService = new ShowLoadingService();
 		count = 0;
+		
+		geneCells = new ArrayList<String>();
+		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
 	
 	private void updateGeneResults(ArrayList<String> results) {
@@ -123,11 +133,14 @@ public class Search {
 			searchResultsList.add("No results found from WormBase");
 		else {
 			for (String result : results) {
+				if (PartsList.getFunctionalNameByLineageName(result)!=null)
+					result += " ("+
+							PartsList.getFunctionalNameByLineageName(result)+
+							")";
 				if (!searchResultsList.contains(result))
 					searchResultsList.add(result);
 			}		
 		}
-		System.out.println("updated list with gene results");
 	}
 	
 	private String getSearchedText() {
@@ -237,7 +250,8 @@ public class Search {
 						
 			case GENE:	
 							if (geneSearchService != null) {
-								cells = geneSearchService.getValue();
+								WormBaseQuery.doSearch(searched);
+								return geneCells;
 							}
 							break;
 		}
@@ -336,6 +350,10 @@ public class Search {
 		};
 	}
 	
+	public BooleanProperty getGeneResultsUpdated() {
+		return geneResultsUpdated;
+	}
+	
 	public ObservableList<String> getSearchResultsList() {
 		return searchResultsList;
 	}
@@ -415,9 +433,12 @@ public class Search {
 				}
 			}
 			else {
-				ArrayList<String> cells = getCellsList(searched);
-				if (cells==null)
-					return;
+				ArrayList<String> cells;
+				if (type==SearchType.GENE)
+					cells = geneCells;
+				else
+					cells = getCellsList(searched);
+				
 				
 				if (descendantTicked) {
 					ArrayList<String> descendants = getDescendantsList(cells);
