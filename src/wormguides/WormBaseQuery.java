@@ -109,7 +109,6 @@ public class WormBaseQuery{
 	
 	public static void doSearch(String text) {
 		searched = text;
-		System.out.println("searched: "+text);
 		searchService.restart();
 	}
 	

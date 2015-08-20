@@ -2,6 +2,7 @@ package wormguides;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -109,7 +110,6 @@ public class Search {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					showLoadingService.restart();
-					System.out.println("scheduled");
 				}
 			});
 			
@@ -139,7 +139,7 @@ public class Search {
 			if (!cellsForListView.contains(result))
 				cellsForListView.add(result);
 		}
-		//System.out.println("updating gene results");
+		
 		searchResultsList.clear();
 		if (results==null || results.isEmpty())
 			searchResultsList.add("No results found from WormBase");
@@ -171,6 +171,7 @@ public class Search {
 							searchResultsList.add(result);
 					}
 				}
+				searchResultsList.sort(new CellNameComparator());
 			}
 		}
 		
@@ -422,73 +423,45 @@ public class Search {
 		String searched = newValue.toLowerCase();
 		searchResultsList.clear();
 		if (!searched.isEmpty()) {
-			/*
-			if (!cellTicked && !descendantTicked && !ancestorTicked) {
-				switch (type) {
-					case SYSTEMATIC:
-							for (String name : allLineageNames) {
-							String nameLowerCase = name.toLowerCase();
-								if (nameLowerCase.startsWith(searched)) {
-									String functionalName = PartsList
-											.getFunctionalNameByLineageName(name);
-									if (functionalName==null)
-										searchResultsList.add(name);
-									else
-										searchResultsList.add(name+" ("+functionalName+")");
-								}
-							}
-							break;
-							
-					case FUNCTIONAL:
-							for (String name : functionalNames) {
-								String nameLowerCase = name.toLowerCase();
-								if (nameLowerCase.startsWith(searched)) {
-									String lineageName = PartsList
-											.getLineageNameByFunctionalName(name);
-									searchResultsList.add(lineageName+" ("+name+")");
-								}
-							}
-							break;
+			ArrayList<String> cells;
+			cells = getCellsList(searched);
 			
-					case DESCRIPTION:
-							for (String text : descriptions) {
-								String textLowerCase = text.toLowerCase();
-								String[] keywords = searched.split(" ");
-								boolean found = true;
-								for (String keyword : keywords) {
-									if (textLowerCase.indexOf(keyword)==-1) {
-										found = false;
-										break;
-									}
-								}
-								if (found) {
-									String name = PartsList
-											.getLineageNameByIndex(descriptions.indexOf(text))
-											+" ("
-											+PartsList
-											.getFunctionalNameByIndex(descriptions.indexOf(text))
-											+")";
-									if (!searchResultsList.contains(name))
-										searchResultsList.add(name);
-								}
-							}
-							break;
-						
-					case GENE:
-							doGeneSearch();
-							break;
-
+			if (cells==null)
+				return;
+			
+			if (!cellTicked && !descendantTicked && !ancestorTicked) {
+				ArrayList<String> cellsCopy = new ArrayList<String>();
+				for (String name : cells) {
+					if (PartsList.getFunctionalNameByLineageName(name)!=null)
+						name += " ("+
+								PartsList.getFunctionalNameByLineageName(name)+
+								")";
+					cellsCopy.add(name);
+				}
+				for (String name : cellsCopy) {
+					if (!searchResultsList.contains(name))
+						searchResultsList.add(name);
 				}
 			}
 			else {
-			*/
-				ArrayList<String> cells;
-				cells = getCellsList(searched);
+				if (descendantTicked) {
+					System.out.println("descendants");
+					ArrayList<String> descendants = getDescendantsList(cells);
+					for (int i=0; i<descendants.size(); i++) {
+						String name = descendants.get(i);
+						System.out.println(name);
+						if (PartsList.getFunctionalNameByLineageName(name)!=null)
+							descendants.set(i, name+" ("+
+									PartsList.getFunctionalNameByLineageName(name)+
+									")");
+					}
+					for (String name : descendants) {
+						if (!searchResultsList.contains(name))
+							searchResultsList.add(name);
+					}
+				}
 				
-				if (cells==null)
-					return;
-				
-				if (!cellTicked && !descendantTicked && !ancestorTicked) {
+				if (cellTicked) {
 					ArrayList<String> cellsCopy = new ArrayList<String>();
 					for (String name : cells) {
 						if (PartsList.getFunctionalNameByLineageName(name)!=null)
@@ -502,57 +475,26 @@ public class Search {
 							searchResultsList.add(name);
 					}
 				}
-				else {
-					if (descendantTicked) {
-						System.out.println("descendants");
-						ArrayList<String> descendants = getDescendantsList(cells);
-						for (int i=0; i<descendants.size(); i++) {
-							String name = descendants.get(i);
-							System.out.println(name);
-							if (PartsList.getFunctionalNameByLineageName(name)!=null)
-								descendants.set(i, name+" ("+
-										PartsList.getFunctionalNameByLineageName(name)+
-										")");
-						}
-						for (String name : descendants) {
-							if (!searchResultsList.contains(name))
-								searchResultsList.add(name);
-						}
+				
+				if (ancestorTicked) {
+					System.out.println("ancestors");
+					ArrayList<String> ancestors = getAncestorsList(cells);
+					for (int i=0; i<ancestors.size(); i++) {
+						String name = ancestors.get(i);
+						System.out.println(name);
+						if (PartsList.getFunctionalNameByLineageName(name)!=null)
+							ancestors.set(i, name+" ("
+									+PartsList.getFunctionalNameByLineageName(name)
+									+")");
 					}
-					
-					if (cellTicked) {
-						ArrayList<String> cellsCopy = new ArrayList<String>();
-						for (String name : cells) {
-							if (PartsList.getFunctionalNameByLineageName(name)!=null)
-								name += " ("+
-										PartsList.getFunctionalNameByLineageName(name)+
-										")";
-							cellsCopy.add(name);
-						}
-						for (String name : cellsCopy) {
-							if (!searchResultsList.contains(name))
-								searchResultsList.add(name);
-						}
-					}
-					
-					if (ancestorTicked) {
-						System.out.println("ancestors");
-						ArrayList<String> ancestors = getAncestorsList(cells);
-						for (int i=0; i<ancestors.size(); i++) {
-							String name = ancestors.get(i);
-							System.out.println(name);
-							if (PartsList.getFunctionalNameByLineageName(name)!=null)
-								ancestors.set(i, name+" ("
-										+PartsList.getFunctionalNameByLineageName(name)
-										+")");
-						}
-						for (String name : ancestors) {
-							if (!searchResultsList.contains(name))
-								searchResultsList.add(name);
-						}
+					for (String name : ancestors) {
+						if (!searchResultsList.contains(name))
+							searchResultsList.add(name);
 					}
 				}
-			//}
+				
+				searchResultsList.sort(new CellNameComparator());
+			}
 		}
 	}
 	
@@ -565,61 +507,12 @@ public class Search {
 		return out;
 	}
 	
-	/*
-	private final class GeneLoadingService extends Service<ArrayList<String>> {
+	private final class CellNameComparator implements Comparator<String> {
 		@Override
-		protected final Task<ArrayList<String>> createTask() {
-			return new Task<ArrayList<String>>() {
-				@Override
-				protected ArrayList<String> call() throws Exception {
-					System.out.println(geneSearchService.getState());
-					final int modulus = 5;
-					// wait for search to finish
-					while (geneSearchService.getValue() != null) {
-						System.out.println("scheduled");
-						if (isCancelled())
-							break;
-						
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								searchResultsList.clear();
-								String loading = "Fetching data from WormBase";
-								int num = getCountFinal(count)%modulus;
-								switch (num) {
-									case 1:		loading+=".";
-												break;
-									case 2:		loading+="..";
-												break;
-									case 3:		loading+="...";
-												break;
-									case 4:		loading+="....";
-												break;
-									default:	break;
-								}
-								searchResultsList.add(loading);
-							}
-						});
-						
-						try {
-							Thread.sleep(WAIT_TIME_MILLI);
-						} catch (InterruptedException ie) {
-							break;
-						}
-						count++;
-						if (count<0)
-							count=0;
-					}
-					// upon finishing
-					System.out.println("gene search service done");
-					updateGeneResults(geneSearchService.getValue());
-					return geneSearchService.getValue();
-				}
-			};
+		public int compare(String s1, String s2) {
+			return s1.compareTo(s2);
 		}
 	}
-	*/
-	
 	
 	private final class ShowLoadingService extends Service<Void> {
 		@Override
