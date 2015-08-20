@@ -25,7 +25,7 @@ public class WormBaseQuery{
 		searchService = new Service<ArrayList<String>>() {
 			@Override
 			protected final Task<ArrayList<String>> createTask() {
-				return new Task<ArrayList<String>>() {
+				Task<ArrayList<String>> task = new Task<ArrayList<String>>() {
 					@Override
 					protected ArrayList<String> call() throws Exception {
 						ArrayList<String> out = new ArrayList<String>();
@@ -83,6 +83,8 @@ public class WormBaseQuery{
 						return out;
 					}
 				};
+				
+				return task;
 			}
 		};
 	}
@@ -94,7 +96,7 @@ public class WormBaseQuery{
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			
-			//Get Response  
+			//Get Response
 		    InputStream is = connection.getInputStream();
 		    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 		    
@@ -107,6 +109,7 @@ public class WormBaseQuery{
 	
 	public static void doSearch(String text) {
 		searched = text;
+		System.out.println("searched: "+text);
 		searchService.restart();
 	}
 	

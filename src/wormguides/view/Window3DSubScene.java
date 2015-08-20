@@ -59,7 +59,6 @@ public class Window3DSubScene{
 	private int endTime;
 	private Sphere[] cells;
 	private String[] names;
-	//private String[] namesLowerCase;
 	private boolean[] searched;
 	private Integer[][] positions;
 	private Integer[] diameters;
