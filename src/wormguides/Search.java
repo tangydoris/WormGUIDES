@@ -17,8 +17,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
@@ -26,16 +24,13 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 
 public class Search {
-	
-	// list of every cell name that exists
-	private ArrayList<String> allLineageNames;
-	
+
+	private ArrayList<String> lineageNames;
 	private ArrayList<String> functionalNames;
 	private ArrayList<String> descriptions;
 	
 	private ObservableList<String> searchResultsList;
-	private TextField searchField;
-	private ListView<String> searchResultsListView;
+	private String searchedText;
 	
 	private SearchType type;
 	
@@ -53,34 +48,23 @@ public class Search {
 	
 	private final Service<Void> showLoadingService;
 	private int count;
-	 
-	public Search() {
-		this(new TextField(), new ListView<String>());
-	}
 	
-	public Search(TextField searchField, ListView<String> searchResultsList) {
-		allLineageNames = new ArrayList<String>(Arrays.asList(
+	public Search() {
+		lineageNames = new ArrayList<String>(Arrays.asList(
 							AceTreeLoader.getAllCellNames()));
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
 		
 		type = SearchType.SYSTEMATIC;
 		
-		if (searchField==null)
-			searchField = new TextField();
-		if (searchResultsList==null)
-			searchResultsList = new ListView<String>();
-		
 		selectedColor = Color.WHITE;
 		
-		this.searchField = searchField;
-		this.searchResultsListView = searchResultsList;
+		searchResultsList = FXCollections.observableArrayList();
+		searchedText = "";
 		
 		cellTicked = false;
 		ancestorTicked = false;
 		descendantTicked = false;
-		
-		addTextListener();
 		
 		resultsUpdateService = new Service<Void>() {
 			@Override
@@ -175,7 +159,7 @@ public class Search {
 	}
 	
 	private String getSearchedText() {
-		final String searched = searchField.getText();
+		final String searched = searchedText;
 		return searched;
 	}
 	
@@ -253,7 +237,7 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-							for (String name : allLineageNames) {
+							for (String name : lineageNames) {
 								if (name.toLowerCase().equals(searched))
 									cells.add(name);
 							}
@@ -297,7 +281,7 @@ public class Search {
 		if (cells==null)
 			return descendants;
 		for (String cell : cells) {
-			for (String name : allLineageNames) {
+			for (String name : lineageNames) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, cell))
 					descendants.add(name);
 			}
@@ -311,7 +295,7 @@ public class Search {
 		if (cells==null)
 			return ancestors;
 		for (String cell : cells) {
-			for (String name : allLineageNames) {
+			for (String name : lineageNames) {
 				if (!ancestors.contains(name) && LineageTree.isAncestor(name, cell))
 					ancestors.add(name);
 			}
@@ -335,9 +319,8 @@ public class Search {
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
 				
-				addColorRule(searchField.getText(), selectedColor, options);
-				
-				searchField.clear();
+				addColorRule(getSearchedText(), selectedColor, options);
+				searchedText = "";
 			}
 		};
 	}
@@ -403,16 +386,14 @@ public class Search {
 		return searchResultsList;
 	}
 	
-	private void addTextListener() {
-		searchResultsList = FXCollections.observableArrayList();
-		searchField.textProperty().addListener(new ChangeListener<String>() {
+	public ChangeListener<String> getTextFieldListener() {
+		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				resultsUpdateService.restart();
 			}
-		});
-		searchResultsListView.setItems(searchResultsList);
+		};
 	}
 	
 	private void refreshSearchResultsList(String newValue) {
@@ -428,7 +409,7 @@ public class Search {
 			ArrayList<String> cellsForListView = new ArrayList<String>();
 			if (!cellTicked && !descendantTicked && !ancestorTicked) {
 				switch (type) {
-					case SYSTEMATIC:	for (String name : allLineageNames) {
+					case SYSTEMATIC:	for (String name : lineageNames) {
 											if (name.toLowerCase().startsWith(searched))
 												cellsForListView.add(name);
 										}
