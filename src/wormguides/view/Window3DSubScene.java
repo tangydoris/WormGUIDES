@@ -167,19 +167,21 @@ public class Window3DSubScene{
 			public void run() {
 				refreshScene();
 				addCellsToScene();	
-				// render opaque spheres first
-				for (int i = 0; i < cells.length; i++) {
-					if (searched[i] || !names[i].toLowerCase().startsWith("nuc"))
-						root.getChildren().add(cells[i]);
-				}
-				// then render translucent ones
 				if (inSearch) {
+					for (int i = 0; i < cells.length; i++) {
+						if (searched[i])
+							root.getChildren().add(cells[i]);
+					}
 					for (int i = 0; i < cells.length; i++) {
 						if (!searched[i])
 							root.getChildren().add(cells[i]);
 					}
 				}
 				else {
+					for (int i = 0; i < cells.length; i++) {
+						if (!names[i].toLowerCase().startsWith("nuc"))
+							root.getChildren().add(cells[i]);
+					}
 					for (int i = 0; i < cells.length; i++) {
 						if (names[i].toLowerCase().startsWith("nuc"))
 							root.getChildren().add(cells[i]);

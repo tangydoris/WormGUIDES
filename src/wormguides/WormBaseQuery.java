@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ public class WormBaseQuery{
 	
 	private static Service<ArrayList<String>> searchService;
 	private static String searched;
+	private static HashMap<String, ArrayList<String>> resultsHash;
 	
 	static {
 		searched = "";
@@ -28,21 +30,26 @@ public class WormBaseQuery{
 				Task<ArrayList<String>> task = new Task<ArrayList<String>>() {
 					@Override
 					protected ArrayList<String> call() throws Exception {
-						ArrayList<String> out = new ArrayList<String>();
-						
 						String[] tokens = searched.trim().split(" ");
 						if (tokens.length!=0)
 							searched = tokens[0];
 						final String searchText = searched.trim();
 						
+						// try to get result if previously searched
+						if (resultsHash.containsKey(searched))
+							return resultsHash.get(searched);
+						
+						// do actual search if result was not cached
+						ArrayList<String> out = new ArrayList<String>();
+						
 						BufferedReader pageStream = openUrl("http://www.wormbase.org/db/get?name="
 																		+searchText+";class=gene");
-						
 						if (pageStream!= null) {
 							String firstQueryLine = "";
 							String restString = "";
 							try {
-								while ((firstQueryLine=pageStream.readLine()) != null && restString.isEmpty()) {
+								while ((firstQueryLine=pageStream.readLine()) != null 
+															&& restString.isEmpty()) {
 									if (firstQueryLine.contains("wname=\"expression\"")){
 										String [] restChunks = pageStream.readLine().split("\"");
 										restString = restChunks[1];
@@ -52,12 +59,14 @@ public class WormBaseQuery{
 								e.printStackTrace();
 							}
 							
-							BufferedReader restPageStream = openUrl("http://www.wormbase.org"+ restString);
+							BufferedReader restPageStream = openUrl("http://www.wormbase.org"
+																				+ restString);
 							String wbGeneLine = "";
 							try {
 								while ((wbGeneLine = restPageStream.readLine()) != null) {
 									
-									Pattern p = Pattern.compile("class=\"anatomy_term-link\" title=\"\">(\\S+)</a>");
+									Pattern p = Pattern.compile("class=\"anatomy_term-link\""
+																	+" title=\"\">(\\S+)</a>");
 									Matcher m = p.matcher(wbGeneLine);
 									
 									while (m.find()) {
@@ -80,6 +89,7 @@ public class WormBaseQuery{
 							}
 						});
 						
+						resultsHash.put(searched, out);
 						return out;
 					}
 				};
@@ -87,6 +97,8 @@ public class WormBaseQuery{
 				return task;
 			}
 		};
+		
+		resultsHash = new HashMap<String, ArrayList<String>>();
 	}
 	
 	private static BufferedReader openUrl(String target) {
