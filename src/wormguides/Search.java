@@ -427,10 +427,25 @@ public class Search {
 			
 			ArrayList<String> cellsForListView = new ArrayList<String>();
 			if (!cellTicked && !descendantTicked && !ancestorTicked) {
-				if (type==SearchType.SYSTEMATIC)
-					;
-				else
-					cellsForListView.addAll(cells);
+				switch (type) {
+					case SYSTEMATIC:	for (String name : allLineageNames) {
+											if (name.toLowerCase().startsWith(searched))
+												cellsForListView.add(name);
+										}
+										break;
+										
+					case FUNCTIONAL:		for (String name : functionalNames) {
+											if (name.toLowerCase().startsWith(searched))
+												cellsForListView.add(PartsList
+													.getLineageNameByFunctionalName(name));
+										}
+										break;
+										
+					default:			cellsForListView.addAll(cells);
+										break;
+				}
+				
+					
 			}
 			else {
 				if (descendantTicked) {
@@ -453,10 +468,9 @@ public class Search {
 							cellsForListView.add(name);
 					}
 				}
-				
-				cellsForListView.sort(new CellNameComparator());
-				addFunctionalNamesToList(cellsForListView);
 			}
+			cellsForListView.sort(new CellNameComparator());
+			addFunctionalNamesToList(cellsForListView);
 		}
 	}
 	

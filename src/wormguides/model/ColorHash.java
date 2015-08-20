@@ -23,7 +23,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	public ColorHash(ObservableList<ColorRule> rulesList) {
 		super();
 		allColors = new TreeSet<Color>(new ColorComparator());
-		allColors.add(Color.WHITE);
+		addColorToHash(Color.WHITE);
 	}
 	
 	public void addColorToHash(Color color) {
