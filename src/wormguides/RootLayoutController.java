@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -70,6 +71,7 @@ public class RootLayoutController implements Initializable{
 	// Search tab
 	private Search search;
 	@FXML private TextField searchField;
+	private BooleanProperty clearSearchField;
 	@FXML private ListView<String> searchResultsListView;
 	@FXML private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	private ToggleGroup typeToggleGroup;
@@ -352,6 +354,19 @@ public class RootLayoutController implements Initializable{
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
 		addSearchBtn.setOnAction(search.getAddButtonListener());
+		
+		clearSearchField = new SimpleBooleanProperty(false);
+		search.setClearSearchFieldProperty(clearSearchField);
+		clearSearchField.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+										Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					searchField.clear();
+					clearSearchField.set(false);
+				}
+			}
+		});
 		
 		searchField.textProperty().addListener(search.getTextFieldListener());
 	}

@@ -101,6 +101,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		HBox buttonBox = new HBox();
 		buttonBox.setPrefHeight(30);
 		Button submit = new Button("Submit");
+		submit.setDefaultButton(true);
 		submit.setFont(new Font(14));
 		submit.setPrefWidth(100);
 		submit.setAlignment(Pos.CENTER);

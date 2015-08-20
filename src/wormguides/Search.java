@@ -31,6 +31,7 @@ public class Search {
 	
 	private ObservableList<String> searchResultsList;
 	private String searchedText;
+	private BooleanProperty clearSearchFieldProperty;
 	
 	private SearchType type;
 	
@@ -320,7 +321,10 @@ public class Search {
 					options.add(SearchOption.DESCENDANT);
 				
 				addColorRule(getSearchedText(), selectedColor, options);
-				searchedText = "";
+				
+				searchResultsList.clear();
+				if (clearSearchFieldProperty != null)
+					clearSearchFieldProperty.set(true);
 			}
 		};
 	}
@@ -367,6 +371,10 @@ public class Search {
 		};
 	}
 	
+	public void setClearSearchFieldProperty(BooleanProperty property) {
+		clearSearchFieldProperty = property;
+	}
+	
 	public ChangeListener<Toggle> getTypeToggleListener() {
 		return new ChangeListener<Toggle>() {
 			@Override
@@ -391,6 +399,7 @@ public class Search {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
+				searchedText = newValue.toLowerCase();
 				resultsUpdateService.restart();
 			}
 		};
@@ -398,7 +407,6 @@ public class Search {
 	
 	private void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
-		searchResultsList.clear();
 		if (!searched.isEmpty()) {
 			ArrayList<String> cells;
 			cells = getCellsList(searched);
@@ -415,7 +423,7 @@ public class Search {
 										}
 										break;
 										
-					case FUNCTIONAL:		for (String name : functionalNames) {
+					case FUNCTIONAL:	for (String name : functionalNames) {
 											if (name.toLowerCase().startsWith(searched))
 												cellsForListView.add(PartsList
 													.getLineageNameByFunctionalName(name));
