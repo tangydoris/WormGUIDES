@@ -88,6 +88,10 @@ public class Window3DSubScene{
 	// specific boolean listener for gene search results
 	private BooleanProperty geneResultsUpdated;
 	
+	// opacity value for "other" cells (Nuc...)
+	private double othersOpacity;
+	private Color othersColor;
+	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
 		this.data = data;
@@ -126,8 +130,6 @@ public class Window3DSubScene{
 			}
 		});
 		
-		//searchedPrefix = new SimpleStringProperty();
-		//searchedPrefix.set("");
 		inSearch = false;
 		
 		totalNuclei = new SimpleIntegerProperty();
@@ -167,13 +169,21 @@ public class Window3DSubScene{
 				addCellsToScene();	
 				// render opaque spheres first
 				for (int i = 0; i < cells.length; i++) {
-					if (searched[i])
+					if (searched[i] || !names[i].toLowerCase().startsWith("nuc"))
 						root.getChildren().add(cells[i]);
 				}
 				// then render translucent ones
-				for (int i = 0; i < cells.length; i++) {
-					if (!searched[i])
-						root.getChildren().add(cells[i]);
+				if (inSearch) {
+					for (int i = 0; i < cells.length; i++) {
+						if (!searched[i])
+							root.getChildren().add(cells[i]);
+					}
+				}
+				else {
+					for (int i = 0; i < cells.length; i++) {
+						if (names[i].toLowerCase().startsWith("nuc"))
+							root.getChildren().add(cells[i]);
+					}
 				}
 			}
 		};
@@ -195,6 +205,9 @@ public class Window3DSubScene{
 		searchResultsUpdateService = null;
 		
 		geneResultsUpdated = new SimpleBooleanProperty();
+		
+		othersOpacity = 1.0d;
+		othersColor = Color.WHITE;
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -298,7 +311,6 @@ public class Window3DSubScene{
 		time--;
 		
 		names = data.getNames(time);
-		//namesLowerCase = toLowerCaseAll(names);
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
 		totalNuclei.set(names.length);
@@ -348,13 +360,17 @@ public class Window3DSubScene{
 					material = colorHash.getTranslucentMaterial();
 			}
 			else {
-				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
-				for (ColorRule rule : rulesList) {
-					// just need to consult rule's active list
-					if (rule.getActiveList().contains(names[i]))
-						colors.add(rule.getColor());
+				if (names[i].toLowerCase().startsWith("nuc"))
+					material = new PhongMaterial(othersColor);
+				else {
+					TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+					for (ColorRule rule : rulesList) {
+						// just need to consult rule's active list
+						if (rule.getActiveList().contains(names[i]))
+							colors.add(rule.getColor());
+					}
+					material = colorHash.getMaterial(colors);
 				}
-				material = colorHash.getMaterial(colors);
 			}
 			
 			sphere.setMaterial(material);
@@ -499,11 +515,27 @@ public class Window3DSubScene{
 		return root;
 	}
 	
+	public ChangeListener<Number> getOthersOpacityListener() {
+		return new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+										Number oldValue, Number newValue) {
+				othersOpacity = newValue.doubleValue()/100d;
+				int darkness = (int) Math.round(othersOpacity*15);
+				String colorString = "#";
+				for (int i=0; i<6; i++)
+					colorString += Integer.toHexString(darkness);
+				othersColor = Color.web(colorString, othersOpacity);
+				buildScene(time.get());
+			}
+		};
+	}
+	
 	public ChangeListener<String> getSearchFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
-								String oldValue, String newValue) {
+										String oldValue, String newValue) {
 				if (newValue.isEmpty())
 					inSearch = false;
 				else

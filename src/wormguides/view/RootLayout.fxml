@@ -230,6 +230,12 @@
                            <children>
                               <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                  <children>
+                                    <Label prefHeight="22.0" text="&quot;Others&quot; Opacity:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Slider fx:id="opacitySlider" VBox.vgrow="ALWAYS" />
                                     <Label prefHeight="22.0" text="Search Layers:">
                                        <font>
                                           <Font size="14.0" />

@@ -56,27 +56,27 @@ public class RootLayoutController implements Initializable{
 	private DoubleProperty subsceneHeight;
 	
 	// Panels stuff
-	@FXML public BorderPane rootBorderPane;
-	@FXML public BorderPane displayPanel;
-	@FXML public AnchorPane modelAnchorPane;
-	@FXML public ScrollPane infoPane;
+	@FXML private BorderPane rootBorderPane;
+	@FXML private BorderPane displayPanel;
+	@FXML private AnchorPane modelAnchorPane;
+	@FXML private ScrollPane infoPane;
 	
 	// Subscene controls
-	@FXML public Button backwardButton, forwardButton, playButton;
-	@FXML public Label timeLabel, totalNucleiLabel;
-	@FXML public Slider timeSlider;
-	@FXML public Button zoomInButton, zoomOutButton;
+	@FXML private Button backwardButton, forwardButton, playButton;
+	@FXML private Label timeLabel, totalNucleiLabel;
+	@FXML private Slider timeSlider;
+	@FXML private Button zoomInButton, zoomOutButton;
 	
 	// Search tab
 	private Search search;
-	@FXML public TextField searchField;
-	@FXML public ListView<String> searchResultsListView;
-	@FXML public RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	@FXML private TextField searchField;
+	@FXML private ListView<String> searchResultsListView;
+	@FXML private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
 	private ToggleGroup typeToggleGroup;
 	
-	@FXML public CheckBox cellTick, ancestorTick, descendantTick;
-	@FXML public AnchorPane colorPickerPane;
-	@FXML public ColorPicker colorPicker;
+	@FXML private CheckBox cellTick, ancestorTick, descendantTick;
+	@FXML private AnchorPane colorPickerPane;
+	@FXML private ColorPicker colorPicker;
 	
 	// Lineage tree
 	//private LineageTree lineageTree;
@@ -87,12 +87,13 @@ public class RootLayoutController implements Initializable{
 	
 	// Layers tab
 	private Layers layers;
-	@FXML public ListView<ColorRule> colorRulesListView;
-	@FXML public Button addSearchBtn;
+	@FXML private ListView<ColorRule> colorRulesListView;
+	@FXML private Button addSearchBtn;
+	@FXML private Slider opacitySlider;
 	
 	// Cell information
-	@FXML public Text cellName;
-	@FXML public Text cellDescription;
+	@FXML private Text cellName;
+	@FXML private Text cellDescription;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -235,6 +236,8 @@ public class RootLayoutController implements Initializable{
 				setSelectedInfo(selectedName.get());
 			}
 		});
+		
+		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
 	}
 	
 	private void setSelectedInfo(String name) {
@@ -330,10 +333,14 @@ public class RootLayoutController implements Initializable{
 		});
 	}
 	
-	private void setSliderProperties() {
+	private void setSlidersProperties() {
 		timeSlider.setMin(1);
 		timeSlider.setMax(window3D.getEndTime());
 		timeSlider.setValue(window3D.getStartTime());
+		
+		opacitySlider.setMin(0);
+		opacitySlider.setMax(100);
+		opacitySlider.setValue(100);
 	}
 	
 	private void initSearch() {
@@ -419,6 +426,8 @@ public class RootLayoutController implements Initializable{
 		
 		assert (cellName != null);
 		assert (cellDescription != null);
+		
+		assert (opacitySlider != null);
 	}
 
 	@Override
@@ -434,7 +443,7 @@ public class RootLayoutController implements Initializable{
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
-		setSliderProperties();
+		setSlidersProperties();
 		
 		initSearch();
 		
