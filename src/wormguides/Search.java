@@ -129,6 +129,8 @@ public class Search {
 	}
 	
 	private void updateGeneResults() {
+		if (geneSearchService.getValue()==null)
+			return;
 		ArrayList<String> results = geneSearchService.getValue();
 		ArrayList<String> cellsForListView = new ArrayList<String>();
 		for (String result : results) {

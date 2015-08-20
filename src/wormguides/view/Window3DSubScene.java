@@ -1,6 +1,7 @@
 package wormguides.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
@@ -90,7 +91,8 @@ public class Window3DSubScene{
 	
 	// opacity value for "other" cells (Nuc...)
 	private double othersOpacity;
-	private Color othersColor;
+	//private Color othersColor;
+	private HashMap<Double, Material> opacityHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -209,7 +211,9 @@ public class Window3DSubScene{
 		geneResultsUpdated = new SimpleBooleanProperty();
 		
 		othersOpacity = 1.0d;
-		othersColor = Color.WHITE;
+		//othersColor = Color.WHITE;
+		opacityHash = new HashMap<Double, Material>();
+		opacityHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -363,7 +367,7 @@ public class Window3DSubScene{
 			}
 			else {
 				if (names[i].toLowerCase().startsWith("nuc"))
-					material = new PhongMaterial(othersColor);
+					material = opacityHash.get(othersOpacity);
 				else {
 					TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 					for (ColorRule rule : rulesList) {
@@ -522,12 +526,20 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 										Number oldValue, Number newValue) {
-				othersOpacity = newValue.doubleValue()/100d;
-				int darkness = (int) Math.round(othersOpacity*15);
-				String colorString = "#";
-				for (int i=0; i<6; i++)
-					colorString += Integer.toHexString(darkness);
-				othersColor = Color.web(colorString, othersOpacity);
+				othersOpacity = Math.round(newValue.doubleValue())/100.0;
+				if (!opacityHash.containsKey(othersOpacity)) {
+					int darkness = (int) Math.round(othersOpacity*255);
+					String colorString = "#";
+					StringBuilder sb = new StringBuilder();
+					sb.append(Integer.toHexString(darkness));
+					if (sb.length()<2)
+						sb.insert(0, "0");
+					for (int i=0; i<3; i++) {
+						colorString += sb.toString();
+					}
+					opacityHash.put(othersOpacity, new PhongMaterial(
+								Color.web(colorString, othersOpacity)));
+				}
 				buildScene(time.get());
 			}
 		};
