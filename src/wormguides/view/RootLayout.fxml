@@ -42,11 +42,6 @@
 			   <children>
 			      <TabPane fx:id="dataPanel" focusTraversable="false" maxWidth="300.0" prefHeight="775.0" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="27.0" tabMinWidth="50.0">
 			        <tabs>
-			          <Tab text="Data">
-			            <content>
-			              <AnchorPane prefHeight="180.0" prefWidth="200.0" />
-			            </content>
-			          </Tab>
 			          <Tab text="Search">
 			            <content>
 			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">

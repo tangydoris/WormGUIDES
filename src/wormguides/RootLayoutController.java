@@ -82,7 +82,6 @@ public class RootLayoutController implements Initializable{
 	@FXML private ColorPicker colorPicker;
 	
 	// Lineage tree
-	//private LineageTree lineageTree;
 	private TreeItem<String> lineageTreeRoot;
 	
 	// Cell selection
