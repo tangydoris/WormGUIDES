@@ -56,19 +56,19 @@ public class RootLayoutController implements Initializable{
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
 	
-	// Panels stuff
+	// panels stuff
 	@FXML private BorderPane rootBorderPane;
 	@FXML private BorderPane displayPanel;
 	@FXML private AnchorPane modelAnchorPane;
 	@FXML private ScrollPane infoPane;
 	
-	// Subscene controls
+	// subscene controls
 	@FXML private Button backwardButton, forwardButton, playButton;
 	@FXML private Label timeLabel, totalNucleiLabel;
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
-	// Search tab
+	// search tab
 	private Search search;
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -81,19 +81,19 @@ public class RootLayoutController implements Initializable{
 	@FXML private AnchorPane colorPickerPane;
 	@FXML private ColorPicker colorPicker;
 	
-	// Lineage tree
+	// lineage tree
 	private TreeItem<String> lineageTreeRoot;
 	
-	// Cell selection
+	// cell selection
 	private StringProperty selectedName;
 	
-	// Layers tab
+	// layers tab
 	private Layers layers;
 	@FXML private ListView<ColorRule> colorRulesListView;
 	@FXML private Button addSearchBtn;
 	@FXML private Slider opacitySlider;
 	
-	// Cell information
+	// cell information
 	@FXML private Text cellName;
 	@FXML private Text cellDescription;
 	
@@ -119,6 +119,10 @@ public class RootLayoutController implements Initializable{
 			aboutStage.setScene(new Scene(new AboutPane()));
 			aboutStage.setTitle("About WormGUIDES");
 			aboutStage.initModality(Modality.NONE);
+			
+			aboutStage.setHeight(400.0);
+			aboutStage.setWidth(300.0);
+			aboutStage.setResizable(false);
 		}
 		aboutStage.show();
 	}

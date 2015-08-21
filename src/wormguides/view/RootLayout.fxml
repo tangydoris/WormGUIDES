@@ -17,16 +17,16 @@
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Close" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem fx:id="menuAbout" mnemonicParsing="false" onAction="#menuAboutAction" text="About" />
-            </items>
-          </Menu>
             <Menu mnemonicParsing="false" text="View">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
               </items>
             </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem fx:id="menuAbout" mnemonicParsing="false" onAction="#menuAboutAction" text="About" />
+            </items>
+          </Menu>
         </menus>
       </MenuBar>
    </top>

@@ -91,8 +91,7 @@ public class Window3DSubScene{
 	
 	// opacity value for "other" cells (Nuc...)
 	private double othersOpacity;
-	//private Color othersColor;
-	private HashMap<Double, Material> opacityHash;
+	private HashMap<Double, Material> opacityMaterialHash;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -211,9 +210,8 @@ public class Window3DSubScene{
 		geneResultsUpdated = new SimpleBooleanProperty();
 		
 		othersOpacity = 1.0d;
-		//othersColor = Color.WHITE;
-		opacityHash = new HashMap<Double, Material>();
-		opacityHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
+		opacityMaterialHash = new HashMap<Double, Material>();
+		opacityMaterialHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -254,13 +252,28 @@ public class Window3DSubScene{
                 mouseOldY = mousePosY;
                 mousePosX = me.getSceneX();
                 mousePosY = me.getSceneY();
-                mouseDeltaX = (mousePosX - mouseOldX)/3;
-                mouseDeltaY = (mousePosY - mouseOldY)/3;
+                mouseDeltaX = (mousePosX - mouseOldX);
+                mouseDeltaY = (mousePosY - mouseOldY);
                 
-                double ryAngle = cameraXform.getRotateY();
-                cameraXform.setRotateY(ryAngle + mouseDeltaX);
-                double rxAngle = cameraXform.getRotateX();
-                cameraXform.setRotateX(rxAngle + mouseDeltaY);
+				if (me.isPrimaryButtonDown()) {
+					mouseDeltaX /= 4;
+	                mouseDeltaY /= 4;
+	                cameraXform.setRotateY(cameraXform.getRotateY() + mouseDeltaX);
+	                cameraXform.setRotateX(cameraXform.getRotateX() + mouseDeltaY);
+				}
+				
+				else if (me.isSecondaryButtonDown()) {
+					/*
+					double tx = cameraXform.t.getTx()+mouseDeltaX;
+					double ty = cameraXform.t.getTy()+mouseDeltaY;
+					System.out.println("old xy: "+cameraXform.t.getTx()+" "+cameraXform.t.getTy());
+					cameraXform.setTranslate(tx, ty);
+					System.out.println("new xy: "+cameraXform.t.getTx()+" "+cameraXform.t.getTy());
+					*/
+					
+					subscene.setTranslateX(mouseDeltaX);
+					subscene.setTranslateY(mouseDeltaY);
+				}
 			}
 		});
 		
@@ -367,7 +380,7 @@ public class Window3DSubScene{
 			}
 			else {
 				if (names[i].toLowerCase().startsWith("nuc"))
-					material = opacityHash.get(othersOpacity);
+					material = opacityMaterialHash.get(othersOpacity);
 				else {
 					TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 					for (ColorRule rule : rulesList) {
@@ -437,6 +450,7 @@ public class Window3DSubScene{
 		// Set new origin to average X Y positions
 		cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
+		System.out.println("origin xyz: "+newOriginX+" "+newOriginY+" "+newOriginZ);
 	}
 	
 	public void setSearchResultsList(ObservableList<String> list) {
@@ -527,7 +541,7 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Number> observable,
 										Number oldValue, Number newValue) {
 				othersOpacity = Math.round(newValue.doubleValue())/100.0;
-				if (!opacityHash.containsKey(othersOpacity)) {
+				if (!opacityMaterialHash.containsKey(othersOpacity)) {
 					int darkness = (int) Math.round(othersOpacity*255);
 					String colorString = "#";
 					StringBuilder sb = new StringBuilder();
@@ -537,7 +551,7 @@ public class Window3DSubScene{
 					for (int i=0; i<3; i++) {
 						colorString += sb.toString();
 					}
-					opacityHash.put(othersOpacity, new PhongMaterial(
+					opacityMaterialHash.put(othersOpacity, new PhongMaterial(
 								Color.web(colorString, othersOpacity)));
 				}
 				buildScene(time.get());
