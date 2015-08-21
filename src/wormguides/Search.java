@@ -115,11 +115,13 @@ public class Search {
 	private void updateGeneResults() {
 		if (geneSearchService.getValue()==null)
 			return;
+		
 		ArrayList<String> results = geneSearchService.getValue();
 		ArrayList<String> cellsForListView = new ArrayList<String>();
 		
-		if (results==null || results.isEmpty())
+		if (results.isEmpty())
 			searchResultsList.add("No results found from WormBase");
+		
 		else {
 			if (!cellTicked && !ancestorTicked && !descendantTicked)
 				cellsForListView.addAll(results);

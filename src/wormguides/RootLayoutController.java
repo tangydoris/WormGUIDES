@@ -77,6 +77,7 @@ public class RootLayoutController implements Initializable{
 	private ToggleGroup typeToggleGroup;
 	
 	@FXML private CheckBox cellTick, ancestorTick, descendantTick;
+	@FXML private Label descendantLabel;
 	@FXML private AnchorPane colorPickerPane;
 	@FXML private ColorPicker colorPicker;
 	
@@ -404,9 +405,12 @@ public class RootLayoutController implements Initializable{
 				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
 					descendantTick.setSelected(false);
 					descendantTick.disableProperty().set(true);
+					descendantLabel.disableProperty().set(true);
 				}
-				else
+				else {
 					descendantTick.disableProperty().set(false);
+					descendantLabel.disableProperty().set(false);
+				}
 			}
 		});
 		sysRadioBtn.setSelected(true);
@@ -436,6 +440,7 @@ public class RootLayoutController implements Initializable{
 		assert (cellTick != null);
 		assert (ancestorTick != null);
 		assert (descendantTick != null);
+		assert (descendantLabel != null);
 		assert (colorPickerPane != null);
 		assert (colorPicker != null);
 		

@@ -31,8 +31,8 @@ public class ColorRuleEditPane extends AnchorPane{
 		
 		infoPacket = packet;
 		
-		setPrefHeight(280.0);
-		setPrefWidth(200.0);
+		setPrefHeight(300.0);
+		setPrefWidth(240.0);
 		
 		VBox vbox = new VBox();
 		vbox.setSpacing(3);
@@ -41,7 +41,11 @@ public class ColorRuleEditPane extends AnchorPane{
 		AnchorPane.setRightAnchor(vbox, 10d);
 		AnchorPane.setBottomAnchor(vbox, 10d);
 		
-		Label optionsLabel = new Label("Search Options for "+packet.getName()+":");
+		Label optionsLabel = new Label("Search Options for "+packet.getName());
+		
+		Region separator = new Region();
+		separator.setPrefHeight(10);
+		
 		Label ancestryLabel = new Label("Cell Ancestry");
 		
 		Label cellLabel = new Label("Cell");
@@ -79,9 +83,16 @@ public class ColorRuleEditPane extends AnchorPane{
 			}
 		});
 		HBox desRow = makeEditRow(desLabel, desTick);
+		if (packet.getName().contains("functional") 
+				|| packet.getName().contains("description")) {
+			desLabel.disableProperty().set(true);
+			desTick.disableProperty().set(true);
+		}
 		
 		Region separator1 = new Region();
 		separator1.setPrefHeight(10);
+		
+		Label colorLabel = new Label("Color");
 		
 		AnchorPane pickerPane = new AnchorPane();
 		VBox.setVgrow(pickerPane, Priority.ALWAYS);
@@ -112,9 +123,9 @@ public class ColorRuleEditPane extends AnchorPane{
 		Region separator2 = new Region();
 		separator2.setPrefHeight(10);
 		
-		vbox.getChildren().addAll(optionsLabel, ancestryLabel,
-				cellRow, ancRow, desRow, separator1, pickerPane,
-				separator2, buttonBox);
+		vbox.getChildren().addAll(optionsLabel, separator, ancestryLabel,
+				cellRow, ancRow, desRow, separator1, colorLabel,
+				pickerPane, separator2, buttonBox);
 		
 		for (Node node : vbox.getChildren()) {
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+
@@ -135,7 +146,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		inner.setFillHeight(true);
 		
 		Region indent = new Region();
-		indent.setPrefWidth(20);
+		indent.setPrefWidth(40);
 		
 		label.setFont(new Font(14));
 		

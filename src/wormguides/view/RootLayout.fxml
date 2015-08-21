@@ -184,7 +184,7 @@
                                                 <HBox prefWidth="180.0">
                                                    <children>
                                                       <Region maxWidth="40.0" minWidth="10.0" prefHeight="22.0" prefWidth="40.0" />
-                                                      <Label prefHeight="22.0" text="Descendant">
+                                                      <Label fx:id="descendantLabel" prefHeight="22.0" text="Descendant">
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font></Label>

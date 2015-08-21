@@ -36,8 +36,10 @@ public class WormBaseQuery{
 						final String searchText = searched.trim();
 						
 						// try to get result if previously searched
-						if (resultsHash.containsKey(searched))
+						if (resultsHash.containsKey(searched)) {
+							System.out.println("result previously cached for: "+searched);
 							return resultsHash.get(searched);
+						}
 						
 						// do actual search if result was not cached
 						ArrayList<String> out = new ArrayList<String>();
