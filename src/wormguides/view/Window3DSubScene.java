@@ -79,7 +79,6 @@ public class Window3DSubScene{
 	private boolean inSearch;
 	private ObservableList<String> searchResultsList;
 	private ArrayList<String> localSearchResults;
-	private ArrayList<String> otherResults;
 	
 	// color rules stuff
 	private ColorHash colorHash;
@@ -203,7 +202,6 @@ public class Window3DSubScene{
 		});
 		
 		localSearchResults = new ArrayList<String>();
-		otherResults = new ArrayList<String>();
 		
 		buildScene(time.get());
 		
@@ -374,23 +372,26 @@ public class Window3DSubScene{
 			Sphere sphere = new Sphere(radius);
 			
 			Material material = new PhongMaterial();
+			// if in search, do highlighting
 			if (inSearch) {
 				if (searched[i])
 					material = colorHash.getHighlightMaterial();
 				else
 					material = colorHash.getTranslucentMaterial();
 			}
+			// consult color rules when not in search
 			else {
-				if (names[i].toLowerCase().startsWith("nuc"))
+				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+				for (ColorRule rule : rulesList) {
+					// just need to consult rule's active list
+					if (rule.getActiveList().contains(names[i]))
+						colors.add(rule.getColor());
+				}
+				material = colorHash.getMaterial(colors);
+				
+				if (colors.size()==0) {
 					material = opacityMaterialHash.get(othersOpacity);
-				else {
-					TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
-					for (ColorRule rule : rulesList) {
-						// just need to consult rule's active list
-						if (rule.getActiveList().contains(names[i]))
-							colors.add(rule.getColor());
-					}
-					material = colorHash.getMaterial(colors);
+					System.out.println("no rule, opacity: "+othersOpacity);
 				}
 			}
 			
@@ -553,6 +554,7 @@ public class Window3DSubScene{
 					for (int i=0; i<3; i++) {
 						colorString += sb.toString();
 					}
+					//System.out.println(colorString);
 					opacityMaterialHash.put(othersOpacity, new PhongMaterial(
 								Color.web(colorString, othersOpacity)));
 				}
