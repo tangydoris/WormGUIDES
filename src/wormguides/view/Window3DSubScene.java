@@ -92,6 +92,7 @@ public class Window3DSubScene{
 	// opacity value for "other" cells (with no rule attached)
 	private double othersOpacity;
 	private HashMap<Double, Material> opacityMaterialHash;
+	private ArrayList<String> otherCells;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -167,7 +168,8 @@ public class Window3DSubScene{
 			@Override
 			public void run() {
 				refreshScene();
-				addCellsToScene();	
+				addCellsToScene();
+				// search mode
 				if (inSearch) {
 					for (int i = 0; i < cells.length; i++) {
 						if (searched[i])
@@ -178,13 +180,14 @@ public class Window3DSubScene{
 							root.getChildren().add(cells[i]);
 					}
 				}
+				// regular mode
 				else {
 					for (int i = 0; i < cells.length; i++) {
-						if (!names[i].toLowerCase().startsWith("nuc"))
+						if (!otherCells.contains(names[i]))
 							root.getChildren().add(cells[i]);
 					}
 					for (int i = 0; i < cells.length; i++) {
-						if (names[i].toLowerCase().startsWith("nuc"))
+						if (otherCells.contains(names[i]))
 							root.getChildren().add(cells[i]);
 					}
 				}
@@ -212,6 +215,7 @@ public class Window3DSubScene{
 		othersOpacity = 1.0d;
 		opacityMaterialHash = new HashMap<Double, Material>();
 		opacityMaterialHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
+		otherCells = new ArrayList<String>();
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -389,9 +393,9 @@ public class Window3DSubScene{
 				}
 				material = colorHash.getMaterial(colors);
 				
-				if (colors.size()==0) {
+				if (colors.isEmpty()) {
+					otherCells.add(names[i]);
 					material = opacityMaterialHash.get(othersOpacity);
-					System.out.println("no rule, opacity: "+othersOpacity);
 				}
 			}
 			
