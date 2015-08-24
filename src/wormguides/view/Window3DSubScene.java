@@ -168,6 +168,7 @@ public class Window3DSubScene{
 			@Override
 			public void run() {
 				refreshScene();
+				otherCells.clear();
 				addCellsToScene();
 				// search mode
 				if (inSearch) {

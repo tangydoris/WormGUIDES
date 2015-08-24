@@ -264,9 +264,11 @@ public class Search {
 										break;
 									}
 								}
-								if (found)
+								if (found && !cells.contains(PartsList.getLineageNameByIndex(
+																descriptions.indexOf(text)))) {
 									cells.add(PartsList.getLineageNameByIndex(
 													descriptions.indexOf(text)));
+								}
 							}
 							break;
 						
@@ -418,25 +420,14 @@ public class Search {
 			
 			ArrayList<String> cellsForListView = new ArrayList<String>();
 			if (!cellTicked && !descendantTicked && !ancestorTicked) {
-				switch (type) {
-					case SYSTEMATIC:	for (String name : lineageNames) {
-											if (name.toLowerCase().startsWith(searched))
-												cellsForListView.add(name);
-										}
-										break;
-										
-					case FUNCTIONAL:	for (String name : functionalNames) {
-											if (name.toLowerCase().startsWith(searched))
-												cellsForListView.add(PartsList
-													.getLineageNameByFunctionalName(name));
-										}
-										break;
-										
-					default:			cellsForListView.addAll(cells);
-										break;
-				}
-				
-					
+				if (type==SearchType.SYSTEMATIC) {
+					for (String name : lineageNames) {
+						if (name.toLowerCase().startsWith(searched))
+							cellsForListView.add(name);
+					}
+				}					
+				else
+					cellsForListView.addAll(cells);
 			}
 			else {
 				if (descendantTicked) {
