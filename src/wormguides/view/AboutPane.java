@@ -7,7 +7,7 @@ public class AboutPane extends AnchorPane {
 		
 		public AboutPane() {
 			super();
-			setPrefHeight(400.0);
+			setPrefHeight(420.0);
 			setPrefWidth(300.0);
 			
 			TextArea e_1 = new TextArea();	

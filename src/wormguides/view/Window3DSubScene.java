@@ -79,6 +79,7 @@ public class Window3DSubScene{
 	private boolean inSearch;
 	private ObservableList<String> searchResultsList;
 	private ArrayList<String> localSearchResults;
+	private ArrayList<String> otherResults;
 	
 	// color rules stuff
 	private ColorHash colorHash;
@@ -89,7 +90,7 @@ public class Window3DSubScene{
 	// specific boolean listener for gene search results
 	private BooleanProperty geneResultsUpdated;
 	
-	// opacity value for "other" cells (Nuc...)
+	// opacity value for "other" cells (with no rule attached)
 	private double othersOpacity;
 	private HashMap<Double, Material> opacityMaterialHash;
 	
@@ -202,6 +203,7 @@ public class Window3DSubScene{
 		});
 		
 		localSearchResults = new ArrayList<String>();
+		otherResults = new ArrayList<String>();
 		
 		buildScene(time.get());
 		
