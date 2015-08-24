@@ -38,6 +38,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
 	
@@ -93,6 +96,10 @@ public class Window3DSubScene{
 	private double othersOpacity;
 	private HashMap<Double, Material> opacityMaterialHash;
 	private ArrayList<String> otherCells;
+	
+	// rotation stuff
+	private final Rotate rotateX;
+	private final Rotate rotateY;
 	
 	public Window3DSubScene(double width, double height, TableLineageData data) {
 		root = new Group();
@@ -217,6 +224,9 @@ public class Window3DSubScene{
 		opacityMaterialHash = new HashMap<Double, Material>();
 		opacityMaterialHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
 		otherCells = new ArrayList<String>();
+		
+		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
+		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -259,25 +269,23 @@ public class Window3DSubScene{
                 mousePosY = me.getSceneY();
                 mouseDeltaX = (mousePosX - mouseOldX);
                 mouseDeltaY = (mousePosY - mouseOldY);
+                mouseDeltaX /= 4;
+                mouseDeltaY /= 4;
                 
 				if (me.isPrimaryButtonDown()) {
-					mouseDeltaX /= 4;
-	                mouseDeltaY /= 4;
-	                cameraXform.setRotateY(cameraXform.getRotateY() + mouseDeltaX);
-	                cameraXform.setRotateX(cameraXform.getRotateX() + mouseDeltaY);
+					mouseDeltaX /= 2;
+	                mouseDeltaY /= 2;
+	                rotateAllCells(mouseDeltaX, mouseDeltaY);
 				}
 				
 				else if (me.isSecondaryButtonDown()) {
-					/*
-					double tx = cameraXform.t.getTx()+mouseDeltaX;
-					double ty = cameraXform.t.getTy()+mouseDeltaY;
-					System.out.println("old xy: "+cameraXform.t.getTx()+" "+cameraXform.t.getTy());
-					cameraXform.setTranslate(tx, ty);
-					System.out.println("new xy: "+cameraXform.t.getTx()+" "+cameraXform.t.getTy());
-					*/
+					double tx = cameraXform.t.getTx()-mouseDeltaX;
+					double ty = cameraXform.t.getTy()-mouseDeltaY;
 					
-					subscene.setTranslateX(mouseDeltaX);
-					subscene.setTranslateY(mouseDeltaY);
+					if (tx>0 && tx<450)
+						cameraXform.t.setX(tx);
+					if (ty>0 && ty<450)
+						cameraXform.t.setY(ty);
 				}
 			}
 		});
@@ -292,6 +300,7 @@ public class Window3DSubScene{
 			public void handle(MouseEvent me) {
 				PickResult result = me.getPickResult();
 				Node node = result.getIntersectedNode();
+				//System.out.println("3d coord: "+result.getIntersectedPoint());
 				if (node instanceof Sphere) {
 					selectedIndex.set(getPickedSphereIndex((Sphere)node));
 					selectedName.set(names[selectedIndex.get()]);
@@ -310,6 +319,11 @@ public class Window3DSubScene{
 		buildCamera();
 		
 		return subscene;
+	}
+	
+	private void rotateAllCells(double x, double y) {
+		rotateX.setAngle(rotateX.getAngle()+y);
+		rotateY.setAngle(rotateY.getAngle()+x);
 	}
 	
 	private int getIndexByName(String name) {
@@ -405,16 +419,29 @@ public class Window3DSubScene{
 	        double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
+	        sphere.getTransforms().addAll(rotateX, rotateY);
+	        //sphere.getTransforms().add(rotateX);
+	        //sphere.getTransforms().add(rotateY);
 	        translateSphere(sphere, x, y, z);
+	        
+	        /*
+	        System.out.println("\n"+names[i]);
+	        for (Transform t : sphere.getTransforms())
+	        	System.out.println(t.toString());
+	        */
 	        
 	        cells[i] = sphere;
 		}
 	}
 	
 	private void translateSphere(Node sphere, double x, double y, double z) {
+		Translate t = new Translate(x, y, z);
+		/*
 		sphere.setTranslateX(x);
         sphere.setTranslateY(y);
         sphere.setTranslateZ(z);
+		*/
+		sphere.getTransforms().add(t);
 	}
 	
 	private void buildCamera() {
@@ -428,8 +455,8 @@ public class Window3DSubScene{
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-        cameraXform.setRotateX(CAMERA_INITIAL_X_ANGLE); 
-        cameraXform.setRotateY(CAMERA_INITIAL_Y_ANGLE);
+        //cameraXform.setRotateX(CAMERA_INITIAL_X_ANGLE); 
+        //cameraXform.setRotateY(CAMERA_INITIAL_Y_ANGLE);
         
         cameraXform.setScaleX(X_SCALE);
         cameraXform.setScaleY(Y_SCALE);
@@ -456,7 +483,7 @@ public class Window3DSubScene{
 		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 		
 		// Set new origin to average X Y positions
-		cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
+		//cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
 		System.out.println("origin xyz: "+newOriginX+" "+newOriginY+" "+newOriginZ);
 	}
