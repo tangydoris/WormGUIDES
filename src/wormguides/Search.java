@@ -248,7 +248,7 @@ public class Search {
 						
 			case FUNCTIONAL:
 							for (String name : functionalNames) {
-								if (name.toLowerCase().equals(searched))
+								if (name.toLowerCase().startsWith(searched))
 									cells.add(PartsList.getLineageNameByFunctionalName(name));
 							}
 							break;
