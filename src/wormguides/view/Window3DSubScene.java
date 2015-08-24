@@ -39,7 +39,6 @@ import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
@@ -653,9 +652,7 @@ public class Window3DSubScene{
 	
 	private static final long WAIT_TIME_MILLI = 400;
 	
-	private static final double CAMERA_INITIAL_DISTANCE = -800,
-								CAMERA_INITIAL_X_ANGLE = 0.0,
-								CAMERA_INITIAL_Y_ANGLE = 0.0;
+	private static final double CAMERA_INITIAL_DISTANCE = -800;
     
     private static final double CAMERA_NEAR_CLIP = 0.01,
     							CAMERA_FAR_CLIP = 10000;
