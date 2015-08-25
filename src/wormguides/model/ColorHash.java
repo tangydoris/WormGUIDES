@@ -20,15 +20,15 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		super();
 	}
 	
-	private Material makeMaterial(Color...colors) {
+	public static Material makeMaterial(Color...colors) {
 		TreeSet<Color> colorSet = new TreeSet<Color>(new ColorComparator());
 		for (Color color : colors)
 			colorSet.add(color);
 		return makeMaterial(colorSet);
 	}
 	
-	private Material makeMaterial(TreeSet<Color> colors) {
-		WritableImage wImage = new WritableImage(240, 240);
+	public static Material makeMaterial(TreeSet<Color> colors) {
+		WritableImage wImage = new WritableImage(120, 120);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);
 		
@@ -65,6 +65,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		
 		PhongMaterial material = new PhongMaterial();
 		material.setDiffuseMap(wImage);
+		
 		return material;
 	}
 	
@@ -72,6 +73,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		if (get(set)==null)
 			put(set, makeMaterial(set));
 		
+		//System.out.println("color hash size: "+size());
 		return get(set);
 	}
 	

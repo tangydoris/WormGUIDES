@@ -89,7 +89,8 @@ public class WormBaseQuery{
 							}
 						});
 						
-						resultsHash.put(searched, out);
+						if (!out.isEmpty())
+							resultsHash.put(searched, out);
 						return out;
 					}
 				};
@@ -109,14 +110,14 @@ public class WormBaseQuery{
 			connection.setRequestMethod("GET");
 			
 			//Get Response
-		    InputStream is = connection.getInputStream();
-		    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-		    
-		    return rd;
-		  } catch (Exception e) {
+			InputStream is = connection.getInputStream();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+			
+			return rd;
+		} catch (Exception e) {
 		    e.printStackTrace();
 		    return null;
-		  }
+		}
 	}
 	
 	public static void doSearch(String text) {

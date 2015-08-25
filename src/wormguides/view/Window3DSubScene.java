@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -71,7 +72,7 @@ public class Window3DSubScene{
 	// switching timepoints stuff
 	private BooleanProperty playingMovie;
 	private PlayService playService;
-	private Runnable renderRunnable;
+	private RenderService renderService;
 	
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
@@ -170,36 +171,7 @@ public class Window3DSubScene{
 			}
 		});
 		
-		renderRunnable = new Runnable() {
-			@Override
-			public void run() {
-				refreshScene();
-				otherCells.clear();
-				addCellsToScene();
-				// search mode
-				if (inSearch) {
-					for (int i = 0; i < cells.length; i++) {
-						if (searched[i])
-							root.getChildren().add(cells[i]);
-					}
-					for (int i = 0; i < cells.length; i++) {
-						if (!searched[i])
-							root.getChildren().add(cells[i]);
-					}
-				}
-				// regular mode
-				else {
-					for (int i = 0; i < cells.length; i++) {
-						if (!otherCells.contains(names[i]))
-							root.getChildren().add(cells[i]);
-					}
-					for (int i = 0; i < cells.length; i++) {
-						if (otherCells.contains(names[i]))
-							root.getChildren().add(cells[i]);
-					}
-				}
-			}
-		};
+		renderService = new RenderService();
 		
 		zoom.addListener(new ChangeListener<Number>() {
 			@Override
@@ -308,6 +280,7 @@ public class Window3DSubScene{
 					selectedIndex.set(-1);
 			}
 		});
+		
 		subscene.setOnMousePressed(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
 				mousePosX = me.getSceneX();
@@ -358,8 +331,7 @@ public class Window3DSubScene{
 		else
 			consultSearchResultsList();
 		
-		// render spheres
-		Platform.runLater(renderRunnable);
+		renderService.restart();
 	}
 	
 	private void updateLocalSearchResults() {
@@ -379,9 +351,8 @@ public class Window3DSubScene{
 	}
 	
 	private void refreshScene() {
-		root = new Group();
+		root.getChildren().clear();
 		root.getChildren().add(cameraXform);
-		subscene.setRoot(root);
 	}
 	
 	private void addCellsToScene() {
@@ -406,6 +377,7 @@ public class Window3DSubScene{
 						colors.add(rule.getColor());
 				}
 				material = colorHash.getMaterial(colors);
+				//material = ColorHash.makeMaterial(colors);
 				
 				if (colors.isEmpty()) {
 					otherCells.add(names[i]);
@@ -419,15 +391,7 @@ public class Window3DSubScene{
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
 	        sphere.getTransforms().addAll(rotateX, rotateY);
-	        //sphere.getTransforms().add(rotateX);
-	        //sphere.getTransforms().add(rotateY);
 	        translateSphere(sphere, x, y, z);
-	        
-	        /*
-	        System.out.println("\n"+names[i]);
-	        for (Transform t : sphere.getTransforms())
-	        	System.out.println(t.toString());
-	        */
 	        
 	        cells[i] = sphere;
 		}
@@ -435,11 +399,6 @@ public class Window3DSubScene{
 	
 	private void translateSphere(Node sphere, double x, double y, double z) {
 		Translate t = new Translate(x, y, z);
-		/*
-		sphere.setTranslateX(x);
-        sphere.setTranslateY(y);
-        sphere.setTranslateZ(z);
-		*/
 		sphere.getTransforms().add(t);
 	}
 	
@@ -535,22 +494,18 @@ public class Window3DSubScene{
 					ListChangeListener.Change<? extends ColorRule> change) {
 				while (change.next()) {
 					for (ColorRule rule : change.getAddedSubList()) {
-						//colorHash.addColorToHash(rule.getColor());
-						
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
 							public void changed(
 									ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
-									//colorHash.addColorToHash(rule.getColor());
 									//System.out.println("rule changed, building scene");
 									buildScene(time.get());
 								}
 							}
 						});
 					}
-					
 					//System.out.println("rule list changed, building scene");
 					buildScene(time.get());
 				}
@@ -582,7 +537,6 @@ public class Window3DSubScene{
 					for (int i=0; i<3; i++) {
 						colorString += sb.toString();
 					}
-					//System.out.println(colorString);
 					opacityMaterialHash.put(othersOpacity, new PhongMaterial(
 								Color.web(colorString, othersOpacity)));
 				}
@@ -612,7 +566,97 @@ public class Window3DSubScene{
 		return START_TIME;
 	}
 	
-	private final class PlayService extends Service<Void>{
+	public EventHandler<ActionEvent> getZoomInButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				double z = zoom.get();
+				if (z<=5 && z>0.25)
+					zoom.set(z-.25);
+			}
+		};
+	}
+	
+	public EventHandler<ActionEvent> getZoomOutButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				double z = zoom.get();
+				if (z<5 && z>=0.25)
+					zoom.set(z+.25);
+			}
+		};
+	}
+	
+	public EventHandler<ActionEvent> getBackwardButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				if (!playingMovie.get()) {
+					int t = time.get();
+					if (t>1 && t<=getEndTime())
+						time.set(t-1);
+				}
+			}
+		};
+	}
+	
+	public EventHandler<ActionEvent> getForwardButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				if (!playingMovie.get()) {
+					int t = time.get();
+					if (t>=1 && t<getEndTime()-1)
+						time.set(t+1);
+				}
+			}
+		};
+	}
+	
+	private final class RenderService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							refreshScene();
+							otherCells.clear();
+							addCellsToScene();
+							// search mode
+							if (inSearch) {
+								for (int i = 0; i < cells.length; i++) {
+									if (searched[i])
+										root.getChildren().add(cells[i]);
+								}
+								for (int i = 0; i < cells.length; i++) {
+									if (!searched[i])
+										root.getChildren().add(cells[i]);
+								}
+							}
+							// regular mode
+							else {
+								for (int i = 0; i < cells.length; i++) {
+									if (!otherCells.contains(names[i]))
+										root.getChildren().add(cells[i]);
+								}
+								for (int i = 0; i < cells.length; i++) {
+									if (otherCells.contains(names[i]))
+										root.getChildren().add(cells[i]);
+								}
+							}
+						}
+					});
+					return null;
+				}
+			};
+		}
+	}
+	
+	private final class PlayService extends Service<Void> {
 		@Override
 		protected final Task<Void> createTask() {
 			return new Task<Void>() {

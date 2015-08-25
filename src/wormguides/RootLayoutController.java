@@ -102,9 +102,6 @@ public class RootLayoutController implements Initializable{
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
-	private DoubleProperty zoom;
-	
-	//private PartsList partsList;
 	
 	@FXML
 	public void menuCloseAction() {
@@ -147,7 +144,7 @@ public class RootLayoutController implements Initializable{
 	
 	private void getPropertiesFrom3DWindow() {
 		time = window3D.getTimeProperty();
-		zoom = window3D.getZoomProperty();
+		window3D.getZoomProperty();
 		totalNuclei = window3D.getTotalNucleiProperty();
 		playingMovie = window3D.getPlayingMovieProperty();
 		selectedName = window3D.getSelectedName();
@@ -172,41 +169,10 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
-		backwardButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				int t = time.get();
-				if (t > 1 && t <= window3D.getEndTime())
-					time.set(t-1);
-			}
-		});
-		
-		forwardButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				int t = time.get();
-				if (t >= 1 && t < window3D.getEndTime()-1)
-					time.set(t+1);
-			}
-		});
-		
-		zoomOutButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				double z = zoom.get();
-				if (z < 5 && z >= 0.25)
-					zoom.set(z+.25);
-			}
-		});
-		
-		zoomInButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				double z = zoom.get();
-				if (z <= 5 && z > 0.25)
-					zoom.set(z-.25);
-			}
-		});
+		backwardButton.setOnAction(window3D.getBackwardButtonListener());
+		forwardButton.setOnAction(window3D.getForwardButtonListener());
+		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
+		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
 		
 		searchField.textProperty().addListener(window3D.getSearchFieldListener());
 		searchResultsListView.getSelectionModel().selectedItemProperty().addListener(

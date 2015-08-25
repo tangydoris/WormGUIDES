@@ -90,6 +90,10 @@ public class TableLineageData implements LineageData{
 		private ArrayList<Integer[]> positions;
 		private ArrayList<Integer> diameters;
 		
+		private String[] namesArray;
+		private Integer[][] positionsArray;
+		private Integer[] diametersArray;
+		
 		private Frame() {
 			names = new ArrayList<String>();
 			positions = new ArrayList<Integer[]>();
@@ -109,15 +113,21 @@ public class TableLineageData implements LineageData{
 		}
 		
 		private String[] getNames() {
-			return names.toArray(new String[names.size()]);
+			if (namesArray==null)
+				namesArray = names.toArray(new String[names.size()]);
+			return namesArray;
 		}
 		
 		private Integer[][] getPositions() {
-			return positions.toArray(new Integer[positions.size()][3]);
+			if (positionsArray==null)
+				positionsArray = positions.toArray(new Integer[positions.size()][3]);
+			return positionsArray;
 		}
 		
 		private Integer[] getDiameters() {
-			return diameters.toArray(new Integer[diameters.size()]);
+			if (diametersArray==null)
+				diametersArray = diameters.toArray(new Integer[diameters.size()]);
+			return diametersArray;
 		}
 		
 		public String toString() {
