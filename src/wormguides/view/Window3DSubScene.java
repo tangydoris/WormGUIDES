@@ -322,7 +322,7 @@ public class Window3DSubScene{
 	
 	private void rotateAllCells(double x, double y) {
 		rotateX.setAngle(rotateX.getAngle()+y);
-		rotateY.setAngle(rotateY.getAngle()+x);
+		rotateY.setAngle(rotateY.getAngle()-x);
 	}
 	
 	private int getIndexByName(String name) {
@@ -454,8 +454,6 @@ public class Window3DSubScene{
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-        //cameraXform.setRotateX(CAMERA_INITIAL_X_ANGLE); 
-        //cameraXform.setRotateY(CAMERA_INITIAL_Y_ANGLE);
         
         cameraXform.setScaleX(X_SCALE);
         cameraXform.setScaleY(Y_SCALE);
@@ -482,7 +480,6 @@ public class Window3DSubScene{
 		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 		
 		// Set new origin to average X Y positions
-		//cameraXform.setPivot(newOriginX, newOriginY, newOriginZ);
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
 		System.out.println("origin xyz: "+newOriginX+" "+newOriginY+" "+newOriginZ);
 	}
@@ -538,7 +535,7 @@ public class Window3DSubScene{
 					ListChangeListener.Change<? extends ColorRule> change) {
 				while (change.next()) {
 					for (ColorRule rule : change.getAddedSubList()) {
-						colorHash.addColorToHash(rule.getColor());
+						//colorHash.addColorToHash(rule.getColor());
 						
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
@@ -546,7 +543,7 @@ public class Window3DSubScene{
 									ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
-									colorHash.addColorToHash(rule.getColor());
+									//colorHash.addColorToHash(rule.getColor());
 									//System.out.println("rule changed, building scene");
 									buildScene(time.get());
 								}

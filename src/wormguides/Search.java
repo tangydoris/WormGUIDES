@@ -208,17 +208,20 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-						label = LineageTree.getCaseSensitiveName(searched);
-						break;
+							label = LineageTree.getCaseSensitiveName(searched);
+							break;
+							
 			case FUNCTIONAL:
-						label = "'"+searched+"' functional";
-						break;
+							label = "'"+searched+"' functional";
+							break;
+							
 			case DESCRIPTION:
-						label = "'"+searched+"' description";
-						break;
+							label = "'"+searched+"' description";
+							break;
+							
 			case GENE:
-						label = "'"+searched+"' gene";
-						break;
+							label = "'"+searched+"' gene";
+							break;
 		}
 		
 		ColorRule rule = new ColorRule(label, color, options);
@@ -404,7 +407,10 @@ public class Search {
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				searchedText = newValue.toLowerCase();
-				resultsUpdateService.restart();
+				if (searchedText.isEmpty())
+					searchResultsList.clear();
+				else
+					resultsUpdateService.restart();
 			}
 		};
 	}
