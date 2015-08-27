@@ -48,9 +48,9 @@ public class ColorRule {
 	private ImageView eyeInvertIcon;
 	
 	private ArrayList<String> cells;
-	private ArrayList<String> ancestors;
-	private ArrayList<String> descendants;
-	private ArrayList<String> active;
+	//private ArrayList<String> ancestors;
+	//private ArrayList<String> descendants;
+	//private ArrayList<String> active;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -77,9 +77,9 @@ public class ColorRule {
 		setColor(color);
 		
 		cells = new ArrayList<String>();
-		ancestors = new ArrayList<String>();
-		descendants = new ArrayList<String>();
-		active = new ArrayList<String>();
+		//ancestors = new ArrayList<String>();
+		//descendants = new ArrayList<String>();
+		//active = new ArrayList<String>();
 		
 		setOptions(options);
 		
@@ -145,11 +145,11 @@ public class ColorRule {
 			public void handle(ActionEvent event) {
 				ruleChanged.set(true);
 				if (visible) {
-					active.clear();
+					//active.clear();
 					visibleBtn.setGraphic(eyeInvertIcon);
 				}
 				else {
-					resetActiveList();
+					//resetActiveList();
 					visibleBtn.setGraphic(eyeIcon);
 				}
 				visible = !visible;
@@ -190,9 +190,10 @@ public class ColorRule {
 	
 	public void setCells(ArrayList<String> list) {
 		cells = list;
-		resetActiveList();
+		//resetActiveList();
 	}
 	
+	/*
 	public void setAncestors(ArrayList<String> list) {
 		ancestors = list;
 		resetActiveList();
@@ -202,11 +203,13 @@ public class ColorRule {
 		descendants = list;
 		resetActiveList();
 	}
+	*/
 	
 	public ArrayList<String> getCells() {
 		return cells;
 	}
 	
+	/*
 	public ArrayList<String> getAncestors() {
 		return ancestors;
 	}
@@ -228,6 +231,7 @@ public class ColorRule {
 		if (isDescendantSelected())
 			active.addAll(descendants);
 	}
+	*/
 	
 	private void setColorButton(Color color) {
 		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
@@ -257,7 +261,7 @@ public class ColorRule {
 		for (SearchOption option : options)
 			if (option != null)
 				this.options.add(option);
-		resetActiveList();
+		//resetActiveList();
 	}
 	
 	public String getSearchedText() {
@@ -317,6 +321,23 @@ public class ColorRule {
 				out += ", ";
 		}
 		return out;
+	}
+	
+	public boolean appliesTo(String name) {
+		if (!visible)
+			return false;
+		
+		if (options.contains(SearchOption.CELL) && cells.contains(name))
+			return true;
+		
+		for (String cell : cells) {
+			if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
+				return true;
+			if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	private EventHandler<ActionEvent> getSubmitHandler() {

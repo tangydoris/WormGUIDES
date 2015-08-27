@@ -232,8 +232,8 @@ public class Search {
 		else
 			cells = getCellsList(searched);
 		rule.setCells(cells);
-		rule.setAncestors(getAncestorsList(cells));
-		rule.setDescendants(getDescendantsList(cells));
+		//rule.setAncestors(getAncestorsList(cells));
+		//rule.setDescendants(getDescendantsList(cells));
 		
 		rulesList.add(rule);
 	}

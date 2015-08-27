@@ -139,11 +139,13 @@ public class LineageTree {
 		ances = ances.toLowerCase();
 		
 		if (desc.length()>ances.length() && desc.startsWith(ances)) {
-			if (!desc.startsWith("e"))
+			if (!desc.equals("e")) {
+				System.out.println("descendant by name: "+desc);
 				return true;
+			}
 		}
 		
-		return isDescendant(findNode(desc), findNode(ances));
+		return isDescendantByNode(findNode(desc), findNode(ances));
 	}
 	
 	// returns true if ances is the ancestor of desc
@@ -156,15 +158,17 @@ public class LineageTree {
 		return nameNodeHash.get(name);
 	}
 	
-	private static boolean isDescendant(TreeItem<String> node, TreeItem<String> ances) {
+	private static boolean isDescendantByNode(TreeItem<String> node, TreeItem<String> ances) {
 		if (node==null || ances==null || node==root || node==ances 
 				|| node.getValue().toLowerCase().equals("nuc"))
 			return false;
 		
-		if (node.getParent()==ances)
+		if (node.getParent()==ances) {
+			System.out.println("descendant by node");
 			return true;
+		}
 		
-		return isDescendant(node.getParent(), ances);
+		return isDescendantByNode(node.getParent(), ances);
 	}
 	
 	public static String getCaseSensitiveName(String name) {

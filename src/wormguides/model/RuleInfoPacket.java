@@ -28,12 +28,6 @@ public class RuleInfoPacket {
 		return color;
 	}
 	
-	/*
-	public ObjectProperty<Color> getColorProperty() {
-		return colorProperty;
-	}
-	*/
-	
 	public ArrayList<SearchOption> getOptions() {
 		return options;
 	}

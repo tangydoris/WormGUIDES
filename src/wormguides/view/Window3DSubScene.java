@@ -178,20 +178,16 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
 				cameraXform.setScale(zoom.get());
-				//System.out.println("zoom changed, building scene");
-				buildScene(time.get());
 			}
 		});
 		
 		localSearchResults = new ArrayList<String>();
 		
-		buildScene(time.get());
-		
 		searchResultsUpdateService = null;
 		
 		geneResultsUpdated = new SimpleBooleanProperty();
 		
-		othersOpacity = 1.0d;
+		othersOpacity = 1.0;
 		opacityMaterialHash = new HashMap<Double, Material>();
 		opacityMaterialHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
 		otherCells = new ArrayList<String>();
@@ -356,38 +352,48 @@ public class Window3DSubScene{
 	}
 	
 	private void addCellsToScene() {
+		ArrayList<Sphere> renderFirst = new ArrayList<Sphere>();
+ 		ArrayList<Sphere> renderSecond = new ArrayList<Sphere>();
+ 		
 		for (int i = 0; i < names.length; i ++) {
 			double radius = SIZE_SCALE*diameters[i]/2;
 			Sphere sphere = new Sphere(radius);
 			
 			Material material = new PhongMaterial();
-			// if in search, do highlighting
-			if (inSearch) {
-				if (searched[i])
+ 			// if in search, do highlighting
+ 			if (inSearch) {
+ 				if (searched[i]) {
+					renderFirst.add(sphere);
 					material = colorHash.getHighlightMaterial();
-				else
+ 				}
+ 				else {
+					renderSecond.add(sphere);
 					material = colorHash.getTranslucentMaterial();
-			}
-			// consult color rules when not in search
-			else {
-				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
-				for (ColorRule rule : rulesList) {
-					// just need to consult rule's active list
-					if (rule.getActiveList().contains(names[i]))
-						colors.add(rule.getColor());
-				}
-				material = colorHash.getMaterial(colors);
-				//material = ColorHash.makeMaterial(colors);
-				
-				if (colors.isEmpty()) {
-					otherCells.add(names[i]);
-					material = opacityMaterialHash.get(othersOpacity);
-				}
-			}
-			
-			sphere.setMaterial(material);
-	        
-	        double x = positions[i][X_COR_INDEX];
+ 				}
+ 			}
+ 			// not in search mode
+ 			else {
+ 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+ 				for (ColorRule rule : rulesList) {
+ 					// just need to consult rule's active list
+ 					if (rule.appliesTo(names[i])) {
+ 						System.out.println("rule applies to: "+names[i]);
+ 						colors.add(rule.getColor());
+ 					}
+ 				}
+ 				material = colorHash.getMaterial(colors);
+ 				
+ 				if (colors.isEmpty()) {
+ 					renderSecond.add(sphere);
+ 					material = opacityMaterialHash.get(othersOpacity);
+ 				}
+ 				else
+ 					renderFirst.add(sphere);
+ 			}
+ 			
+ 			sphere.setMaterial(material);
+	 			
+ 			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
 	        sphere.getTransforms().addAll(rotateX, rotateY);
@@ -395,6 +401,10 @@ public class Window3DSubScene{
 	        
 	        cells[i] = sphere;
 		}
+		
+		refreshScene();
+		root.getChildren().addAll(renderFirst);
+		root.getChildren().addAll(renderSecond);
 	}
 	
 	private void translateSphere(Node sphere, double x, double y, double z) {
@@ -540,6 +550,7 @@ public class Window3DSubScene{
 					opacityMaterialHash.put(othersOpacity, new PhongMaterial(
 								Color.web(colorString, othersOpacity)));
 				}
+				
 				buildScene(time.get());
 			}
 		};
@@ -550,8 +561,10 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 										String oldValue, String newValue) {
-				if (newValue.isEmpty())
+				if (newValue.isEmpty()) {
 					inSearch = false;
+					buildScene(time.get());
+				}
 				else
 					inSearch = true;
 			}
@@ -626,28 +639,6 @@ public class Window3DSubScene{
 							refreshScene();
 							otherCells.clear();
 							addCellsToScene();
-							// search mode
-							if (inSearch) {
-								for (int i = 0; i < cells.length; i++) {
-									if (searched[i])
-										root.getChildren().add(cells[i]);
-								}
-								for (int i = 0; i < cells.length; i++) {
-									if (!searched[i])
-										root.getChildren().add(cells[i]);
-								}
-							}
-							// regular mode
-							else {
-								for (int i = 0; i < cells.length; i++) {
-									if (!otherCells.contains(names[i]))
-										root.getChildren().add(cells[i]);
-								}
-								for (int i = 0; i < cells.length; i++) {
-									if (otherCells.contains(names[i]))
-										root.getChildren().add(cells[i]);
-								}
-							}
 						}
 					});
 					return null;
