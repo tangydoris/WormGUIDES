@@ -208,11 +208,6 @@ public class LineageTree {
 		return isDescendant(desc, ances);
 	}
 	
-	private static TreeItem<String> findNode(String name) {
-		// name should already be lower case
-		return nameNodeHash.get(name);
-	}
-	
 	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();
 		if (nameNodeHash.get(name)==null) {
