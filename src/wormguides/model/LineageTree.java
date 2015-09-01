@@ -146,10 +146,8 @@ public class LineageTree {
 		
 		if (desc.startsWith("p") && ances.startsWith("p")) {
 			int comp = desc.compareTo(ances);
-			if (comp>0) {
-				System.out.println(desc+" is descendant of "+ances);
+			if (comp>0)
 				return true;
-			}
 			else
 				return false;
 		}
@@ -203,7 +201,6 @@ public class LineageTree {
 		}
 		
 		return false;
-		//return isDescendantByNode(findNode(desc), findNode(ances));
 	}
 	
 	// returns true if ances is the ancestor of desc
@@ -215,21 +212,6 @@ public class LineageTree {
 		// name should already be lower case
 		return nameNodeHash.get(name);
 	}
-	
-	/*
-	private static boolean isDescendantByNode(TreeItem<String> node, TreeItem<String> ances) {
-		if (node==null || ances==null || node==root || node==ances 
-				|| node.getValue().toLowerCase().equals("nuc"))
-			return false;
-		
-		if (node.getParent()==ances) {
-			System.out.println("descendant by node");
-			return true;
-		}
-		
-		return isDescendantByNode(node.getParent(), ances);
-	}
-	*/
 	
 	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();
