@@ -138,14 +138,72 @@ public class LineageTree {
 		desc = desc.toLowerCase();
 		ances = ances.toLowerCase();
 		
+		if (desc.equals("p0"))
+			return false;
+		
+		if (ances.equals("p0"))
+			return true;
+		
+		if (desc.startsWith("p") && ances.startsWith("p")) {
+			int comp = desc.compareTo(ances);
+			if (comp>0) {
+				System.out.println(desc+" is descendant of "+ances);
+				return true;
+			}
+			else
+				return false;
+		}
+		
 		if (desc.length()>ances.length() && desc.startsWith(ances)) {
 			if (!desc.equals("e")) {
-				System.out.println("descendant by name: "+desc);
 				return true;
 			}
 		}
 		
-		return isDescendantByNode(findNode(desc), findNode(ances));
+		if (desc.startsWith("z")) {
+			if (ances.startsWith("p"))
+				return true;
+			else
+				return false;
+		}
+		
+		if (desc.startsWith("d")) {
+			if (ances.equals("p3"))
+				return true;
+			else
+				return isDescendant("p3", ances);
+		}
+		
+		if (desc.startsWith("c")) {
+			if (ances.equals("p2"))
+				return true;
+			else
+				return isDescendant("p2", ances);
+		}
+		
+		if (desc.equals("ems")) {
+			if (ances.equals("p1"))
+				return true;
+			else
+				return isDescendant("p1", ances);
+		}
+		
+		if (desc.startsWith("ms") || desc.startsWith("e")) {
+			if (ances.equals("ems"))
+				return true;
+			else
+				return isDescendant("ems", ances);
+		}
+		
+		if (desc.startsWith("ab")) {
+			if (ances.equals("p0"))
+				return true;
+			else
+				return false;
+		}
+		
+		return false;
+		//return isDescendantByNode(findNode(desc), findNode(ances));
 	}
 	
 	// returns true if ances is the ancestor of desc
@@ -158,6 +216,7 @@ public class LineageTree {
 		return nameNodeHash.get(name);
 	}
 	
+	/*
 	private static boolean isDescendantByNode(TreeItem<String> node, TreeItem<String> ances) {
 		if (node==null || ances==null || node==root || node==ances 
 				|| node.getValue().toLowerCase().equals("nuc"))
@@ -170,6 +229,7 @@ public class LineageTree {
 		
 		return isDescendantByNode(node.getParent(), ances);
 	}
+	*/
 	
 	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();

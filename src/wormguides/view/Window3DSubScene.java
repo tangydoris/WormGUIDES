@@ -377,7 +377,7 @@ public class Window3DSubScene{
  				for (ColorRule rule : rulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesTo(names[i])) {
- 						System.out.println("rule applies to: "+names[i]);
+ 						//System.out.println("rule applies to: "+names[i]);
  						colors.add(rule.getColor());
  					}
  				}
