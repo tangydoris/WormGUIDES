@@ -157,6 +157,10 @@ public class RootLayoutController implements Initializable{
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
 				timeSlider.setValue(time.get());
+				if (time.get()>=window3D.getEndTime()-1) {
+					playButton.setGraphic(playIcon);
+					playingMovie.set(false);
+				}
 			}
 		});
 		
@@ -296,10 +300,12 @@ public class RootLayoutController implements Initializable{
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (playingMovie.get())
+				if (playingMovie.get()) {
 					playButton.setGraphic(playIcon);
-				else
+				}
+				else {
 					playButton.setGraphic(pauseIcon);
+				}
 				playingMovie.set(!playingMovie.get());
 			}
 		});
