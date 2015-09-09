@@ -22,6 +22,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -96,6 +97,10 @@ public class RootLayoutController implements Initializable{
 	// cell information
 	@FXML private Text cellName;
 	@FXML private Text cellDescription;
+	
+	// url generation
+	@FXML private MenuItem menuGenerateURL;
+	@FXML private MenuItem menuLoadURL;
 	
 	private ImageView playIcon, pauseIcon;
 	
