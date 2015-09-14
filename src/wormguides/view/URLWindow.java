@@ -80,6 +80,7 @@ public class URLWindow extends AnchorPane {
 						"-fx-faint-focus-color: transparent;");
 		
 		resetBtn = new Button("Reset");
+		resetBtn.setFont(font);
 		resetBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {

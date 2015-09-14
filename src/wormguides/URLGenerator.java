@@ -75,7 +75,6 @@ public class URLGenerator {
 			// color
 			String color = rule.getColor().toString();
 			color = color.substring(color.indexOf("x")+1, color.length()-2);
-			//System.out.println(color);
 			builder.append("+%23ff").append(color);
 		}
 		
@@ -83,7 +82,7 @@ public class URLGenerator {
 	}
 	
 	private static String generateViewParameters(int time, double rX, double rY, 
-								double rZ, double tX, double tY, double scale, double dim) {
+						double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder("/view");
 		
 		// time
