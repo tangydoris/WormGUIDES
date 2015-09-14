@@ -190,48 +190,11 @@ public class ColorRule {
 	
 	public void setCells(ArrayList<String> list) {
 		cells = list;
-		//resetActiveList();
 	}
-	
-	/*
-	public void setAncestors(ArrayList<String> list) {
-		ancestors = list;
-		resetActiveList();
-	}
-	
-	public void setDescendants(ArrayList<String> list) {
-		descendants = list;
-		resetActiveList();
-	}
-	*/
 	
 	public ArrayList<String> getCells() {
 		return cells;
 	}
-	
-	/*
-	public ArrayList<String> getAncestors() {
-		return ancestors;
-	}
-	
-	public ArrayList<String> getDescendants() {
-		return descendants;
-	}
-	
-	public ArrayList<String> getActiveList() {
-		return active;
-	}
-	
-	private void resetActiveList() {
-		active.clear();
-		if (isCellSelected())
-			active.addAll(cells);
-		if (isAncestorSelected())
-			active.addAll(ancestors);
-		if (isDescendantSelected())
-			active.addAll(descendants);
-	}
-	*/
 	
 	private void setColorButton(Color color) {
 		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
@@ -261,7 +224,6 @@ public class ColorRule {
 		for (SearchOption option : options)
 			if (option != null)
 				this.options.add(option);
-		//resetActiveList();
 	}
 	
 	public String getSearchedText() {

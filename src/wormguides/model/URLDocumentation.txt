@@ -1,0 +1,36 @@
+Note:	The Adroid and web URLs are currently equivalent.
+Note:	URLs are generated using the UTF8 values.
+
+Search Type:
+Description	-> "-d"
+Systematic 	-> "-s"
+Proper  	-> "-n"
+Gene		-> "-g"
+
+Systematic, Proper		-> -s-n
+Description, Proper		-> -d-n
+Description, Systematic	-> -d-s
+All		-> -d-s-n
+
+Note:	Gene search can only be toggled by itself.
+Note:	Currently on the desktop version, we toggle each search type by itself. Multiple search types
+		can be toggled on the iOS version.
+
+
+Modifier:
+Cell		-> "$"
+Descendant	-> "<" (%3E in UTF8)
+Ancestor	-> ">" (%3C in UTF8)
+
+Cell, Descendant		-> "<$" (%3E$)
+Cell, Ancestor			-> "$>" ($%3C)
+Descendant, Ancestor	-> "<>" (%3E3C)
+All						-> "<$>" (%3E$%3C)
+
+Note:	The "$" is not used in the Android version. There is ambiguity in whether or not the cell
+		modifier is implicitly selected.
+
+
+Color:
+The RGB hex is placed after the search type and modifiers. We append "#ff" (or +%23ff in UTF8) 
+followed by the hex value.
