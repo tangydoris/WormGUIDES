@@ -115,7 +115,7 @@ public class Window3DSubScene{
 			}
 		});
 		
-		zoom = new SimpleDoubleProperty(1d);
+		zoom = new SimpleDoubleProperty(1.0);
 		zScale = Z_SCALE;
 		
 		cells = new Sphere[1];
@@ -521,6 +521,48 @@ public class Window3DSubScene{
 				}
 			}
 		});
+	}
+	
+	public ArrayList<ColorRule> getRulesList() {
+		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
+		for (ColorRule rule : rulesList)
+			list.add(rule);
+		return list;
+	}
+	
+	public int getTime() {
+		return time.get();
+	}
+	
+	// TODO
+	public double getRotationX() {
+		return 0.0;
+	}
+	
+	public double getRotationY() {
+		return 0.0;
+	}
+	
+	public double getRotationZ() {
+		return 0.0;
+	}
+	
+	public double getTranslationX() {
+		return 0.0;
+	}
+	
+	public double getTranslationY() {
+		return 0.0;
+	}
+	
+	public double getScale() {
+		double scale = zoom.get()-0.25;
+		scale /= 3.167;
+		return scale;
+	}
+	
+	public double getOthersVisibility() {
+		return othersOpacity;
 	}
 	
 	public SubScene getSubScene() {

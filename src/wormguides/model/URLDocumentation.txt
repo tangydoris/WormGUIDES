@@ -12,7 +12,8 @@ Description, Proper		-> -d-n
 Description, Systematic	-> -d-s
 All		-> -d-s-n
 
-Note:	Gene search can only be toggled by itself.
+Note:	The documentation says that "-g" corresponds to gene search, but iOS only registers a text as
+		a gene search if there are no modifiers.
 Note:	Currently on the desktop version, we toggle each search type by itself. Multiple search types
 		can be toggled on the iOS version.
 
@@ -24,7 +25,7 @@ Ancestor	-> ">" (%3C in UTF8)
 
 Cell, Descendant		-> "<$" (%3E$)
 Cell, Ancestor			-> "$>" ($%3C)
-Descendant, Ancestor	-> "<>" (%3E3C)
+Descendant, Ancestor	-> "<>" (%3E%3C)
 All						-> "<$>" (%3E$%3C)
 
 Note:	The "$" is not used in the Android version. There is ambiguity in whether or not the cell

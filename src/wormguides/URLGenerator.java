@@ -2,44 +2,87 @@ package wormguides;
 
 import java.util.ArrayList;
 
-import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
 
 public class URLGenerator {
 	
-	private enum UrlType {
-		IOS, ANDROID, WEB;
-	}
-	
 	public static String generateIOSURL(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
-		
-		return null;
+		StringBuilder builder = new StringBuilder("wormguides://wormguides/testurlscript?");
+		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
+		builder.append("/iOS/");
+		return builder.toString();
 	}
 	
 	public static String generateAndroidURL(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
-		
-		return null;
+		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
+		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
+		builder.append("/Android/");
+		return builder.toString();
 	}
 
 	public static String generateWebURL(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
-		
-		return null;
+		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
+		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
+		builder.append("/browser/");
+		return builder.toString();
 	}
 	
-	private static String generateSetParameters(UrlType type, ArrayList<ColorRule> rules) {
+	private static String generateParameterString(ArrayList<ColorRule> rules, int time, double rX, 
+						double rY, double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder();
+		builder.append(generateSetParameters(rules));
+		builder.append(generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim));
+		return builder.toString();
+	}
+	
+	private static String generateSetParameters(ArrayList<ColorRule> rules) {
+		StringBuilder builder = new StringBuilder("/set");
+		
 		for (ColorRule rule : rules) {
-			String name = rule.getSearchedText();
-			Color color = rule.getColor();
+			String ruleText = rule.getSearchedText();
+			if (ruleText.indexOf("'") != -1) {
+				ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
+				ruleText = ruleText.substring(ruleText.indexOf("'")+1, ruleText.length());
+			}
+			builder.append("/").append(ruleText);
+			
+			// search types
+			switch (rule.getSearchType()) {
+				case SYSTEMATIC :	builder.append("-s");
+									break;
+				case DESCRIPTION :	builder.append("-d");
+									break;
+				case FUNCTIONAL :	builder.append("-n");
+									break;
+				case GENE :			builder.append("-g");
+									break;
+			}
+			
+			// ancestry modifiers
+			// descendant <
+			if (rule.isDescendantSelected())
+				builder.append("%3E");
+			// cell $
+			if (rule.isCellSelected())
+				builder.append("$");
+			// ancestor >
+			if (rule.isAncestorSelected())
+				builder.append("%3C");
+			
+			// color
+			String color = rule.getColor().toString();
+			color = color.substring(color.indexOf("x")+1, color.length()-2);
+			//System.out.println(color);
+			builder.append("+%23ff").append(color);
 		}
 		
 		return builder.toString();
 	}
 	
-	private static String generateViewParameters(UrlType type, int time, double rX, double rY, 
+	private static String generateViewParameters(int time, double rX, double rY, 
 								double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder("/view");
 		
@@ -59,24 +102,7 @@ public class URLGenerator {
 		builder.append("/scale=").append(scale);
 		builder.append("/dim=").append(dim);
 		
-		// platform
-		switch (type) {
-			case IOS :		builder.append("/iOS/");
-							break;
-			case ANDROID : 	builder.append("/Android/");
-							break;
-			case WEB :		builder.append("/browser/");
-							break;
-		}
-		
 		return builder.toString();
 	}
-	
-	private static final String IOSPREFIX = "wormguides://wormguides/testurlscript?/set/";
-	private static final String ANDROIDPREFIX = "http://scene.wormguides.org/wormguides/testurlscript?/set/";
-	private static final String WEBPREFIX = "http://scene.wormguides.org/wormguides/testurlscript?/set/";
-	
-	private static final String SYSTEMATIC 	= "-s",
-								FUNCTIONAL 	= "-n",
-								DESCRIPTION	= "-d";
+
 }

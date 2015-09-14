@@ -22,7 +22,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -43,6 +42,8 @@ import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
+import wormguides.view.URLLoadWindow;
+import wormguides.view.URLWindow;
 import wormguides.view.Window3DSubScene;
 
 public class RootLayoutController implements Initializable{
@@ -50,6 +51,12 @@ public class RootLayoutController implements Initializable{
 	// popup windows
 	private Stage aboutStage;
 	private Stage treeStage;
+	private Stage urlStage;
+	private Stage urlLoadStage;
+	
+	// URL generation/loading
+	private URLWindow urlWindow;
+	private URLLoadWindow urlLoadWindow;
 	
 	// 3D subscene stuff
 	private Window3DSubScene window3D;
@@ -99,8 +106,10 @@ public class RootLayoutController implements Initializable{
 	@FXML private Text cellDescription;
 	
 	// url generation
+	/*
 	@FXML private MenuItem menuGenerateURL;
 	@FXML private MenuItem menuLoadURL;
+	*/
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -138,6 +147,29 @@ public class RootLayoutController implements Initializable{
 			treeStage.initModality(Modality.NONE);
 		}
 		treeStage.show();
+	}
+	
+	@FXML
+	public void generateURLAction() {
+		if (urlStage==null) {
+			urlStage = new Stage();
+			urlWindow = new URLWindow();
+			urlWindow.setScene(window3D);
+			urlStage.setScene(new Scene(urlWindow));
+			urlStage.setTitle("URLs");
+			urlStage.initModality(Modality.NONE);
+			
+			urlStage.setResizable(false);
+		}
+		else
+			urlWindow.resetURLs();
+		
+		urlStage.show();
+	}
+	
+	@FXML
+	public void loadURLAction() {
+		
 	}
 	
 	public void init3DWindow(TableLineageData data) {

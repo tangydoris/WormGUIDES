@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -40,6 +41,7 @@ public class ColorRule {
 	private String searchedTextLowerCase;
 	
 	private ArrayList<SearchOption> options;
+	private SearchType type;
 	private BooleanProperty ruleChanged;
 	private boolean visible;
 	private Color color;
@@ -48,9 +50,6 @@ public class ColorRule {
 	private ImageView eyeInvertIcon;
 	
 	private ArrayList<String> cells;
-	//private ArrayList<String> ancestors;
-	//private ArrayList<String> descendants;
-	//private ArrayList<String> active;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -69,17 +68,16 @@ public class ColorRule {
 	}
 	
 	public ColorRule(String searched, Color color, SearchOption...options) {
-		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
+		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)),
+														SearchType.SYSTEMATIC);
 	}
 	
-	public ColorRule(String searched, Color color, ArrayList<SearchOption> options) {
+	public ColorRule(String searched, Color color, ArrayList<SearchOption> options,
+																SearchType type) {
 		setSearchedText(searched);
 		setColor(color);
 		
 		cells = new ArrayList<String>();
-		//ancestors = new ArrayList<String>();
-		//descendants = new ArrayList<String>();
-		//active = new ArrayList<String>();
 		
 		setOptions(options);
 		
@@ -185,6 +183,7 @@ public class ColorRule {
 			}
 		});
 		
+		this.type = type;
 		visible = true;
 	}
 	
@@ -228,6 +227,10 @@ public class ColorRule {
 	
 	public String getSearchedText() {
 		return searchedText;
+	}
+	
+	public SearchType getSearchType() {
+		return type;
 	}
 	
 	public String getSearchedTextLowerCase() {

@@ -224,7 +224,7 @@ public class Search {
 							break;
 		}
 		
-		ColorRule rule = new ColorRule(label, color, options);
+		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
 		if (type==SearchType.GENE)
