@@ -168,9 +168,8 @@ public class RootLayoutController implements Initializable{
 			urlStage.setResizable(false);
 			urlStage.initModality(Modality.NONE);
 		}
-		else
-			urlWindow.resetURLs();
 		
+		urlWindow.resetURLs();
 		urlStage.show();
 	}
 	

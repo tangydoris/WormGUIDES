@@ -107,7 +107,6 @@ public class URLWindow extends AnchorPane {
 	
 	public void setScene(Window3DSubScene window3D) {
 		this.scene = window3D;
-		resetURLs();
 	}
 	
 	public void resetURLs() {

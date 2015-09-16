@@ -530,8 +530,18 @@ public class Window3DSubScene{
 		return list;
 	}
 	
+	public void setRulesList(ArrayList<ColorRule> list) {
+		rulesList.clear();
+		rulesList.setAll(list);
+	}
+	
 	public int getTime() {
 		return time.get();
+	}
+	
+	public void setTime(int t) {
+		if (t > 0 && t < endTime)
+			time.set(t);
 	}
 	
 	// TODO
@@ -539,20 +549,40 @@ public class Window3DSubScene{
 		return 0.0;
 	}
 	
+	public void setRotationX(double rx) {
+		
+	}
+	
 	public double getRotationY() {
 		return 0.0;
+	}
+	
+	public void setRotationY(double ry) {
+		
 	}
 	
 	public double getRotationZ() {
 		return 0.0;
 	}
 	
+	public void setRotationZ(double rz) {
+		
+	}
+	
 	public double getTranslationX() {
 		return 0.0;
 	}
 	
+	public void setTranslationX(double tx) {
+		
+	}
+	
 	public double getTranslationY() {
 		return 0.0;
+	}
+	
+	public void setTranslationY(double ty) {
+		
 	}
 	
 	public double getScale() {
@@ -561,8 +591,16 @@ public class Window3DSubScene{
 		return scale;
 	}
 	
+	public void setScale(double scale) {
+		
+	}
+	
 	public double getOthersVisibility() {
 		return othersOpacity;
+	}
+	
+	public void setOthersVisibility() {
+		
 	}
 	
 	public SubScene getSubScene() {
