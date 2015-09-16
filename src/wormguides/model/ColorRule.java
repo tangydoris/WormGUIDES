@@ -6,6 +6,7 @@ import java.util.Arrays;
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
 import wormguides.SearchType;
+import wormguides.view.AppFont;
 import wormguides.view.ColorRuleEditPane;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -27,7 +28,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -85,7 +85,7 @@ public class ColorRule {
 		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
 		
 		hbox.setSpacing(2);	
-		label.setFont(new Font(14));
+		label.setFont(AppFont.getFont());
 		label.prefHeightProperty().bind(sideLength);
 		label.setMaxWidth(150);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);

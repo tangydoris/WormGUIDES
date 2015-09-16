@@ -153,13 +153,20 @@ public class RootLayoutController implements Initializable{
 	public void generateURLAction() {
 		if (urlStage==null) {
 			urlStage = new Stage();
+			
 			urlWindow = new URLWindow();
 			urlWindow.setScene(window3D);
+			urlWindow.getCloseButton().setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					urlStage.hide();
+				}
+			});
+			
 			urlStage.setScene(new Scene(urlWindow));
 			urlStage.setTitle("URLs");
-			urlStage.initModality(Modality.NONE);
-			
 			urlStage.setResizable(false);
+			urlStage.initModality(Modality.NONE);
 		}
 		else
 			urlWindow.resetURLs();
@@ -169,7 +176,31 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void loadURLAction() {
+		if (urlLoadStage==null) {
+			urlLoadStage = new Stage();
+			
+			urlLoadWindow = new URLLoadWindow();
+			urlLoadWindow.getLoadButton().setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					// TODO Auto-generated method stub
+					urlLoadStage.hide();
+				}
+			});
+			urlLoadWindow.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					urlLoadStage.hide();
+				}
+			});
+			
+			urlLoadStage.setScene(new Scene(urlLoadWindow));
+			urlLoadStage.setTitle("Load URL");
+			urlLoadStage.setResizable(false);
+			urlLoadStage.initModality(Modality.NONE);
+		}
 		
+		urlLoadStage.show();
 	}
 	
 	public void init3DWindow(TableLineageData data) {

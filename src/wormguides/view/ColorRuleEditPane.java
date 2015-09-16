@@ -16,7 +16,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 public class ColorRuleEditPane extends AnchorPane{
 	
@@ -113,7 +112,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		buttonBox.setPrefHeight(30);
 		Button submit = new Button("Submit");
 		submit.setDefaultButton(true);
-		submit.setFont(new Font(14));
+		submit.setFont(AppFont.getFont());
 		submit.setPrefWidth(100);
 		submit.setAlignment(Pos.CENTER);
 		submit.setOnAction(handler);
@@ -131,7 +130,7 @@ public class ColorRuleEditPane extends AnchorPane{
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+
 					"-fx-faint-focus-color: transparent;");
 			if (node instanceof Label)
-				((Label) node).setFont(new Font(14));
+				((Label) node).setFont(AppFont.getFont());
 		}
 		
 		getChildren().add(vbox);
@@ -148,7 +147,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		Region indent = new Region();
 		indent.setPrefWidth(40);
 		
-		label.setFont(new Font(14));
+		label.setFont(AppFont.getFont());
 		
 		Region separator = new Region();
 		HBox.setHgrow(separator, Priority.ALWAYS);

@@ -12,7 +12,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import wormguides.URLGenerator;
 import wormguides.model.ColorRule;
 
@@ -32,13 +31,12 @@ public class URLWindow extends AnchorPane {
 	private String androidURL;
 	private String webURL;
 	
-	private Font font;
 	private Button resetBtn;
+	private Button closeBtn;
 	
 	public URLWindow() {
 		super();
-		setPrefHeight(200);
-		setPrefWidth(400);
+		setPrefWidth(430);
 		
 		VBox vBox = new VBox();
 		vBox.setSpacing(5);
@@ -48,48 +46,56 @@ public class URLWindow extends AnchorPane {
 		AnchorPane.setBottomAnchor(vBox, 10.0);
 		getChildren().add(vBox);
 		
-		font = new Font(14);
-		
 		iOSLabel = new Label("iOS:");
-		iOSLabel.setFont(font);
+		iOSLabel.setFont(AppFont.getFont());
 		iOSLabel.setPrefHeight(22);
 		androidLabel = new Label("Android:");
-		androidLabel.setFont(font);
+		androidLabel.setFont(AppFont.getFont());
 		androidLabel.setPrefHeight(22);
 		webLabel = new Label("Web browser:");
-		webLabel.setFont(font);
+		webLabel.setFont(AppFont.getFont());
 		webLabel.setPrefHeight(22);
 		
 		iOSField = new TextField();
-		iOSField.setFont(font);
+		iOSField.setFont(AppFont.getFont());
 		iOSField.setEditable(false);
 		iOSField.setPrefHeight(22);
 		iOSField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		androidField = new TextField();
-		androidField.setFont(font);
+		androidField.setFont(AppFont.getFont());
 		androidField.setEditable(false);
 		androidField.setPrefHeight(22);
 		androidField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		webField = new TextField();
-		webField.setFont(font);
+		webField.setFont(AppFont.getFont());
 		webField.setEditable(false);
 		webField.setPrefHeight(22);
 		webField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		
 		resetBtn = new Button("Reset");
-		resetBtn.setFont(font);
+		resetBtn.setPrefWidth(70);
+		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
+						"-fx-faint-focus-color: transparent;");
+		resetBtn.setFont(AppFont.getFont());
 		resetBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
 				resetURLs();
 			}
 		});
+		
+		closeBtn = new Button("Close");
+		closeBtn.setPrefWidth(70);
+		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
+						"-fx-faint-focus-color: transparent;");
+		closeBtn.setFont(AppFont.getFont());
 		HBox hBox = new HBox();
+		hBox.setSpacing(10);
 		hBox.setAlignment(Pos.CENTER);
-		hBox.getChildren().add(resetBtn);
+		hBox.getChildren().addAll(resetBtn, closeBtn);
 		
 		Region r = new Region();
 		r.setPrefHeight(5);
@@ -124,5 +130,9 @@ public class URLWindow extends AnchorPane {
 			androidField.setText(androidURL);
 			webField.setText(webURL);
 		}
+	}
+	
+	public Button getCloseButton() {
+		return closeBtn;
 	}
 }
