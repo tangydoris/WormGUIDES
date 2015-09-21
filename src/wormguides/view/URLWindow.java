@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -47,6 +48,7 @@ public class URLWindow extends AnchorPane {
 		setPrefWidth(430);
 		
 		cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Tooltip tooltip = new Tooltip("copy");
 		
 		VBox vBox = new VBox();
 		vBox.setSpacing(5);
@@ -74,6 +76,7 @@ public class URLWindow extends AnchorPane {
 						"-fx-faint-focus-color: transparent;");
 		HBox.setHgrow(iOSField, Priority.ALWAYS);
 		Button iOSCopyBtn = new Button();
+		iOSCopyBtn.setTooltip(tooltip);
 		iOSCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 							"-fx-faint-focus-color: transparent;");
 		iOSCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
@@ -99,6 +102,7 @@ public class URLWindow extends AnchorPane {
 						"-fx-faint-focus-color: transparent;");
 		HBox.setHgrow(androidField, Priority.ALWAYS);
 		Button androidCopyBtn = new Button();
+		androidCopyBtn.setTooltip(tooltip);
 		androidCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 								"-fx-faint-focus-color: transparent;");
 		androidCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
@@ -124,6 +128,7 @@ public class URLWindow extends AnchorPane {
 						"-fx-faint-focus-color: transparent;"); 
 		HBox.setHgrow(webField, Priority.ALWAYS);
 		Button webCopyBtn = new Button();
+		webCopyBtn.setTooltip(tooltip);
 		webCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 							"-fx-faint-focus-color: transparent;");
 		webCopyBtn.maxWidthProperty().bind(webCopyBtn.heightProperty());
