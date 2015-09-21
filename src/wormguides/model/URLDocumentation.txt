@@ -1,4 +1,4 @@
-Note:	The Adroid and web URLs are currently equivalent.
+Note:	The Android and web URLs are currently equivalent.
 Note:	URLs are generated using the UTF8 values.
 
 Search Type:

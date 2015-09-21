@@ -51,6 +51,10 @@ public class URLLoadWindow extends AnchorPane {
 		getChildren().add(vBox);
 	}
 	
+	public String getInputURL() {
+		return field.getText();
+	}
+	
 	public Button getLoadButton() {
 		return loadBtn;
 	}

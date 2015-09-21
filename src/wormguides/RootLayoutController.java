@@ -105,11 +105,8 @@ public class RootLayoutController implements Initializable{
 	@FXML private Text cellName;
 	@FXML private Text cellDescription;
 	
-	// url generation
-	/*
-	@FXML private MenuItem menuGenerateURL;
-	@FXML private MenuItem menuLoadURL;
-	*/
+	// url stuff
+	private URLLoader urlLoader;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -184,6 +181,10 @@ public class RootLayoutController implements Initializable{
 				public void handle(ActionEvent event) {
 					// TODO Auto-generated method stub
 					urlLoadStage.hide();
+					if (urlLoader==null) {
+						urlLoader = new URLLoader(window3D);
+						urlLoader.parseURL(urlLoadWindow.getInputURL());
+					}
 				}
 			});
 			urlLoadWindow.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {

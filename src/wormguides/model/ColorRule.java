@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -135,6 +136,7 @@ public class ColorRule {
 		visibleBtn.maxWidthProperty().bind(sideLength);
 		visibleBtn.minHeightProperty().bind(sideLength);
 		visibleBtn.minWidthProperty().bind(sideLength);
+		visibleBtn.setPadding(Insets.EMPTY);
 		visibleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		visibleBtn.setGraphic(eyeIcon);
 		visibleBtn.setGraphicTextGap(0);
@@ -142,14 +144,10 @@ public class ColorRule {
 			@Override
 			public void handle(ActionEvent event) {
 				ruleChanged.set(true);
-				if (visible) {
-					//active.clear();
+				if (visible)
 					visibleBtn.setGraphic(eyeInvertIcon);
-				}
-				else {
-					//resetActiveList();
+				else
 					visibleBtn.setGraphic(eyeIcon);
-				}
 				visible = !visible;
 				ruleChanged.set(false);
 			}
