@@ -4,13 +4,13 @@ Note:	URLs are generated using the UTF8 values.
 Search Type:
 Description	-> "-d"
 Systematic 	-> "-s"
-Proper  	-> "-n"
+Functional 	-> "-n"
 Gene		-> "-g"
 
 Systematic, Proper		-> -s-n
 Description, Proper		-> -d-n
 Description, Systematic	-> -d-s
-All		-> -d-s-n
+All						-> -d-s-n
 
 Note:	The documentation says that "-g" corresponds to gene search, but iOS only registers a text as
 		a gene search if there are no modifiers.

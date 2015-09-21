@@ -25,21 +25,21 @@ import wormguides.model.PartsList;
 
 public class Search {
 
-	private ArrayList<String> lineageNames;
-	private ArrayList<String> functionalNames;
-	private ArrayList<String> descriptions;
+	private static ArrayList<String> lineageNames;
+	private static ArrayList<String> functionalNames;
+	private static ArrayList<String> descriptions;
 	
 	private ObservableList<String> searchResultsList;
-	private String searchedText;
+	private static String searchedText;
 	private BooleanProperty clearSearchFieldProperty;
 	
-	private SearchType type;
+	private static SearchType type;
 	
 	private boolean cellTicked;
 	private boolean ancestorTicked;
 	private boolean descendantTicked;
 	
-	private ObservableList<ColorRule> rulesList;
+	private static ObservableList<ColorRule> rulesList;
 	private Color selectedColor;
 	
 	private final Service<Void> resultsUpdateService;
@@ -161,13 +161,13 @@ public class Search {
 		}
 	}
 	
-	private String getSearchedText() {
+	private static String getSearchedText() {
 		final String searched = searchedText;
 		return searched;
 	}
 	
-	public void setRulesList(ObservableList<ColorRule> rulesList) {
-		this.rulesList = rulesList;
+	public void setRulesList(ObservableList<ColorRule> rulesListArg) {
+		rulesList = rulesListArg;
 	}
 	
 	public boolean containsRule(ColorRule other) {
@@ -187,12 +187,21 @@ public class Search {
 		};
 	}
 	
+	public static void setColorRulesCells(ArrayList<ColorRule> rules) {
+		
+	}
+	
 	public void addDefaultRules() {
 		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, 
 					SearchOption.CELL, SearchOption.DESCENDANT);
+	}
+	
+	public void clearColorRules() {
+		// TODO add an 'are you sure?' popup window
+		rulesList.clear();
 	}
 	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
@@ -227,18 +236,29 @@ public class Search {
 		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
-		if (type==SearchType.GENE)
+		if (type==SearchType.GENE) {
+			// TODO make sure correct cells are received when called from urlloader
 			cells = geneSearchService.getValue();
+		}
 		else
 			cells = getCellsList(searched);
-		rule.setCells(cells);
-		//rule.setAncestors(getAncestorsList(cells));
-		//rule.setDescendants(getDescendantsList(cells));
 		
+		rule.setCells(cells);
 		rulesList.add(rule);
 	}
 	
-	private ArrayList<String> getCellsList(String searched) {
+	public static void addCellsToEmptyRules() {
+		SearchType prevType = type;
+		for (ColorRule rule : rulesList) {
+			if (!rule.areCellsSet()) {
+				type = rule.getSearchType();
+				rule.setCells(getCellsList(rule.getSearchedText()));
+			}
+		}
+		type = prevType;
+	}
+	
+	private static ArrayList<String> getCellsList(String searched) {
 		ArrayList<String> cells = new ArrayList<String> ();
 		searched = searched.toLowerCase();
 		switch (type) {

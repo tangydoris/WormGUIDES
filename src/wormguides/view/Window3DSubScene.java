@@ -530,6 +530,10 @@ public class Window3DSubScene{
 		return list;
 	}
 	
+	public ObservableList<ColorRule> getObservableRulesList() {
+		return rulesList;
+	}
+	
 	public void setRulesList(ArrayList<ColorRule> list) {
 		rulesList.clear();
 		rulesList.setAll(list);

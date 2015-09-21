@@ -12,9 +12,11 @@ public enum SearchType {
 	SearchType() {
 		this("");
 	}
+	
 	SearchType(String description) {
 		this.description = description;
 	}
+	
 	public String getDescription() {
 		return description;
 	}

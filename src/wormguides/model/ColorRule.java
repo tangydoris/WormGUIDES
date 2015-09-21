@@ -51,6 +51,7 @@ public class ColorRule {
 	private ImageView eyeInvertIcon;
 	
 	private ArrayList<String> cells;
+	private boolean cellsSet;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -79,6 +80,7 @@ public class ColorRule {
 		setColor(color);
 		
 		cells = new ArrayList<String>();
+		cellsSet = false;
 		
 		setOptions(options);
 		
@@ -187,6 +189,11 @@ public class ColorRule {
 	
 	public void setCells(ArrayList<String> list) {
 		cells = list;
+		cellsSet = true;
+	}
+	
+	public boolean areCellsSet() {
+		return cellsSet;
 	}
 	
 	public ArrayList<String> getCells() {
