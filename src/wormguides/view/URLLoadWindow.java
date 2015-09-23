@@ -1,5 +1,14 @@
 package wormguides.view;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -50,6 +59,22 @@ public class URLLoadWindow extends AnchorPane {
 		pasteBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		pasteBtn.setTooltip(tt);
+		pasteBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				Transferable contents = clipboard.getContents(null);
+			    boolean hasTransferableText = (contents != null)
+			    		&& contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+			    if (hasTransferableText) {
+			    	try {
+						field.setText((String)contents.getTransferData(DataFlavor.stringFlavor));
+					} catch (UnsupportedFlavorException | IOException e) {
+						e.printStackTrace();
+					}
+			    }
+			}
+		});
 		fieldHBox.getChildren().addAll(field, pasteBtn);
 		
 		loadBtn = new Button("Load");
