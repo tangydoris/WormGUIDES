@@ -16,6 +16,7 @@ public class ImageLoader {
 	private static ImageView plus, minus;
 	private static Image edit, eye, eyeInvert, close; 
 	private static Image copy;
+	private static ImageView paste;
 	private static JarFile jarFile;
 	
 	public static void loadImages(String jarPath) {
@@ -66,6 +67,8 @@ public class ImageLoader {
 								return;
 			case MINUS_PNG: 	minus = icon;
 								return;
+			case PASTE_PNG:		paste = icon;
+								return;
 		}
 	}
 
@@ -113,6 +116,10 @@ public class ImageLoader {
 		return new ImageView(copy);
 	}
 	
+	public static ImageView getPasteIcon() {
+		return paste;
+	}
+	
 	private static final String ENTRY_PREFIX = "wormguides/view/icons/",
 			BACKWARD_PNG = ENTRY_PREFIX+"backward.png",
 			FORWARD_PNG = ENTRY_PREFIX+"forward.png",
@@ -124,5 +131,6 @@ public class ImageLoader {
 			CLOSE_PNG = ENTRY_PREFIX+"close.png",
 			PLUS_PNG = ENTRY_PREFIX+"plus.png",
 			MINUS_PNG = ENTRY_PREFIX+"minus.png",
-			COPY_PNG = ENTRY_PREFIX+"copy.png";
+			COPY_PNG = ENTRY_PREFIX+"copy.png",
+			PASTE_PNG = ENTRY_PREFIX+"paste.png";
 }
