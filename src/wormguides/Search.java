@@ -3,6 +3,7 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -50,6 +51,7 @@ public class Search {
 	private final static Service<Void> showLoadingService;
 	// count used to display ellipsis when gene search is running
 	private static int count;
+	private static LinkedList<String> geneSearchQueue;
 	
 	static {
 		lineageNames = new ArrayList<String>(Arrays.asList(
@@ -97,6 +99,7 @@ public class Search {
 					showLoadingService.cancel();
 					updateGeneResults();
 					String searched = WormBaseQuery.getSearchedText();
+					geneSearchQueue.remove(searched);
 					// TODO
 					for (ColorRule rule : rulesList) {
 						if (rule.getSearchedText().contains("'"+searched+"'")) {
@@ -105,12 +108,15 @@ public class Search {
 						}
 					}
 					geneResultsUpdated.set(!geneResultsUpdated.get());
+					
+					if (!geneSearchQueue.isEmpty())
+						WormBaseQuery.doSearch(geneSearchQueue.pop());
 				}
 			});
 		}
 		
-		count = 0;
-		
+		geneSearchQueue = new LinkedList<String>();
+		count = 0;	
 		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
 	
@@ -224,6 +230,7 @@ public class Search {
 		
 		String label = "";
 		searched = searched.toLowerCase();
+		searched.trim();
 		switch (type) {
 			case SYSTEMATIC:
 							label = LineageTree.getCaseSensitiveName(searched);
@@ -237,7 +244,8 @@ public class Search {
 							label = "'"+searched+"' description";
 							break;
 							
-			case GENE:
+			case GENE:		
+							geneSearchQueue.add(searched);
 							label = "'"+searched+"' gene";
 							break;
 		}
