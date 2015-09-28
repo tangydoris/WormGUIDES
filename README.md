@@ -10,7 +10,7 @@ URL feature documentation can be found in src/wormguides/model/URLDocumentation.
 
 
 
-/*******About*******/
+####About
 
 WormGUIDES is a collaboration led by Drs. Zhirong Bao (MSKCC), Daniel Colon-Ramos (Yale), William Mohler (UConn) and Hari Shroff (NIH). For more information, visit our website at http://wormguides.org. 
 
@@ -19,9 +19,9 @@ The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhiron
 
 
 
-/*******Notes on Eclipse Project Setup*******/
+####Notes on Eclipse Project Setup
 
-**Eclipse Setup:**<br>
+#####Eclipse Setup:<br>
 Download Eclipse Mars<br>
 Download the latest JDK (currently using early release of Java 1.8.0_66 found at https://jdk8.java.net/download.html)<br>
 Make sure environment variables point to the bin directory of the jdk (usually found in C:/Program Files/Java/jdk.../bin)<br>
@@ -29,12 +29,12 @@ If Eclipse cannot open, try to modify the eclipse.ini configuration file in the 
 Change the required java version in the argument -Dosgi.requiredJavaVersion from 1.7 to 1.8<br>
 Make sure the -vm argument points to the correct javaw.exe for your Java 1.8+ version<br>
 
-**Project Setup:**<br>
+#####Project Setup:<br>
 Select File > Import > Existing Projects into Workspace<br>
 Choose the Git directory you cloned and hit Finish<br><br>
 
 
-**If working with WormGUIDES:**<br>
+#####If working with WormGUIDES:<br>
 JavaFX Runtime and Tooling is helpful in development this app in eclipse<br>
 In Eclipse, go to Help > Install New Software...<br>
 Insert the address<br> http://download.eclipse.org/efxclipse/updates-released/2.0.0/site into the Location field and hit OK<br>
@@ -43,7 +43,7 @@ Go through the wizard and restart Eclipse when finished<br>
 (Steps taken from https://www.eclipse.org/efxclipse/install.html)<br><br>
 
 
-**If working with AceTree:**<br>
+#####If working with AceTree:<br>
 If there are many compiler errors, it is probably due to Eclipse not recognizing the dependencies in the jar subdirectory<br>
 To fix this, right click on your project in the Package Explorer and go to Properties<br>
 Select Java Build Path and choose the Libraries tab<br>
