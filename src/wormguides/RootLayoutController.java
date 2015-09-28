@@ -200,6 +200,7 @@ public class RootLayoutController implements Initializable{
 			urlLoadStage.initModality(Modality.NONE);
 		}
 		
+		urlLoadWindow.clearField();
 		urlLoadStage.show();
 	}
 	

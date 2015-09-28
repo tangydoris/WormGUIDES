@@ -28,6 +28,7 @@ public class URLLoadWindow extends AnchorPane {
 	private TextField field;
 	private Button loadBtn;
 	private Button cancelBtn;
+	private Button clearBtn;
 	
 	public URLLoadWindow() {
 		super();
@@ -81,6 +82,16 @@ public class URLLoadWindow extends AnchorPane {
 		loadBtn.setPrefWidth(70);
 		loadBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
+		clearBtn = new Button("Clear");
+		clearBtn.setPrefWidth(70);
+		clearBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
+					"-fx-faint-focus-color: transparent;");
+		clearBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				field.clear();
+			}
+		});
 		cancelBtn = new Button("Cancel");
 		cancelBtn.setPrefWidth(70);
 		cancelBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
@@ -91,7 +102,7 @@ public class URLLoadWindow extends AnchorPane {
 		
 		HBox hBox = new HBox(10);
 		hBox.setAlignment(Pos.CENTER);
-		hBox.getChildren().addAll(loadBtn, cancelBtn);
+		hBox.getChildren().addAll(loadBtn, clearBtn, cancelBtn);
 		
 		vBox.getChildren().addAll(label, fieldHBox, r, hBox);
 		getChildren().add(vBox);
@@ -107,5 +118,9 @@ public class URLLoadWindow extends AnchorPane {
 	
 	public Button getCancelButton() {
 		return cancelBtn;
+	}
+	
+	public void clearField() {
+		field.clear();
 	}
 }
