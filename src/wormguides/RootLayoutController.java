@@ -24,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -188,15 +187,14 @@ public class RootLayoutController implements Initializable{
 					alert.setTitle("Confirmation");
 					alert.setHeaderText("When you load a URL, all current color rules are erased.");
 					alert.setContentText("Are you sure you want to continue with loading?");
-
 					Optional<ButtonType> result = alert.showAndWait();
+					
 					if (result.get() == ButtonType.OK){
 						urlLoadStage.hide();
 						if (urlLoader==null)
 							urlLoader = new URLLoader(window3D);
 						urlLoader.parseURL(urlLoadWindow.getInputURL());
 					}
-					
 				}
 			});
 			urlLoadWindow.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {

@@ -91,18 +91,19 @@ public class Search {
 		
 		geneSearchService = WormBaseQuery.getSearchService();
 		if (geneSearchService != null) {
-			geneSearchService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-				@Override
-				public void handle(WorkerStateEvent event) {
-					showLoadingService.restart();
-				}
-			});
-			
 			geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					showLoadingService.cancel();
 					updateGeneResults();
+					String searched = WormBaseQuery.getSearchedText();
+					// TODO
+					for (ColorRule rule : rulesList) {
+						if (rule.getSearchedText().contains("'"+searched+"'")) {
+							rule.setCells(geneSearchService.getValue());
+							searchResultsList.clear();
+						}
+					}
 					geneResultsUpdated.set(!geneResultsUpdated.get());
 				}
 			});
@@ -111,18 +112,6 @@ public class Search {
 		count = 0;
 		
 		geneResultsUpdated = new SimpleBooleanProperty(false);
-		/*
-		geneResultsUpdated.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, 
-											Boolean arg1, Boolean arg2) {
-				// TODO Auto-generated method stub
-				if (arg2) {
-					updateGeneResults();
-				}
-			}
-		});
-		*/
 	}
 	
 	private static void updateGeneResults() {
@@ -213,7 +202,6 @@ public class Search {
 	}
 	
 	public void clearColorRules() {
-		// TODO add an 'are you sure?' popup window
 		rulesList.clear();
 	}
 	
@@ -222,7 +210,7 @@ public class Search {
 	}
 	
 	public static void addColorRule(SearchType type, String searched, Color color, 
-											ArrayList<SearchOption> options) {
+													ArrayList<SearchOption> options) {
 		SearchType tempType = Search.type;
 		Search.type = type;
 		addColorRule(searched, color, options);
@@ -258,28 +246,17 @@ public class Search {
 		
 		ArrayList<String> cells;
 		if (type==SearchType.GENE) {
-			// TODO make sure correct cells are received when called from urlloader
-			cells = geneSearchService.getValue();
+			showLoadingService.restart();
+			WormBaseQuery.doSearch(searched);
 		}
-		else
+		else {
 			cells = getCellsList(searched);
-		
-		rule.setCells(cells);
-		rulesList.add(rule);
-	}
-	
-	/*
-	public static void addCellsToEmptyRules() {
-		SearchType prevType = type;
-		for (ColorRule rule : rulesList) {
-			if (!rule.areCellsSet()) {
-				type = rule.getSearchType();
-				rule.setCells(getCellsList(rule.getSearchedText()));
-			}
+			rule.setCells(cells);
 		}
-		type = prevType;
+		
+		rulesList.add(rule);
+		searchResultsList.clear();
 	}
-	*/
 	
 	private static ArrayList<String> getCellsList(String searched) {
 		ArrayList<String> cells = new ArrayList<String> ();
@@ -319,6 +296,7 @@ public class Search {
 							break;
 						
 			case GENE:		
+							showLoadingService.restart();
 							WormBaseQuery.doSearch(getSearchedText());
 							return null;
 		}
@@ -448,7 +426,7 @@ public class Search {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
+											String oldValue, String newValue) {
 				searchedText = newValue.toLowerCase();
 				if (searchedText.isEmpty())
 					searchResultsList.clear();

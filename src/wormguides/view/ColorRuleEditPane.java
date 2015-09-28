@@ -122,9 +122,12 @@ public class ColorRuleEditPane extends AnchorPane{
 		Region separator2 = new Region();
 		separator2.setPrefHeight(10);
 		
+		Region separator3 = new Region();
+		separator3.setPrefHeight(5);
+		
 		vbox.getChildren().addAll(optionsLabel, separator, ancestryLabel,
 				cellRow, ancRow, desRow, separator1, colorLabel,
-				pickerPane, separator2, buttonBox);
+				pickerPane, separator2, buttonBox, separator3);
 		
 		for (Node node : vbox.getChildren()) {
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+

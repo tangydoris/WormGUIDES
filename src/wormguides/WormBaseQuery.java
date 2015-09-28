@@ -34,6 +34,9 @@ public class WormBaseQuery{
 						if (tokens.length!=0)
 							searched = tokens[0];
 						final String searchText = searched.trim();
+						searched = searchText;
+						
+						//System.out.println("starting gene search for "+searchText);
 						
 						// try to get result if previously searched
 						if (resultsHash.containsKey(searched))
@@ -77,7 +80,7 @@ public class WormBaseQuery{
 								}
 								pageStream.close();
 								restPageStream.close();
-								System.out.println("finished gene search");
+								//System.out.println("finished gene search for "+searched);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -90,8 +93,7 @@ public class WormBaseQuery{
 							}
 						});
 						
-						if (!out.isEmpty())
-							resultsHash.put(searched, out);
+						resultsHash.put(searched, out);
 						return out;
 					}
 				};
@@ -124,6 +126,10 @@ public class WormBaseQuery{
 	public static void doSearch(String text) {
 		searched = text;
 		searchService.restart();
+	}
+	
+	public static String getSearchedText() {
+		return searched;
 	}
 	
 	public static Service<ArrayList<String>> getSearchService() {
