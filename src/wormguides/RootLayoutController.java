@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
@@ -17,9 +18,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -179,12 +184,19 @@ public class RootLayoutController implements Initializable{
 			urlLoadWindow.getLoadButton().setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					// TODO Auto-generated method stub
-					urlLoadStage.hide();
-					if (urlLoader==null) {
-						urlLoader = new URLLoader(window3D);
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Confirmation");
+					alert.setHeaderText("When you load a URL, all current color rules are erased.");
+					alert.setContentText("Are you sure you want to continue with loading?");
+
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.get() == ButtonType.OK){
+						urlLoadStage.hide();
+						if (urlLoader==null)
+							urlLoader = new URLLoader(window3D);
 						urlLoader.parseURL(urlLoadWindow.getInputURL());
 					}
+					
 				}
 			});
 			urlLoadWindow.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {

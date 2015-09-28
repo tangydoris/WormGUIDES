@@ -29,28 +29,29 @@ public class Search {
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> descriptions;
 	
-	private ObservableList<String> searchResultsList;
+	private static ObservableList<String> searchResultsList;
 	private static String searchedText;
 	private BooleanProperty clearSearchFieldProperty;
 	
 	private static SearchType type;
 	
-	private boolean cellTicked;
-	private boolean ancestorTicked;
-	private boolean descendantTicked;
+	private static boolean cellTicked;
+	private static boolean ancestorTicked;
+	private static boolean descendantTicked;
 	
 	private static ObservableList<ColorRule> rulesList;
-	private Color selectedColor;
+	private static Color selectedColor;
 	
-	private final Service<Void> resultsUpdateService;
-	private final Service<ArrayList<String>> geneSearchService;
+	private final static Service<Void> resultsUpdateService;
+	private final static Service<ArrayList<String>> geneSearchService;
 	
-	private BooleanProperty geneResultsUpdated;
+	private static BooleanProperty geneResultsUpdated;
 	
-	private final Service<Void> showLoadingService;
-	private int count;
+	private final static Service<Void> showLoadingService;
+	// count used to display ellipsis when gene search is running
+	private static int count;
 	
-	public Search() {
+	static {
 		lineageNames = new ArrayList<String>(Arrays.asList(
 							AceTreeLoader.getAllCellNames()));
 		functionalNames = PartsList.getFunctionalNames();
@@ -110,9 +111,21 @@ public class Search {
 		count = 0;
 		
 		geneResultsUpdated = new SimpleBooleanProperty(false);
+		/*
+		geneResultsUpdated.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, 
+											Boolean arg1, Boolean arg2) {
+				// TODO Auto-generated method stub
+				if (arg2) {
+					updateGeneResults();
+				}
+			}
+		});
+		*/
 	}
 	
-	private void updateGeneResults() {
+	private static void updateGeneResults() {
 		if (geneSearchService.getValue()==null)
 			return;
 		
@@ -150,7 +163,7 @@ public class Search {
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
 	
-	private void addFunctionalNamesToList(ArrayList<String> list) {
+	private static void addFunctionalNamesToList(ArrayList<String> list) {
 		searchResultsList.clear();
 		for (String result : list) {
 			if (PartsList.getFunctionalNameByLineageName(result)!=null)
@@ -208,7 +221,15 @@ public class Search {
 		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
 	
-	private void addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
+	public static void addColorRule(SearchType type, String searched, Color color, 
+											ArrayList<SearchOption> options) {
+		SearchType tempType = Search.type;
+		Search.type = type;
+		addColorRule(searched, color, options);
+		Search.type = tempType;
+	}
+	
+	private static void addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
 		// default search options is cell and descendant
 		if (options==null)
 			options = new ArrayList<SearchOption>();
@@ -247,6 +268,7 @@ public class Search {
 		rulesList.add(rule);
 	}
 	
+	/*
 	public static void addCellsToEmptyRules() {
 		SearchType prevType = type;
 		for (ColorRule rule : rulesList) {
@@ -257,6 +279,7 @@ public class Search {
 		}
 		type = prevType;
 	}
+	*/
 	
 	private static ArrayList<String> getCellsList(String searched) {
 		ArrayList<String> cells = new ArrayList<String> ();
@@ -304,7 +327,7 @@ public class Search {
 	}
 	
 	// generates a list of descendants of all cells in input
-	private ArrayList<String> getDescendantsList(ArrayList<String> cells) {
+	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
 		ArrayList<String> descendants = new ArrayList<String>();
 		if (cells==null)
 			return descendants;
@@ -318,7 +341,7 @@ public class Search {
 	}
 	
 	// generates a list of ancestors of all cells in input
-	private ArrayList<String> getAncestorsList(ArrayList<String> cells) {
+	private static ArrayList<String> getAncestorsList(ArrayList<String> cells) {
 		ArrayList<String> ancestors = new ArrayList<String>();
 		if (cells==null)
 			return ancestors;
@@ -435,7 +458,7 @@ public class Search {
 		};
 	}
 	
-	private void refreshSearchResultsList(String newValue) {
+	private static void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
 		if (!searched.isEmpty()) {
 			ArrayList<String> cells;
@@ -486,19 +509,19 @@ public class Search {
 		return resultsUpdateService;
 	}
 	
-	private int getCountFinal(int count) {
+	private static int getCountFinal(int count) {
 		final int out = count;
 		return out;
 	}
 	
-	private final class CellNameComparator implements Comparator<String> {
+	private static final class CellNameComparator implements Comparator<String> {
 		@Override
 		public int compare(String s1, String s2) {
 			return s1.compareTo(s2);
 		}
 	}
 	
-	private final class ShowLoadingService extends Service<Void> {
+	private static final class ShowLoadingService extends Service<Void> {
 		@Override
 		protected final Task<Void> createTask() {
 			return new Task<Void>() {

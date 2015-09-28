@@ -376,10 +376,8 @@ public class Window3DSubScene{
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
  				for (ColorRule rule : rulesList) {
  					// just need to consult rule's active list
- 					if (rule.appliesTo(names[i])) {
- 						//System.out.println("rule applies to: "+names[i]);
+ 					if (rule.appliesTo(names[i]))
  						colors.add(rule.getColor());
- 					}
  				}
  				material = colorHash.getMaterial(colors);
  				

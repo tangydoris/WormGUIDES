@@ -80,6 +80,8 @@ public class ColorRule {
 		setColor(color);
 		
 		cells = new ArrayList<String>();
+		// if the cells list from Search is set for this rule, cellsSet is true
+		// is false before the list is set
 		cellsSet = false;
 		
 		setOptions(options);
@@ -297,14 +299,16 @@ public class ColorRule {
 		if (!visible)
 			return false;
 		
-		if (options.contains(SearchOption.CELL) && cells.contains(name))
-			return true;
-		
-		for (String cell : cells) {
-			if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
+		if (cells != null) {
+			if (options.contains(SearchOption.CELL) && cells.contains(name))
 				return true;
-			if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
-				return true;
+			
+			for (String cell : cells) {
+				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
+					return true;
+				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
+					return true;
+			}
 		}
 		
 		return false;

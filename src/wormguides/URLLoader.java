@@ -67,39 +67,68 @@ public class URLLoader {
 	private void parseRules(ArrayList<String> rules) {
 		rulesList.clear();
 		for (String rule : rules) {
+			ArrayList<String> types = new ArrayList<String>();
+			StringBuilder sb = new StringBuilder(rule);
+			
 			try {
-				String name = rule.substring(0, rule.indexOf("-"));
-				String colorString = rule.substring(rule.indexOf("+")+6, rule.length());
+				if (sb.indexOf("-s") > -1) {
+					types.add("-s");
+					int i = sb.indexOf("-s");
+					sb.replace(i, i+2, "");
+				}
+				if (sb.indexOf("-n") > -1) {
+					types.add("-n");
+					int i = sb.indexOf("-n");
+					sb.replace(i, i+2, "");
+				}
+				if (sb.indexOf("-d") > -1) {
+					types.add("-d");
+					int i = sb.indexOf("-d");
+					sb.replace(i, i+2, "");
+				}
+				if (sb.indexOf("-g") > -1) {
+					types.add("-g");
+					int i = sb.indexOf("-g");
+					sb.replace(i, i+2, "");
+				}
+				
+				String colorString = sb.substring(sb.indexOf("+")+6, sb.length());
 				
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-				if (rule.contains("%3C"))
+				if (sb.indexOf("%3C") > -1) {
 					options.add(SearchOption.ANCESTOR);
-				if (rule.contains("$"))
+					int i = sb.indexOf("%3C");
+					sb.replace(i, i+3, "");
+				}
+				if (sb.indexOf("$") > -1) {
 					options.add(SearchOption.CELL);
-				if (rule.contains("%3E"))
+					int i = sb.indexOf("$");
+					sb.replace(i, i+1, "");
+				}
+				if (rule.contains("%3E")) {
 					options.add(SearchOption.DESCENDANT);
-				
-				if (rule.contains("-s")) {
-					rulesList.add(new ColorRule(name, Color.web(colorString), 
-											options, SearchType.SYSTEMATIC));
-				}
-				if (rule.contains("-n")) {
-					rulesList.add(new ColorRule("'"+name+"' "+SearchType.FUNCTIONAL.getDescription(), 
-									Color.web(colorString), options, SearchType.FUNCTIONAL));
-				}
-				if (rule.contains("-d")) {
-					rulesList.add(new ColorRule("'"+name+"' "+SearchType.DESCRIPTION.getDescription(), 
-									Color.web(colorString), options, SearchType.DESCRIPTION));
-				}
-				if (rule.contains("-g")) {
-					rulesList.add(new ColorRule("'"+name+"' "+SearchType.GENE.getDescription(), 
-									Color.web(colorString), options, SearchType.GENE));
+					int i = sb.indexOf("%3E");
+					sb.replace(i, i+3, "");
 				}
 				
-				Search.addCellsToEmptyRules();
+				// extract name from what's left of rule
+				String name = sb.substring(0, sb.indexOf("+"));
+				
+				if (types.contains("-s")) {
+					Search.addColorRule(SearchType.SYSTEMATIC, name, Color.web(colorString), options);
+				}
+				if (types.contains("-n")) {
+					Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+				}
+				if (types.contains("-d")) {
+					Search.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+				}
+				if (types.contains("-g")) {
+					Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+				}
 			}
 			catch (StringIndexOutOfBoundsException e) {
-				System.out.println("invalid color rule format.");
+				System.out.println("invalid color rule format");
 				e.printStackTrace();
 			}
 		}

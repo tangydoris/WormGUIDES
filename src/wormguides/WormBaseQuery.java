@@ -44,7 +44,7 @@ public class WormBaseQuery{
 						
 						BufferedReader pageStream = openUrl("http://www.wormbase.org/db/get?name="
 																		+searchText+";class=gene");
-						if (pageStream!= null) {
+						if (pageStream != null) {
 							String firstQueryLine = "";
 							String restString = "";
 							try {
@@ -77,6 +77,7 @@ public class WormBaseQuery{
 								}
 								pageStream.close();
 								restPageStream.close();
+								System.out.println("finished gene search");
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
