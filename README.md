@@ -21,8 +21,8 @@ The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhiron
 
 /*****Notes on Eclipse Project Setup*****/
 
-Eclipse Setup:
-Download Eclipse Mars
+Eclipse Setup:</br>
+Download Eclipse Mars<br>
 Download the latest JDK (currently using early release of Java 1.8.0_66 found at https://jdk8.java.net/download.html)
 Make sure environment variables point to the bin directory of the jdk (usually found in C:/Program Files/Java/jdk.../bin)
 If Eclipse cannot open, try to modify the eclipse.ini configuration file in the main eclipse directory
