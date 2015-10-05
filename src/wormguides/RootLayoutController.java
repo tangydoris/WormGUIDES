@@ -16,14 +16,16 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -37,6 +39,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -45,6 +51,7 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
 import wormguides.view.AboutPane;
+import wormguides.view.AppFont;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
@@ -61,6 +68,11 @@ public class RootLayoutController implements Initializable{
 	// URL generation/loading
 	private URLWindow urlWindow;
 	private URLLoadWindow urlLoadWindow;
+	private boolean showLoadWarning;
+	private GridPane loadWarningPane;
+	private Dialog<ButtonType> loadWarningDialog;
+	private ButtonType buttonTypeOkay;
+	private ButtonType buttonTypeCancel;
 	
 	// 3D subscene stuff
 	private Window3DSubScene window3D;
@@ -177,19 +189,67 @@ public class RootLayoutController implements Initializable{
 	@FXML
 	public void loadURLAction() {
 		if (urlLoadStage==null) {
+			showLoadWarning = true;
 			urlLoadStage = new Stage();
 			
 			urlLoadWindow = new URLLoadWindow();
 			urlLoadWindow.getLoadButton().setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					Alert alert = new Alert(AlertType.CONFIRMATION);
-					alert.setTitle("Confirmation");
-					alert.setHeaderText("When you load a URL, all current color rules are erased.");
-					alert.setContentText("Are you sure you want to continue with loading?");
-					Optional<ButtonType> result = alert.showAndWait();
-					
-					if (result.get() == ButtonType.OK){
+					if (showLoadWarning) {
+						if (loadWarningDialog == null) {
+							loadWarningDialog = new Dialog<ButtonType>();
+							loadWarningDialog.setTitle("Confirm");
+							
+							loadWarningPane = new GridPane();
+							loadWarningPane.setHgap(10);
+							loadWarningPane.setVgap(10);
+							loadWarningPane.setPadding(new Insets(15, 15, 15, 15));
+							
+							final CheckBox checkBox = new CheckBox();
+							checkBox.setText("Do not show warning again.");
+							checkBox.setFont(AppFont.getFont());
+							checkBox.setContentDisplay(ContentDisplay.TEXT_ONLY);
+							
+							checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+								@Override
+								public void changed(ObservableValue<? extends Boolean> observable, 
+															Boolean oldValue, Boolean newValue) {
+									showLoadWarning = !newValue;
+								}
+							});
+							
+							final Label label = new Label("Loading a URL erases all current color rules. "+
+									"Are you sure you want to continue with loading?");
+							label.setWrapText(true);
+							label.setFont(AppFont.getFont());
+							VBox.setVgrow(label, Priority.ALWAYS);
+							HBox.setHgrow(label, Priority.ALWAYS);
+							
+							loadWarningPane.add(label, 0, 0);
+							loadWarningPane.add(checkBox, 0, 1);
+							
+							loadWarningDialog.getDialogPane().setContent(loadWarningPane);
+							
+							buttonTypeOkay = new ButtonType("OK", ButtonData.OK_DONE);
+							buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+							loadWarningDialog.getDialogPane().getButtonTypes().addAll(buttonTypeOkay, buttonTypeCancel);
+							
+							
+							loadWarningPane.setPrefSize(400, 100);
+							loadWarningPane.setMinSize(400, 100);
+							loadWarningPane.setMaxSize(400, 100);
+						}
+						
+						Optional<ButtonType> result = loadWarningDialog.showAndWait();
+						if (result.get() == buttonTypeOkay){
+							urlLoadStage.hide();
+							if (urlLoader==null)
+								urlLoader = new URLLoader(window3D);
+							urlLoader.parseURL(urlLoadWindow.getInputURL());
+						}
+					}
+					else {
 						urlLoadStage.hide();
 						if (urlLoader==null)
 							urlLoader = new URLLoader(window3D);
@@ -540,7 +600,9 @@ public class RootLayoutController implements Initializable{
         setLabels();
         
         sizeSubscene();
-        sizeInfoPane();  
+        sizeInfoPane();
+        
+        showLoadWarning = true;
 	}
 	
 	

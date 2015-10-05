@@ -100,7 +100,6 @@ public class Search {
 					updateGeneResults();
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
-					// TODO
 					for (ColorRule rule : rulesList) {
 						if (rule.getSearchedText().contains("'"+searched+"'")) {
 							rule.setCells(geneSearchService.getValue());
