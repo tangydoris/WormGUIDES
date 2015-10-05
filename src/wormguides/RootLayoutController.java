@@ -53,6 +53,7 @@ import wormguides.model.TableLineageData;
 import wormguides.view.AboutPane;
 import wormguides.view.AppFont;
 import wormguides.view.TreePane;
+import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.Window3DSubScene;
@@ -69,10 +70,7 @@ public class RootLayoutController implements Initializable{
 	private URLWindow urlWindow;
 	private URLLoadWindow urlLoadWindow;
 	private boolean showLoadWarning;
-	private GridPane loadWarningPane;
-	private Dialog<ButtonType> loadWarningDialog;
-	private ButtonType buttonTypeOkay;
-	private ButtonType buttonTypeCancel;
+	private URLLoadWarningDialog warning;
 	
 	// 3D subscene stuff
 	private Window3DSubScene window3D;
@@ -196,53 +194,12 @@ public class RootLayoutController implements Initializable{
 			urlLoadWindow.getLoadButton().setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					if (showLoadWarning) {
-						if (loadWarningDialog == null) {
-							loadWarningDialog = new Dialog<ButtonType>();
-							loadWarningDialog.setTitle("Confirm");
-							
-							loadWarningPane = new GridPane();
-							loadWarningPane.setHgap(10);
-							loadWarningPane.setVgap(10);
-							loadWarningPane.setPadding(new Insets(15, 15, 15, 15));
-							
-							final CheckBox checkBox = new CheckBox();
-							checkBox.setText("Do not show warning again.");
-							checkBox.setFont(AppFont.getFont());
-							checkBox.setContentDisplay(ContentDisplay.TEXT_ONLY);
-							
-							checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-								@Override
-								public void changed(ObservableValue<? extends Boolean> observable, 
-															Boolean oldValue, Boolean newValue) {
-									showLoadWarning = !newValue;
-								}
-							});
-							
-							final Label label = new Label("Loading a URL erases all current color rules. "+
-									"Are you sure you want to continue with loading?");
-							label.setWrapText(true);
-							label.setFont(AppFont.getFont());
-							VBox.setVgrow(label, Priority.ALWAYS);
-							HBox.setHgrow(label, Priority.ALWAYS);
-							
-							loadWarningPane.add(label, 0, 0);
-							loadWarningPane.add(checkBox, 0, 1);
-							
-							loadWarningDialog.getDialogPane().setContent(loadWarningPane);
-							
-							buttonTypeOkay = new ButtonType("OK", ButtonData.OK_DONE);
-							buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-							loadWarningDialog.getDialogPane().getButtonTypes().addAll(buttonTypeOkay, buttonTypeCancel);
-							
-							
-							loadWarningPane.setPrefSize(400, 100);
-							loadWarningPane.setMinSize(400, 100);
-							loadWarningPane.setMaxSize(400, 100);
-						}
-						
-						Optional<ButtonType> result = loadWarningDialog.showAndWait();
-						if (result.get() == buttonTypeOkay){
+					if (warning == null) {
+						warning = new URLLoadWarningDialog();
+					}
+					if (!warning.doNotShowAgain()){
+						Optional<ButtonType> result = warning.showAndWait();
+						if (result.get() == warning.getButtonTypeOkay()) {
 							urlLoadStage.hide();
 							if (urlLoader==null)
 								urlLoader = new URLLoader(window3D);
