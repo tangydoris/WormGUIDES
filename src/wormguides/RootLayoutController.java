@@ -16,16 +16,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -39,19 +35,15 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.ColorRule;
+import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.TableLineageData;
 import wormguides.view.AboutPane;
-import wormguides.view.AppFont;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
@@ -69,7 +61,6 @@ public class RootLayoutController implements Initializable{
 	// URL generation/loading
 	private URLWindow urlWindow;
 	private URLLoadWindow urlLoadWindow;
-	private boolean showLoadWarning;
 	private URLLoadWarningDialog warning;
 	
 	// 3D subscene stuff
@@ -187,7 +178,6 @@ public class RootLayoutController implements Initializable{
 	@FXML
 	public void loadURLAction() {
 		if (urlLoadStage==null) {
-			showLoadWarning = true;
 			urlLoadStage = new Stage();
 			
 			urlLoadWindow = new URLLoadWindow();
@@ -231,7 +221,7 @@ public class RootLayoutController implements Initializable{
 		urlLoadStage.show();
 	}
 	
-	public void init3DWindow(TableLineageData data) {
+	public void init3DWindow(LineageData data) {
 		window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
 				modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
@@ -310,6 +300,7 @@ public class RootLayoutController implements Initializable{
 		});
 		
 		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
+		window3D.addListenerToOpacitySlider(opacitySlider);
 	}
 	
 	private void setSelectedInfo(String name) {
@@ -534,6 +525,11 @@ public class RootLayoutController implements Initializable{
 		
 		initToggleGroup();
 		initLayers();
+		
+		initializeWithLineageData(data);
+	}
+	
+	public void initializeWithLineageData(LineageData data) {
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
 		
@@ -558,8 +554,6 @@ public class RootLayoutController implements Initializable{
         
         sizeSubscene();
         sizeInfoPane();
-        
-        showLoadWarning = true;
 	}
 	
 	

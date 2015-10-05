@@ -7,4 +7,5 @@ public interface LineageData {
 	Integer[][] getPositions(int time);
 	Integer[] getDiameters(int time);
 	ArrayList<String> getAllCellNames();
+	int getTotalTimePoints();
 }

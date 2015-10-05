@@ -54,10 +54,12 @@ public class URLLoader {
 				i++;
 		}
 		
+		/*
 		for (String arg : ruleArgs)
 			System.out.println(arg);
 		for (String arg : viewArgs)
 			System.out.println(arg);
+		*/
 		
 		// process arguments
 		parseRules(ruleArgs);
@@ -135,6 +137,68 @@ public class URLLoader {
 	}
 	
 	private void parseViewArgs(ArrayList<String> viewArgs) {
-		
+		for (String arg : viewArgs) {
+			String[] tokens = arg.split("=");
+			if (tokens.length!=0) {
+				switch (tokens[0]) {
+					case "time":	try {
+										window3D.setTime(Integer.parseInt(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing time variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "rX":		try {
+										window3D.setRotationX(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing rotation variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "rY":		try {
+										window3D.setRotationY(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing rotation variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "rZ":		try {
+										window3D.setRotationZ(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing rotation variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "tX":		try {
+										window3D.setTranslationX(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing translation variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "tY":		try {
+										window3D.setTranslationY(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing translation variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "scale":	try {
+										window3D.setScale(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing scale variable");
+										nfe.printStackTrace();
+									}
+									break;
+					case "dim":		try {
+										window3D.setOthersVisibility(Double.parseDouble(tokens[1]));
+									} catch (NumberFormatException nfe) {
+										System.out.println("error in parsing dim variable");
+										nfe.printStackTrace();
+									}
+									break;
+				}
+			}
+		}
 	}
 }

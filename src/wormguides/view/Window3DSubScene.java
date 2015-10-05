@@ -7,8 +7,8 @@ import java.util.TreeSet;
 import wormguides.ColorComparator;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
-import wormguides.model.TableLineageData;
 import wormguides.model.ColorRule;
+import wormguides.model.LineageData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -33,6 +33,7 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
@@ -44,7 +45,7 @@ import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
 	
-	private TableLineageData data;
+	private LineageData data;
 	
 	private SubScene subscene;
 	
@@ -93,7 +94,7 @@ public class Window3DSubScene{
 	private BooleanProperty geneResultsUpdated;
 	
 	// opacity value for "other" cells (with no rule attached)
-	private double othersOpacity;
+	private DoubleProperty othersOpacity;
 	private HashMap<Double, Material> opacityMaterialHash;
 	private ArrayList<String> otherCells;
 	
@@ -101,7 +102,7 @@ public class Window3DSubScene{
 	private final Rotate rotateX;
 	private final Rotate rotateY;
 	
-	public Window3DSubScene(double width, double height, TableLineageData data) {
+	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
 		this.data = data;
 		
@@ -187,9 +188,9 @@ public class Window3DSubScene{
 		
 		geneResultsUpdated = new SimpleBooleanProperty();
 		
-		othersOpacity = 1.0;
+		othersOpacity = new SimpleDoubleProperty(1.0);
 		opacityMaterialHash = new HashMap<Double, Material>();
-		opacityMaterialHash.put(new Double(othersOpacity), new PhongMaterial(Color.WHITE));
+		opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(Color.WHITE));
 		otherCells = new ArrayList<String>();
 		
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
@@ -383,7 +384,8 @@ public class Window3DSubScene{
  				
  				if (colors.isEmpty()) {
  					renderSecond.add(sphere);
- 					material = opacityMaterialHash.get(othersOpacity);
+ 					material = opacityMaterialHash.get(othersOpacity.get());
+ 					othersOpacity.set(1.0);
  				}
  				else
  					renderFirst.add(sphere);
@@ -514,7 +516,6 @@ public class Window3DSubScene{
 							}
 						});
 					}
-					//System.out.println("rule list changed, building scene");
 					buildScene(time.get());
 				}
 			}
@@ -547,6 +548,10 @@ public class Window3DSubScene{
 	}
 	
 	// TODO
+	/*
+	 * Not sure how the rotation is generated in the Android app
+	 * but as of now I am going to take the parameter in radians
+	 */
 	public double getRotationX() {
 		return 0.0;
 	}
@@ -594,14 +599,15 @@ public class Window3DSubScene{
 	}
 	
 	public void setScale(double scale) {
-		
+		scale *= 3.167;
+		zoom.set(scale+0.25);
 	}
 	
 	public double getOthersVisibility() {
-		return othersOpacity;
+		return othersOpacity.get();
 	}
 	
-	public void setOthersVisibility() {
+	public void setOthersVisibility(double dim) {
 		
 	}
 	
@@ -618,24 +624,41 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 										Number oldValue, Number newValue) {
-				othersOpacity = Math.round(newValue.doubleValue())/100.0;
+				othersOpacity.set(Math.round(newValue.doubleValue())/100.0);
+				
 				if (!opacityMaterialHash.containsKey(othersOpacity)) {
-					int darkness = (int) Math.round(othersOpacity*255);
+					int darkness = (int) Math.round(othersOpacity.get()*255);
 					String colorString = "#";
 					StringBuilder sb = new StringBuilder();
 					sb.append(Integer.toHexString(darkness));
+					
 					if (sb.length()<2)
 						sb.insert(0, "0");
-					for (int i=0; i<3; i++) {
+					
+					for (int i=0; i<3; i++)
 						colorString += sb.toString();
-					}
-					opacityMaterialHash.put(othersOpacity, new PhongMaterial(
-								Color.web(colorString, othersOpacity)));
+					
+					System.out.println("slider changed: "+othersOpacity.get());
+					opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(
+									Color.web(colorString, othersOpacity.get())));
 				}
 				
 				buildScene(time.get());
 			}
 		};
+	}
+	
+	public void addListenerToOpacitySlider(Slider slider) {
+		othersOpacity.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				Double arg = arg2.doubleValue();
+				System.out.println("number changed: "+arg);
+				if (arg>=0 && arg<=1.0) {
+					slider.setValue(arg*100.0);
+				}
+			}
+		});
 	}
 	
 	public ChangeListener<String> getSearchFieldListener() {
