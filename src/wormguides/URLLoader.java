@@ -54,13 +54,6 @@ public class URLLoader {
 				i++;
 		}
 		
-		/*
-		for (String arg : ruleArgs)
-			System.out.println(arg);
-		for (String arg : viewArgs)
-			System.out.println(arg);
-		*/
-		
 		// process arguments
 		parseRules(ruleArgs);
 		parseViewArgs(viewArgs);
@@ -71,24 +64,29 @@ public class URLLoader {
 		for (String rule : rules) {
 			ArrayList<String> types = new ArrayList<String>();
 			StringBuilder sb = new StringBuilder(rule);
+			boolean noTypeSpecified = true;
 			
 			try {
 				if (sb.indexOf("-s") > -1) {
+					noTypeSpecified = false;
 					types.add("-s");
 					int i = sb.indexOf("-s");
 					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-n") > -1) {
+					noTypeSpecified = false;
 					types.add("-n");
 					int i = sb.indexOf("-n");
 					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-d") > -1) {
+					noTypeSpecified = false;
 					types.add("-d");
 					int i = sb.indexOf("-d");
 					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-g") > -1) {
+					noTypeSpecified = false;
 					types.add("-g");
 					int i = sb.indexOf("-g");
 					sb.replace(i, i+2, "");
@@ -116,18 +114,21 @@ public class URLLoader {
 				// extract name from what's left of rule
 				String name = sb.substring(0, sb.indexOf("+"));
 				
-				if (types.contains("-s")) {
+				if (types.contains("-s"))
 					Search.addColorRule(SearchType.SYSTEMATIC, name, Color.web(colorString), options);
-				}
-				if (types.contains("-n")) {
+				
+				if (types.contains("-n"))
 					Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
-				}
-				if (types.contains("-d")) {
+				
+				if (types.contains("-d"))
 					Search.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
-				}
-				if (types.contains("-g")) {
+				
+				if (types.contains("-g"))
 					Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
-				}
+				
+				// if no type present, default is systematic
+				if (noTypeSpecified)
+					Search.addColorRule(SearchType.SYSTEMATIC, name, Color.web(colorString), options);
 			}
 			catch (StringIndexOutOfBoundsException e) {
 				System.out.println("invalid color rule format");

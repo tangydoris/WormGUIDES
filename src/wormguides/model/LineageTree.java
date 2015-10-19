@@ -210,10 +210,9 @@ public class LineageTree {
 	
 	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();
-		if (nameNodeHash.get(name)==null) {
-			System.out.println("no node for "+name);
-			return "null";
-		}
+		if (nameNodeHash.get(name)==null)
+			return "'"+name+"' systematic";
+		
 		return nameNodeHash.get(name).getValue();
 	}
 	

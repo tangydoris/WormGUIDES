@@ -385,7 +385,6 @@ public class Window3DSubScene{
  				if (colors.isEmpty()) {
  					renderSecond.add(sphere);
  					material = opacityMaterialHash.get(othersOpacity.get());
- 					othersOpacity.set(1.0);
  				}
  				else
  					renderFirst.add(sphere);
@@ -553,54 +552,61 @@ public class Window3DSubScene{
 	 * but as of now I am going to take the parameter in radians
 	 */
 	public double getRotationX() {
-		return 0.0;
+		return rotateX.getAngle();
 	}
 	
 	public void setRotationX(double rx) {
-		
+		rotateX.setAngle(rx);
 	}
 	
 	public double getRotationY() {
-		return 0.0;
+		return rotateY.getAngle();
 	}
 	
 	public void setRotationY(double ry) {
-		
+		rotateY.setAngle(ry);
 	}
 	
+	// rotationZ is not used
 	public double getRotationZ() {
 		return 0.0;
 	}
 	
+	// rotationZ is not used
 	public void setRotationZ(double rz) {
 		
 	}
 	
 	public double getTranslationX() {
-		return 0.0;
+		return cameraXform.t.getTx();
 	}
 	
 	public void setTranslationX(double tx) {
-		
+		if (tx>0 && tx<450)
+			cameraXform.t.setX(tx);
 	}
 	
 	public double getTranslationY() {
-		return 0.0;
+		return cameraXform.t.getTy();
 	}
 	
 	public void setTranslationY(double ty) {
-		
+		if (ty>0 && ty<450)
+			cameraXform.t.setY(ty);
 	}
 	
 	public double getScale() {
-		double scale = zoom.get()-0.25;
-		scale /= 3.167;
+		double scale = zoom.get()-0.5;
+		scale = 1-(scale/6.5);
 		return scale;
 	}
 	
 	public void setScale(double scale) {
-		scale *= 3.167;
-		zoom.set(scale+0.25);
+		if (scale > 1)
+			scale = 1;
+		scale = 6.5*(1-scale);
+		// smaller zoom value means larger picture
+		zoom.set((scale+0.5));
 	}
 	
 	public double getOthersVisibility() {
@@ -608,7 +614,7 @@ public class Window3DSubScene{
 	}
 	
 	public void setOthersVisibility(double dim) {
-		
+		othersOpacity.set(dim);
 	}
 	
 	public SubScene getSubScene() {
@@ -638,7 +644,6 @@ public class Window3DSubScene{
 					for (int i=0; i<3; i++)
 						colorString += sb.toString();
 					
-					System.out.println("slider changed: "+othersOpacity.get());
 					opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(
 									Color.web(colorString, othersOpacity.get())));
 				}
@@ -652,8 +657,7 @@ public class Window3DSubScene{
 		othersOpacity.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				Double arg = arg2.doubleValue();
-				System.out.println("number changed: "+arg);
+				Double arg = arg0.getValue().doubleValue();
 				if (arg>=0 && arg<=1.0) {
 					slider.setValue(arg*100.0);
 				}
@@ -688,9 +692,9 @@ public class Window3DSubScene{
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				double z = zoom.get();
-				if (z<=5 && z>0.25)
-					zoom.set(z-.25);
+				double z = zoom.get()-0.5;
+				if (!(z>7) && !(z<=0.25))
+					zoom.set(z);
 			}
 		};
 	}
@@ -699,9 +703,9 @@ public class Window3DSubScene{
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				double z = zoom.get();
-				if (z<5 && z>=0.25)
-					zoom.set(z+.25);
+				double z = zoom.get()+0.5;
+				if (!(z>7) && !(z<=0.25))
+					zoom.set(z);
 			}
 		};
 	}

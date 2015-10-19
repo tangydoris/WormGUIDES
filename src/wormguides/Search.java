@@ -233,6 +233,8 @@ public class Search {
 		switch (type) {
 			case SYSTEMATIC:
 							label = LineageTree.getCaseSensitiveName(searched);
+							if (label.isEmpty())
+								label = searched;
 							break;
 							
 			case FUNCTIONAL:
