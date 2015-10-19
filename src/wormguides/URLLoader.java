@@ -127,14 +127,34 @@ public class URLLoader {
 					Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
 				
 				// if no type present, default is systematic
-				if (noTypeSpecified)
-					Search.addColorRule(SearchType.SYSTEMATIC, name, Color.web(colorString), options);
+				if (noTypeSpecified) {
+					SearchType type = SearchType.SYSTEMATIC;
+					if (isGeneFormat(name))
+						type = SearchType.GENE;
+					Search.addColorRule(type, name, Color.web(colorString), options);
+				}
 			}
 			catch (StringIndexOutOfBoundsException e) {
 				System.out.println("invalid color rule format");
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private boolean isGeneFormat(String name) {
+		if (name.indexOf("-") < 0)
+			return false;
+		
+		String[] tokens = name.split("-");
+		if (tokens.length != 2)
+			return false;
+		try {
+			Integer.parseInt(tokens[1]);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	private void parseViewArgs(ArrayList<String> viewArgs) {
