@@ -508,10 +508,8 @@ public class Window3DSubScene{
 							public void changed(
 									ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									//System.out.println("rule changed, building scene");
+								if (newValue)
 									buildScene(time.get());
-								}
 							}
 						});
 					}
@@ -552,7 +550,7 @@ public class Window3DSubScene{
 	 * but as of now I am going to take the parameter in radians
 	 */
 	public double getRotationX() {
-		return rotateX.getAngle();
+		return Math.toRadians(rotateX.getAngle());
 	}
 	
 	public void setRotationX(double rx) {
@@ -560,7 +558,7 @@ public class Window3DSubScene{
 	}
 	
 	public double getRotationY() {
-		return rotateY.getAngle();
+		return Math.toRadians(rotateY.getAngle());
 	}
 	
 	public void setRotationY(double ry) {

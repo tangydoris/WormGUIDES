@@ -26,7 +26,7 @@ import wormguides.model.PartsList;
 
 public class Search {
 
-	private static ArrayList<String> lineageNames;
+	private static ArrayList<String> activeLineageNames;
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> descriptions;
 	
@@ -54,8 +54,7 @@ public class Search {
 	private static LinkedList<String> geneSearchQueue;
 	
 	static {
-		lineageNames = new ArrayList<String>(Arrays.asList(
-							AceTreeLoader.getAllCellNames()));
+		activeLineageNames = new ArrayList<String>();
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
 		
@@ -119,6 +118,10 @@ public class Search {
 		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
 	
+	public static void setActiveLineageNames(ArrayList<String> names) {
+		activeLineageNames = names;
+	}
+	
 	private static void updateGeneResults() {
 		if (geneSearchService.getValue()==null)
 			return;
@@ -166,6 +169,10 @@ public class Search {
 						")";
 			searchResultsList.add(result);
 		}
+	}
+	
+	public static boolean isLineageName(String name) {
+		return activeLineageNames.contains(name);
 	}
 	
 	private static String getSearchedText() {
@@ -272,7 +279,7 @@ public class Search {
 		searched = searched.toLowerCase();
 		switch (type) {
 			case SYSTEMATIC:
-							for (String name : lineageNames) {
+							for (String name : activeLineageNames) {
 								if (name.toLowerCase().equals(searched))
 									cells.add(name);
 							}
@@ -319,7 +326,7 @@ public class Search {
 		if (cells==null)
 			return descendants;
 		for (String cell : cells) {
-			for (String name : lineageNames) {
+			for (String name : activeLineageNames) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, cell))
 					descendants.add(name);
 			}
@@ -333,7 +340,7 @@ public class Search {
 		if (cells==null)
 			return ancestors;
 		for (String cell : cells) {
-			for (String name : lineageNames) {
+			for (String name : activeLineageNames) {
 				if (!ancestors.contains(name) && LineageTree.isAncestor(name, cell))
 					ancestors.add(name);
 			}
@@ -457,7 +464,7 @@ public class Search {
 			ArrayList<String> cellsForListView = new ArrayList<String>();
 			if (!cellTicked && !descendantTicked && !ancestorTicked) {
 				if (type==SearchType.SYSTEMATIC) {
-					for (String name : lineageNames) {
+					for (String name : activeLineageNames) {
 						if (name.toLowerCase().startsWith(searched))
 							cellsForListView.add(name);
 					}

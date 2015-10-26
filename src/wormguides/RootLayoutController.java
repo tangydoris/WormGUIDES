@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -442,8 +443,8 @@ public class RootLayoutController implements Initializable{
 		new PartsList();
 	}
 	
-	private void initLineageTree() {
-		new LineageTree(AceTreeLoader.getAllCellNames());
+	private void initLineageTree(ArrayList<String> allCellNames) {
+		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
 		lineageTreeRoot = LineageTree.getRoot();
 	}
 	
@@ -518,8 +519,8 @@ public class RootLayoutController implements Initializable{
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
-		TableLineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
-		initLineageTree();
+		LineageData data = AceTreeLoader.loadNucFiles(JAR_NAME);
+		initLineageTree(data.getAllCellNames());
 		
 		assertFXMLNodes();
 		
@@ -536,6 +537,7 @@ public class RootLayoutController implements Initializable{
 		setSlidersProperties();
 		
 		initSearch();
+		Search.setActiveLineageNames(data.getAllCellNames());
 		
 		search.setRulesList(layers.getRulesList());
 		window3D.setRulesList(layers.getRulesList());
