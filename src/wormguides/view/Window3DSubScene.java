@@ -27,6 +27,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Point3D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -40,7 +41,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.MatrixType;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
@@ -101,6 +104,7 @@ public class Window3DSubScene{
 	// rotation stuff
 	private final Rotate rotateX;
 	private final Rotate rotateY;
+	private final Rotate rotateZ;
 	
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
@@ -111,7 +115,6 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				//System.out.println("time changed, building scene");
 				buildScene(time.get());
 			}
 		});
@@ -195,6 +198,7 @@ public class Window3DSubScene{
 		
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
+		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
 	}
 	
 	public IntegerProperty getTimeProperty() {
@@ -395,7 +399,7 @@ public class Window3DSubScene{
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
-	        sphere.getTransforms().addAll(rotateX, rotateY);
+	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
 	        translateSphere(sphere, x, y, z);
 	        
 	        cells[i] = sphere;
@@ -536,7 +540,7 @@ public class Window3DSubScene{
 	}
 	
 	public int getTime() {
-		return time.get();
+		return time.get()-1;
 	}
 	
 	public void setTime(int t) {
@@ -545,52 +549,72 @@ public class Window3DSubScene{
 	}
 	
 	// TODO
-	/*
-	 * Not sure how the rotation is generated in the Android app
-	 * but as of now I am going to take the parameter in radians
-	 */
 	public double getRotationX() {
-		return Math.toRadians(rotateX.getAngle());
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
+			return roll;
+		}
+		else
+			return 0;
 	}
 	
-	public void setRotationX(double rx) {
-		rotateX.setAngle(rx);
+	public void setRotations(double rx, double ry, double rz) {
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			
+		}
 	}
 	
 	public double getRotationY() {
-		return Math.toRadians(rotateY.getAngle());
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double pitch = Math.atan2(-transform.getMzy(), transform.getMzz());
+			return pitch;
+		}
+		else
+			return 0;
 	}
 	
-	public void setRotationY(double ry) {
-		rotateY.setAngle(ry);
+	public void setRotationY(double rx, double ry, double rz) {
+		//rotateY.setAngle(Math.toDegrees(ry));
 	}
 	
 	// rotationZ is not used
 	public double getRotationZ() {
-		return 0.0;
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double yaw = Math.atan2(transform.getMzx(), Math.sqrt((transform.getMzy()*transform.getMzy()
+														+(transform.getMzz()*transform.getMzz()))));
+			return yaw;
+		}
+		else
+			return 0;
 	}
 	
 	// rotationZ is not used
-	public void setRotationZ(double rz) {
+	public void setRotationZ(double rx, double ry, double rz) {
 		
 	}
 	
 	public double getTranslationX() {
-		return cameraXform.t.getTx();
+		return cameraXform.t.getTx()-newOriginX;
 	}
 	
 	public void setTranslationX(double tx) {
-		if (tx>0 && tx<450)
-			cameraXform.t.setX(tx);
+		double newTx = tx+newOriginX;
+		if (newTx>0 && newTx<450)
+			cameraXform.t.setX(newTx);
 	}
 	
 	public double getTranslationY() {
-		return cameraXform.t.getTy();
+		return cameraXform.t.getTy()-newOriginY;
 	}
 	
 	public void setTranslationY(double ty) {
-		if (ty>0 && ty<450)
-			cameraXform.t.setY(ty);
+		double newTy = ty+newOriginY;
+		if (newTy>0 && newTy<450)
+			cameraXform.t.setY(newTy);
 	}
 	
 	public double getScale() {
@@ -806,6 +830,6 @@ public class Window3DSubScene{
 					    		X_SCALE = 1,
 					    		Y_SCALE = 1;
     
-    private static final double SIZE_SCALE = .9;
+    private static final double SIZE_SCALE = .8;
 
 }

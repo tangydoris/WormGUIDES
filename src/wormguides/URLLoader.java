@@ -158,7 +158,30 @@ public class URLLoader {
 	}
 	
 	private void parseViewArgs(ArrayList<String> viewArgs) {
+		// manipulate viewArgs arraylist so that rx ry and rz are grouped together
+		// to facilitate loading rotations in x and y
+		for (int i = 0; i < viewArgs.size(); i++) {
+			if (viewArgs.get(i).startsWith("rX")) {
+				String ry = viewArgs.get(i+1);
+				String rz = viewArgs.get(i+2);
+				viewArgs.set(i, viewArgs.get(i)+","+ry+","+rz);
+				break;
+			}
+		}
+		
 		for (String arg : viewArgs) {
+			if (arg.startsWith("rX")) {
+				String[] tokens = arg.split(",");
+				try {
+					double rx = Double.parseDouble(tokens[0].split("=")[1]);
+					double ry = Double.parseDouble(tokens[1].split("=")[1]);
+					double rz = Double.parseDouble(tokens[2].split("=")[1]);
+					window3D.setRotations(rx, ry, rz);
+				} catch (NumberFormatException nfe) {
+					System.out.println("error in parsing time variable");
+					nfe.printStackTrace();
+				}
+			}
 			String[] tokens = arg.split("=");
 			if (tokens.length!=0) {
 				switch (tokens[0]) {
@@ -170,12 +193,13 @@ public class URLLoader {
 									}
 									break;
 					case "rX":		try {
-										window3D.setRotationX(Double.parseDouble(tokens[1]));
+										window3D.setRotations(Double.parseDouble(tokens[1]), 0, 0);
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing rotation variable");
 										nfe.printStackTrace();
 									}
 									break;
+					/*
 					case "rY":		try {
 										window3D.setRotationY(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
@@ -190,6 +214,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
+					*/
 					case "tX":		try {
 										window3D.setTranslationX(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
