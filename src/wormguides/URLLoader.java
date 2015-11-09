@@ -181,24 +181,30 @@ public class URLLoader {
 					System.out.println("error in parsing time variable");
 					nfe.printStackTrace();
 				}
+				
+				continue;
 			}
 			String[] tokens = arg.split("=");
 			if (tokens.length!=0) {
 				switch (tokens[0]) {
 					case "time":	try {
-										window3D.setTime(Integer.parseInt(tokens[1]));
+										window3D.setTime(Integer.parseInt(tokens[1])+1);
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing time variable");
 										nfe.printStackTrace();
 									}
 									break;
-					case "rX":		try {
+					
+					/*
+					case "rX":		
+									try {
 										window3D.setRotations(Double.parseDouble(tokens[1]), 0, 0);
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing rotation variable");
 										nfe.printStackTrace();
 									}
 									break;
+					*/
 					/*
 					case "rY":		try {
 										window3D.setRotationY(Double.parseDouble(tokens[1]));
@@ -207,6 +213,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
+					
 					case "rZ":		try {
 										window3D.setRotationZ(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
@@ -222,6 +229,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
+					
 					case "tY":		try {
 										window3D.setTranslationY(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
@@ -229,6 +237,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
+					
 					case "scale":	try {
 										window3D.setScale(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
@@ -236,6 +245,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
+					
 					case "dim":		try {
 										window3D.setOthersVisibility(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {

@@ -43,7 +43,6 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
-import wormguides.model.TableLineageData;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;

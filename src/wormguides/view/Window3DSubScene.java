@@ -27,7 +27,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Point3D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -41,7 +40,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
-import javafx.scene.transform.MatrixType;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
@@ -553,17 +551,20 @@ public class Window3DSubScene{
 		if (cells[0]!=null) {
 			Transform transform = cells[0].getLocalToSceneTransform();
 			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
-			return roll;
+			return roll;  
 		}
 		else
 			return 0;
 	}
 	
 	public void setRotations(double rx, double ry, double rz) {
-		if (cells[0]!=null) {
-			Transform transform = cells[0].getLocalToSceneTransform();
-			
-		}
+		rx = Math.toDegrees(rx);
+		ry = Math.toDegrees(ry);
+		rx = Math.toDegrees(rz);
+		
+		rotateX.setAngle(rx+180);
+		rotateY.setAngle(ry);
+		rotateZ.setAngle(rz);
 	}
 	
 	public double getRotationY() {
