@@ -233,12 +233,19 @@
                                        </font>
                                     </Label>
                                     <Slider fx:id="opacitySlider" VBox.vgrow="ALWAYS" />
-                                    <Label prefHeight="22.0" text="Search Layers:">
+                                    <Label prefHeight="22.0" text="Coloring Layers:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <ListView fx:id="colorRulesListView" focusTraversable="false" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="colorRulesListView" focusTraversable="false" prefHeight="342.0" prefWidth="290.0" VBox.vgrow="NEVER" />
+                                    <Region prefHeight="5.0" prefWidth="250.0" />
+                                    <Label text="Cell Shapes:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <ListView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>

@@ -194,34 +194,7 @@ public class URLLoader {
 										nfe.printStackTrace();
 									}
 									break;
-					
-					/*
-					case "rX":		
-									try {
-										window3D.setRotations(Double.parseDouble(tokens[1]), 0, 0);
-									} catch (NumberFormatException nfe) {
-										System.out.println("error in parsing rotation variable");
-										nfe.printStackTrace();
-									}
-									break;
-					*/
-					/*
-					case "rY":		try {
-										window3D.setRotationY(Double.parseDouble(tokens[1]));
-									} catch (NumberFormatException nfe) {
-										System.out.println("error in parsing rotation variable");
-										nfe.printStackTrace();
-									}
-									break;
-					
-					case "rZ":		try {
-										window3D.setRotationZ(Double.parseDouble(tokens[1]));
-									} catch (NumberFormatException nfe) {
-										System.out.println("error in parsing rotation variable");
-										nfe.printStackTrace();
-									}
-									break;
-					*/
+									
 					case "tX":		try {
 										window3D.setTranslationX(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
