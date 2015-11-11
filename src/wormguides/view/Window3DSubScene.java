@@ -110,6 +110,7 @@ public class Window3DSubScene{
 
 	//Scene Elements stuff
 	private SceneElementsList sceneElementsList;
+	ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
 
 	public Window3DSubScene(double width, double height, LineageData data) {
@@ -348,17 +349,13 @@ public class Window3DSubScene{
 			currentSceneElementMeshes.clear();
 		}
 		
-		ArrayList<SceneElement> sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
+		sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
 		for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 			//add meshes from each scene element
 			MeshView mesh = sceneElementsAtTime.get(i).buildGeometry(time);
 			
 			if (mesh != null) { //null mesh when file not found thrown
 				mesh.getTransforms().addAll(rotateX, rotateY);
-				
-				//long term this will inherit the color of the cell name that it is associated with
-				mesh.setMaterial(new PhongMaterial(Color.DEEPPINK));
-				mesh.setCullFace(CullFace.NONE);
 				
 				//add rendered mesh to meshes list
 				currentSceneElementMeshes.add(mesh);
@@ -435,6 +432,32 @@ public class Window3DSubScene{
  			}
 
  			sphere.setMaterial(material);
+ 			
+//------------------------------MESH INHERITS COLOR FROM ATTACHED CELL--------------------
+ 			//consult names array and scene elements for matches
+ 			if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
+ 				//same size unless file not found on mesh
+// 				System.out.println(sceneElementsAtTime.size());
+// 				System.out.println(currentSceneElementMeshes.size());
+ 				
+// 			 	System.out.println(names[i]);
+ 				for (int j = 0; j < sceneElementsAtTime.size(); j++) {
+ 					
+ 					//should I make these names to lower case???
+ 					
+ 					
+ 					if (sceneElementsAtTime.get(j).getAllCellNames().contains(names[i])) {
+// 						System.out.println("matching name in mesh and current cell");
+// 		 				System.out.println(sceneElementsAtTime.size());
+// 		 				System.out.println(currentSceneElementMeshes.size());
+ 						
+ 						//if match - set mesh color to current color of cell
+ 						currentSceneElementMeshes.get(j).setMaterial(material);
+ 						currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);;
+ 					}
+ 				}
+ 			}	
+//------------------------------END COLOR INHERITANCE-------------------------------------
 
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
