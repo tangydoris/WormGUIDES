@@ -176,7 +176,7 @@ public class URLLoader {
 					double rx = Double.parseDouble(tokens[0].split("=")[1]);
 					double ry = Double.parseDouble(tokens[1].split("=")[1]);
 					double rz = Double.parseDouble(tokens[2].split("=")[1]);
-					window3D.setRotations(rx, ry, rz);
+					//window3D.setRotations(rx, ry, rz);
 				} catch (NumberFormatException nfe) {
 					System.out.println("error in parsing time variable");
 					nfe.printStackTrace();
