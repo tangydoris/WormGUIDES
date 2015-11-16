@@ -30,7 +30,6 @@ public class SceneElementsList {
 		try {
 			Scanner scanner = new Scanner(obj);
 			if (scanner.hasNextLine()) { //headings
-				@SuppressWarnings("unused")
 				String titleBar = scanner.nextLine(); //skip column headings line
 			}
 			else {

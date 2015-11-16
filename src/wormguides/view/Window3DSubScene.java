@@ -41,12 +41,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
-import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 public class Window3DSubScene{
@@ -107,6 +105,7 @@ public class Window3DSubScene{
 	// rotation stuff
 	private final Rotate rotateX;
 	private final Rotate rotateY;
+	private final Rotate rotateZ;
 
 	//Scene Elements stuff
 	private SceneElementsList sceneElementsList;
@@ -206,13 +205,14 @@ public class Window3DSubScene{
 
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
+		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
 
-		// --------------------- INITIALIZE SCENE ELEMENTS ---------------------
-		//REPLACE CONFIG FILE PATH WITH OWN CSV FILE
+		// Initialize scene element events
+		// REPLACE CONFIG FILE PATH WITH OWN CSV FILE
 		String configFile = "C:\\Users\\katzmanb\\Desktop\\CellShapesConfig.csv";
 		sceneElementsList = new SceneElementsList(configFile);
 		currentSceneElementMeshes = new ArrayList<MeshView>();
-		//-----------------------------END SCENE ELEMENT INITIALIZATION---------
+		// End scene element initialization
 	}
 
 	public IntegerProperty getTimeProperty() {
@@ -335,7 +335,7 @@ public class Window3DSubScene{
 		// Frame is indexed 1 less than the time requested
 		time--;
 
-		System.out.println("building scene");
+		//System.out.println("building scene");
 
 		names = data.getNames(time);
 		positions = data.getPositions(time);
@@ -343,7 +343,7 @@ public class Window3DSubScene{
 		totalNuclei.set(names.length);
 		cells = new Sphere[names.length];
 		
-//-----------------------REFERENCE SCENE ELEMENT LIST, FIND SCENE ELEMENTS PRESENT AT TIME, BUILD AND MESHES-----------
+		// Start scene element list, find scene elements present at time, build and meshes
 		//empty meshes from last rendering
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
@@ -361,7 +361,7 @@ public class Window3DSubScene{
 				currentSceneElementMeshes.add(mesh);
 			}
 		}	
-//-----------------------------END MESH LOADING AND BUILDING-------------------------------------------------------------------
+		// End mesh loading/building
 
 		if (localSearchResults.isEmpty())
 			searched = new boolean[names.length];
@@ -433,7 +433,7 @@ public class Window3DSubScene{
 
  			sphere.setMaterial(material);
  			
-//------------------------------MESH INHERITS COLOR FROM ATTACHED CELL--------------------
+ 			// Mesh inherits color from attached cell
  			//consult names array and scene elements for matches
  			if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
  				//same size unless file not found on mesh
@@ -457,7 +457,7 @@ public class Window3DSubScene{
  					}
  				}
  			}	
-//------------------------------END COLOR INHERITANCE-------------------------------------
+ 			// End color inheritance
 
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
@@ -619,61 +619,80 @@ public class Window3DSubScene{
 		if (t > 0 && t < endTime)
 			time.set(t);
 	}
-
-	// TODO
-	/*
-	 * Not sure how the rotation is generated in the Android app
-	 * but as of now I am going to take the parameter in radians
-	 */
-	public double getRotationX() {
-		return 0.0;
+	
+	public void setRotations(double rx, double ry, double rz) {
+		rx = Math.toDegrees(rx);
+		ry = Math.toDegrees(ry);
+		rx = Math.toDegrees(rz);
+		
+		rotateX.setAngle(rx+180);
+		rotateY.setAngle(ry);
+		rotateZ.setAngle(rz);
 	}
 
-	public void setRotationX(double rx) {
-
+	public double getRotationX() {
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
+			return roll;  
+		}
+		else
+			return 0;
 	}
 
 	public double getRotationY() {
-		return 0.0;
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double pitch = Math.atan2(-transform.getMzy(), transform.getMzz());
+			return pitch;
+		}
+		else
+			return 0;
 	}
-
-	public void setRotationY(double ry) {
-
-	}
-
+	
 	public double getRotationZ() {
-		return 0.0;
-	}
-
-	public void setRotationZ(double rz) {
-
+		if (cells[0]!=null) {
+			Transform transform = cells[0].getLocalToSceneTransform();
+			double yaw = Math.atan2(transform.getMzx(), Math.sqrt((transform.getMzy()*transform.getMzy()
+														+(transform.getMzz()*transform.getMzz()))));
+			return yaw;
+		}
+		else
+			return 0;
 	}
 
 	public double getTranslationX() {
-		return 0.0;
+		return cameraXform.t.getTx()-newOriginX;
 	}
-
+	
 	public void setTranslationX(double tx) {
-
+		double newTx = tx+newOriginX;
+		if (newTx>0 && newTx<450)
+			cameraXform.t.setX(newTx);
 	}
-
+	
 	public double getTranslationY() {
-		return 0.0;
+		return cameraXform.t.getTy()-newOriginY;
 	}
-
+	
 	public void setTranslationY(double ty) {
-
+		double newTy = ty+newOriginY;
+		if (newTy>0 && newTy<450)
+			cameraXform.t.setY(newTy);
 	}
 
 	public double getScale() {
-		double scale = zoom.get()-0.25;
-		scale /= 3.167;
+		double scale = zoom.get()-0.5;
+		scale = 1-(scale/6.5);
 		return scale;
 	}
 
 	public void setScale(double scale) {
-		scale *= 3.167;
-		zoom.set(scale+0.25);
+		if (scale > 1)
+			scale = 1;
+		scale = 6.5*(1-scale);
+		// smaller zoom value means larger picture
+		zoom.set((scale+0.5));
 	}
 
 	public double getOthersVisibility() {
