@@ -180,8 +180,8 @@ public class Search {
 		return searched;
 	}
 	
-	public void setRulesList(ObservableList<ColorRule> rulesListArg) {
-		rulesList = rulesListArg;
+	public void setRulesList(ObservableList<ColorRule> observableList) {
+		rulesList = observableList;
 	}
 	
 	public boolean containsRule(ColorRule other) {

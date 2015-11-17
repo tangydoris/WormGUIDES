@@ -344,7 +344,7 @@ public class Window3DSubScene{
 		cells = new Sphere[names.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
-		//empty meshes from last rendering
+		// empty meshes from last rendering
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
 		}
@@ -354,10 +354,11 @@ public class Window3DSubScene{
 			//add meshes from each scene element
 			MeshView mesh = sceneElementsAtTime.get(i).buildGeometry(time);
 			
-			if (mesh != null) { //null mesh when file not found thrown
-				mesh.getTransforms().addAll(rotateX, rotateY);
+			if (mesh != null) {
+				// null mesh when file not found thrown
+				mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
 				
-				//add rendered mesh to meshes list
+				// add rendered mesh to meshes list
 				currentSceneElementMeshes.add(mesh);
 			}
 		}	
@@ -401,6 +402,7 @@ public class Window3DSubScene{
 			Sphere sphere = new Sphere(radius);
 
 			Material material = new PhongMaterial();
+			
  			// if in search, do highlighting
  			if (inSearch) {
  				if (searched[i]) {
@@ -412,6 +414,7 @@ public class Window3DSubScene{
 					material = colorHash.getTranslucentMaterial();
  				}
  			}
+ 			
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
@@ -425,7 +428,7 @@ public class Window3DSubScene{
  				if (colors.isEmpty()) {
  					renderSecond.add(sphere);
  					material = opacityMaterialHash.get(othersOpacity.get());
- 					othersOpacity.set(1.0);
+ 					//othersOpacity.set(1.0);
  				}
  				else
  					renderFirst.add(sphere);
@@ -462,22 +465,25 @@ public class Window3DSubScene{
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
-	        sphere.getTransforms().addAll(rotateX, rotateY);
+	        
+	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
 	        translateSphere(sphere, x, y, z);
 
 	        cells[i] = sphere;
 		}
 
 		refreshScene();
+		
 		root.getChildren().addAll(renderFirst);
-		root.getChildren().addAll(renderSecond);
 	
-//------------------------------ADD SCENE ELEMENTS TO THE SCENE-----------------------------
-		//add scene element meshes to scene
+		// ADD SCENE ELEMENTS TO THE SCENE
+		// add scene element meshes to scene
 		if (!currentSceneElementMeshes.isEmpty()) {
 			root.getChildren().addAll(currentSceneElementMeshes);
 		}
-//------------------------------------------------------------------------------------------
+		
+		root.getChildren().addAll(renderSecond);
+
 	}
 
 	private void translateSphere(Node sphere, double x, double y, double z) {
@@ -700,7 +706,7 @@ public class Window3DSubScene{
 	}
 
 	public void setOthersVisibility(double dim) {
-
+		othersOpacity.set(dim);
 	}
 
 	public SubScene getSubScene() {
@@ -715,11 +721,11 @@ public class Window3DSubScene{
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
-										Number oldValue, Number newValue) {
-				othersOpacity.set(Math.round(newValue.doubleValue())/100.0);
+											Number oldValue, Number newValue) {
+				othersOpacity.set(Math.round(newValue.doubleValue())/100d);
 
-				if (!opacityMaterialHash.containsKey(othersOpacity)) {
-					int darkness = (int) Math.round(othersOpacity.get()*255);
+				if (!opacityMaterialHash.containsKey(othersOpacity.get())) {
+					int darkness = (int) (Math.round(othersOpacity.get()*255));
 					String colorString = "#";
 					StringBuilder sb = new StringBuilder();
 					sb.append(Integer.toHexString(darkness));
@@ -729,10 +735,9 @@ public class Window3DSubScene{
 
 					for (int i=0; i<3; i++)
 						colorString += sb.toString();
-
-					System.out.println("slider changed: "+othersOpacity.get());
+					
 					opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(
-									Color.web(colorString, othersOpacity.get())));
+										Color.web(colorString, othersOpacity.get())));
 				}
 
 				buildScene(time.get());
@@ -744,8 +749,7 @@ public class Window3DSubScene{
 		othersOpacity.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				Double arg = arg2.doubleValue();
-				System.out.println("number changed: "+arg);
+				Double arg = arg0.getValue().doubleValue();
 				if (arg>=0 && arg<=1.0) {
 					slider.setValue(arg*100.0);
 				}
@@ -834,7 +838,7 @@ public class Window3DSubScene{
 						@Override
 						public void run() {
 							refreshScene();
-							otherCells.clear();
+							//otherCells.clear();
 							addCellsToScene();
 						}
 					});

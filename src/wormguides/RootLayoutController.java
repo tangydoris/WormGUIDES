@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -24,6 +25,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
@@ -39,10 +41,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.Rule;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -101,10 +105,12 @@ public class RootLayoutController implements Initializable{
 	private StringProperty selectedName;
 	
 	// layers tab
-	private Layers layers;
-	@FXML private ListView<ColorRule> colorRulesListView;
+	private Layers colorLayers;
+	private Layers shapeLayers;
+	@FXML private ListView<Rule> colorRulesListView;
 	@FXML private Button addSearchBtn;
 	@FXML private Slider opacitySlider;
+	@FXML private ListView<Rule> shapeRulesListView;
 	
 	// cell information
 	@FXML private Text cellName;
@@ -241,7 +247,7 @@ public class RootLayoutController implements Initializable{
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
-					Number oldValue, Number newValue) {
+											Number oldValue, Number newValue) {
 				timeSlider.setValue(time.get());
 				if (time.get()>=window3D.getEndTime()-1) {
 					playButton.setGraphic(playIcon);
@@ -435,17 +441,25 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initLayers() {
-		layers = new Layers(colorRulesListView);
+		// color rules layers
+		colorLayers = new Layers(colorRulesListView);
+		colorRulesListView.setCellFactory(new LayersListViewCallback());
+		
+		// shape rules layers
+		shapeLayers = new Layers(shapeRulesListView);
 	}
+	
 	
 	private void initPartsList() {
 		new PartsList();
 	}
 	
+	
 	private void initLineageTree(ArrayList<String> allCellNames) {
 		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
 		lineageTreeRoot = LineageTree.getRoot();
 	}
+	
 	
 	private void initToggleGroup() {
 		typeToggleGroup = new ToggleGroup();
@@ -478,6 +492,7 @@ public class RootLayoutController implements Initializable{
 		sysRadioBtn.setSelected(true);
 	}
 	
+	
 	private void assertFXMLNodes() {
 		assert (rootBorderPane != null);
 		assert (modelAnchorPane != null);
@@ -507,6 +522,7 @@ public class RootLayoutController implements Initializable{
 		assert (colorPicker != null);
 		
 		assert (colorRulesListView != null);
+		assert (shapeRulesListView != null);
 		assert (addSearchBtn != null);
 		
 		assert (cellName != null);
@@ -515,6 +531,7 @@ public class RootLayoutController implements Initializable{
 		assert (opacitySlider != null);
 	}
 
+	
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
@@ -529,6 +546,8 @@ public class RootLayoutController implements Initializable{
 		initializeWithLineageData(data);
 	}
 	
+	
+	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
 		init3DWindow(data);
 		getPropertiesFrom3DWindow();
@@ -538,8 +557,10 @@ public class RootLayoutController implements Initializable{
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
-		search.setRulesList(layers.getRulesList());
-		window3D.setRulesList(layers.getRulesList());
+		// unchecked cast
+		ObservableList<ColorRule> tempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
+		search.setRulesList(tempList);
+		window3D.setRulesList(tempList);
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
@@ -557,6 +578,26 @@ public class RootLayoutController implements Initializable{
         sizeInfoPane();
 	}
 	
+	
+	/*
+	 * Renderer for rules in ListView's in Layers tab
+	 */
+	private class LayersListViewCallback implements Callback<ListView<Rule>, ListCell<Rule>> {
+		@Override
+		public ListCell<Rule> call(ListView<Rule> param) {
+			ListCell<Rule> cell = new ListCell<Rule>(){
+                @Override
+                protected void updateItem(Rule item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item != null) 
+                    	setGraphic(item.getHBox());
+                	else
+                		setGraphic(null);
+            	}
+        	};
+        	return cell;
+		}
+	}
 	
 	
 	private static final String JAR_NAME = "WormGUIDES.jar";

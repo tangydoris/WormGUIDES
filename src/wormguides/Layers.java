@@ -1,45 +1,36 @@
 package wormguides;
 
 import java.util.HashMap;
-
-import wormguides.model.ColorRule;
+import wormguides.model.Rule;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.util.Callback;
 
 public class Layers {
 	
-	private ObservableList<ColorRule> rulesList;
-	private HashMap<ColorRule, Button> buttonMap;
-	private ListView<ColorRule> rulesListView;
+	private ObservableList<Rule> rulesList;
+	private HashMap<Rule, Button> buttonMap;
 	
-	public Layers() {
-		this(new ListView<ColorRule>());
-	}
-
-	public Layers(ListView<ColorRule> listView) {
+	public Layers(ListView<Rule> listView) {
 		if (listView==null)
-			listView = new ListView<ColorRule>();
-		rulesListView = listView;
+			listView = new ListView<Rule>();
 		
-		buttonMap = new HashMap<ColorRule, Button>();
+		buttonMap = new HashMap<Rule, Button>();
 		
 		rulesList = FXCollections.observableArrayList();
-		rulesList.addListener(new ListChangeListener<ColorRule>() {
+		rulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(ListChangeListener
-									.Change<? extends ColorRule> change) {
+									.Change<? extends Rule> change) {
 				while (change.next()) {
 					if (!change.wasUpdated()) {
 						// added to list
-						for (ColorRule rule : change.getAddedSubList()) {
-							ColorRule ruleToRemove = rule;
+						for (Rule rule : change.getAddedSubList()) {
+							Rule ruleToRemove = rule;
 							buttonMap.put(ruleToRemove, rule.getDeleteButton());
 							
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
@@ -55,32 +46,11 @@ public class Layers {
 			}
 		});
 			
-		rulesListView.setItems(rulesList);
-		makeCellFactory();
+		listView.setItems(rulesList);
 	}
 	
-	public ObservableList<ColorRule> getRulesList() {
+	public ObservableList<Rule> getRulesList() {
 		return rulesList;
-	}
-	
-	private void makeCellFactory() {
-		rulesListView.setCellFactory(new Callback<ListView<ColorRule>, 
-										ListCell<ColorRule>>() {
-			@Override
-			public ListCell<ColorRule> call(ListView<ColorRule> listView) {
-				ListCell<ColorRule> cell = new ListCell<ColorRule>(){
-                    @Override
-                    protected void updateItem(ColorRule item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item != null) 
-                            setGraphic(item.getHBox());
-                        else
-                        	setGraphic(null);
-                    }
-                };
-                return cell;
-			}
-		});
 	}
 	
 }
