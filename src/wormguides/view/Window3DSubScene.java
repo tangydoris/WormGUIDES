@@ -10,6 +10,7 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
+import wormguides.model.StoryList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -43,6 +44,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
@@ -111,6 +113,14 @@ public class Window3DSubScene{
 	private SceneElementsList sceneElementsList;
 	ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
+	
+	//Story elements stuff
+	private StoryList storyList;
+	ArrayList<SceneElement> storyElementsAtTime;
+	private ArrayList<MeshView> currentStoryElementMeshes;
+	
+	//Billboard stuff
+	ArrayList<Text> billboardsAtTime;
 
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
@@ -208,11 +218,21 @@ public class Window3DSubScene{
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
 
 		// Initialize scene element events
-		// REPLACE CONFIG FILE PATH WITH OWN CSV FILE
-		String configFile = "C:\\Users\\katzmanb\\Desktop\\CellShapesConfig.csv";
+		String configFile = "CellShapesConfig.csv";
 		sceneElementsList = new SceneElementsList(configFile);
+		sceneElementsList.buildListFromConfig();
 		currentSceneElementMeshes = new ArrayList<MeshView>();
 		// End scene element initialization
+		
+		
+		//initialize story elements
+		String configFile2 = "StoryListConfig.csv";
+		storyList = new StoryList(configFile2);
+		storyList.buildStories();
+		currentStoryElementMeshes = new ArrayList<MeshView>();
+		
+		//initialize billboards
+		billboardsAtTime = new ArrayList<Text>();
 	}
 
 	public IntegerProperty getTimeProperty() {
@@ -335,8 +355,6 @@ public class Window3DSubScene{
 		// Frame is indexed 1 less than the time requested
 		time--;
 
-		//System.out.println("building scene");
-
 		names = data.getNames(time);
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
@@ -344,7 +362,7 @@ public class Window3DSubScene{
 		cells = new Sphere[names.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
-		//empty meshes from last rendering
+		//empty meshes from last rendering. Same for story elements
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
 		}
@@ -361,7 +379,38 @@ public class Window3DSubScene{
 				currentSceneElementMeshes.add(mesh);
 			}
 		}	
-		// End mesh loading/building
+		// End scene element mesh loading/building
+		
+		//clear billboards
+		if(!billboardsAtTime.isEmpty()) {
+			billboardsAtTime.clear();
+		}
+		
+		//repeat process for story elements and billboards
+		if(!currentStoryElementMeshes.isEmpty()) {
+			currentStoryElementMeshes.clear();
+		}
+		
+		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
+		for (int i = 0; i < storyElementsAtTime.size(); i++) {
+			//add meshes from each scene element in story
+			SceneElement se = storyElementsAtTime.get(i);
+			if (se.getBillboardFlag()) {
+				Text t = se.buildBillboard();
+				if (t != null) {
+					t.getTransforms().addAll(rotateX, rotateY);
+					billboardsAtTime.add(t);
+				}
+				
+			} else {
+				MeshView mesh = se.buildGeometry(time);
+				if (mesh != null) {
+					mesh.getTransforms().addAll(rotateX, rotateY);
+					currentStoryElementMeshes.add(mesh);
+				}
+			}	
+		}
+		
 
 		if (localSearchResults.isEmpty())
 			searched = new boolean[names.length];
@@ -436,21 +485,8 @@ public class Window3DSubScene{
  			// Mesh inherits color from attached cell
  			//consult names array and scene elements for matches
  			if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
- 				//same size unless file not found on mesh
-// 				System.out.println(sceneElementsAtTime.size());
-// 				System.out.println(currentSceneElementMeshes.size());
- 				
-// 			 	System.out.println(names[i]);
  				for (int j = 0; j < sceneElementsAtTime.size(); j++) {
- 					
- 					//should I make these names to lower case???
- 					
- 					
  					if (sceneElementsAtTime.get(j).getAllCellNames().contains(names[i])) {
-// 						System.out.println("matching name in mesh and current cell");
-// 		 				System.out.println(sceneElementsAtTime.size());
-// 		 				System.out.println(currentSceneElementMeshes.size());
- 						
  						//if match - set mesh color to current color of cell
  						currentSceneElementMeshes.get(j).setMaterial(material);
  						currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);;
@@ -472,12 +508,20 @@ public class Window3DSubScene{
 		root.getChildren().addAll(renderFirst);
 		root.getChildren().addAll(renderSecond);
 	
-//------------------------------ADD SCENE ELEMENTS TO THE SCENE-----------------------------
 		//add scene element meshes to scene
 		if (!currentSceneElementMeshes.isEmpty()) {
 			root.getChildren().addAll(currentSceneElementMeshes);
 		}
-//------------------------------------------------------------------------------------------
+
+		//add story scene element meshes to scene
+		if(!currentStoryElementMeshes.isEmpty()) {
+			root.getChildren().addAll(currentStoryElementMeshes);
+		}
+
+		//add billboards to scene
+		if(!billboardsAtTime.isEmpty()) {
+			root.getChildren().addAll(billboardsAtTime);
+		}
 	}
 
 	private void translateSphere(Node sphere, double x, double y, double z) {

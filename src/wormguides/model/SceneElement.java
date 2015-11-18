@@ -1,7 +1,10 @@
 package wormguides.model;
+import java.util.StringTokenizer;
 import java.util.Vector;
-
 import javafx.scene.shape.MeshView;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.transform.Translate;
 
 public class SceneElement {
 	private final String SceneName; //descriptor or display of object
@@ -13,11 +16,13 @@ public class SceneElement {
 	private final int StartTime;
 	private final int EndTime;
 	private final String Comments;
+	private final boolean CompleteResourceFlag;
+	private final boolean BillboardFlag;
 	private static final String OBJEXT = ".obj";
 
 	public SceneElement(String sceneName, Vector<String> cellNames,
 			String markerName, String imagingSource, String resourceLocation, 
-			int startTime, int endTime, String comments) { //add EmbryoName
+			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) { //add EmbryoName
 		this.SceneName = sceneName;
 		this.cellNames = cellNames;
 		this.MarkerName = markerName;
@@ -27,14 +32,46 @@ public class SceneElement {
 		this.StartTime = startTime;
 		this.EndTime = endTime;
 		this.Comments = comments;
+		this.CompleteResourceFlag = completeResourceFlag;
+		this.BillboardFlag = billboardFlag;
 	}
 	
 	public MeshView buildGeometry(int time) {
-		//append time and ext to resource location
-		String objFile = this.ResourceLocation + "_t" + time + OBJEXT;
 		GeometryLoader loader = new GeometryLoader();
-
-		return loader.loadOBJ(objFile);
+		
+		//check if complete resource
+		if (CompleteResourceFlag) {
+			return loader.loadOBJ(this.ResourceLocation);
+		} else {
+			//append time and ext to resource location
+			String objFile = this.ResourceLocation + "_t" + time + OBJEXT;
+			return loader.loadOBJ(objFile);
+		}
+		
+	}
+	
+	public Text buildBillboard() {
+		if (BillboardFlag) {	
+			//extract positions from resource location
+			double x, y, z;
+			StringTokenizer st = new StringTokenizer(ResourceLocation);
+			if (st.countTokens() == 3) {
+				x = Double.parseDouble(st.nextToken());
+				y = Double.parseDouble(st.nextToken());
+				z = Double.parseDouble(st.nextToken());
+				Text t = new Text(20, 50, SceneName);
+				t.setFont(new Font(25));
+				
+				//add positioning to text
+				Translate tr = new Translate(x, y, z);
+				t.getTransforms().add(tr);
+				return t;
+			} else { //incorrect position format
+				return null;
+			}	
+		} else { //billboardflag is false, method was incorrectly called
+			return null;
+		}
 	}
 
 	public String getSceneName() {
@@ -71,5 +108,13 @@ public class SceneElement {
 
 	public String getComments() {
 		return this.Comments;
+	}
+	
+	public boolean getCompleteResourseFlag() {
+		return this.CompleteResourceFlag;
+	}
+	
+	public boolean getBillboardFlag() {
+		return this.BillboardFlag;
 	}
 }
