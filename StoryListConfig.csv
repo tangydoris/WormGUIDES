@@ -1,0 +1,6 @@
+FIRST STORY NAME,FIRST STORY TAGS,,,,,,
+first scene element,dummycells,dummy marker,SE imaging source,cow.obj,5,25,test obj file
+my cow,SE cells,SE marker,SE imaging source,BILLBOARD 200 200 50,5,25,billboard comments
+SECOND STORY NAME,SECOND STORY TAGS,,,,,,
+second scene element,cellscellscells,marker,src,cow.obj,80,100,hi
+braden's cool cow,morecells,marker,src,BILLBOARD 100 50 0,85,105,

@@ -13,6 +13,7 @@ import javafx.scene.shape.TriangleMesh;
  * Created: Nov. 2nd, 2015
  */
 
+
 public class GeometryLoader {
 	private static final String vertexLine = "v ";
 	private static final String faceLine = "f ";
