@@ -245,7 +245,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <ListView fx:id="cellShapesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="shapeRulesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>
