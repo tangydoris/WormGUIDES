@@ -85,17 +85,6 @@ public class AceTreeLoader {
 		return allCellNames.contains(name);
 	}
 	
-	/*
-	public static String[] getAllCellNames() {
-		allCellNames.sort(new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareTo(s2);
-			}
-		});
-		return allCellNames.toArray(new String[allCellNames.size()]);
-	}
-	*/
 	
 	private static final String ENTRY_PREFIX = "wormguides/model/nuclei_files/";
 	private static final int TOKEN_ARRAY_SIZE = 21;

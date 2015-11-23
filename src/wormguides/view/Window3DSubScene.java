@@ -10,7 +10,7 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.StoryList;
+//import wormguides.model.StoryList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -44,7 +44,6 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
-import javafx.scene.text.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
@@ -84,6 +83,7 @@ public class Window3DSubScene{
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
+	private StringProperty selectedCellMeshName; //for our rendered cell meshes
 
 	// searched highlighting stuff
 	private boolean inSearch;
@@ -113,14 +113,17 @@ public class Window3DSubScene{
 	private SceneElementsList sceneElementsList;
 	ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
-	
-	//Story elements stuff
-	private StoryList storyList;
-	ArrayList<SceneElement> storyElementsAtTime;
-	private ArrayList<MeshView> currentStoryElementMeshes;
-	
-	//Billboard stuff
-	ArrayList<Text> billboardsAtTime;
+	private ArrayList<SceneElement> renderedSceneElementRef; //reference of successfully rendered scene elements for click responsiveness
+
+//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------	
+//	//Story elements stuff
+//	private StoryList storyList;
+//	ArrayList<SceneElement> storyElementsAtTime;
+//	private ArrayList<MeshView> currentStoryElementMeshes;
+//	
+//	//Billboard stuff
+//	ArrayList<Text> billboardsAtTime;
+//-------------------------------------------------------------------------------
 
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
@@ -157,6 +160,17 @@ public class Window3DSubScene{
 				int selected = getIndexByName(newValue);
 				if (selected != -1)
 					selectedIndex.set(selected);
+			}
+		});
+		
+		selectedCellMeshName = new SimpleStringProperty();
+		selectedCellMeshName.set("");
+		selectedName.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
+						String oldValue, String newValue) {
+				//unused but required for initialization
+				//bypassed use of index like above by keeping parallel scene element reference array
 			}
 		});
 
@@ -218,21 +232,23 @@ public class Window3DSubScene{
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
 
 		// Initialize scene element events
-		String configFile = "CellShapesConfig.csv";
-		sceneElementsList = new SceneElementsList(configFile);
+		String configFile = "src/wormguides/model/CellShapesConfig.csv";
+		sceneElementsList = new SceneElementsList();
 		sceneElementsList.buildListFromConfig();
 		currentSceneElementMeshes = new ArrayList<MeshView>();
+		renderedSceneElementRef = new ArrayList<SceneElement>();
 		// End scene element initialization
 		
-		
-		//initialize story elements
-		String configFile2 = "StoryListConfig.csv";
-		storyList = new StoryList(configFile2);
-		storyList.buildStories();
-		currentStoryElementMeshes = new ArrayList<MeshView>();
-		
-		//initialize billboards
-		billboardsAtTime = new ArrayList<Text>();
+//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
+//		//initialize story elements
+//		String configFile2 = "StoryListConfig.csv";
+//		storyList = new StoryList(configFile2);
+//		storyList.buildStories();
+//		currentStoryElementMeshes = new ArrayList<MeshView>();
+//		
+//		//initialize billboards
+//		billboardsAtTime = new ArrayList<Text>();
+//--------------------------------------------------------------------------------------	
 	}
 
 	public IntegerProperty getTimeProperty() {
@@ -249,6 +265,10 @@ public class Window3DSubScene{
 
 	public StringProperty getSelectedName() {
 		return selectedName;
+	}
+	
+	public StringProperty getSelectedCellMeshName() {
+		return selectedCellMeshName;
 	}
 
 	public IntegerProperty getTotalNucleiProperty() {
@@ -311,6 +331,16 @@ public class Window3DSubScene{
 					selectedIndex.set(getPickedSphereIndex((Sphere)node));
 					selectedName.set(names[selectedIndex.get()]);
 				}
+				else if (node instanceof MeshView) {
+					for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
+						MeshView curr = currentSceneElementMeshes.get(i);
+						if (curr.equals(node)) {
+							SceneElement clickedSceneElement = renderedSceneElementRef.get(i);
+							selectedCellMeshName.set(clickedSceneElement.getAllCellNames().get(0));
+							selectedName.set(selectedCellMeshName.get());
+						}
+					}
+				}
 				else
 					selectedIndex.set(-1);
 			}
@@ -362,55 +392,62 @@ public class Window3DSubScene{
 		cells = new Sphere[names.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
-		// empty meshes from last rendering. Same for story elements
+		//empty meshes and scene element references from last rendering. Same for story elements
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
+			renderedSceneElementRef.clear();
 		}
 		
 		sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
 		for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 			//add meshes from each scene element
-			MeshView mesh = sceneElementsAtTime.get(i).buildGeometry(time);
+			SceneElement curr = sceneElementsAtTime.get(i);
+			MeshView mesh = curr.buildGeometry(time);
 			
-			if (mesh != null) {
-				// null mesh when file not found thrown
-				mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+			if (mesh != null) { //null mesh when file not found thrown
+				mesh.getTransforms().addAll(rotateX, rotateY);
 				
-				// add rendered mesh to meshes list
+				//add rendered mesh to meshes list
 				currentSceneElementMeshes.add(mesh);
+				
+				//add scene element to rendered scene element reference for on click responsiveness
+				renderedSceneElementRef.add(curr);
 			}
 		}	
 		// End scene element mesh loading/building
 		
+		
+//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------		
 		//clear billboards
-		if(!billboardsAtTime.isEmpty()) {
-			billboardsAtTime.clear();
-		}
-		
-		//repeat process for story elements and billboards
-		if(!currentStoryElementMeshes.isEmpty()) {
-			currentStoryElementMeshes.clear();
-		}
-		
-		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
-		for (int i = 0; i < storyElementsAtTime.size(); i++) {
-			//add meshes from each scene element in story
-			SceneElement se = storyElementsAtTime.get(i);
-			if (se.getBillboardFlag()) {
-				Text t = se.buildBillboard();
-				if (t != null) {
-					t.getTransforms().addAll(rotateX, rotateY);
-					billboardsAtTime.add(t);
-				}
-				
-			} else {
-				MeshView mesh = se.buildGeometry(time);
-				if (mesh != null) {
-					mesh.getTransforms().addAll(rotateX, rotateY);
-					currentStoryElementMeshes.add(mesh);
-				}
-			}	
-		}
+//		if(!billboardsAtTime.isEmpty()) {
+//			billboardsAtTime.clear();
+//		}
+//		
+//		//repeat process for story elements and billboards
+//		if(!currentStoryElementMeshes.isEmpty()) {
+//			currentStoryElementMeshes.clear();
+//		}
+//		
+//		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
+//		for (int i = 0; i < storyElementsAtTime.size(); i++) {
+//			//add meshes from each scene element in story
+//			SceneElement se = storyElementsAtTime.get(i);
+//			if (se.getBillboardFlag()) {
+//				Text t = se.buildBillboard();
+//				if (t != null) {
+//					t.getTransforms().addAll(rotateX, rotateY);
+//					billboardsAtTime.add(t);
+//				}
+//				
+//			} else {
+//				MeshView mesh = se.buildGeometry(time);
+//				if (mesh != null) {
+//					mesh.getTransforms().addAll(rotateX, rotateY);
+//					currentStoryElementMeshes.add(mesh);
+//				}
+//			}	
+//		}
+//----------------------------------------------------------------------------------------
 		
 
 		if (localSearchResults.isEmpty())
@@ -451,7 +488,6 @@ public class Window3DSubScene{
 			Sphere sphere = new Sphere(radius);
 
 			Material material = new PhongMaterial();
-			
  			// if in search, do highlighting
  			if (inSearch) {
  				if (searched[i]) {
@@ -463,7 +499,6 @@ public class Window3DSubScene{
 					material = colorHash.getTranslucentMaterial();
  				}
  			}
- 			
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
@@ -488,8 +523,8 @@ public class Window3DSubScene{
  			// Mesh inherits color from attached cell
  			//consult names array and scene elements for matches
  			if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
- 				for (int j = 0; j < sceneElementsAtTime.size(); j++) {
- 					if (sceneElementsAtTime.get(j).getAllCellNames().contains(names[i])) {
+ 				for (int j = 0; j < renderedSceneElementRef.size(); j++) {
+ 					if (renderedSceneElementRef.get(j).getAllCellNames().contains(names[i])) {
  						//if match - set mesh color to current color of cell
  						currentSceneElementMeshes.get(j).setMaterial(material);
  						currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);;
@@ -501,8 +536,7 @@ public class Window3DSubScene{
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
-	        
-	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+	        sphere.getTransforms().addAll(rotateX, rotateY);
 	        translateSphere(sphere, x, y, z);
 
 	        cells[i] = sphere;
@@ -510,33 +544,27 @@ public class Window3DSubScene{
 
 		refreshScene();
 		
+		// render opaque entities first
 		root.getChildren().addAll(renderFirst);
-		
-		// ADD SCENE ELEMENTS TO THE SCENE
-		// add scene element meshes to scene
-		if (!currentSceneElementMeshes.isEmpty()) {
-			root.getChildren().addAll(currentSceneElementMeshes);
-		}
-		
-		root.getChildren().addAll(renderSecond);
-
-		/*
 		//add scene element meshes to scene
 		if (!currentSceneElementMeshes.isEmpty()) {
 			root.getChildren().addAll(currentSceneElementMeshes);
 		}
+		
+		// render transparent entities last
+		root.getChildren().addAll(renderSecond);
 
-		//add story scene element meshes to scene
-		if(!currentStoryElementMeshes.isEmpty()) {
-			root.getChildren().addAll(currentStoryElementMeshes);
-		}
-
-		//add billboards to scene
-		if(!billboardsAtTime.isEmpty()) {
-			root.getChildren().addAll(billboardsAtTime);
-		}
-		*/
-
+//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION----------
+//		//add story scene element meshes to scene
+//		if(!currentStoryElementMeshes.isEmpty()) {
+//			root.getChildren().addAll(currentStoryElementMeshes);
+//		}
+//
+//		//add billboards to scene
+//		if(!billboardsAtTime.isEmpty()) {
+//			root.getChildren().addAll(billboardsAtTime);
+//		}
+//--------------------------------------------------------------------------
 	}
 
 	private void translateSphere(Node sphere, double x, double y, double z) {
@@ -891,7 +919,7 @@ public class Window3DSubScene{
 						@Override
 						public void run() {
 							refreshScene();
-							//otherCells.clear();
+							otherCells.clear();
 							addCellsToScene();
 						}
 					});
@@ -940,8 +968,8 @@ public class Window3DSubScene{
 
 	private static final double CAMERA_INITIAL_DISTANCE = -800;
 
-    private static final double CAMERA_NEAR_CLIP = 0.01,
-    							CAMERA_FAR_CLIP = 10000;
+    private static final double CAMERA_NEAR_CLIP = 1, // 0.01,
+    							CAMERA_FAR_CLIP = 1000; // 10000;
 
     private static final int START_TIME = 1;
 

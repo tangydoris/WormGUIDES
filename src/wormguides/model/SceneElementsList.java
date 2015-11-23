@@ -7,40 +7,71 @@ package wormguides.model;
  * Author: Braden Katzman
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class SceneElementsList {
-	public ArrayList<SceneElement> SceneElementsList;
-	private final String configFile;
+	
+	public ArrayList<SceneElement> sceneElementsList;
+	private JarFile jarFile;
+	
+	// TODO Maybe use this for optimization when reading jarfile from GeometryLoader
+	// may not need this at all
+	private ArrayList<JarEntry> objEntries;
 
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
-	public SceneElementsList(String configFile) {
-		this.SceneElementsList = new ArrayList<SceneElement>();
-		this.configFile = configFile;
+	public SceneElementsList() {
+		sceneElementsList = new ArrayList<SceneElement>();
+		objEntries = new ArrayList<JarEntry>();
+		buildListFromConfig();
 	}
 	
 	public void buildListFromConfig() {
-		File obj = new File(this.configFile);
 		try {
-			Scanner scanner = new Scanner(obj);
-			if (scanner.hasNextLine()) { //headings
-				String titleBar = scanner.nextLine(); //skip column headings line
-			}
-			else {
-				System.out.println("Invalid file: '" + configFile);
-				scanner.close();
-				return;
+			jarFile = new JarFile(new File("WormGUIDES.jar"));
+			Enumeration<JarEntry> entries = jarFile.entries();
+			JarEntry entry;
+			
+			while (entries.hasMoreElements()) {
+				entry = entries.nextElement();
+				
+				if (entry.getName().equals("wormguides/model/shapes_file/"+CELL_CONFIG_FILE_NAME)) {
+					InputStream stream = jarFile.getInputStream(entry);
+					processStreamString(stream);
+				}
+				else if (entry.getName().startsWith("wormguides/model/obj_file/"))
+					objEntries.add(entry);
+				
 			}
 			
-			//if reached we have a valid csv file
-			while(scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				
+			jarFile.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
+		} catch (IOException e) {
+			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
+		}
+	}
+	
+	private void processStreamString(InputStream stream) {
+		InputStreamReader streamReader = new InputStreamReader(stream);
+		BufferedReader reader = new BufferedReader(streamReader);
+		
+		try {
+			String titleBar = reader.readLine();
+			
+			String line;
+			// process each line
+			while ((line = reader.readLine()) != null) {
 				String[] splits =  line.split(",", 8);
 				
 				//BUIILD SCENE ELEMENT
@@ -72,30 +103,33 @@ public class SceneElementsList {
 					completeResourceFlag = false;
 				}
 				
-				SceneElement se = new SceneElement(splits[0], cellNames,
+				SceneElement se = new SceneElement(//objEntries,
+						splits[0], cellNames,
 						splits[2], splits[3], splits[4],
 						Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
 						splits[7], completeResourceFlag, billboardFlag);
 				
 				//add scene element to list
-				SceneElementsList.add(se);
+				sceneElementsList.add(se);
 			}
-			scanner.close();
-		}
-		catch (FileNotFoundException e) {
-			System.out.println("The config file '" + configFile + "' wasn't found on the system.");
-			//e.printStackTrace(); 
+			
+			reader.close();
+		} catch (IOException e) {
+			System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
+			return;
 		}
 	}
 
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
-		for (int i = 0; i < SceneElementsList.size(); i++) {
-			SceneElement curr = SceneElementsList.get(i);
+		for (int i = 0; i < sceneElementsList.size(); i++) {
+			SceneElement curr = sceneElementsList.get(i);
 			if (curr.getStartTime() <= time && curr.getEndTime() >= time) {
 				sceneElements.add(curr);
 			}
 		}
 		return sceneElements;
 	}
+	
+	private final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
 }

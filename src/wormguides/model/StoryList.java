@@ -1,32 +1,62 @@
 package wormguides.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class StoryList {
 	
 	ArrayList<Story> stories;
-	private final String configFile;
 	
-	public StoryList(String configFile) {
+	public StoryList() {
 		stories = new ArrayList<Story>();
-		this.configFile = configFile;
+		buildStories();
 	}
 	
 	public void buildStories() {
-		int storyCounter = -1; //used for accessing the current story for adding scene elements
-		File obj = new File(this.configFile);
 		try {
-			Scanner scanner = new Scanner(obj);
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
+			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
+			Enumeration<JarEntry> entries = jarFile.entries();
+			JarEntry entry;
+			
+			while (entries.hasMoreElements()) {
+				entry = entries.nextElement();
+				
+				if (entry.getName().equals("wormguides/model/story_file/"+STORY_CONFIG_FILE_NAME)) {
+					InputStream stream = jarFile.getInputStream(entry);
+					processStreamString(stream);
+				}
+			}
+			
+			jarFile.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
+		} catch (IOException e) {
+			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
+		}
+	}
+	
+	public void processStreamString(InputStream stream) {
+		int storyCounter = -1; //used for accessing the current story for adding scene elements
+		//File obj = new File(this.configFile);
+		try {
+			InputStreamReader streamReader = new InputStreamReader(stream);
+			BufferedReader reader = new BufferedReader(streamReader);
+			
+			String line;
+			while ((line = reader.readLine()) != null) {
 				String[] splits =  line.split(",", 8); //split the line up by commas
 				
-				//check if story line or scene element line
+				//check if story line or scene element line - CHANGE THIS CHECK EMPTYNESS OF ENTIRE END OF LINE
 				if (splits[2].length() == 0) { //story line
 					Story story = new Story(splits[0], splits[1]);
 					stories.add(story);
@@ -67,11 +97,14 @@ public class StoryList {
 					stories.get(storyCounter).addSceneElement(se);
 				}
 			}
-			scanner.close();
-		}
-		catch (FileNotFoundException e) {
-			System.out.println("The config file '" + configFile + "' wasn't found on the system.");
-			//e.printStackTrace(); 
+			
+			reader.close();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("Unable to process file '" + STORY_CONFIG_FILE_NAME + "'.");
+		} catch (NumberFormatException e) {
+			System.out.println("Number Format Error in file '" + STORY_CONFIG_FILE_NAME + "'.");
+		} catch (IOException e) {
+			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		}
 	}
 	
@@ -88,4 +121,6 @@ public class StoryList {
 		}
 		return sceneElementsAtTime;
 	}
+	
+	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
 }

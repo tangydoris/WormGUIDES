@@ -19,10 +19,14 @@ public class SceneElement {
 	private final boolean CompleteResourceFlag;
 	private final boolean BillboardFlag;
 	private static final String OBJEXT = ".obj";
+	
+	//private ArrayList<JarEntry> objEntries;
 
 	public SceneElement(String sceneName, Vector<String> cellNames,
 			String markerName, String imagingSource, String resourceLocation, 
 			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) { //add EmbryoName
+		//this.objEntries = objEntries;
+		
 		this.SceneName = sceneName;
 		this.cellNames = cellNames;
 		this.MarkerName = markerName;
@@ -37,6 +41,7 @@ public class SceneElement {
 	}
 	
 	public MeshView buildGeometry(int time) {
+		// TODO OPTIMIZE THIS LATER
 		GeometryLoader loader = new GeometryLoader();
 		
 		//check if complete resource
