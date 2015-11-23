@@ -1,6 +1,6 @@
 package wormguides.model;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -8,7 +8,7 @@ import javafx.scene.transform.Translate;
 
 public class SceneElement {
 	private final String SceneName; //descriptor or display of object
-	private Vector<String> cellNames; //cell names at time point i.e. cells involved in this scene
+	private ArrayList<String> cellNames; //cell names at time point i.e. cells involved in this scene
 	private final String MarkerName; //used when neuron is separated from marker
 	private final String EmbryoName; //used when based on specific embryo
 	private final String ImagingSource; //meta data
@@ -22,7 +22,7 @@ public class SceneElement {
 	
 	//private ArrayList<JarEntry> objEntries;
 
-	public SceneElement(String sceneName, Vector<String> cellNames,
+	public SceneElement(String sceneName, ArrayList<String> cellNames,
 			String markerName, String imagingSource, String resourceLocation, 
 			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) { //add EmbryoName
 		//this.objEntries = objEntries;
@@ -83,7 +83,7 @@ public class SceneElement {
 		return this.SceneName;
 	}
 	
-	public Vector<String> getAllCellNames() {
+	public ArrayList<String> getAllCellNames() {
 		return this.cellNames;
 	}
 	

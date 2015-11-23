@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -68,7 +67,7 @@ public class StoryList {
 					}
 						
 					//vector of cell names
-					Vector<String> cellNames = new Vector<String>();
+					ArrayList<String> cellNames = new ArrayList<String>();
 					StringTokenizer st = new StringTokenizer(splits[1]);
 					while (st.hasMoreTokens()) {
 						cellNames.add(st.nextToken());

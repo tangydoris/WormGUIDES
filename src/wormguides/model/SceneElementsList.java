@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -82,7 +81,7 @@ public class SceneElementsList {
 				}
 				
 				//vector of cell names
-				Vector<String> cellNames = new Vector<String>();
+				ArrayList<String> cellNames = new ArrayList<String>();
 				StringTokenizer st = new StringTokenizer(splits[1]);
 				while (st.hasMoreTokens()) {
 					cellNames.add(st.nextToken());
@@ -118,6 +117,18 @@ public class SceneElementsList {
 			System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
 			return;
 		}
+	}
+	
+	public String[] getSceneElementNamesAtTime(int time) {
+		ArrayList<String> names = new ArrayList<String>();
+		for (int i = 0; i < sceneElementsList.size(); i++) {
+			SceneElement curr = sceneElementsList.get(i);
+			if (curr.getStartTime() <= time && curr.getEndTime() >= time) {
+				ArrayList<String> allNames = curr.getAllCellNames();
+				return allNames.toArray(new String[allNames.size()]);
+			}
+		}
+		return new String[1];
 	}
 
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
