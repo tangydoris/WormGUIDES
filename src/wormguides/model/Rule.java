@@ -67,19 +67,6 @@ public abstract class Rule {
 	
 	private RuleInfoPacket infoPacket;
 	
-	
-	/*
-	public ColorRule(String searched, Color color) {
-		this(searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
-	}
-	
-	public ColorRule(String searched, Color color, SearchOption...options) {
-		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)),
-														SearchType.SYSTEMATIC);
-	}
-	*/
-	
-	
 	public Rule(String searched, Color color, ArrayList<SearchOption> options) {
 		setSearchedText(searched);
 		setColor(color);

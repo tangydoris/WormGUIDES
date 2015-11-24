@@ -86,7 +86,6 @@ public class Window3DSubScene{
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
-	private StringProperty selectedCellMeshName; //for our rendered cell meshes
 
 	// searched highlighting stuff
 	private boolean inSearch;
@@ -136,7 +135,7 @@ public class Window3DSubScene{
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
-					Number oldValue, Number newValue) {
+								Number oldValue, Number newValue) {
 				//System.out.println("time changed, building scene");
 				buildScene(time.get());
 			}
@@ -169,8 +168,7 @@ public class Window3DSubScene{
 			}
 		});
 		
-		selectedCellMeshName = new SimpleStringProperty();
-		selectedCellMeshName.set("");
+		
 		selectedName.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
@@ -236,14 +234,6 @@ public class Window3DSubScene{
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
-
-		// Initialize scene element events
-		String configFile = "src/wormguides/model/CellShapesConfig.csv";
-		sceneElementsList = new SceneElementsList();
-		sceneElementsList.buildListFromConfig();
-		currentSceneElementMeshes = new ArrayList<MeshView>();
-		renderedSceneElementRef = new ArrayList<SceneElement>();
-		// End scene element initialization
 		
 //-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
 //		//initialize story elements
@@ -256,6 +246,24 @@ public class Window3DSubScene{
 //		billboardsAtTime = new ArrayList<Text>();
 //--------------------------------------------------------------------------------------	
 	}
+	
+	
+	/*
+	 * Called by RootLayoutController to set the loaded SceneElementsList
+	 * after the list is set, the SceneElements are loaded
+	 */
+	public void setSceneElementsList(SceneElementsList list) {
+		sceneElementsList = list;
+		
+		if (sceneElementsList != null) {
+			// Initialize scene element events
+			sceneElementsList.buildListFromConfig();
+			currentSceneElementMeshes = new ArrayList<MeshView>();
+			renderedSceneElementRef = new ArrayList<SceneElement>();
+			// End scene element initialization
+		}
+	}
+	
 
 	public IntegerProperty getTimeProperty() {
 		return time;
@@ -271,10 +279,6 @@ public class Window3DSubScene{
 
 	public StringProperty getSelectedName() {
 		return selectedName;
-	}
-	
-	public StringProperty getSelectedCellMeshName() {
-		return selectedCellMeshName;
 	}
 
 	public IntegerProperty getTotalNucleiProperty() {
@@ -332,18 +336,18 @@ public class Window3DSubScene{
 			public void handle(MouseEvent me) {
 				PickResult result = me.getPickResult();
 				Node node = result.getIntersectedNode();
-				//System.out.println("3d coord: "+result.getIntersectedPoint());
 				if (node instanceof Sphere) {
 					selectedIndex.set(getPickedSphereIndex((Sphere)node));
 					selectedName.set(names[selectedIndex.get()]);
 				}
 				else if (node instanceof MeshView) {
+					//selectedIndex.set(getPickedMeshIndex((MeshView)node));
+					
 					for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = renderedSceneElementRef.get(i);
-							selectedCellMeshName.set(clickedSceneElement.getAllCellNames().get(0));
-							selectedName.set(selectedCellMeshName.get());
+							selectedName.set(clickedSceneElement.getAllCellNames().get(0));
 						}
 					}
 				}
@@ -392,7 +396,10 @@ public class Window3DSubScene{
 		time--;
 
 		names = data.getNames(time);
-		meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
+		
+		if (sceneElementsList != null)
+			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
+		
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
 		totalNuclei.set(names.length);
@@ -406,22 +413,24 @@ public class Window3DSubScene{
 			renderedSceneElementRef.clear();
 		}
 		
-		sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
-		for (int i = 0; i < sceneElementsAtTime.size(); i++) {
-			//add meshes from each scene element
-			SceneElement curr = sceneElementsAtTime.get(i);
-			MeshView mesh = curr.buildGeometry(time);
-			
-			if (mesh != null) { //null mesh when file not found thrown
-				mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+		if (sceneElementsList != null) {
+			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
+			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
+				//add meshes from each scene element
+				SceneElement curr = sceneElementsAtTime.get(i);
+				MeshView mesh = curr.buildGeometry(time);
 				
-				//add rendered mesh to meshes list
-				currentSceneElementMeshes.add(mesh);
-				
-				//add scene element to rendered scene element reference for on click responsiveness
-				renderedSceneElementRef.add(curr);
-			}
-		}	
+				if (mesh != null) { //null mesh when file not found thrown
+					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+					
+					//add rendered mesh to meshes list
+					currentSceneElementMeshes.add(mesh);
+					
+					//add scene element to rendered scene element reference for on click responsiveness
+					renderedSceneElementRef.add(curr);
+				}
+			}	
+		}
 		// End scene element mesh loading/building
 		
 		

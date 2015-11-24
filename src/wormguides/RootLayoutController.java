@@ -47,6 +47,7 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElementsList;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -229,7 +230,7 @@ public class RootLayoutController implements Initializable{
 	
 	public void init3DWindow(LineageData data) {
 		window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
-				modelAnchorPane.prefHeight(-1), data);
+										modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
 	}
@@ -441,12 +442,15 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initLayers() {
+		LayersListViewCallback callback = new LayersListViewCallback();
+		
 		// color rules layers
 		colorLayers = new Layers(colorRulesListView);
-		colorRulesListView.setCellFactory(new LayersListViewCallback());
+		colorRulesListView.setCellFactory(callback);
 		
 		// shape rules layers
 		shapeLayers = new Layers(shapeRulesListView);
+		shapeRulesListView.setCellFactory(callback);
 	}
 	
 	
@@ -561,6 +565,7 @@ public class RootLayoutController implements Initializable{
 		ObservableList<ColorRule> tempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
 		search.setRulesList(tempList);
 		window3D.setRulesList(tempList);
+		window3D.setSceneElementsList(new SceneElementsList());
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
