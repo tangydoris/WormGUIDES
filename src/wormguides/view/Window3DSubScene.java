@@ -226,9 +226,11 @@ public class Window3DSubScene{
 
 		geneResultsUpdated = new SimpleBooleanProperty();
 
-		othersOpacity = new SimpleDoubleProperty(1.0);
+		// get completely opaque 'other' material first
+		othersOpacity = new SimpleDoubleProperty(1);
 		opacityMaterialHash = new HashMap<Double, Material>();
 		opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(Color.WHITE));
+		
 		otherCells = new ArrayList<String>();
 
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
@@ -536,7 +538,6 @@ public class Window3DSubScene{
  				if (colors.isEmpty()) {
  					renderSecondSpheres.add(sphere);
  					material = opacityMaterialHash.get(othersOpacity.get());
- 					//othersOpacity.set(1.0);
  				}
  				else {
  					renderFirstSpheres.add(sphere);

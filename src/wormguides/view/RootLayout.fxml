@@ -232,7 +232,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <Slider fx:id="opacitySlider" VBox.vgrow="ALWAYS" />
+                                    <Slider fx:id="opacitySlider" value="50.0" VBox.vgrow="ALWAYS" />
                                     <Label prefHeight="22.0" text="Coloring Layers:">
                                        <font>
                                           <Font size="14.0" />

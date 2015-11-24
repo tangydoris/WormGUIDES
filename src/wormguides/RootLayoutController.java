@@ -306,8 +306,12 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
+		// slider has to listen to 3D window's opacity value
+		// 3d window's opacity value has to listen to opacity slider's value
 		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
 		window3D.addListenerToOpacitySlider(opacitySlider);
+		// set to 50% transparency as default
+		opacitySlider.setValue(50);
 	}
 	
 	private void setSelectedInfo(String name) {
