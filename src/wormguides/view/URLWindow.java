@@ -55,24 +55,23 @@ public class URLWindow extends AnchorPane {
 		AnchorPane.setTopAnchor(vBox, 15.0);
 		AnchorPane.setLeftAnchor(vBox, 15.0);
 		AnchorPane.setRightAnchor(vBox, 15.0);
-		AnchorPane.setBottomAnchor(vBox, 10.0);
+		AnchorPane.setBottomAnchor(vBox, 20.0);
 		getChildren().add(vBox);
 		
 		iOSLabel = new Label("iOS:");
 		iOSLabel.setFont(AppFont.getFont());
-		iOSLabel.setPrefHeight(22);
+		iOSLabel.setPrefHeight(23);
 		androidLabel = new Label("Android:");
 		androidLabel.setFont(AppFont.getFont());
-		androidLabel.setPrefHeight(22);
+		androidLabel.setPrefHeight(23);
 		webLabel = new Label("Web browser:");
 		webLabel.setFont(AppFont.getFont());
-		webLabel.setPrefHeight(22);
+		webLabel.setPrefHeight(23);
 		
 		HBox iOSHBox = new HBox(10);
 		iOSField = new TextField();
 		iOSField.setFont(AppFont.getFont());
 		iOSField.setEditable(false);
-		iOSField.setPrefHeight(23);
 		iOSField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		HBox.setHgrow(iOSField, Priority.ALWAYS);
@@ -98,7 +97,6 @@ public class URLWindow extends AnchorPane {
 		androidField = new TextField();
 		androidField.setFont(AppFont.getFont());
 		androidField.setEditable(false);
-		androidField.setPrefHeight(23);
 		androidField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		HBox.setHgrow(androidField, Priority.ALWAYS);
@@ -124,7 +122,6 @@ public class URLWindow extends AnchorPane {
 		webField = new TextField();
 		webField.setFont(AppFont.getFont());
 		webField.setEditable(false);
-		webField.setPrefHeight(23);
 		webField.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;"); 
 		HBox.setHgrow(webField, Priority.ALWAYS);
@@ -132,9 +129,9 @@ public class URLWindow extends AnchorPane {
 		webCopyBtn.setTooltip(tooltip);
 		webCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 							"-fx-faint-focus-color: transparent;");
-		webCopyBtn.maxWidthProperty().bind(webCopyBtn.heightProperty());
-		webCopyBtn.prefWidthProperty().bind(webCopyBtn.heightProperty());
-		webCopyBtn.minWidthProperty().bind(webCopyBtn.heightProperty());
+		webCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
+		webCopyBtn.prefWidthProperty().bind(iOSCopyBtn.heightProperty());
+		webCopyBtn.minWidthProperty().bind(iOSCopyBtn.heightProperty());
 		webCopyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		webCopyBtn.setGraphic(ImageLoader.getCopyIcon());
 		webCopyBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -147,7 +144,7 @@ public class URLWindow extends AnchorPane {
 		webHBox.getChildren().addAll(webField, webCopyBtn);
 		
 		resetBtn = new Button("Generate");
-		resetBtn.setPrefWidth(80);
+		resetBtn.setPrefWidth(100);
 		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		resetBtn.setFont(AppFont.getFont());
@@ -159,20 +156,26 @@ public class URLWindow extends AnchorPane {
 		});
 		
 		closeBtn = new Button("Close");
-		closeBtn.setPrefWidth(80);
+		closeBtn.setPrefWidth(100);
 		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
 						"-fx-faint-focus-color: transparent;");
 		closeBtn.setFont(AppFont.getFont());
 		HBox hBox = new HBox();
-		hBox.setSpacing(10);
+		hBox.setSpacing(20);
 		hBox.setAlignment(Pos.CENTER);
 		hBox.getChildren().addAll(resetBtn, closeBtn);
 		
+		Region r1 = new Region();
+		r1.setPrefHeight(0);
+		
+		Region r2 = new Region();
+		r1.setPrefHeight(15);
+		
 		Region r = new Region();
-		r.setPrefHeight(10);
+		r.setPrefHeight(5);
 		
 		vBox.getChildren().addAll(iOSLabel, iOSHBox, androidLabel, androidHBox, 
-													webLabel, webHBox, r, hBox);
+												webLabel, webHBox, r, hBox);
 	}
 	
 	
