@@ -110,6 +110,7 @@ public class RootLayoutController implements Initializable{
 	private Layers shapeLayers;
 	@FXML private ListView<Rule> colorRulesListView;
 	@FXML private Button addSearchBtn;
+	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
 	@FXML private ListView<Rule> shapeRulesListView;
 	
@@ -536,6 +537,7 @@ public class RootLayoutController implements Initializable{
 		assert (cellName != null);
 		assert (cellDescription != null);
 		
+		assert (uniformSizeCheckBox != null);
 		assert (opacitySlider != null);
 	}
 
