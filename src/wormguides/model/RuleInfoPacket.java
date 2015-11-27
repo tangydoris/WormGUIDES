@@ -10,15 +10,22 @@ public class RuleInfoPacket {
 	private ArrayList<SearchOption> options;
 	private boolean disableDescendantOption;
 	
+	// transparency is enabled for ShapeRule(s)
+	// not for ColorRule(s)
+	private boolean enableAlpha;
+	private double alpha;
+	
 	public RuleInfoPacket() {
-		this("", Color.WHITE, null);
+		this("", Color.WHITE, false, null);
 	}
 	
-	public RuleInfoPacket(String name, Color color, ArrayList<SearchOption> options) {
+	public RuleInfoPacket(String name, Color color, boolean enableAlpha, ArrayList<SearchOption> options) {
 		this.name = name;
 		this.color = color;
 		this.options = options;
 		this.disableDescendantOption = false;
+		this.enableAlpha = enableAlpha;
+		this.alpha = 1;
 	}
 	
 	public void disableDescendantOption() {
@@ -33,6 +40,10 @@ public class RuleInfoPacket {
 		return name;
 	}
 	
+	public double getAlpha() {
+		return alpha;
+	}
+	
 	public Color getColor() {
 		return color;
 	}
@@ -41,12 +52,19 @@ public class RuleInfoPacket {
 		return options;
 	}
 	
+	public void setAlpha(double alpha) {
+		if (alpha>=0 && alpha<=1)
+			this.alpha = alpha;
+	}
+	
 	public void setColor(Color color) {
-		this.color = color;
+		if (color != null)
+			this.color = color;
 	}
 	
 	public void setOptions(ArrayList<SearchOption> options) {
-		this.options = options;
+		if (options != null)
+			this.options = options;
 	}
 	
 	public void setCellSelected(boolean selected) {
@@ -86,6 +104,14 @@ public class RuleInfoPacket {
 	
 	public boolean isAncestorSelected() {
 		return options.contains(SearchOption.ANCESTOR);
+	}
+	
+	public boolean isAlphaEnabled() {
+		return enableAlpha;
+	}
+	
+	public void enableAlpha() {
+		enableAlpha = true;
 	}
 	
 	public String toString() {

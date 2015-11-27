@@ -11,26 +11,27 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-public class ColorRuleEditPane extends AnchorPane{
+public class RuleEditPane extends AnchorPane{
 	
 	private RuleInfoPacket infoPacket;
 
-	public ColorRuleEditPane() {
+	public RuleEditPane() {
 		this(new RuleInfoPacket(), null);
 	}
 		
-	public ColorRuleEditPane(RuleInfoPacket packet, EventHandler<ActionEvent> handler) {
+	public RuleEditPane(RuleInfoPacket packet, EventHandler<ActionEvent> handler) {
 		super();
 		
 		infoPacket = packet;
 		
-		setPrefHeight(350.0);
+		setPrefHeight(370.0);
 		setPrefWidth(240.0);
 		
 		VBox vbox = new VBox();
@@ -42,8 +43,8 @@ public class ColorRuleEditPane extends AnchorPane{
 		
 		Label optionsLabel = new Label("Search Options for "+packet.getName());
 		
-		Region separator = new Region();
-		separator.setPrefHeight(10);
+		Region r1 = new Region();
+		r1.setPrefHeight(10);
 		
 		Label ancestryLabel = new Label("Cell Ancestry");
 		
@@ -89,8 +90,8 @@ public class ColorRuleEditPane extends AnchorPane{
 			desTick.disableProperty().set(true);
 		}
 		
-		Region separator1 = new Region();
-		separator1.setPrefHeight(10);
+		Region r2 = new Region();
+		r2.setPrefHeight(10);
 		
 		Label colorLabel = new Label("Color");
 		
@@ -120,15 +121,41 @@ public class ColorRuleEditPane extends AnchorPane{
 		buttonBox.getChildren().add(submit);
 		buttonBox.setAlignment(Pos.CENTER);
 		
-		Region separator2 = new Region();
-		separator2.setPrefHeight(10);
+		Region r4 = new Region();
+		r4.setPrefHeight(10);
 		
-		Region separator3 = new Region();
-		separator3.setPrefHeight(5);
+		Region r5 = new Region();
+		r5.setPrefHeight(5);
 		
-		vbox.getChildren().addAll(optionsLabel, separator, ancestryLabel,
-				cellRow, ancRow, desRow, separator1, colorLabel,
-				pickerPane, separator2, buttonBox, separator3);
+		if (packet.isAlphaEnabled()) {
+			Label alphaLabel = new Label("Transparency");
+			Slider alphaSlider = new Slider();
+			alphaSlider.setMax(100);
+			alphaSlider.setMin(0);
+			alphaSlider.setValue(100);
+			alphaSlider.valueProperty().addListener(new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> observable, 
+									Number oldValue, Number newValue) {
+					packet.setAlpha(Math.round(newValue.doubleValue())/100d);
+				}
+			});
+			HBox.setHgrow(alphaSlider, Priority.ALWAYS);
+			
+			Region r3 = new Region();
+			r3.setPrefHeight(10);
+			
+			vbox.getChildren().addAll(optionsLabel, r1, ancestryLabel,
+					cellRow, ancRow, desRow, r2, alphaLabel, alphaSlider, r3, 
+					colorLabel, pickerPane, r4, buttonBox, r5);
+		}
+		else {
+			vbox.getChildren().addAll(optionsLabel, r1, ancestryLabel,
+					cellRow, ancRow, desRow, r2, 
+					colorLabel, pickerPane, r4, buttonBox, r5);
+		}
+		
+		
 		
 		for (Node node : vbox.getChildren()) {
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+

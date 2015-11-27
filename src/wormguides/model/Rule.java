@@ -29,7 +29,7 @@ import javafx.stage.Stage;
 import wormguides.ImageLoader;
 import wormguides.SearchOption;
 import wormguides.view.AppFont;
-import wormguides.view.ColorRuleEditPane;
+import wormguides.view.RuleEditPane;
 
 /*
  * Superclass for ColorRule and ShapeRule, which have
@@ -47,6 +47,9 @@ public abstract class Rule {
 	private BooleanProperty ruleChanged;
 	private boolean visible;
 	private Color color;
+	
+	private boolean enableAlpha;
+	private double alpha;
 	
 	private ImageView eyeIcon;
 	private ImageView eyeInvertIcon;
@@ -69,6 +72,8 @@ public abstract class Rule {
 	public Rule(String searched, Color color, ArrayList<SearchOption> options) {
 		setSearchedText(searched);
 		setColor(color);
+		enableAlpha = false;
+		alpha = 1;
 		
 		cells = new ArrayList<String>();
 		// if the cells list from Search is set for this rule, cellsSet is true
@@ -110,9 +115,13 @@ public abstract class Rule {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editStage = new Stage();
-					editStage.setScene(new Scene(new ColorRuleEditPane(
+					editStage.setScene(new Scene(new RuleEditPane(
 										infoPacket, getSubmitHandler())));
-					editStage.setTitle("Edit Color Rule");
+					if (enableAlpha)
+						editStage.setTitle("Edit Shape Rule");
+					else
+						editStage.setTitle("Edit Color Rule");
+					
 					editStage.initModality(Modality.NONE);
 					editStage.setResizable(false);
 				}
@@ -163,7 +172,7 @@ public abstract class Rule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(text, this.color, options);
+		infoPacket = new RuleInfoPacket(text, this.color, enableAlpha, options);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -176,6 +185,17 @@ public abstract class Rule {
 		});
 		
 		visible = true;
+	}
+	
+	
+	public boolean isAlphaEnabled() {
+		return enableAlpha;
+	}
+	
+	
+	public void enableAlpha() {
+		enableAlpha = true;
+		infoPacket.enableAlpha();
 	}
 	
 	
@@ -336,6 +356,19 @@ public abstract class Rule {
 		return visible;
 	}
 	
+	public double getAlpha() {
+		return alpha;
+	}
+	
+	public boolean isOpaque() {
+		return alpha==1;
+	}
+	
+	public void setAlpha(double alpha) {
+		if (0<=alpha && alpha<=1)
+			this.alpha = alpha;
+	}
+	
 	private EventHandler<ActionEvent> getSubmitHandler() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -343,6 +376,7 @@ public abstract class Rule {
 				setColor(infoPacket.getColor());
 				setOptions(infoPacket.getOptions().toArray(
 						new SearchOption[infoPacket.getOptions().size()]));
+				setAlpha(infoPacket.getAlpha());
 				editStage.hide();
 				setOptions(infoPacket.getOptions());
 				resetLabel();

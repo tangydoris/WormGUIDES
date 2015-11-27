@@ -587,11 +587,13 @@ public class Window3DSubScene{
 					
 					// meshes with names
 					else {
+						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 						for (String name : allNames) {
 							for (ShapeRule rule : shapeRulesList) {
 								if (rule.appliesTo(name)) {
-									colors.add(rule.getColor());
+									colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+									isOpaque = rule.isOpaque();
 								}
 							}
 						}
@@ -600,7 +602,10 @@ public class Window3DSubScene{
 						if (!colors.isEmpty()) {
 							//System.out.println(allNames.get(0)+" gets color "+colors.first());
 							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
-							renderFirst.add(currentSceneElementMeshes.get(i));
+							if (isOpaque)
+								renderFirst.add(currentSceneElementMeshes.get(i));
+							else
+								renderSecond.add(currentSceneElementMeshes.get(i));
 						}
 						else {
 							//System.out.println("no rule for "+allNames.get(0)+" making it 'other'");
@@ -662,8 +667,9 @@ public class Window3DSubScene{
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
  				for (ColorRule rule : colorRulesList) {
  					// just need to consult rule's active list
- 					if (rule.appliesTo(cellNames[i]))
- 						colors.add(rule.getColor());
+ 					if (rule.appliesTo(cellNames[i])) {
+ 						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+ 					}
  				}
  				material = colorHash.getMaterial(colors);
 
@@ -839,10 +845,8 @@ public class Window3DSubScene{
 							public void changed(
 									ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									System.out.println("shape rule changed, building scene");
+								if (newValue)
 									buildScene(time.get());
-								}
 							}
 						});
 					}
