@@ -221,11 +221,11 @@ public class Search {
 		addShapeRule("DA", Color.GREEN, SearchOption.CELL);
 	}
 	
-	private void addShapeRule(String name, Color color) {
+	public void addShapeRule(String name, Color color) {
 		addShapeRule(name, color, SearchOption.CELL);
 	}
 	
-	private void addShapeRule(String name, Color color, SearchOption...options) {
+	public void addShapeRule(String name, Color color, SearchOption...options) {
 		String label = "";
 		name = name.trim();
 		
@@ -235,7 +235,6 @@ public class Search {
 		
 		ShapeRule rule = new ShapeRule(name, color, optionsArray);
 		
-		// TODO add cell list to shape rule
 		rule.setCells(name);
 		shapeRulesList.add(rule);
 	}

@@ -6,9 +6,9 @@ import wormguides.SearchOption;
 
 public class RuleInfoPacket {
 	private final String name;
-	//private ObjectProperty<Color> colorProperty;
 	private Color color;
 	private ArrayList<SearchOption> options;
+	private boolean disableDescendantOption;
 	
 	public RuleInfoPacket() {
 		this("", Color.WHITE, null);
@@ -18,6 +18,15 @@ public class RuleInfoPacket {
 		this.name = name;
 		this.color = color;
 		this.options = options;
+		this.disableDescendantOption = false;
+	}
+	
+	public void disableDescendantOption() {
+		disableDescendantOption = true;
+	}
+	
+	public boolean isDescendantDisabled() {
+		return disableDescendantOption;
 	}
 	
 	public String getName() {

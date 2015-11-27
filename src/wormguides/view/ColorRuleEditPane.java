@@ -30,7 +30,7 @@ public class ColorRuleEditPane extends AnchorPane{
 		
 		infoPacket = packet;
 		
-		setPrefHeight(300.0);
+		setPrefHeight(350.0);
 		setPrefWidth(240.0);
 		
 		VBox vbox = new VBox();
@@ -83,7 +83,8 @@ public class ColorRuleEditPane extends AnchorPane{
 		});
 		HBox desRow = makeEditRow(desLabel, desTick);
 		if (packet.getName().contains("functional") 
-				|| packet.getName().contains("description")) {
+				|| packet.getName().contains("description")
+				|| packet.isDescendantDisabled()) {
 			desLabel.disableProperty().set(true);
 			desTick.disableProperty().set(true);
 		}

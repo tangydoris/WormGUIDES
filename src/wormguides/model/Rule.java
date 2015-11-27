@@ -110,9 +110,8 @@ public abstract class Rule {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editStage = new Stage();
-					editStage.setScene(new Scene(
-							new ColorRuleEditPane(
-									infoPacket, getSubmitHandler())));
+					editStage.setScene(new Scene(new ColorRuleEditPane(
+										infoPacket, getSubmitHandler())));
 					editStage.setTitle("Edit Color Rule");
 					editStage.initModality(Modality.NONE);
 					editStage.setResizable(false);
@@ -177,6 +176,11 @@ public abstract class Rule {
 		});
 		
 		visible = true;
+	}
+	
+	
+	public void disableDescendantOption() {
+		infoPacket.disableDescendantOption();
 	}
 	
 	
