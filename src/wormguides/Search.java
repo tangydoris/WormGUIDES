@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.ShapeRule;
 
 public class Search {
 
@@ -40,7 +41,8 @@ public class Search {
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	
-	private static ObservableList<ColorRule> rulesList;
+	private static ObservableList<ColorRule> colorRulesList;
+	private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
 	
 	private final static Service<Void> resultsUpdateService;
@@ -99,7 +101,7 @@ public class Search {
 					updateGeneResults();
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
-					for (ColorRule rule : rulesList) {
+					for (ColorRule rule : colorRulesList) {
 						if (rule.getSearchedText().contains("'"+searched+"'")) {
 							rule.setCells(geneSearchService.getValue());
 							searchResultsList.clear();
@@ -180,12 +182,16 @@ public class Search {
 		return searched;
 	}
 	
-	public void setRulesList(ObservableList<ColorRule> observableList) {
-		rulesList = observableList;
+	public void setColorRulesList(ObservableList<ColorRule> observableList) {
+		colorRulesList = observableList;
 	}
 	
-	public boolean containsRule(ColorRule other) {
-		for (ColorRule rule : rulesList) {
+	public void setShapeRulesList(ObservableList<ShapeRule> observableList) {
+		shapeRulesList = observableList;
+	}
+	
+	public boolean containsColorRule(ColorRule other) {
+		for (ColorRule rule : colorRulesList) {
 			if (rule.equals(other))
 				return true;
 		}
@@ -201,24 +207,56 @@ public class Search {
 		};
 	}
 	
-	public static void setColorRulesCells(ArrayList<ColorRule> rules) {
-		
-	}
-	
-	public void addDefaultRules() {
+	public void addDefaultColorRules() {
 		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, 
-					SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
+														SearchOption.DESCENDANT);
+	}
+	
+	public void addDefaultShapeRules() {
+		addShapeRule("AVG", Color.RED, SearchOption.CELL);
+		addShapeRule("DD", Color.BLUE, SearchOption.CELL);
+		addShapeRule("DA", Color.GREEN, SearchOption.CELL);
+	}
+	
+	private void addShapeRule(String name, Color color) {
+		addShapeRule(name, color, SearchOption.CELL);
+	}
+	
+	private void addShapeRule(String name, Color color, SearchOption...options) {
+		String label = "";
+		name = name.trim();
+		
+		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
+		for (SearchOption option : options)
+			optionsArray.add(option);
+		
+		ShapeRule rule = new ShapeRule(name, color, optionsArray);
+		
+		// TODO add cell list to shape rule
+		rule.setCells(name);
+		shapeRulesList.add(rule);
+	}
+	
+	public void clearShapeRules() {
+		shapeRulesList.clear();
 	}
 	
 	public void clearColorRules() {
-		rulesList.clear();
+		colorRulesList.clear();
 	}
 	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
 		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
+	}
+	
+	public static void addColorRule(SearchType type, String searched, Color color, SearchOption...options) {
+		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
+		for (SearchOption option : options)
+			optionsArray.add(option);
+		addColorRule(type, searched, color, optionsArray);
 	}
 	
 	public static void addColorRule(SearchType type, String searched, Color color, 
@@ -236,7 +274,7 @@ public class Search {
 		
 		String label = "";
 		searched = searched.toLowerCase();
-		searched.trim();
+		searched = searched.trim();
 		switch (type) {
 			case SYSTEMATIC:
 							label = LineageTree.getCaseSensitiveName(searched);
@@ -270,7 +308,7 @@ public class Search {
 			rule.setCells(cells);
 		}
 		
-		rulesList.add(rule);
+		colorRulesList.add(rule);
 		searchResultsList.clear();
 	}
 	

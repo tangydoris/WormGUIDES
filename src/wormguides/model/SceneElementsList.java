@@ -32,7 +32,7 @@ public class SceneElementsList {
 	public SceneElementsList() {
 		sceneElementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
-		buildListFromConfig();
+		//buildListFromConfig();
 	}
 	
 	public void buildListFromConfig() {
@@ -124,11 +124,11 @@ public class SceneElementsList {
 		for (int i = 0; i < sceneElementsList.size(); i++) {
 			SceneElement curr = sceneElementsList.get(i);
 			if (curr.getStartTime() <= time && curr.getEndTime() >= time) {
-				ArrayList<String> allNames = curr.getAllCellNames();
-				return allNames.toArray(new String[allNames.size()]);
+				for (String name : curr.getAllCellNames())
+					names.add(name);
 			}
 		}
-		return new String[1];
+		return names.toArray(new String[names.size()]);
 	}
 
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {

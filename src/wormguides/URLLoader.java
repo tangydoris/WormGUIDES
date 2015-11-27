@@ -14,7 +14,7 @@ public class URLLoader {
 	
 	public URLLoader(Window3DSubScene window3D) {
 		this.window3D = window3D;
-		rulesList = window3D.getObservableRulesList();
+		rulesList = window3D.getObservableColorRulesList();
 	}
 	
 	public void parseURL(String url) {

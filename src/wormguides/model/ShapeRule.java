@@ -6,14 +6,24 @@ import javafx.scene.paint.Color;
 import wormguides.SearchOption;
 
 public class ShapeRule extends Rule{
-
 	
 	public ShapeRule(String searched, Color color, ArrayList<SearchOption> options) {
 		super(searched, color, options);
-		
-		// TODO Auto-generated constructor stub
+	}
+	
+	public void setCells(String name) {
+		getCells().add(name);
 	}
 	
 	
-	
+	public boolean appliesTo(String name) {
+		if (isVisible()) {
+			// name is expected to be a lineage name
+			name = PartsList.getFunctionalNameByLineageName(name);
+			if (name != null && name.toLowerCase().startsWith(getSearchedTextLowerCase()))
+				return true;
+		}
+		
+		return false;
+	}
 }

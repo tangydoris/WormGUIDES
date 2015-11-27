@@ -185,7 +185,7 @@ public class URLWindow extends AnchorPane {
 	
 	public void resetURLs() {
 		if (scene != null) {
-			ArrayList<ColorRule> list = scene.getRulesList();
+			ArrayList<ColorRule> list = scene.getColorRulesList();
 			iOSURL = URLGenerator.generateIOSURL(list, scene.getTime(), 
 							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
 							scene.getTranslationX(), scene.getTranslationY(), 

@@ -4,19 +4,22 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import wormguides.ColorComparator;
-import javafx.collections.ObservableList;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
+/*
+ * Hash of a combination of Colors mapped to a Material
+ */
+
 public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
 	private Material highlightMaterial = makeMaterial(Color.GOLD);
 	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
 	
-	public ColorHash(ObservableList<ColorRule> rulesList) {
+	public ColorHash() {
 		super();
 	}
 	
@@ -28,6 +31,8 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	}
 	
 	public static Material makeMaterial(TreeSet<Color> colors) {
+		System.out.println("making new material...");
+		
 		WritableImage wImage = new WritableImage(200, 200);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);
@@ -70,8 +75,10 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	}
 	
 	public Material getMaterial(TreeSet<Color> set) {
-		if (get(set)==null)
+		if (get(set)==null) {
+			
 			put(set, makeMaterial(set));
+		}
 		
 		//System.out.println("color hash size: "+size());
 		return get(set);

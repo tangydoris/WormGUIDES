@@ -48,6 +48,7 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
+import wormguides.model.ShapeRule;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -459,6 +460,9 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	
+	
+	
+	
 	private void initPartsList() {
 		new PartsList();
 	}
@@ -568,9 +572,12 @@ public class RootLayoutController implements Initializable{
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
 		// unchecked cast
-		ObservableList<ColorRule> tempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
-		search.setRulesList(tempList);
-		window3D.setRulesList(tempList);
+		ObservableList<ColorRule> colorTempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
+		search.setColorRulesList(colorTempList);
+		window3D.setColorRulesList(colorTempList);
+		ObservableList<ShapeRule> shapeTempList = (ObservableList<ShapeRule>)((ObservableList<? extends Rule>)shapeLayers.getRulesList());
+		search.setShapeRulesList(shapeTempList);
+		window3D.setShapeRulesList(shapeTempList);
 		window3D.setSceneElementsList(new SceneElementsList());
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
@@ -578,7 +585,9 @@ public class RootLayoutController implements Initializable{
 		
 		window3D.setResultsUpdateService(search.getResultsUpdateService());
 		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
-		search.addDefaultRules();
+		
+		search.addDefaultColorRules();
+		search.addDefaultShapeRules();
 		
         addListeners();
         

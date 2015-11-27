@@ -44,7 +44,6 @@ public abstract class Rule {
 	private String textLowerCase;
 	
 	private ArrayList<SearchOption> options;
-	//private SearchType type;
 	private BooleanProperty ruleChanged;
 	private boolean visible;
 	private Color color;
@@ -177,7 +176,6 @@ public abstract class Rule {
 			}
 		});
 		
-		//this.type = type;
 		visible = true;
 	}
 	
@@ -237,13 +235,6 @@ public abstract class Rule {
 	public String getSearchedText() {
 		return text;
 	}
-	
-	
-	/*
-	public SearchType getSearchType() {
-		return type;
-	}
-	*/
 	
 	
 	public String getSearchedTextLowerCase() {
@@ -337,6 +328,9 @@ public abstract class Rule {
 		return false;
 	}
 	
+	public boolean isVisible() {
+		return visible;
+	}
 	
 	private EventHandler<ActionEvent> getSubmitHandler() {
 		return new EventHandler<ActionEvent>() {

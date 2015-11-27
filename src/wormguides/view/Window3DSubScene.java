@@ -10,6 +10,7 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
+import wormguides.model.ShapeRule;
 //import wormguides.model.StoryList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -22,6 +23,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -69,7 +71,7 @@ public class Window3DSubScene{
 	private int endTime;
 	private Sphere[] cells;
 	private MeshView[] meshes;
-	private String[] names;
+	private String[] cellNames;
 	private String[] meshNames;
 	private boolean[] searchedCells;
 	private boolean[] searchedMeshes;
@@ -94,7 +96,8 @@ public class Window3DSubScene{
 
 	// color rules stuff
 	private ColorHash colorHash;
-	private ObservableList<ColorRule> rulesList;
+	private ObservableList<ColorRule> colorRulesList;
+	private ObservableList<ShapeRule> shapeRulesList;
 
 	private Service<Void> searchResultsUpdateService;
 
@@ -111,11 +114,15 @@ public class Window3DSubScene{
 	private final Rotate rotateY;
 	private final Rotate rotateZ;
 
-	//Scene Elements stuff
+	// Scene Elements stuff
 	private SceneElementsList sceneElementsList;
 	ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
-	private ArrayList<SceneElement> renderedSceneElementRef; //reference of successfully rendered scene elements for click responsiveness
+	//reference of successfully rendered scene elements for click responsiveness
+	private ArrayList<SceneElement> currentSceneElements;
+	
+	// uniform nuclei size
+	private boolean uniformSize;
 
 //------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------	
 //	//Story elements stuff
@@ -146,7 +153,7 @@ public class Window3DSubScene{
 
 		cells = new Sphere[1];
 		meshes = new MeshView[1];
-		names = new String[1];
+		cellNames = new String[1];
 		meshNames = new String[1];
 		positions = new Integer[1][3];
 		diameters = new Integer[1];
@@ -237,6 +244,13 @@ public class Window3DSubScene{
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
 		
+		uniformSize = false;
+		
+		colorRulesList = FXCollections.observableArrayList();
+		shapeRulesList = FXCollections.observableArrayList();
+		
+		colorHash = new ColorHash();
+		
 //-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
 //		//initialize story elements
 //		String configFile2 = "StoryListConfig.csv";
@@ -261,7 +275,7 @@ public class Window3DSubScene{
 			// Initialize scene element events
 			sceneElementsList.buildListFromConfig();
 			currentSceneElementMeshes = new ArrayList<MeshView>();
-			renderedSceneElementRef = new ArrayList<SceneElement>();
+			currentSceneElements = new ArrayList<SceneElement>();
 			// End scene element initialization
 		}
 	}
@@ -340,7 +354,7 @@ public class Window3DSubScene{
 				Node node = result.getIntersectedNode();
 				if (node instanceof Sphere) {
 					selectedIndex.set(getPickedSphereIndex((Sphere)node));
-					selectedName.set(names[selectedIndex.get()]);
+					selectedName.set(cellNames[selectedIndex.get()]);
 				}
 				else if (node instanceof MeshView) {
 					//selectedIndex.set(getPickedMeshIndex((MeshView)node));
@@ -348,7 +362,7 @@ public class Window3DSubScene{
 					for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
-							SceneElement clickedSceneElement = renderedSceneElementRef.get(i);
+							SceneElement clickedSceneElement = currentSceneElements.get(i);
 							selectedName.set(clickedSceneElement.getAllCellNames().get(0));
 						}
 					}
@@ -376,15 +390,15 @@ public class Window3DSubScene{
 	}
 
 	private int getIndexByName(String name) {
-		for (int i = 0; i < names.length; i++) {
-			if (names[i].equals(name))
+		for (int i = 0; i < cellNames.length; i++) {
+			if (cellNames[i].equals(name))
 				return i;
 		}
 		return -1;
 	}
 
 	private int getPickedSphereIndex(Sphere picked) {
-		for (int i = 0; i < names.length; i++) {
+		for (int i = 0; i < cellNames.length; i++) {
 			if (cells[i].equals(picked)) {
 				return i;
 			}
@@ -397,22 +411,28 @@ public class Window3DSubScene{
 		// Frame is indexed 1 less than the time requested
 		time--;
 
-		names = data.getNames(time);
+		cellNames = data.getNames(time);
 		
-		if (sceneElementsList != null)
+		if (sceneElementsList != null) {
 			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
+			//System.out.println("mesh names at time "+time);
+			/*
+			for (String name : meshNames)
+				System.out.println(name);
+			*/
+		}
 		
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
-		totalNuclei.set(names.length);
-		cells = new Sphere[names.length];
+		totalNuclei.set(cellNames.length);
+		cells = new Sphere[cellNames.length];
 		meshes = new MeshView[meshNames.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
 		//empty meshes and scene element references from last rendering. Same for story elements
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
-			renderedSceneElementRef.clear();
+			currentSceneElements.clear();
 		}
 		
 		if (sceneElementsList != null) {
@@ -422,14 +442,15 @@ public class Window3DSubScene{
 				SceneElement curr = sceneElementsAtTime.get(i);
 				MeshView mesh = curr.buildGeometry(time);
 				
-				if (mesh != null) { //null mesh when file not found thrown
+				if (mesh != null) {
+					//null mesh when file not found thrown
 					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
 					
 					//add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
 					
 					//add scene element to rendered scene element reference for on click responsiveness
-					renderedSceneElementRef.add(curr);
+					currentSceneElements.add(curr);
 				}
 			}	
 		}
@@ -470,7 +491,7 @@ public class Window3DSubScene{
 		
 
 		if (localSearchResults.isEmpty()) {
-			searchedCells = new boolean[names.length];
+			searchedCells = new boolean[cellNames.length];
 			searchedMeshes = new boolean[meshNames.length];
 		}
 		else
@@ -500,81 +521,20 @@ public class Window3DSubScene{
 		root.getChildren().add(cameraXform);
 	}
 
-	private void addCellsToScene() {
+	private void addEntitiesToScene() {
 		ArrayList<Sphere> renderFirstSpheres = new ArrayList<Sphere>();
  		ArrayList<Sphere> renderSecondSpheres = new ArrayList<Sphere>();
  		
  		ArrayList<MeshView> renderFirstMeshes = new ArrayList<MeshView>();
  		ArrayList<MeshView> renderSecondMeshes = new ArrayList<MeshView>();
  		
- 		// for sphere rendering
-		for (int i = 0; i < names.length; i ++) {
-			boolean isOther = true;
-			double radius = SIZE_SCALE*diameters[i]/2;
-			Sphere sphere = new Sphere(radius);
-
-			Material material = new PhongMaterial();
- 			// if in search, do highlighting
- 			if (inSearch) {
- 				if (searchedCells[i]) {
-					renderFirstSpheres.add(sphere);
-					material = colorHash.getHighlightMaterial();
- 				}
- 				else {
-					renderSecondSpheres.add(sphere);
-					material = colorHash.getTranslucentMaterial();
- 				}
- 			}
- 			// not in search mode
- 			else {
- 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
- 				for (ColorRule rule : rulesList) {
- 					// just need to consult rule's active list
- 					if (rule.appliesTo(names[i]))
- 						colors.add(rule.getColor());
- 				}
- 				material = colorHash.getMaterial(colors);
-
- 				if (colors.isEmpty()) {
- 					renderSecondSpheres.add(sphere);
- 					material = opacityMaterialHash.get(othersOpacity.get());
- 				}
- 				else {
- 					renderFirstSpheres.add(sphere);
- 					isOther = false;
- 				}
- 			}
-
- 			sphere.setMaterial(material);
- 			
- 			// Mesh inherits color from attached cell
- 			// consult names array and scene elements for matches
- 			if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
- 				for (int j = 0; j < renderedSceneElementRef.size(); j++) {
- 					if (renderedSceneElementRef.get(j).getAllCellNames().contains(names[i])) {
- 						//if match - set mesh color to current color of cell
- 						currentSceneElementMeshes.get(j).setMaterial(material);
- 						currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);
- 						if (isOther)
- 							renderSecondMeshes.add(currentSceneElementMeshes.get(j));
- 						else
- 							renderFirstMeshes.add(currentSceneElementMeshes.get(j));
-	 				}
-	 			}
- 			}
- 			// End color inheritance
-
- 			double x = positions[i][X_COR_INDEX];
-	        double y = positions[i][Y_COR_INDEX];
-	        double z = positions[i][Z_COR_INDEX]*zScale;
-	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-	        translateSphere(sphere, x, y, z);
-	        
-	        cells[i] = sphere;
-	        
-		}
+ 		addCellsToScene(renderFirstSpheres, renderSecondSpheres);
+ 		addMeshesToScene(renderFirstMeshes, renderSecondMeshes);
 
 		refreshScene();
+		
+		System.out.println("first meshes size: "+renderFirstMeshes.size());
+		System.out.println("second meshes size: "+renderSecondMeshes.size());
 		
 		// render opaque entities first
 		root.getChildren().addAll(renderFirstSpheres);
@@ -596,6 +556,139 @@ public class Window3DSubScene{
 //		}
 //--------------------------------------------------------------------------
 	}
+	
+	
+	private void addMeshesToScene(ArrayList<MeshView> renderFirst, ArrayList<MeshView> renderSecond) {
+		// consult ShapeRule(s)
+		// process only if meshes at this time point
+		if (!currentSceneElements.isEmpty()) {
+			
+			for (int i=0; i<currentSceneElements.size(); i++) {
+				// in search mode
+				if (inSearch) {
+	 				if (searchedMeshes[i]) {
+	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
+						renderFirst.add(currentSceneElementMeshes.get(i));
+	 				}
+	 				else {
+	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getTranslucentMaterial());
+						renderSecond.add(currentSceneElementMeshes.get(i));
+	 				}
+	 			}
+				
+				else {
+					// in regular view mode
+					ArrayList<String> allNames = currentSceneElements.get(i).getAllCellNames();
+					
+					// default white meshes
+					if (allNames.isEmpty()) {
+						System.out.println("Empty name, default white mesh");
+						currentSceneElementMeshes.get(i).setMaterial(new PhongMaterial(Color.WHITE));
+						currentSceneElementMeshes.get(i).setCullFace(CullFace.NONE);
+						renderFirst.add(currentSceneElementMeshes.get(i));
+					}
+					
+					// meshes with names
+					else {
+						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+						for (String name : allNames) {
+							for (ShapeRule rule : shapeRulesList) {
+								if (rule.appliesTo(name)) {
+									colors.add(rule.getColor());
+								}
+							}
+						}
+						
+						// if ShapeRule(s) applied
+						if (!colors.isEmpty()) {
+							System.out.println(allNames.get(0)+" gets color "+colors.first());
+							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
+							renderFirst.add(currentSceneElementMeshes.get(i));
+						}
+						else {
+							System.out.println("no rule for "+allNames.get(0)+" making it 'other'");
+							currentSceneElementMeshes.get(i).setMaterial(opacityMaterialHash.get(othersOpacity.get()));
+							renderSecond.add(currentSceneElementMeshes.get(i));
+						}
+					}
+				}
+				// end regular view mode processing
+			}
+		}
+		
+		/*
+		// Mesh inherits color from attached cell
+		// consult names array and scene elements for matches
+		if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
+			for (int j = 0; j < currentSceneElements.size(); j++) {
+				ArrayList<String> meshCellNames = currentSceneElements.get(j).getAllCellNames();
+				if (meshCellNames.contains(names[i])) {
+					//if match - set mesh color to current color of cell
+					currentSceneElementMeshes.get(j).setMaterial(material);
+					currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);
+					if (isOther)
+						renderSecond.add(currentSceneElementMeshes.get(j));
+					else
+						renderFirst.add(currentSceneElementMeshes.get(j));
+				}
+			}
+		}
+		// End color inheritance
+		*/
+	}
+	
+	
+	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
+		// for sphere rendering
+		for (int i = 0; i < cellNames.length; i ++) {
+			//boolean isOther = true;
+			double radius = SIZE_SCALE*diameters[i]/2;
+			Sphere sphere = new Sphere(radius);
+
+			Material material = new PhongMaterial();
+ 			// if in search, do highlighting
+ 			if (inSearch) {
+ 				if (searchedCells[i]) {
+					renderFirst.add(sphere);
+					material = colorHash.getHighlightMaterial();
+ 				}
+ 				else {
+					renderSecond.add(sphere);
+					material = colorHash.getTranslucentMaterial();
+ 				}
+ 			}
+ 			// not in search mode
+ 			else {
+ 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+ 				for (ColorRule rule : colorRulesList) {
+ 					// just need to consult rule's active list
+ 					if (rule.appliesTo(cellNames[i]))
+ 						colors.add(rule.getColor());
+ 				}
+ 				material = colorHash.getMaterial(colors);
+
+ 				if (colors.isEmpty()) {
+ 					renderSecond.add(sphere);
+ 					material = opacityMaterialHash.get(othersOpacity.get());
+ 				}
+ 				else {
+ 					renderFirst.add(sphere);
+ 					//isOther = false;
+ 				}
+ 			}
+
+ 			sphere.setMaterial(material);
+
+ 			double x = positions[i][X_COR_INDEX];
+	        double y = positions[i][Y_COR_INDEX];
+	        double z = positions[i][Z_COR_INDEX]*zScale;
+	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+	        translateSphere(sphere, x, y, z);
+	        
+	        cells[i] = sphere;
+		}
+	}
+	
 
 	private void translateSphere(Node sphere, double x, double y, double z) {
 		Translate t = new Translate(x, y, z);
@@ -669,19 +762,19 @@ public class Window3DSubScene{
 	}
 
 	public void consultSearchResultsList() {
-		searchedCells = new boolean[names.length];
+		searchedCells = new boolean[cellNames.length];
 		searchedMeshes = new boolean[meshNames.length];
 		
 		// look for searched cells
-		for (int i=0; i<names.length; i++) {
-			if (localSearchResults.contains(names[i]))
+		for (int i=0; i<cellNames.length; i++) {
+			if (localSearchResults.contains(cellNames[i]))
 				searchedCells[i] = true;
 			else
 				searchedCells[i] = false;
 		}
 		
 		// look for searched meshes
-		for (int i=0; i>meshNames.length; i++) {
+		for (int i=0; i<meshNames.length; i++) {
 			if (localSearchResults.contains(meshNames[i]))
 				searchedMeshes[i] = true;
 			else
@@ -690,8 +783,8 @@ public class Window3DSubScene{
 	}
 
 	public void printCellNames() {
-		for (int i = 0; i < names.length; i++)
-			System.out.println(names[i]+CS+cells[i]);
+		for (int i = 0; i < cellNames.length; i++)
+			System.out.println(cellNames[i]+CS+cells[i]);
 	}
 	
 	public void printMeshNames() {
@@ -700,11 +793,12 @@ public class Window3DSubScene{
 	}
 
 	// sets everything associated with color rules
-	public void setRulesList(ObservableList<ColorRule> rulesList) {
-		this.rulesList = rulesList;
-		colorHash = new ColorHash(rulesList);
-
-		this.rulesList.addListener(new ListChangeListener<ColorRule>() {
+	public void setColorRulesList(ObservableList<ColorRule> list) {
+		if (list == null)
+			return;
+		
+		colorRulesList = list;
+		colorRulesList.addListener(new ListChangeListener<ColorRule>() {
 			@Override
 			public void onChanged(
 					ListChangeListener.Change<? extends ColorRule> change) {
@@ -727,21 +821,68 @@ public class Window3DSubScene{
 			}
 		});
 	}
+	
+	
+	// sets everything associated with shape rules
+	public void setShapeRulesList(ObservableList<ShapeRule> list) {
+		if (list == null)
+			return;
+		
+		shapeRulesList = list;
+		shapeRulesList.addListener(new ListChangeListener<ShapeRule>() {
+			@Override
+			public void onChanged(
+					ListChangeListener.Change<? extends ShapeRule> change) {
+				while (change.next()) {
+					for (ShapeRule rule : change.getAddedSubList()) {
+						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+							@Override
+							public void changed(
+									ObservableValue<? extends Boolean> observable,
+									Boolean oldValue, Boolean newValue) {
+								if (newValue) {
+									System.out.println("shape rule changed, building scene");
+									buildScene(time.get());
+								}
+							}
+						});
+					}
+					buildScene(time.get());
+				}
+			}
+		});
+	}
 
-	public ArrayList<ColorRule> getRulesList() {
+	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (ColorRule rule : rulesList)
+		for (ColorRule rule : colorRulesList)
+			list.add(rule);
+		return list;
+	}
+	
+	public ArrayList<ShapeRule> getShapeRulesList() {
+		ArrayList<ShapeRule> list = new ArrayList<ShapeRule>();
+		for (ShapeRule rule : shapeRulesList)
 			list.add(rule);
 		return list;
 	}
 
-	public ObservableList<ColorRule> getObservableRulesList() {
-		return rulesList;
+	public ObservableList<ColorRule> getObservableColorRulesList() {
+		return colorRulesList;
+	}
+	
+	public ObservableList<ShapeRule> getObservableShapeRulesList() {
+		return shapeRulesList;
 	}
 
-	public void setRulesList(ArrayList<ColorRule> list) {
-		rulesList.clear();
-		rulesList.setAll(list);
+	public void setColorRulesList(ArrayList<ColorRule> list) {
+		colorRulesList.clear();
+		colorRulesList.setAll(list);
+	}
+	
+	public void setShapeRulesList(ArrayList<ShapeRule> list) {
+		shapeRulesList.clear();
+		shapeRulesList.setAll(list);
 	}
 
 	public int getTime() {
@@ -954,6 +1095,18 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
+	public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+									Boolean oldValue, Boolean newValue) {
+				uniformSize = newValue.booleanValue();
+				buildScene(time.get());
+				// TODO modify buildScene to take uniform size into account!!
+			}
+		};
+	}
 
 	private final class RenderService extends Service<Void> {
 		@Override
@@ -966,7 +1119,7 @@ public class Window3DSubScene{
 						public void run() {
 							refreshScene();
 							otherCells.clear();
-							addCellsToScene();
+							addEntitiesToScene();
 						}
 					});
 					return null;
