@@ -31,8 +31,6 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	}
 	
 	public static Material makeMaterial(TreeSet<Color> colors) {
-		System.out.println("making new material...");
-		
 		WritableImage wImage = new WritableImage(200, 200);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);

@@ -225,7 +225,7 @@
 			              <content>
 			                <AnchorPane>
                            <children>
-                              <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                              <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                  <children>
                                     <Region prefHeight="5.0" />
                                     <CheckBox fx:id="uniformSizeCheckBox" mnemonicParsing="false" text="Uniform Small Nuclei">

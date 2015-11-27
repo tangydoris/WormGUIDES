@@ -533,9 +533,6 @@ public class Window3DSubScene{
 
 		refreshScene();
 		
-		System.out.println("first meshes size: "+renderFirstMeshes.size());
-		System.out.println("second meshes size: "+renderSecondMeshes.size());
-		
 		// render opaque entities first
 		root.getChildren().addAll(renderFirstSpheres);
 		root.getChildren().addAll(renderFirstMeshes);
@@ -582,7 +579,7 @@ public class Window3DSubScene{
 					
 					// default white meshes
 					if (allNames.isEmpty()) {
-						System.out.println("Empty name, default white mesh");
+						//System.out.println("Empty name, default white mesh");
 						currentSceneElementMeshes.get(i).setMaterial(new PhongMaterial(Color.WHITE));
 						currentSceneElementMeshes.get(i).setCullFace(CullFace.NONE);
 						renderFirst.add(currentSceneElementMeshes.get(i));
@@ -601,12 +598,12 @@ public class Window3DSubScene{
 						
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty()) {
-							System.out.println(allNames.get(0)+" gets color "+colors.first());
+							//System.out.println(allNames.get(0)+" gets color "+colors.first());
 							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
 							renderFirst.add(currentSceneElementMeshes.get(i));
 						}
 						else {
-							System.out.println("no rule for "+allNames.get(0)+" making it 'other'");
+							//System.out.println("no rule for "+allNames.get(0)+" making it 'other'");
 							currentSceneElementMeshes.get(i).setMaterial(opacityMaterialHash.get(othersOpacity.get()));
 							renderSecond.add(currentSceneElementMeshes.get(i));
 						}
@@ -641,8 +638,11 @@ public class Window3DSubScene{
 	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
 		// for sphere rendering
 		for (int i = 0; i < cellNames.length; i ++) {
-			//boolean isOther = true;
-			double radius = SIZE_SCALE*diameters[i]/2;
+			double radius;
+			if (!uniformSize)
+				radius = SIZE_SCALE*diameters[i]/2;
+			else
+				radius = SIZE_SCALE*UNIFORM_RADIUS;
 			Sphere sphere = new Sphere(radius);
 
 			Material material = new PhongMaterial();
@@ -673,7 +673,6 @@ public class Window3DSubScene{
  				}
  				else {
  					renderFirst.add(sphere);
- 					//isOther = false;
  				}
  			}
 
@@ -1102,8 +1101,8 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
 				uniformSize = newValue.booleanValue();
+				System.out.println("uniform size: "+uniformSize);
 				buildScene(time.get());
-				// TODO modify buildScene to take uniform size into account!!
 			}
 		};
 	}
@@ -1181,5 +1180,6 @@ public class Window3DSubScene{
 					    		Y_SCALE = 1;
 
     private static final double SIZE_SCALE = .9;
+    private static final double UNIFORM_RADIUS = 4;
 
 }

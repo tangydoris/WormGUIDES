@@ -314,6 +314,10 @@ public class RootLayoutController implements Initializable{
 		window3D.addListenerToOpacitySlider(opacitySlider);
 		// set to 50% transparency as default
 		opacitySlider.setValue(50);
+		
+		// uniform nuclei size
+		uniformSizeCheckBox.selectedProperty().addListener(
+					window3D.getUniformSizeCheckBoxListener());
 	}
 	
 	private void setSelectedInfo(String name) {
@@ -571,7 +575,7 @@ public class RootLayoutController implements Initializable{
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
-		// unchecked cast
+		// unchecked casts
 		ObservableList<ColorRule> colorTempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
