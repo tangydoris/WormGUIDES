@@ -1105,7 +1105,6 @@ public class Window3DSubScene{
 			public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
 				uniformSize = newValue.booleanValue();
-				System.out.println("uniform size: "+uniformSize);
 				buildScene(time.get());
 			}
 		};
