@@ -31,7 +31,7 @@ public class RuleEditPane extends AnchorPane{
 		
 		infoPacket = packet;
 		
-		setPrefHeight(370.0);
+		setPrefHeight(380.0);
 		setPrefWidth(240.0);
 		
 		VBox vbox = new VBox();
@@ -46,9 +46,9 @@ public class RuleEditPane extends AnchorPane{
 		Region r1 = new Region();
 		r1.setPrefHeight(10);
 		
-		Label ancestryLabel = new Label("Cell Ancestry");
+		Label choicesLabel = new Label("Color:");
 		
-		Label cellLabel = new Label("Cell");
+		Label cellLabel = new Label("Cell Nucleus");
 		CheckBox cellTick = new CheckBox();
 		cellTick.setSelected(infoPacket.isCellSelected());
 		cellTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -60,7 +60,19 @@ public class RuleEditPane extends AnchorPane{
 		});
 		HBox cellRow = makeEditRow(cellLabel, cellTick);
 		
-		Label ancLabel = new Label("Ancestor");
+		Label cellBodyLabel = new Label("Cell Body");
+		CheckBox cellBodyTick = new CheckBox();
+		cellBodyTick.setSelected(infoPacket.isCellBodySelected());
+		cellBodyTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				infoPacket.setCellBodySelected(newValue);
+			}
+		});
+		HBox cellBodyRow = makeEditRow(cellBodyLabel, cellBodyTick);
+		
+		Label ancLabel = new Label("Its Ancestors");
 		CheckBox ancTick = new CheckBox();
 		ancTick.setSelected(infoPacket.isAncestorSelected());
 		ancTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -72,7 +84,7 @@ public class RuleEditPane extends AnchorPane{
 		});
 		HBox ancRow = makeEditRow(ancLabel, ancTick);
 		
-		Label desLabel = new Label("Descendant");
+		Label desLabel = new Label("Its Descendants");
 		CheckBox desTick = new CheckBox();
 		desTick.setSelected(infoPacket.isDescendantSelected());
 		desTick.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -128,6 +140,15 @@ public class RuleEditPane extends AnchorPane{
 		r5.setPrefHeight(5);
 		
 		if (packet.isAlphaEnabled()) {
+			// Disable all ticks and labels because we know that
+			// the shape rules only apply to cell bodies anyway
+			cellLabel.setDisable(true);
+			cellTick.setDisable(true);
+			cellBodyLabel.setDisable(true);
+			cellBodyTick.setDisable(true);
+			ancLabel.setDisable(true);
+			ancTick.setDisable(true);
+			
 			Label alphaLabel = new Label("Transparency");
 			Slider alphaSlider = new Slider();
 			alphaSlider.setMax(100);
@@ -145,13 +166,13 @@ public class RuleEditPane extends AnchorPane{
 			Region r3 = new Region();
 			r3.setPrefHeight(10);
 			
-			vbox.getChildren().addAll(optionsLabel, r1, ancestryLabel,
-					cellRow, ancRow, desRow, r2, alphaLabel, alphaSlider, r3, 
+			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
+					cellRow, cellBodyRow, ancRow, desRow, r2, alphaLabel, alphaSlider, r3, 
 					colorLabel, pickerPane, r4, buttonBox, r5);
 		}
 		else {
-			vbox.getChildren().addAll(optionsLabel, r1, ancestryLabel,
-					cellRow, ancRow, desRow, r2, 
+			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
+					cellRow, cellBodyRow, ancRow, desRow, r2, 
 					colorLabel, pickerPane, r4, buttonBox, r5);
 		}
 		
@@ -170,13 +191,17 @@ public class RuleEditPane extends AnchorPane{
 	private HBox makeEditRow(Label label, CheckBox box) {
 		HBox row = new HBox();
 		row.setPrefHeight(22);
+		row.setMinHeight(USE_PREF_SIZE);
+		row.setMaxHeight(USE_PREF_SIZE);
 		
 		HBox inner = new HBox();
-		inner.setPrefWidth(160);
+		inner.setPrefWidth(190);
 		inner.setFillHeight(true);
 		
 		Region indent = new Region();
 		indent.setPrefWidth(40);
+		indent.setMinWidth(USE_PREF_SIZE);
+		indent.setMaxWidth(USE_PREF_SIZE);
 		
 		label.setFont(AppFont.getFont());
 		

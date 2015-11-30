@@ -2,9 +2,9 @@ package wormguides;
 
 public enum SearchType {
 	
-	SYSTEMATIC ("systematic"), 
-	FUNCTIONAL ("functional"), 
-	DESCRIPTION ("description"), 
+	SYSTEMATIC ("lineage name"), 
+	FUNCTIONAL ("functional name"), 
+	DESCRIPTION ("'PartsList' description"), 
 	GENE ("gene");
 	
 	private String description;

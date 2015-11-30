@@ -76,6 +76,15 @@ public class RuleInfoPacket {
 			options.remove(SearchOption.CELL);
 	}
 	
+	public void setCellBodySelected(boolean selected) {
+		if (selected) {
+			if (!options.contains(SearchOption.CELLBODY))
+				options.add(SearchOption.CELLBODY);
+		}
+		else
+			options.remove(SearchOption.CELLBODY);
+	}
+	
 	public void setDescendantSelected(boolean selected) {
 		if (selected) {
 			if (!options.contains(SearchOption.DESCENDANT))
@@ -96,6 +105,10 @@ public class RuleInfoPacket {
 	
 	public boolean isCellSelected() {
 		return options.contains(SearchOption.CELL);
+	}
+	
+	public boolean isCellBodySelected() {
+		return options.contains(SearchOption.CELLBODY);
 	}
 	
 	public boolean isDescendantSelected() {

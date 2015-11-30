@@ -38,6 +38,7 @@ public class Search {
 	private static SearchType type;
 	
 	private static boolean cellTicked;
+	private static boolean cellBodyTicked;
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	
@@ -67,7 +68,9 @@ public class Search {
 		searchResultsList = FXCollections.observableArrayList();
 		searchedText = "";
 		
-		cellTicked = false;
+		// cell nucleus search type default to true
+		cellTicked = true;
+		cellBodyTicked = false;
 		ancestorTicked = false;
 		descendantTicked = false;
 		
@@ -120,9 +123,11 @@ public class Search {
 		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
 	
+	
 	public static void setActiveLineageNames(ArrayList<String> names) {
 		activeLineageNames = names;
 	}
+	
 	
 	private static void updateGeneResults() {
 		if (geneSearchService.getValue()==null)
@@ -162,6 +167,7 @@ public class Search {
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
 	
+	
 	private static void addFunctionalNamesToList(ArrayList<String> list) {
 		searchResultsList.clear();
 		for (String result : list) {
@@ -173,22 +179,27 @@ public class Search {
 		}
 	}
 	
+	
 	public static boolean isLineageName(String name) {
 		return activeLineageNames.contains(name);
 	}
+	
 	
 	private static String getSearchedText() {
 		final String searched = searchedText;
 		return searched;
 	}
 	
+	
 	public void setColorRulesList(ObservableList<ColorRule> observableList) {
 		colorRulesList = observableList;
 	}
 	
+	
 	public void setShapeRulesList(ObservableList<ShapeRule> observableList) {
 		shapeRulesList = observableList;
 	}
+	
 	
 	public boolean containsColorRule(ColorRule other) {
 		for (ColorRule rule : colorRulesList) {
@@ -197,6 +208,7 @@ public class Search {
 		}
 		return false;
 	}
+	
 	
 	public EventHandler<ActionEvent> getColorPickerListener() {
 		return new EventHandler<ActionEvent>() {
@@ -207,6 +219,7 @@ public class Search {
 		};
 	}
 	
+	
 	public void addDefaultColorRules() {
 		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
@@ -215,17 +228,20 @@ public class Search {
 														SearchOption.DESCENDANT);
 	}
 	
+	
 	public void addDefaultShapeRules() {
-		addShapeRule("AVG", Color.RED, SearchOption.CELL);
-		addShapeRule("DD", Color.BLUE, SearchOption.CELL);
-		addShapeRule("DA", Color.GREEN, SearchOption.CELL);
+		addShapeRule("AVG", Color.RED);
+		addShapeRule("DD", Color.BLUE);
+		addShapeRule("DA", Color.GREEN);
 	}
+	
 	
 	public void addShapeRule(String name, Color color) {
-		addShapeRule(name, color, SearchOption.CELL);
+		addShapeRule(name, color, SearchOption.CELLBODY);
 	}
 	
-	public void addShapeRule(String name, Color color, SearchOption...options) {
+	
+	public static void addShapeRule(String name, Color color, SearchOption...options) {
 		String label = "";
 		name = name.trim();
 		
@@ -234,22 +250,27 @@ public class Search {
 			optionsArray.add(option);
 		
 		ShapeRule rule = new ShapeRule(name, color, optionsArray);
-		
 		rule.setCells(name);
+		rule.setVisible(false);
+		
 		shapeRulesList.add(rule);
 	}
+	
 	
 	public void clearShapeRules() {
 		shapeRulesList.clear();
 	}
 	
+	
 	public void clearColorRules() {
 		colorRulesList.clear();
 	}
 	
+	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
 		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
+	
 	
 	public static void addColorRule(SearchType type, String searched, Color color, SearchOption...options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
@@ -258,6 +279,7 @@ public class Search {
 		addColorRule(type, searched, color, optionsArray);
 	}
 	
+	
 	public static void addColorRule(SearchType type, String searched, Color color, 
 													ArrayList<SearchOption> options) {
 		SearchType tempType = Search.type;
@@ -265,6 +287,7 @@ public class Search {
 		addColorRule(searched, color, options);
 		Search.type = tempType;
 	}
+	
 	
 	private static void addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
 		// default search options is cell and descendant
@@ -311,6 +334,7 @@ public class Search {
 		searchResultsList.clear();
 	}
 	
+	
 	private static ArrayList<String> getCellsList(String searched) {
 		ArrayList<String> cells = new ArrayList<String> ();
 		searched = searched.toLowerCase();
@@ -353,9 +377,9 @@ public class Search {
 							WormBaseQuery.doSearch(getSearchedText());
 							return null;
 		}
-		
 		return cells;
 	}
+	
 	
 	// generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
@@ -371,6 +395,7 @@ public class Search {
 		return descendants;
 	}
 	
+	
 	// generates a list of ancestors of all cells in input
 	private static ArrayList<String> getAncestorsList(ArrayList<String> cells) {
 		ArrayList<String> ancestors = new ArrayList<String>();
@@ -385,6 +410,7 @@ public class Search {
 		return ancestors;
 	}
 	
+	
 	public EventHandler<ActionEvent> getAddButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -396,6 +422,8 @@ public class Search {
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 				if (cellTicked)
 					options.add(SearchOption.CELL);
+				if (cellBodyTicked)
+					options.add(SearchOption.CELLBODY);
 				if (ancestorTicked)
 					options.add(SearchOption.ANCESTOR);
 				if (descendantTicked)
@@ -409,6 +437,7 @@ public class Search {
 			}
 		};
 	}
+	
 	
 	public ChangeListener<Boolean> getCellTickListner() {
 		return new ChangeListener<Boolean>() {
@@ -424,6 +453,22 @@ public class Search {
 		};
 	}
 	
+	
+	public ChangeListener<Boolean> getCellBodyTickListner() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				cellBodyTicked = newValue;
+				if (type==SearchType.GENE)
+					updateGeneResults();
+				else
+					resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	
 	public ChangeListener<Boolean> getAncestorTickListner() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -437,6 +482,7 @@ public class Search {
 			}
 		};
 	}
+	
 	
 	public ChangeListener<Boolean> getDescendantTickListner() {
 		return new ChangeListener<Boolean>() {
@@ -452,9 +498,11 @@ public class Search {
 		};
 	}
 	
+	
 	public void setClearSearchFieldProperty(BooleanProperty property) {
 		clearSearchFieldProperty = property;
 	}
+	
 	
 	public ChangeListener<Toggle> getTypeToggleListener() {
 		return new ChangeListener<Toggle>() {
@@ -467,13 +515,16 @@ public class Search {
 		};
 	}
 	
+	
 	public BooleanProperty getGeneResultsUpdated() {
 		return geneResultsUpdated;
 	}
 	
+	
 	public ObservableList<String> getSearchResultsList() {
 		return searchResultsList;
 	}
+	
 	
 	public ChangeListener<String> getTextFieldListener() {
 		return new ChangeListener<String>() {
@@ -488,6 +539,7 @@ public class Search {
 			}
 		};
 	}
+	
 	
 	private static void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
@@ -536,14 +588,17 @@ public class Search {
 		}
 	}
 	
+	
 	public Service<Void> getResultsUpdateService() {
 		return resultsUpdateService;
 	}
+	
 	
 	private static int getCountFinal(int count) {
 		final int out = count;
 		return out;
 	}
+	
 	
 	private static final class CellNameComparator implements Comparator<String> {
 		@Override
@@ -551,6 +606,7 @@ public class Search {
 			return s1.compareTo(s2);
 		}
 	}
+	
 	
 	private static final class ShowLoadingService extends Service<Void> {
 		@Override
@@ -597,6 +653,7 @@ public class Search {
 			};
 		}
 	}
+	
 	
 	private static final long WAIT_TIME_MILLI = 750;
 }

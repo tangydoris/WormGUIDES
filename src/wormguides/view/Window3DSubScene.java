@@ -585,15 +585,27 @@ public class Window3DSubScene{
 						renderFirst.add(currentSceneElementMeshes.get(i));
 					}
 					
-					// meshes with names
+					// If mesh has with name(s), then process rules (cell or shape)
+					// that apply to it
 					else {
 						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 						for (String name : allNames) {
-							for (ShapeRule rule : shapeRulesList) {
-								if (rule.appliesTo(name)) {
-									colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
-									isOpaque = rule.isOpaque();
+							// Consult shape rules first to see if there is 
+							// an explicit rule for the body
+							for (ShapeRule shapeRule : shapeRulesList) {
+								if (shapeRule.appliesTo(name)) {
+									colors.add(Color.web(shapeRule.getColor().toString(), shapeRule.getAlpha()));
+									isOpaque = shapeRule.isOpaque();
+								}
+							}
+							
+							// Then consult color rules if no shape rules apply
+							if (colors.isEmpty()) {
+								for (ColorRule colorRule : colorRulesList) {
+									if (colorRule.appliesToBody(name)) {
+										colors.add(colorRule.getColor());
+									}
 								}
 							}
 						}
@@ -667,7 +679,7 @@ public class Window3DSubScene{
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
  				for (ColorRule rule : colorRulesList) {
  					// just need to consult rule's active list
- 					if (rule.appliesTo(cellNames[i])) {
+ 					if (rule.appliesToCell(cellNames[i])) {
  						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
  					}
  				}

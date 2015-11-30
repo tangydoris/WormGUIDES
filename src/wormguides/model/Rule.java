@@ -286,6 +286,11 @@ public abstract class Rule {
 	}
 	
 	
+	public boolean isCellBodySelected() {
+		return options.contains(SearchOption.CELLBODY);
+	}
+	
+	
 	public boolean isAncestorSelected() {
 		return options.contains(SearchOption.ANCESTOR);
 	}
@@ -333,7 +338,16 @@ public abstract class Rule {
 	}
 	
 	
-	public boolean appliesTo(String name) {
+	// @param name : lineage name of cell body
+	public boolean appliesToBody(String name) {
+		if (options.contains(SearchOption.CELLBODY))
+			return appliesToCell(name);
+		
+		return false;
+	}
+	
+	
+	public boolean appliesToCell(String name) {
 		if (!visible)
 			return false;
 		
@@ -344,6 +358,7 @@ public abstract class Rule {
 			for (String cell : cells) {
 				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
 					return true;
+				
 				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
 					return true;
 			}
@@ -351,6 +366,17 @@ public abstract class Rule {
 		
 		return false;
 	}
+	
+	
+	public void setVisible(Boolean visible) {
+		if (!visible)
+			visibleBtn.setGraphic(eyeInvertIcon);
+		else
+			visibleBtn.setGraphic(eyeIcon);
+		
+		this.visible = visible;
+	}
+	
 	
 	public boolean isVisible() {
 		return visible;

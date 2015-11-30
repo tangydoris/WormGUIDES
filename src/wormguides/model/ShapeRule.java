@@ -13,11 +13,13 @@ public class ShapeRule extends Rule{
 		enableAlpha();
 	}
 	
+	
 	public void setCells(String name) {
 		getCells().add(name);
 	}
 	
 	
+	// @param name : lineageName of cell body
 	public boolean appliesTo(String name) {
 		if (isVisible()) {
 			// name is expected to be a lineage name

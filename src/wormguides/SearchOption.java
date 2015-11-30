@@ -2,7 +2,8 @@ package wormguides;
 
 public enum SearchOption {
 	
-	CELL("cell"),
+	CELL("cell nucleus"),
+	CELLBODY("cell body"),
 	ANCESTOR("ancestor"),
 	DESCENDANT("descendant");
 	
