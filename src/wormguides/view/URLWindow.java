@@ -168,9 +168,6 @@ public class URLWindow extends AnchorPane {
 		Region r1 = new Region();
 		r1.setPrefHeight(0);
 		
-		Region r2 = new Region();
-		r1.setPrefHeight(15);
-		
 		Region r = new Region();
 		r.setPrefHeight(5);
 		

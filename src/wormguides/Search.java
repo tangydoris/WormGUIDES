@@ -236,13 +236,12 @@ public class Search {
 	}
 	
 	
-	public void addShapeRule(String name, Color color) {
+	public static void addShapeRule(String name, Color color) {
 		addShapeRule(name, color, SearchOption.CELLBODY);
 	}
 	
 	
 	public static void addShapeRule(String name, Color color, SearchOption...options) {
-		String label = "";
 		name = name.trim();
 		
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();

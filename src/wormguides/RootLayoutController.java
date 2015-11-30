@@ -38,6 +38,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -47,6 +48,7 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
 import wormguides.view.AboutPane;
@@ -584,7 +586,9 @@ public class RootLayoutController implements Initializable{
 		ObservableList<ShapeRule> shapeTempList = (ObservableList<ShapeRule>)((ObservableList<? extends Rule>)shapeLayers.getRulesList());
 		search.setShapeRulesList(shapeTempList);
 		window3D.setShapeRulesList(shapeTempList);
-		window3D.setSceneElementsList(new SceneElementsList());
+		SceneElementsList elementsList = new SceneElementsList();
+		window3D.setSceneElementsList(elementsList);
+		addShapeRulesForSceneElements(elementsList);
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
@@ -593,7 +597,6 @@ public class RootLayoutController implements Initializable{
 		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
 		
 		search.addDefaultColorRules();
-		search.addDefaultShapeRules();
 		
         addListeners();
         
@@ -602,6 +605,24 @@ public class RootLayoutController implements Initializable{
         
         sizeSubscene();
         sizeInfoPane();
+	}
+	
+	
+	private void addShapeRulesForSceneElements(SceneElementsList sceneElementsList) {
+		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
+			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
+			/* iterate through cell names in scene element
+			* add shape rule for each cell
+			*/
+			ArrayList<String> currSECellNames = currSE.getAllCellNames();
+			for (int j = 0; j < currSECellNames.size(); j++) {
+				//extract functional name from parts list to set shape rule
+				String functionalName = PartsList.getFunctionalNameByLineageName(currSECellNames.get(j));
+
+				//add the shape rule
+				Search.addShapeRule(functionalName, Color.WHITE);
+			}
+		}
 	}
 	
 	

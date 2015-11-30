@@ -66,7 +66,7 @@ public class SceneElementsList {
 		BufferedReader reader = new BufferedReader(streamReader);
 		
 		try {
-			String titleBar = reader.readLine();
+			reader.readLine();
 			
 			String line;
 			// process each line
