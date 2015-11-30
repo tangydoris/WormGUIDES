@@ -55,6 +55,7 @@ public class SceneElement {
 	
 	
 	public MeshView buildGeometry(int time) {
+		time++;
 		// TODO OPTIMIZE THIS LATER
 		GeometryLoader loader = new GeometryLoader();
 		

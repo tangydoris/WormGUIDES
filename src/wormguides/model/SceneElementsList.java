@@ -120,6 +120,7 @@ public class SceneElementsList {
 	}
 	
 	public String[] getSceneElementNamesAtTime(int time) {
+		time++;
 		ArrayList<String> names = new ArrayList<String>();
 		for (int i = 0; i < sceneElementsList.size(); i++) {
 			SceneElement curr = sceneElementsList.get(i);
@@ -132,6 +133,7 @@ public class SceneElementsList {
 	}
 
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
+		time++;
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
 		for (int i = 0; i < sceneElementsList.size(); i++) {
 			SceneElement curr = sceneElementsList.get(i);
