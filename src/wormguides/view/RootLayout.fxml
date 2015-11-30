@@ -147,7 +147,7 @@
                                                          </font>
                                                       </Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="cellTick1" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="cellTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -162,7 +162,7 @@
                                                             <Font size="14.0" />
                                                          </font></Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="cellTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                      <CheckBox fx:id="cellBodyTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
