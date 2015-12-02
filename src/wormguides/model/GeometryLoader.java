@@ -49,6 +49,7 @@ public class GeometryLoader {
 					BufferedReader reader = new BufferedReader(streamReader);
 					
 					String line;
+					
 					while((line = reader.readLine()) != null) {
 						//make sure valid line
 						if (line.length() <= 1) break;

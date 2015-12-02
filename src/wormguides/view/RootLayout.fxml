@@ -68,7 +68,7 @@
                                           </HBox>
                                           <Label prefHeight="17.0" prefWidth="252.0" text="(cell name, keyword, phrase)">
                                              <graphic>
-                                                <Region prefHeight="200.0" prefWidth="85.0" />
+                                                <Region prefHeight="22.0" prefWidth="85.0" />
                                              </graphic>
                                           </Label>
                                           <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
