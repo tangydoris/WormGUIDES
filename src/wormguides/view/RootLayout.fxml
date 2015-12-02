@@ -50,7 +50,7 @@
                            <children>
                               <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="11.0" layoutY="11.0" prefViewportHeight="723.0" prefViewportWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <VBox maxWidth="280.0" prefWidth="280.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                    <VBox maxWidth="280.0" prefHeight="499.0" prefWidth="280.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <children>
                                           <HBox maxHeight="30.0" minHeight="30.0" prefHeight="30.0">
                                              <children>
@@ -66,6 +66,11 @@
                                                    </font></TextField>
                                              </children>
                                           </HBox>
+                                          <Label prefHeight="17.0" prefWidth="252.0" text="(cell name, keyword, phrase)">
+                                             <graphic>
+                                                <Region prefHeight="200.0" prefWidth="85.0" />
+                                             </graphic>
+                                          </Label>
                                           <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
                                              <font>
                                                 <Font size="14.0" />
@@ -108,9 +113,70 @@
                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="'PartsList&quot; Description">
                                                          <font>
                                                             <Font size="14.0" />
-                                                         </font></Label>
+                                                         </font>
+                                                      </Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
                                                       <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <Region prefHeight="26.0" prefWidth="20.0" />
+                                                <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" prefWidth="95.0" text="Connectome">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="26.0" prefWidth="74.0" />
+                                                <RadioButton mnemonicParsing="false" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <HBox prefWidth="190.0">
+                                                   <children>
+                                                      <Region maxWidth="41.0" minWidth="20.0" prefHeight="22.0" prefWidth="41.0" />
+                                                      <Label fx:id="descendantLabel1" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="88.0" text="Pre-Synaptic" />
+                                                      <Region prefHeight="22.0" prefWidth="57.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox fx:id="preSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="272.0">
+                                             <children>
+                                                <HBox prefHeight="22.0" prefWidth="198.0">
+                                                   <children>
+                                                      <Region maxWidth="94.0" minWidth="35.0" prefHeight="22.0" prefWidth="35.0" />
+                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="146.0" text="Post-Synaptic" />
+                                                      <Region prefHeight="22.0" prefWidth="26.0" />
+                                                      <CheckBox fx:id="postSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="48.0" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="30.0" layoutY="241.0" prefHeight="22.0">
+                                             <children>
+                                                <HBox prefWidth="190.0">
+                                                   <children>
+                                                      <Region maxWidth="53.0" minWidth="20.0" prefHeight="22.0" prefWidth="34.0" />
+                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="97.0" text="Gap Junction" />
+                                                      <Region prefHeight="22.0" prefWidth="29.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox fx:id="gapJunctionTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0">
+                                             <children>
+                                                <HBox prefWidth="190.0">
+                                                   <children>
+                                                      <Region maxWidth="36.0" minWidth="20.0" prefHeight="22.0" prefWidth="36.0" />
+                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Neuromuscular" />
+                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
+                                                      <CheckBox fx:id="neuromuscularTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -131,7 +197,7 @@
                                              </children>
                                           </HBox>
                                           <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Color:">
+                                          <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Add to Display:">
                                              <font>
                                                 <Font size="14.0" />
                                              </font></Label>
@@ -166,6 +232,12 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
+                                          <Region prefHeight="200.0" prefWidth="200.0" />
+                                          <Label text="Propagate Colors to:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
                                           <HBox prefHeight="22.0">
                                              <children>
                                                 <HBox prefWidth="190.0">
@@ -197,75 +269,6 @@
                                              </children>
                                           </HBox>
                                           <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <Label layoutX="30.0" layoutY="195.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Connectome:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <HBox layoutX="30.0" layoutY="291.0" prefHeight="22.0">
-                                             <children>
-                                                <HBox prefWidth="190.0">
-                                                   <children>
-                                                      <Region maxWidth="20.0" minWidth="20.0" prefHeight="22.0" prefWidth="20.0" />
-                                                      <Label fx:id="descendantLabel1" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Pre-Synaptic">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="preSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox layoutX="30.0" layoutY="216.0" prefHeight="22.0">
-                                             <children>
-                                                <HBox prefWidth="190.0">
-                                                   <children>
-                                                      <Region maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Post-Synaptic">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="postSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox layoutX="30.0" layoutY="241.0" prefHeight="22.0">
-                                             <children>
-                                                <HBox prefWidth="190.0">
-                                                   <children>
-                                                      <Region maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
-                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Gap Junction">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="gapJunctionTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox layoutX="30.0" layoutY="266.0" prefHeight="22.0">
-                                             <children>
-                                                <HBox prefWidth="190.0">
-                                                   <children>
-                                                      <Region maxWidth="20.0" minWidth="20.0" prefHeight="22.0" prefWidth="20.0" />
-                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Neuromuscular">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                      <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                      <CheckBox fx:id="neuromuscularTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </HBox>
                                           <Region layoutX="30.0" layoutY="182.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                           <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS" />
                                           <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
@@ -302,19 +305,19 @@
                                        </font>
                                     </CheckBox>
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                    <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="&quot;Others&quot; Visibility:">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Slider fx:id="opacitySlider" value="50.0" VBox.vgrow="ALWAYS" />
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Layers:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <ListView fx:id="colorRulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
+                                    <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Slider fx:id="opacitySlider" value="50.0" VBox.vgrow="ALWAYS" />
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                  </children>
                               </VBox>
                            </children>
