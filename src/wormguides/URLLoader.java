@@ -102,6 +102,7 @@ public class URLLoader {
 				}
 				if (sb.indexOf("$") > -1) {
 					options.add(SearchOption.CELL);
+					options.add(SearchOption.CELLBODY);
 					int i = sb.indexOf("$");
 					sb.replace(i, i+1, "");
 				}

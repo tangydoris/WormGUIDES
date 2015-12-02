@@ -612,7 +612,8 @@ public class RootLayoutController implements Initializable{
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
 			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
 			/* 
-			* add shape rule for each cell shape - using scene element description as functional name
+			* add shape rule for each cell shape 
+			* use scene element description as functional name
 			*/
 			String functionalName = currSE.getSceneName();
 			
