@@ -129,9 +129,6 @@ public class GeometryLoader {
 		}
 
 		mesh.getFaces().addAll(faceCoords);
-
-		//null tex coords
-		//mesh.getTexCoords().addAll(100, 100);
 	}
 
 	/*--------------------DEBUGGING------------------------*/

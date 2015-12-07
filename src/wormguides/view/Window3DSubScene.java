@@ -656,7 +656,6 @@ public class Window3DSubScene{
 		*/
 	}
 	
-	
 	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
 		// for sphere rendering
 		for (int i = 0; i < cellNames.length; i ++) {
