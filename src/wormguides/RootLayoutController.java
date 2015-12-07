@@ -325,9 +325,14 @@ public class RootLayoutController implements Initializable{
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
-		
-		if (name.indexOf("(")!=-1) 
-			name = name.substring(0, name.indexOf(" "));
+
+		if (name.indexOf("(")!=-1) {
+			if (name.indexOf(" ")==-1) {
+				name = name.substring(0, name.indexOf("("));
+			} else {
+				name = name.substring(0, name.indexOf(" "));
+			}
+		}
 		
 		String functionalName = PartsList.getFunctionalNameByLineageName(name);
 		if (functionalName==null) {

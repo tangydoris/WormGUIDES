@@ -33,7 +33,7 @@ public class GeometryLoader {
 		faces = new ArrayList<int[]>();
 		mesh = new TriangleMesh();
 	}
-
+ 
 	public MeshView loadOBJ(String fileName) {
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
