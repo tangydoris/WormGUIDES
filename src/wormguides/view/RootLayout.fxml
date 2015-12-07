@@ -22,6 +22,10 @@
             <Menu mnemonicParsing="false" text="View">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Cell Shapes Index" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Parts List" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Connectome" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Product Information" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

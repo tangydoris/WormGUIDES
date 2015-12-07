@@ -363,7 +363,12 @@ public class Window3DSubScene{
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = currentSceneElements.get(i);
-							selectedName.set(clickedSceneElement.getSceneName());
+							if (clickedSceneElement.getAllCellNames().size() > 1) {
+								selectedName.set(clickedSceneElement.getSceneName());
+							} else {
+								selectedName.set(clickedSceneElement.getAllCellNames().get(0));
+							}
+							
 						}
 					}
 				}
