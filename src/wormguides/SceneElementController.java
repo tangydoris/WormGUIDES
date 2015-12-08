@@ -12,7 +12,7 @@ import wormguides.model.ColorRule;
 
 public class SceneElementController {
 	ColorRule manualColor; //???
-	private boolean visibility;
+	//private boolean visibility;
 	
 	public SceneElementController() {
 		

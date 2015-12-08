@@ -14,6 +14,7 @@ import javafx.scene.paint.PhongMaterial;
  * Hash of a combination of Colors mapped to a Material
  */
 
+@SuppressWarnings("serial")
 public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
 	private Material highlightMaterial = makeMaterial(Color.GOLD);

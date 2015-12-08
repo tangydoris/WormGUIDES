@@ -33,7 +33,7 @@ public class GeometryLoader {
 		faces = new ArrayList<int[]>();
 		mesh = new TriangleMesh();
 	}
-
+ 
 	public MeshView loadOBJ(String fileName) {
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
@@ -49,6 +49,7 @@ public class GeometryLoader {
 					BufferedReader reader = new BufferedReader(streamReader);
 					
 					String line;
+					
 					while((line = reader.readLine()) != null) {
 						//make sure valid line
 						if (line.length() <= 1) break;
@@ -101,30 +102,33 @@ public class GeometryLoader {
 
 	public void createMesh() {
 		int counter = 0;
-
+		int texCounter = 0;
+		float stripeSeparation = 1500;
+		
 		float[] coordinates = new float[(coords.size() * 3)];
+		float[] texCoords = new float[(coords.size() * 2)];
 		for (int i = 0; i < coords.size(); i++) {
 			for (int j = 0; j < 3; j++) {
 				coordinates[counter++] = (float) coords.get(i)[j];
 			}
+			texCoords[texCounter++] = 0;
+			texCoords[texCounter++] = ((float)coords.get(i)[0]/stripeSeparation) * 200;
 		}
 
 		mesh.getPoints().addAll(coordinates);
-
+		mesh.getTexCoords().addAll(texCoords);		
+		
 		counter = 0;
 
 		int[] faceCoords = new int[(faces.size() * 3)*2];
 		for (int i = 0; i < faces.size(); i++) {
 			for (int j = 0; j < 3; j++) {
 				faceCoords[counter++] = faces.get(i)[j] - 1;
-				faceCoords[counter++] = 0; //for our texture coordinate - face syntax: p0, t0, p1, t1, p2, t2
+				faceCoords[counter++] = faces.get(i)[j] - 1; //for our texture coordinate - face syntax: p0, t0, p1, t1, p2, t2
 			}
 		}
 
 		mesh.getFaces().addAll(faceCoords);
-
-		//null tex coords
-		mesh.getTexCoords().addAll(0,0);
 	}
 
 	/*--------------------DEBUGGING------------------------*/

@@ -325,7 +325,15 @@ public class RootLayoutController implements Initializable{
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
-		
+
+//		if (name.indexOf("(")!=-1) {
+//			if (name.indexOf(" ")==-1) {
+//				name = name.substring(0, name.indexOf("("));
+//			} else {
+//				name = name.substring(0, name.indexOf(" "));
+//			}
+//		}
+//		
 		if (name.indexOf("(")!=-1) 
 			name = name.substring(0, name.indexOf(" "));
 		
@@ -611,17 +619,13 @@ public class RootLayoutController implements Initializable{
 	private void addShapeRulesForSceneElements(SceneElementsList sceneElementsList) {
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
 			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
-			/* iterate through cell names in scene element
-			* add shape rule for each cell
+			/* 
+			* add shape rule for each cell shape 
+			* use scene element description as functional name
 			*/
-			ArrayList<String> currSECellNames = currSE.getAllCellNames();
-			for (int j = 0; j < currSECellNames.size(); j++) {
-				//extract functional name from parts list to set shape rule
-				String functionalName = PartsList.getFunctionalNameByLineageName(currSECellNames.get(j));
-
-				//add the shape rule
-				Search.addShapeRule(functionalName, Color.WHITE);
-			}
+			String functionalName = currSE.getSceneName();
+			
+			Search.addShapeRule(functionalName, Color.WHITE);
 		}
 	}
 	

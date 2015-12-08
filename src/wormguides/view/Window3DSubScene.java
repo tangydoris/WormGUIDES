@@ -363,7 +363,12 @@ public class Window3DSubScene{
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = currentSceneElements.get(i);
-							selectedName.set(clickedSceneElement.getAllCellNames().get(0));
+							if (clickedSceneElement.getAllCellNames().size() > 1) {
+								selectedName.set(clickedSceneElement.getSceneName());
+							} else {
+								selectedName.set(clickedSceneElement.getAllCellNames().get(0));
+							}
+							
 						}
 					}
 				}
@@ -650,7 +655,6 @@ public class Window3DSubScene{
 		// End color inheritance
 		*/
 	}
-	
 	
 	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
 		// for sphere rendering
