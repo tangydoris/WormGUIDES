@@ -79,7 +79,7 @@ public abstract class Rule {
 		// if the cells list from Search is set for this rule, cellsSet is true
 		// is false before the list is set
 		cellsSet = false;
-		
+
 		setOptions(options);
 		
 		// format UI elements
@@ -340,8 +340,8 @@ public abstract class Rule {
 	
 	// @param name : lineage name of cell body
 	public boolean appliesToBody(String name) {
-		if (options.contains(SearchOption.CELLBODY))
-			return appliesToCell(name);
+		if (options.contains(SearchOption.CELLBODY) && cells.contains(name))
+			return true;
 		
 		return false;
 	}
@@ -354,7 +354,7 @@ public abstract class Rule {
 		if (cells != null) {
 			if (options.contains(SearchOption.CELL) && cells.contains(name))
 				return true;
-			
+
 			for (String cell : cells) {
 				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
 					return true;

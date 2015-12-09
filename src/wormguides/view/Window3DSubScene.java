@@ -796,7 +796,7 @@ public class Window3DSubScene{
 		
 		// look for searched meshes
 		for (int i=0; i<meshNames.length; i++) {
-			if (localSearchResults.contains(meshNames[i]))
+			if (localSearchResults.contains(meshNames[i])) 
 				searchedMeshes[i] = true;
 			else
 				searchedMeshes[i] = false;
