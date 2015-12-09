@@ -340,6 +340,9 @@ public abstract class Rule {
 	
 	// @param name : lineage name of cell body
 	public boolean appliesToBody(String name) {
+		if (!visible)
+			return false;
+		
 		if (options.contains(SearchOption.CELLBODY) && cells.contains(name))
 			return true;
 		
