@@ -341,9 +341,9 @@
 			          </Tab>
                   <Tab text="Structures">
                     <content>
-                      <AnchorPane prefHeight="180.0">
+                      <AnchorPane>
                            <children>
-                              <ScrollPane prefHeight="745.0" prefWidth="304.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="723.0" prefViewportWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
                                     <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0">
                                        <children>
