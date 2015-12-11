@@ -605,15 +605,18 @@ public class Window3DSubScene{
 								}
 							}
 							
+							
 							// Then consult color rules if no shape rules apply
-							if (colors.isEmpty()) {
+							//if (colors.isEmpty()) {
+//								System.out.println(colorRulesList.size());
 								for (ColorRule colorRule : colorRulesList) {
 									if (colorRule.appliesToBody(name)) {
 										colors.add(colorRule.getColor());
 									}
 								}
-							}
+							//}
 						}
+						System.out.println("----------------------");
 						
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty()) {
