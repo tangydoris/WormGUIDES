@@ -625,6 +625,9 @@ public class RootLayoutController implements Initializable{
 			*/
 			String functionalName = currSE.getSceneName();
 			
+			/* this will cause setCells(name) to be given the scene name as the cell (Search.java line 253)
+			*  -- is this the behavior we want?
+			*/
 			Search.addShapeRule(functionalName, Color.WHITE);
 		}
 	}
