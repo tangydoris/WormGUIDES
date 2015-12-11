@@ -226,6 +226,15 @@ public class Search {
 		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
 		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
 														SearchOption.DESCENDANT);
+		
+		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
+
 	}
 	
 	
