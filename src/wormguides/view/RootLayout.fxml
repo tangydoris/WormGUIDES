@@ -194,6 +194,18 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
+                                          <HBox prefHeight="64.0" prefWidth="259.0">
+                                             <children>
+                                                <Region prefHeight="20.0" prefWidth="19.0" />
+                                                <Label text="Multicellular Structure">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="20.0" prefWidth="33.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" />
+                                             </children>
+                                          </HBox>
                                           <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="210.0" HBox.hgrow="NEVER">
@@ -207,11 +219,6 @@
                                                       <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
                                                    </children>
                                                 </HBox>
-                                             </children>
-                                          </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
-                                             <children>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" prefWidth="255.0" />
                                              </children>
                                           </HBox>
                                           <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS" />
