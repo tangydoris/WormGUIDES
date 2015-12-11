@@ -100,7 +100,7 @@ public class SceneElement {
 	}
 	
 	
-	public ArrayList<String> getAllCellNames() {
+	public ArrayList<String> getAllCellNames() {		
 		return this.cellNames;
 	}
 	
