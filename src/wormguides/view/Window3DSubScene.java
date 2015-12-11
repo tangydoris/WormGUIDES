@@ -616,7 +616,6 @@ public class Window3DSubScene{
 								}
 							//}
 						}
-						System.out.println("----------------------");
 						
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty()) {

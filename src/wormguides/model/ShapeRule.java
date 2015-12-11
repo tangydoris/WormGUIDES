@@ -15,7 +15,7 @@ public class ShapeRule extends Rule{
 	
 	
 	public void setCells(String name) {
-		getCells().add(name);
+		getCells().add(name);		
 	}
 	
 	

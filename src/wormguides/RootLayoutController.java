@@ -117,6 +117,9 @@ public class RootLayoutController implements Initializable{
 	@FXML private Slider opacitySlider;
 	@FXML private ListView<Rule> shapeRulesListView;
 	
+	//structures tab
+	@FXML private ListView<Rule> allStructuresListView;
+	
 	// cell information
 	@FXML private Text cellName;
 	@FXML private Text cellDescription;
