@@ -203,7 +203,7 @@
                                                    </font>
                                                 </Label>
                                                 <Region prefHeight="20.0" prefWidth="33.0" />
-                                                <RadioButton contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="16.0" prefWidth="1.0" />
                                              </children>
                                           </HBox>
                                           <HBox prefHeight="22.0" VBox.vgrow="NEVER">
@@ -403,7 +403,7 @@
                                           <HBox prefHeight="247.0" prefWidth="334.0" VBox.vgrow="ALWAYS">
                                              <children>
                                                 <Region prefHeight="100.0" prefWidth="22.0" />
-                                                <ListView prefHeight="100.0" prefWidth="266.0" />
+                                                <ListView fx:id="shapeRulesListView" prefHeight="100.0" prefWidth="266.0" />
                                                 <Region prefHeight="100.0" prefWidth="23.0" />
                                              </children>
                                           </HBox>
@@ -472,24 +472,6 @@
                         </AnchorPane>
 			              </content>
 			            </Tab>
-                  <Tab text="Cell Shapes">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                 <children>
-                                    <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Cell Shapes:">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <ListView fx:id="shapeRulesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
 			        </tabs>
 			         <GridPane.margin>
 			            <Insets />
