@@ -599,22 +599,15 @@ public class Window3DSubScene{
 							// Consult shape rules first to see if there is 
 							// an explicit rule for the body
 							for (ShapeRule shapeRule : shapeRulesList) {
-								if (shapeRule.appliesTo(name)) {
-									colors.add(Color.web(shapeRule.getColor().toString(), shapeRule.getAlpha()));
-									isOpaque = shapeRule.isOpaque();
-								}
+								if (shapeRule.appliesTo(name))
+									colors.add(Color.web(shapeRule.getColor().toString()));
 							}
 							
-							
-							// Then consult color rules if no shape rules apply
-							//if (colors.isEmpty()) {
-//								System.out.println(colorRulesList.size());
-								for (ColorRule colorRule : colorRulesList) {
-									if (colorRule.appliesToBody(name)) {
-										colors.add(colorRule.getColor());
-									}
+							for (ColorRule colorRule : colorRulesList) {
+								if (colorRule.appliesToBody(name)) {
+									colors.add(colorRule.getColor());
 								}
-							//}
+							}
 						}
 						
 						// if ShapeRule(s) applied
@@ -686,7 +679,7 @@ public class Window3DSubScene{
  				for (ColorRule rule : colorRulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesToCell(cellNames[i])) {
- 						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+ 						colors.add(Color.web(rule.getColor().toString()));
  					}
  				}
  				material = colorHash.getMaterial(colors);

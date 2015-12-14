@@ -6,12 +6,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -31,7 +29,7 @@ public class RuleEditPane extends AnchorPane{
 		
 		infoPacket = packet;
 		
-		setPrefHeight(380.0);
+		setPrefHeight(340.0);
 		setPrefWidth(240.0);
 		
 		VBox vbox = new VBox();
@@ -139,6 +137,7 @@ public class RuleEditPane extends AnchorPane{
 		Region r5 = new Region();
 		r5.setPrefHeight(5);
 		
+		/*
 		if (packet.isAlphaEnabled()) {
 			// Disable all ticks and labels because we know that
 			// the shape rules only apply to cell bodies anyway
@@ -177,7 +176,6 @@ public class RuleEditPane extends AnchorPane{
 		}
 		
 		
-		
 		for (Node node : vbox.getChildren()) {
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+
 					"-fx-faint-focus-color: transparent;");
@@ -186,6 +184,7 @@ public class RuleEditPane extends AnchorPane{
 		}
 		
 		getChildren().add(vbox);
+		*/
 	}
 	
 	private HBox makeEditRow(Label label, CheckBox box) {

@@ -16,15 +16,14 @@ public class RuleInfoPacket {
 	private double alpha;
 	
 	public RuleInfoPacket() {
-		this("", Color.WHITE, false, null);
+		this("", Color.WHITE, null);
 	}
 	
-	public RuleInfoPacket(String name, Color color, boolean enableAlpha, ArrayList<SearchOption> options) {
+	public RuleInfoPacket(String name, Color color, ArrayList<SearchOption> options) {
 		this.name = name;
 		this.color = color;
 		this.options = options;
 		this.disableDescendantOption = false;
-		this.enableAlpha = enableAlpha;
 		this.alpha = 1;
 	}
 	
@@ -117,14 +116,6 @@ public class RuleInfoPacket {
 	
 	public boolean isAncestorSelected() {
 		return options.contains(SearchOption.ANCESTOR);
-	}
-	
-	public boolean isAlphaEnabled() {
-		return enableAlpha;
-	}
-	
-	public void enableAlpha() {
-		enableAlpha = true;
 	}
 	
 	public String toString() {
