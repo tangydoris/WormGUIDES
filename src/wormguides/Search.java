@@ -55,7 +55,7 @@ public class Search {
 	// count used to display ellipsis when gene search is running
 	private static int count;
 	private static LinkedList<String> geneSearchQueue;
-	
+		
 	static {
 		activeLineageNames = new ArrayList<String>();
 		functionalNames = PartsList.getFunctionalNames();
@@ -72,7 +72,7 @@ public class Search {
 		cellTicked = true;
 		cellBodyTicked = false;
 		ancestorTicked = false;
-		descendantTicked = false;
+		descendantTicked = false;	
 		
 		resultsUpdateService = new Service<Void>() {
 			@Override
@@ -121,6 +121,7 @@ public class Search {
 		geneSearchQueue = new LinkedList<String>();
 		count = 0;	
 		geneResultsUpdated = new SimpleBooleanProperty(false);
+		
 	}
 	
 	
@@ -221,11 +222,20 @@ public class Search {
 	
 	
 	public void addDefaultColorRules() {
-		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
-														SearchOption.DESCENDANT);
+//		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
+//		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
+//		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
+//		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
+//														SearchOption.DESCENDANT);
+		
+		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
+
 	}
 	
 	

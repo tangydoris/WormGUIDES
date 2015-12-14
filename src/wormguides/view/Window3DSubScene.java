@@ -605,14 +605,16 @@ public class Window3DSubScene{
 								}
 							}
 							
+							
 							// Then consult color rules if no shape rules apply
-							if (colors.isEmpty()) {
+							//if (colors.isEmpty()) {
+//								System.out.println(colorRulesList.size());
 								for (ColorRule colorRule : colorRulesList) {
 									if (colorRule.appliesToBody(name)) {
 										colors.add(colorRule.getColor());
 									}
 								}
-							}
+							//}
 						}
 						
 						// if ShapeRule(s) applied
@@ -796,7 +798,7 @@ public class Window3DSubScene{
 		
 		// look for searched meshes
 		for (int i=0; i<meshNames.length; i++) {
-			if (localSearchResults.contains(meshNames[i]))
+			if (localSearchResults.contains(meshNames[i])) 
 				searchedMeshes[i] = true;
 			else
 				searchedMeshes[i] = false;

@@ -48,7 +48,7 @@
 			   <children>
 			      <TabPane fx:id="dataPanel" focusTraversable="false" maxWidth="300.0" prefHeight="775.0" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE" tabMinHeight="27.0" tabMinWidth="70.0">
 			        <tabs>
-			          <Tab text="Search">
+			          <Tab text="Cells">
 			            <content>
 			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
                            <children>
@@ -56,7 +56,7 @@
                                  <content>
                                     <VBox maxWidth="280.0" prefHeight="499.0" prefWidth="280.0" spacing="3.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <children>
-                                          <HBox maxHeight="30.0" minHeight="30.0" prefHeight="30.0">
+                                          <HBox maxHeight="30.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" text="Find Cells:">
                                                    <font>
@@ -70,16 +70,25 @@
                                                    </font></TextField>
                                              </children>
                                           </HBox>
-                                          <Label prefHeight="17.0" prefWidth="252.0" text="(cell name, keyword, phrase)">
-                                             <graphic>
-                                                <Region prefHeight="22.0" prefWidth="85.0" />
-                                             </graphic>
-                                          </Label>
-                                          <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font></Label>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Label prefHeight="17.0" prefWidth="277.0" text="(cell/structure name, keyword, phrase)">
+                                                   <graphic>
+                                                      <Region prefHeight="22.0" prefWidth="47.0" />
+                                                   </graphic>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="210.0" HBox.hgrow="NEVER">
                                                    <children>
@@ -94,7 +103,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="210.0" HBox.hgrow="NEVER">
                                                    <children>
@@ -109,7 +118,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="210.0" HBox.hgrow="NEVER">
                                                    <children>
@@ -125,7 +134,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <Region prefHeight="26.0" prefWidth="20.0" />
                                                 <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" prefWidth="95.0" text="Connectome">
@@ -137,7 +146,7 @@
                                                 <RadioButton mnemonicParsing="false" />
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -149,7 +158,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0" prefWidth="272.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefHeight="22.0" prefWidth="198.0">
                                                    <children>
@@ -161,7 +170,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox layoutX="30.0" layoutY="241.0" prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -173,7 +182,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -185,7 +194,19 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="64.0" prefWidth="259.0">
+                                             <children>
+                                                <Region prefHeight="20.0" prefWidth="19.0" />
+                                                <Label text="Multicellular Structure">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="20.0" prefWidth="33.0" />
+                                                <RadioButton contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="16.0" prefWidth="1.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="210.0" HBox.hgrow="NEVER">
                                                    <children>
@@ -200,12 +221,22 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Add to Display:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font></Label>
-                                          <HBox layoutX="30.0" layoutY="282.0" prefHeight="22.0">
+                                          <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS" />
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="4.0" prefWidth="255.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Add to Display:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="30.0" layoutY="282.0" prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -221,7 +252,7 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -236,13 +267,26 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <Region prefHeight="200.0" prefWidth="200.0" />
-                                          <Label text="Propagate Colors to:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="6.0" prefWidth="256.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="39.0" prefWidth="252.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Label text="Propagate Colors to:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -250,14 +294,15 @@
                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Its Ancestors">
                                                          <font>
                                                             <Font size="14.0" />
-                                                         </font></Label>
+                                                         </font>
+                                                      </Label>
                                                       <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
                                                       <CheckBox fx:id="ancestorTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                    </children>
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="22.0">
+                                          <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <HBox prefWidth="190.0">
                                                    <children>
@@ -272,17 +317,15 @@
                                                 </HBox>
                                              </children>
                                           </HBox>
-                                          <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <Region layoutX="30.0" layoutY="182.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                          <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS" />
-                                          <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" prefWidth="270.0" />
-                                          <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                          <Button fx:id="addSearchBtn" focusTraversable="false" graphicTextGap="5.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Add" textAlignment="CENTER">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Button>
+                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Button fx:id="addSearchBtn" focusTraversable="false" graphicTextGap="5.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Add" textAlignment="CENTER">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                          </HBox>
                                        </children>
                                        <opaqueInsets>
                                           <Insets />
@@ -296,6 +339,107 @@
                            </children></AnchorPane>
 			            </content>
 			          </Tab>
+                  <Tab text="Structures">
+                    <content>
+                      <AnchorPane>
+                           <children>
+                              <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="723.0" prefViewportWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <content>
+                                    <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0">
+                                       <children>
+                                          <HBox prefHeight="16.0" prefWidth="302.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="16.0" prefWidth="301.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="34.0" prefWidth="291.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="52.0" prefWidth="13.0" />
+                                                <Label prefHeight="45.0" prefWidth="101.0" text="Find Structures: ">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                                <Region prefHeight="40.0" prefWidth="10.0" />
+                                                <TextField prefHeight="32.0" prefWidth="149.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="22.0" prefWidth="247.0">
+                                             <children>
+                                                <Label prefHeight="17.0" prefWidth="298.0" text="(cell/structure name, keyword, phrase)">
+                                                   <graphic>
+                                                      <Region prefHeight="22.0" prefWidth="68.0" />
+                                                   </graphic>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="27.0" prefWidth="289.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="33.0" prefWidth="300.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="244.0" prefWidth="310.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="100.0" prefWidth="28.0" />
+                                                <ListView fx:id="structuresSearchResultsListView" prefHeight="214.0" prefWidth="272.0" />
+                                                <Region prefHeight="100.0" prefWidth="28.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="10.0" prefWidth="293.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="2.0" prefWidth="302.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="27.0" prefWidth="294.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="27.0" prefWidth="37.0" />
+                                                <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="247.0" prefWidth="334.0" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <Region prefHeight="100.0" prefWidth="22.0" />
+                                                <ListView fx:id="allStructuresListView" prefHeight="100.0" prefWidth="266.0" />
+                                                <Region prefHeight="100.0" prefWidth="23.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="24.0" prefWidth="292.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="22.0" prefWidth="300.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="37.0" prefWidth="293.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="37.0" prefWidth="22.0" />
+                                                <ColorPicker prefHeight="36.0" prefWidth="268.0" />
+                                                <Region prefHeight="88.0" prefWidth="25.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="18.0" prefWidth="303.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="31.0" prefWidth="301.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
+                                             <children>
+                                                <Region prefHeight="53.0" prefWidth="18.0" />
+                                                <Button mnemonicParsing="false" prefHeight="46.0" prefWidth="110.0" text="Add" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="5.0" top="15.0" />
+                                       </padding>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
+                    </content>
+                  </Tab>
 			            <Tab text="Display">
 			              <content>
 			                <AnchorPane>
@@ -328,24 +472,6 @@
                         </AnchorPane>
 			              </content>
 			            </Tab>
-                  <Tab text="Cell Shapes">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <VBox prefWidth="260.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                 <children>
-                                    <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Cell Shapes:">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <ListView fx:id="shapeRulesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
 			        </tabs>
 			         <GridPane.margin>
 			            <Insets />

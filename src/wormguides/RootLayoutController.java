@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -116,6 +117,10 @@ public class RootLayoutController implements Initializable{
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
 	@FXML private ListView<Rule> shapeRulesListView;
+	
+	//structures tab
+	@FXML private ListView<String> allStructuresListView;
+	private MulticellularStructuresList multiCellularStructuresList;
 	
 	// cell information
 	@FXML private Text cellName;
@@ -310,6 +315,22 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
+		
+		//---------------STRUCTURES LISTVIEW<STRING> for multiple selection-------------
+//		allStructuresListView.selectionModelProperty().addListener(
+//				new ChangeListener<MultipleSelectionModel<String>>() {
+//			@Override
+//			public void changed(
+//					ObservableValue<? extends MultipleSelectionModel<String>> observable,
+//					MultipleSelectionModel<String> oldValue,
+//					MultipleSelectionModel<String> newValue) {
+////				String sulston = newValue.getSelectedItem();
+////				System.out.println(sulston);
+////				setSelectedInfo(sulston);
+//			}
+//		});
+		//---------------STRUCTURES LISTVIEW<STRING>-----------------------------------
+		
 		// slider has to listen to 3D window's opacity value
 		// 3d window's opacity value has to listen to opacity slider's value
 		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
@@ -470,8 +491,8 @@ public class RootLayoutController implements Initializable{
 		colorRulesListView.setCellFactory(callback);
 		
 		// shape rules layers
-		shapeLayers = new Layers(shapeRulesListView);
-		shapeRulesListView.setCellFactory(callback);
+		//shapeLayers = new Layers(shapeRulesListView);
+		//shapeRulesListView.setCellFactory(callback);
 	}
 	
 	
@@ -538,6 +559,7 @@ public class RootLayoutController implements Initializable{
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
+		assert (allStructuresListView != null);
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
 		assert (genRadioBtn != null);
@@ -551,7 +573,7 @@ public class RootLayoutController implements Initializable{
 		assert (colorPicker != null);
 		
 		assert (colorRulesListView != null);
-		assert (shapeRulesListView != null);
+//		assert (shapeRulesListView != null);
 		assert (addSearchBtn != null);
 		
 		assert (cellName != null);
@@ -591,15 +613,21 @@ public class RootLayoutController implements Initializable{
 		ObservableList<ColorRule> colorTempList = (ObservableList<ColorRule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
-		ObservableList<ShapeRule> shapeTempList = (ObservableList<ShapeRule>)((ObservableList<? extends Rule>)shapeLayers.getRulesList());
-		search.setShapeRulesList(shapeTempList);
-		window3D.setShapeRulesList(shapeTempList);
+//		ObservableList<ShapeRule> shapeTempList = (ObservableList<ShapeRule>)((ObservableList<? extends Rule>)shapeLayers.getRulesList());
+//		search.setShapeRulesList(shapeTempList);
+//		window3D.setShapeRulesList(shapeTempList);
 		SceneElementsList elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
-		addShapeRulesForSceneElements(elementsList);
+		//addShapeRulesForSceneElements(elementsList);
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
+		
+		//set the structures list view
+		multiCellularStructuresList = new MulticellularStructuresList(elementsList, 
+				allStructuresListView);
+		multiCellularStructuresList.setStructuresList();
+
 		
 		window3D.setResultsUpdateService(search.getResultsUpdateService());
 		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
@@ -615,20 +643,37 @@ public class RootLayoutController implements Initializable{
         sizeInfoPane();
 	}
 	
+//	private void setStructuresList(SceneElementsList sceneElementsList) {
+//		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
+//			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
+//			
+//			ArrayList<String> allCellNames = currSE.getAllCellNames();
+//			
+//			//check if the scene element is a multicellular structure
+//			if (allCellNames.size() > 1) {
+//				//add the scene name to the structures list
+//				allStructuresList.add(currSE.getSceneName());
+//			}
+//		}
+//	}
 	
+	/*
 	private void addShapeRulesForSceneElements(SceneElementsList sceneElementsList) {
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
 			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
-			/* 
-			* add shape rule for each cell shape 
-			* use scene element description as functional name
-			*/
+			 
+			 add shape rule for each cell shape 
+			 use scene element description as functional name
+			
 			String functionalName = currSE.getSceneName();
+			
+			 this will cause setCells(name) to be given the scene name as the cell (Search.java line 253)
+			  -- is this the behavior we want?
 			
 			Search.addShapeRule(functionalName, Color.WHITE);
 		}
 	}
-	
+	*/
 	
 	/*
 	 * Renderer for rules in ListView's in Layers tab
