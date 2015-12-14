@@ -403,14 +403,14 @@
                                     <Region layoutX="25.0" layoutY="678.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <HBox>
                                        <children>
-                                          <ColorPicker maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="70.0" HBox.hgrow="ALWAYS" />
+                                          <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="70.0" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
                                        <children>
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Add" />
+                                          <Button fx:id="addStructureRuleBtn" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Add" />
                                           <Region HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
