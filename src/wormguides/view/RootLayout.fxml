@@ -403,7 +403,7 @@
                                           <HBox prefHeight="247.0" prefWidth="334.0" VBox.vgrow="ALWAYS">
                                              <children>
                                                 <Region prefHeight="100.0" prefWidth="22.0" />
-                                                <ListView fx:id="shapeRulesListView" prefHeight="100.0" prefWidth="266.0" />
+                                                <ListView fx:id="allStructuresListView" prefHeight="100.0" prefWidth="266.0" />
                                                 <Region prefHeight="100.0" prefWidth="23.0" />
                                              </children>
                                           </HBox>
