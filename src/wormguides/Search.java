@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.Rule;
 import wormguides.model.ShapeRule;
 
 public class Search {
@@ -42,7 +43,7 @@ public class Search {
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	
-	private static ObservableList<ColorRule> colorRulesList;
+	private static ObservableList<Rule> colorRulesList;
 	private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
 	
@@ -104,10 +105,12 @@ public class Search {
 					updateGeneResults();
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
-					for (ColorRule rule : colorRulesList) {
-						if (rule.getSearchedText().contains("'"+searched+"'")) {
-							rule.setCells(geneSearchService.getValue());
-							searchResultsList.clear();
+					for (Rule rule : colorRulesList) {
+						if (rule instanceof ColorRule) {
+							if (rule.getSearchedText().contains("'"+searched+"'")) {
+								rule.setCells(geneSearchService.getValue());
+								searchResultsList.clear();
+							}
 						}
 					}
 					geneResultsUpdated.set(!geneResultsUpdated.get());
@@ -192,7 +195,7 @@ public class Search {
 	}
 	
 	
-	public void setColorRulesList(ObservableList<ColorRule> observableList) {
+	public void setColorRulesList(ObservableList<Rule> observableList) {
 		colorRulesList = observableList;
 	}
 	
@@ -203,9 +206,11 @@ public class Search {
 	
 	
 	public boolean containsColorRule(ColorRule other) {
-		for (ColorRule rule : colorRulesList) {
-			if (rule.equals(other))
-				return true;
+		for (Rule rule : colorRulesList) {
+			if (rule instanceof ColorRule) {
+				if (rule.equals(other))
+					return true;
+			}
 		}
 		return false;
 	}
@@ -262,7 +267,8 @@ public class Search {
 		rule.setCells(name);
 		rule.setVisible(false);
 		
-		shapeRulesList.add(rule);
+		//let's add this to a general rules list
+		colorRulesList.add(rule);
 	}
 	
 	
@@ -275,11 +281,9 @@ public class Search {
 		colorRulesList.clear();
 	}
 	
-	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
 		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
-	
 	
 	public static void addColorRule(SearchType type, String searched, Color color, SearchOption...options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();

@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
+import wormguides.model.Rule;
 import wormguides.view.Window3DSubScene;
 
 public class URLLoader {
 	
 	private Window3DSubScene window3D;
-	private ObservableList<ColorRule> rulesList;
+	private ObservableList<Rule> rulesList;
 	
 	public URLLoader(Window3DSubScene window3D) {
 		this.window3D = window3D;

@@ -8,6 +8,7 @@ import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
+import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
@@ -96,7 +97,7 @@ public class Window3DSubScene{
 
 	// color rules stuff
 	private ColorHash colorHash;
-	private ObservableList<ColorRule> colorRulesList;
+	private ObservableList<Rule> colorRulesList;
 	private ObservableList<ShapeRule> shapeRulesList;
 
 	private Service<Void> searchResultsUpdateService;
@@ -596,25 +597,22 @@ public class Window3DSubScene{
 						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 						for (String name : allNames) {
-							// Consult shape rules first to see if there is 
-							// an explicit rule for the body
-							for (ShapeRule shapeRule : shapeRulesList) {
-								if (shapeRule.appliesTo(name)) {
-									colors.add(Color.web(shapeRule.getColor().toString(), shapeRule.getAlpha()));
-									isOpaque = shapeRule.isOpaque();
-								}
-							}
-							
-							
-							// Then consult color rules if no shape rules apply
-							//if (colors.isEmpty()) {
-//								System.out.println(colorRulesList.size());
-								for (ColorRule colorRule : colorRulesList) {
-									if (colorRule.appliesToBody(name)) {
-										colors.add(colorRule.getColor());
+							//consult all of the rules
+							for (Rule rule : colorRulesList) {
+								//if color rule, check if applies to a cell body
+								if (rule instanceof ColorRule) {
+									if (rule.appliesToBody(name)) {
+										colors.add(rule.getColor());
+									}
+								} 
+								//if shape rule, check if applies to multicellular structure
+								else if (rule instanceof ShapeRule) {
+									if (((ShapeRule)rule).appliesTo(name)) {
+										colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+										isOpaque = rule.isOpaque();
 									}
 								}
-							//}
+							}
 						}
 						
 						// if ShapeRule(s) applied
@@ -683,10 +681,12 @@ public class Window3DSubScene{
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
- 				for (ColorRule rule : colorRulesList) {
+ 				for (Rule rule : colorRulesList) {
+ 					if (rule instanceof ColorRule) {
  					// just need to consult rule's active list
- 					if (rule.appliesToCell(cellNames[i])) {
- 						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+ 	 					if (rule.appliesToCell(cellNames[i])) {
+ 	 						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
+ 	 					}
  					}
  				}
  				material = colorHash.getMaterial(colors);
@@ -816,17 +816,17 @@ public class Window3DSubScene{
 	}
 
 	// sets everything associated with color rules
-	public void setColorRulesList(ObservableList<ColorRule> list) {
+	public void setColorRulesList(ObservableList<Rule> list) {
 		if (list == null)
 			return;
 		
 		colorRulesList = list;
-		colorRulesList.addListener(new ListChangeListener<ColorRule>() {
+		colorRulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(
-					ListChangeListener.Change<? extends ColorRule> change) {
+					ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
-					for (ColorRule rule : change.getAddedSubList()) {
+					for (Rule rule : change.getAddedSubList()) {
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
 							public void changed(
@@ -876,8 +876,11 @@ public class Window3DSubScene{
 
 	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (ColorRule rule : colorRulesList)
-			list.add(rule);
+		for (Rule rule : colorRulesList) {
+			if (rule instanceof ColorRule) {
+				list.add((ColorRule)rule);
+			}
+		}
 		return list;
 	}
 	
@@ -888,7 +891,7 @@ public class Window3DSubScene{
 		return list;
 	}
 
-	public ObservableList<ColorRule> getObservableColorRulesList() {
+	public ObservableList<Rule> getObservableColorRulesList() {
 		return colorRulesList;
 	}
 	

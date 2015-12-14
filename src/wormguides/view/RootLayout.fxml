@@ -415,7 +415,7 @@
                                           <HBox prefHeight="37.0" prefWidth="293.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <Region prefHeight="37.0" prefWidth="22.0" />
-                                                <ColorPicker prefHeight="36.0" prefWidth="268.0" />
+                                                <ColorPicker fx:id="structureRuleColorPicker" prefHeight="36.0" prefWidth="268.0" />
                                                 <Region prefHeight="88.0" prefWidth="25.0" />
                                              </children>
                                           </HBox>
@@ -427,7 +427,7 @@
                                           <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
                                              <children>
                                                 <Region prefHeight="53.0" prefWidth="18.0" />
-                                                <Button mnemonicParsing="false" prefHeight="46.0" prefWidth="110.0" text="Add" />
+                                                <Button fx:id="addStructureRuleBtn" mnemonicParsing="false" prefHeight="46.0" prefWidth="110.0" text="Add" />
                                              </children>
                                           </HBox>
                                        </children>

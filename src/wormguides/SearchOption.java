@@ -4,6 +4,7 @@ public enum SearchOption {
 	
 	CELL("cell nucleus"),
 	CELLBODY("cell body"),
+	MULTICELLULAR("multicellular"),
 	ANCESTOR("ancestor"),
 	DESCENDANT("descendant");
 	
