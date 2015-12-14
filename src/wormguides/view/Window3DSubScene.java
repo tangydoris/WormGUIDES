@@ -8,6 +8,7 @@ import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
+import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
@@ -96,7 +97,7 @@ public class Window3DSubScene{
 
 	// color rules stuff
 	private ColorHash colorHash;
-	private ObservableList<ColorRule> colorRulesList;
+	private ObservableList<Rule> colorRulesList;
 	private ObservableList<ShapeRule> shapeRulesList;
 
 	private Service<Void> searchResultsUpdateService;
@@ -603,7 +604,7 @@ public class Window3DSubScene{
 									colors.add(Color.web(shapeRule.getColor().toString()));
 							}
 							
-							for (ColorRule colorRule : colorRulesList) {
+							for (Rule colorRule : colorRulesList) {
 								if (colorRule.appliesToBody(name)) {
 									colors.add(colorRule.getColor());
 								}
@@ -676,7 +677,7 @@ public class Window3DSubScene{
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
- 				for (ColorRule rule : colorRulesList) {
+ 				for (Rule rule : colorRulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesToCell(cellNames[i])) {
  						colors.add(Color.web(rule.getColor().toString()));
@@ -809,17 +810,17 @@ public class Window3DSubScene{
 	}
 
 	// sets everything associated with color rules
-	public void setColorRulesList(ObservableList<ColorRule> list) {
+	public void setColorRulesList(ObservableList<Rule> list) {
 		if (list == null)
 			return;
 		
 		colorRulesList = list;
-		colorRulesList.addListener(new ListChangeListener<ColorRule>() {
+		colorRulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(
-					ListChangeListener.Change<? extends ColorRule> change) {
+					ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
-					for (ColorRule rule : change.getAddedSubList()) {
+					for (Rule rule : change.getAddedSubList()) {
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
 							public void changed(
@@ -869,8 +870,11 @@ public class Window3DSubScene{
 
 	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (ColorRule rule : colorRulesList)
-			list.add(rule);
+		for (Rule rule : colorRulesList) {
+			if (rule instanceof ColorRule) {
+				list.add((ColorRule)rule);
+			}
+		}
 		return list;
 	}
 	
@@ -881,7 +885,7 @@ public class Window3DSubScene{
 		return list;
 	}
 
-	public ObservableList<ColorRule> getObservableColorRulesList() {
+	public ObservableList<Rule> getObservableColorRulesList() {
 		return colorRulesList;
 	}
 	
