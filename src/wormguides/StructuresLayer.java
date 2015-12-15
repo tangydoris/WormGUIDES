@@ -2,6 +2,9 @@ package wormguides;
 
 import java.util.ArrayList;
 
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,17 +20,16 @@ import wormguides.model.SceneElementsList;
 public class StructuresLayer {
 	private SceneElementsList sceneElementsList;
 	@FXML private ListView<String> allStructuresListView;
-	private ObservableList<String> allStructuresList;
-	private Search search;
 	@FXML private Button addStructureRuleBtn;
+	private ObservableList<String> allStructuresList;
 	private static Color selectedColor;
+	private String selectedStructure;
 	
 	public StructuresLayer(SceneElementsList sceneElementsList, 
 			ListView<String> allStructuresListView, Search search,
 			Button addStructureRuleBtn) {
 		this.sceneElementsList = sceneElementsList;
 		this.allStructuresListView = allStructuresListView;
-		this.search = search;
 		this.allStructuresList = FXCollections.observableArrayList();
 		this.addStructureRuleBtn = addStructureRuleBtn;
 		selectedColor = Color.WHITE; //default color
@@ -35,11 +37,26 @@ public class StructuresLayer {
 		//add listeners
 	}
 
-	public void setStructuresListView() {
+	public void setStructuresLayer() {
 		setStructuresList();
 		allStructuresListView.setItems(this.allStructuresList);
 		//how to set font of listview to 14 -- appfont.get
-	}	
+		
+		//add listener for list view
+		allStructuresListView.getSelectionModel().selectedItemProperty().addListener(
+				new ChangeListener<String>() {
+					@Override
+					public void changed(
+							ObservableValue<? extends String> observable,
+							String oldValue, String newValue) {
+						setSelectedInfo(newValue);
+					}
+		});
+	}
+	
+	private void setSelectedInfo(String newValue) {
+		selectedStructure = newValue;
+	}
 	
 	public void setStructuresList() {	
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
@@ -54,12 +71,14 @@ public class StructuresLayer {
 			}
 		}
 	}
-	
+
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Search.addShapeRule("test", selectedColor, SearchOption.MULTICELLULAR);
+				//check search name
+
+				Search.addShapeRule(selectedStructure, selectedColor);
 			}
 		};
 	}

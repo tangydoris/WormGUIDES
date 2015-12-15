@@ -24,6 +24,8 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElement;
+import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
 
 public class Search {
@@ -56,6 +58,9 @@ public class Search {
 	// count used to display ellipsis when gene search is running
 	private static int count;
 	private static LinkedList<String> geneSearchQueue;
+	
+	//used for adding shape rules
+	SceneElementsList sceneElementsList;
 		
 	static {
 		activeLineageNames = new ArrayList<String>();
@@ -243,13 +248,13 @@ public class Search {
 
 	}
 	
-	
+/* NOT USED	
 	public void addDefaultShapeRules() {
 		addShapeRule("AVG", Color.RED);
 		addShapeRule("DD", Color.BLUE);
 		addShapeRule("DA", Color.GREEN);
 	}
-	
+*/
 	
 	public static void addShapeRule(String name, Color color) {
 		addShapeRule(name, color, SearchOption.CELLBODY);
@@ -264,7 +269,6 @@ public class Search {
 			optionsArray.add(option);
 		
 		ShapeRule rule = new ShapeRule(name, color, optionsArray);
-		rule.setCells(name);
 		
 		//let's add this to a general rules list
 		rulesList.add(rule);
@@ -664,6 +668,10 @@ public class Search {
 				}
 			};
 		}
+	}
+	
+	public void setSceneElementsList(SceneElementsList sceneElementsList) {
+		this.sceneElementsList = sceneElementsList;
 	}
 	
 	

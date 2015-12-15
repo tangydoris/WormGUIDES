@@ -12,17 +12,20 @@ public class ShapeRule extends Rule {
 		disableDescendantOption();
 	}
 	
-	public void setCells(String name) {
-		getCells().add(name);		
-	}
+//	public void setCells(String name) {
+//		getCells().add(name);		
+//	}
 		
 	// @param name : lineageName of cell body
 	public boolean appliesTo(String name) {
 		if (isVisible()) {
-			// name is expected to be a lineage name
-			name = PartsList.getFunctionalNameByLineageName(name);
-			if (name != null && name.toLowerCase().startsWith(getSearchedTextLowerCase()))
-				return true;
+			return this.getSearchedText().equals(name);
+			
+			
+//			// name is expected to be a lineage name
+//			name = PartsList.getFunctionalNameByLineageName(name);
+//			if (name != null && name.toLowerCase().startsWith(getSearchedTextLowerCase()))
+//				return true;
 		}
 		return false;
 	}

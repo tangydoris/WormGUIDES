@@ -115,8 +115,8 @@ public class RootLayoutController implements Initializable{
 	@FXML private ListView<Rule> shapeRulesListView;
 	
 	//structures tab
-	@FXML private ListView<String> allStructuresListView;
 	private StructuresLayer structuresLayer;
+	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
 	
@@ -593,11 +593,10 @@ public class RootLayoutController implements Initializable{
 		assert (structureRuleColorPicker != null);
 	}
 	
-	private void initStructureLayer() {
+	private void initStructuresLayer() {
 		structuresLayer = new StructuresLayer(elementsList, 
 				allStructuresListView, search, addStructureRuleBtn);
-		structuresLayer.setStructuresListView();
-		//getAddStructureRuleButtonListener
+		structuresLayer.setStructuresLayer();
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getStructureRuleColorPickerListener());
 	}
@@ -638,9 +637,10 @@ public class RootLayoutController implements Initializable{
 		elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
 		//addShapeRulesForSceneElements(elementsList);
+		search.setSceneElementsList(elementsList);
 		
 		//set up the structure layer
-		initStructureLayer();
+		initStructuresLayer();
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
