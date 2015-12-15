@@ -117,6 +117,7 @@ public class RootLayoutController implements Initializable{
 	//structures tab
 	private StructuresLayer structuresLayer;
 	@FXML private TextField structuresSearchField;
+	@FXML private ListView<String> structuresSearchResultsListView;
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
@@ -568,6 +569,7 @@ public class RootLayoutController implements Initializable{
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
+		assert (structuresSearchResultsListView != null);
 		assert (allStructuresListView != null);
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
@@ -595,9 +597,12 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initStructuresLayer() {
-		structuresLayer = new StructuresLayer(elementsList, 
+		structuresLayer = new StructuresLayer(elementsList, structuresSearchResultsListView,
 				allStructuresListView, search, addStructureRuleBtn);
 		structuresLayer.setStructuresLayer();
+		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresSearchFieldListener());
+		searchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
+		structuresSearchResultsListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getStructureRuleColorPickerListener());
 	}

@@ -262,6 +262,9 @@ public class Search {
 	
 	
 	public static void addShapeRule(String name, Color color, SearchOption...options) {
+		if (name == null)
+			return;
+		
 		name = name.trim();
 		
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();

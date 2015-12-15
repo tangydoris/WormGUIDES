@@ -19,22 +19,28 @@ import wormguides.model.SceneElementsList;
 
 public class StructuresLayer {
 	private SceneElementsList sceneElementsList;
+	@FXML private ListView<String> structuresSearchResultsListView;
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	private ObservableList<String> allStructuresList;
 	private static Color selectedColor;
 	private String selectedStructure;
+	private String searchText;
+	
+	private static ObservableList<String> structuresSearchResultsList;
 	
 	public StructuresLayer(SceneElementsList sceneElementsList, 
+			ListView<String> structuresSearchResultsListView,
 			ListView<String> allStructuresListView, Search search,
 			Button addStructureRuleBtn) {
 		this.sceneElementsList = sceneElementsList;
+		this.structuresSearchResultsListView = structuresSearchResultsListView;
 		this.allStructuresListView = allStructuresListView;
 		this.allStructuresList = FXCollections.observableArrayList();
 		this.addStructureRuleBtn = addStructureRuleBtn;
 		selectedColor = Color.WHITE; //default color
 		
-		//add listeners
+		structuresSearchResultsList = FXCollections.observableArrayList();
 	}
 
 	public void setStructuresLayer() {
@@ -51,6 +57,17 @@ public class StructuresLayer {
 							String oldValue, String newValue) {
 						setSelectedInfo(newValue);
 					}
+		});
+		
+
+		structuresSearchResultsListView.getSelectionModel().selectedItemProperty().addListener(
+				new ChangeListener<String>() {
+			@Override
+			public void changed(
+					ObservableValue<? extends String> observable,
+					String oldValue, String newValue) {
+				System.out.println("HEY");
+			}
 		});
 	}
 	
@@ -71,6 +88,30 @@ public class StructuresLayer {
 			}
 		}
 	}
+	
+	public ChangeListener<String> getStructuresSearchFieldListener() {
+		return new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
+										String oldValue, String newValue) {
+				searchText = newValue;
+			}
+		};
+	}
+	
+	public ChangeListener<String> getStructuresTextFieldListener() {
+		return new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
+											String oldValue, String newValue) {
+				searchText = newValue.toLowerCase();
+				if (searchText.isEmpty())
+					structuresSearchResultsList.clear();
+				else
+					searchStructures();
+			}
+		};
+	}
 
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
 		return new EventHandler<ActionEvent>() {
@@ -90,5 +131,18 @@ public class StructuresLayer {
 				selectedColor = ((ColorPicker)event.getSource()).getValue();
 			}
 		};
+	}
+	
+	public void searchStructures() {
+		System.out.println("searching structures for matches");
+		structuresSearchResultsList.add("HELLO");
+	}
+	
+	public String getSearchText() {
+		return this.searchText;
+	}
+	
+	public ObservableList<String> getStructuresSearchResultsList() {
+		return this.structuresSearchResultsList;
 	}
 }
