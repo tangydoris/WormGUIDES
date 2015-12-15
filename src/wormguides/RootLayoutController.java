@@ -116,6 +116,7 @@ public class RootLayoutController implements Initializable{
 	
 	//structures tab
 	private StructuresLayer structuresLayer;
+	@FXML private TextField structuresSearchField;
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;

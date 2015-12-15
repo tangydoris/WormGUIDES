@@ -598,10 +598,6 @@ public class Window3DSubScene{
 						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 						
-						//iterate over rules
-							//if instanceof shaperule -- one check with equivalence of names
-							//if instanceof colorrule -- iterate over cell names and see if it applies
-						
 						//iterate over rulesList
 						for (Rule rule: rulesList) {
 							if (rule instanceof ShapeRule) {

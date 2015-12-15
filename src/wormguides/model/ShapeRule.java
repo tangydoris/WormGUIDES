@@ -8,7 +8,7 @@ import wormguides.SearchOption;
 public class ShapeRule extends Rule {
 	
 	public ShapeRule(String searched, Color color, ArrayList<SearchOption> options) {
-		super(searched, color, options);
+		super(searched, color, options, true);
 		disableDescendantOption();
 	}
 	
@@ -20,12 +20,6 @@ public class ShapeRule extends Rule {
 	public boolean appliesTo(String name) {
 		if (isVisible()) {
 			return this.getSearchedText().equals(name);
-			
-			
-//			// name is expected to be a lineage name
-//			name = PartsList.getFunctionalNameByLineageName(name);
-//			if (name != null && name.toLowerCase().startsWith(getSearchedTextLowerCase()))
-//				return true;
 		}
 		return false;
 	}

@@ -24,7 +24,7 @@ public class ColorRule extends Rule{
 	
 	
 	public ColorRule(String searched, Color color, ArrayList<SearchOption> options, SearchType type) {
-		super (searched, color, options);
+		super (searched, color, options, false);
 		this.type = type;
 	}
 
