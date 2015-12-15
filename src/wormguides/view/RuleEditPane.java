@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -169,12 +170,27 @@ public class RuleEditPane extends AnchorPane{
 					cellRow, cellBodyRow, ancRow, desRow, r2, alphaLabel, alphaSlider, r3, 
 					colorLabel, pickerPane, r4, buttonBox, r5);
 		}
-		else {
+		*/
+		//else {
+//			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
+//					cellRow, cellBodyRow, ancRow, desRow, r2, 
+//					colorLabel, pickerPane, r4, buttonBox, r5);
+		//}
+		
+		if (packet.isShapeRule()) {
+			cellLabel.setDisable(true);
+			cellTick.setDisable(true);
+			cellBodyLabel.setDisable(true);
+			cellBodyTick.setSelected(false);
+			cellBodyTick.setDisable(true);
+			ancLabel.setDisable(true);
+			ancTick.setDisable(true);
+		}
+
 			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
 					cellRow, cellBodyRow, ancRow, desRow, r2, 
-					colorLabel, pickerPane, r4, buttonBox, r5);
-		}
-		
+					colorLabel, pickerPane, r4, buttonBox, r5);	
+			
 		
 		for (Node node : vbox.getChildren()) {
 			node.setStyle("-fx-focus-color: -fx-outer-border; "+
@@ -184,7 +200,7 @@ public class RuleEditPane extends AnchorPane{
 		}
 		
 		getChildren().add(vbox);
-		*/
+		
 	}
 	
 	private HBox makeEditRow(Label label, CheckBox box) {

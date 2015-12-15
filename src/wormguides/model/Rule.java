@@ -54,6 +54,8 @@ public abstract class Rule {
 	private ArrayList<String> cells;
 	private boolean cellsSet;
 	
+	private boolean shapeRule;
+	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
 	private Region region = new Region();
@@ -66,9 +68,11 @@ public abstract class Rule {
 	
 	private RuleInfoPacket infoPacket;
 	
-	public Rule(String searched, Color color, ArrayList<SearchOption> options) {
+	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean shapeRule) {
 		setSearchedText(searched);
 		setColor(color);
+		
+		this.shapeRule = shapeRule;
 		
 		cells = new ArrayList<String>();
 		// if the cells list from Search is set for this rule, cellsSet is true
@@ -165,7 +169,7 @@ public abstract class Rule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(text, this.color, options);
+		infoPacket = new RuleInfoPacket(text, this.color, options, this.shapeRule);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override

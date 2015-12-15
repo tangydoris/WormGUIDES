@@ -97,7 +97,7 @@ public class Window3DSubScene{
 
 	// color rules stuff
 	private ColorHash colorHash;
-	private ObservableList<Rule> colorRulesList;
+	private ObservableList<Rule> rulesList;
 	private ObservableList<ShapeRule> shapeRulesList;
 
 	private Service<Void> searchResultsUpdateService;
@@ -247,7 +247,7 @@ public class Window3DSubScene{
 		
 		uniformSize = false;
 		
-		colorRulesList = FXCollections.observableArrayList();
+		rulesList = FXCollections.observableArrayList();
 		shapeRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
@@ -582,6 +582,7 @@ public class Window3DSubScene{
 				else {
 					// in regular view mode
 					ArrayList<String> allNames = currentSceneElements.get(i).getAllCellNames();
+					String sceneName = currentSceneElements.get(i).getSceneName();
 					
 					// default white meshes
 					if (allNames.isEmpty()) {
@@ -596,18 +597,23 @@ public class Window3DSubScene{
 					else {
 						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
-						for (String name : allNames) {
-							// Consult shape rules first to see if there is 
-							// an explicit rule for the body
-							for (ShapeRule shapeRule : shapeRulesList) {
-								if (shapeRule.appliesTo(name))
-									colors.add(Color.web(shapeRule.getColor().toString()));
-							}
-							
-							for (Rule colorRule : colorRulesList) {
-								if (colorRule.appliesToBody(name)) {
-									colors.add(colorRule.getColor());
+						
+						//iterate over rulesList
+						for (Rule rule: rulesList) {
+							if (rule instanceof ShapeRule) {
+								//check equivalence of shape rule to scene name
+								if (((ShapeRule)rule).appliesTo(sceneName)) {
+									colors.add(Color.web(((ShapeRule)rule).getColor().toString()));
 								}
+								
+							}
+							else if(rule instanceof ColorRule) {
+								//iterate over cells and check if cells apply
+								for (String name: allNames) {
+									if(((ColorRule)rule).appliesToBody(name)) {
+										colors.add(((ColorRule)rule).getColor());
+									}
+								}	
 							}
 						}
 						
@@ -677,7 +683,7 @@ public class Window3DSubScene{
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
- 				for (Rule rule : colorRulesList) {
+ 				for (Rule rule : rulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesToCell(cellNames[i])) {
  						colors.add(Color.web(rule.getColor().toString()));
@@ -814,8 +820,8 @@ public class Window3DSubScene{
 		if (list == null)
 			return;
 		
-		colorRulesList = list;
-		colorRulesList.addListener(new ListChangeListener<Rule>() {
+		rulesList = list;
+		rulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(
 					ListChangeListener.Change<? extends Rule> change) {
@@ -870,7 +876,7 @@ public class Window3DSubScene{
 
 	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (Rule rule : colorRulesList) {
+		for (Rule rule : rulesList) {
 			if (rule instanceof ColorRule) {
 				list.add((ColorRule)rule);
 			}
@@ -886,7 +892,7 @@ public class Window3DSubScene{
 	}
 
 	public ObservableList<Rule> getObservableColorRulesList() {
-		return colorRulesList;
+		return rulesList;
 	}
 	
 	public ObservableList<ShapeRule> getObservableShapeRulesList() {
@@ -894,8 +900,8 @@ public class Window3DSubScene{
 	}
 
 	public void setColorRulesList(ArrayList<ColorRule> list) {
-		colorRulesList.clear();
-		colorRulesList.setAll(list);
+		rulesList.clear();
+		rulesList.setAll(list);
 	}
 	
 	public void setShapeRulesList(ArrayList<ShapeRule> list) {

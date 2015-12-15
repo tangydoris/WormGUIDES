@@ -9,18 +9,20 @@ public class RuleInfoPacket {
 	private Color color;
 	private ArrayList<SearchOption> options;
 	private boolean disableDescendantOption;
+	private boolean shapeRule;
 	
 	
 	public RuleInfoPacket() {
-		this("", Color.WHITE, null);
+		this("", Color.WHITE, null, false);
 	}
 	
 	
-	public RuleInfoPacket(String name, Color color, ArrayList<SearchOption> options) {
+	public RuleInfoPacket(String name, Color color, ArrayList<SearchOption> options, boolean shapeRule) {
 		this.name = name;
 		this.color = color;
 		this.options = options;
 		this.disableDescendantOption = false;
+		this.shapeRule = shapeRule;
 	}
 	
 	
@@ -128,6 +130,10 @@ public class RuleInfoPacket {
 		for (SearchOption option : getOptions())
 			out += option+" ";
 		return out;
+	}
+	
+	public boolean isShapeRule() {
+		return this.shapeRule;
 	}
 	
 }

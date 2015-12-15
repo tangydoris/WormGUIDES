@@ -115,8 +115,10 @@ public class RootLayoutController implements Initializable{
 	@FXML private ListView<Rule> shapeRulesListView;
 	
 	//structures tab
-	@FXML private ListView<String> allStructuresListView;
 	private StructuresLayer structuresLayer;
+	@FXML private TextField structuresSearchField;
+	@FXML private ListView<String> structuresSearchResultsListView;
+	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
 	
@@ -567,6 +569,7 @@ public class RootLayoutController implements Initializable{
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
+		assert (structuresSearchResultsListView != null);
 		assert (allStructuresListView != null);
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
@@ -593,11 +596,13 @@ public class RootLayoutController implements Initializable{
 		assert (structureRuleColorPicker != null);
 	}
 	
-	private void initStructureLayer() {
-		structuresLayer = new StructuresLayer(elementsList, 
+	private void initStructuresLayer() {
+		structuresLayer = new StructuresLayer(elementsList, structuresSearchResultsListView,
 				allStructuresListView, search, addStructureRuleBtn);
-		structuresLayer.setStructuresListView();
-		//getAddStructureRuleButtonListener
+		structuresLayer.setStructuresLayer();
+		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresSearchFieldListener());
+		searchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
+		structuresSearchResultsListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getStructureRuleColorPickerListener());
 	}
@@ -638,9 +643,10 @@ public class RootLayoutController implements Initializable{
 		elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
 		//addShapeRulesForSceneElements(elementsList);
+		search.setSceneElementsList(elementsList);
 		
 		//set up the structure layer
-		initStructureLayer();
+		initStructuresLayer();
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
