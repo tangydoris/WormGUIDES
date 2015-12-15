@@ -10,7 +10,6 @@ public class ShapeRule extends Rule {
 	public ShapeRule(String searched, Color color, ArrayList<SearchOption> options) {
 		super(searched, color, options);
 		disableDescendantOption();
-		enableAlpha();
 	}
 	
 	public void setCells(String name) {

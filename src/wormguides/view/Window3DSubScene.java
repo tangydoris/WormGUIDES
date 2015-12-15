@@ -597,20 +597,16 @@ public class Window3DSubScene{
 						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 						for (String name : allNames) {
-							//consult all of the rules
-							for (Rule rule : colorRulesList) {
-								//if color rule, check if applies to a cell body
-								if (rule instanceof ColorRule) {
-									if (rule.appliesToBody(name)) {
-										colors.add(rule.getColor());
-									}
-								} 
-								//if shape rule, check if applies to multicellular structure
-								else if (rule instanceof ShapeRule) {
-									if (((ShapeRule)rule).appliesTo(name)) {
-										colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
-										isOpaque = rule.isOpaque();
-									}
+							// Consult shape rules first to see if there is 
+							// an explicit rule for the body
+							for (ShapeRule shapeRule : shapeRulesList) {
+								if (shapeRule.appliesTo(name))
+									colors.add(Color.web(shapeRule.getColor().toString()));
+							}
+							
+							for (Rule colorRule : colorRulesList) {
+								if (colorRule.appliesToBody(name)) {
+									colors.add(colorRule.getColor());
 								}
 							}
 						}
@@ -682,11 +678,9 @@ public class Window3DSubScene{
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
  				for (Rule rule : colorRulesList) {
- 					if (rule instanceof ColorRule) {
  					// just need to consult rule's active list
- 	 					if (rule.appliesToCell(cellNames[i])) {
- 	 						colors.add(Color.web(rule.getColor().toString(), rule.getAlpha()));
- 	 					}
+ 					if (rule.appliesToCell(cellNames[i])) {
+ 						colors.add(Color.web(rule.getColor().toString()));
  					}
  				}
  				material = colorHash.getMaterial(colors);

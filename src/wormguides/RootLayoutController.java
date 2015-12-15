@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -39,19 +38,16 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -508,14 +504,7 @@ public class RootLayoutController implements Initializable{
 		// color rules layers
 		colorLayers = new Layers(colorRulesListView);
 		colorRulesListView.setCellFactory(callback);
-		
-		// shape rules layers
-		//shapeLayers = new Layers(shapeRulesListView);
-		//shapeRulesListView.setCellFactory(callback);
 	}
-	
-	
-	
 	
 	
 	private void initPartsList() {
@@ -592,7 +581,6 @@ public class RootLayoutController implements Initializable{
 		assert (colorPicker != null);
 		
 		assert (colorRulesListView != null);
-//		assert (shapeRulesListView != null);
 		assert (addSearchBtn != null);
 		
 		assert (cellName != null);
@@ -600,6 +588,9 @@ public class RootLayoutController implements Initializable{
 		
 		assert (uniformSizeCheckBox != null);
 		assert (opacitySlider != null);
+		
+		assert (addStructureRuleBtn != null);
+		assert (structureRuleColorPicker != null);
 	}
 	
 	private void initStructureLayer() {

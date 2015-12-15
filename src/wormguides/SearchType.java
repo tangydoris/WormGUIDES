@@ -4,7 +4,7 @@ public enum SearchType {
 	
 	SYSTEMATIC ("lineage name"), 
 	FUNCTIONAL ("functional name"), 
-	DESCRIPTION ("'PartsList' description"), 
+	DESCRIPTION ("'PartsList' description"),
 	GENE ("gene");
 	
 	private String description;

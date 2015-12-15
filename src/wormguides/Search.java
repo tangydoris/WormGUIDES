@@ -43,7 +43,7 @@ public class Search {
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	
-	private static ObservableList<Rule> colorRulesList;
+	private static ObservableList<Rule> rulesList;
 	private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
 	
@@ -105,7 +105,7 @@ public class Search {
 					updateGeneResults();
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
-					for (Rule rule : colorRulesList) {
+					for (Rule rule : rulesList) {
 						if (rule instanceof ColorRule) {
 							if (rule.getSearchedText().contains("'"+searched+"'")) {
 								rule.setCells(geneSearchService.getValue());
@@ -196,7 +196,7 @@ public class Search {
 	
 	
 	public void setColorRulesList(ObservableList<Rule> observableList) {
-		colorRulesList = observableList;
+		rulesList = observableList;
 	}
 	
 	
@@ -206,7 +206,7 @@ public class Search {
 	
 	
 	public boolean containsColorRule(ColorRule other) {
-		for (Rule rule : colorRulesList) {
+		for (Rule rule : rulesList) {
 			if (rule instanceof ColorRule) {
 				if (rule.equals(other))
 					return true;
@@ -265,10 +265,9 @@ public class Search {
 		
 		ShapeRule rule = new ShapeRule(name, color, optionsArray);
 		rule.setCells(name);
-		rule.setVisible(false);
 		
 		//let's add this to a general rules list
-		colorRulesList.add(rule);
+		rulesList.add(rule);
 	}
 	
 	
@@ -278,7 +277,7 @@ public class Search {
 	
 	
 	public void clearColorRules() {
-		colorRulesList.clear();
+		rulesList.clear();
 	}
 	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
@@ -343,7 +342,7 @@ public class Search {
 			rule.setCells(cells);
 		}
 		
-		colorRulesList.add(rule);
+		rulesList.add(rule);
 		searchResultsList.clear();
 	}
 	
