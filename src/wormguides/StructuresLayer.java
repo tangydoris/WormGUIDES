@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,16 +25,23 @@ public class StructuresLayer {
 	private String selectedStructure;
 	private String searchText;
 	
+	private HashMap<String, String> nameToCommentsMap;
+	
 	public StructuresLayer(SceneElementsList sceneElementsList) {
 		selectedColor = Color.WHITE; //default color
+		
 		allStructuresList = FXCollections.observableArrayList();
 		searchResultsList = FXCollections.observableArrayList();
+		
+		nameToCommentsMap = new HashMap<String, String>();
 		
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
 			SceneElement current = sceneElementsList.sceneElementsList.get(i);
 			//check if the scene element is a multicellular structure
-			if (current.getAllCellNames().size() > 1)
+			if (current.getAllCellNames().size() > 1) {
 				allStructuresList.add(current.getSceneName());
+				nameToCommentsMap.put(current.getSceneName(), current.getComments());
+			}
 		}
 	}
 	
@@ -123,12 +131,21 @@ public class StructuresLayer {
 	
 	
 	// Only searches names for now
-	// TODO extend search to comments
 	public void searchStructures(String searched) {
+		searched = searched.toLowerCase();
 		searchResultsList.clear();
 		for (String name : allStructuresList) {
-			if (!searchResultsList.contains(name) && name.toLowerCase().startsWith(searched))
-				searchResultsList.add(name);
+			if (!searchResultsList.contains(name)) {
+				// Look at scene names
+				if (name.toLowerCase().startsWith(searched)) {
+					searchResultsList.add(name);
+					continue;
+				}
+				
+				// Look at comments
+				if (nameToCommentsMap.get(name).toLowerCase().contains(searched))
+					searchResultsList.add(name);
+			}
 		}
 	}
 	

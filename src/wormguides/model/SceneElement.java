@@ -96,57 +96,57 @@ public class SceneElement {
 	
 
 	public String getSceneName() {
-		return this.sceneName;
+		return sceneName;
 	}
 	
 	
 	public ArrayList<String> getAllCellNames() {		
-		return this.cellNames;
+		return cellNames;
 	}
 	
 	
 	public String getMarkerName() {
-		return this.markerName;
+		return markerName;
 	}
 	
 	
 	public String getEmbryoName() {
-		return this.embryoName;
+		return embryoName;
 	}
 	
 	
 	public String getImagingSource() {
-		return this.imagingSource;
+		return imagingSource;
 	}
 	
 	
 	public String getResourceLocation() {
-		return this.resourceLocation;
+		return resourceLocation;
 	}
 
 	
 	public int getStartTime() {
-		return this.startTime;
+		return startTime;
 	}
 
 	
 	public int getEndTime() {
-		return this.endTime;
+		return endTime;
 	}
 
 	
 	public String getComments() {
-		return this.comments;
+		return comments;
 	}
 	
 	
 	public boolean getCompleteResourseFlag() {
-		return this.completeResourceFlag;
+		return completeResourceFlag;
 	}
 	
 	
 	public boolean getBillboardFlag() {
-		return this.billboardFlag;
+		return billboardFlag;
 	}
 	
 }
