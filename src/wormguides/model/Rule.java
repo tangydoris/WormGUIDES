@@ -169,7 +169,7 @@ public abstract class Rule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(text, this.color, options, this.shapeRule);
+		infoPacket = new RuleInfoPacket(text, color, options, shapeRule);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override

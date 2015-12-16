@@ -1,110 +1,77 @@
 package wormguides;
 
-import java.util.ArrayList;
-
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 
+
 public class StructuresLayer {
-	private SceneElementsList sceneElementsList;
-	@FXML private ListView<String> structuresSearchResultsListView;
-	@FXML private ListView<String> allStructuresListView;
-	@FXML private Button addStructureRuleBtn;
 	private ObservableList<String> allStructuresList;
+	private ObservableList<String> searchResultsList;
 	private static Color selectedColor;
 	private String selectedStructure;
 	private String searchText;
 	
-	private static ObservableList<String> structuresSearchResultsList;
-	
-	public StructuresLayer(SceneElementsList sceneElementsList, 
-			ListView<String> structuresSearchResultsListView,
-			ListView<String> allStructuresListView, Search search,
-			Button addStructureRuleBtn) {
-		this.sceneElementsList = sceneElementsList;
-		this.structuresSearchResultsListView = structuresSearchResultsListView;
-		this.allStructuresListView = allStructuresListView;
-		this.allStructuresList = FXCollections.observableArrayList();
-		this.addStructureRuleBtn = addStructureRuleBtn;
+	public StructuresLayer(SceneElementsList sceneElementsList) {
 		selectedColor = Color.WHITE; //default color
+		allStructuresList = FXCollections.observableArrayList();
+		searchResultsList = FXCollections.observableArrayList();
 		
-		structuresSearchResultsList = FXCollections.observableArrayList();
-	}
-
-	public void setStructuresLayer() {
-		setStructuresList();
-		allStructuresListView.setItems(this.allStructuresList);
-		//how to set font of listview to 14 -- appfont.get
-		
-		//add listener for list view
-		allStructuresListView.getSelectionModel().selectedItemProperty().addListener(
-				new ChangeListener<String>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends String> observable,
-							String oldValue, String newValue) {
-						setSelectedInfo(newValue);
-					}
-		});
-		
-
-		structuresSearchResultsListView.getSelectionModel().selectedItemProperty().addListener(
-				new ChangeListener<String>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
-				System.out.println("HEY");
-			}
-		});
-	}
-	
-	private void setSelectedInfo(String newValue) {
-		selectedStructure = newValue;
-	}
-	
-	public void setStructuresList() {	
 		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
-			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
-			
-			ArrayList<String> allCellNames = currSE.getAllCellNames();
-			
+			SceneElement current = sceneElementsList.sceneElementsList.get(i);
 			//check if the scene element is a multicellular structure
-			if (allCellNames.size() > 1) {
-				//add the scene name to the structures list
-				allStructuresList.add(currSE.getSceneName());
-			}
+			if (current.getAllCellNames().size() > 1)
+				allStructuresList.add(current.getSceneName());
 		}
 	}
 	
-	public ChangeListener<String> getStructuresSearchFieldListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-										String oldValue, String newValue) {
-				searchText = newValue;
-			}
-		};
+	
+	public ObservableList<String> getAllStructuresList() {
+		return allStructuresList;
 	}
+	
+	
+	public void setSelectedStructure(String structure) {
+		selectedStructure = structure;
+	}
+	
+	
+	public void setSelectedColor(Color color) {
+		selectedColor = color;
+	}
+	
 	
 	public ChangeListener<String> getStructuresTextFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
+										String oldValue, String newValue) {
+				searchText = newValue.toLowerCase();
+				if (searchText.isEmpty())
+					searchResultsList.clear();
+				else
+					searchStructures(newValue.toLowerCase());
+			}
+		};
+	}
+	
+	
+	/*
+	 * Not sure what this text field this is for
+	public ChangeListener<String> getTextFieldListener() {
+		return new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable,
 											String oldValue, String newValue) {
 				searchText = newValue.toLowerCase();
+				System.out.println(searchText);
 				if (searchText.isEmpty())
 					structuresSearchResultsList.clear();
 				else
@@ -112,19 +79,20 @@ public class StructuresLayer {
 			}
 		};
 	}
+	*/
 
+	
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				//check search name
-
 				Search.addShapeRule(selectedStructure, selectedColor);
 			}
 		};
 	}
 	
-	public EventHandler<ActionEvent> getStructureRuleColorPickerListener() {
+	
+	public EventHandler<ActionEvent> getColorPickerListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -133,16 +101,25 @@ public class StructuresLayer {
 		};
 	}
 	
-	public void searchStructures() {
-		System.out.println("searching structures for matches");
-		structuresSearchResultsList.add("HELLO");
+	
+	// Only searches names for now
+	// TODO extend search to comments
+	public void searchStructures(String searched) {
+		searchResultsList.clear();
+		for (String name : allStructuresList) {
+			if (!searchResultsList.contains(name) && name.toLowerCase().startsWith(searched))
+				searchResultsList.add(name);
+		}
 	}
+	
 	
 	public String getSearchText() {
-		return this.searchText;
+		return searchText;
 	}
 	
+	
 	public ObservableList<String> getStructuresSearchResultsList() {
-		return this.structuresSearchResultsList;
+		return searchResultsList;
 	}
+	
 }

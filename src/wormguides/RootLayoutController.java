@@ -27,7 +27,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
@@ -38,6 +37,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -49,6 +49,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AboutPane;
+import wormguides.view.AppFont;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
@@ -117,7 +118,7 @@ public class RootLayoutController implements Initializable{
 	//structures tab
 	private StructuresLayer structuresLayer;
 	@FXML private TextField structuresSearchField;
-	@FXML private ListView<String> structuresSearchResultsListView;
+	@FXML private ListView<String> structuresSearchListView;
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
@@ -284,27 +285,14 @@ public class RootLayoutController implements Initializable{
 		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
 		
 		searchField.textProperty().addListener(window3D.getSearchFieldListener());
-		searchResultsListView.getSelectionModel().selectedItemProperty().addListener(
-				new ChangeListener<String>() {
+		searchResultsListView.getSelectionModel().selectedItemProperty()
+							.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
 					ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				setSelectedInfo(newValue);
 				selectedName.set(newValue);
-			}
-		});
-		
-		searchResultsListView.selectionModelProperty().addListener(
-				new ChangeListener<MultipleSelectionModel<String>>() {
-			@Override
-			public void changed(
-					ObservableValue<? extends MultipleSelectionModel<String>> observable,
-					MultipleSelectionModel<String> oldValue,
-					MultipleSelectionModel<String> newValue) {
-				String sulston = newValue.getSelectedItem();
-				System.out.println(sulston);
-				setSelectedInfo(sulston);
 			}
 		});
 		
@@ -319,46 +307,115 @@ public class RootLayoutController implements Initializable{
 		});
 		
 		
-		//---------------STRUCTURES LISTVIEW<STRING> for multiple selection-------------
-		allStructuresListView.getSelectionModel().selectedItemProperty().addListener(
-				new ChangeListener<String>() {
+		// Multicellular structure stuff
+		allStructuresListView.getSelectionModel().selectedItemProperty()
+										.addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(
-					ObservableValue<? extends String> observable,
-					String oldValue, String newValue) {
-				//add the description to the text to be set on the GUI
-				String structureComment = "";
-				for (int i = 0; i < elementsList.sceneElementsList.size(); i++) {
-					SceneElement currSE = elementsList.sceneElementsList.get(i);
-					if (currSE.getSceneName().equals(newValue)) {
-						structureComment = currSE.getComments();
-						break;
-					}
-				}
-				//add the comment to the newValue
-				if (!structureComment.equals("")) {
-					String descriptionGUI = newValue + "\n" + structureComment;
-					setSelectedInfo(descriptionGUI);
-					selectedName.set(descriptionGUI);
-				} else {
-					setSelectedInfo(newValue);
-					selectedName.set(newValue);
-				}
+			public void changed(ObservableValue<? extends String> observable,
+										String oldValue, String newValue) {
+				setStructureNameAndComment(newValue);
+				structuresLayer.setSelectedStructure(newValue);
+				structuresSearchListView.getSelectionModel().clearSelection();
 			}
 		});
-		//---------------STRUCTURES LISTVIEW<STRING>-----------------------------------
+		structuresSearchListView.getSelectionModel().selectedItemProperty()
+										.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+										String oldValue, String newValue) {
+				setStructureNameAndComment(newValue);
+				structuresLayer.setSelectedStructure(newValue);
+				allStructuresListView.getSelectionModel().clearSelection();
+			}
+		});
+		
+		// Modify font for structures lists
+		structuresSearchListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+			@Override
+			public ListCell<String> call(ListView<String> param) {
+				ListCell<String> cell = new ListCell<String>() {
+					@Override
+	                protected void updateItem(String name, boolean empty) {
+	                    super.updateItem(name, empty);
+	                    if (name != null)
+	                    	setGraphic(makeStructuresListCellGraphic(name));
+	                	else
+	                		setGraphic(null);
+	            	}
+				};
+				cell.setFont(AppFont.getFont());
+				cell.setStyle("-fx-focus-color: -fx-outer-border; "+
+						"-fx-faint-focus-color: transparent;");
+				return cell;
+			}
+		});
+		allStructuresListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+			@Override
+			public ListCell<String> call(ListView<String> param) {
+				ListCell<String> cell = new ListCell<String>() {
+					@Override
+	                protected void updateItem(String name, boolean empty) {
+	                    super.updateItem(name, empty);
+	                    if (name != null)
+	                    	setGraphic(makeStructuresListCellGraphic(name));
+	                	else
+	                		setGraphic(null);
+	            	}
+				};
+				return cell;
+			}
+		});
+		
+		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
+		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
+		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
+		
 		
 		// slider has to listen to 3D window's opacity value
 		// 3d window's opacity value has to listen to opacity slider's value
 		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
 		window3D.addListenerToOpacitySlider(opacitySlider);
-		// set to 50% transparency as default
 		opacitySlider.setValue(50);
 		
 		// uniform nuclei size
-		uniformSizeCheckBox.selectedProperty().addListener(
-					window3D.getUniformSizeCheckBoxListener());
+		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
 	}
+	
+	
+	// Creates the graphic for a ListCell in structures ListView's
+	private HBox makeStructuresListCellGraphic(String name) {
+		HBox hbox = new HBox();
+    	Label label = new Label(name);
+    	label.setFont(AppFont.getFont());
+    	label.setPrefHeight(22);
+    	hbox.getChildren().add(label);
+    	return hbox;
+	}
+	
+	
+	// Adds multicellular strucuture name and comment in description panel
+	private void setStructureNameAndComment(String name) {
+		//add the description to the text to be set on the GUI
+		String structureComment = "";
+		for (int i = 0; i < elementsList.sceneElementsList.size(); i++) {
+			SceneElement element = elementsList.sceneElementsList.get(i);
+			if (element.getSceneName().equals(name)) {
+				structureComment = element.getComments();
+				break;
+			}
+		}
+		//add the comment to the newValue
+		if (!structureComment.equals("")) {
+			String description = name + "\n" + structureComment;
+			setSelectedInfo(description);
+			selectedName.set(description);
+		} else {
+			setSelectedInfo(name);
+			selectedName.set(name);
+		}
+	}
+	
+	
 	
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
@@ -569,8 +626,6 @@ public class RootLayoutController implements Initializable{
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
-		assert (structuresSearchResultsListView != null);
-		assert (allStructuresListView != null);
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
 		assert (genRadioBtn != null);
@@ -594,17 +649,14 @@ public class RootLayoutController implements Initializable{
 		
 		assert (addStructureRuleBtn != null);
 		assert (structureRuleColorPicker != null);
+		assert (structuresSearchListView != null);
+		assert (allStructuresListView != null);
 	}
 	
 	private void initStructuresLayer() {
-		structuresLayer = new StructuresLayer(elementsList, structuresSearchResultsListView,
-				allStructuresListView, search, addStructureRuleBtn);
-		structuresLayer.setStructuresLayer();
-		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresSearchFieldListener());
-		searchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
-		structuresSearchResultsListView.setItems(structuresLayer.getStructuresSearchResultsList());
-		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
-		structureRuleColorPicker.setOnAction(structuresLayer.getStructureRuleColorPickerListener());
+		structuresLayer = new StructuresLayer(elementsList);
+		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
+		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 	}
 
 	
@@ -637,12 +689,8 @@ public class RootLayoutController implements Initializable{
 		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
-//		ObservableList<ShapeRule> shapeTempList = (ObservableList<ShapeRule>)((ObservableList<? extends Rule>)shapeLayers.getRulesList());
-//		search.setShapeRulesList(shapeTempList);
-//		window3D.setShapeRulesList(shapeTempList);
 		elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
-		//addShapeRulesForSceneElements(elementsList);
 		search.setSceneElementsList(elementsList);
 		
 		//set up the structure layer

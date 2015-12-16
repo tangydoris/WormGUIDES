@@ -279,7 +279,7 @@
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="41.0" prefWidth="247.0" HBox.hgrow="ALWAYS" />
+                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" prefWidth="247.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
@@ -380,7 +380,7 @@
                                     <Region layoutX="25.0" layoutY="593.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <AnchorPane maxHeight="210.0" minHeight="210.0" prefHeight="210.0">
                                        <children>
-                                          <ListView fx:id="structuresSearchResultsListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                     <Region prefHeight="15.0" />
@@ -403,7 +403,7 @@
                                     <Region layoutX="25.0" layoutY="678.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <HBox>
                                        <children>
-                                          <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="42.0" prefWidth="256.0" HBox.hgrow="ALWAYS" />
+                                          <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="60.0" prefWidth="256.0" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />

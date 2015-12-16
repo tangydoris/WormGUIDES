@@ -175,16 +175,6 @@ public class Window3DSubScene{
 					selectedIndex.set(selected);
 			}
 		});
-		
-		
-		selectedName.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-						String oldValue, String newValue) {
-				//unused but required for initialization
-				//bypassed use of index like above by keeping parallel scene element reference array
-			}
-		});
 
 		inSearch = false;
 
@@ -277,7 +267,6 @@ public class Window3DSubScene{
 			sceneElementsList.buildListFromConfig();
 			currentSceneElementMeshes = new ArrayList<MeshView>();
 			currentSceneElements = new ArrayList<SceneElement>();
-			// End scene element initialization
 		}
 	}
 	
@@ -286,26 +275,32 @@ public class Window3DSubScene{
 		return time;
 	}
 
+	
 	public DoubleProperty getZoomProperty() {
 		return zoom;
 	}
 
+	
 	public IntegerProperty getSelectedIndex() {
 		return selectedIndex;
 	}
 
+	
 	public StringProperty getSelectedName() {
 		return selectedName;
 	}
 
+	
 	public IntegerProperty getTotalNucleiProperty() {
 		return totalNuclei;
 	}
 
+	
 	public BooleanProperty getPlayingMovieProperty() {
 		return playingMovie;
 	}
 
+	
 	private SubScene createSubScene(Double width, Double height) {
 		subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
 
@@ -389,12 +384,14 @@ public class Window3DSubScene{
 
 		return subscene;
 	}
+	
 
 	private void rotateAllCells(double x, double y) {
 		rotateX.setAngle(rotateX.getAngle()+y);
 		rotateY.setAngle(rotateY.getAngle()-x);
 	}
 
+	
 	private int getIndexByName(String name) {
 		for (int i = 0; i < cellNames.length; i++) {
 			if (cellNames[i].equals(name))
@@ -402,6 +399,7 @@ public class Window3DSubScene{
 		}
 		return -1;
 	}
+	
 
 	private int getPickedSphereIndex(Sphere picked) {
 		for (int i = 0; i < cellNames.length; i++) {
@@ -411,6 +409,7 @@ public class Window3DSubScene{
 		}
 		return -1;
 	}
+	
 
 	// Builds subscene for a given timepoint
 	private void buildScene(int time) {
@@ -506,6 +505,7 @@ public class Window3DSubScene{
 		renderService.restart();
 	}
 
+	
 	private void updateLocalSearchResults() {
 		if (searchResultsList==null)
 			return;
@@ -522,11 +522,13 @@ public class Window3DSubScene{
 		buildScene(time.get());
 	}
 
+	
 	private void refreshScene() {
 		root.getChildren().clear();
 		root.getChildren().add(cameraXform);
 	}
 
+	
 	private void addEntitiesToScene() {
 		ArrayList<Sphere> renderFirstSpheres = new ArrayList<Sphere>();
  		ArrayList<Sphere> renderSecondSpheres = new ArrayList<Sphere>();
@@ -658,6 +660,7 @@ public class Window3DSubScene{
 		*/
 	}
 	
+	
 	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
 		// for sphere rendering
 		for (int i = 0; i < cellNames.length; i ++) {
@@ -718,6 +721,7 @@ public class Window3DSubScene{
 		sphere.getTransforms().add(t);
 	}
 
+	
 	private void buildCamera() {
 		this.camera = new PerspectiveCamera(true);
 		this.cameraXform = new Xform();
@@ -738,6 +742,7 @@ public class Window3DSubScene{
         subscene.setCamera(camera);
 	}
 
+	
 	private void setNewOrigin() {
 		// Find average X Y positions of initial timepoint
 		Integer[][] positions = data.getPositions(START_TIME);
@@ -758,11 +763,13 @@ public class Window3DSubScene{
 		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
 		System.out.println("origin xyz: "+newOriginX+" "+newOriginY+" "+newOriginZ);
 	}
+	
 
 	public void setSearchResultsList(ObservableList<String> list) {
 		searchResultsList = list;
 	}
 
+	
 	public void setResultsUpdateService(Service<Void> service) {
 		searchResultsUpdateService = service;
 		searchResultsUpdateService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -773,6 +780,7 @@ public class Window3DSubScene{
 		});
 	}
 
+	
 	public void setGeneResultsUpdated(BooleanProperty updated) {
 		geneResultsUpdated = updated;
 		geneResultsUpdated.addListener(new ChangeListener<Boolean>() {
@@ -784,6 +792,7 @@ public class Window3DSubScene{
 		});
 	}
 
+	
 	public void consultSearchResultsList() {
 		searchedCells = new boolean[cellNames.length];
 		searchedMeshes = new boolean[meshNames.length];
@@ -805,16 +814,19 @@ public class Window3DSubScene{
 		}
 	}
 
+	
 	public void printCellNames() {
 		for (int i = 0; i < cellNames.length; i++)
 			System.out.println(cellNames[i]+CS+cells[i]);
 	}
+	
 	
 	public void printMeshNames() {
 		for (int i = 0; i < meshNames.length; i++)
 			System.out.println(meshNames[i]+CS+meshes[i]);
 	}
 
+	
 	// sets everything associated with color rules
 	public void setColorRulesList(ObservableList<Rule> list) {
 		if (list == null)
@@ -874,6 +886,7 @@ public class Window3DSubScene{
 		});
 	}
 
+	
 	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
 		for (Rule rule : rulesList) {
@@ -884,6 +897,7 @@ public class Window3DSubScene{
 		return list;
 	}
 	
+	
 	public ArrayList<ShapeRule> getShapeRulesList() {
 		ArrayList<ShapeRule> list = new ArrayList<ShapeRule>();
 		for (ShapeRule rule : shapeRulesList)
@@ -891,32 +905,39 @@ public class Window3DSubScene{
 		return list;
 	}
 
+	
 	public ObservableList<Rule> getObservableColorRulesList() {
 		return rulesList;
 	}
+	
 	
 	public ObservableList<ShapeRule> getObservableShapeRulesList() {
 		return shapeRulesList;
 	}
 
+	
 	public void setColorRulesList(ArrayList<ColorRule> list) {
 		rulesList.clear();
 		rulesList.setAll(list);
 	}
+	
 	
 	public void setShapeRulesList(ArrayList<ShapeRule> list) {
 		shapeRulesList.clear();
 		shapeRulesList.setAll(list);
 	}
 
+	
 	public int getTime() {
 		return time.get();
 	}
 
+	
 	public void setTime(int t) {
 		if (t > 0 && t < endTime)
 			time.set(t);
 	}
+	
 	
 	public void setRotations(double rx, double ry, double rz) {
 		rx = Math.toDegrees(rx);
@@ -927,6 +948,7 @@ public class Window3DSubScene{
 		rotateY.setAngle(ry);
 		rotateZ.setAngle(rz);
 	}
+	
 
 	public double getRotationX() {
 		if (cells[0]!=null) {
@@ -938,6 +960,7 @@ public class Window3DSubScene{
 			return 0;
 	}
 
+	
 	public double getRotationY() {
 		if (cells[0]!=null) {
 			Transform transform = cells[0].getLocalToSceneTransform();
@@ -947,6 +970,7 @@ public class Window3DSubScene{
 		else
 			return 0;
 	}
+	
 	
 	public double getRotationZ() {
 		if (cells[0]!=null) {
@@ -959,9 +983,11 @@ public class Window3DSubScene{
 			return 0;
 	}
 
+	
 	public double getTranslationX() {
 		return cameraXform.t.getTx()-newOriginX;
 	}
+	
 	
 	public void setTranslationX(double tx) {
 		double newTx = tx+newOriginX;
@@ -969,9 +995,11 @@ public class Window3DSubScene{
 			cameraXform.t.setX(newTx);
 	}
 	
+	
 	public double getTranslationY() {
 		return cameraXform.t.getTy()-newOriginY;
 	}
+	
 	
 	public void setTranslationY(double ty) {
 		double newTy = ty+newOriginY;
@@ -979,12 +1007,14 @@ public class Window3DSubScene{
 			cameraXform.t.setY(newTy);
 	}
 
+	
 	public double getScale() {
 		double scale = zoom.get()-0.5;
 		scale = 1-(scale/6.5);
 		return scale;
 	}
 
+	
 	public void setScale(double scale) {
 		if (scale > 1)
 			scale = 1;
@@ -993,21 +1023,26 @@ public class Window3DSubScene{
 		zoom.set((scale+0.5));
 	}
 
+	
 	public double getOthersVisibility() {
 		return othersOpacity.get();
 	}
+	
 
 	public void setOthersVisibility(double dim) {
 		othersOpacity.set(dim);
 	}
+	
 
 	public SubScene getSubScene() {
 		return subscene;
 	}
 
+	
 	public Group getRoot() {
 		return root;
 	}
+	
 
 	public ChangeListener<Number> getOthersOpacityListener() {
 		return new ChangeListener<Number>() {
@@ -1037,6 +1072,7 @@ public class Window3DSubScene{
 		};
 	}
 
+	
 	public void addListenerToOpacitySlider(Slider slider) {
 		othersOpacity.addListener(new ChangeListener<Number>() {
 			@Override
@@ -1049,6 +1085,7 @@ public class Window3DSubScene{
 		});
 	}
 
+	
 	public ChangeListener<String> getSearchFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
@@ -1063,14 +1100,17 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
 
 	public int getEndTime() {
 		return endTime;
 	}
 
+	
 	public int getStartTime() {
 		return START_TIME;
 	}
+	
 
 	public EventHandler<ActionEvent> getZoomInButtonListener() {
 		return new EventHandler<ActionEvent>() {
@@ -1082,6 +1122,7 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
 
 	public EventHandler<ActionEvent> getZoomOutButtonListener() {
 		return new EventHandler<ActionEvent>() {
@@ -1093,6 +1134,7 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
 
 	public EventHandler<ActionEvent> getBackwardButtonListener() {
 		return new EventHandler<ActionEvent>() {
@@ -1106,6 +1148,7 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
 
 	public EventHandler<ActionEvent> getForwardButtonListener() {
 		return new EventHandler<ActionEvent>() {
@@ -1120,6 +1163,7 @@ public class Window3DSubScene{
 		};
 	}
 	
+	
 	public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -1130,6 +1174,7 @@ public class Window3DSubScene{
 			}
 		};
 	}
+	
 
 	private final class RenderService extends Service<Void> {
 		@Override
@@ -1150,6 +1195,7 @@ public class Window3DSubScene{
 			};
 		}
 	}
+	
 
 	private final class PlayService extends Service<Void> {
 		@Override
@@ -1181,6 +1227,7 @@ public class Window3DSubScene{
 			};
 		}
 	}
+	
 
 	private static final String CS = ", ";
 
@@ -1190,8 +1237,8 @@ public class Window3DSubScene{
 
 	private static final double CAMERA_INITIAL_DISTANCE = -800;
 
-    private static final double CAMERA_NEAR_CLIP = 1, // 0.01,
-    							CAMERA_FAR_CLIP = 1000; // 10000;
+    private static final double CAMERA_NEAR_CLIP = 1,
+    							CAMERA_FAR_CLIP = 1000;
 
     private static final int START_TIME = 1;
 

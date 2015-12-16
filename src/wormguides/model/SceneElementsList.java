@@ -23,17 +23,15 @@ public class SceneElementsList {
 	
 	public ArrayList<SceneElement> sceneElementsList;
 	private JarFile jarFile;
-	
-	// TODO Maybe use this for optimization when reading jarfile from GeometryLoader
-	// may not need this at all
 	private ArrayList<JarEntry> objEntries;
 
+	
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
 	public SceneElementsList() {
 		sceneElementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
-		//buildListFromConfig();
 	}
+	
 	
 	public void buildListFromConfig() {
 		try {
@@ -60,6 +58,7 @@ public class SceneElementsList {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		}
 	}
+	
 	
 	private void processStreamString(InputStream stream) {
 		InputStreamReader streamReader = new InputStreamReader(stream);
@@ -119,6 +118,7 @@ public class SceneElementsList {
 		}
 	}
 	
+	
 	public String[] getSceneElementNamesAtTime(int time) {
 		time++;
 		ArrayList<String> names = new ArrayList<String>();
@@ -132,6 +132,7 @@ public class SceneElementsList {
 		return names.toArray(new String[names.size()]);
 	}
 
+	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		time++;
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
@@ -143,6 +144,7 @@ public class SceneElementsList {
 		}
 		return sceneElements;
 	}
+	
 	
 	private final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
 }

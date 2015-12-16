@@ -24,7 +24,6 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
-import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
 
@@ -133,6 +132,12 @@ public class Search {
 	}
 	
 	
+	// TODO
+	/*
+	 * Search class has to have lsit of names of multicellular structures
+	 */
+	
+	
 	public static void setActiveLineageNames(ArrayList<String> names) {
 		activeLineageNames = names;
 	}
@@ -232,11 +237,13 @@ public class Search {
 	
 	
 	public void addDefaultColorRules() {
-//		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
-//		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
-//		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
-//		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
-//														SearchOption.DESCENDANT);
+		/*
+		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
+		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
+														SearchOption.DESCENDANT);
+		*/
 		
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
@@ -247,14 +254,6 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
 
 	}
-	
-/* NOT USED	
-	public void addDefaultShapeRules() {
-		addShapeRule("AVG", Color.RED);
-		addShapeRule("DD", Color.BLUE);
-		addShapeRule("DA", Color.GREEN);
-	}
-*/
 	
 	public static void addShapeRule(String name, Color color) {
 		addShapeRule(name, color, SearchOption.CELLBODY);
@@ -272,8 +271,6 @@ public class Search {
 			optionsArray.add(option);
 		
 		ShapeRule rule = new ShapeRule(name, color, optionsArray);
-		
-		//let's add this to a general rules list
 		rulesList.add(rule);
 	}
 	
@@ -287,9 +284,11 @@ public class Search {
 		rulesList.clear();
 	}
 	
+	
 	private void addColorRule(String searched, Color color, SearchOption...options) {
 		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
+	
 	
 	public static void addColorRule(SearchType type, String searched, Color color, SearchOption...options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
