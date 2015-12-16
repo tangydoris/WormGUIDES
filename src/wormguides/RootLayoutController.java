@@ -311,12 +311,25 @@ public class RootLayoutController implements Initializable{
 		
 		
 		// Multicellular structure stuff
+		/*
 		allStructuresListView.getSelectionModel().selectedItemProperty()
 										.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 										String oldValue, String newValue) {
 				setStructureNameAndComment(newValue);
+				//System.out.println(allStructuresListView.getSelectionModel().getSelectedIndex());
+				structuresLayer.setSelectedStructure(newValue);
+			}
+		});
+		*/
+		// TODO
+		allStructuresListView.getFocusModel().focusedItemProperty()
+								.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+										String oldValue, String newValue) {
+				System.out.println(allStructuresListView.getFocusModel().getFocusedItem());
 				structuresLayer.setSelectedStructure(newValue);
 			}
 		});

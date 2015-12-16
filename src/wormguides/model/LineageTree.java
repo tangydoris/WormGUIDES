@@ -32,6 +32,9 @@ public class LineageTree {
 								"p3", "d", "p4", "z2", "z3"};
 		treeBaseNames = new ArrayList<String>(Arrays.asList(baseNames));
 		
+		// zero-th root layer
+		nameNodeHash.put("p0", root);
+		
 		// first layer
 		ab = makeTreeItem("AB");
 		TreeItem<String> p1 = makeTreeItem("P1");
@@ -109,8 +112,7 @@ public class LineageTree {
 		}
 	}
 	
-	// returns prent node of cell to be added (specified
-	// by newName)
+	// returns prent node of cell to be added (specified by newName)
 	private TreeItem<String> addCellHelper(String newName, TreeItem<String> node) {
 		String currName = node.getValue().toLowerCase();
 		newName = newName.toLowerCase();
@@ -138,21 +140,27 @@ public class LineageTree {
 		desc = desc.toLowerCase();
 		ances = ances.toLowerCase();
 		
+		if (!nameNodeHash.containsKey(desc) || !nameNodeHash.containsKey(ances))
+			return false;
+		
+		// root is not a descendant
 		if (desc.equals("p0"))
 			return false;
 		
+		// root is always an ancestor
 		if (ances.equals("p0"))
 			return true;
 		
+		// for the p cells, test number after the 'p'
 		if (desc.startsWith("p") && ances.startsWith("p")) {
-			int comp = desc.compareTo(ances);
-			if (comp>0)
+			if (desc.compareTo(ances)>0)
 				return true;
 			else
 				return false;
 		}
 		
-		if (desc.length()>ances.length() && desc.startsWith(ances)) {
+		// try to decipher lineage from names
+		if (desc.startsWith(ances) && desc.length()>ances.length()) {
 			if (!desc.equals("e")) {
 				return true;
 			}
@@ -211,7 +219,7 @@ public class LineageTree {
 	public static String getCaseSensitiveName(String name) {
 		name = name.toLowerCase();
 		if (nameNodeHash.get(name)==null)
-			return "'"+name+"' systematic";
+			return "'"+name+"' Systematic";
 		
 		return nameNodeHash.get(name).getValue();
 	}

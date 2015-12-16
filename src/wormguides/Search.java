@@ -131,9 +131,9 @@ public class Search {
 	}
 	
 	
-	// TODO
 	/*
-	 * Search class has to have lsit of names of multicellular structures
+	 * TODO
+	 * Search class has to have list of names of multicellular structures
 	 */
 	
 	
@@ -416,14 +416,26 @@ public class Search {
 	// generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
 		ArrayList<String> descendants = new ArrayList<String>();
+		
 		if (cells==null)
 			return descendants;
+		
+		// Special cases for 'ab' and 'p0' because the input list of cells would be empty
+		String searched = searchedText.toLowerCase();
+		if (searched.equals("ab") || searched.equals("p0")) {
+			for (String name : activeLineageNames) {
+				if (!descendants.contains(name) && LineageTree.isDescendant(name, searched))
+					descendants.add(name);
+			}
+		}
+		
 		for (String cell : cells) {
 			for (String name : activeLineageNames) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, cell))
 					descendants.add(name);
 			}
 		}
+		
 		return descendants;
 	}
 	
@@ -431,14 +443,17 @@ public class Search {
 	// generates a list of ancestors of all cells in input
 	private static ArrayList<String> getAncestorsList(ArrayList<String> cells) {
 		ArrayList<String> ancestors = new ArrayList<String>();
+		
 		if (cells==null)
 			return ancestors;
+		
 		for (String cell : cells) {
 			for (String name : activeLineageNames) {
 				if (!ancestors.contains(name) && LineageTree.isAncestor(name, cell))
 					ancestors.add(name);
 			}
 		}
+		
 		return ancestors;
 	}
 	
