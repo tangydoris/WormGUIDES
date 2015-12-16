@@ -19,6 +19,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 	
 	private Material highlightMaterial = makeMaterial(Color.GOLD);
 	private Material translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
+	private Material defaultMaterial = makeMaterial(Color.WHITE);
 	
 	public ColorHash() {
 		super();
@@ -62,6 +63,7 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 				for (int k = 0; k < wImage.getWidth(); k++) {
 					 if (j < (i+1)*segmentLength)
 						 color = copy[i];
+					 
 					 writer.setColor(k, j, color);
 				}
 			}
@@ -73,14 +75,14 @@ public class ColorHash extends HashMap<TreeSet<Color>, Material> {
 		return material;
 	}
 	
-	public Material getMaterial(TreeSet<Color> set) {
-		if (get(set)==null) {
-			
-			put(set, makeMaterial(set));
-		}
+	public Material getMaterial(TreeSet<Color> colorSet) {
+		if (colorSet==null)
+			colorSet = new TreeSet<Color>();
 		
-		//System.out.println("color hash size: "+size());
-		return get(set);
+		if (get(colorSet)==null)
+			put(colorSet, makeMaterial(colorSet));
+		
+		return get(colorSet);
 	}
 	
 	public Material getHighlightMaterial() {

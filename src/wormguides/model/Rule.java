@@ -307,20 +307,22 @@ public abstract class Rule {
 	}
 	
 	
-	// this tostring takes up a lot of horizontal space (only used in tooltip)
+	// Returns full string description of the Rule
 	public String toStringFull() {
-		String out = text+" ";
+		StringBuilder sb = new StringBuilder(text);
+		sb.append(" ");
 		
-		for (SearchOption option : options)
-			out += option.getDescription() + ", ";
-		
-		try {
-			out = out.substring(0, out.lastIndexOf(","));
-		} catch (StringIndexOutOfBoundsException e) {
-			// do nothing, leave string as is
+		if (!options.isEmpty()) {
+			sb.append("(");
+			for (int i=0; i<options.size(); i++) {
+				sb.append(options.get(i).toString());
+				if (i<options.size()-1)
+					sb.append(", ");
+			}
+			sb.append(")");
 		}
 		
-		return out;
+		return sb.toString();
 	}
 	
 	

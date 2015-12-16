@@ -247,10 +247,8 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1", 0.60), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3", 0.6), SearchOption.CELL);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
 	}
 	
 	
@@ -321,25 +319,28 @@ public class Search {
 							break;
 							
 			case FUNCTIONAL:
-							label = "'"+searched+"' functional";
+							label = "'"+searched+"' Functional Name";
 							break;
 							
 			case DESCRIPTION:
-							label = "'"+searched+"' description";
+							label = "'"+searched+"' \"PartsList\" Description";
 							break;
 							
 			case GENE:		
 							geneSearchQueue.add(searched);
-							label = "'"+searched+"' gene";
+							label = "'"+searched+"' Gene";
 							break;
 							
 		case CONNECTOME:
+							label = "'"+searched+"' Connectome";
 							break;
 							
 		case MULTICELL:
+							label = "'"+searched+"' Multicellular Structure";
 							break;
 							
 		default:
+							label = searched;
 							break;
 		}
 		

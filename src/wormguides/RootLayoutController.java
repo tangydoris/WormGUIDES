@@ -36,6 +36,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -110,11 +111,10 @@ public class RootLayoutController implements Initializable{
 	// layers tab
 	private Layers layers;
 	private Layers shapeLayers;
-	@FXML private ListView<Rule> colorRulesListView;
+	@FXML private ListView<Rule> rulesListView;
 	@FXML private Button addSearchBtn;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
-	@FXML private ListView<Rule> shapeRulesListView;
 	
 	//structures tab
 	private StructuresLayer structuresLayer;
@@ -320,14 +320,11 @@ public class RootLayoutController implements Initializable{
 				structuresLayer.setSelectedStructure(newValue);
 			}
 		});
-		structuresSearchListView.getSelectionModel().selectedItemProperty()
-										.addListener(new ChangeListener<String>() {
+		structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-										String oldValue, String newValue) {
-				setStructureNameAndComment(newValue);
-				structuresLayer.setSelectedStructure(newValue);
-			}
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
 		});
 		
 		// Modify font for structures lists
@@ -561,8 +558,8 @@ public class RootLayoutController implements Initializable{
 		LayersListViewCallback callback = new LayersListViewCallback();
 		
 		// color rules layers
-		layers = new Layers(colorRulesListView);
-		colorRulesListView.setCellFactory(callback);
+		layers = new Layers(rulesListView);
+		rulesListView.setCellFactory(callback);
 	}
 	
 	
@@ -644,7 +641,7 @@ public class RootLayoutController implements Initializable{
 		assert (colorPickerPane != null);
 		assert (colorPicker != null);
 		
-		assert (colorRulesListView != null);
+		assert (rulesListView != null);
 		assert (addSearchBtn != null);
 		
 		assert (cellName != null);

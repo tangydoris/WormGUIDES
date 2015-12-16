@@ -302,7 +302,7 @@ public class Window3DSubScene{
 
 	
 	private SubScene createSubScene(Double width, Double height) {
-		subscene = new SubScene(root, width, height, true, SceneAntialiasing.DISABLED);
+		subscene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
 
 		subscene.setFill(Color.web(FILL_COLOR_HEX));
 		subscene.setCursor(Cursor.HAND);
@@ -530,6 +530,13 @@ public class Window3DSubScene{
 
 	
 	private void addEntitiesToScene() {
+		
+		/*
+		 * TODO:
+		 * Fix rendering order of both spheres and meshes
+		 * Bug with z buffering, need to sort by opacity
+		 */
+		
 		ArrayList<Sphere> renderFirstSpheres = new ArrayList<Sphere>();
  		ArrayList<Sphere> renderSecondSpheres = new ArrayList<Sphere>();
  		

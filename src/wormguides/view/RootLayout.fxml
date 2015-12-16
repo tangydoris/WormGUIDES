@@ -438,7 +438,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <ListView fx:id="colorRulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="rulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
                                        <font>
