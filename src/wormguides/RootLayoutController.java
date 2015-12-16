@@ -344,9 +344,6 @@ public class RootLayoutController implements Initializable{
 	                		setGraphic(null);
 	            	}
 				};
-				cell.setFont(AppFont.getFont());
-				cell.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;");
 				return cell;
 			}
 		});
@@ -379,7 +376,9 @@ public class RootLayoutController implements Initializable{
 		opacitySlider.setValue(50);
 		
 		// uniform nuclei size
+		// default to uniform small nuclei
 		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
+		uniformSizeCheckBox.setSelected(true);
 	}
 	
 	

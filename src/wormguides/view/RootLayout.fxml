@@ -125,7 +125,7 @@
                                                       <HBox prefWidth="210.0" HBox.hgrow="NEVER">
                                                          <children>
                                                             <Region maxWidth="20.0" minWidth="20.0" prefHeight="22.0" prefWidth="20.0" />
-                                                            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="'PartsList&quot; Description">
+                                                            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="&quot;PartsList&quot; Description">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>

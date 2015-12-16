@@ -41,6 +41,7 @@ public class RuleEditPane extends AnchorPane{
 		AnchorPane.setBottomAnchor(vbox, 10d);
 		
 		Label optionsLabel = new Label("Search Options for "+packet.getName());
+		optionsLabel.setWrapText(true);
 		
 		Region r1 = new Region();
 		r1.setPrefHeight(10);
@@ -104,8 +105,6 @@ public class RuleEditPane extends AnchorPane{
 		Region r2 = new Region();
 		r2.setPrefHeight(10);
 		
-		Label colorLabel = new Label("Color");
-		
 		AnchorPane pickerPane = new AnchorPane();
 		VBox.setVgrow(pickerPane, Priority.ALWAYS);
 		ColorPicker picker = new ColorPicker(infoPacket.getColor());
@@ -138,45 +137,6 @@ public class RuleEditPane extends AnchorPane{
 		Region r5 = new Region();
 		r5.setPrefHeight(5);
 		
-		/*
-		if (packet.isAlphaEnabled()) {
-			// Disable all ticks and labels because we know that
-			// the shape rules only apply to cell bodies anyway
-			cellLabel.setDisable(true);
-			cellTick.setDisable(true);
-			cellBodyLabel.setDisable(true);
-			cellBodyTick.setDisable(true);
-			ancLabel.setDisable(true);
-			ancTick.setDisable(true);
-			
-			Label alphaLabel = new Label("Transparency");
-			Slider alphaSlider = new Slider();
-			alphaSlider.setMax(100);
-			alphaSlider.setMin(0);
-			alphaSlider.setValue(100);
-			alphaSlider.valueProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> observable, 
-									Number oldValue, Number newValue) {
-					packet.setAlpha(Math.round(newValue.doubleValue())/100d);
-				}
-			});
-			HBox.setHgrow(alphaSlider, Priority.ALWAYS);
-			
-			Region r3 = new Region();
-			r3.setPrefHeight(10);
-			
-			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
-					cellRow, cellBodyRow, ancRow, desRow, r2, alphaLabel, alphaSlider, r3, 
-					colorLabel, pickerPane, r4, buttonBox, r5);
-		}
-		*/
-		//else {
-//			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
-//					cellRow, cellBodyRow, ancRow, desRow, r2, 
-//					colorLabel, pickerPane, r4, buttonBox, r5);
-		//}
-		
 		if (packet.isShapeRule()) {
 			cellLabel.setDisable(true);
 			cellTick.setDisable(true);
@@ -187,9 +147,9 @@ public class RuleEditPane extends AnchorPane{
 			ancTick.setDisable(true);
 		}
 
-			vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
-					cellRow, cellBodyRow, ancRow, desRow, r2, 
-					colorLabel, pickerPane, r4, buttonBox, r5);	
+		vbox.getChildren().addAll(optionsLabel, r1, choicesLabel,
+				cellRow, cellBodyRow, ancRow, desRow, r2, 
+				pickerPane, r4, buttonBox, r5);	
 			
 		
 		for (Node node : vbox.getChildren()) {

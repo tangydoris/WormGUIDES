@@ -249,7 +249,7 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3", 0.6), SearchOption.CELL);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
 	}
 	

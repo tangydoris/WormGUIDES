@@ -1238,7 +1238,7 @@ public class Window3DSubScene{
 	private static final double CAMERA_INITIAL_DISTANCE = -800;
 
     private static final double CAMERA_NEAR_CLIP = 1,
-    							CAMERA_FAR_CLIP = 1000;
+    							CAMERA_FAR_CLIP = 2000;
 
     private static final int START_TIME = 1;
 
