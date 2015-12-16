@@ -233,7 +233,7 @@
                                                    </children>
                                                 </HBox>
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <ListView fx:id="searchResultsListView" fixedCellSize="22.0" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="210.0" />
+                                                <ListView fx:id="searchResultsListView" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="210.0" />
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -368,7 +368,10 @@
                                              </font>
                                           </Label>
                                           <Region prefHeight="40.0" prefWidth="10.0" />
-                                          <TextField fx:id="structuresSearchField" prefHeight="32.0" prefWidth="149.0" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="structuresSearchField" prefHeight="32.0" prefWidth="149.0" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></TextField>
                                        </children>
                                     </HBox>
                                     <HBox prefHeight="22.0" prefWidth="247.0">

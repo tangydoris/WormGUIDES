@@ -12,7 +12,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 import wormguides.model.Rule;
-import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
 
@@ -33,16 +32,8 @@ public class StructuresLayer {
 		allStructuresList = FXCollections.observableArrayList();
 		searchResultsList = FXCollections.observableArrayList();
 		
-		nameToCommentsMap = new HashMap<String, String>();
-		
-		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
-			SceneElement current = sceneElementsList.sceneElementsList.get(i);
-			//check if the scene element is a multicellular structure
-			if (current.getAllCellNames().size() > 1) {
-				allStructuresList.add(current.getSceneName());
-				nameToCommentsMap.put(current.getSceneName(), current.getComments());
-			}
-		}
+		allStructuresList.addAll(sceneElementsList.getAllMulticellNames());
+		nameToCommentsMap = sceneElementsList.getMulticellNamesToCommentsMap();
 	}
 	
 	
@@ -147,6 +138,17 @@ public class StructuresLayer {
 					searchResultsList.add(name);
 			}
 		}
+	}
+	
+	
+	public ChangeListener<String> getSelectionListener() {
+		return new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+										String oldValue, String newValue) {
+				setSelectedStructure(newValue);
+			}
+		};
 	}
 	
 

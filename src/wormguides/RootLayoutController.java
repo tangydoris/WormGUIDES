@@ -39,7 +39,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -51,7 +50,6 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AboutPane;
-import wormguides.view.AppFont;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
@@ -311,28 +309,10 @@ public class RootLayoutController implements Initializable{
 		
 		
 		// Multicellular structure stuff
-		/*
-		allStructuresListView.getSelectionModel().selectedItemProperty()
-										.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-										String oldValue, String newValue) {
-				setStructureNameAndComment(newValue);
-				//System.out.println(allStructuresListView.getSelectionModel().getSelectedIndex());
-				structuresLayer.setSelectedStructure(newValue);
-			}
-		});
-		*/
-		// TODO
+		// TODO: Add rules for all structures search results if one structure
+		// is not specifically selected in the list of ALL structures
 		allStructuresListView.getFocusModel().focusedItemProperty()
-								.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-										String oldValue, String newValue) {
-				System.out.println(allStructuresListView.getFocusModel().getFocusedItem());
-				structuresLayer.setSelectedStructure(newValue);
-			}
-		});
+								.addListener(structuresLayer.getSelectionListener());
 		structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event) {
@@ -340,39 +320,10 @@ public class RootLayoutController implements Initializable{
             }
 		});
 		
-		// Modify font for structures lists
-		structuresSearchListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-			@Override
-			public ListCell<String> call(ListView<String> param) {
-				ListCell<String> cell = new ListCell<String>() {
-					@Override
-	                protected void updateItem(String name, boolean empty) {
-	                    super.updateItem(name, empty);
-	                    if (name != null)
-	                    	setGraphic(makeStructuresListCellGraphic(name));
-	                	else
-	                		setGraphic(null);
-	            	}
-				};
-				return cell;
-			}
-		});
-		allStructuresListView.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-			@Override
-			public ListCell<String> call(ListView<String> param) {
-				ListCell<String> cell = new ListCell<String>() {
-					@Override
-	                protected void updateItem(String name, boolean empty) {
-	                    super.updateItem(name, empty);
-	                    if (name != null)
-	                    	setGraphic(makeStructuresListCellGraphic(name));
-	                	else
-	                		setGraphic(null);
-	            	}
-				};
-				return cell;
-			}
-		});
+		// Modify font for ListView's of String's
+		structuresSearchListView.setCellFactory(new StringCellCallback());
+		allStructuresListView.setCellFactory(new StringCellCallback());
+		searchResultsListView.setCellFactory(new StringCellCallback());
 		
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
@@ -389,17 +340,6 @@ public class RootLayoutController implements Initializable{
 		// default to uniform small nuclei
 		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
 		uniformSizeCheckBox.setSelected(true);
-	}
-	
-	
-	// Creates the graphic for a ListCell in structures ListView's
-	private HBox makeStructuresListCellGraphic(String name) {
-		HBox hbox = new HBox();
-    	Label label = new Label(name);
-    	label.setFont(AppFont.getFont());
-    	label.setPrefHeight(22);
-    	hbox.getChildren().add(label);
-    	return hbox;
 	}
 	
 	
@@ -708,7 +648,7 @@ public class RootLayoutController implements Initializable{
 		window3D.setColorRulesList(colorTempList);
 		elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
-		search.setSceneElementsList(elementsList);
+		Search.setSceneElementsList(elementsList);
 		
 		//set up the structure layer
 		initStructuresLayer();
@@ -729,47 +669,6 @@ public class RootLayoutController implements Initializable{
         sizeSubscene();
         sizeInfoPane();
 	}
-	
-	
-	// Use JavaFX application threads to manage selecting between structures lists
-	/*
-	private final class AllStructuresListDeselectService extends Service<Void> {
-		@Override
-		protected Task<Void> createTask() {
-			return new Task<Void>() {
-				@Override
-				protected Void call() throws Exception {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							allStructuresListView.getSelectionModel().clearSelection();
-							System.out.println("clear all structures selection");
-						}
-					});
-					return null;
-				}
-			};
-		}
-	}
-	private final class StructuresSearchListDeselectService extends Service<Void> {
-		@Override
-		protected Task<Void> createTask() {
-			return new Task<Void>() {
-				@Override
-				protected Void call() throws Exception {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							structuresSearchListView.getSelectionModel().clearSelection();
-							System.out.println("clear structures search selection");
-						}
-					});
-					return null;
-				}
-			};
-		}
-	}
-	*/
 	
 	
 	/*

@@ -58,7 +58,7 @@ public class Search {
 	private static LinkedList<String> geneSearchQueue;
 	
 	//used for adding shape rules
-	SceneElementsList sceneElementsList;
+	private static SceneElementsList sceneElementsList;
 		
 	static {
 		activeLineageNames = new ArrayList<String>();
@@ -404,6 +404,12 @@ public class Search {
 							return null;
 							
 			case MULTICELL:	
+							if (sceneElementsList != null) {
+								for (String name : sceneElementsList.getAllMulticellNames()) {
+									if (name.toLowerCase().startsWith(searched))
+										cells.add(name);
+								}
+							}
 							break;
 							
 			case CONNECTOME:
@@ -701,8 +707,9 @@ public class Search {
 		}
 	}
 	
-	public void setSceneElementsList(SceneElementsList sceneElementsList) {
-		this.sceneElementsList = sceneElementsList;
+	
+	public static void setSceneElementsList(SceneElementsList list) {
+		sceneElementsList = list;
 	}
 	
 	

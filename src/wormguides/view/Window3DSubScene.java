@@ -511,12 +511,15 @@ public class Window3DSubScene{
 			return;
 
 		localSearchResults.clear();
+		System.out.println("3d subscene local results:");
 
 		for (String name : searchResultsList) {
 			if (name.indexOf("(")!=-1)
 				localSearchResults.add(name.substring(0, name.indexOf(" ")));
-			else
+			else {
+				System.out.println(name);
 				localSearchResults.add(name);
+			}
 		}
 
 		buildScene(time.get());
@@ -578,6 +581,13 @@ public class Window3DSubScene{
 			for (int i=0; i<currentSceneElements.size(); i++) {
 				// in search mode
 				if (inSearch) {
+					
+					/*
+					 * TODO
+					 * Fix multicell structure highlighting in search mode
+					 * only works for commissure right and not left...
+					 */
+					
 	 				if (searchedMeshes[i]) {
 	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
 						renderFirst.add(currentSceneElementMeshes.get(i));
@@ -813,8 +823,10 @@ public class Window3DSubScene{
 		}
 		
 		// look for searched meshes
+		System.out.println("mesh names in current scene: ");
 		for (int i=0; i<meshNames.length; i++) {
-			if (localSearchResults.contains(meshNames[i])) 
+			System.out.println(meshNames[i]);
+			if (localSearchResults.contains(meshNames[i]))
 				searchedMeshes[i] = true;
 			else
 				searchedMeshes[i] = false;

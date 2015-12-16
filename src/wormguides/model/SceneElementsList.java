@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -22,6 +24,7 @@ import java.util.jar.JarFile;
 public class SceneElementsList {
 	
 	public ArrayList<SceneElement> sceneElementsList;
+	public HashMap<String, String> multicellNamesToCommentsMap;
 	private JarFile jarFile;
 	private ArrayList<JarEntry> objEntries;
 
@@ -30,6 +33,7 @@ public class SceneElementsList {
 	public SceneElementsList() {
 		sceneElementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
+		multicellNamesToCommentsMap = new HashMap<String, String>();
 	}
 	
 	
@@ -116,20 +120,41 @@ public class SceneElementsList {
 			System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
 			return;
 		}
+		
+		pickOutMulticellNames();
+	}
+	
+	
+	// Pick out all multicellular names and map them to their comments
+	private void pickOutMulticellNames() {
+		for (int i = 0; i < sceneElementsList.size(); i++) {
+			SceneElement current = sceneElementsList.get(i);
+			//check if the scene element is a multicellular structure
+			if (current.getAllCellNames().size() > 1) {
+				multicellNamesToCommentsMap.put(current.getSceneName(), current.getComments());
+			}
+		}
 	}
 	
 	
 	public String[] getSceneElementNamesAtTime(int time) {
 		time++;
-		ArrayList<String> names = new ArrayList<String>();
+		
+		// Add lineage names of all structures at time
+		ArrayList<String> list = new ArrayList<String>();
 		for (int i = 0; i < sceneElementsList.size(); i++) {
-			SceneElement curr = sceneElementsList.get(i);
-			if (curr.getStartTime() <= time && curr.getEndTime() >= time) {
-				for (String name : curr.getAllCellNames())
-					names.add(name);
+			SceneElement current = sceneElementsList.get(i);
+			if (current.getStartTime() <= time && current.getEndTime() >= time) {
+				if (current.getAllCellNames().size() > 1)
+					list.add(current.getSceneName());
+				for (String name : current.getAllCellNames())
+					list.add(name);
 			}
 		}
-		return names.toArray(new String[names.size()]);
+		
+		// Add scene names of multicellular structures too for search highlighting
+		
+		return list.toArray(new String[list.size()]);
 	}
 
 	
@@ -143,6 +168,16 @@ public class SceneElementsList {
 			}
 		}
 		return sceneElements;
+	}
+	
+	
+	public Set<String> getAllMulticellNames() {
+		return multicellNamesToCommentsMap.keySet();
+	}
+	
+	
+	public HashMap<String, String> getMulticellNamesToCommentsMap() {
+		return multicellNamesToCommentsMap;
 	}
 	
 	
