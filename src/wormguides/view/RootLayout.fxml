@@ -233,7 +233,7 @@
                                                    </children>
                                                 </HBox>
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <ListView fx:id="searchResultsListView" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="200.0" VBox.vgrow="ALWAYS" />
+                                                <ListView fx:id="searchResultsListView" fixedCellSize="22.0" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="210.0" />
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -279,7 +279,7 @@
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" prefWidth="247.0" HBox.hgrow="ALWAYS" />
+                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="60.0" prefWidth="247.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
@@ -378,19 +378,18 @@
                                        </children>
                                     </HBox>
                                     <Region layoutX="25.0" layoutY="593.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
-                                    <AnchorPane maxHeight="210.0" minHeight="210.0" prefHeight="210.0">
+                                    <AnchorPane maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                        <children>
                                           <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
-                                    <Region prefHeight="15.0" />
                                     <Region layoutX="25.0" layoutY="69.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <AnchorPane VBox.vgrow="ALWAYS">
+                                    <AnchorPane maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                        <children>
                                           <ListView fx:id="allStructuresListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
@@ -426,27 +425,27 @@
 			              <content>
 			                <AnchorPane>
                            <children>
-                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="15.0">
+                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
                                  <children>
                                     <CheckBox fx:id="uniformSizeCheckBox" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="22.0" text="Uniform Small Nuclei">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </CheckBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Layers:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <ListView fx:id="rulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Slider fx:id="opacitySlider" value="50.0" VBox.vgrow="ALWAYS" />
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                  </children>
                               </VBox>
                            </children>
