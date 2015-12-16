@@ -99,7 +99,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                            <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                            <RadioButton fx:id="sysRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -115,7 +115,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                            <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                            <RadioButton fx:id="funRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -131,7 +131,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                            <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                            <RadioButton fx:id="desRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -140,62 +140,62 @@
                                                    <children>
                                                       <HBox prefWidth="210.0">
                                                          <children>
-                                                            <Region prefHeight="26.0" prefWidth="20.0" />
+                                                            <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="20.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" prefWidth="95.0" text="Connectome">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
                                                             <Region prefHeight="26.0" prefWidth="74.0" />
-                                                            <RadioButton mnemonicParsing="false" />
+                                                            <RadioButton fx:id="conRadioBtn" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
                                                 </HBox>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0">
+                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0">
                                                          <children>
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label fx:id="descendantLabel1" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="88.0" text="Pre-Synaptic" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="preSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                            <CheckBox fx:id="preSynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
                                                 </HBox>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0">
+                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0">
                                                          <children>
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="146.0" text="Post-Synaptic" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="postSynapticTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                            <CheckBox fx:id="postSynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
                                                 </HBox>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0">
+                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0">
                                                          <children>
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="97.0" text="Gap Junction" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="gapJunctionTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                            <CheckBox fx:id="gapJunctionTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
                                                 </HBox>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0">
+                                                      <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0">
                                                          <children>
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Neuromuscular" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="neuromuscularTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
+                                                            <CheckBox fx:id="neuromuscularTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -211,7 +211,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <RadioButton contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="16.0" prefWidth="1.0" />
+                                                            <RadioButton fx:id="multiRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -227,7 +227,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" />
+                                                            <RadioButton fx:id="genRadioBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>

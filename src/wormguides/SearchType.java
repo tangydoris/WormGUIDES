@@ -5,7 +5,9 @@ public enum SearchType {
 	SYSTEMATIC ("lineage name"), 
 	FUNCTIONAL ("functional name"), 
 	DESCRIPTION ("'PartsList' description"),
-	GENE ("gene");
+	GENE ("gene"),
+	CONNECTOME ("connectome"),
+	MULTICELL ("multicellular");
 	
 	private String description;
 	

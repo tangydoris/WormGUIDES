@@ -59,6 +59,7 @@ public class URLGenerator {
 									break;
 				case GENE :			builder.append("-g");
 									break;
+				default:			break;
 			}
 			
 			// ancestry modifiers

@@ -43,7 +43,6 @@ public class Search {
 	private static boolean cellBodyTicked;
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
-	
 	private static ObservableList<Rule> rulesList;
 	private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
@@ -252,8 +251,8 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x80b3b3"), SearchOption.CELL);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe64d4d"), SearchOption.CELL);
-
 	}
+	
 	
 	public static void addShapeRule(String name, Color color) {
 		addShapeRule(name, color, SearchOption.CELLBODY);
@@ -265,7 +264,6 @@ public class Search {
 			return;
 		
 		name = name.trim();
-		
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 		for (SearchOption option : options)
 			optionsArray.add(option);
@@ -334,6 +332,15 @@ public class Search {
 							geneSearchQueue.add(searched);
 							label = "'"+searched+"' gene";
 							break;
+							
+		case CONNECTOME:
+							break;
+							
+		case MULTICELL:
+							break;
+							
+		default:
+							break;
 		}
 		
 		ColorRule rule = new ColorRule(label, color, options, type);
@@ -389,11 +396,17 @@ public class Search {
 								}
 							}
 							break;
-						
+						 
 			case GENE:		
 							showLoadingService.restart();
 							WormBaseQuery.doSearch(getSearchedText());
 							return null;
+							
+			case MULTICELL:	
+							break;
+							
+			case CONNECTOME:
+							break;
 		}
 		return cells;
 	}

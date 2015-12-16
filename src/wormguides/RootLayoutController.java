@@ -14,6 +14,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -92,7 +93,7 @@ public class RootLayoutController implements Initializable{
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
 	@FXML private ListView<String> searchResultsListView;
-	@FXML private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn;
+	@FXML private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
 	private ToggleGroup typeToggleGroup;
 	
 	@FXML private CheckBox cellTick, cellBodyTick, ancestorTick, descendantTick;
@@ -107,7 +108,7 @@ public class RootLayoutController implements Initializable{
 	private StringProperty selectedName;
 	
 	// layers tab
-	private Layers colorLayers;
+	private Layers layers;
 	private Layers shapeLayers;
 	@FXML private ListView<Rule> colorRulesListView;
 	@FXML private Button addSearchBtn;
@@ -122,6 +123,8 @@ public class RootLayoutController implements Initializable{
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
+	private Service<Void> structuresSearchListDeselect;
+	private Service<Void> allStructuresListDeselect;
 	
 	// cell information
 	@FXML private Text cellName;
@@ -315,7 +318,6 @@ public class RootLayoutController implements Initializable{
 										String oldValue, String newValue) {
 				setStructureNameAndComment(newValue);
 				structuresLayer.setSelectedStructure(newValue);
-				structuresSearchListView.getSelectionModel().clearSelection();
 			}
 		});
 		structuresSearchListView.getSelectionModel().selectedItemProperty()
@@ -325,7 +327,6 @@ public class RootLayoutController implements Initializable{
 										String oldValue, String newValue) {
 				setStructureNameAndComment(newValue);
 				structuresLayer.setSelectedStructure(newValue);
-				allStructuresListView.getSelectionModel().clearSelection();
 			}
 		});
 		
@@ -561,7 +562,7 @@ public class RootLayoutController implements Initializable{
 		LayersListViewCallback callback = new LayersListViewCallback();
 		
 		// color rules layers
-		colorLayers = new Layers(colorRulesListView);
+		layers = new Layers(colorRulesListView);
 		colorRulesListView.setCellFactory(callback);
 	}
 	
@@ -587,6 +588,10 @@ public class RootLayoutController implements Initializable{
 		desRadioBtn.setUserData(SearchType.DESCRIPTION);
 		genRadioBtn.setToggleGroup(typeToggleGroup);
 		genRadioBtn.setUserData(SearchType.GENE);
+		conRadioBtn.setToggleGroup(typeToggleGroup);
+		conRadioBtn.setUserData(SearchType.CONNECTOME);
+		multiRadioBtn.setToggleGroup(typeToggleGroup);
+		multiRadioBtn.setUserData(SearchType.MULTICELL);
 		
 		typeToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
@@ -629,6 +634,8 @@ public class RootLayoutController implements Initializable{
 		assert (sysRadioBtn != null);
 		assert (desRadioBtn != null);
 		assert (genRadioBtn != null);
+		assert (conRadioBtn != null);
+		assert (multiRadioBtn != null);
 		
 		assert (cellTick != null);
 		assert (cellBodyTick != null);
@@ -657,6 +664,7 @@ public class RootLayoutController implements Initializable{
 		structuresLayer = new StructuresLayer(elementsList);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
+		structuresLayer.setRulesList(layers.getRulesList());
 	}
 
 	
@@ -686,7 +694,7 @@ public class RootLayoutController implements Initializable{
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
 		// unchecked casts
-		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)colorLayers.getRulesList());
+		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)layers.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
 		elementsList = new SceneElementsList();
@@ -712,6 +720,48 @@ public class RootLayoutController implements Initializable{
         sizeSubscene();
         sizeInfoPane();
 	}
+	
+	
+	// Use JavaFX application threads to manage selecting between structures lists
+	/*
+	private final class AllStructuresListDeselectService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							allStructuresListView.getSelectionModel().clearSelection();
+							System.out.println("clear all structures selection");
+						}
+					});
+					return null;
+				}
+			};
+		}
+	}
+	private final class StructuresSearchListDeselectService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							structuresSearchListView.getSelectionModel().clearSelection();
+							System.out.println("clear structures search selection");
+						}
+					});
+					return null;
+				}
+			};
+		}
+	}
+	*/
+	
 	
 	/*
 	private void addShapeRulesForSceneElements(SceneElementsList sceneElementsList) {

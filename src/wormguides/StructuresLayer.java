@@ -1,5 +1,7 @@
 package wormguides;
 
+import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -8,13 +10,16 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
+import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
+import wormguides.model.ShapeRule;
 
 
 public class StructuresLayer {
 	private ObservableList<String> allStructuresList;
 	private ObservableList<String> searchResultsList;
+	private ObservableList<Rule> rulesList;
 	private static Color selectedColor;
 	private String selectedStructure;
 	private String searchText;
@@ -86,9 +91,24 @@ public class StructuresLayer {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Search.addShapeRule(selectedStructure, selectedColor);
+				addShapeRule(selectedStructure, selectedColor);
 			}
 		};
+	}
+	
+	
+	public void addShapeRule(String name, Color color) {
+		if (name==null || color==null)
+			return;
+		
+		// Check for validity of name
+		if (allStructuresList.contains(name)) {
+			name = name.trim();
+			ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
+			optionsArray.add(SearchOption.MULTICELLULAR);
+			ShapeRule rule = new ShapeRule(name, color, optionsArray);
+			rulesList.add(rule);
+		}
 	}
 	
 	
@@ -110,6 +130,15 @@ public class StructuresLayer {
 			if (!searchResultsList.contains(name) && name.toLowerCase().startsWith(searched))
 				searchResultsList.add(name);
 		}
+	}
+	
+
+	/*
+	 * Called by RootLayourController to set reference to global rules list
+	 */
+	public void setRulesList(ObservableList<Rule> list) {
+		if (list!=null)
+			rulesList = list;
 	}
 	
 	
