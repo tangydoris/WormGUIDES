@@ -1284,7 +1284,7 @@ public class Window3DSubScene{
 
 	private static final String FILL_COLOR_HEX = "#272727";
 
-	private static final long WAIT_TIME_MILLI = 550;
+	private static final long WAIT_TIME_MILLI = 200;
 
 	private static final double CAMERA_INITIAL_DISTANCE = -800;
 
