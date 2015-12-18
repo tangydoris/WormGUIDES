@@ -100,7 +100,7 @@ public class Window3DSubScene{
 	private ObservableList<Rule> rulesList;
 	private ObservableList<ShapeRule> shapeRulesList;
 
-	private Service<Void> searchResultsUpdateService;
+	//private Service<Void> searchResultsUpdateService;
 
 	// specific boolean listener for gene search results
 	private BooleanProperty geneResultsUpdated;
@@ -224,7 +224,7 @@ public class Window3DSubScene{
 
 		localSearchResults = new ArrayList<String>();
 
-		searchResultsUpdateService = null;
+		//searchResultsUpdateService = null;
 
 		geneResultsUpdated = new SimpleBooleanProperty();
 
@@ -777,9 +777,8 @@ public class Window3DSubScene{
 	}
 
 	
-	public void setResultsUpdateService(Service<Void> service) {
-		searchResultsUpdateService = service;
-		searchResultsUpdateService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+	public void setSearchResultsUpdateService(Service<Void> service) {
+		service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				updateLocalSearchResults();

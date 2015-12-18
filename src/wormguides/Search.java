@@ -144,36 +144,26 @@ public class Search {
 	
 	
 	private static void updateGeneResults() {
-		if (geneSearchService.getValue()==null)
-			return;
-		
 		ArrayList<String> results = geneSearchService.getValue();
 		ArrayList<String> cellsForListView = new ArrayList<String>();
 		
-		if (results.isEmpty())
-			searchResultsList.add("No results found from WormBase");
+		if (results==null || results.isEmpty())
+			return;
 		
 		else {
-			if (!ancestorTicked && !descendantTicked)
-				cellsForListView.addAll(results);
-			else {
-				/*
-				if (cellNucleusTicked)
-					cellsForListView.addAll(results);
-				*/
-				if (ancestorTicked) {
-					ArrayList<String> ancestors = getAncestorsList(results);
-					for (String name : ancestors) {
-						if (!cellsForListView.contains(name))
-							cellsForListView.add(name);
-					}
+			cellsForListView.addAll(results);
+			if (ancestorTicked) {
+				ArrayList<String> ancestors = getAncestorsList(results);
+				for (String name : ancestors) {
+					if (!cellsForListView.contains(name))
+						cellsForListView.add(name);
 				}
-				if (descendantTicked) {
-					ArrayList<String> descendants = getDescendantsList(results);
-					for (String name : descendants) {
-						if (!cellsForListView.contains(name))
-							cellsForListView.add(name);
-					}
+			}
+			if (descendantTicked) {
+				ArrayList<String> descendants = getDescendantsList(results);
+				for (String name : descendants) {
+					if (!cellsForListView.contains(name))
+						cellsForListView.add(name);
 				}
 			}
 		}
@@ -497,16 +487,13 @@ public class Search {
 	}
 	
 	
+	/*
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellNucleusTicked = newValue;
-				if (type==SearchType.GENE)
-					updateGeneResults();
-				else
-					resultsUpdateService.restart();
 			}
 		};
 	}
@@ -518,13 +505,10 @@ public class Search {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellBodyTicked = newValue;
-				if (type==SearchType.GENE)
-					updateGeneResults();
-				else
-					resultsUpdateService.restart();
 			}
 		};
 	}
+	*/
 	
 	
 	public ChangeListener<Boolean> getAncestorTickListner() {

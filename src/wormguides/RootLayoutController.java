@@ -488,8 +488,8 @@ public class RootLayoutController implements Initializable{
 		search = new Search();
 		
 		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
-		cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
-		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
+		//cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
+		//cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
@@ -669,7 +669,7 @@ public class RootLayoutController implements Initializable{
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
 		
-		window3D.setResultsUpdateService(search.getResultsUpdateService());
+		window3D.setSearchResultsUpdateService(search.getResultsUpdateService());
 		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
 		
 		search.addDefaultColorRules();
