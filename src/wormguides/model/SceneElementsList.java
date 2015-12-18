@@ -144,7 +144,10 @@ public class SceneElementsList {
 		ArrayList<String> list = new ArrayList<String>();
 		for (SceneElement se : sceneElementsList) {
 			if (se.getStartTime()<=time && se.getEndTime()>=time)
-				list.add(se.getSceneName());
+				if (se.getAllCellNames().size()>1)
+					list.add(se.getSceneName());
+				else
+					list.add(se.getAllCellNames().get(0));
 		}
 		
 		return list.toArray(new String[list.size()]);
@@ -161,6 +164,11 @@ public class SceneElementsList {
 			}
 		}
 		return sceneElements;
+	}
+	
+	
+	public ArrayList<SceneElement> getList() {
+		return sceneElementsList;
 	}
 	
 	

@@ -95,7 +95,7 @@ public class RootLayoutController implements Initializable{
 	@FXML private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
 	private ToggleGroup typeToggleGroup;
 	
-	@FXML private CheckBox cellTick, cellBodyTick, ancestorTick, descendantTick;
+	@FXML private CheckBox cellNucleusTick, cellBodyTick, ancestorTick, descendantTick;
 	@FXML private Label descendantLabel;
 	@FXML private AnchorPane colorPickerPane;
 	@FXML private ColorPicker colorPicker;
@@ -247,6 +247,26 @@ public class RootLayoutController implements Initializable{
 										modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
+		
+		backwardButton.setOnAction(window3D.getBackwardButtonListener());
+		forwardButton.setOnAction(window3D.getForwardButtonListener());
+		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
+		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
+		
+		searchField.textProperty().addListener(window3D.getSearchFieldListener());
+		
+		// slider has to listen to 3D window's opacity value
+		// 3d window's opacity value has to listen to opacity slider's value
+		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
+		window3D.addListenerToOpacitySlider(opacitySlider);
+		
+		// default to uniform small nuclei
+		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
+		
+		cellNucleusTick.selectedProperty().addListener(window3D.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(window3D.getCellBodyTickListener());
+		
+		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
 	}
 	
 	private void getPropertiesFrom3DWindow() {
@@ -280,12 +300,6 @@ public class RootLayoutController implements Initializable{
 			}
 		});
 		
-		backwardButton.setOnAction(window3D.getBackwardButtonListener());
-		forwardButton.setOnAction(window3D.getForwardButtonListener());
-		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
-		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
-		
-		searchField.textProperty().addListener(window3D.getSearchFieldListener());
 		searchResultsListView.getSelectionModel().selectedItemProperty()
 							.addListener(new ChangeListener<String>() {
 			@Override
@@ -309,10 +323,6 @@ public class RootLayoutController implements Initializable{
 		
 		
 		// Multicellular structure stuff
-		// TODO: Add rules for all structures search results if one structure
-		// is not specifically selected in the list of ALL structures
-		allStructuresListView.getFocusModel().focusedItemProperty()
-								.addListener(structuresLayer.getSelectionListener());
 		structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event) {
@@ -325,21 +335,15 @@ public class RootLayoutController implements Initializable{
 		allStructuresListView.setCellFactory(new StringCellCallback());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
-		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
-		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
-		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 		
-		
-		// slider has to listen to 3D window's opacity value
-		// 3d window's opacity value has to listen to opacity slider's value
-		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
-		window3D.addListenerToOpacitySlider(opacitySlider);
+		// 'Others' opacity
 		opacitySlider.setValue(50);
 		
-		// uniform nuclei size
-		// default to uniform small nuclei
-		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
+		// Uniform nuclei size
 		uniformSizeCheckBox.setSelected(true);
+		
+		// Cell Nucleus search option
+		cellNucleusTick.setSelected(true);
 	}
 	
 	
@@ -484,8 +488,8 @@ public class RootLayoutController implements Initializable{
 		search = new Search();
 		
 		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
-		cellTick.selectedProperty().addListener(search.getCellTickListner());
-		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListner());
+		cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
@@ -586,7 +590,7 @@ public class RootLayoutController implements Initializable{
 		assert (conRadioBtn != null);
 		assert (multiRadioBtn != null);
 		
-		assert (cellTick != null);
+		assert (cellNucleusTick != null);
 		assert (cellBodyTick != null);
 		assert (ancestorTick != null);
 		assert (descendantTick != null);
@@ -614,6 +618,15 @@ public class RootLayoutController implements Initializable{
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 		structuresLayer.setRulesList(layers.getRulesList());
+		
+		// TODO: Add rules for all structures search results if one structure
+		// is not specifically selected in the list of ALL structures
+		allStructuresListView.getFocusModel().focusedItemProperty()
+							.addListener(structuresLayer.getSelectionListener());
+		
+		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
+		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
+		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 	}
 
 	

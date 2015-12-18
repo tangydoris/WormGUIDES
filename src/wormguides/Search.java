@@ -24,6 +24,7 @@ import wormguides.model.ColorRule;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
 
@@ -39,7 +40,7 @@ public class Search {
 	
 	private static SearchType type;
 	
-	private static boolean cellTicked;
+	private static boolean cellNucleusTicked;
 	private static boolean cellBodyTicked;
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
@@ -73,7 +74,7 @@ public class Search {
 		searchedText = "";
 		
 		// cell nucleus search type default to true
-		cellTicked = true;
+		cellNucleusTicked = true;
 		cellBodyTicked = false;
 		ancestorTicked = false;
 		descendantTicked = false;	
@@ -153,11 +154,13 @@ public class Search {
 			searchResultsList.add("No results found from WormBase");
 		
 		else {
-			if (!cellTicked && !ancestorTicked && !descendantTicked)
+			if (!ancestorTicked && !descendantTicked)
 				cellsForListView.addAll(results);
 			else {
-				if (cellTicked)
+				/*
+				if (cellNucleusTicked)
 					cellsForListView.addAll(results);
+				*/
 				if (ancestorTicked) {
 					ArrayList<String> ancestors = getAncestorsList(results);
 					for (String name : ancestors) {
@@ -176,12 +179,12 @@ public class Search {
 		}
 		
 		searchResultsList.sort(new CellNameComparator());
-		addFunctionalNamesToList(cellsForListView);
+		appendFunctionalToLineageNames(cellsForListView);
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
 	
 	
-	private static void addFunctionalNamesToList(ArrayList<String> list) {
+	private static void appendFunctionalToLineageNames(ArrayList<String> list) {
 		searchResultsList.clear();
 		for (String result : list) {
 			if (PartsList.getFunctionalNameByLineageName(result)!=null)
@@ -405,9 +408,11 @@ public class Search {
 							
 			case MULTICELL:	
 							if (sceneElementsList != null) {
-								for (String name : sceneElementsList.getAllMulticellNames()) {
-									if (name.toLowerCase().startsWith(searched))
-										cells.add(name);
+								for (SceneElement se : sceneElementsList.getList()) {
+									if (se.getAllCellNames().size()>1 
+										&& se.getSceneName().toLowerCase().startsWith(searched)) {
+										cells.addAll(se.getAllCellNames());
+									}
 								}
 							}
 							break;
@@ -473,7 +478,7 @@ public class Search {
 					return;
 				
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-				if (cellTicked)
+				if (cellNucleusTicked)
 					options.add(SearchOption.CELL);
 				if (cellBodyTicked)
 					options.add(SearchOption.CELLBODY);
@@ -492,12 +497,12 @@ public class Search {
 	}
 	
 	
-	public ChangeListener<Boolean> getCellTickListner() {
+	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
-				cellTicked = newValue;
+				cellNucleusTicked = newValue;
 				if (type==SearchType.GENE)
 					updateGeneResults();
 				else
@@ -507,7 +512,7 @@ public class Search {
 	}
 	
 	
-	public ChangeListener<Boolean> getCellBodyTickListner() {
+	public ChangeListener<Boolean> getCellBodyTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
@@ -604,7 +609,7 @@ public class Search {
 				return;
 			
 			ArrayList<String> cellsForListView = new ArrayList<String>();
-			if (!cellTicked && !descendantTicked && !ancestorTicked) {
+			if (!descendantTicked && !ancestorTicked) {
 				if (type==SearchType.SYSTEMATIC) {
 					for (String name : activeLineageNames) {
 						if (name.toLowerCase().startsWith(searched))
@@ -622,12 +627,14 @@ public class Search {
 							cellsForListView.add(name);
 					}
 				}
-				if (cellTicked) {
+				/*
+				if (cellNucleusTicked) {
 					for (String name : cells) {
 						if (!cellsForListView.contains(name))
 							cellsForListView.add(name);
 					}
 				}
+				*/
 				if (ancestorTicked) {
 					ArrayList<String> ancestors = getAncestorsList(cells);
 					for (String name : ancestors) {
@@ -637,7 +644,7 @@ public class Search {
 				}
 			}
 			cellsForListView.sort(new CellNameComparator());
-			addFunctionalNamesToList(cellsForListView);
+			appendFunctionalToLineageNames(cellsForListView);
 		}
 	}
 	

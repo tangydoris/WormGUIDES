@@ -117,13 +117,18 @@ public class Window3DSubScene{
 
 	// Scene Elements stuff
 	private SceneElementsList sceneElementsList;
-	ArrayList<SceneElement> sceneElementsAtTime;
+	private ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
 	//reference of successfully rendered scene elements for click responsiveness
 	private ArrayList<SceneElement> currentSceneElements;
 	
-	// uniform nuclei size
+	// Uniform nuclei size
 	private boolean uniformSize;
+	
+	// Cell body and cell nucleus highlighting in search mode
+	private boolean cellNucleusTicked;
+	private boolean cellBodyTicked;
+	private boolean multicellMode;
 
 //------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------	
 //	//Story elements stuff
@@ -144,7 +149,6 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 								Number oldValue, Number newValue) {
-				//System.out.println("time changed, building scene");
 				buildScene(time.get());
 			}
 		});
@@ -242,6 +246,10 @@ public class Window3DSubScene{
 		
 		colorHash = new ColorHash();
 		
+		
+		currentSceneElementMeshes = new ArrayList<MeshView>();
+		currentSceneElements = new ArrayList<SceneElement>();
+		
 //-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
 //		//initialize story elements
 //		String configFile2 = "StoryListConfig.csv";
@@ -265,8 +273,6 @@ public class Window3DSubScene{
 		if (sceneElementsList != null) {
 			// Initialize scene element events
 			sceneElementsList.buildListFromConfig();
-			currentSceneElementMeshes = new ArrayList<MeshView>();
-			currentSceneElements = new ArrayList<SceneElement>();
 		}
 	}
 	
@@ -508,7 +514,7 @@ public class Window3DSubScene{
 
 		for (String name : searchResultsList) {
 			if (name.indexOf("(")!=-1)
-				localSearchResults.add(name.substring(0, name.indexOf(" ")));
+				localSearchResults.add(name.substring(0, name.indexOf("(")).trim());
 			else
 				localSearchResults.add(name);
 		}
@@ -537,7 +543,7 @@ public class Window3DSubScene{
  		ArrayList<MeshView> renderFirstMeshes = new ArrayList<MeshView>();
  		ArrayList<MeshView> renderSecondMeshes = new ArrayList<MeshView>();
  		
- 		addCellsToScene(renderFirstSpheres, renderSecondSpheres);
+		addCellsToScene(renderFirstSpheres, renderSecondSpheres);
  		addMeshesToScene(renderFirstMeshes, renderSecondMeshes);
 
 		refreshScene();
@@ -572,14 +578,7 @@ public class Window3DSubScene{
 			for (int i=0; i<currentSceneElements.size(); i++) {
 				// in search mode
 				if (inSearch) {
-					
-					/*
-					 * TODO
-					 * Fix multicell structure highlighting in search mode
-					 * only works for commissure right and not left...
-					 */
-					
-	 				if (searchedMeshes[i]) {
+	 				if (cellBodyTicked && searchedMeshes[i]) {
 	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
 						renderFirst.add(currentSceneElementMeshes.get(i));
 	 				}
@@ -682,7 +681,7 @@ public class Window3DSubScene{
 			Material material = new PhongMaterial();
  			// if in search, do highlighting
  			if (inSearch) {
- 				if (searchedCells[i]) {
+ 				if (cellNucleusTicked && searchedCells[i]) {
 					renderFirst.add(sphere);
 					material = colorHash.getHighlightMaterial();
  				}
@@ -813,13 +812,26 @@ public class Window3DSubScene{
 				searchedCells[i] = false;
 		}
 		
-		// look for searched meshes
+		// look for single celled meshes
 		for (int i=0; i<meshNames.length; i++) {
-			if (localSearchResults.contains(meshNames[i]))
+			if (sceneElementsAtTime.get(i).getAllCellNames().size()>1) {
 				searchedMeshes[i] = true;
-			else
-				searchedMeshes[i] = false;
+				for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
+					if (localSearchResults.contains(name))
+						searchedMeshes[i] &= true;
+					else
+						searchedMeshes[i] &= false;
+				}
+			}
+			else {
+				if (localSearchResults.contains(meshNames[i]))
+					searchedMeshes[i] = true;
+				else
+					searchedMeshes[i] = false;
+			}
 		}
+		
+		// look for multicelled meshes
 	}
 
 	
@@ -852,10 +864,8 @@ public class Window3DSubScene{
 							public void changed(
 									ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									//System.out.println("rule changed, building scene");
+								if (newValue)
 									buildScene(time.get());
-								}
 							}
 						});
 					}
@@ -1234,6 +1244,40 @@ public class Window3DSubScene{
 				}
 			};
 		}
+	}
+	
+	
+	public ChangeListener<Boolean> getCellNucleusTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				cellNucleusTicked = newValue;
+				buildScene(time.get());
+			}
+		};
+	}
+	
+	
+	public ChangeListener<Boolean> getCellBodyTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				cellBodyTicked = newValue;
+				buildScene(time.get());
+			}
+		};
+	}
+	
+	
+	public ChangeListener<Boolean> getMulticellModeListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				multicellMode = newValue;
+			}
+		};
 	}
 	
 

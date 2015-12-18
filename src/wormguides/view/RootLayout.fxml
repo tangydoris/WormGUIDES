@@ -255,7 +255,7 @@
                                                                </font>
                                                             </Label>
                                                             <Region prefHeight="22.0" HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="cellTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" selected="true" />
+                                                            <CheckBox fx:id="cellNucleusTick" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" />
                                                          </children>
                                                       </HBox>
                                                    </children>
