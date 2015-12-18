@@ -241,8 +241,10 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1", 0.60), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL);
 	}
 	
 	
