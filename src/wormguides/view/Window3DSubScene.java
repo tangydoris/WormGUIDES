@@ -418,14 +418,8 @@ public class Window3DSubScene{
 
 		cellNames = data.getNames(time);
 		
-		if (sceneElementsList != null) {
+		if (sceneElementsList != null)
 			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
-			//System.out.println("mesh names at time "+time);
-			/*
-			for (String name : meshNames)
-				System.out.println(name);
-			*/
-		}
 		
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
@@ -511,15 +505,12 @@ public class Window3DSubScene{
 			return;
 
 		localSearchResults.clear();
-		System.out.println("3d subscene local results:");
 
 		for (String name : searchResultsList) {
 			if (name.indexOf("(")!=-1)
 				localSearchResults.add(name.substring(0, name.indexOf(" ")));
-			else {
-				System.out.println(name);
+			else
 				localSearchResults.add(name);
-			}
 		}
 
 		buildScene(time.get());
@@ -823,9 +814,7 @@ public class Window3DSubScene{
 		}
 		
 		// look for searched meshes
-		System.out.println("mesh names in current scene: ");
 		for (int i=0; i<meshNames.length; i++) {
-			System.out.println(meshNames[i]);
 			if (localSearchResults.contains(meshNames[i]))
 				searchedMeshes[i] = true;
 			else

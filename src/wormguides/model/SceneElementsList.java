@@ -142,17 +142,10 @@ public class SceneElementsList {
 		
 		// Add lineage names of all structures at time
 		ArrayList<String> list = new ArrayList<String>();
-		for (int i = 0; i < sceneElementsList.size(); i++) {
-			SceneElement current = sceneElementsList.get(i);
-			if (current.getStartTime() <= time && current.getEndTime() >= time) {
-				if (current.getAllCellNames().size() > 1)
-					list.add(current.getSceneName());
-				for (String name : current.getAllCellNames())
-					list.add(name);
-			}
+		for (SceneElement se : sceneElementsList) {
+			if (se.getStartTime()<=time && se.getEndTime()>=time)
+				list.add(se.getSceneName());
 		}
-		
-		// Add scene names of multicellular structures too for search highlighting
 		
 		return list.toArray(new String[list.size()]);
 	}
