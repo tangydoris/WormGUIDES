@@ -35,6 +35,7 @@ public class Search {
 	private static ArrayList<String> descriptions;
 	
 	private static ObservableList<String> searchResultsList;
+	private static Comparator<String> nameComparator;
 	private static String searchedText;
 	private BooleanProperty clearSearchFieldProperty;
 	
@@ -71,6 +72,7 @@ public class Search {
 		selectedColor = Color.WHITE;
 		
 		searchResultsList = FXCollections.observableArrayList();
+		nameComparator = new CellNameComparator();
 		searchedText = "";
 		
 		// cell nucleus search type default to true
@@ -106,14 +108,15 @@ public class Search {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					showLoadingService.cancel();
+					searchResultsList.clear();
 					updateGeneResults();
+					
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
 					for (Rule rule : rulesList) {
 						if (rule instanceof ColorRule) {
 							if (rule.getSearchedText().contains("'"+searched+"'")) {
 								rule.setCells(geneSearchService.getValue());
-								searchResultsList.clear();
 							}
 						}
 					}
@@ -150,25 +153,23 @@ public class Search {
 		if (results==null || results.isEmpty())
 			return;
 		
-		else {
-			cellsForListView.addAll(results);
-			if (ancestorTicked) {
-				ArrayList<String> ancestors = getAncestorsList(results);
-				for (String name : ancestors) {
-					if (!cellsForListView.contains(name))
-						cellsForListView.add(name);
-				}
+		cellsForListView.addAll(results);
+		if (ancestorTicked) {
+			ArrayList<String> ancestors = getAncestorsList(results);
+			for (String name : ancestors) {
+				if (!cellsForListView.contains(name))
+					cellsForListView.add(name);
 			}
-			if (descendantTicked) {
-				ArrayList<String> descendants = getDescendantsList(results);
-				for (String name : descendants) {
-					if (!cellsForListView.contains(name))
-						cellsForListView.add(name);
-				}
+		}
+		if (descendantTicked) {
+			ArrayList<String> descendants = getDescendantsList(results);
+			for (String name : descendants) {
+				if (!cellsForListView.contains(name))
+					cellsForListView.add(name);
 			}
 		}
 		
-		searchResultsList.sort(new CellNameComparator());
+		searchResultsList.sort(nameComparator);
 		appendFunctionalToLineageNames(cellsForListView);
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
@@ -324,15 +325,15 @@ public class Search {
 							label = "'"+searched+"' Gene";
 							break;
 							
-		case CONNECTOME:
+			case CONNECTOME:
 							label = "'"+searched+"' Connectome";
 							break;
 							
-		case MULTICELL:
+			case MULTICELL:
 							label = "'"+searched+"' Multicellular Structure";
 							break;
 							
-		default:
+			default:
 							label = searched;
 							break;
 		}
@@ -340,10 +341,8 @@ public class Search {
 		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
-		if (type==SearchType.GENE) {
-			showLoadingService.restart();
+		if (type==SearchType.GENE)
 			WormBaseQuery.doSearch(searched);
-		}
 		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
@@ -392,9 +391,11 @@ public class Search {
 							break;
 						 
 			case GENE:		
-							showLoadingService.restart();
-							WormBaseQuery.doSearch(getSearchedText());
-							return null;
+							if (isGeneFormat(getSearchedText())) {
+								showLoadingService.restart();
+								WormBaseQuery.doSearch(getSearchedText());
+							}
+							break;
 							
 			case MULTICELL:	
 							if (sceneElementsList != null) {
@@ -414,7 +415,22 @@ public class Search {
 	}
 	
 	
-	// generates a list of descendants of all cells in input
+	// Returns true if name is a gene name, false otherwise
+	// (some string, -, some number)
+	private static boolean isGeneFormat(String name) {
+		if (name.indexOf("-")!=-1) {
+			try {
+				Integer.parseInt(name.substring(name.indexOf("-")+1));
+				return true;
+			} catch (NumberFormatException e) {
+				// Don't do anything if the suffix is not a number
+			}
+		}
+		return false;
+	}
+	
+	
+	// Generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
 		ArrayList<String> descendants = new ArrayList<String>();
 		
@@ -627,7 +643,8 @@ public class Search {
 					}
 				}
 			}
-			cellsForListView.sort(new CellNameComparator());
+			
+			cellsForListView.sort(nameComparator);
 			appendFunctionalToLineageNames(cellsForListView);
 		}
 	}
