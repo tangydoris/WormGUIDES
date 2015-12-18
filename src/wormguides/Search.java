@@ -372,22 +372,24 @@ public class Search {
 							break;
 						
 			case DESCRIPTION:
-							for (String text : descriptions) {
-								String textLowerCase = text.toLowerCase();
+							// TODO some cells with the searched term are not showing up in results list
+							//System.out.println("\nShowing found description names:");
+				
+							for (int i=0; i<descriptions.size(); i++) {
+								String textLowerCase = descriptions.get(i).toLowerCase();
 								String[] keywords = searched.split(" ");
 								boolean found = true;
 								for (String keyword : keywords) {
-									if (textLowerCase.indexOf(keyword)==-1) {
+									if (textLowerCase.indexOf(keyword)<0) {
 										found = false;
 										break;
 									}
 								}
-								if (found && !cells.contains(PartsList.getLineageNameByIndex(
-																descriptions.indexOf(text)))) {
-									cells.add(PartsList.getLineageNameByIndex(
-													descriptions.indexOf(text)));
-								}
+								
+								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
+									cells.add(PartsList.getLineageNameByIndex(i));
 							}
+							
 							break;
 						 
 			case GENE:		

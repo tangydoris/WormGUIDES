@@ -19,6 +19,7 @@ public class PartsList {
 	private final static String JAR_NAME = "WormGUIDES.jar";
 	private final static String PARTSLIST_NAME = "wormguides/model/partslist.txt";
 	
+	
 	static {
 		functionalNames = new ArrayList<String>();
 		lineageNames = new ArrayList<String>();
@@ -48,14 +49,22 @@ public class PartsList {
 				}
 			}
 			jarFile.close();
+			
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 	
-	public static boolean contains(String name) {
+	
+	public static boolean containsLineageName(String name) {
 		return lineageNames.contains(name);
 	}
+	
+	
+	public static boolean containsFunctionalName(String name) {
+		return functionalNames.contains(name);
+	}
+	
 	
 	public static String getFunctionalNameByIndex(int i) {
 		try {
@@ -65,9 +74,11 @@ public class PartsList {
 		}
 	}
 	
+	
 	public static String getFunctionalNameByLineageName(String lineageName) {
 		return getFunctionalNameByIndex(lineageNames.indexOf(lineageName));
 	}
+	
 	
 	public static String getLineageNameByIndex(int i) {
 		try {
@@ -77,9 +88,11 @@ public class PartsList {
 		}
 	}
 	
+	
 	public static String getLineageNameByFunctionalName(String functionalName) {
 		return getLineageNameByIndex(functionalNames.indexOf(functionalName));
 	}
+	
 	
 	public static String getDescriptionByIndex(int i) {
 		try {
@@ -89,21 +102,26 @@ public class PartsList {
 		}
 	}
 	
+	
 	public static String getDescriptionByLineageName(String lineageName) {
 		return getDescriptionByIndex(lineageNames.indexOf(lineageName));
 	}
+	
 	
 	public static String getDescriptionByFunctionalName(String functionalName) {
 		return getDescriptionByIndex(functionalNames.indexOf(functionalName));
 	}
 	
+	
 	public static ArrayList<String> getLineageNames() {
 		return lineageNames;
 	}
 	
+	
 	public static ArrayList<String> getFunctionalNames() {
 		return functionalNames;
 	}
+	
 	
 	public static ArrayList<String> getDescriptions() {
 		return descriptions;
