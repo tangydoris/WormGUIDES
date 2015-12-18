@@ -143,12 +143,12 @@ DB4	ABprpappapp	Ventral cord motor neurons, innervate dorsal muscles
 DB5	ABplpapappp	Ventral cord motor neurons, innervate dorsal muscles
 DB6	ABplppaappp	Ventral cord motor neurons, innervate dorsal muscles
 DB7	ABprppaappp	Ventral cord motor neurons, innervate dorsal muscles
-DD1	ABplppappap	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
-DD2	ABprppappap	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
-DD3	ABplppapppa	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
-DD4	ABprppapppa	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
-DD5	ABplppapppp	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
-DD6	ABprppapppp	Ventral cord motor neurons, reciprocal inhibitors, chnage synaptic pattern during postembryonic development
+DD1	ABplppappap	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD2	ABprppappap	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD3	ABplppapppa	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD4	ABprppapppa	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD5	ABplppapppp	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
+DD6	ABprppapppp	Ventral cord motor neurons, reciprocal inhibitors, change synaptic pattern during postembryonic development
 DVA	ABprppppapp	Ring interneurons, cell bodies in dorsorectal ganglion
 DVB	K.p	ABplpapppaap. Ring interneuron, cell body in dorsorectal ganglion, inervates rectal muscles
 DVC	Caapaa	Ring interneurons, cell bodies in dorsorectal ganglion
