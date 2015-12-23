@@ -367,7 +367,7 @@ public class Window3DSubScene{
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = currentSceneElements.get(i);
-							if (clickedSceneElement.getAllCellNames().size() > 1) {
+							if (clickedSceneElement.isMulticellular()) {
 								selectedName.set(clickedSceneElement.getSceneName());
 							} else {
 								selectedName.set(clickedSceneElement.getAllCellNames().get(0));
@@ -773,7 +773,7 @@ public class Window3DSubScene{
 		
 		// look for single celled meshes
 		for (int i=0; i<meshNames.length; i++) {
-			if (sceneElementsAtTime.get(i).getAllCellNames().size()>1) {
+			if (sceneElementsAtTime.get(i).isMulticellular()) {
 				searchedMeshes[i] = true;
 				for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
 					if (localSearchResults.contains(name))

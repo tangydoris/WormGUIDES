@@ -130,7 +130,7 @@ public class SceneElementsList {
 		for (int i = 0; i < sceneElementsList.size(); i++) {
 			SceneElement current = sceneElementsList.get(i);
 			//check if the scene element is a multicellular structure
-			if (current.getAllCellNames().size() > 1) {
+			if (current.isMulticellular()) {
 				multicellNamesToCommentsMap.put(current.getSceneName(), current.getComments());
 			}
 		}
@@ -144,7 +144,7 @@ public class SceneElementsList {
 		ArrayList<String> list = new ArrayList<String>();
 		for (SceneElement se : sceneElementsList) {
 			if (se.getStartTime()<=time && se.getEndTime()>=time)
-				if (se.getAllCellNames().size()>1)
+				if (se.isMulticellular())
 					list.add(se.getSceneName());
 				else
 					list.add(se.getAllCellNames().get(0));

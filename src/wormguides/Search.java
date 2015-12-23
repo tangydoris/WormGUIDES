@@ -398,7 +398,7 @@ public class Search {
 			case MULTICELL:	
 							if (sceneElementsList != null) {
 								for (SceneElement se : sceneElementsList.getList()) {
-									if (se.getAllCellNames().size()>1) {
+									if (se.isMulticellular()) {
 										if (isNameSearched(se.getSceneName(), searched))
 											cells.addAll(se.getAllCellNames());
 									}
@@ -723,7 +723,39 @@ public class Search {
 	
 	
 	public static void setSceneElementsList(SceneElementsList list) {
-		sceneElementsList = list;
+		if (list!=null)
+			sceneElementsList = list;
+	}
+	
+	
+	public static boolean isMulticellStructure(String name) {
+		if (sceneElementsList==null)
+			return false;
+		
+		for (SceneElement e : sceneElementsList.getList()) {
+			if (e.isMulticellular() 
+				&& name.toLowerCase().equals(e.getSceneName().toLowerCase()))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	
+	public static String getMulticellComment(String name) {
+		String out = "";
+		if (sceneElementsList==null)
+			return out;
+		
+		for (SceneElement e : sceneElementsList.getList()) {
+			if (e.isMulticellular() 
+				&& name.toLowerCase().equals(e.getSceneName().toLowerCase())) {
+				out = e.getComments();
+				break;
+			}
+		}
+		
+		return out;
 	}
 	
 	
