@@ -149,4 +149,8 @@ public class SceneElement {
 		return billboardFlag;
 	}
 	
+	
+	public String toString() {
+		return sceneName+": "+resourceLocation;
+	}
 }

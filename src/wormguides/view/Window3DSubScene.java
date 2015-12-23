@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-//import wormguides.model.StoryList;
+import wormguides.model.StoryList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -41,6 +41,7 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
@@ -134,15 +135,15 @@ public class Window3DSubScene{
 	private boolean cellBodyTicked;
 	private boolean multicellMode;
 
-//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------	
-//	//Story elements stuff
-//	private StoryList storyList;
-//	ArrayList<SceneElement> storyElementsAtTime;
-//	private ArrayList<MeshView> currentStoryElementMeshes;
-//	
-//	//Billboard stuff
-//	ArrayList<Text> billboardsAtTime;
-//-------------------------------------------------------------------------------
+//------------------------STORY ELEMENTS---------------	
+	//Story elements stuff
+	private StoryList storyList;
+	private ArrayList<SceneElement> storyElementsAtTime;
+	private ArrayList<MeshView> currentStoryElementMeshes;
+	
+	//Billboard stuff
+	private ArrayList<Text> billboardsAtTime;
+//------------------------------------------------------
 
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
@@ -251,16 +252,14 @@ public class Window3DSubScene{
 		currentSceneElementMeshes = new ArrayList<MeshView>();
 		currentSceneElements = new ArrayList<SceneElement>();
 		
-//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
-//		//initialize story elements
-//		String configFile2 = "StoryListConfig.csv";
-//		storyList = new StoryList(configFile2);
-//		storyList.buildStories();
-//		currentStoryElementMeshes = new ArrayList<MeshView>();
-//		
-//		//initialize billboards
-//		billboardsAtTime = new ArrayList<Text>();
-//--------------------------------------------------------------------------------------	
+//-------------------------STORY ELEMENTS---------------------	
+		//initialize story elements
+		storyList = new StoryList();
+		currentStoryElementMeshes = new ArrayList<MeshView>();
+		
+		//initialize billboards
+		billboardsAtTime = new ArrayList<Text>();
+//-------------------------------------------------------------	
 	}
 	
 	
@@ -459,37 +458,37 @@ public class Window3DSubScene{
 		// End scene element mesh loading/building
 		
 		
-//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------		
+//-------------------------STORY ELEMENTS---------------------		
 		//clear billboards
-//		if(!billboardsAtTime.isEmpty()) {
-//			billboardsAtTime.clear();
-//		}
-//		
-//		//repeat process for story elements and billboards
-//		if(!currentStoryElementMeshes.isEmpty()) {
-//			currentStoryElementMeshes.clear();
-//		}
-//		
-//		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
-//		for (int i = 0; i < storyElementsAtTime.size(); i++) {
-//			//add meshes from each scene element in story
-//			SceneElement se = storyElementsAtTime.get(i);
-//			if (se.getBillboardFlag()) {
-//				Text t = se.buildBillboard();
-//				if (t != null) {
-//					t.getTransforms().addAll(rotateX, rotateY);
-//					billboardsAtTime.add(t);
-//				}
-//				
-//			} else {
-//				MeshView mesh = se.buildGeometry(time);
-//				if (mesh != null) {
-//					mesh.getTransforms().addAll(rotateX, rotateY);
-//					currentStoryElementMeshes.add(mesh);
-//				}
-//			}	
-//		}
-//----------------------------------------------------------------------------------------
+		if(!billboardsAtTime.isEmpty()) {
+			billboardsAtTime.clear();
+		}
+		
+		//repeat process for story elements and billboards
+		if(!currentStoryElementMeshes.isEmpty()) {
+			currentStoryElementMeshes.clear();
+		}
+		
+		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
+		for (int i = 0; i < storyElementsAtTime.size(); i++) {
+			//add meshes from each scene element in story
+			SceneElement se = storyElementsAtTime.get(i);
+			if (se.getBillboardFlag()) {
+				Text t = se.buildBillboard();
+				if (t != null) {
+					t.getTransforms().addAll(rotateX, rotateY);
+					billboardsAtTime.add(t);
+				}
+				
+			} else {
+				MeshView mesh = se.buildGeometry(time);
+				if (mesh != null) {
+					mesh.getTransforms().addAll(rotateX, rotateY);
+					currentStoryElementMeshes.add(mesh);
+				}
+			}	
+		}
+//---------------------------------------------------------------
 		
 
 		if (localSearchResults.isEmpty()) {
@@ -538,17 +537,17 @@ public class Window3DSubScene{
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
 
-//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION----------
-//		//add story scene element meshes to scene
-//		if(!currentStoryElementMeshes.isEmpty()) {
-//			root.getChildren().addAll(currentStoryElementMeshes);
-//		}
-//
-//		//add billboards to scene
-//		if(!billboardsAtTime.isEmpty()) {
-//			root.getChildren().addAll(billboardsAtTime);
-//		}
-//--------------------------------------------------------------------------
+//------------------------STORY ELEMENTS----------
+		//add story scene element meshes to scene
+		if(!currentStoryElementMeshes.isEmpty()) {
+			root.getChildren().addAll(currentStoryElementMeshes);
+		}
+
+		//add billboards to scene
+		if(!billboardsAtTime.isEmpty()) {
+			root.getChildren().addAll(billboardsAtTime);
+		}
+//------------------------------------------------
 	}
 	
 	
@@ -790,8 +789,6 @@ public class Window3DSubScene{
 					searchedMeshes[i] = false;
 			}
 		}
-		
-		// look for multicelled meshes
 	}
 
 	
