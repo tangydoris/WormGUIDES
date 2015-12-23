@@ -43,6 +43,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
@@ -130,6 +131,9 @@ public class RootLayoutController implements Initializable{
 	
 	//scene elements stuff
 	SceneElementsList elementsList;
+	
+	//connectome stuff
+	Connectome connectome;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -662,6 +666,10 @@ public class RootLayoutController implements Initializable{
 		elementsList = new SceneElementsList();
 		window3D.setSceneElementsList(elementsList);
 		Search.setSceneElementsList(elementsList);
+		
+		//set up the connectome
+		connectome = new Connectome();
+		connectome.buildConnectome();
 		
 		//set up the structure layer
 		initStructuresLayer();
