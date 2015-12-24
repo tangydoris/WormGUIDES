@@ -135,12 +135,6 @@ public class Search {
 	}
 	
 	
-	/*
-	 * TODO
-	 * Search class has to have list of names of multicellular structures
-	 */
-	
-	
 	public static void setActiveLineageNames(ArrayList<String> names) {
 		activeLineageNames = names;
 	}
@@ -404,9 +398,9 @@ public class Search {
 			case MULTICELL:	
 							if (sceneElementsList != null) {
 								for (SceneElement se : sceneElementsList.getList()) {
-									if (se.getAllCellNames().size()>1 
-										&& se.getSceneName().toLowerCase().startsWith(searched)) {
-										cells.addAll(se.getAllCellNames());
+									if (se.isMulticellular()) {
+										if (isNameSearched(se.getSceneName(), searched))
+											cells.addAll(se.getAllCellNames());
 									}
 								}
 							}
@@ -416,6 +410,25 @@ public class Search {
 							break;
 		}
 		return cells;
+	}
+	
+	
+	// Tests if name contains all parts of a search string
+	// returns true if it does, false otherwise
+	private static boolean isNameSearched(String name, String searched) {
+		if (name==null || searched==null)
+			return false;
+		
+		boolean isSearched = true;
+		name = name.trim().toLowerCase();
+		String[] searchedTokens = searched.trim().toLowerCase().split(" ");
+		for (String keyword : searchedTokens) {
+			if (!name.contains(keyword)) {
+				isSearched = false;
+				break;
+			}
+		}
+		return isSearched;
 	}
 	
 	
@@ -613,41 +626,30 @@ public class Search {
 				return;
 			
 			ArrayList<String> cellsForListView = new ArrayList<String>();
-			if (!descendantTicked && !ancestorTicked) {
-				if (type==SearchType.SYSTEMATIC) {
-					for (String name : activeLineageNames) {
-						if (name.toLowerCase().startsWith(searched))
-							cellsForListView.add(name);
-					}
-				}					
-				else
-					cellsForListView.addAll(cells);
-			}
-			else {
-				if (descendantTicked) {
-					ArrayList<String> descendants = getDescendantsList(cells);
-					for (String name : descendants) {
-						if (!cellsForListView.contains(name))
-							cellsForListView.add(name);
-					}
+			if (type==SearchType.SYSTEMATIC) {
+				for (String name : activeLineageNames) {
+					if (name.toLowerCase().startsWith(searched))
+						cellsForListView.add(name);
 				}
-				/*
-				if (cellNucleusTicked) {
-					for (String name : cells) {
-						if (!cellsForListView.contains(name))
-							cellsForListView.add(name);
-					}
-				}
-				*/
-				if (ancestorTicked) {
-					ArrayList<String> ancestors = getAncestorsList(cells);
-					for (String name : ancestors) {
-						if (!cellsForListView.contains(name))
-							cellsForListView.add(name);
-					}
+			}				
+			else
+				cellsForListView.addAll(cells);
+
+			if (descendantTicked) {
+				ArrayList<String> descendants = getDescendantsList(cells);
+				for (String name : descendants) {
+					if (!cellsForListView.contains(name))
+						cellsForListView.add(name);
 				}
 			}
-			
+			if (ancestorTicked) {
+				ArrayList<String> ancestors = getAncestorsList(cells);
+				for (String name : ancestors) {
+					if (!cellsForListView.contains(name))
+						cellsForListView.add(name);
+				}
+			}
+
 			cellsForListView.sort(nameComparator);
 			appendFunctionalToLineageNames(cellsForListView);
 		}
@@ -721,7 +723,39 @@ public class Search {
 	
 	
 	public static void setSceneElementsList(SceneElementsList list) {
-		sceneElementsList = list;
+		if (list!=null)
+			sceneElementsList = list;
+	}
+	
+	
+	public static boolean isMulticellStructure(String name) {
+		if (sceneElementsList==null)
+			return false;
+		
+		for (SceneElement e : sceneElementsList.getList()) {
+			if (e.isMulticellular() 
+				&& name.toLowerCase().equals(e.getSceneName().toLowerCase()))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	
+	public static String getMulticellComment(String name) {
+		String out = "";
+		if (sceneElementsList==null)
+			return out;
+		
+		for (SceneElement e : sceneElementsList.getList()) {
+			if (e.isMulticellular() 
+				&& name.toLowerCase().equals(e.getSceneName().toLowerCase())) {
+				out = e.getComments();
+				break;
+			}
+		}
+		
+		return out;
 	}
 	
 	

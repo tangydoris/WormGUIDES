@@ -105,6 +105,11 @@ public class SceneElement {
 	}
 	
 	
+	public boolean isMulticellular() {
+		return cellNames.size()>1;
+	}
+	
+	
 	public String getMarkerName() {
 		return markerName;
 	}
@@ -149,4 +154,8 @@ public class SceneElement {
 		return billboardFlag;
 	}
 	
+	
+	public String toString() {
+		return sceneName+": "+resourceLocation;
+	}
 }

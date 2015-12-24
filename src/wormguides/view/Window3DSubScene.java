@@ -1,18 +1,11 @@
 package wormguides.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeSet;
-import wormguides.ColorComparator;
-import wormguides.Xform;
-import wormguides.model.ColorHash;
-import wormguides.model.ColorRule;
-import wormguides.model.LineageData;
-import wormguides.model.Rule;
-import wormguides.model.SceneElement;
-import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
-//import wormguides.model.StoryList;
+
+import wormguides.model.StoryList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -46,10 +39,21 @@ import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
+import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
+import wormguides.ColorComparator;
+import wormguides.Xform;
+import wormguides.model.ColorHash;
+import wormguides.model.ColorRule;
+import wormguides.model.LineageData;
+import wormguides.model.Rule;
+import wormguides.model.SceneElement;
+import wormguides.model.SceneElementsList;
+import wormguides.model.ShapeRule;
 
 public class Window3DSubScene{
 
@@ -99,6 +103,8 @@ public class Window3DSubScene{
 	private ColorHash colorHash;
 	private ObservableList<Rule> rulesList;
 	private ObservableList<ShapeRule> shapeRulesList;
+	private Comparator<Color> colorComparator;
+	private Comparator<Shape3D> opacityComparator;
 
 	//private Service<Void> searchResultsUpdateService;
 
@@ -107,7 +113,6 @@ public class Window3DSubScene{
 
 	// opacity value for "other" cells (with no rule attached)
 	private DoubleProperty othersOpacity;
-	private HashMap<Double, Material> opacityMaterialHash;
 	private ArrayList<String> otherCells;
 
 	// rotation stuff
@@ -136,15 +141,15 @@ public class Window3DSubScene{
 	private boolean cellBodyTicked;
 	private boolean multicellMode;
 
-//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------	
-//	//Story elements stuff
-//	private StoryList storyList;
-//	ArrayList<SceneElement> storyElementsAtTime;
-//	private ArrayList<MeshView> currentStoryElementMeshes;
-//	
-//	//Billboard stuff
-//	ArrayList<Text> billboardsAtTime;
-//-------------------------------------------------------------------------------
+//------------------------STORY ELEMENTS---------------	
+	//Story elements stuff
+	private StoryList storyList;
+	private ArrayList<SceneElement> storyElementsAtTime;
+	private ArrayList<MeshView> currentStoryElementMeshes;
+	
+	//Billboard stuff
+	private ArrayList<Text> billboardsAtTime;
+//------------------------------------------------------
 
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
@@ -230,14 +235,10 @@ public class Window3DSubScene{
 
 		localSearchResults = new ArrayList<String>();
 
-		//searchResultsUpdateService = null;
-
 		geneResultsUpdated = new SimpleBooleanProperty();
 
 		// get completely opaque 'other' material first
 		othersOpacity = new SimpleDoubleProperty(1);
-		opacityMaterialHash = new HashMap<Double, Material>();
-		opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(Color.WHITE));
 		
 		otherCells = new ArrayList<String>();
 
@@ -251,21 +252,20 @@ public class Window3DSubScene{
 		shapeRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
-		
+		colorComparator = new ColorComparator();
+		opacityComparator = new OpacityComparator();
 		
 		currentSceneElementMeshes = new ArrayList<MeshView>();
 		currentSceneElements = new ArrayList<SceneElement>();
 		
-//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------	
-//		//initialize story elements
-//		String configFile2 = "StoryListConfig.csv";
-//		storyList = new StoryList(configFile2);
-//		storyList.buildStories();
-//		currentStoryElementMeshes = new ArrayList<MeshView>();
-//		
-//		//initialize billboards
-//		billboardsAtTime = new ArrayList<Text>();
-//--------------------------------------------------------------------------------------	
+//-------------------------STORY ELEMENTS---------------------	
+		//initialize story elements
+		storyList = new StoryList();
+		currentStoryElementMeshes = new ArrayList<MeshView>();
+		
+		//initialize billboards
+		billboardsAtTime = new ArrayList<Text>();
+//-------------------------------------------------------------	
 	}
 	
 	
@@ -335,7 +335,9 @@ public class Window3DSubScene{
 				if (me.isPrimaryButtonDown()) {
 					mouseDeltaX /= 2;
 	                mouseDeltaY /= 2;
-	                rotateAllCells(mouseDeltaX, mouseDeltaY);
+	                rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
+	        		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
+	        		//System.out.println("x: "+rotateX.getAngle()+" y: "+rotateY.getAngle());
 				}
 
 				else if (me.isSecondaryButtonDown()) {
@@ -371,7 +373,7 @@ public class Window3DSubScene{
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = currentSceneElements.get(i);
-							if (clickedSceneElement.getAllCellNames().size() > 1) {
+							if (clickedSceneElement.isMulticellular()) {
 								selectedName.set(clickedSceneElement.getSceneName());
 							} else {
 								selectedName.set(clickedSceneElement.getAllCellNames().get(0));
@@ -395,12 +397,6 @@ public class Window3DSubScene{
 		buildCamera();
 
 		return subscene;
-	}
-	
-
-	private void rotateAllCells(double x, double y) {
-		rotateX.setAngle(rotateX.getAngle()+y);
-		rotateY.setAngle(rotateY.getAngle()-x);
 	}
 
 	
@@ -455,7 +451,7 @@ public class Window3DSubScene{
 				
 				if (mesh != null) {
 					//null mesh when file not found thrown
-					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
 					
 					//add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
@@ -468,37 +464,37 @@ public class Window3DSubScene{
 		// End scene element mesh loading/building
 		
 		
-//-------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION---------------------		
+//-------------------------STORY ELEMENTS---------------------		
 		//clear billboards
-//		if(!billboardsAtTime.isEmpty()) {
-//			billboardsAtTime.clear();
-//		}
-//		
-//		//repeat process for story elements and billboards
-//		if(!currentStoryElementMeshes.isEmpty()) {
-//			currentStoryElementMeshes.clear();
-//		}
-//		
-//		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
-//		for (int i = 0; i < storyElementsAtTime.size(); i++) {
-//			//add meshes from each scene element in story
-//			SceneElement se = storyElementsAtTime.get(i);
-//			if (se.getBillboardFlag()) {
-//				Text t = se.buildBillboard();
-//				if (t != null) {
-//					t.getTransforms().addAll(rotateX, rotateY);
-//					billboardsAtTime.add(t);
-//				}
-//				
-//			} else {
-//				MeshView mesh = se.buildGeometry(time);
-//				if (mesh != null) {
-//					mesh.getTransforms().addAll(rotateX, rotateY);
-//					currentStoryElementMeshes.add(mesh);
-//				}
-//			}	
-//		}
-//----------------------------------------------------------------------------------------
+		if(!billboardsAtTime.isEmpty()) {
+			billboardsAtTime.clear();
+		}
+		
+		//repeat process for story elements and billboards
+		if(!currentStoryElementMeshes.isEmpty()) {
+			currentStoryElementMeshes.clear();
+		}
+		
+		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
+		for (int i = 0; i < storyElementsAtTime.size(); i++) {
+			//add meshes from each scene element in story
+			SceneElement se = storyElementsAtTime.get(i);
+			if (se.getBillboardFlag()) {
+				Text t = se.buildBillboard();
+				if (t != null) {
+					t.getTransforms().addAll(rotateX, rotateY);
+					billboardsAtTime.add(t);
+				}
+				
+			} else {
+				MeshView mesh = se.buildGeometry(time);
+				if (mesh != null) {
+					mesh.getTransforms().addAll(rotateX, rotateY);
+					currentStoryElementMeshes.add(mesh);
+				}
+			}	
+		}
+//---------------------------------------------------------------
 		
 
 		if (localSearchResults.isEmpty()) {
@@ -536,47 +532,32 @@ public class Window3DSubScene{
 
 	
 	private void addEntitiesToScene() {
-		
-		/*
-		 * TODO:
-		 * Fix rendering order of both spheres and meshes
-		 * Bug with z buffering, need to sort by opacity
-		 */
-		
-		ArrayList<Sphere> renderFirstSpheres = new ArrayList<Sphere>();
- 		ArrayList<Sphere> renderSecondSpheres = new ArrayList<Sphere>();
+		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
  		
- 		ArrayList<MeshView> renderFirstMeshes = new ArrayList<MeshView>();
- 		ArrayList<MeshView> renderSecondMeshes = new ArrayList<MeshView>();
- 		
-		addCellsToScene(renderFirstSpheres, renderSecondSpheres);
- 		addMeshesToScene(renderFirstMeshes, renderSecondMeshes);
+		addCellsToScene(entities);
+ 		addMeshesToScene(entities);
 
 		refreshScene();
 		
 		// render opaque entities first
-		root.getChildren().addAll(renderFirstSpheres);
-		root.getChildren().addAll(renderFirstMeshes);
-		
-		// render transparent entities last
-		root.getChildren().addAll(renderSecondSpheres);
-		root.getChildren().addAll(renderSecondMeshes);
+		Collections.sort(entities, opacityComparator);
+		root.getChildren().addAll(entities);
 
-//------------------------NO STORY ELEMENTS IN LATEST DISTRIBUTION----------
-//		//add story scene element meshes to scene
-//		if(!currentStoryElementMeshes.isEmpty()) {
-//			root.getChildren().addAll(currentStoryElementMeshes);
-//		}
-//
-//		//add billboards to scene
-//		if(!billboardsAtTime.isEmpty()) {
-//			root.getChildren().addAll(billboardsAtTime);
-//		}
-//--------------------------------------------------------------------------
+//------------------------STORY ELEMENTS----------
+		//add story scene element meshes to scene
+		if(!currentStoryElementMeshes.isEmpty()) {
+			root.getChildren().addAll(currentStoryElementMeshes);
+		}
+
+		//add billboards to scene
+		if(!billboardsAtTime.isEmpty()) {
+			root.getChildren().addAll(billboardsAtTime);
+		}
+//------------------------------------------------
 	}
 	
 	
-	private void addMeshesToScene(ArrayList<MeshView> renderFirst, ArrayList<MeshView> renderSecond) {
+	private void addMeshesToScene(ArrayList<Shape3D> list) {
 		// consult ShapeRule(s)
 		// process only if meshes at this time point
 		if (!currentSceneElements.isEmpty()) {
@@ -584,14 +565,10 @@ public class Window3DSubScene{
 			for (int i=0; i<currentSceneElements.size(); i++) {
 				// in search mode
 				if (inSearch) {
-	 				if (cellBodyTicked && searchedMeshes[i]) {
+	 				if (cellBodyTicked && searchedMeshes[i])
 	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
-						renderFirst.add(currentSceneElementMeshes.get(i));
-	 				}
-	 				else {
+	 				else 
 	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getTranslucentMaterial());
-						renderSecond.add(currentSceneElementMeshes.get(i));
-	 				}
 	 			}
 				
 				else {
@@ -601,17 +578,15 @@ public class Window3DSubScene{
 					
 					// default white meshes
 					if (allNames.isEmpty()) {
-						//System.out.println("Empty name, default white mesh");
 						currentSceneElementMeshes.get(i).setMaterial(new PhongMaterial(Color.WHITE));
 						currentSceneElementMeshes.get(i).setCullFace(CullFace.NONE);
-						renderFirst.add(currentSceneElementMeshes.get(i));
 					}
 					
 					// If mesh has with name(s), then process rules (cell or shape)
 					// that apply to it
 					else {
 						boolean isOpaque = true;
-						TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 						
 						//iterate over rulesList
 						for (Rule rule: rulesList) {
@@ -633,22 +608,14 @@ public class Window3DSubScene{
 						}
 						
 						// if ShapeRule(s) applied
-						if (!colors.isEmpty()) {
-							//System.out.println(allNames.get(0)+" gets color "+colors.first());
+						if (!colors.isEmpty())
 							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
-							if (isOpaque)
-								renderFirst.add(currentSceneElementMeshes.get(i));
-							else
-								renderSecond.add(currentSceneElementMeshes.get(i));
-						}
-						else {
-							//System.out.println("no rule for "+allNames.get(0)+" making it 'other'");
-							currentSceneElementMeshes.get(i).setMaterial(opacityMaterialHash.get(othersOpacity.get()));
-							renderSecond.add(currentSceneElementMeshes.get(i));
-						}
+						else
+							currentSceneElementMeshes.get(i).setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 					}
 				}
-				// end regular view mode processing
+				
+				list.add(currentSceneElementMeshes.get(i));
 			}
 		}
 		
@@ -674,7 +641,7 @@ public class Window3DSubScene{
 	}
 	
 	
-	private void addCellsToScene(ArrayList<Sphere> renderFirst, ArrayList<Sphere> renderSecond) {
+	private void addCellsToScene(ArrayList<Shape3D> list) {
 		// for sphere rendering
 		for (int i = 0; i < cellNames.length; i ++) {
 			double radius;
@@ -687,18 +654,14 @@ public class Window3DSubScene{
 			Material material = new PhongMaterial();
  			// if in search, do highlighting
  			if (inSearch) {
- 				if (cellNucleusTicked && searchedCells[i]) {
-					renderFirst.add(sphere);
+ 				if (cellNucleusTicked && searchedCells[i])
 					material = colorHash.getHighlightMaterial();
- 				}
- 				else {
-					renderSecond.add(sphere);
+ 				else
 					material = colorHash.getTranslucentMaterial();
- 				}
  			}
  			// not in search mode
  			else {
- 				TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+ 				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
  				for (Rule rule : rulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesToCell(cellNames[i])) {
@@ -707,13 +670,8 @@ public class Window3DSubScene{
  				}
  				material = colorHash.getMaterial(colors);
 
- 				if (colors.isEmpty()) {
- 					renderSecond.add(sphere);
- 					material = opacityMaterialHash.get(othersOpacity.get());
- 				}
- 				else {
- 					renderFirst.add(sphere);
- 				}
+ 				if (colors.isEmpty())
+ 					material = colorHash.getOthersMaterial(othersOpacity.get());
  			}
 
  			sphere.setMaterial(material);
@@ -721,10 +679,12 @@ public class Window3DSubScene{
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
 	        double z = positions[i][Z_COR_INDEX]*zScale;
-	        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
 	        translateSphere(sphere, x, y, z);
 	        
 	        cells[i] = sphere;
+	        
+	        list.add(cells[i]);
 		}
 	}
 	
@@ -819,7 +779,7 @@ public class Window3DSubScene{
 		
 		// look for single celled meshes
 		for (int i=0; i<meshNames.length; i++) {
-			if (sceneElementsAtTime.get(i).getAllCellNames().size()>1) {
+			if (sceneElementsAtTime.get(i).isMulticellular()) {
 				searchedMeshes[i] = true;
 				for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
 					if (localSearchResults.contains(name))
@@ -835,8 +795,6 @@ public class Window3DSubScene{
 					searchedMeshes[i] = false;
 			}
 		}
-		
-		// look for multicelled meshes
 	}
 
 	
@@ -1074,21 +1032,7 @@ public class Window3DSubScene{
 											Number oldValue, Number newValue) {
 				othersOpacity.set(Math.round(newValue.doubleValue())/100d);
 
-				if (!opacityMaterialHash.containsKey(othersOpacity.get())) {
-					int darkness = (int) (Math.round(othersOpacity.get()*255));
-					String colorString = "#";
-					StringBuilder sb = new StringBuilder();
-					sb.append(Integer.toHexString(darkness));
-
-					if (sb.length()<2)
-						sb.insert(0, "0");
-
-					for (int i=0; i<3; i++)
-						colorString += sb.toString();
-					
-					opacityMaterialHash.put(othersOpacity.get(), new PhongMaterial(
-										Color.web(colorString, othersOpacity.get())));
-				}
+				
 
 				buildScene(time.get());
 			}
@@ -1318,6 +1262,21 @@ public class Window3DSubScene{
 				buildScene(time.get());
 			}
 		};
+	}
+	
+	
+	private class OpacityComparator implements Comparator<Shape3D> {
+		@Override
+		public int compare(Shape3D o1, Shape3D o2) {
+			double op1 = colorHash.getMaterialOpacity(o1.getMaterial());
+			double op2 = colorHash.getMaterialOpacity(o2.getMaterial());
+			if (op1 < op2)
+				return 1;
+			else if (op1 > op2)
+				return -1;
+			else
+				return 0;
+		}
 	}
 	
 	

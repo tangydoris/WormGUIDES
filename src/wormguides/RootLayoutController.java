@@ -48,7 +48,6 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
-import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
@@ -359,7 +358,8 @@ public class RootLayoutController implements Initializable{
 	
 	
 	// Adds multicellular strucuture name and comment in description panel
-	private void setStructureNameAndComment(String name) {
+	/*
+	private void setSelectedStructureNameAndComment(String name) {
 		//add the description to the text to be set on the GUI
 		String structureComment = "";
 		for (int i = 0; i < elementsList.sceneElementsList.size(); i++) {
@@ -379,32 +379,31 @@ public class RootLayoutController implements Initializable{
 			selectedName.set(name);
 		}
 	}
-	
+	*/
 	
 	
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
 
-//		if (name.indexOf("(")!=-1) {
-//			if (name.indexOf(" ")==-1) {
-//				name = name.substring(0, name.indexOf("("));
-//			} else {
-//				name = name.substring(0, name.indexOf(" "));
-//			}
-//		}
-//		
 		if (name.indexOf("(")!=-1) 
-			name = name.substring(0, name.indexOf(" "));
+			name = name.substring(0, name.indexOf("("));
+		name = name.trim();
 		
-		String functionalName = PartsList.getFunctionalNameByLineageName(name);
-		if (functionalName==null) {
+		if (Search.isMulticellStructure(name)) {
 			cellName.setText(name);
-			cellDescription.setText("");
+			cellDescription.setText(Search.getMulticellComment(name));
 		}
 		else {
-			cellName.setText(name+" ("+functionalName+")");
-			cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+			String functionalName = PartsList.getFunctionalNameByLineageName(name);
+			if (functionalName==null) {
+				cellName.setText(name);
+				cellDescription.setText("");
+			}
+			else {
+				cellName.setText(name+" ("+functionalName+")");
+				cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+			}
 		}
 	}
 	

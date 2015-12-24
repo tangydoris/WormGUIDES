@@ -123,18 +123,20 @@ public class StructuresLayer {
 	
 	// Only searches names for now
 	public void searchStructures(String searched) {
-		searched = searched.toLowerCase();
+		String[] searchTerms = searched.toLowerCase().split(" ");
 		searchResultsList.clear();
 		for (String name : allStructuresList) {
 			if (!searchResultsList.contains(name)) {
 				// Look at scene names
-				if (name.toLowerCase().startsWith(searched)) {
-					searchResultsList.add(name);
-					continue;
+				boolean nameSearched = true;
+				boolean commentSearched = true;
+				for (String word : searchTerms) {
+					if (name.toLowerCase().contains(searched))
+						nameSearched = false;
+					if (nameToCommentsMap.get(name).toLowerCase().contains(searched))
+						commentSearched = false;
 				}
-				
-				// Look at comments
-				if (nameToCommentsMap.get(name).toLowerCase().contains(searched))
+				if (nameSearched || commentSearched)
 					searchResultsList.add(name);
 			}
 		}

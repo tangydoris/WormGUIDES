@@ -32,7 +32,7 @@ public class StoryList {
 				
 				if (entry.getName().equals("wormguides/model/story_file/"+STORY_CONFIG_FILE_NAME)) {
 					InputStream stream = jarFile.getInputStream(entry);
-					processStreamString(stream);
+					processStream(stream);
 				}
 			}
 			
@@ -44,9 +44,9 @@ public class StoryList {
 		}
 	}
 	
-	public void processStreamString(InputStream stream) {
+	public void processStream(InputStream stream) {
 		int storyCounter = -1; //used for accessing the current story for adding scene elements
-		//File obj = new File(this.configFile);
+
 		try {
 			InputStreamReader streamReader = new InputStreamReader(stream);
 			BufferedReader reader = new BufferedReader(streamReader);
@@ -98,6 +98,11 @@ public class StoryList {
 			}
 			
 			reader.close();
+			
+			// Debug
+			for (Story story : stories)
+				System.out.println(story.toString());
+			
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.out.println("Unable to process file '" + STORY_CONFIG_FILE_NAME + "'.");
 		} catch (NumberFormatException e) {
@@ -110,7 +115,7 @@ public class StoryList {
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		ArrayList<SceneElement> sceneElementsAtTime = new ArrayList<SceneElement>();
 		for (int i = 0; i < stories.size(); i++) {
-			ArrayList<SceneElement> currStorySceneElements = stories.get(i).getStorySceneElements();
+			ArrayList<SceneElement> currStorySceneElements = stories.get(i).getSceneElements();
 			for (int j = 0; j < currStorySceneElements.size(); j++) {
 				SceneElement currSE = currStorySceneElements.get(j);
 				if (currSE.getStartTime() <= time && currSE.getEndTime() >= time) {
