@@ -88,7 +88,7 @@ public class RootLayoutController implements Initializable{
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
-	// search tab
+	// cells tab
 	private Search search;
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -100,6 +100,10 @@ public class RootLayoutController implements Initializable{
 	@FXML private Label descendantLabel;
 	@FXML private AnchorPane colorPickerPane;
 	@FXML private ColorPicker colorPicker;
+	
+	//connectome stuff
+	Connectome connectome;
+	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
 	// lineage tree
 	private TreeItem<String> lineageTreeRoot;
@@ -131,9 +135,6 @@ public class RootLayoutController implements Initializable{
 	
 	//scene elements stuff
 	SceneElementsList elementsList;
-	
-	//connectome stuff
-	Connectome connectome;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -271,6 +272,12 @@ public class RootLayoutController implements Initializable{
 		cellBodyTick.selectedProperty().addListener(window3D.getCellBodyTickListener());
 		
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
+
+		//connectome checkboxes
+		presynapticTick.selectedProperty().addListener(window3D.getPresynapticTickListener());
+		postsynapticTick.selectedProperty().addListener(window3D.getPostsynapticTickListener());
+		electricalTick.selectedProperty().addListener(window3D.getElectricalTickListener());
+		neuromuscularTick.selectedProperty().addListener(window3D.getNeuromuscularTickListener());
 	}
 	
 	private void getPropertiesFrom3DWindow() {

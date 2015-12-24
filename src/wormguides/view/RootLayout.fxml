@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -157,9 +157,9 @@
                                                       <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0">
                                                          <children>
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-                                                            <Label fx:id="descendantLabel1" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="88.0" text="Pre-Synaptic" />
+                                                            <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="88.0" text="Pre-Synaptic" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="preSynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
+                                                            <CheckBox fx:id="presynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -171,7 +171,7 @@
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="146.0" text="Post-Synaptic" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="postSynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
+                                                            <CheckBox fx:id="postsynapticTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>
@@ -183,7 +183,7 @@
                                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                                             <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="97.0" text="Gap Junction" />
                                                             <Region HBox.hgrow="ALWAYS" />
-                                                            <CheckBox fx:id="gapJunctionTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
+                                                            <CheckBox fx:id="electricalTick" focusTraversable="false" maxHeight="1.7976931348623157E308" mnemonicParsing="false" />
                                                          </children>
                                                       </HBox>
                                                    </children>

@@ -125,6 +125,12 @@ public class Window3DSubScene{
 	// Uniform nuclei size
 	private boolean uniformSize;
 	
+	// connectome - synapse type checkboxes
+	private boolean presynapticTicked;
+	private boolean postsynapticTicked;
+	private boolean electricalTicked;
+	private boolean neuromuscularTicked;
+	
 	// Cell body and cell nucleus highlighting in search mode
 	private boolean cellNucleusTicked;
 	private boolean cellBodyTicked;
@@ -1245,6 +1251,51 @@ public class Window3DSubScene{
 		}
 	}
 	
+	//connectome checkbox listeners
+	public ChangeListener<Boolean> getPresynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				presynapticTicked = newValue;
+				//buildScene(time.get());
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getPostsynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				postsynapticTicked = newValue;
+				//buildScene(time.get());
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getElectricalTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				electricalTicked = newValue;
+				System.out.println("changed electrical");
+				//buildScene(time.get());
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getNeuromuscularTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				neuromuscularTicked = newValue;
+				//buildScene(time.get());
+			}
+		};
+	}
 	
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
