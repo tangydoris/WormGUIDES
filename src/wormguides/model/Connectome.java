@@ -55,7 +55,6 @@ public class Connectome {
 		
 		ArrayList<String> searchResults = new ArrayList<String>();
 		
-		System.out.println("STARTING NEW SEARCH");
 //		//iterate over connectome
 		for (NeuronalSynapse ns : connectome) {
 			//check if synapse contains query cell
@@ -104,12 +103,10 @@ public class Connectome {
 					if (neuromuscularTicked) {
 						//don't add duplicates
 						if (!searchResults.contains(cell_1)) {
-							System.out.println("adding #1: " + cell_1);
 							searchResults.add(cell_1);
 						}
 						
 						if (!searchResults.contains(cell_2)) {
-							System.out.println("adding #2: " + cell_2);
 							searchResults.add(cell_2);
 						}
 					}
