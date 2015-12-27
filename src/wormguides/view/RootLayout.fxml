@@ -52,7 +52,7 @@
 			            <content>
 			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
                            <children>
-                              <ScrollPane layoutX="6.0" layoutY="6.0" prefViewportHeight="723.0" prefViewportWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <ScrollPane layoutX="1.0" layoutY="1.0" prefViewportHeight="723.0" prefViewportWidth="288.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
                                  <content>
                                     <AnchorPane>
                                        <children>

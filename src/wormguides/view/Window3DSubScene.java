@@ -1194,53 +1194,7 @@ public class Window3DSubScene{
 			};
 		}
 	}
-	
-	//connectome checkbox listeners
-	public ChangeListener<Boolean> getPresynapticTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				presynapticTicked = newValue;
-				//buildScene(time.get());
-			}
-		};
-	}
-	
-	public ChangeListener<Boolean> getPostsynapticTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				postsynapticTicked = newValue;
-				//buildScene(time.get());
-			}
-		};
-	}
-	
-	public ChangeListener<Boolean> getElectricalTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				electricalTicked = newValue;
-				System.out.println("changed electrical");
-				//buildScene(time.get());
-			}
-		};
-	}
-	
-	public ChangeListener<Boolean> getNeuromuscularTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				neuromuscularTicked = newValue;
-				//buildScene(time.get());
-			}
-		};
-	}
-	
+
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override

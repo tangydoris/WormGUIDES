@@ -21,6 +21,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
+import wormguides.model.Connectome;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
@@ -61,6 +62,14 @@ public class Search {
 	
 	//used for adding shape rules
 	private static SceneElementsList sceneElementsList;
+	
+	//for connectome searching
+	private static Connectome connectome;
+	private static boolean presynapticTicked;
+	private static boolean postsynapticTicked;
+	private static boolean electricalTicked;
+	private static boolean neuromuscularTicked;
+
 		
 	static {
 		activeLineageNames = new ArrayList<String>();
@@ -80,6 +89,12 @@ public class Search {
 		cellBodyTicked = false;
 		ancestorTicked = false;
 		descendantTicked = false;	
+		
+		//connectome synapse types all unchecked at init
+		presynapticTicked = false;
+		postsynapticTicked = false;;
+		electricalTicked = false;
+		neuromuscularTicked = false;
 		
 		resultsUpdateService = new Service<Void>() {
 			@Override
@@ -167,7 +182,6 @@ public class Search {
 		appendFunctionalToLineageNames(cellsForListView);
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
-	
 	
 	private static void appendFunctionalToLineageNames(ArrayList<String> list) {
 		searchResultsList.clear();
@@ -407,6 +421,10 @@ public class Search {
 							break;
 							
 			case CONNECTOME:
+							if (connectome != null) {
+								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
+										postsynapticTicked, electricalTicked, neuromuscularTicked));
+							}
 							break;
 		}
 		return cells;
@@ -509,6 +527,7 @@ public class Search {
 					options.add(SearchOption.ANCESTOR);
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
+				
 				
 				addColorRule(getSearchedText(), selectedColor, options);
 				
@@ -758,6 +777,57 @@ public class Search {
 		return out;
 	}
 	
+	public static void setConnectome(Connectome con) {
+		if (con != null) {
+			connectome = con;
+		}
+	}
 	
+	//connectome checkbox listeners
+	public ChangeListener<Boolean> getPresynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				presynapticTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getPostsynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				postsynapticTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getElectricalTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				electricalTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getNeuromuscularTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				neuromuscularTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+
+
 	private static final long WAIT_TIME_MILLI = 750;
 }

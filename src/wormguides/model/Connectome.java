@@ -43,42 +43,87 @@ public class Connectome {
 	 * Search function which takes cell and filters results based on filter toggles
 	 * filter toggles = 4 Synapse Types
 	 */
-	public ArrayList<NeuronalSynapse> filterToggleSearch(String queryCell,
+	public ArrayList<String> querryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
 			boolean electricalTicked, boolean neuromuscularTicked) {
 		
-		ArrayList<NeuronalSynapse> searchResults = new ArrayList<NeuronalSynapse>();
+		/* TO DO
+		 * - add synapse types to check (add to search class)
+		 * - build color rule
+		 * - add search spec from email --> translation in search class
+		 */
 		
-		//iterate over connectome
+		ArrayList<String> searchResults = new ArrayList<String>();
+		
+		System.out.println("STARTING NEW SEARCH");
+//		//iterate over connectome
 		for (NeuronalSynapse ns : connectome) {
 			//check if synapse contains query cell
-			if (ns.getCell1().equals(queryCell) || ns.getCell2().equals(queryCell)) {
+			if (ns.getCell1().toLowerCase().contains(queryCell) || ns.getCell2().toLowerCase().contains(queryCell)) {
+				String cell_1 = ns.getCell1();
+				String cell_2 = ns.getCell2();
+				
 				//process type code
 				String synapseTypeDescription = ns.getSynapseType().getDescription();
 				
 				//find synapse type code for connection, compare to toggle ticks
 				if (synapseTypeDescription.equals(s_presynapticDescription)) {
 					if (presynapticTicked) {
-						searchResults.add(ns);
+						//don't add duplicates
+						if (!searchResults.contains(cell_1)) {
+							searchResults.add(cell_1);
+						}
+						
+						if (!searchResults.contains(cell_2)) {
+							searchResults.add(cell_2);
+						}
 					}
 				} else if (synapseTypeDescription.equals(r_postsynapticDescription)) {
 					if (postsynapticTicked) {
-						searchResults.add(ns);
+						//don't add duplicates
+						if (!searchResults.contains(cell_1)) {
+							searchResults.add(cell_1);
+						}
+						
+						if (!searchResults.contains(cell_2)) {
+							searchResults.add(cell_2);
+						}
 					}
 				} else if (synapseTypeDescription.equals(ej_electricalDescription)) {
 					if (electricalTicked) {
-						searchResults.add(ns);
+						//don't add duplicates
+						if (!searchResults.contains(cell_1)) {
+							searchResults.add(cell_1);
+						}
+						
+						if (!searchResults.contains(cell_2)) {
+							searchResults.add(cell_2);
+						}
 					}
-					
 				} else if (synapseTypeDescription.equals(nmj_neuromuscularDescrpition)) {
 					if (neuromuscularTicked) {
-						searchResults.add(ns);
+						//don't add duplicates
+						if (!searchResults.contains(cell_1)) {
+							System.out.println("adding #1: " + cell_1);
+							searchResults.add(cell_1);
+						}
+						
+						if (!searchResults.contains(cell_2)) {
+							System.out.println("adding #2: " + cell_2);
+							searchResults.add(cell_2);
+						}
 					}
 				}
 			}
 		}
-		
 		return searchResults;
+	}
+	
+	public String generateHTML(String queryCell) {
+		String HTML = "";
+		
+		return HTML;
+		
 	}
 	
 	public void debug() {
@@ -92,12 +137,12 @@ public class Connectome {
 		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
 		
 		String queryCell = "AIZL";
-		filterToggleSearch(queryCell, true, true, true, true);
+		querryConnectivity(queryCell, true, true, true, true);
 	}
 	
 	private final static String connectomeFilePath = "src/wormguides/model/connectome_file/NeuronConnect.csv";
-	private final static String s_presynapticDescription = "";
-	private final static String r_postsynapticDescription = "";
-	private final static String ej_electricalDescription = "";
-	private final static String nmj_neuromuscularDescrpition = "";
+	private final static String s_presynapticDescription = "S presynaptic";
+	private final static String r_postsynapticDescription = "R postsynaptic";
+	private final static String ej_electricalDescription = "EJ electrical";
+	private final static String nmj_neuromuscularDescrpition = "Nmj neuromuscular";
 }
