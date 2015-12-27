@@ -54,6 +54,11 @@ public class Connectome {
 		 */
 		
 		ArrayList<String> searchResults = new ArrayList<String>();
+
+		//error check
+		if (queryCell == null) {
+			return searchResults;
+		}
 		
 //		//iterate over connectome
 		for (NeuronalSynapse ns : connectome) {
