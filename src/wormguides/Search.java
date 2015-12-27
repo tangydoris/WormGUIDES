@@ -351,15 +351,39 @@ public class Search {
 		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
-		if (type==SearchType.GENE)
+		if (type==SearchType.GENE) {
 			WormBaseQuery.doSearch(searched);
-		else {
+		} else if (type == SearchType.CONNECTOME) { //separate case for name translation purposes (see setConnectomeRuleCells())
+			cells = setConnectomeRuleCells(searched);
+			rule.setCells(cells);
+		} else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
 		}
 		
 		rulesList.add(rule);
 		searchResultsList.clear();
+	}
+	
+	/*
+	 * Method which returns the cells which pertain to a connectome rule
+	 * If a systematic name is searched in the connectome e.g. ABa, the query if translated to a functional name prior to adding cells
+	 * If a functional name is searched in the connectome e.g. ASAL, no translation is done
+	 */
+	private static ArrayList<String> setConnectomeRuleCells(String searched) {
+		ArrayList<String> cells = new ArrayList<String>();
+		
+		//if a systematic name is searched, translate to functional before searching connectome
+		if (PartsList.containsLineageName(searched)) {
+			searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+		}
+		searched = searched.toLowerCase();
+		for (String name : functionalNames) {
+			if (name.toLowerCase().startsWith(searched)) {
+				cells.add(PartsList.getLineageNameByFunctionalName(name));
+			}
+		}
+		return cells;
 	}
 	
 	
@@ -384,7 +408,6 @@ public class Search {
 			case DESCRIPTION:
 							// TODO some cells with the searched term are not showing up in results list
 							//System.out.println("\nShowing found description names:");
-				
 							for (int i=0; i<descriptions.size(); i++) {
 								String textLowerCase = descriptions.get(i).toLowerCase();
 								String[] keywords = searched.split(" ");
