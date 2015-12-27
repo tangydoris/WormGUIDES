@@ -156,9 +156,12 @@ public class StoryList {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Stories list:\n");
-		for (Story story : stories) {
+		for (int i=0; i<stories.size(); i++) {
+			Story story = stories.get(i);
 			sb.append(story.getName()).append(": ")
-				.append(story.getNumberOfNotes()).append(" notes\n");
+				.append(story.getNumberOfNotes()).append(" notes");
+			if (i<stories.size()-1)
+				sb.append("\n");
 		}
 		
 		return sb.toString();
