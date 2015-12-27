@@ -8,18 +8,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import wormguides.model.Note.AttachmentTypeEnumException;
+import wormguides.model.Note.LocationStringFormatException;
+import wormguides.model.Note.TagDisplayEnumException;
+import wormguides.model.Note.TimeStringFormatException;
+
 public class StoryList {
 	
-	ArrayList<Story> stories;
+	public ArrayList<Story> stories;
+	public SceneElementsList list;
 	
-	public StoryList() {
+	
+	public StoryList(SceneElementsList list) {
 		stories = new ArrayList<Story>();
+		this.list = list;
 		buildStories();
 	}
+	
 	
 	public void buildStories() {
 		try {
@@ -44,6 +52,7 @@ public class StoryList {
 		}
 	}
 	
+	
 	public void processStream(InputStream stream) {
 		int storyCounter = -1; //used for accessing the current story for adding scene elements
 
@@ -52,56 +61,65 @@ public class StoryList {
 			BufferedReader reader = new BufferedReader(streamReader);
 			
 			String line;
+			
+			// Skip heading line
+			reader.readLine();
+			
 			while ((line = reader.readLine()) != null) {
-				String[] splits =  line.split(",", 8); //split the line up by commas
+				String[] split =  line.split(",", NUMBER_OF_CSV_FIELDS); //split the line up by commas
 				
-				//check if story line or scene element line - CHANGE THIS CHECK EMPTYNESS OF ENTIRE END OF LINE
-				if (splits[2].length() == 0) { //story line
-					Story story = new Story(splits[0], splits[1]);
+				int len = split.length;
+
+				if (len!=NUMBER_OF_CSV_FIELDS) {
+					System.out.println("Missing fields in CSV file.");
+					continue;
+				}
+				
+				if (isStory(split)) {
+					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX]);
 					stories.add(story);
 					storyCounter++;
-				} else { //scene element line
-					boolean billboardFlag = false;
-					if (splits[4].contains("BILLBOARD")) {
-						billboardFlag = true;
-					}
-						
-					//vector of cell names
-					ArrayList<String> cellNames = new ArrayList<String>();
-					StringTokenizer st = new StringTokenizer(splits[1]);
-					while (st.hasMoreTokens()) {
-						cellNames.add(st.nextToken());
-					}
-					
-					//check if complete resource location
-					boolean completeResourceFlag = true;
-					String resourceLocation = splits[4];
-					int idx = resourceLocation.lastIndexOf(".");
-					if (idx != -1) {
-						String extCheck = resourceLocation.substring(++idx); //substring after "."
-						for (int i = 0 ; i < extCheck.length(); i++) {
-							if (!Character.isLetter(extCheck.charAt(i))) {
-								completeResourceFlag = false;
-							}
-						}
-					} else {
-						completeResourceFlag = false;
-					}
-
-					SceneElement se = new SceneElement(splits[0], cellNames,
-							splits[2], splits[3], splits[4],
-							Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
-							splits[7], completeResourceFlag, billboardFlag);
-							
-					stories.get(storyCounter).addSceneElement(se);
 				}
+				else {
+					Note note = new Note(split[NAME_INDEX], split[CONTENTS_INDEX]);
+					try {
+						note.setTagDisplay(split[DISPLAY_INDEX]);
+						note.setAttachmentType(split[TYPE_INDEX]);
+						note.setLocation(split[LOCATION_INDEX]);
+						note.setCells(split[CELLS_INDEX]);
+						// story.setMarker(?);
+						
+						SceneElement element = note.setImgSource(split[IMG_SOURCE_INDEX]);
+						if (element!=null)
+							list.addSceneElement(element);
+						
+						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
+						note.setStartTime(split[START_TIME_INDEX]);
+						note.setEndTime(split[END_TIME_INDEX]);
+						note.setComments(split[COMMENTS_INDEX]);
+						
+					} catch (ArrayIndexOutOfBoundsException e) {
+						System.out.println(e.toString());
+						System.out.println(line);
+					} catch (TagDisplayEnumException e) {
+						System.out.println(e.toString());
+						System.out.println(line);
+					} catch (AttachmentTypeEnumException e) {
+						System.out.println(e.toString());
+						System.out.println(line);
+					} catch (LocationStringFormatException e) {
+						System.out.println(e.toString());
+						System.out.println(line);
+					} catch (TimeStringFormatException e) {
+						System.out.println(e.toString());
+						System.out.println(line);
+					} finally {
+						stories.get(storyCounter).addNote(note);
+					}
+				}	
 			}
 			
 			reader.close();
-			
-			// Debug
-			for (Story story : stories)
-				System.out.println(story.toString());
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.out.println("Unable to process file '" + STORY_CONFIG_FILE_NAME + "'.");
@@ -112,19 +130,56 @@ public class StoryList {
 		}
 	}
 	
-	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		ArrayList<SceneElement> sceneElementsAtTime = new ArrayList<SceneElement>();
-		for (int i = 0; i < stories.size(); i++) {
-			ArrayList<SceneElement> currStorySceneElements = stories.get(i).getSceneElements();
-			for (int j = 0; j < currStorySceneElements.size(); j++) {
-				SceneElement currSE = currStorySceneElements.get(j);
-				if (currSE.getStartTime() <= time && currSE.getEndTime() >= time) {
-					sceneElementsAtTime.add(currSE);
-				}
-			}
+	
+	public boolean isStory(String[] csvLine) {
+		try {
+			if (csvLine[DISPLAY_INDEX].isEmpty())
+				return true;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return false;
 		}
-		return sceneElementsAtTime;
+		return false;
 	}
 	
+	
+	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
+		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
+		for (Story story : stories) {
+			for (SceneElement element : story.getSceneElementsAtTime(time)) {
+				if (!elements.contains(element))
+					elements.add(element);
+			}
+		}
+		return elements;
+	}
+	
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Stories list:\n");
+		for (Story story : stories) {
+			sb.append(story.getName()).append(": ")
+				.append(story.getNumberOfNotes()).append(" notes\n");
+		}
+		
+		return sb.toString();
+	}
+	
+	
 	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
+	private final int NUMBER_OF_CSV_FIELDS = 12;
+	private final int STORY_NAME_INDEX = 0,
+					STORY_DESCRIPTION_INDEX = 1;
+	private final int NAME_INDEX = 0,
+					CONTENTS_INDEX = 1,
+					DISPLAY_INDEX = 2,
+					TYPE_INDEX = 3,
+					LOCATION_INDEX = 4,
+					CELLS_INDEX = 5,
+					MARKER_INDEX = 6,
+					IMG_SOURCE_INDEX = 7,
+					RESOURCE_LOCATION_INDEX = 8,
+					START_TIME_INDEX = 9,
+					END_TIME_INDEX = 10,
+					COMMENTS_INDEX = 11;
+	
 }

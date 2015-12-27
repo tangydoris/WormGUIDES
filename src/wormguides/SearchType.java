@@ -15,21 +15,22 @@ public enum SearchType {
 	 */
 	MULTICELL ("Multicellular Structure");
 	
+	
 	private String description;
 	
-	SearchType() {
-		this("");
-	}
 	
 	SearchType(String description) {
 		this.description = description;
 	}
 	
+	
 	public String getDescription() {
 		return description;
 	}
 	
+	
 	public String toString() {
 		return getDescription();
 	}
+	
 }

@@ -16,10 +16,6 @@ public enum SearchOption {
 	
 	private String description;
 	
-	SearchOption() {
-		this("");
-	}
-	
 	SearchOption(String description) {
 		this.description = description;
 	}

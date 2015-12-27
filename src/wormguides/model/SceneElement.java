@@ -20,7 +20,6 @@ public class SceneElement {
 	private final String comments;
 	private final boolean completeResourceFlag;
 	private final boolean billboardFlag;
-	private static final String OBJEXT = ".obj";
 	
 
 	public SceneElement(String sceneName, ArrayList<String> cellNames,
@@ -54,6 +53,23 @@ public class SceneElement {
 	}
 	
 	
+	// Geometry used for notes in stories
+	public SceneElement(String sceneName, String imagingSource, String resourceLocation, 
+						int startTime, int endTime, String comments, boolean billboardFlag) {
+		this.sceneName = sceneName;
+		this.cellNames = new ArrayList<String>();
+		this.markerName = "";
+		this.embryoName = ""; //will fill this field in later?
+		this.imagingSource = imagingSource;
+		this.resourceLocation = resourceLocation;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.comments = comments;
+		this.completeResourceFlag = !resourceLocation.isEmpty() && resourceLocation.endsWith(OBJ_EXT);
+		this.billboardFlag = billboardFlag;
+	}
+	
+	
 	public MeshView buildGeometry(int time) {
 		time++;
 		// TODO OPTIMIZE THIS LATER
@@ -64,7 +80,7 @@ public class SceneElement {
 			return loader.loadOBJ(this.resourceLocation);
 		} else {
 			//append time and ext to resource location
-			String objFile = this.resourceLocation + "_t" + time + OBJEXT;
+			String objFile = this.resourceLocation + "_t" + time + OBJ_EXT;
 			return loader.loadOBJ(objFile);
 		}
 	}
@@ -107,6 +123,11 @@ public class SceneElement {
 	
 	public boolean isMulticellular() {
 		return cellNames.size()>1;
+	}
+	
+	
+	public boolean existsAtTime(int time) {
+		return startTime<=time && time<=endTime;
 	}
 	
 	
@@ -158,4 +179,6 @@ public class SceneElement {
 	public String toString() {
 		return sceneName+": "+resourceLocation;
 	}
+	
+	private final String OBJ_EXT = ".obj";
 }

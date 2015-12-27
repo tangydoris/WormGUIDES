@@ -23,7 +23,7 @@ import java.util.jar.JarFile;
 
 public class SceneElementsList {
 	
-	public ArrayList<SceneElement> sceneElementsList;
+	public ArrayList<SceneElement> elementsList;
 	public HashMap<String, String> multicellNamesToCommentsMap;
 	private JarFile jarFile;
 	private ArrayList<JarEntry> objEntries;
@@ -31,7 +31,7 @@ public class SceneElementsList {
 	
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
 	public SceneElementsList() {
-		sceneElementsList = new ArrayList<SceneElement>();
+		elementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
 		multicellNamesToCommentsMap = new HashMap<String, String>();
 	}
@@ -112,7 +112,7 @@ public class SceneElementsList {
 						splits[7], completeResourceFlag, billboardFlag);
 				
 				//add scene element to list
-				sceneElementsList.add(se);
+				elementsList.add(se);
 			}
 			
 			reader.close();
@@ -125,10 +125,16 @@ public class SceneElementsList {
 	}
 	
 	
+	public void addSceneElement(SceneElement element) {
+		if (element!=null)
+			elementsList.add(element);
+	}
+	
+	
 	// Pick out all multicellular names and map them to their comments
 	private void pickOutMulticellNames() {
-		for (int i = 0; i < sceneElementsList.size(); i++) {
-			SceneElement current = sceneElementsList.get(i);
+		for (int i = 0; i < elementsList.size(); i++) {
+			SceneElement current = elementsList.get(i);
 			//check if the scene element is a multicellular structure
 			if (current.isMulticellular()) {
 				multicellNamesToCommentsMap.put(current.getSceneName(), current.getComments());
@@ -142,8 +148,8 @@ public class SceneElementsList {
 		
 		// Add lineage names of all structures at time
 		ArrayList<String> list = new ArrayList<String>();
-		for (SceneElement se : sceneElementsList) {
-			if (se.getStartTime()<=time && se.getEndTime()>=time)
+		for (SceneElement se : elementsList) {
+			if (se.existsAtTime(time))
 				if (se.isMulticellular())
 					list.add(se.getSceneName());
 				else
@@ -157,10 +163,10 @@ public class SceneElementsList {
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		time++;
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
-		for (int i = 0; i < sceneElementsList.size(); i++) {
-			SceneElement curr = sceneElementsList.get(i);
-			if (curr.getStartTime() <= time && curr.getEndTime() >= time) {
-				sceneElements.add(curr);
+		for (int i = 0; i < elementsList.size(); i++) {
+			SceneElement se = elementsList.get(i);
+			if (se.existsAtTime(time)) {
+				sceneElements.add(se);
 			}
 		}
 		return sceneElements;
@@ -168,7 +174,7 @@ public class SceneElementsList {
 	
 	
 	public ArrayList<SceneElement> getList() {
-		return sceneElementsList;
+		return elementsList;
 	}
 	
 	

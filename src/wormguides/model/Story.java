@@ -3,47 +3,75 @@ package wormguides.model;
 import java.util.ArrayList;
 
 public class Story {
-
-	private ArrayList<SceneElement> elements;
-	private String StoryName;
-	private String StoryTags;
+	
+	private String name;
+	private String description;
+	private ArrayList<Note> notes;
 	
 	
-	public Story(String storyName, String storyTags) {
-		elements = new ArrayList<SceneElement>();
-		this.StoryName = storyName;
-		this.StoryTags = storyTags;
+	public Story(String name, String description) {
+		this.name = name;
+		this.description = description;
+		notes = new ArrayList<Note>();
 	}
 	
 	
-	public void addSceneElement(SceneElement se) {
-		if (se != null) {
-			elements.add(se);
+	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
+		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
+		for (SceneElement element : getAllSceneElements()) {
+			if (element.existsAtTime(time) && !elements.contains(element))
+				elements.add(element);
 		}
-	}
-	
-	
-	public ArrayList<SceneElement> getSceneElements() {
 		return elements;
 	}
 	
 	
-	public String getStoryName() {
-		return StoryName;
+	public ArrayList<SceneElement> getAllSceneElements() {
+		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
+		for (Note note : notes) {
+			if (note.hasSceneElements()) {
+				for (SceneElement element : note.getSceneElements()) {
+					if (!elements.contains(element))
+						elements.add(element);
+				}
+			}
+		}
+		return elements;
 	}
 	
 	
-	public String getStoryTags() {
-		return StoryTags;
+	public int getNumberOfNotes() {
+		return notes.size();
 	}
 	
 	
-	public String toString() {
-		StringBuilder sb = new StringBuilder(getStoryName());
-		sb.append(" applies to\n");
-		for (SceneElement e : elements)
-			sb.append("\t"+e.getSceneName()+"\n");
-		return sb.toString();
+	public void setName(String name) {
+		this.name = name;
 	}
 	
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	
+	public void addNote(Note note) {
+		notes.add(note);
+	}
+	
+	
+	public String getName() {
+		return name;
+	}
+	
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	
+	public Note[] getNotes() {
+		return notes.toArray(new Note[notes.size()]);
+	}
+
 }

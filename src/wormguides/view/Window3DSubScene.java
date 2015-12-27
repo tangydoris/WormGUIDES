@@ -138,7 +138,7 @@ public class Window3DSubScene{
 //------------------------STORY ELEMENTS---------------	
 	//Story elements stuff
 	private StoryList storyList;
-	private ArrayList<SceneElement> storyElementsAtTime;
+	private ArrayList<SceneElement> currentStoryElements;
 	private ArrayList<MeshView> currentStoryElementMeshes;
 	
 	//Billboard stuff
@@ -254,7 +254,8 @@ public class Window3DSubScene{
 		
 //-------------------------STORY ELEMENTS---------------------	
 		//initialize story elements
-		storyList = new StoryList();
+		storyList = new StoryList(sceneElementsList);
+		System.out.println(storyList.toString());
 		currentStoryElementMeshes = new ArrayList<MeshView>();
 		
 		//initialize billboards
@@ -361,8 +362,6 @@ public class Window3DSubScene{
 					selectedName.set(cellNames[selectedIndex.get()]);
 				}
 				else if (node instanceof MeshView) {
-					//selectedIndex.set(getPickedMeshIndex((MeshView)node));
-					
 					for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
@@ -440,8 +439,8 @@ public class Window3DSubScene{
 			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
 			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 				//add meshes from each scene element
-				SceneElement curr = sceneElementsAtTime.get(i);
-				MeshView mesh = curr.buildGeometry(time);
+				SceneElement se = sceneElementsAtTime.get(i);
+				MeshView mesh = se.buildGeometry(time);
 				
 				if (mesh != null) {
 					//null mesh when file not found thrown
@@ -451,7 +450,7 @@ public class Window3DSubScene{
 					currentSceneElementMeshes.add(mesh);
 					
 					//add scene element to rendered scene element reference for on click responsiveness
-					currentSceneElements.add(curr);
+					currentSceneElements.add(se);
 				}
 			}	
 		}
@@ -469,10 +468,10 @@ public class Window3DSubScene{
 			currentStoryElementMeshes.clear();
 		}
 		
-		storyElementsAtTime = storyList.getSceneElementsAtTime(time);
-		for (int i = 0; i < storyElementsAtTime.size(); i++) {
+		currentStoryElements = storyList.getSceneElementsAtTime(time);
+		for (int i = 0; i < currentStoryElements.size(); i++) {
 			//add meshes from each scene element in story
-			SceneElement se = storyElementsAtTime.get(i);
+			SceneElement se = currentStoryElements.get(i);
 			if (se.getBillboardFlag()) {
 				Text t = se.buildBillboard();
 				if (t != null) {

@@ -368,9 +368,6 @@ public class Search {
 							break;
 						
 			case DESCRIPTION:
-							// TODO some cells with the searched term are not showing up in results list
-							//System.out.println("\nShowing found description names:");
-				
 							for (int i=0; i<descriptions.size(); i++) {
 								String textLowerCase = descriptions.get(i).toLowerCase();
 								String[] keywords = searched.split(" ");
@@ -397,16 +394,43 @@ public class Search {
 							
 			case MULTICELL:	
 							if (sceneElementsList != null) {
+								/*
+								 * TODO implement comment search for multicell
+								 */
 								for (SceneElement se : sceneElementsList.getList()) {
 									if (se.isMulticellular()) {
-										if (isNameSearched(se.getSceneName(), searched))
-											cells.addAll(se.getAllCellNames());
+										String[] searchTerms = searched.trim().toLowerCase().split(" ");
+										boolean nameSearched = true;
+										boolean commentSearched = true;
+										
+										String name = se.getSceneName();
+										String comment = sceneElementsList.getMulticellNamesToCommentsMap()
+																			.get(name).toLowerCase();
+										name = name.toLowerCase();
+										
+										for (String word : searchTerms) {
+											if (nameSearched && !name.contains(word))
+												nameSearched = false;
+											if (comment!=null && commentSearched
+														&& !comment.contains(word))
+												commentSearched = false;
+										}
+										
+										if (nameSearched || commentSearched) {
+											for (String cellName : se.getAllCellNames()) {
+												if (!searchResultsList.contains(cellName))
+													searchResultsList.add(cellName);
+											}
+										}
 									}
 								}
 							}
 							break;
 							
 			case CONNECTOME:
+							/*
+							 * TODO implement connectome search
+							 */
 							break;
 		}
 		return cells;

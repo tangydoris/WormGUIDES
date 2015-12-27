@@ -65,25 +65,6 @@ public class StructuresLayer {
 			}
 		};
 	}
-	
-	
-	/*
-	 * Not sure what this text field this is for
-	public ChangeListener<String> getTextFieldListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-											String oldValue, String newValue) {
-				searchText = newValue.toLowerCase();
-				System.out.println(searchText);
-				if (searchText.isEmpty())
-					structuresSearchResultsList.clear();
-				else
-					searchStructures();
-			}
-		};
-	}
-	*/
 
 	
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
@@ -130,12 +111,18 @@ public class StructuresLayer {
 				// Look at scene names
 				boolean nameSearched = true;
 				boolean commentSearched = true;
+				
+				String comment = nameToCommentsMap.get(name).toLowerCase();
+				name = name.toLowerCase();
+				
 				for (String word : searchTerms) {
-					if (name.toLowerCase().contains(searched))
+					if (nameSearched && !name.contains(word))
 						nameSearched = false;
-					if (nameToCommentsMap.get(name).toLowerCase().contains(searched))
+					if (comment!=null && commentSearched
+								&& !comment.contains(word))
 						commentSearched = false;
 				}
+				
 				if (nameSearched || commentSearched)
 					searchResultsList.add(name);
 			}
