@@ -104,7 +104,7 @@ public class StructuresLayer {
 	
 	// Only searches names for now
 	public void searchStructures(String searched) {
-		String[] searchTerms = searched.toLowerCase().split(" ");
+		String[] terms = searched.toLowerCase().split(" ");
 		searchResultsList.clear();
 		for (String name : allStructuresList) {
 			if (!searchResultsList.contains(name)) {
@@ -115,11 +115,10 @@ public class StructuresLayer {
 				String comment = nameToCommentsMap.get(name).toLowerCase();
 				name = name.toLowerCase();
 				
-				for (String word : searchTerms) {
+				for (String word : terms) {
 					if (nameSearched && !name.contains(word))
 						nameSearched = false;
-					if (comment!=null && commentSearched
-								&& !comment.contains(word))
+					if (comment!=null && commentSearched && !comment.contains(word))
 						commentSearched = false;
 				}
 				

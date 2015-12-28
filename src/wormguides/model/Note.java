@@ -12,24 +12,26 @@ public class Note {
 	private Type attachmentType;
 	private Display tagDisplay;
 	private Point3D location;
-	private ArrayList<String> cells;
-	private boolean marker;
-	private String imgSource;
+	private String cellName;
+	private String marker;
+	private String imagingSource;
 	private String resourceLocation;
 	private int startTime, endTime;
 	private String comments;
+	private String url;
 	
 	
 	public Note() {
-		elements = null;
+		elements = new ArrayList<SceneElement>();
 		tagName = "";
 		tagContents = "";
 		location = new Point3D(0, 0, 0);
-		cells = new ArrayList<String>();
-		imgSource = "";
+		cellName = "";
+		imagingSource = "";
 		resourceLocation = "";
-		startTime = endTime = 0;
+		startTime = endTime = -1;
 		comments = "";
+		url = "";
 	}
 	
 	
@@ -40,45 +42,66 @@ public class Note {
 	}
 	
 	
+	public void setUrl(String url) {
+		if (url!=null)
+			this.url = url;
+	}
+	
+	
 	public void setTagName(String tagName) {
-		this.tagName = tagName;
+		if (tagName!=null)
+			this.tagName = tagName;
 	}
 	
 	
 	public void setTagContents(String tagContents) {
-		this.tagContents = tagContents;
+		if (tagContents!=null)
+			this.tagContents = tagContents;
 	}
 	
 	
-	public void setTagDisplay(String display) throws TagDisplayEnumException {
-		for (Display d : Display.values()) {
-			if (d.equalsTo(display.trim().toLowerCase())) {
-				setTagDisplay(d);
-				return;
+	public SceneElement setTagDisplay(String display) throws TagDisplayEnumException {
+		if (display!=null) {
+			for (Display d : Display.values()) {
+				if (d.equalsTo(display.trim().toLowerCase())) {
+					setTagDisplay(d);
+					if (d.equalsTo("billboard")) {
+						SceneElement element = new SceneElement(tagName, cellName, marker, imagingSource, resourceLocation, 
+																startTime, endTime, comments, true);
+						elements.add(element);
+						return element;
+					}
+					return null;
+				}
 			}
+			throw new TagDisplayEnumException();
 		}
-		throw new TagDisplayEnumException();
+		return null;
 	}
 	
 	
 	private void setTagDisplay(Display display) {
-		tagDisplay = display;
+		if (display!=null)
+			tagDisplay = display;
 	}
 	
 	
 	public void setAttachmentType(String type) throws AttachmentTypeEnumException {
-		for (Type t : Type.values()) {
-			if (t.equalsTo(type)) {
-				setAttachmentType(t);
-				return;
+		if (type!=null) {
+			for (Type t : Type.values()) {
+				if (t.equalsTo(type)) {
+					setAttachmentType(t);
+					return;
+				}
 			}
+			throw new AttachmentTypeEnumException();
 		}
-		throw new AttachmentTypeEnumException();
 	}
 	
 	
 	private void setAttachmentType(Type type) {
-		attachmentType = type;
+		if (type!=null)
+			attachmentType = type;
 	}
 	
 	
@@ -103,42 +126,50 @@ public class Note {
 	
 	public void setLocation(int x, int y, int z) {
 		location = new Point3D(x, y, z);
+		for (SceneElement se : elements)
+			se.setBillboardLocation(x, y, z);
 	}
 	
 	
-	public void setCells(String inputString) {
-		String[] names = inputString.trim().split(" ");
-		for (String name : names)
-			cells.add(name);
-	}
-	
-	
-	public void setMarker(boolean marker) {
-		this.marker = marker;
-	}
-	
-	
-	public SceneElement setImgSource(String imgSource) {
-		this.imgSource = imgSource;
-		if (!imgSource.isEmpty() && imgSource.trim().toLowerCase().endsWith(OBJ_EXT)) {
-			elements = new ArrayList<SceneElement>();
-			boolean billboardFlag = isDisplayBillboard(tagDisplay.toString());
-			SceneElement element = new SceneElement(tagName, imgSource, resourceLocation, startTime,
-													endTime, comments, billboardFlag);
-			elements.add(element);
-			return element;
+	public void setCellName(String name) {
+		if (name!=null) {
+			cellName = name;
+			for (SceneElement se : elements)
+				se.addCellName(name);
 		}
-		return null;
+	}
+	
+	
+	public void setMarker(String marker) {
+		if (marker!=null) {
+			this.marker = marker;
+			for (SceneElement se : elements)
+				se.setMarker(marker);
+		}
+	}
+	
+	
+	public void setImagingSource(String source) {
+		if (source!=null && !source.isEmpty() && source.trim().toLowerCase().endsWith(OBJ_EXT)) {
+			imagingSource = source;
+			
+			for (SceneElement se : elements)
+				se.setImagingSource(imagingSource);
+		}
 	}
 	
 	
 	public boolean hasSceneElements() {
-		return elements!=null && !elements.isEmpty();
+		return !elements.isEmpty();
 	}
 	
 	
-	public void setResourceLocation(String resourceLocation) {
-		this.resourceLocation = resourceLocation;
+	public void setResourceLocation(String location) {
+		if (location!=null) {
+			resourceLocation = location;
+			for (SceneElement se : elements)
+				se.setResourceLocation(resourceLocation);
+		}
 	}
 	
 	
@@ -154,8 +185,10 @@ public class Note {
 	}
 	
 	
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
+	public void setStartTime(int time) {
+		this.startTime = time;
+		for (SceneElement se : elements)
+			se.setStartTime(time);
 	}
 	
 	
@@ -171,8 +204,10 @@ public class Note {
 	}
 	
 	
-	public void setEndTime(int endTime) {
-		this.endTime = endTime;
+	public void setEndTime(int time) {
+		this.endTime = time;
+		for (SceneElement se : elements)
+			se.setEndTime(time);
 	}
 	
 	
@@ -180,18 +215,26 @@ public class Note {
 		if (startTime<=endTime) {
 			this.startTime = startTime;
 			this.endTime = endTime;
+			for (SceneElement se : elements) {
+				se.setStartTime(startTime);
+				se.setEndTime(endTime);
+			}
 		}
 	}
 	
 	
 	public void setComments(String comments) {
-		this.comments = comments;
+		if (comments!=null) {
+			this.comments = comments;
+			for (SceneElement se : elements)
+				se.setComments(comments);
+		}
 	}
 	
 	
-	public void addSceneElement(SceneElement se) {
-		if (se != null)
-			elements.add(se);
+	public void addSceneElement(SceneElement element) {
+		if (element!=null)
+			elements.add(element);
 	}
 	
 	
@@ -225,18 +268,18 @@ public class Note {
 	}
 	
 	
-	public String[] getCells() {
-		return cells.toArray(new String[cells.size()]);
+	public String getCellName() {
+		return cellName;
 	}
 	
 	
-	public boolean getMarker() {
+	public String getMarker() {
 		return marker;
 	}
 	
 	
 	public String getImgSource() {
-		return imgSource;
+		return imagingSource;
 	}
 	
 	
@@ -274,8 +317,17 @@ public class Note {
 	}
 	
 	
-	public boolean isDisplayBillboard(String display) {
+	// Returns true if display string correspongs to the Display.BILLBOARD enum
+	// false otherwise
+	public boolean isDisplayBillboardEnum(String display) {
 		return Display.BILLBOARD.toString().equals(display.toLowerCase().trim());
+	}
+	
+	
+	// Returns true if the note tag display is Display.BILLBOARD
+	// false otherwise
+	public boolean isBillboard() {
+		return tagDisplay==Display.BILLBOARD;
 	}
 	
 	

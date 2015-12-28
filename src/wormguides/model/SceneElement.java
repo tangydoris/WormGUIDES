@@ -1,30 +1,39 @@
 package wormguides.model;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Translate;
+import wormguides.GeometryLoader;
 
 
 public class SceneElement {
 	
+	/*
+	 * A scene element can either be a billboard or a mesh
+	 */
+	
 	private final String sceneName; //descriptor or display of object
-	private ArrayList<String> cellNames; //cell names at time point i.e. cells involved in this scene
-	private final String markerName; //used when neuron is separated from marker
-	private final String embryoName; //used when based on specific embryo
-	private final String imagingSource; //meta data
-	private final String resourceLocation; //directory that contains the .obj files for this scene element. URL, JAR, path, web server
-	private final int startTime;
-	private final int endTime;
-	private final String comments;
-	private final boolean completeResourceFlag;
-	private final boolean billboardFlag;
+	private final ArrayList<String> cellNames; //cell names at time point i.e. cells involved in this scene
+	private String markerName; //used when neuron is separated from marker
+	private String embryoName; //used when based on specific embryo
+	private String imagingSource; //meta data
+	private String resourceLocation; //directory that contains the .obj files for this scene element. URL, JAR, path, web server
+	private int startTime;
+	private int endTime;
+	private String comments;
+	private boolean completeResourceFlag;
+	private boolean billboardFlag;
+	
+	
+	// TODO change this out later, this is just a hack to make billboard show up
+	// ask Anthony about making another BillBoard object instead of having it as a scene element
+	private int boardX, boardY, boardZ;
 	
 
 	public SceneElement(String sceneName, ArrayList<String> cellNames,
 			String markerName, String imagingSource, String resourceLocation, 
-			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) { //add EmbryoName
+			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) {
 		
 		this.sceneName = sceneName;
 		this.cellNames = cellNames;
@@ -54,18 +63,21 @@ public class SceneElement {
 	
 	
 	// Geometry used for notes in stories
-	public SceneElement(String sceneName, String imagingSource, String resourceLocation, 
-						int startTime, int endTime, String comments, boolean billboardFlag) {
+	public SceneElement(String sceneName, String cellName,
+			String markerName, String imagingSource, String resourceLocation, 
+			int startTime, int endTime, String comments, boolean billboardFlag) {
+		
 		this.sceneName = sceneName;
 		this.cellNames = new ArrayList<String>();
-		this.markerName = "";
+		cellNames.add(cellName);
+		this.markerName = markerName;
 		this.embryoName = ""; //will fill this field in later?
 		this.imagingSource = imagingSource;
 		this.resourceLocation = resourceLocation;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.comments = comments;
-		this.completeResourceFlag = !resourceLocation.isEmpty() && resourceLocation.endsWith(OBJ_EXT);
+		this.completeResourceFlag = resourceLocation!=null && !resourceLocation.isEmpty();
 		this.billboardFlag = billboardFlag;
 	}
 	
@@ -88,26 +100,90 @@ public class SceneElement {
 	
 	public Text buildBillboard() {
 		if (billboardFlag) {	
-			//extract positions from resource location
-			double x, y, z;
-			StringTokenizer st = new StringTokenizer(resourceLocation);
-			if (st.countTokens() == 3) {
-				x = Double.parseDouble(st.nextToken());
-				y = Double.parseDouble(st.nextToken());
-				z = Double.parseDouble(st.nextToken());
-				Text t = new Text(20, 50, sceneName);
-				t.setFont(new Font(25));
-				
-				//add positioning to text
-				Translate tr = new Translate(x, y, z);
-				t.getTransforms().add(tr);
-				return t;
-			} else { //incorrect position format
-				return null;
-			}	
-		} else { //billboardflag is false, method was incorrectly called
-			return null;
+			Text t = new Text(sceneName);
+			t.setFont(new Font(13));
+			t.setFill(Color.WHITE);
+			return t;
+
 		}
+		else //billboardflag is false, method was incorrectly called
+			return null;
+	}
+	
+	
+	public int getBillboardX() {
+		return boardX;
+	}
+	
+	
+	public int getBillboardY() {
+		return boardY;
+	}
+	
+	
+	public int getBillboardZ() {
+		return boardZ;
+	}
+	
+	
+	public void setImagingSource(String source) {
+		if (source!=null)
+			this.imagingSource = source;
+	}
+	
+	
+	public void setResourceLocation(String location) {
+		if (location!=null)
+			resourceLocation = location;
+	}
+	
+	
+	public void setStartTime(int time) {
+		startTime = time;
+	}
+	
+	
+	public void setEndTime(int time) {
+		endTime = time;
+	}
+	
+	
+	public void setMarker(String marker) {
+		if (marker!=null)
+			markerName = marker;
+	}
+	
+	
+	public void addCellName(String name) {
+		if (name!=null)
+			cellNames.add(name);
+	}
+	
+	
+	public void setComments(String comments) {
+		if (comments!=null)
+			this.comments = comments;
+	}
+	
+	
+	public void setEmbryoName(String name) {
+		if (name!=null)
+			embryoName = name;
+	}
+	
+	
+	public void setBillboardLocation(int x, int y, int z) {
+		boardX = x;
+		boardY = y;
+		boardZ = z;
+	}
+	
+	
+	public String getBillboardLocationString() {
+		StringBuilder sb = new StringBuilder(sceneName);
+		sb.append(" - billboard location: ");
+		sb.append(boardX).append(", ").append(boardY).append(", ").append(boardZ);
+		return sb.toString();
 	}
 	
 
@@ -122,11 +198,12 @@ public class SceneElement {
 	
 	
 	public boolean isMulticellular() {
-		return cellNames.size()>1;
+		return !billboardFlag && cellNames.size()>1;
 	}
 	
 	
 	public boolean existsAtTime(int time) {
+		time++;
 		return startTime<=time && time<=endTime;
 	}
 	

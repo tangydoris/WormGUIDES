@@ -16,13 +16,13 @@ import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
 import wormguides.model.Note.TimeStringFormatException;
 
-public class StoryList {
+public class StoriesList {
 	
 	public ArrayList<Story> stories;
 	public SceneElementsList list;
 	
 	
-	public StoryList(SceneElementsList list) {
+	public StoriesList(SceneElementsList list) {
 		stories = new ArrayList<Story>();
 		this.list = list;
 		buildStories();
@@ -83,15 +83,15 @@ public class StoryList {
 				else {
 					Note note = new Note(split[NAME_INDEX], split[CONTENTS_INDEX]);
 					try {
-						note.setTagDisplay(split[DISPLAY_INDEX]);
+						SceneElement e = note.setTagDisplay(split[DISPLAY_INDEX]);
+						if (e!=null)
+							list.addSceneElement(e);
 						note.setAttachmentType(split[TYPE_INDEX]);
 						note.setLocation(split[LOCATION_INDEX]);
-						note.setCells(split[CELLS_INDEX]);
+						note.setCellName(split[CELLNAME_INDEX]);
 						// story.setMarker(?);
 						
-						SceneElement element = note.setImgSource(split[IMG_SOURCE_INDEX]);
-						if (element!=null)
-							list.addSceneElement(element);
+						note.setImagingSource(split[IMG_SOURCE_INDEX]);
 						
 						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
 						note.setStartTime(split[START_TIME_INDEX]);
@@ -146,8 +146,10 @@ public class StoryList {
 		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
 		for (Story story : stories) {
 			for (SceneElement element : story.getSceneElementsAtTime(time)) {
-				if (!elements.contains(element))
+				if (!elements.contains(element)) {
+					//System.out.println("got scene element for "+story.getName()+" at time "+time);
 					elements.add(element);
+				}
 			}
 		}
 		return elements;
@@ -160,6 +162,10 @@ public class StoryList {
 			Story story = stories.get(i);
 			sb.append(story.getName()).append(": ")
 				.append(story.getNumberOfNotes()).append(" notes");
+			for (Note note : story.getNotes()) {
+				if (note.isBillboard())
+					sb.append(", billboard");
+			}
 			if (i<stories.size()-1)
 				sb.append("\n");
 		}
@@ -177,7 +183,7 @@ public class StoryList {
 					DISPLAY_INDEX = 2,
 					TYPE_INDEX = 3,
 					LOCATION_INDEX = 4,
-					CELLS_INDEX = 5,
+					CELLNAME_INDEX = 5,
 					MARKER_INDEX = 6,
 					IMG_SOURCE_INDEX = 7,
 					RESOURCE_LOCATION_INDEX = 8,

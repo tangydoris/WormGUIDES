@@ -17,22 +17,15 @@ public class Story {
 	
 	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-		for (SceneElement element : getAllSceneElements()) {
-			if (element.existsAtTime(time) && !elements.contains(element))
-				elements.add(element);
-		}
-		return elements;
-	}
-	
-	
-	public ArrayList<SceneElement> getAllSceneElements() {
+		//System.out.println("getting scene elements for story "+name+" at time "+time);
 		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
 		for (Note note : notes) {
 			if (note.hasSceneElements()) {
 				for (SceneElement element : note.getSceneElements()) {
-					if (!elements.contains(element))
+					if (element.existsAtTime(time) && !elements.contains(element)) {
+						//System.out.println("Got scene element from "+note.getTagName());
 						elements.add(element);
+					}
 				}
 			}
 		}

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import wormguides.model.StoryList;
+import wormguides.model.StoriesList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -137,12 +137,12 @@ public class Window3DSubScene{
 
 //------------------------STORY ELEMENTS---------------	
 	//Story elements stuff
-	private StoryList storyList;
+	private StoriesList storiesList;
 	private ArrayList<SceneElement> currentStoryElements;
 	private ArrayList<MeshView> currentStoryElementMeshes;
 	
 	//Billboard stuff
-	private ArrayList<Text> billboardsAtTime;
+	private ArrayList<Text> currentBillboards;
 //------------------------------------------------------
 
 	public Window3DSubScene(double width, double height, LineageData data) {
@@ -252,15 +252,9 @@ public class Window3DSubScene{
 		currentSceneElementMeshes = new ArrayList<MeshView>();
 		currentSceneElements = new ArrayList<SceneElement>();
 		
-//-------------------------STORY ELEMENTS---------------------	
-		//initialize story elements
-		storyList = new StoryList(sceneElementsList);
-		System.out.println(storyList.toString());
+		currentStoryElements = new ArrayList<SceneElement>();
 		currentStoryElementMeshes = new ArrayList<MeshView>();
-		
-		//initialize billboards
-		billboardsAtTime = new ArrayList<Text>();
-//-------------------------------------------------------------	
+		currentBillboards = new ArrayList<Text>();
 	}
 	
 	
@@ -269,12 +263,16 @@ public class Window3DSubScene{
 	 * after the list is set, the SceneElements are loaded
 	 */
 	public void setSceneElementsList(SceneElementsList list) {
-		sceneElementsList = list;
-		
-		if (sceneElementsList != null) {
-			// Initialize scene element events
-			sceneElementsList.buildListFromConfig();
+		if (list!=null) {
+			sceneElementsList = list;
+			sceneElementsList.toString();
 		}
+	}
+	
+	
+	public void setStoriesList(StoriesList list) {
+		if (list!=null)
+			storiesList = list;
 	}
 	
 
@@ -419,7 +417,7 @@ public class Window3DSubScene{
 
 		cellNames = data.getNames(time);
 		
-		if (sceneElementsList != null)
+		if (sceneElementsList!=null)
 			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
 		
 		positions = data.getPositions(time);
@@ -457,35 +455,42 @@ public class Window3DSubScene{
 		// End scene element mesh loading/building
 		
 		
-//-------------------------STORY ELEMENTS---------------------		
-		//clear billboards
-		if(!billboardsAtTime.isEmpty()) {
-			billboardsAtTime.clear();
-		}
-		
-		//repeat process for story elements and billboards
-		if(!currentStoryElementMeshes.isEmpty()) {
-			currentStoryElementMeshes.clear();
-		}
-		
-		currentStoryElements = storyList.getSceneElementsAtTime(time);
-		for (int i = 0; i < currentStoryElements.size(); i++) {
-			//add meshes from each scene element in story
-			SceneElement se = currentStoryElements.get(i);
-			if (se.getBillboardFlag()) {
-				Text t = se.buildBillboard();
-				if (t != null) {
-					t.getTransforms().addAll(rotateX, rotateY);
-					billboardsAtTime.add(t);
-				}
-				
-			} else {
-				MeshView mesh = se.buildGeometry(time);
-				if (mesh != null) {
-					mesh.getTransforms().addAll(rotateX, rotateY);
-					currentStoryElementMeshes.add(mesh);
-				}
-			}	
+//-------------------------STORY ELEMENTS---------------------
+		if (storiesList!=null) {
+			//clear billboards
+			if(!currentBillboards.isEmpty()) {
+				currentBillboards.clear();
+			}
+			
+			//repeat process for story elements and billboards
+			if(!currentStoryElementMeshes.isEmpty()) {
+				currentStoryElementMeshes.clear();
+			}
+			
+			currentStoryElements = storiesList.getSceneElementsAtTime(time);
+			for (int i = 0; i < currentStoryElements.size(); i++) {
+				//add meshes from each scene element in story
+				SceneElement se = currentStoryElements.get(i);
+				if (se.getBillboardFlag()) {
+					System.out.println(se.getBillboardLocationString());
+					Text t = se.buildBillboard();
+					if (t != null) {
+						t.getTransforms().addAll(rotateX, rotateY, rotateZ);
+						t.getTransforms().add(new Translate(
+												newOriginX+se.getBillboardX(),
+												newOriginY+se.getBillboardY(),
+												newOriginZ+se.getBillboardZ()));
+						currentBillboards.add(t);
+					}
+					
+				} else {
+					MeshView mesh = se.buildGeometry(time);
+					if (mesh != null) {
+						mesh.getTransforms().addAll(rotateX, rotateY);
+						currentStoryElementMeshes.add(mesh);
+					}
+				}	
+			}
 		}
 //---------------------------------------------------------------
 		
@@ -529,24 +534,24 @@ public class Window3DSubScene{
  		
 		addCellsToScene(entities);
  		addMeshesToScene(entities);
+ 		
+ 		// STORY ELEMENTS
+ 		//add story scene element meshes to scene
+		if(!currentStoryElementMeshes.isEmpty())
+			entities.addAll(currentStoryElementMeshes);
 
 		refreshScene();
 		
 		// render opaque entities first
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
-
-//------------------------STORY ELEMENTS----------
-		//add story scene element meshes to scene
-		if(!currentStoryElementMeshes.isEmpty()) {
-			root.getChildren().addAll(currentStoryElementMeshes);
-		}
-
+		
+		// STORY ELEMENTS
 		//add billboards to scene
-		if(!billboardsAtTime.isEmpty()) {
-			root.getChildren().addAll(billboardsAtTime);
+		if(!currentBillboards.isEmpty()) {
+			//System.out.println("Adding billboards.");
+			root.getChildren().addAll(currentBillboards);
 		}
-//------------------------------------------------
 	}
 	
 	
@@ -611,26 +616,6 @@ public class Window3DSubScene{
 				list.add(currentSceneElementMeshes.get(i));
 			}
 		}
-		
-		/*
-		// Mesh inherits color from attached cell
-		// consult names array and scene elements for matches
-		if (!currentSceneElementMeshes.isEmpty()) { //process only if meshes at this time point
-			for (int j = 0; j < currentSceneElements.size(); j++) {
-				ArrayList<String> meshCellNames = currentSceneElements.get(j).getAllCellNames();
-				if (meshCellNames.contains(names[i])) {
-					//if match - set mesh color to current color of cell
-					currentSceneElementMeshes.get(j).setMaterial(material);
-					currentSceneElementMeshes.get(j).setCullFace(CullFace.NONE);
-					if (isOther)
-						renderSecond.add(currentSceneElementMeshes.get(j));
-					else
-						renderFirst.add(currentSceneElementMeshes.get(j));
-				}
-			}
-		}
-		// End color inheritance
-		*/
 	}
 	
 	

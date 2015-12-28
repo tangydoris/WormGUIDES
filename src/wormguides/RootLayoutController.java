@@ -48,6 +48,7 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
+import wormguides.model.StoriesList;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -129,6 +130,7 @@ public class RootLayoutController implements Initializable{
 	
 	//scene elements stuff
 	SceneElementsList elementsList;
+	StoriesList storiesList;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -379,7 +381,7 @@ public class RootLayoutController implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		if (Search.isMulticellStructure(name)) {
+		if (Search.isMulticellStructureName(name)) {
 			cellName.setText(name);
 			cellDescription.setText(Search.getMulticellComment(name));
 		}
@@ -658,8 +660,11 @@ public class RootLayoutController implements Initializable{
 		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)layers.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
+		
 		elementsList = new SceneElementsList();
+		storiesList = new StoriesList(elementsList);
 		window3D.setSceneElementsList(elementsList);
+		window3D.setStoriesList(storiesList);
 		Search.setSceneElementsList(elementsList);
 		
 		//set up the structure layer
