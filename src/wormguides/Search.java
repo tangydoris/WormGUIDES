@@ -368,6 +368,9 @@ public class Search {
 							break;
 						
 			case DESCRIPTION:
+							// TODO some cells with the searched term are not showing up in results list
+							//System.out.println("\nShowing found description names:");
+				
 							for (int i=0; i<descriptions.size(); i++) {
 								String textLowerCase = descriptions.get(i).toLowerCase();
 								String[] keywords = searched.split(" ");
@@ -394,43 +397,16 @@ public class Search {
 							
 			case MULTICELL:	
 							if (sceneElementsList != null) {
-								/*
-								 * TODO implement comment search for multicell
-								 */
 								for (SceneElement se : sceneElementsList.getList()) {
 									if (se.isMulticellular()) {
-										String[] searchTerms = searched.trim().toLowerCase().split(" ");
-										boolean nameSearched = true;
-										boolean commentSearched = true;
-										
-										String name = se.getSceneName();
-										String comment = sceneElementsList.getMulticellNamesToCommentsMap()
-																			.get(name).toLowerCase();
-										name = name.toLowerCase();
-										
-										for (String word : searchTerms) {
-											if (nameSearched && !name.contains(word))
-												nameSearched = false;
-											if (comment!=null && commentSearched
-														&& !comment.contains(word))
-												commentSearched = false;
-										}
-										
-										if (nameSearched || commentSearched) {
-											for (String cellName : se.getAllCellNames()) {
-												if (!searchResultsList.contains(cellName))
-													searchResultsList.add(cellName);
-											}
-										}
+										if (isNameSearched(se.getSceneName(), searched))
+											cells.addAll(se.getAllCellNames());
 									}
 								}
 							}
 							break;
 							
 			case CONNECTOME:
-							/*
-							 * TODO implement connectome search
-							 */
 							break;
 		}
 		return cells;
@@ -650,14 +626,7 @@ public class Search {
 				return;
 			
 			ArrayList<String> cellsForListView = new ArrayList<String>();
-			if (type==SearchType.SYSTEMATIC) {
-				for (String name : activeLineageNames) {
-					if (name.toLowerCase().startsWith(searched))
-						cellsForListView.add(name);
-				}
-			}				
-			else
-				cellsForListView.addAll(cells);
+			cellsForListView.addAll(cells);
 
 			if (descendantTicked) {
 				ArrayList<String> descendants = getDescendantsList(cells);
@@ -752,34 +721,16 @@ public class Search {
 	}
 	
 	
-	public static boolean isMulticellStructure(String name) {
-		if (sceneElementsList==null)
-			return false;
-		
-		for (SceneElement e : sceneElementsList.getList()) {
-			if (e.isMulticellular() 
-				&& name.toLowerCase().equals(e.getSceneName().toLowerCase()))
-				return true;
-		}
-		
-		return false;
+	public static String getMulticellComment(String name) {
+		return sceneElementsList.getCommentByName(name);
 	}
 	
 	
-	public static String getMulticellComment(String name) {
-		String out = "";
-		if (sceneElementsList==null)
-			return out;
+	public static boolean isMulticellStructureName(String name) {
+		if (sceneElementsList!=null && sceneElementsList.isMulticellStructureName(name))
+			return true;
 		
-		for (SceneElement e : sceneElementsList.getList()) {
-			if (e.isMulticellular() 
-				&& name.toLowerCase().equals(e.getSceneName().toLowerCase())) {
-				out = e.getComments();
-				break;
-			}
-		}
-		
-		return out;
+		return false;
 	}
 	
 	

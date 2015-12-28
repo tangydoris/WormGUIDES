@@ -34,10 +34,12 @@ public class SceneElementsList {
 		elementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
 		multicellNamesToCommentsMap = new HashMap<String, String>();
+		
+		buildListFromConfig();
 	}
 	
 	
-	public void buildListFromConfig() {
+	private void buildListFromConfig() {
 		try {
 			jarFile = new JarFile(new File("WormGUIDES.jar"));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -79,7 +81,7 @@ public class SceneElementsList {
 				//BUIILD SCENE ELEMENT
 				
 				boolean billboardFlag = false;
-				if (splits[4].contains("BILLBOARD")) {
+				if (splits[4].trim().toLowerCase().contains("billboard")) {
 					billboardFlag = true;
 				}
 				
@@ -137,7 +139,7 @@ public class SceneElementsList {
 			SceneElement current = elementsList.get(i);
 			//check if the scene element is a multicellular structure
 			if (current.isMulticellular()) {
-				multicellNamesToCommentsMap.put(current.getSceneName(), current.getComments());
+				multicellNamesToCommentsMap.put(current.getSceneName().toLowerCase(), current.getComments());
 			}
 		}
 	}
@@ -173,6 +175,15 @@ public class SceneElementsList {
 	}
 	
 	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("scene elements list:\n");
+		for (SceneElement se : elementsList) {
+			sb.append(se.getSceneName()).append("\n");
+		}
+		return sb.toString();
+	}
+	
+	
 	public ArrayList<SceneElement> getList() {
 		return elementsList;
 	}
@@ -180,6 +191,34 @@ public class SceneElementsList {
 	
 	public Set<String> getAllMulticellNames() {
 		return multicellNamesToCommentsMap.keySet();
+	}
+	
+	
+	public ArrayList<SceneElement> getMulticellSceneElements() {
+		ArrayList<SceneElement> list = new ArrayList<SceneElement>();
+		for (SceneElement se : elementsList) {
+			if (se.isMulticellular() && !list.contains(se))
+				list.add(se);
+		}
+		return list;
+	}
+	
+	
+	public boolean isMulticellStructureName(String name) {
+		name = name.trim().toLowerCase();
+		for (String cellName : getAllMulticellNames()) {
+			if (cellName.toLowerCase().equals(name))
+				return true;
+		}
+		return false;
+	}
+	
+	
+	public String getCommentByName(String name) {
+		String comment = multicellNamesToCommentsMap.get(name.trim().toLowerCase());
+		if (comment==null)
+			return "";
+		return comment;
 	}
 	
 	
