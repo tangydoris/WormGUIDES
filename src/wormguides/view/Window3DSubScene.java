@@ -3,6 +3,7 @@ package wormguides.view;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.TreeSet;
 
 import wormguides.model.StoriesList;
@@ -25,6 +26,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -34,6 +36,8 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
@@ -41,8 +45,10 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import wormguides.ColorComparator;
@@ -50,6 +56,9 @@ import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
+import wormguides.model.Note;
+import wormguides.model.Note.Display;
+import wormguides.model.Note.Type;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
@@ -60,6 +69,11 @@ public class Window3DSubScene{
 	private LineageData data;
 
 	private SubScene subscene;
+	private VBox overlayVBox;
+	
+	// for note sprites/billboards attached to cell/celltime
+	private HashMap<Node, Sphere> spriteSphereMap;
+	private HashMap<Node, Sphere> billboardSphereMap;
 
 	// transformation stuff
 	private Group root;
@@ -74,7 +88,7 @@ public class Window3DSubScene{
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private int endTime;
-	private Sphere[] cells;
+	private Sphere[] spheres;
 	private MeshView[] meshes;
 	private String[] cellNames;
 	private String[] meshNames;
@@ -106,8 +120,6 @@ public class Window3DSubScene{
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
 
-	//private Service<Void> searchResultsUpdateService;
-
 	// specific boolean listener for gene search results
 	private BooleanProperty geneResultsUpdated;
 
@@ -135,16 +147,13 @@ public class Window3DSubScene{
 	private boolean cellBodyTicked;
 	private boolean multicellMode;
 
-//------------------------STORY ELEMENTS---------------	
 	//Story elements stuff
 	private StoriesList storiesList;
-	private ArrayList<SceneElement> currentStoryElements;
-	private ArrayList<MeshView> currentStoryElementMeshes;
-	
-	//Billboard stuff
-	private ArrayList<Text> currentBillboards;
-//------------------------------------------------------
+	// currentNotes contains all notes that are 'active' within a scene
+	// (any note that should be visible in a given frame)
+	private ArrayList<Note> currentNotes;
 
+	
 	public Window3DSubScene(double width, double height, LineageData data) {
 		root = new Group();
 		this.data = data;
@@ -161,7 +170,7 @@ public class Window3DSubScene{
 		zoom = new SimpleDoubleProperty(1.0);
 		zScale = Z_SCALE;
 
-		cells = new Sphere[1];
+		spheres = new Sphere[1];
 		meshes = new MeshView[1];
 		cellNames = new String[1];
 		meshNames = new String[1];
@@ -179,7 +188,7 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				int selected = getIndexByName(newValue);
+				int selected = getIndexByCellName(newValue);
 				if (selected != -1)
 					selectedIndex.set(selected);
 			}
@@ -252,9 +261,9 @@ public class Window3DSubScene{
 		currentSceneElementMeshes = new ArrayList<MeshView>();
 		currentSceneElements = new ArrayList<SceneElement>();
 		
-		currentStoryElements = new ArrayList<SceneElement>();
-		currentStoryElementMeshes = new ArrayList<MeshView>();
-		currentBillboards = new ArrayList<Text>();
+		currentNotes = new ArrayList<Note>();
+		spriteSphereMap = new HashMap<Node, Sphere>();
+		billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
 	
@@ -271,8 +280,10 @@ public class Window3DSubScene{
 	
 	
 	public void setStoriesList(StoriesList list) {
-		if (list!=null)
+		if (list!=null) {
 			storiesList = list;
+			buildScene(time.get());
+		}
 	}
 	
 
@@ -330,6 +341,7 @@ public class Window3DSubScene{
 	                mouseDeltaY /= 2;
 	                rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
 	        		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
+	        		repositionNotes();
 	        		//System.out.println("x: "+rotateX.getAngle()+" y: "+rotateY.getAngle());
 				}
 
@@ -341,16 +353,18 @@ public class Window3DSubScene{
 						cameraXform.t.setX(tx);
 					if (ty>0 && ty<450)
 						cameraXform.t.setY(ty);
+					
+					repositionNotes();
 				}
 			}
 		});
-
+		
 		subscene.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
 				subscene.setCursor(Cursor.HAND);
 			}
 		});
-
+		
 		subscene.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			public void handle(MouseEvent me) {
 				PickResult result = me.getPickResult();
@@ -364,12 +378,7 @@ public class Window3DSubScene{
 						MeshView curr = currentSceneElementMeshes.get(i);
 						if (curr.equals(node)) {
 							SceneElement clickedSceneElement = currentSceneElements.get(i);
-							if (clickedSceneElement.isMulticellular()) {
-								selectedName.set(clickedSceneElement.getSceneName());
-							} else {
-								selectedName.set(clickedSceneElement.getAllCellNames().get(0));
-							}
-							
+							selectedName.set(clickedSceneElement.getSceneName());
 						}
 					}
 				}
@@ -389,9 +398,31 @@ public class Window3DSubScene{
 
 		return subscene;
 	}
+	
+	
+	private void repositionNotes() {
+		// Reposition sprites
+		for (Node node : spriteSphereMap.keySet()) {
+			Sphere s = spriteSphereMap.get(node);
+			if (s!=null) {
+				Bounds bound = s.localToParent(s.getBoundsInLocal());	
+				node.getTransforms().clear();
+				node.getTransforms().add(new Translate(
+										(bound.getMinX()+bound.getMaxX())/2, 
+										(bound.getMinY()+bound.getMaxY())/2,
+										(bound.getMinZ()+bound.getMaxZ())/2));
+			}
+		}
+		
+		for (Node node : billboardSphereMap.keySet()) {
+			Sphere s = billboardSphereMap.get(node);
+			node.getTransforms().clear();
+			node.getTransforms().addAll(s.getTransforms());
+		}
+	}
 
 	
-	private int getIndexByName(String name) {
+	private int getIndexByCellName(String name) {
 		for (int i = 0; i < cellNames.length; i++) {
 			if (cellNames[i].equals(name))
 				return i;
@@ -402,7 +433,7 @@ public class Window3DSubScene{
 
 	private int getPickedSphereIndex(Sphere picked) {
 		for (int i = 0; i < cellNames.length; i++) {
-			if (cells[i].equals(picked)) {
+			if (spheres[i].equals(picked)) {
 				return i;
 			}
 		}
@@ -423,7 +454,7 @@ public class Window3DSubScene{
 		positions = data.getPositions(time);
 		diameters = data.getDiameters(time);
 		totalNuclei.set(cellNames.length);
-		cells = new Sphere[cellNames.length];
+		spheres = new Sphere[cellNames.length];
 		meshes = new MeshView[meshNames.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
@@ -457,40 +488,19 @@ public class Window3DSubScene{
 		
 //-------------------------STORY ELEMENTS---------------------
 		if (storiesList!=null) {
-			//clear billboards
-			if(!currentBillboards.isEmpty()) {
-				currentBillboards.clear();
+			currentNotes = storiesList.getNotesAtTime(time);
+			for (Note note : storiesList.getNotesWithCell()) {
+				for (String name : cellNames) {
+					if (name.equalsIgnoreCase(note.getCellName())) {
+						//System.out.println("got a cell note");
+						currentNotes.add(note);
+						break;
+					}
+				}
 			}
 			
-			//repeat process for story elements and billboards
-			if(!currentStoryElementMeshes.isEmpty()) {
-				currentStoryElementMeshes.clear();
-			}
-			
-			currentStoryElements = storiesList.getSceneElementsAtTime(time);
-			for (int i = 0; i < currentStoryElements.size(); i++) {
-				//add meshes from each scene element in story
-				SceneElement se = currentStoryElements.get(i);
-				if (se.getBillboardFlag()) {
-					System.out.println(se.getBillboardLocationString());
-					Text t = se.buildBillboard();
-					if (t != null) {
-						t.getTransforms().addAll(rotateX, rotateY, rotateZ);
-						t.getTransforms().add(new Translate(
-												newOriginX+se.getBillboardX(),
-												newOriginY+se.getBillboardY(),
-												newOriginZ+se.getBillboardZ()));
-						currentBillboards.add(t);
-					}
-					
-				} else {
-					MeshView mesh = se.buildGeometry(time);
-					if (mesh != null) {
-						mesh.getTransforms().addAll(rotateX, rotateY);
-						currentStoryElementMeshes.add(mesh);
-					}
-				}	
-			}
+			spriteSphereMap.clear();
+			billboardSphereMap.clear();
 		}
 //---------------------------------------------------------------
 		
@@ -524,42 +534,159 @@ public class Window3DSubScene{
 
 	
 	private void refreshScene() {
+		// clear note billboards, cell spheres and meshes
 		root.getChildren().clear();
 		root.getChildren().add(cameraXform);
+		
+		// clear note sprites and overlays
+		if (overlayVBox!=null)
+			overlayVBox.getChildren().clear();
 	}
 
 	
 	private void addEntitiesToScene() {
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
- 		
-		addCellsToScene(entities);
- 		addMeshesToScene(entities);
- 		
- 		// STORY ELEMENTS
- 		//add story scene element meshes to scene
-		if(!currentStoryElementMeshes.isEmpty())
-			entities.addAll(currentStoryElementMeshes);
 
 		refreshScene();
 		
-		// render opaque entities first
+		// Must render everything that belongs to scene first before
+		// making the notes
+		addSpheresToList(entities);
+ 		addMeshesToList(entities);
+ 		
+ 		// render opaque entities first
+		addNotesGeometryToList(root.getChildren());
+		repositionNotes();
+ 			
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
 		
-		// STORY ELEMENTS
-		//add billboards to scene
-		if(!currentBillboards.isEmpty()) {
-			//System.out.println("Adding billboards.");
-			root.getChildren().addAll(currentBillboards);
+		// TODO Remove this later
+		// only for testing purposes (make Stanford bunny appear)
+		for (int i=0; i<currentSceneElements.size(); i++) {
+			SceneElement se = currentSceneElements.get(i);
+			if (se.getSceneName().contains("first scene")) {
+				MeshView mesh = currentSceneElementMeshes.get(i);
+				mesh.getTransforms().addAll(new Translate(newOriginX, newOriginY, newOriginZ), new Scale(180, -180, -180));
+				//System.out.println(mesh.getBoundsInParent().toString());
+			}
 		}
 	}
 	
 	
-	private void addMeshesToScene(ArrayList<Shape3D> list) {
+	private void addNotesGeometryToList(ObservableList<Node> list) {
+		for (Note note : currentNotes) {
+			
+			// Revert to overlay display if we have invalid display/attachment 
+			// type combination
+			if (note.hasLocationError() || note.hasCellNameError() 
+										|| note.hasTimeError())
+				note.setTagDisplay(Display.OVERLAY);
+			
+			Node node = makeShowTextNode(note.getTagName(), note.isOverlay());
+			
+			Type type = note.getAttachmentType();
+			Display display = note.getTagDisplay();
+			
+			switch (display) {
+			
+				// Overlay: text is always facing the user
+				case OVERLAY:
+						// set overlay position relative to parent anchor pane
+						if (overlayVBox!=null) {
+							overlayVBox.getChildren().add(node);
+							//System.out.println("overlay: "+note.toString());
+						}
+						break;
+				
+				// Billboard: text transforms with the scene meshes/spheres
+				case BILLBOARD:
+						if (positionSpriteOrBillboard(note, node))
+							list.add(node);
+						//System.out.println("billboard: "+note.toString());
+						break;
+				
+				// Sprite: text moves with whatever it is attached to and
+				// always faces user
+				case SPRITE:
+						if (positionSpriteOrBillboard(note, node))
+							list.add(node);
+						break;
+						
+				default:
+						break;
+			}
+		}
+	}
+	
+	
+	// Returns true if sprite or billboard is successfully positioned
+	// (whether it is to location or cell)
+	// false otherwise
+	private boolean positionSpriteOrBillboard(Note note, Node node) {
+		if (note.getAttachmentType()==Type.LOCATION) {
+			if (note.isBillboard())
+				node.getTransforms().addAll(rotateX, rotateY, rotateZ);
+			node.getTransforms().add(new Translate(
+									newOriginX+note.getX(),
+									newOriginY+note.getY(),
+									newOriginZ+note.getZ()));
+			return true;
+		}
+		else if (note.isAttachedToCell() 
+				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
+			for (int i=0; i<cellNames.length; i++) {
+				if (cellNames[i].equalsIgnoreCase(note.getCellName())) {
+					if (spheres[i]!=null) {
+						if (note.isBillboard()) {
+							node.getTransforms().addAll(rotateX, rotateY, rotateZ);
+							billboardSphereMap.put(node, spheres[i]);
+							node.getTransforms().addAll(spheres[i].getTransforms());
+						}
+						else if (note.isSprite())
+							spriteSphereMap.put(node, spheres[i]);
+						
+						return true;
+					}
+					break;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	// Makes an anchor pane that contains the text to be shown
+	// if isOverlay is true, then the text is larger
+	private Node makeShowTextNode(String text, boolean isOverlay) {
+		AnchorPane pane = new AnchorPane();
+		Text t = new Text(text);
+		AnchorPane.setTopAnchor(t, 0.0);
+		AnchorPane.setLeftAnchor(t, 0.0);
+		AnchorPane.setRightAnchor(t, 0.0);
+		AnchorPane.setBottomAnchor(t, 0.0);
+		
+		if (isOverlay) {
+			pane.setPrefWidth(120);
+			t.setFont(new Font(18));
+		}
+		else {
+			pane.setPrefWidth(60);
+			t.setFont(new Font(12));
+		}
+		
+		t.setWrappingWidth(t.prefWidth(-1));
+		t.setFill(Color.WHITE);
+		pane.getChildren().add(t);
+		
+		return pane;
+	}
+	
+	
+	private void addMeshesToList(ArrayList<Shape3D> list) {
 		// consult ShapeRule(s)
 		// process only if meshes at this time point
-		if (!currentSceneElements.isEmpty()) {
-			
+		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
 				// in search mode
 				if (inSearch) {
@@ -583,7 +710,6 @@ public class Window3DSubScene{
 					// If mesh has with name(s), then process rules (cell or shape)
 					// that apply to it
 					else {
-						boolean isOpaque = true;
 						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 						
 						//iterate over rulesList
@@ -619,7 +745,7 @@ public class Window3DSubScene{
 	}
 	
 	
-	private void addCellsToScene(ArrayList<Shape3D> list) {
+	private void addSpheresToList(ArrayList<Shape3D> list) {
 		// for sphere rendering
 		for (int i = 0; i < cellNames.length; i ++) {
 			double radius;
@@ -660,9 +786,9 @@ public class Window3DSubScene{
 	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
 	        translateSphere(sphere, x, y, z);
 	        
-	        cells[i] = sphere;
+	        spheres[i] = sphere;
 	        
-	        list.add(cells[i]);
+	        list.add(spheres[i]);
 		}
 	}
 	
@@ -778,7 +904,7 @@ public class Window3DSubScene{
 	
 	public void printCellNames() {
 		for (int i = 0; i < cellNames.length; i++)
-			System.out.println(cellNames[i]+CS+cells[i]);
+			System.out.println(cellNames[i]+CS+spheres[i]);
 	}
 	
 	
@@ -817,7 +943,17 @@ public class Window3DSubScene{
 	}
 	
 	
-	// sets everything associated with shape rules
+	// Sets parent anchor pane in order to
+	// display text from notes
+	public void setOverlayVBox(VBox box) {
+		if (box!=null) {
+			overlayVBox = box;
+			overlayVBox.toFront();
+		}
+	}
+	
+	
+	// Sets anything associated with shape rules
 	public void setShapeRulesList(ObservableList<ShapeRule> list) {
 		if (list == null)
 			return;
@@ -910,8 +1046,8 @@ public class Window3DSubScene{
 	
 
 	public double getRotationX() {
-		if (cells[0]!=null) {
-			Transform transform = cells[0].getLocalToSceneTransform();
+		if (spheres[0]!=null) {
+			Transform transform = spheres[0].getLocalToSceneTransform();
 			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
 			return roll;  
 		}
@@ -921,8 +1057,8 @@ public class Window3DSubScene{
 
 	
 	public double getRotationY() {
-		if (cells[0]!=null) {
-			Transform transform = cells[0].getLocalToSceneTransform();
+		if (spheres[0]!=null) {
+			Transform transform = spheres[0].getLocalToSceneTransform();
 			double pitch = Math.atan2(-transform.getMzy(), transform.getMzz());
 			return pitch;
 		}
@@ -932,8 +1068,8 @@ public class Window3DSubScene{
 	
 	
 	public double getRotationZ() {
-		if (cells[0]!=null) {
-			Transform transform = cells[0].getLocalToSceneTransform();
+		if (spheres[0]!=null) {
+			Transform transform = spheres[0].getLocalToSceneTransform();
 			double yaw = Math.atan2(transform.getMzx(), Math.sqrt((transform.getMzy()*transform.getMzy()
 														+(transform.getMzz()*transform.getMzz()))));
 			return yaw;

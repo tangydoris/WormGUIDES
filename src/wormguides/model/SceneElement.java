@@ -1,20 +1,16 @@
 package wormguides.model;
 import java.util.ArrayList;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import wormguides.GeometryLoader;
 
+/*
+ * A SceneElement represents a cell body structure (uni or multicellular)
+ */
 
 public class SceneElement {
 	
-	/*
-	 * A scene element can either be a billboard or a mesh
-	 */
-	
-	private final String sceneName; //descriptor or display of object
-	private final ArrayList<String> cellNames; //cell names at time point i.e. cells involved in this scene
+	private String sceneName; //descriptor or display of object
+	private ArrayList<String> cellNames; //cell names at time point i.e. cells involved in this scene
 	private String markerName; //used when neuron is separated from marker
 	private String embryoName; //used when based on specific embryo
 	private String imagingSource; //meta data
@@ -23,17 +19,12 @@ public class SceneElement {
 	private int endTime;
 	private String comments;
 	private boolean completeResourceFlag;
-	private boolean billboardFlag;
-	
-	
-	// TODO change this out later, this is just a hack to make billboard show up
-	// ask Anthony about making another BillBoard object instead of having it as a scene element
-	private int boardX, boardY, boardZ;
+	private boolean belongsToNote;
 	
 
 	public SceneElement(String sceneName, ArrayList<String> cellNames,
 			String markerName, String imagingSource, String resourceLocation, 
-			int startTime, int endTime, String comments, boolean completeResourceFlag, boolean billboardFlag) {
+			int startTime, int endTime, String comments) {
 		
 		this.sceneName = sceneName;
 		this.cellNames = cellNames;
@@ -44,8 +35,8 @@ public class SceneElement {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.comments = comments;
-		this.completeResourceFlag = completeResourceFlag;
-		this.billboardFlag = billboardFlag;
+		completeResourceFlag = isResourceComplete();
+		belongsToNote = false;
 		
 		// make sure there is proper capitalization in cell names
 		// specificially "Ab" instead of "AB"
@@ -64,9 +55,8 @@ public class SceneElement {
 	
 	// Geometry used for notes in stories
 	public SceneElement(String sceneName, String cellName,
-			String markerName, String imagingSource, String resourceLocation, 
-			int startTime, int endTime, String comments, boolean billboardFlag) {
-		
+						String markerName, String imagingSource, String resourceLocation, 
+						int startTime, int endTime, String comments) {
 		this.sceneName = sceneName;
 		this.cellNames = new ArrayList<String>();
 		cellNames.add(cellName);
@@ -77,8 +67,38 @@ public class SceneElement {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.comments = comments;
-		this.completeResourceFlag = resourceLocation!=null && !resourceLocation.isEmpty();
-		this.billboardFlag = billboardFlag;
+
+		completeResourceFlag = isResourceComplete();
+		belongsToNote = false;
+	}
+	
+	
+	public void setBelongsToNote(boolean belongsToNote) {
+		this.belongsToNote = belongsToNote;
+	}
+	
+	
+	public boolean belongsToNote() {
+		return belongsToNote;
+	}
+	
+	
+	private boolean isResourceComplete() {
+		boolean complete = true;
+		if (resourceLocation!=null) {
+			int idx = resourceLocation.lastIndexOf(".");
+			if (idx != -1) {
+				String extCheck = resourceLocation.substring(++idx); //substring after "."
+				for (int i = 0 ; i < extCheck.length(); i++) {
+					if (!Character.isLetter(extCheck.charAt(i))) {
+						complete = false;
+					}
+				}
+			} else {
+				complete = false;
+			}
+		}
+		return complete;
 	}
 	
 	
@@ -89,40 +109,18 @@ public class SceneElement {
 		
 		//check if complete resource
 		if (completeResourceFlag) {
-			return loader.loadOBJ(this.resourceLocation);
+			return loader.loadOBJ(resourceLocation);
 		} else {
 			//append time and ext to resource location
-			String objFile = this.resourceLocation + "_t" + time + OBJ_EXT;
+			String objFile = resourceLocation + "_t" + time + OBJ_EXT;
 			return loader.loadOBJ(objFile);
 		}
 	}
 	
 	
-	public Text buildBillboard() {
-		if (billboardFlag) {	
-			Text t = new Text(sceneName);
-			t.setFont(new Font(13));
-			t.setFill(Color.WHITE);
-			return t;
-
-		}
-		else //billboardflag is false, method was incorrectly called
-			return null;
-	}
-	
-	
-	public int getBillboardX() {
-		return boardX;
-	}
-	
-	
-	public int getBillboardY() {
-		return boardY;
-	}
-	
-	
-	public int getBillboardZ() {
-		return boardZ;
+	public void setSceneName(String name) {
+		if (name!=null)
+			sceneName = name;
 	}
 	
 	
@@ -139,12 +137,14 @@ public class SceneElement {
 	
 	
 	public void setStartTime(int time) {
-		startTime = time;
+		if (-1<time)
+			startTime = time;
 	}
 	
 	
 	public void setEndTime(int time) {
-		endTime = time;
+		if (-1<time)
+			endTime = time;
 	}
 	
 	
@@ -171,21 +171,6 @@ public class SceneElement {
 			embryoName = name;
 	}
 	
-	
-	public void setBillboardLocation(int x, int y, int z) {
-		boardX = x;
-		boardY = y;
-		boardZ = z;
-	}
-	
-	
-	public String getBillboardLocationString() {
-		StringBuilder sb = new StringBuilder(sceneName);
-		sb.append(" - billboard location: ");
-		sb.append(boardX).append(", ").append(boardY).append(", ").append(boardZ);
-		return sb.toString();
-	}
-	
 
 	public String getSceneName() {
 		return sceneName;
@@ -198,7 +183,7 @@ public class SceneElement {
 	
 	
 	public boolean isMulticellular() {
-		return !billboardFlag && cellNames.size()>1;
+		return cellNames.size()>1;
 	}
 	
 	
@@ -245,11 +230,6 @@ public class SceneElement {
 	
 	public boolean getCompleteResourseFlag() {
 		return completeResourceFlag;
-	}
-	
-	
-	public boolean getBillboardFlag() {
-		return billboardFlag;
 	}
 	
 	

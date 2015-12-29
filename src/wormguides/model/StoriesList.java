@@ -11,6 +11,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
@@ -18,13 +20,13 @@ import wormguides.model.Note.TimeStringFormatException;
 
 public class StoriesList {
 	
-	public ArrayList<Story> stories;
-	public SceneElementsList list;
+	public ObservableList<Story> stories;
+	public SceneElementsList elementsList;
 	
 	
 	public StoriesList(SceneElementsList list) {
-		stories = new ArrayList<Story>();
-		this.list = list;
+		stories = FXCollections.observableArrayList();
+		this.elementsList = list;
 		buildStories();
 	}
 	
@@ -83,9 +85,7 @@ public class StoriesList {
 				else {
 					Note note = new Note(split[NAME_INDEX], split[CONTENTS_INDEX]);
 					try {
-						SceneElement e = note.setTagDisplay(split[DISPLAY_INDEX]);
-						if (e!=null)
-							list.addSceneElement(e);
+						note.setTagDisplay(split[DISPLAY_INDEX]);
 						note.setAttachmentType(split[TYPE_INDEX]);
 						note.setLocation(split[LOCATION_INDEX]);
 						note.setCellName(split[CELLNAME_INDEX]);
@@ -97,6 +97,7 @@ public class StoriesList {
 						note.setStartTime(split[START_TIME_INDEX]);
 						note.setEndTime(split[END_TIME_INDEX]);
 						note.setComments(split[COMMENTS_INDEX]);
+						note.addSceneElementsToList(elementsList);
 						
 					} catch (ArrayIndexOutOfBoundsException e) {
 						System.out.println(e.toString());
@@ -142,6 +143,26 @@ public class StoriesList {
 	}
 	
 	
+	public ArrayList<Note> getNotesWithCell() {
+		ArrayList<Note> notes = new ArrayList<Note>();
+		for (Story story : stories) {
+			notes.addAll(story.getNotesWithCell());
+		}
+		return notes;
+	}
+	
+	
+	public ArrayList<Note> getNotesAtTime(int time) {
+		//System.out.println("stories list getting notes at time "+time);
+		ArrayList<Note> notes = new ArrayList<Note>();
+		//System.out.println(stories.size());
+		for (Story story : stories) {
+			notes.addAll(story.getNotesAtTime(time));
+		}
+		return notes;
+	}
+	
+	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
 		for (Story story : stories) {
@@ -161,10 +182,11 @@ public class StoriesList {
 		for (int i=0; i<stories.size(); i++) {
 			Story story = stories.get(i);
 			sb.append(story.getName()).append(": ")
-				.append(story.getNumberOfNotes()).append(" notes");
+				.append(story.getNumberOfNotes()).append(" notes\n");
 			for (Note note : story.getNotes()) {
-				if (note.isBillboard())
-					sb.append(", billboard");
+				sb.append("\t").append(note.getTagName()).append(": times ")
+					.append(note.getStartTime()).append(" ")
+					.append(note.getEndTime()).append("\n");
 			}
 			if (i<stories.size()-1)
 				sb.append("\n");

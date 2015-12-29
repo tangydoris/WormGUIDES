@@ -488,6 +488,7 @@
                               </Label>
                               <Button fx:id="zoomOutButton" layoutX="550.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                               <Button fx:id="zoomInButton" layoutX="502.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="34.0" />
+                              <VBox fx:id="noteOverlayVBox" alignment="TOP_CENTER" layoutX="474.0" layoutY="21.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" spacing="10.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                            </children>
                         </AnchorPane>
                      </center>

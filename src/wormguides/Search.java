@@ -721,13 +721,14 @@ public class Search {
 	}
 	
 	
-	public static String getMulticellComment(String name) {
+	public static String getStructureComment(String name) {
 		return sceneElementsList.getCommentByName(name);
 	}
 	
 	
-	public static boolean isMulticellStructureName(String name) {
-		if (sceneElementsList!=null && sceneElementsList.isMulticellStructureName(name))
+	public static boolean isStructureWithComment(String name) {
+		if (sceneElementsList!=null && (sceneElementsList.isMulticellStructureName(name)
+				|| sceneElementsList.isNoteStructureName(name)))
 			return true;
 		
 		return false;

@@ -39,6 +39,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -80,6 +81,7 @@ public class RootLayoutController implements Initializable{
 	@FXML private BorderPane displayPanel;
 	@FXML private AnchorPane modelAnchorPane;
 	@FXML private ScrollPane infoPane;
+	@FXML private VBox noteOverlayVBox;
 	
 	// subscene controls
 	@FXML private Button backwardButton, forwardButton, playButton;
@@ -248,6 +250,7 @@ public class RootLayoutController implements Initializable{
 										modelAnchorPane.prefHeight(-1), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
+		window3D.setOverlayVBox(noteOverlayVBox);
 		
 		backwardButton.setOnAction(window3D.getBackwardButtonListener());
 		forwardButton.setOnAction(window3D.getForwardButtonListener());
@@ -381,10 +384,11 @@ public class RootLayoutController implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		if (Search.isMulticellStructureName(name)) {
-			cellName.setText(name);
-			cellDescription.setText(Search.getMulticellComment(name));
-		}
+		
+		cellName.setText(name);
+		if (Search.isStructureWithComment(name))
+			cellDescription.setText(Search.getStructureComment(name));
+		
 		else {
 			String functionalName = PartsList.getFunctionalNameByLineageName(name);
 			if (functionalName==null) {
@@ -571,6 +575,7 @@ public class RootLayoutController implements Initializable{
 	private void assertFXMLNodes() {
 		assert (rootBorderPane != null);
 		assert (modelAnchorPane != null);
+		assert (noteOverlayVBox != null);
 		assert (displayPanel != null);
 		assert (infoPane != null);
 		

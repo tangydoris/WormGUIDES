@@ -2,16 +2,17 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
-import javafx.geometry.Point3D;
-
 public class Note {
 
+	// TODO Refactor this to be a single scene element?
+	// right now it is possible for a note to have multiple scene elements
+	// just by setting its resource location
 	private ArrayList<SceneElement> elements;
 	private String tagName;
 	private String tagContents;
 	private Type attachmentType;
 	private Display tagDisplay;
-	private Point3D location;
+	private int x, y, z;
 	private String cellName;
 	private String marker;
 	private String imagingSource;
@@ -22,14 +23,14 @@ public class Note {
 	
 	
 	public Note() {
-		elements = new ArrayList<SceneElement>();
+		elements = null;
 		tagName = "";
 		tagContents = "";
-		location = new Point3D(0, 0, 0);
+		x = y = z = Integer.MIN_VALUE;
 		cellName = "";
 		imagingSource = "";
 		resourceLocation = "";
-		startTime = endTime = -1;
+		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
 	}
@@ -51,6 +52,11 @@ public class Note {
 	public void setTagName(String tagName) {
 		if (tagName!=null)
 			this.tagName = tagName;
+		
+		if (elements!=null) {
+			for (SceneElement se : elements)
+				se.setSceneName(tagName);
+		}
 	}
 	
 	
@@ -60,27 +66,20 @@ public class Note {
 	}
 	
 	
-	public SceneElement setTagDisplay(String display) throws TagDisplayEnumException {
+	public void setTagDisplay(String display) throws TagDisplayEnumException {
 		if (display!=null) {
 			for (Display d : Display.values()) {
-				if (d.equalsTo(display.trim().toLowerCase())) {
+				if (d.equals(display.trim())) {
 					setTagDisplay(d);
-					if (d.equalsTo("billboard")) {
-						SceneElement element = new SceneElement(tagName, cellName, marker, imagingSource, resourceLocation, 
-																startTime, endTime, comments, true);
-						elements.add(element);
-						return element;
-					}
-					return null;
+					return;
 				}
 			}
 			throw new TagDisplayEnumException();
 		}
-		return null;
 	}
 	
 	
-	private void setTagDisplay(Display display) {
+	public void setTagDisplay(Display display) {
 		if (display!=null)
 			tagDisplay = display;
 	}
@@ -89,11 +88,12 @@ public class Note {
 	public void setAttachmentType(String type) throws AttachmentTypeEnumException {
 		if (type!=null) {
 			for (Type t : Type.values()) {
-				if (t.equalsTo(type)) {
+				if (t.equals(type.trim())) {
 					setAttachmentType(t);
 					return;
 				}
 			}
+			
 			throw new AttachmentTypeEnumException();
 		}
 	}
@@ -125,50 +125,62 @@ public class Note {
 	
 	
 	public void setLocation(int x, int y, int z) {
-		location = new Point3D(x, y, z);
-		for (SceneElement se : elements)
-			se.setBillboardLocation(x, y, z);
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 	
 	
 	public void setCellName(String name) {
 		if (name!=null) {
-			cellName = name;
-			for (SceneElement se : elements)
-				se.addCellName(name);
+			cellName = name.trim();
+			
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.addCellName(cellName);
+			}
 		}
 	}
 	
 	
 	public void setMarker(String marker) {
 		if (marker!=null) {
-			this.marker = marker;
-			for (SceneElement se : elements)
-				se.setMarker(marker);
+			this.marker = marker.trim();
+			
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.setMarker(this.marker);
+			}
 		}
 	}
 	
 	
 	public void setImagingSource(String source) {
 		if (source!=null && !source.isEmpty() && source.trim().toLowerCase().endsWith(OBJ_EXT)) {
-			imagingSource = source;
+			imagingSource = source.trim();
 			
-			for (SceneElement se : elements)
-				se.setImagingSource(imagingSource);
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.setImagingSource(imagingSource);
+			}
 		}
 	}
 	
 	
 	public boolean hasSceneElements() {
-		return !elements.isEmpty();
+		return elements!=null && !elements.isEmpty();
 	}
 	
 	
 	public void setResourceLocation(String location) {
-		if (location!=null) {
-			resourceLocation = location;
-			for (SceneElement se : elements)
-				se.setResourceLocation(resourceLocation);
+		if (location!=null && location.trim().toLowerCase().endsWith(".obj")) {
+			resourceLocation = location.trim();
+			
+			elements = new ArrayList<SceneElement>();
+			SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource,
+											resourceLocation, startTime, endTime+1, comments);
+			se.setBelongsToNote(true);
+			elements.add(se);
 		}
 	}
 	
@@ -186,9 +198,14 @@ public class Note {
 	
 	
 	public void setStartTime(int time) {
-		this.startTime = time;
-		for (SceneElement se : elements)
-			se.setStartTime(time);
+		if (time>-1) {
+			startTime = time++;
+			
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.setStartTime(startTime+1);
+			}
+		}
 	}
 	
 	
@@ -205,19 +222,27 @@ public class Note {
 	
 	
 	public void setEndTime(int time) {
-		this.endTime = time;
-		for (SceneElement se : elements)
-			se.setEndTime(time);
+		if (time>-1) {
+			endTime = time++;
+			
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.setEndTime(endTime+1);
+			}
+		}
 	}
 	
 	
 	public void setStartAndEndTimes(int startTime, int endTime) {
-		if (startTime<=endTime) {
-			this.startTime = startTime;
-			this.endTime = endTime;
-			for (SceneElement se : elements) {
-				se.setStartTime(startTime);
-				se.setEndTime(endTime);
+		if (-1<startTime && -1<endTime && startTime<=endTime) {
+			this.startTime = startTime++;
+			this.endTime = endTime++;
+			
+			if (elements!=null) {
+				for (SceneElement se : elements) {
+					se.setStartTime(this.startTime);
+					se.setEndTime(this.endTime+1);
+				}
 			}
 		}
 	}
@@ -225,16 +250,30 @@ public class Note {
 	
 	public void setComments(String comments) {
 		if (comments!=null) {
-			this.comments = comments;
-			for (SceneElement se : elements)
-				se.setComments(comments);
+			this.comments = comments.trim();
+			
+			if (elements!=null) {
+				for (SceneElement se : elements)
+					se.setComments(this.comments);
+			}
 		}
 	}
 	
 	
 	public void addSceneElement(SceneElement element) {
-		if (element!=null)
-			elements.add(element);
+		if (elements==null)
+			elements = new ArrayList<SceneElement>();
+		elements.add(element);
+		
+	}
+	
+	
+	public void addSceneElementsToList(SceneElementsList list) {
+		if (elements!=null) {
+			for (SceneElement se : elements) {
+				list.addSceneElement(se);
+			}
+		}
 	}
 	
 	
@@ -263,8 +302,18 @@ public class Note {
 	}
 	
 	
-	public Point3D getLocation() {
-		return location;
+	public int getX() {
+		return x;
+	}
+	
+	
+	public int getY() {
+		return x;
+	}
+	
+	
+	public int getZ() {
+		return x;
 	}
 	
 	
@@ -304,36 +353,165 @@ public class Note {
 	
 	
 	public String toString() {
-		return tagName+": "+tagContents;
+		return tagName+" - '"+tagContents+"' from time "+startTime+" to "+endTime;
 	}
 	
 	
-	public boolean isTagDisplay(String display) {
+	public boolean isTagDisplayEnum(String display) {
 		for (Display d : Display.values()) {
-			if (d.equalsTo(display.trim().toLowerCase()))
+			if (d.equals(display))
 				return true;
 		}
 		return false;
 	}
 	
 	
-	// Returns true if display string correspongs to the Display.BILLBOARD enum
+	// Notes in error mode should not be displayed
+	// Returns true if time is not specified for CELLTIME and TIME attachment types
+	// or if cell name is not specified for CELL and CELLTIME attachment types
 	// false otherwise
-	public boolean isDisplayBillboardEnum(String display) {
-		return Display.BILLBOARD.toString().equals(display.toLowerCase().trim());
+	public boolean isWithoutScope() {
+		if (tagDisplay!=Display.OVERLAY) {
+			if ((attachmentType==Type.CELLTIME || attachmentType==Type.TIME)
+					&& !isTimeSpecified())
+				return true;
+			
+			if ((attachmentType==Type.CELL || attachmentType==Type.CELLTIME)
+					&& !isCellSpecified())
+				return true;
+			
+			if (isWithoutTypeScope())
+				return true;
+		}
+		
+		
+		return false;
 	}
 	
 	
-	// Returns true if the note tag display is Display.BILLBOARD
+	public boolean isWithoutTypeScope() {
+		return attachmentType==Type.NULL;
+	}
+	
+	
+	public boolean hasLocationError() {
+		if (tagDisplay!=Display.OVERLAY) {
+			
+			if (attachmentType==Type.LOCATION && !isLoctionSpecified())
+				return true;
+			
+			if (isAttachedToTime())
+				return true;
+		}
+		
+		return false;
+	}
+	
+	
+	public boolean hasCellNameError() {
+		if (tagDisplay!=Display.OVERLAY && (attachmentType==Type.CELL 
+				|| attachmentType==Type.CELLTIME) && cellName.isEmpty())
+			return true;
+		return false;
+	}
+	
+	
+	public boolean hasTimeError() {
+		if (tagDisplay==Display.SPRITE && attachmentType==Type.TIME)
+			return true;
+		return false;
+	}
+	
+	
+	public boolean existsWithCell() {
+		return attachmentType==Type.CELL || attachmentType==Type.CELLTIME;
+	}
+	
+	
+	public boolean isValidTimeAttachment() {
+		return isAttachedToTime() && isTimeSpecified();
+	}
+	
+	
+	public boolean isAttachedToTime() {
+		return attachmentType==Type.TIME;
+	}
+	
+	
+	public boolean isValidCellAttachment() {
+		return isAttachedToCell() && isCellSpecified();
+	}
+	
+	
+	public boolean isValidCellTimeAttachment() {
+		return isAttachedToCellTime() && isCellSpecified() && isTimeSpecified();
+	}
+	
+	
+	public boolean isAttachedToCell() {
+		return attachmentType==Type.CELL;
+	}
+	
+	
+	public boolean isAttachedToCellTime() {
+		return attachmentType==Type.CELLTIME;
+	}
+	
+	
+	public boolean isCellSpecified() {
+		return !cellName.isEmpty();
+	}
+	
+	
+	public boolean isTimeSpecified() {
+		return startTime>=0 && endTime>=0;
+	}
+	
+	
+	// Returns true if note is visible at input time, or in sprite cell/celltime mode
 	// false otherwise
+	public boolean existsAtTime(int time) {
+		if (!isWithoutScope()) {
+			// If start and end times are not set
+			// then note exists at all times
+			if (!isTimeSpecified())
+				return true;
+			
+			time++;
+			if (startTime<=time && time<=endTime)
+				return true;
+		}
+			
+		return false;
+	}
+	
+	
+	// Returns true if location was specified in csv file
+	// false otherwise
+	public boolean isLoctionSpecified() {
+		return (x!=Integer.MIN_VALUE && y!=Integer.MIN_VALUE && z!=Integer.MIN_VALUE);
+	}
+	
+	
+	public boolean isOverlay() {
+		return tagDisplay==Display.OVERLAY;
+	}
+	
+	
+	public boolean isSprite() {
+		return tagDisplay==Display.SPRITE;
+	}
+	
+	
 	public boolean isBillboard() {
 		return tagDisplay==Display.BILLBOARD;
+		
 	}
 	
 	
-	public boolean isAttachmentType(String type) {
+	public boolean isAttachmentTypeEnum(String type) {
 		for (Type t : Type.values()) {
-			if (t.equalsTo(type.trim().toLowerCase()))
+			if (t.equals(type))
 				return true;
 		}
 		return false;
@@ -344,7 +522,8 @@ public class Note {
 		LOCATION("location"),
 		CELL("cell"),
 		CELLTIME("cell time"), 
-		TIME("time");
+		TIME("time"),
+		NULL("");
 		
 		private String type;
 		
@@ -356,8 +535,12 @@ public class Note {
 			return type;
 		}
 		
-		boolean equalsTo(String type) {
-			return this.type.equals(type.toLowerCase());
+		boolean equals(String type) {
+			return this.type.equalsIgnoreCase(type.trim());
+		}
+		
+		boolean equals(Type type) {
+			return this==type;
 		}
 	}
 	
@@ -377,17 +560,20 @@ public class Note {
 			return display;
 		}
 		
-		boolean equalsTo(String display) {
-			return this.display.equals(display.toLowerCase());
+		boolean equals(String display) {
+			return this.display.equalsIgnoreCase(display.trim());
 		}
 		
+		boolean equals(Display display) {
+			return this==display;
+		}
 	}
 	
 	
 	public class TagDisplayEnumException extends Exception {
 		public TagDisplayEnumException() {
 			super("Invalid note tag display enum, must be one of the following: "
-					+ "OVERLAY, BILLBOARD, SPRITE.");
+					+ Display.values());
 		}
 	}
 	
@@ -395,7 +581,7 @@ public class Note {
 	public class AttachmentTypeEnumException extends Exception {
 		public AttachmentTypeEnumException() {
 			super("Invalid note attachment type enum, must be one of the following: "
-					+ "LOCATION, CELL, CELLTIME, TIME.");
+					+ Type.values());
 		}
 	}
 	

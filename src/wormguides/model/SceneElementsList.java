@@ -24,7 +24,7 @@ import java.util.jar.JarFile;
 public class SceneElementsList {
 	
 	public ArrayList<SceneElement> elementsList;
-	public HashMap<String, String> multicellNamesToCommentsMap;
+	public HashMap<String, String> nameCommentsMap;
 	private JarFile jarFile;
 	private ArrayList<JarEntry> objEntries;
 
@@ -33,7 +33,7 @@ public class SceneElementsList {
 	public SceneElementsList() {
 		elementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
-		multicellNamesToCommentsMap = new HashMap<String, String>();
+		nameCommentsMap = new HashMap<String, String>();
 		
 		buildListFromConfig();
 	}
@@ -85,36 +85,25 @@ public class SceneElementsList {
 					billboardFlag = true;
 				}
 				
-				//vector of cell names
+				// vector of cell names
 				ArrayList<String> cellNames = new ArrayList<String>();
 				StringTokenizer st = new StringTokenizer(splits[1]);
 				while (st.hasMoreTokens()) {
 					cellNames.add(st.nextToken());
 				}
 				
-				//check if complete resource location
-				boolean completeResourceFlag = true;
-				String resourceLocation = splits[4];
-				int idx = resourceLocation.lastIndexOf(".");
-				if (idx != -1) {
-					String extCheck = resourceLocation.substring(++idx); //substring after "."
-					for (int i = 0 ; i < extCheck.length(); i++) {
-						if (!Character.isLetter(extCheck.charAt(i))) {
-							completeResourceFlag = false;
-						}
-					}
-				} else {
-					completeResourceFlag = false;
-				}
-				
+				// check if complete resource location
+				String resourceLocation = splits[4];		
 				SceneElement se = new SceneElement(//objEntries,
 						splits[0], cellNames,
 						splits[2], splits[3], splits[4],
 						Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
-						splits[7], completeResourceFlag, billboardFlag);
+						splits[7]);
 				
-				//add scene element to list
+				// add scene element to list
 				elementsList.add(se);
+				
+				addComments(se);
 			}
 			
 			reader.close();
@@ -122,27 +111,36 @@ public class SceneElementsList {
 			System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
 			return;
 		}
-		
-		pickOutMulticellNames();
+	}
+	
+	
+	private void addComments(SceneElement element) {
+		if (element.isMulticellular() || element.belongsToNote())
+			nameCommentsMap.put(element.getSceneName(), element.getComments());
 	}
 	
 	
 	public void addSceneElement(SceneElement element) {
 		if (element!=null)
 			elementsList.add(element);
+		
+		addComments(element);
 	}
 	
 	
 	// Pick out all multicellular names and map them to their comments
-	private void pickOutMulticellNames() {
+	/*
+	private void populateCommentsMap() {
 		for (int i = 0; i < elementsList.size(); i++) {
 			SceneElement current = elementsList.get(i);
 			//check if the scene element is a multicellular structure
-			if (current.isMulticellular()) {
-				multicellNamesToCommentsMap.put(current.getSceneName().toLowerCase(), current.getComments());
+			if (current.isMulticellular() || current.belongsToNote()) {
+				nameCommentsMap.put(current.getSceneName().toLowerCase(), current.getComments());
+				System.out.println(current.getComments());
 			}
 		}
 	}
+	*/
 	
 	
 	public String[] getSceneElementNamesAtTime(int time) {
@@ -190,7 +188,7 @@ public class SceneElementsList {
 	
 	
 	public Set<String> getAllMulticellNames() {
-		return multicellNamesToCommentsMap.keySet();
+		return nameCommentsMap.keySet();
 	}
 	
 	
@@ -204,10 +202,18 @@ public class SceneElementsList {
 	}
 	
 	
+	public boolean isNoteStructureName(String name) {
+		for (SceneElement se : elementsList) {
+			if (se.belongsToNote() || se.getSceneName().equalsIgnoreCase(name.trim()))
+				return true;
+		}
+		return false;
+	}
+	
+	
 	public boolean isMulticellStructureName(String name) {
-		name = name.trim().toLowerCase();
 		for (String cellName : getAllMulticellNames()) {
-			if (cellName.toLowerCase().equals(name))
+			if (cellName.equalsIgnoreCase(name.trim()))
 				return true;
 		}
 		return false;
@@ -215,7 +221,7 @@ public class SceneElementsList {
 	
 	
 	public String getCommentByName(String name) {
-		String comment = multicellNamesToCommentsMap.get(name.trim().toLowerCase());
+		String comment = nameCommentsMap.get(name.trim().toLowerCase());
 		if (comment==null)
 			return "";
 		return comment;
@@ -223,7 +229,7 @@ public class SceneElementsList {
 	
 	
 	public HashMap<String, String> getMulticellNamesToCommentsMap() {
-		return multicellNamesToCommentsMap;
+		return nameCommentsMap;
 	}
 	
 	

@@ -6,20 +6,42 @@ public class Story {
 	
 	private String name;
 	private String description;
-	private ArrayList<Note> notes;
+	private ArrayList<Note> notesList;
 	
 	
 	public Story(String name, String description) {
 		this.name = name;
 		this.description = description;
-		notes = new ArrayList<Note>();
+		notesList = new ArrayList<Note>();
+	}
+	
+	
+	public ArrayList<Note> getNotesWithCell() {
+		ArrayList<Note> notes = new ArrayList<Note>();
+		for (Note note : notesList) {
+			if (note.isAttachedToCell() || note.isAttachedToCellTime())
+				notes.add(note);
+		}
+		return notes;
+	}
+	
+	
+	public ArrayList<Note> getNotesAtTime(int time) {
+		ArrayList<Note> notes = new ArrayList<Note>();
+		for (Note note : notesList) {
+			if (note.existsAtTime(time)) {
+				//System.out.println("Story: "+note.getTagName()+" exists at time "+time);
+				notes.add(note);
+			}
+		}
+		return notes;
 	}
 	
 	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		//System.out.println("getting scene elements for story "+name+" at time "+time);
 		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-		for (Note note : notes) {
+		for (Note note : notesList) {
 			if (note.hasSceneElements()) {
 				for (SceneElement element : note.getSceneElements()) {
 					if (element.existsAtTime(time) && !elements.contains(element)) {
@@ -34,7 +56,7 @@ public class Story {
 	
 	
 	public int getNumberOfNotes() {
-		return notes.size();
+		return notesList.size();
 	}
 	
 	
@@ -49,7 +71,7 @@ public class Story {
 	
 	
 	public void addNote(Note note) {
-		notes.add(note);
+		notesList.add(note);
 	}
 	
 	
@@ -64,7 +86,7 @@ public class Story {
 	
 	
 	public Note[] getNotes() {
-		return notes.toArray(new Note[notes.size()]);
+		return notesList.toArray(new Note[notesList.size()]);
 	}
 
 }
