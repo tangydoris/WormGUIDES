@@ -57,7 +57,13 @@ public class PartsList {
 	
 	
 	public static boolean containsLineageName(String name) {
-		return lineageNames.contains(name);
+		//case insensitive search
+		for (String lineageName : lineageNames) {
+			if (lineageName.toLowerCase().equals(name.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
@@ -75,8 +81,15 @@ public class PartsList {
 	}
 	
 	
-	public static String getFunctionalNameByLineageName(String lineageName) {
-		return getFunctionalNameByIndex(lineageNames.indexOf(lineageName));
+	public static String getFunctionalNameByLineageName(String name) {
+		//account for case insensitivity and translate lineage name
+		for (String lineageName : lineageNames) {
+			if (lineageName.toLowerCase().equals(name.toLowerCase())) {
+				name = lineageName;
+				break;
+			}
+		}
+		return getFunctionalNameByIndex(lineageNames.indexOf(name));
 	}
 	
 	
