@@ -354,7 +354,8 @@ public class Search {
 		if (type==SearchType.GENE) {
 			WormBaseQuery.doSearch(searched);
 		} else if (type == SearchType.CONNECTOME) { //separate case for name translation purposes (see setConnectomeRuleCells())
-			cells = setConnectomeRuleCells(searched);
+			//cells = setConnectomeRuleCells(searched);
+			cells = getCellsList(searched);
 			rule.setCells(cells);
 		} else {
 			cells = getCellsList(searched);
@@ -370,6 +371,7 @@ public class Search {
 	 * If a systematic name is searched in the connectome e.g. ABa, the query if translated to a functional name prior to adding cells
 	 * If a functional name is searched in the connectome e.g. ASAL, no translation is done
 	 */
+	// TODO Look into this
 	private static ArrayList<String> setConnectomeRuleCells(String searched) {
 		ArrayList<String> cells = new ArrayList<String>();
 		

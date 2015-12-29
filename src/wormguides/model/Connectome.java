@@ -123,8 +123,9 @@ public class Connectome {
 		ArrayList<String> lineageNameResults = new ArrayList<String>();
 		for (String result : searchResults) {
 			String lineageName = PartsList.getLineageNameByFunctionalName(result);
+			
 			if (lineageName!=null)
-				lineageNameResults.add(lineageName+" ("+result+")");
+				lineageNameResults.add(lineageName);
 		}
 		
 		return lineageNameResults;
