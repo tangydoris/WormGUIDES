@@ -21,6 +21,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import wormguides.model.ColorRule;
+import wormguides.model.Connectome;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
@@ -61,6 +62,14 @@ public class Search {
 	
 	//used for adding shape rules
 	private static SceneElementsList sceneElementsList;
+	
+	//for connectome searching
+	private static Connectome connectome;
+	private static boolean presynapticTicked;
+	private static boolean postsynapticTicked;
+	private static boolean electricalTicked;
+	private static boolean neuromuscularTicked;
+
 		
 	static {
 		activeLineageNames = new ArrayList<String>();
@@ -80,6 +89,12 @@ public class Search {
 		cellBodyTicked = false;
 		ancestorTicked = false;
 		descendantTicked = false;	
+		
+		//connectome synapse types all unchecked at init
+		presynapticTicked = false;
+		postsynapticTicked = false;
+		electricalTicked = false;
+		neuromuscularTicked = false;
 		
 		resultsUpdateService = new Service<Void>() {
 			@Override
@@ -167,7 +182,6 @@ public class Search {
 		appendFunctionalToLineageNames(cellsForListView);
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
-	
 	
 	private static void appendFunctionalToLineageNames(ArrayList<String> list) {
 		searchResultsList.clear();
@@ -337,15 +351,39 @@ public class Search {
 		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
-		if (type==SearchType.GENE)
+		if (type==SearchType.GENE) {
 			WormBaseQuery.doSearch(searched);
-		else {
+		} else if (type == SearchType.CONNECTOME) { //separate case for name translation purposes (see setConnectomeRuleCells())
+			cells = setConnectomeRuleCells(searched);
+			rule.setCells(cells);
+		} else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
 		}
 		
 		rulesList.add(rule);
 		searchResultsList.clear();
+	}
+	
+	/*
+	 * Method which returns the cells which pertain to a connectome rule
+	 * If a systematic name is searched in the connectome e.g. ABa, the query if translated to a functional name prior to adding cells
+	 * If a functional name is searched in the connectome e.g. ASAL, no translation is done
+	 */
+	private static ArrayList<String> setConnectomeRuleCells(String searched) {
+		ArrayList<String> cells = new ArrayList<String>();
+		
+		//if a systematic name is searched, translate to functional before searching connectome
+		if (PartsList.containsLineageName(searched)) {
+			searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+		}
+		searched = searched.toLowerCase();
+		for (String name : functionalNames) {
+			if (name.toLowerCase().startsWith(searched)) {
+				cells.add(PartsList.getLineageNameByFunctionalName(name));
+			}
+		}
+		return cells;
 	}
 	
 	
@@ -370,7 +408,6 @@ public class Search {
 			case DESCRIPTION:
 							// TODO some cells with the searched term are not showing up in results list
 							//System.out.println("\nShowing found description names:");
-				
 							for (int i=0; i<descriptions.size(); i++) {
 								String textLowerCase = descriptions.get(i).toLowerCase();
 								String[] keywords = searched.split(" ");
@@ -407,6 +444,14 @@ public class Search {
 							break;
 							
 			case CONNECTOME:
+							if (connectome != null) {
+								//if a systematic name is searched, translate to functional before searching connectome
+								if (PartsList.containsLineageName(searched)) {
+									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+								}
+								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
+										postsynapticTicked, electricalTicked, neuromuscularTicked));
+							}
 							break;
 		}
 		return cells;
@@ -509,6 +554,7 @@ public class Search {
 					options.add(SearchOption.ANCESTOR);
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
+				
 				
 				addColorRule(getSearchedText(), selectedColor, options);
 				
@@ -734,6 +780,57 @@ public class Search {
 		return false;
 	}
 	
+	public static void setConnectome(Connectome con) {
+		if (con != null) {
+			connectome = con;
+		}
+	}
 	
+	//connectome checkbox listeners
+	public ChangeListener<Boolean> getPresynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				presynapticTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getPostsynapticTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				postsynapticTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getElectricalTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				electricalTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+	
+	public ChangeListener<Boolean> getNeuromuscularTickListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				neuromuscularTicked = newValue;
+				resultsUpdateService.restart();
+			}
+		};
+	}
+
+
 	private static final long WAIT_TIME_MILLI = 750;
 }

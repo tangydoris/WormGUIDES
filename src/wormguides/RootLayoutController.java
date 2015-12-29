@@ -44,6 +44,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
@@ -89,7 +90,7 @@ public class RootLayoutController implements Initializable{
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
-	// search tab
+	// cells tab
 	private Search search;
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -101,6 +102,11 @@ public class RootLayoutController implements Initializable{
 	@FXML private Label descendantLabel;
 	@FXML private AnchorPane colorPickerPane;
 	@FXML private ColorPicker colorPicker;
+	@FXML private Button addSearchBtn;
+	
+	//connectome stuff
+	Connectome connectome;
+	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
 	// lineage tree
 	private TreeItem<String> lineageTreeRoot;
@@ -112,7 +118,6 @@ public class RootLayoutController implements Initializable{
 	private Layers layers;
 	private Layers shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
-	@FXML private Button addSearchBtn;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
 	
@@ -493,6 +498,13 @@ public class RootLayoutController implements Initializable{
 		search = new Search();
 		
 		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
+		
+		//connectome checkboxes
+		presynapticTick.selectedProperty().addListener(search.getPresynapticTickListener());
+		postsynapticTick.selectedProperty().addListener(search.getPostsynapticTickListener());
+		electricalTick.selectedProperty().addListener(search.getElectricalTickListener());
+		neuromuscularTick.selectedProperty().addListener(search.getNeuromuscularTickListener());
+		
 		//cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
 		//cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
@@ -604,6 +616,11 @@ public class RootLayoutController implements Initializable{
 		assert (colorPickerPane != null);
 		assert (colorPicker != null);
 		
+		assert (presynapticTick != null);
+		assert (postsynapticTick != null);
+		assert (electricalTick != null);
+		assert (neuromuscularTick != null);
+		
 		assert (rulesListView != null);
 		assert (addSearchBtn != null);
 		
@@ -671,6 +688,11 @@ public class RootLayoutController implements Initializable{
 		window3D.setSceneElementsList(elementsList);
 		window3D.setStoriesList(storiesList);
 		Search.setSceneElementsList(elementsList);
+		
+		//set up the connectome
+		connectome = new Connectome();
+		connectome.buildConnectome();
+		Search.setConnectome(connectome);
 		
 		//set up the structure layer
 		initStructuresLayer();

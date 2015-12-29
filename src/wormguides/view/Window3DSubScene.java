@@ -142,6 +142,12 @@ public class Window3DSubScene{
 	// Uniform nuclei size
 	private boolean uniformSize;
 	
+	// connectome - synapse type checkboxes
+	private boolean presynapticTicked;
+	private boolean postsynapticTicked;
+	private boolean electricalTicked;
+	private boolean neuromuscularTicked;
+	
 	// Cell body and cell nucleus highlighting in search mode
 	private boolean cellNucleusTicked;
 	private boolean cellBodyTicked;
@@ -1308,8 +1314,7 @@ public class Window3DSubScene{
 			};
 		}
 	}
-	
-	
+
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
