@@ -251,11 +251,12 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DSubScene(modelAnchorPane.prefWidth(-1), 
-										modelAnchorPane.prefHeight(-1), data);
+		window3D = new Window3DSubScene(modelAnchorPane.widthProperty(), 
+										modelAnchorPane.heightProperty(), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
 		window3D.setOverlayVBox(noteOverlayVBox);
+		window3D.setModelAnchorPane(modelAnchorPane);
 		
 		backwardButton.setOnAction(window3D.getBackwardButtonListener());
 		forwardButton.setOnAction(window3D.getForwardButtonListener());

@@ -6,11 +6,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
 
+import com.sun.javafx.scene.CameraHelper;
+
 import wormguides.model.StoriesList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -27,6 +30,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -45,7 +50,10 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
+import javafx.scene.shape.StrokeLineJoin;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -70,15 +78,16 @@ public class Window3DSubScene{
 
 	private SubScene subscene;
 	private VBox overlayVBox;
+	private AnchorPane parentAnchorPane;
 	
 	// for note sprites/billboards attached to cell/celltime
 	private HashMap<Node, Sphere> spriteSphereMap;
-	private HashMap<Node, Sphere> billboardSphereMap;
+	//private HashMap<Node, Sphere> billboardSphereMap;
 
 	// transformation stuff
 	private Group root;
 	private PerspectiveCamera camera;
-	private Xform cameraXform;
+	private Xform xform;
 	private double mousePosX, mousePosY;
 	private double mouseOldX, mouseOldY;
 	private double mouseDeltaX, mouseDeltaY;
@@ -158,9 +167,11 @@ public class Window3DSubScene{
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
+	
+	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DSubScene(double width, double height, LineageData data) {
+	public Window3DSubScene(ReadOnlyDoubleProperty width, ReadOnlyDoubleProperty height, LineageData data) {
 		root = new Group();
 		this.data = data;
 
@@ -207,7 +218,11 @@ public class Window3DSubScene{
 
 		endTime = data.getTotalTimePoints();
 
-		createSubScene(width, height);
+		createSubScene(width.get(), height.get());
+		
+		subsceneSizeListener = new SubsceneSizeListener();
+		width.addListener(subsceneSizeListener);
+		height.addListener(subsceneSizeListener);
 
 		mousePosX = 0;
 		mousePosY = 0;
@@ -238,7 +253,8 @@ public class Window3DSubScene{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				cameraXform.setScale(zoom.get());
+				xform.setScale(zoom.get());
+				repositionNoteSprites();
 			}
 		});
 
@@ -269,10 +285,10 @@ public class Window3DSubScene{
 		
 		currentNotes = new ArrayList<Note>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
-		billboardSphereMap = new HashMap<Node, Sphere>();
+		//billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
-	
+
 	/*
 	 * Called by RootLayoutController to set the loaded SceneElementsList
 	 * after the list is set, the SceneElements are loaded
@@ -347,20 +363,20 @@ public class Window3DSubScene{
 	                mouseDeltaY /= 2;
 	                rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
 	        		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
-	        		repositionNotes();
+	        		repositionNoteSprites();
 	        		//System.out.println("x: "+rotateX.getAngle()+" y: "+rotateY.getAngle());
 				}
 
 				else if (me.isSecondaryButtonDown()) {
-					double tx = cameraXform.t.getTx()-mouseDeltaX;
-					double ty = cameraXform.t.getTy()-mouseDeltaY;
+					double tx = xform.t.getTx()-mouseDeltaX;
+					double ty = xform.t.getTy()-mouseDeltaY;
 
 					if (tx>0 && tx<450)
-						cameraXform.t.setX(tx);
+						xform.t.setX(tx);
 					if (ty>0 && ty<450)
-						cameraXform.t.setY(ty);
+						xform.t.setY(ty);
 					
-					repositionNotes();
+					repositionNoteSprites();
 				}
 			}
 		});
@@ -406,24 +422,24 @@ public class Window3DSubScene{
 	}
 	
 	
-	private void repositionNotes() {
+	private void repositionNoteSprites() {
 		// Reposition sprites
 		for (Node node : spriteSphereMap.keySet()) {
 			Sphere s = spriteSphereMap.get(node);
 			if (s!=null) {
-				Bounds bound = s.localToParent(s.getBoundsInLocal());	
-				node.getTransforms().clear();
-				node.getTransforms().add(new Translate(
-										(bound.getMinX()+bound.getMaxX())/2, 
-										(bound.getMinY()+bound.getMaxY())/2,
-										(bound.getMinZ()+bound.getMaxZ())/2));
+				Bounds b = s.getBoundsInParent();
+				
+				if (b!=null) {
+					node.getTransforms().clear();
+					
+					double x = b.getMaxX();
+					double y = b.getMaxY();
+					double z = b.getMaxZ();
+					Point2D p = CameraHelper.project(camera, new Point3D(x, y, z));
+					
+					node.getTransforms().add(new Translate(p.getX(), p.getY()));
+				}
 			}
-		}
-		
-		for (Node node : billboardSphereMap.keySet()) {
-			Sphere s = billboardSphereMap.get(node);
-			node.getTransforms().clear();
-			node.getTransforms().addAll(s.getTransforms());
 		}
 	}
 
@@ -494,19 +510,34 @@ public class Window3DSubScene{
 		
 //-------------------------STORY ELEMENTS---------------------
 		if (storiesList!=null) {
+			spriteSphereMap.clear();
+			//billboardSphereMap.clear();
+			
+			// Clear sprites
+			if (parentAnchorPane!=null) {
+				ArrayList<Node> toRemove = new ArrayList<Node>();
+				for (Node node : parentAnchorPane.getChildren()) {
+					if (node.getStyleClass().contains(NOTE_SPRITE))
+						toRemove.add(node);
+				}
+				
+				for (Node node : toRemove) {
+					parentAnchorPane.getChildren().remove(node);
+				}
+			}
+			
 			currentNotes = storiesList.getNotesAtTime(time);
 			for (Note note : storiesList.getNotesWithCell()) {
 				for (String name : cellNames) {
 					if (name.equalsIgnoreCase(note.getCellName())) {
-						//System.out.println("got a cell note");
 						currentNotes.add(note);
 						break;
 					}
 				}
 			}
 			
-			spriteSphereMap.clear();
-			billboardSphereMap.clear();
+			
+			
 		}
 //---------------------------------------------------------------
 		
@@ -542,7 +573,7 @@ public class Window3DSubScene{
 	private void refreshScene() {
 		// clear note billboards, cell spheres and meshes
 		root.getChildren().clear();
-		root.getChildren().add(cameraXform);
+		root.getChildren().add(xform);
 		
 		// clear note sprites and overlays
 		if (overlayVBox!=null)
@@ -552,6 +583,7 @@ public class Window3DSubScene{
 	
 	private void addEntitiesToScene() {
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
+		ArrayList<Node> notes = new ArrayList<Node>();
 
 		refreshScene();
 		
@@ -561,26 +593,30 @@ public class Window3DSubScene{
  		addMeshesToList(entities);
  		
  		// render opaque entities first
-		addNotesGeometryToList(root.getChildren());
-		repositionNotes();
+		addNotesGeometryToList(notes);
+		root.getChildren().addAll(notes);
+		repositionNoteSprites();
  			
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
 		
 		// TODO Remove this later
-		// only for testing purposes (make Stanford bunny appear)
 		for (int i=0; i<currentSceneElements.size(); i++) {
 			SceneElement se = currentSceneElements.get(i);
-			if (se.getSceneName().contains("first scene")) {
+			if (se.belongsToNote()) {
 				MeshView mesh = currentSceneElementMeshes.get(i);
-				mesh.getTransforms().addAll(new Translate(newOriginX, newOriginY, newOriginZ), new Scale(180, -180, -180));
-				//System.out.println(mesh.getBoundsInParent().toString());
+				mesh.getTransforms().addAll(new Translate(
+											newOriginX+se.getX(),
+											newOriginY+se.getY(),
+											newOriginZ+se.getZ()),
+											new Scale(150, -150, -150));
+				mesh.setMaterial(colorHash.getNoteMaterial());
 			}
 		}
 	}
 	
 	
-	private void addNotesGeometryToList(ObservableList<Node> list) {
+	private void addNotesGeometryToList(ArrayList<Node> list) {
 		for (Note note : currentNotes) {
 			
 			// Revert to overlay display if we have invalid display/attachment 
@@ -589,7 +625,7 @@ public class Window3DSubScene{
 										|| note.hasTimeError())
 				note.setTagDisplay(Display.OVERLAY);
 			
-			Node node = makeShowTextNode(note.getTagName(), note.isOverlay());
+			Node node = makeShowTextNode(note);
 			
 			Type type = note.getAttachmentType();
 			Display display = note.getTagDisplay();
@@ -599,24 +635,25 @@ public class Window3DSubScene{
 				// Overlay: text is always facing the user
 				case OVERLAY:
 						// set overlay position relative to parent anchor pane
-						if (overlayVBox!=null) {
+						if (overlayVBox!=null)
 							overlayVBox.getChildren().add(node);
-							//System.out.println("overlay: "+note.toString());
-						}
 						break;
 				
 				// Billboard: text transforms with the scene meshes/spheres
 				case BILLBOARD:
 						if (positionSpriteOrBillboard(note, node))
 							list.add(node);
-						//System.out.println("billboard: "+note.toString());
 						break;
 				
 				// Sprite: text moves with whatever it is attached to and
 				// always faces user
 				case SPRITE:
-						if (positionSpriteOrBillboard(note, node))
-							list.add(node);
+						if (positionSpriteOrBillboard(note, node)) {
+							if (parentAnchorPane!=null) {
+								node.getStyleClass().add(NOTE_SPRITE);
+								parentAnchorPane.getChildren().add(node);
+							}
+						}
 						break;
 						
 				default:
@@ -631,13 +668,20 @@ public class Window3DSubScene{
 	// false otherwise
 	private boolean positionSpriteOrBillboard(Note note, Node node) {
 		if (note.getAttachmentType()==Type.LOCATION) {
-			if (note.isBillboard())
+			if (note.isBillboard()) {
 				node.getTransforms().addAll(rotateX, rotateY, rotateZ);
-			node.getTransforms().add(new Translate(
-									newOriginX+note.getX(),
-									newOriginY+note.getY(),
-									newOriginZ+note.getZ()));
-			return true;
+				node.getTransforms().add(new Translate(
+										newOriginX+note.getX(),
+										newOriginY+note.getY(),
+										newOriginZ+note.getZ()));
+				return true;
+			}
+			if (note.isSprite()) {
+				// Z coordinate is ignored for sprites - they reside on top of the subscene
+				node.getTransforms().add(new Translate(note.getX(), note.getY()));
+				return true;
+			}
+			
 		}
 		else if (note.isAttachedToCell() 
 				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
@@ -645,12 +689,20 @@ public class Window3DSubScene{
 				if (cellNames[i].equalsIgnoreCase(note.getCellName())) {
 					if (spheres[i]!=null) {
 						if (note.isBillboard()) {
-							node.getTransforms().addAll(rotateX, rotateY, rotateZ);
-							billboardSphereMap.put(node, spheres[i]);
 							node.getTransforms().addAll(spheres[i].getTransforms());
+							
+							// offset billboard from sphere
+							double offset = 5;
+							if (!uniformSize)
+								offset = spheres[i].getRadius()+2;
+							node.getTransforms().add(new Translate(offset, offset));
 						}
-						else if (note.isSprite())
+						
+						else if (note.isSprite()) {
 							spriteSphereMap.put(node, spheres[i]);
+							node.getTransforms().addAll(spheres[i].getTransforms());
+							node.toFront();
+						}
 						
 						return true;
 					}
@@ -664,28 +716,39 @@ public class Window3DSubScene{
 	
 	// Makes an anchor pane that contains the text to be shown
 	// if isOverlay is true, then the text is larger
-	private Node makeShowTextNode(String text, boolean isOverlay) {
-		AnchorPane pane = new AnchorPane();
-		Text t = new Text(text);
-		AnchorPane.setTopAnchor(t, 0.0);
-		AnchorPane.setLeftAnchor(t, 0.0);
-		AnchorPane.setRightAnchor(t, 0.0);
-		AnchorPane.setBottomAnchor(t, 0.0);
+	private Node makeShowTextNode(Note note) {
+		//AnchorPane pane = new AnchorPane();
+		Text t = new Text(note.getTagName());
 		
-		if (isOverlay) {
-			pane.setPrefWidth(120);
-			t.setFont(new Font(18));
-		}
-		else {
-			pane.setPrefWidth(60);
-			t.setFont(new Font(12));
+		switch (note.getTagDisplay()) {
+		
+			case OVERLAY:
+						t.setWrappingWidth(120);
+						t.setFont(Font.font("System", FontWeight.MEDIUM, 18));
+						break;
+			
+			case SPRITE:
+						t.setWrappingWidth(110);
+						t.setFont(Font.font("System", FontWeight.MEDIUM, 14));
+						break;
+						
+			case BILLBOARD:
+						t.setWrappingWidth(100);
+						t.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
+						t.setSmooth(false);
+						t.setStrokeLineJoin(StrokeLineJoin.MITER);
+						t.setStrokeType(StrokeType.OUTSIDE);
+						t.setStrokeWidth(2);
+						break;
+			
+			default:
+						break;
+						
 		}
 		
-		t.setWrappingWidth(t.prefWidth(-1));
 		t.setFill(Color.WHITE);
-		pane.getChildren().add(t);
 		
-		return pane;
+		return t;
 	}
 	
 	
@@ -807,18 +870,18 @@ public class Window3DSubScene{
 	
 	private void buildCamera() {
 		this.camera = new PerspectiveCamera(true);
-		this.cameraXform = new Xform();
-		cameraXform.reset();
+		this.xform = new Xform();
+		xform.reset();
 
-		root.getChildren().add(cameraXform);
-		cameraXform.getChildren().add(camera);
+		root.getChildren().add(xform);
+		xform.getChildren().add(camera);
 
         camera.setNearClip(CAMERA_NEAR_CLIP);
         camera.setFarClip(CAMERA_FAR_CLIP);
         camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
 
-        cameraXform.setScaleX(X_SCALE);
-        cameraXform.setScaleY(Y_SCALE);
+        xform.setScaleX(X_SCALE);
+        xform.setScaleY(Y_SCALE);
 
         setNewOrigin();
 
@@ -843,7 +906,7 @@ public class Window3DSubScene{
 		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 
 		// Set new origin to average X Y positions
-		cameraXform.setTranslate(newOriginX, newOriginY, newOriginZ);
+		xform.setTranslate(newOriginX, newOriginY, newOriginZ);
 		System.out.println("origin xyz: "+newOriginX+" "+newOriginY+" "+newOriginZ);
 	}
 	
@@ -949,13 +1012,20 @@ public class Window3DSubScene{
 	}
 	
 	
-	// Sets parent anchor pane in order to
-	// display text from notes
+	// Sets vbox for overlay notes display
 	public void setOverlayVBox(VBox box) {
 		if (box!=null) {
 			overlayVBox = box;
 			overlayVBox.toFront();
 		}
+	}
+	
+	
+	// Sets parent anchor pane for sprite notes display
+	// this is the anchor pane that the subscene is in
+	public void setModelAnchorPane(AnchorPane pane) {
+		if (pane!=null)
+			parentAnchorPane = pane;
 	}
 	
 	
@@ -1086,26 +1156,26 @@ public class Window3DSubScene{
 
 	
 	public double getTranslationX() {
-		return cameraXform.t.getTx()-newOriginX;
+		return xform.t.getTx()-newOriginX;
 	}
 	
 	
 	public void setTranslationX(double tx) {
 		double newTx = tx+newOriginX;
 		if (newTx>0 && newTx<450)
-			cameraXform.t.setX(newTx);
+			xform.t.setX(newTx);
 	}
 	
 	
 	public double getTranslationY() {
-		return cameraXform.t.getTy()-newOriginY;
+		return xform.t.getTy()-newOriginY;
 	}
 	
 	
 	public void setTranslationY(double ty) {
 		double newTy = ty+newOriginY;
 		if (newTy>0 && newTy<450)
-			cameraXform.t.setY(newTy);
+			xform.t.setY(newTy);
 	}
 
 	
@@ -1314,6 +1384,15 @@ public class Window3DSubScene{
 			};
 		}
 	}
+	
+	
+	private final class SubsceneSizeListener implements ChangeListener<Number> {
+		@Override
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			repositionNoteSprites();
+		}
+	}
+	
 
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
@@ -1387,5 +1466,7 @@ public class Window3DSubScene{
 
     private static final double SIZE_SCALE = .9;
     private static final double UNIFORM_RADIUS = 4;
+    
+    private static final String NOTE_SPRITE = ".sprite";
 
 }

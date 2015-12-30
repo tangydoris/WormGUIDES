@@ -20,6 +20,8 @@ public class SceneElement {
 	private String comments;
 	private boolean completeResourceFlag;
 	private boolean belongsToNote;
+	// x y z coordinates used when element belongs to a note
+	private int x, y, z;
 	
 
 	public SceneElement(String sceneName, ArrayList<String> cellNames,
@@ -145,6 +147,43 @@ public class SceneElement {
 	public void setEndTime(int time) {
 		if (-1<time)
 			endTime = time;
+	}
+	
+	
+	public int getX() {
+		return x;
+	}
+	
+	
+	public int getY() {
+		return y;
+	}
+	
+	
+	public int getZ() {
+		return z;
+	}
+	
+	
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	
+	public void setZ(int z) {
+		this.z = z;
+	}
+	
+	
+	public void setLocation(int x, int y, int z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 	
 	
