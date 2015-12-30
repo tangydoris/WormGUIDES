@@ -186,6 +186,7 @@ public class Note {
 			SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource,
 											resourceLocation, startTime, endTime+1, comments);
 			se.setBelongsToNote(true);
+			se.setLocation(x, y, z);
 			elements.add(se);
 		}
 	}

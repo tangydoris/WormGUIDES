@@ -33,7 +33,7 @@ public class StructuresLayer {
 		searchResultsList = FXCollections.observableArrayList();
 		
 		allStructuresList.addAll(sceneElementsList.getAllMulticellNames());
-		nameToCommentsMap = sceneElementsList.getMulticellNamesToCommentsMap();
+		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 	}
 	
 	

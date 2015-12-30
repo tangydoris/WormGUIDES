@@ -8,7 +8,6 @@ import java.util.TreeSet;
 
 import com.sun.javafx.scene.CameraHelper;
 
-import wormguides.model.StoriesList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -60,6 +59,7 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import wormguides.ColorComparator;
+import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
@@ -163,7 +163,7 @@ public class Window3DSubScene{
 	private boolean multicellMode;
 
 	//Story elements stuff
-	private StoriesList storiesList;
+	private StoriesLayer storiesLayer;
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
@@ -285,7 +285,6 @@ public class Window3DSubScene{
 		
 		currentNotes = new ArrayList<Note>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
-		//billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
 
@@ -301,9 +300,9 @@ public class Window3DSubScene{
 	}
 	
 	
-	public void setStoriesList(StoriesList list) {
+	public void setStoriesList(StoriesLayer list) {
 		if (list!=null) {
-			storiesList = list;
+			storiesLayer = list;
 			buildScene(time.get());
 		}
 	}
@@ -509,7 +508,7 @@ public class Window3DSubScene{
 		
 		
 //-------------------------STORY ELEMENTS---------------------
-		if (storiesList!=null) {
+		if (storiesLayer!=null) {
 			spriteSphereMap.clear();
 			//billboardSphereMap.clear();
 			
@@ -526,8 +525,8 @@ public class Window3DSubScene{
 				}
 			}
 			
-			currentNotes = storiesList.getNotesAtTime(time);
-			for (Note note : storiesList.getNotesWithCell()) {
+			currentNotes = storiesLayer.getNotesAtTime(time);
+			for (Note note : storiesLayer.getNotesWithCell()) {
 				for (String name : cellNames) {
 					if (name.equalsIgnoreCase(note.getCellName())) {
 						currentNotes.add(note);
@@ -599,20 +598,6 @@ public class Window3DSubScene{
  			
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
-		
-		// TODO Remove this later
-		for (int i=0; i<currentSceneElements.size(); i++) {
-			SceneElement se = currentSceneElements.get(i);
-			if (se.belongsToNote()) {
-				MeshView mesh = currentSceneElementMeshes.get(i);
-				mesh.getTransforms().addAll(new Translate(
-											newOriginX+se.getX(),
-											newOriginY+se.getY(),
-											newOriginZ+se.getZ()),
-											new Scale(150, -150, -150));
-				mesh.setMaterial(colorHash.getNoteMaterial());
-			}
-		}
 	}
 	
 	
@@ -757,23 +742,35 @@ public class Window3DSubScene{
 		// process only if meshes at this time point
 		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
+				SceneElement se = currentSceneElements.get(i);
+				MeshView mesh = currentSceneElementMeshes.get(i);
+				
 				// in search mode
 				if (inSearch) {
 	 				if (cellBodyTicked && searchedMeshes[i])
-	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
+	 					mesh.setMaterial(colorHash.getHighlightMaterial());
 	 				else 
-	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getTranslucentMaterial());
+	 					mesh.setMaterial(colorHash.getTranslucentMaterial());
 	 			}
+				
+				else if (se.belongsToNote()) {
+					mesh.setMaterial(colorHash.getNoteMaterial());
+					mesh.getTransforms().addAll(new Translate(
+												newOriginX+se.getX(),
+												newOriginY+se.getY(),
+												newOriginZ+se.getZ()),
+												new Scale(150, -150, -150));
+				}
 				
 				else {
 					// in regular view mode
-					ArrayList<String> allNames = currentSceneElements.get(i).getAllCellNames();
-					String sceneName = currentSceneElements.get(i).getSceneName();
+					ArrayList<String> allNames = se.getAllCellNames();
+					String sceneName = se.getSceneName();
 					
 					// default white meshes
 					if (allNames.isEmpty()) {
-						currentSceneElementMeshes.get(i).setMaterial(new PhongMaterial(Color.WHITE));
-						currentSceneElementMeshes.get(i).setCullFace(CullFace.NONE);
+						mesh.setMaterial(new PhongMaterial(Color.WHITE));
+						mesh.setCullFace(CullFace.NONE);
 					}
 					
 					// If mesh has with name(s), then process rules (cell or shape)
@@ -802,13 +799,13 @@ public class Window3DSubScene{
 						
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty())
-							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
+							mesh.setMaterial(colorHash.getMaterial(colors));
 						else
-							currentSceneElementMeshes.get(i).setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 					}
 				}
 				
-				list.add(currentSceneElementMeshes.get(i));
+				list.add(mesh);
 			}
 		}
 	}

@@ -50,7 +50,7 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
-import wormguides.model.StoriesList;
+import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -137,7 +137,10 @@ public class RootLayoutController implements Initializable{
 	
 	//scene elements stuff
 	SceneElementsList elementsList;
-	StoriesList storiesList;
+	
+	// story stuff
+	StoriesLayer storiesList;
+	@FXML private ListView<Story> storiesListView;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -635,6 +638,8 @@ public class RootLayoutController implements Initializable{
 		assert (structureRuleColorPicker != null);
 		assert (structuresSearchListView != null);
 		assert (allStructuresListView != null);
+		
+		assert (storiesListView != null);
 	}
 	
 	private void initStructuresLayer() {
@@ -651,6 +656,11 @@ public class RootLayoutController implements Initializable{
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
+	}
+	
+	
+	private void initStoriesLayer() {
+		
 	}
 
 	
@@ -685,18 +695,21 @@ public class RootLayoutController implements Initializable{
 		window3D.setColorRulesList(colorTempList);
 		
 		elementsList = new SceneElementsList();
-		storiesList = new StoriesList(elementsList);
+		storiesList = new StoriesLayer(elementsList);
 		window3D.setSceneElementsList(elementsList);
 		window3D.setStoriesList(storiesList);
 		Search.setSceneElementsList(elementsList);
 		
-		//set up the connectome
+		// connectome
 		connectome = new Connectome();
 		connectome.buildConnectome();
 		Search.setConnectome(connectome);
 		
-		//set up the structure layer
+		// structures layer
 		initStructuresLayer();
+		
+		// stories layer
+		initStoriesLayer();
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());

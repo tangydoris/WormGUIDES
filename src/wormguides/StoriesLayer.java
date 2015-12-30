@@ -1,4 +1,4 @@
-package wormguides.model;
+package wormguides;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,18 +13,22 @@ import java.util.jar.JarFile;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import wormguides.model.Note;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
 import wormguides.model.Note.TimeStringFormatException;
+import wormguides.model.SceneElement;
+import wormguides.model.SceneElementsList;
+import wormguides.model.Story;
 
-public class StoriesList {
+public class StoriesLayer {
 	
 	public ObservableList<Story> stories;
 	public SceneElementsList elementsList;
 	
 	
-	public StoriesList(SceneElementsList list) {
+	public StoriesLayer(SceneElementsList list) {
 		stories = FXCollections.observableArrayList();
 		this.elementsList = list;
 		buildStories();

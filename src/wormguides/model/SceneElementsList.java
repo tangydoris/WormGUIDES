@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -187,18 +186,23 @@ public class SceneElementsList {
 	}
 	
 	
-	public Set<String> getAllMulticellNames() {
-		return nameCommentsMap.keySet();
+	public ArrayList<String> getAllMulticellNames() {
+		ArrayList<String> names = new ArrayList<String>();
+		for (SceneElement se : elementsList) {
+			if (se.isMulticellular() && !names.contains(se))
+				names.add(se.getSceneName());
+		}
+		return names;
 	}
 	
 	
 	public ArrayList<SceneElement> getMulticellSceneElements() {
-		ArrayList<SceneElement> list = new ArrayList<SceneElement>();
+		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
 		for (SceneElement se : elementsList) {
-			if (se.isMulticellular() && !list.contains(se))
-				list.add(se);
+			if (se.isMulticellular() && !elements.contains(se))
+				elements.add(se);
 		}
-		return list;
+		return elements;
 	}
 	
 	
@@ -228,7 +232,7 @@ public class SceneElementsList {
 	}
 	
 	
-	public HashMap<String, String> getMulticellNamesToCommentsMap() {
+	public HashMap<String, String> getNameToCommentsMap() {
 		return nameCommentsMap;
 	}
 	
