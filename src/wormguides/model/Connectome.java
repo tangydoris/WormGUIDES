@@ -135,7 +135,7 @@ public class Connectome {
 	
 	/*
 	 * TODO
-	 * - MAKE CONNECTOME RULE TIED TO SELECTED CELL AND NOT SEARCH STRING
+	 * - MAKE CONNECTOME RULE TIED TO SELECTED CELL AND NOT SEARCH STRING --> send email, this is also happening with other rules
 	 * - implemented grayed out view options
 	 * - send email about plan for class for external html window for connectome
 	 */

@@ -73,6 +73,7 @@ public class RootLayoutController implements Initializable{
 	private Stage treeStage;
 	private Stage urlStage;
 	private Stage urlLoadStage;
+	private Stage connectomeStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -115,7 +116,6 @@ public class RootLayoutController implements Initializable{
 	//connectome stuff
 	Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
-	private Stage connectomeStage;
 	
 	// lineage tree
 	private TreeItem<String> lineageTreeRoot;
@@ -257,6 +257,29 @@ public class RootLayoutController implements Initializable{
 		
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
+	}
+	
+	@FXML
+	public void viewConnectome() {
+		if (connectomeStage == null) {
+			connectomeStage = new Stage();
+			connectomeStage.setTitle("Connectome");
+			connectomeStage.setWidth(805);
+			connectomeStage.setHeight(625);
+			
+			WebView connectomeHTML = new WebView();
+			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
+			
+			VBox root = new VBox();
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.setContent(connectomeHTML);
+			root.getChildren().addAll(scrollPane);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			connectomeStage.setScene(scene);
+		}
+		connectomeStage.show();
 	}
 	
 	public void init3DWindow(LineageData data) {
@@ -703,34 +726,6 @@ public class RootLayoutController implements Initializable{
 		connectome = new Connectome();
 		connectome.buildConnectome();
 		Search.setConnectome(connectome);
-		
-//		-----------------------------------------------
-		/* CONNECTOME HTML WINDOW
-		 * maybe make this stage a separate class in view (like Window3DSub) that can build the webview, load the content, etc.
-		 */
-		try {
-			connectomeStage = new Stage();
-			connectomeStage.setTitle("Connectome");
-			connectomeStage.setWidth(805);
-			connectomeStage.setHeight(625);
-			
-			WebView connectomeHTML = new WebView();
-			//connectomeHTML.getEngine().load("/Users/stormfootball4life/Desktop/WormGUIDES/connectome.html");
-			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
-			
-			VBox root = new VBox();
-			ScrollPane scrollPane = new ScrollPane();
-			scrollPane.setContent(connectomeHTML);
-			root.getChildren().addAll(scrollPane);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
-			
-			connectomeStage.setScene(scene);
-			connectomeStage.show();
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
-//		-----------------------------------------------
 		
 		//set up the structure layer
 		initStructuresLayer();
