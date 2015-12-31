@@ -703,12 +703,15 @@ public class RootLayoutController implements Initializable{
 		connectome.buildConnectome();
 		Search.setConnectome(connectome);
 		
-		//DEBUGGING CONNECTOME HTML PAGE
+//		-----------------------------------------------
+		/* CONNECTOME HTML WINDOW
+		 * maybe make this stage a separate class in view (like Window3DSub) that can build the webview, load the content, etc.
+		 */
 		try {
 			connectomeStage = new Stage();
 			connectomeStage.setTitle("Connectome");
-			connectomeStage.setWidth(400);
-			connectomeStage.setHeight(400);
+			connectomeStage.setWidth(805);
+			connectomeStage.setHeight(625);
 			
 			WebView connectomeHTML = new WebView();
 			//connectomeHTML.getEngine().load("/Users/stormfootball4life/Desktop/WormGUIDES/connectome.html");
@@ -723,10 +726,10 @@ public class RootLayoutController implements Initializable{
 			
 			connectomeStage.setScene(scene);
 			connectomeStage.show();
-			System.out.println("initialized connectome html window...");
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
+//		-----------------------------------------------
 		
 		//set up the structure layer
 		initStructuresLayer();

@@ -1,6 +1,7 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Connectome {
 	private ArrayList<NeuronalSynapse> connectome;
@@ -134,8 +135,9 @@ public class Connectome {
 	
 	/*
 	 * TODO
-	 * - RENDER PAGE IN EXTERNAL WINDOW
 	 * - MAKE CONNECTOME RULE TIED TO SELECTED CELL AND NOT SEARCH STRING
+	 * - implemented grayed out view options
+	 * - send email about plan for class for external html window for connectome
 	 */
 	
 	/*
@@ -165,8 +167,6 @@ public class Connectome {
 			
 			if (queryCell.equals(cell_1)) {
 				//add cell_2 as a wiring partner
-				
-				//addWiringPartner(cell_2);
 				
 				//extract number of synapses
 				int numberOfSynapses = ns.numberOfSynapses();
@@ -217,6 +217,7 @@ public class Connectome {
 				closeTableHeaderHTML + closeTableRowHTML;
 		
 		String presynapticPartnersTableRow;
+		Collections.sort(presynapticPartners); //alphabetize
 		if (presynapticPartners.size() > 0) {
 			presynapticPartnersTableRow = openTableRowHTML + openTableDataHTML +
 					presynapticPartnersTitle + closeTableDataHTML + openTableDataHTML +
@@ -227,6 +228,7 @@ public class Connectome {
 		
 		
 		String postsynapticPartnersTableRow;
+		Collections.sort(postsynapticPartners); //alphabetize
 		if (postsynapticPartners.size() > 0) {
 			postsynapticPartnersTableRow = openTableRowHTML + openTableDataHTML + 
 					postsynapticPartnersTitle + closeTableDataHTML + openTableDataHTML +
@@ -236,6 +238,7 @@ public class Connectome {
 		}
 		
 		String electricalPartnersTableRow;
+		Collections.sort(electricalPartners); //alphabetize
 		if (electricalPartners.size() > 0) {
 			electricalPartnersTableRow = openTableRowHTML + openTableDataHTML +
 					electricalPartnersTitle + closeTableDataHTML + openTableDataHTML +
@@ -245,6 +248,7 @@ public class Connectome {
 		}
 		
 		String neuromuscularPartnersTableRow;
+		Collections.sort(neuromuscularPartners); //alphabetize
 		if (neuromuscularPartners.size() > 0) {
 			neuromuscularPartnersTableRow = openTableRowHTML + openTableDataHTML +
 					neuromusclarPartnersTitle + closeTableDataHTML + openTableDataHTML +
@@ -286,6 +290,9 @@ public class Connectome {
 					cells.add(cell_2);
 				}
 			}
+			
+			//alphabetize the connectome cells
+			Collections.sort(cells);
 			
 			//add tables of wiring partners for each unique entry
 			ArrayList<String> wiringPartnersAsHTMLTables = new ArrayList<String>();
