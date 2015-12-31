@@ -58,6 +58,14 @@ import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.Window3DSubScene;
 
+
+//FOR CONNECTOME WINDOW
+import javafx.scene.web.WebView;
+//import java.io.BufferedWriter;
+//import java.io.File;
+//import java.io.FileWriter;
+import javafx.scene.Group;
+
 public class RootLayoutController implements Initializable{
 	
 	// popup windows
@@ -107,6 +115,7 @@ public class RootLayoutController implements Initializable{
 	//connectome stuff
 	Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
+	private Stage connectomeStage;
 	
 	// lineage tree
 	private TreeItem<String> lineageTreeRoot;
@@ -693,6 +702,31 @@ public class RootLayoutController implements Initializable{
 		connectome = new Connectome();
 		connectome.buildConnectome();
 		Search.setConnectome(connectome);
+		
+		//DEBUGGING CONNECTOME HTML PAGE
+		try {
+			connectomeStage = new Stage();
+			connectomeStage.setTitle("Connectome");
+			connectomeStage.setWidth(400);
+			connectomeStage.setHeight(400);
+			
+			WebView connectomeHTML = new WebView();
+			//connectomeHTML.getEngine().load("/Users/stormfootball4life/Desktop/WormGUIDES/connectome.html");
+			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
+			
+			VBox root = new VBox();
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.setContent(connectomeHTML);
+			root.getChildren().addAll(scrollPane);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			connectomeStage.setScene(scene);
+			connectomeStage.show();
+			System.out.println("initialized connectome html window...");
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
 		
 		//set up the structure layer
 		initStructuresLayer();
