@@ -128,6 +128,12 @@ public class Note {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		
+		if (elements!=null) {
+			for (SceneElement se : elements) {
+				se.setLocation(x, y, z);
+			}
+		}
 	}
 	
 	
