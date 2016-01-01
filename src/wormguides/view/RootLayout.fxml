@@ -461,7 +461,11 @@
                                     <HBox>
                                        <children>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <Button maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor" />
+                                          <Button maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Button>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>

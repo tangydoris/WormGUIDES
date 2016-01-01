@@ -59,7 +59,6 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import wormguides.ColorComparator;
-import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
@@ -71,6 +70,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
+import wormguides.model.StoriesList;
 
 public class Window3DSubScene{
 
@@ -163,7 +163,7 @@ public class Window3DSubScene{
 	private boolean multicellMode;
 
 	//Story elements stuff
-	private StoriesLayer storiesLayer;
+	private StoriesList storiesList;
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
@@ -285,6 +285,7 @@ public class Window3DSubScene{
 		
 		currentNotes = new ArrayList<Note>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
+		//billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
 
@@ -300,9 +301,9 @@ public class Window3DSubScene{
 	}
 	
 	
-	public void setStoriesList(StoriesLayer list) {
+	public void setStoriesList(StoriesList list) {
 		if (list!=null) {
-			storiesLayer = list;
+			storiesList = list;
 			buildScene(time.get());
 		}
 	}
@@ -508,7 +509,7 @@ public class Window3DSubScene{
 		
 		
 //-------------------------STORY ELEMENTS---------------------
-		if (storiesLayer!=null) {
+		if (storiesList!=null) {
 			spriteSphereMap.clear();
 			//billboardSphereMap.clear();
 			
@@ -525,8 +526,8 @@ public class Window3DSubScene{
 				}
 			}
 			
-			currentNotes = storiesLayer.getNotesAtTime(time);
-			for (Note note : storiesLayer.getNotesWithCell()) {
+			currentNotes = storiesList.getNotesAtTime(time);
+			for (Note note : storiesList.getNotesWithCell()) {
 				for (String name : cellNames) {
 					if (name.equalsIgnoreCase(note.getCellName())) {
 						currentNotes.add(note);
@@ -760,6 +761,7 @@ public class Window3DSubScene{
 												newOriginY+se.getY(),
 												newOriginZ+se.getZ()),
 												new Scale(150, -150, -150));
+					
 				}
 				
 				else {

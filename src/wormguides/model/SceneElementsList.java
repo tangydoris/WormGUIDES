@@ -114,8 +114,8 @@ public class SceneElementsList {
 	
 	
 	private void addComments(SceneElement element) {
-		if (element.isMulticellular() || element.belongsToNote())
-			nameCommentsMap.put(element.getSceneName(), element.getComments());
+		if (element!=null && (element.isMulticellular() || element.belongsToNote()))
+			nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
 	}
 	
 	
@@ -125,21 +125,6 @@ public class SceneElementsList {
 		
 		addComments(element);
 	}
-	
-	
-	// Pick out all multicellular names and map them to their comments
-	/*
-	private void populateCommentsMap() {
-		for (int i = 0; i < elementsList.size(); i++) {
-			SceneElement current = elementsList.get(i);
-			//check if the scene element is a multicellular structure
-			if (current.isMulticellular() || current.belongsToNote()) {
-				nameCommentsMap.put(current.getSceneName().toLowerCase(), current.getComments());
-				System.out.println(current.getComments());
-			}
-		}
-	}
-	*/
 	
 	
 	public String[] getSceneElementNamesAtTime(int time) {
@@ -186,7 +171,7 @@ public class SceneElementsList {
 	}
 	
 	
-	public ArrayList<String> getAllMulticellNames() {
+	public ArrayList<String> getAllMulticellSceneNames() {
 		ArrayList<String> names = new ArrayList<String>();
 		for (SceneElement se : elementsList) {
 			if (se.isMulticellular() && !names.contains(se))
@@ -216,7 +201,7 @@ public class SceneElementsList {
 	
 	
 	public boolean isMulticellStructureName(String name) {
-		for (String cellName : getAllMulticellNames()) {
+		for (String cellName : getAllMulticellSceneNames()) {
 			if (cellName.equalsIgnoreCase(name.trim()))
 				return true;
 		}

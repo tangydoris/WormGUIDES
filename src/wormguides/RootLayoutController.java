@@ -50,6 +50,7 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
+import wormguides.model.StoriesList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
@@ -139,7 +140,7 @@ public class RootLayoutController implements Initializable{
 	SceneElementsList elementsList;
 	
 	// story stuff
-	StoriesLayer storiesList;
+	StoriesList storiesList;
 	@FXML private ListView<Story> storiesListView;
 	
 	// url stuff
@@ -319,7 +320,6 @@ public class RootLayoutController implements Initializable{
 			public void changed(
 					ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				setSelectedInfo(newValue);
 				selectedName.set(newValue);
 			}
 		});
@@ -341,6 +341,15 @@ public class RootLayoutController implements Initializable{
             public void handle(MouseEvent event) {
                 event.consume();
             }
+		});
+		
+		allStructuresListView.getSelectionModel().selectedItemProperty()
+							.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue,
+								String newValue) {
+				selectedName.set(newValue);
+			}
 		});
 		
 		// Modify font for ListView's of String's
@@ -388,11 +397,10 @@ public class RootLayoutController implements Initializable{
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
-
+		
 		if (name.indexOf("(")!=-1) 
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
-		
 		
 		cellName.setText(name);
 		if (Search.isStructureWithComment(name))
@@ -695,7 +703,7 @@ public class RootLayoutController implements Initializable{
 		window3D.setColorRulesList(colorTempList);
 		
 		elementsList = new SceneElementsList();
-		storiesList = new StoriesLayer(elementsList);
+		storiesList = new StoriesList(elementsList);
 		window3D.setSceneElementsList(elementsList);
 		window3D.setStoriesList(storiesList);
 		Search.setSceneElementsList(elementsList);
