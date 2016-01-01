@@ -49,6 +49,7 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
 import wormguides.view.AboutPane;
@@ -75,6 +76,7 @@ public class RootLayoutController implements Initializable{
 	private Stage urlLoadStage;
 	private Stage connectomeStage;
 	private Stage partsListStage;
+	private Stage cellShapesIndexStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -262,7 +264,35 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void viewCellShapesIndex() {
-		System.out.println("show cell shapes index");
+		if (elementsList == null) return;
+		
+		if (cellShapesIndexStage == null) {
+			cellShapesIndexStage = new Stage();
+			cellShapesIndexStage.setTitle("Cell Shapes Index");
+			cellShapesIndexStage.setWidth(805);
+			cellShapesIndexStage.setHeight(625);
+			
+			//format cell shapes as string for webview
+			String cellShapesIndex = "Scene Name, Cell Names, Marker, Start Time, End Time, Comments" + "<br>";
+			for (SceneElement se : elementsList.elementsList) {
+				String sceneElementAsString = se.getSceneName() + ", " + se.getAllCellNames().toString()
+						+ ", " + se.getMarkerName() + ", " + se.getStartTime() + ", " + se.getEndTime()
+						+ ", " + se.getComments() + "<br>";
+				cellShapesIndex += sceneElementAsString;
+			}
+			
+			//webview to render cell shapes list i.e. elementsList
+			WebView cellShapesIndexWebView = new WebView();
+			cellShapesIndexWebView.getEngine().loadContent(cellShapesIndex);
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(cellShapesIndexWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			cellShapesIndexStage.setScene(scene);
+		}
+		cellShapesIndexStage.show();
 	}
 	
 	@FXML
@@ -273,7 +303,7 @@ public class RootLayoutController implements Initializable{
 			partsListStage.setWidth(805);
 			partsListStage.setHeight(625);
 			
-			//build webview scene to render html
+			//build webview scene to render parts list
 			WebView partsListWebView = new WebView();
 			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsString());
 			
