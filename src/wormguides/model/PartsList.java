@@ -16,6 +16,8 @@ public class PartsList {
 	private static ArrayList<String> lineageNames;
 	private static ArrayList<String> descriptions;
 	
+	private static ArrayList<String> partsListAsArrayList;
+	
 	private final static String JAR_NAME = "WormGUIDES.jar";
 	private final static String PARTSLIST_NAME = "wormguides/model/partslist.txt";
 	
@@ -24,6 +26,7 @@ public class PartsList {
 		functionalNames = new ArrayList<String>();
 		lineageNames = new ArrayList<String>();
 		descriptions = new ArrayList<String>();
+		partsListAsArrayList = new ArrayList<String>();
 		
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
@@ -39,6 +42,8 @@ public class PartsList {
 					
 					String line;
 					while ((line = br.readLine()) != null) {
+						partsListAsArrayList.add(line);
+						
 						String[] lineArray = line.split("\t");
 						functionalNames.add(lineArray[0]);
 						lineageNames.add(lineArray[1]);
@@ -138,6 +143,14 @@ public class PartsList {
 	
 	public static ArrayList<String> getDescriptions() {
 		return descriptions;
+	}
+	
+	public static String getPartsListAsString() {
+		String partsListAsString = "";
+		for (String line : partsListAsArrayList) {
+			partsListAsString += (line + "<br>");
+		}
+		return partsListAsString;
 	}
 
 }

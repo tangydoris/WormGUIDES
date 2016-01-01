@@ -74,6 +74,7 @@ public class RootLayoutController implements Initializable{
 	private Stage urlStage;
 	private Stage urlLoadStage;
 	private Stage connectomeStage;
+	private Stage partsListStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -260,6 +261,33 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	@FXML
+	public void viewCellShapesIndex() {
+		System.out.println("show cell shapes index");
+	}
+	
+	@FXML
+	public void viewPartsList() {
+		if (partsListStage == null) {
+			partsListStage = new Stage();
+			partsListStage.setTitle("Parts List");
+			partsListStage.setWidth(805);
+			partsListStage.setHeight(625);
+			
+			//build webview scene to render html
+			WebView partsListWebView = new WebView();
+			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsString());
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(partsListWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			partsListStage.setScene(scene);
+		}
+		partsListStage.show();
+	}
+	
+	@FXML
 	public void viewConnectome() {
 		if (connectomeStage == null) {
 			connectomeStage = new Stage();
@@ -267,13 +295,12 @@ public class RootLayoutController implements Initializable{
 			connectomeStage.setWidth(805);
 			connectomeStage.setHeight(625);
 			
+			//build webview scene to render html
 			WebView connectomeHTML = new WebView();
 			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
 			
 			VBox root = new VBox();
-			ScrollPane scrollPane = new ScrollPane();
-			scrollPane.setContent(connectomeHTML);
-			root.getChildren().addAll(scrollPane);
+			root.getChildren().addAll(connectomeHTML);
 			Scene scene = new Scene(new Group());
 			scene.setRoot(root);
 			
