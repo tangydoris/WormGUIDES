@@ -303,7 +303,9 @@ public class Window3DSubScene{
 	
 	public void setStoriesList(StoriesList list) {
 		if (list!=null) {
+			System.out.println("Set stories list in window3d");
 			storiesList = list;
+			System.out.println(storiesList.toString());
 			buildScene(time.get());
 		}
 	}
@@ -510,21 +512,12 @@ public class Window3DSubScene{
 		
 //-------------------------STORY ELEMENTS---------------------
 		if (storiesList!=null) {
-			spriteSphereMap.clear();
-			//billboardSphereMap.clear();
-			
-			// Clear sprites
 			if (parentAnchorPane!=null) {
-				ArrayList<Node> toRemove = new ArrayList<Node>();
-				for (Node node : parentAnchorPane.getChildren()) {
-					if (node.getStyleClass().contains(NOTE_SPRITE))
-						toRemove.add(node);
-				}
-				
-				for (Node node : toRemove) {
+				for (Node node : spriteSphereMap.keySet()) {
 					parentAnchorPane.getChildren().remove(node);
 				}
 			}
+			spriteSphereMap.clear();
 			
 			currentNotes = storiesList.getNotesAtTime(time);
 			for (Note note : storiesList.getNotesWithCell()) {
@@ -535,9 +528,6 @@ public class Window3DSubScene{
 					}
 				}
 			}
-			
-			
-			
 		}
 //---------------------------------------------------------------
 		
@@ -591,9 +581,9 @@ public class Window3DSubScene{
 		// making the notes
 		addSpheresToList(entities);
  		addMeshesToList(entities);
+ 		addNotesGeometryToList(notes);
  		
  		// render opaque entities first
-		addNotesGeometryToList(notes);
 		root.getChildren().addAll(notes);
 		repositionNoteSprites();
  			
@@ -604,7 +594,6 @@ public class Window3DSubScene{
 	
 	private void addNotesGeometryToList(ArrayList<Node> list) {
 		for (Note note : currentNotes) {
-			
 			// Revert to overlay display if we have invalid display/attachment 
 			// type combination
 			if (note.hasLocationError() || note.hasCellNameError() 

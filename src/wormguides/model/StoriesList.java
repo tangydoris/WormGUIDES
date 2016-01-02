@@ -26,7 +26,7 @@ public class StoriesList {
 	
 	public StoriesList(SceneElementsList list) {
 		stories = FXCollections.observableArrayList();
-		this.elementsList = list;
+		elementsList = list;
 		buildStories();
 	}
 	
@@ -153,11 +153,13 @@ public class StoriesList {
 	
 	
 	public ArrayList<Note> getNotesAtTime(int time) {
-		//System.out.println("stories list getting notes at time "+time);
+		System.out.println("stories list getting notes at time "+time);
 		ArrayList<Note> notes = new ArrayList<Note>();
 		//System.out.println(stories.size());
 		for (Story story : stories) {
 			notes.addAll(story.getNotesAtTime(time));
+			for (Note note : notes)
+				System.out.println(note.toString());
 		}
 		return notes;
 	}
@@ -168,7 +170,7 @@ public class StoriesList {
 		for (Story story : stories) {
 			for (SceneElement element : story.getSceneElementsAtTime(time)) {
 				if (!elements.contains(element)) {
-					//System.out.println("got scene element for "+story.getName()+" at time "+time);
+					System.out.println("got scene element for "+story.getName()+" at time "+time);
 					elements.add(element);
 				}
 			}
