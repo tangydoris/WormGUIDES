@@ -1,4 +1,4 @@
-package wormguides.model;
+package wormguides;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,9 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import wormguides.model.NeuronalSynapse;
+import wormguides.model.SynapseType;
 
 public class ConnectomeLoader {
 	private String filePath;

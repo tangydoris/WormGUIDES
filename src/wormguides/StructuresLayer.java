@@ -20,11 +20,11 @@ public class StructuresLayer {
 	private ObservableList<String> allStructuresList;
 	private ObservableList<String> searchResultsList;
 	private ObservableList<Rule> rulesList;
-	private static Color selectedColor;
+	private Color selectedColor;
 	private String selectedStructure;
 	private String searchText;
-	
 	private HashMap<String, String> nameToCommentsMap;
+	
 	
 	public StructuresLayer(SceneElementsList sceneElementsList) {
 		selectedColor = Color.WHITE; //default color
@@ -32,8 +32,8 @@ public class StructuresLayer {
 		allStructuresList = FXCollections.observableArrayList();
 		searchResultsList = FXCollections.observableArrayList();
 		
-		allStructuresList.addAll(sceneElementsList.getAllMulticellNames());
-		nameToCommentsMap = sceneElementsList.getMulticellNamesToCommentsMap();
+		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
+		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 	}
 	
 	

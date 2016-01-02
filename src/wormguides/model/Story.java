@@ -2,46 +2,69 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import wormguides.view.AppFont;
+
 public class Story {
 	
 	private String name;
 	private String description;
-	private ArrayList<Note> notesList;
+	private ArrayList<Note> notes;
+	private VBox vBox;
 	
 	
 	public Story(String name, String description) {
 		this.name = name;
 		this.description = description;
-		notesList = new ArrayList<Note>();
+		notes = new ArrayList<Note>();
+		
+		makeGraphic();
+	}
+	
+	
+	private void makeGraphic() {
+		vBox = new VBox(5);
+		
+		Label titleLabel = new Label(name);
+		titleLabel.setFont(AppFont.getBoldFont());
+		titleLabel.setWrapText(true);
+		
+		Text descriptionText = new Text(description);
+		descriptionText.setFont(AppFont.getFont());
+		descriptionText.wrappingWidthProperty().bind(vBox.widthProperty());
+		
+		vBox.getChildren().addAll(titleLabel, descriptionText);
+		
+		// TODO Add graphic for Note in this class?
 	}
 	
 	
 	public ArrayList<Note> getNotesWithCell() {
-		ArrayList<Note> notes = new ArrayList<Note>();
-		for (Note note : notesList) {
+		ArrayList<Note> list = new ArrayList<Note>();
+		for (Note note : notes) {
 			if (note.isAttachedToCell() || note.isAttachedToCellTime())
-				notes.add(note);
+				list.add(note);
 		}
-		return notes;
+		return list;
 	}
 	
 	
 	public ArrayList<Note> getNotesAtTime(int time) {
-		ArrayList<Note> notes = new ArrayList<Note>();
-		for (Note note : notesList) {
-			if (note.existsAtTime(time)) {
-				//System.out.println("Story: "+note.getTagName()+" exists at time "+time);
-				notes.add(note);
-			}
+		ArrayList<Note> list = new ArrayList<Note>();
+		for (Note note : notes) {
+			if (note.existsAtTime(time))
+				list.add(note);
 		}
-		return notes;
+		return list;
 	}
 	
 	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
 		//System.out.println("getting scene elements for story "+name+" at time "+time);
 		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-		for (Note note : notesList) {
+		for (Note note : notes) {
 			if (note.hasSceneElements()) {
 				for (SceneElement element : note.getSceneElements()) {
 					if (element.existsAtTime(time) && !elements.contains(element)) {
@@ -56,7 +79,7 @@ public class Story {
 	
 	
 	public int getNumberOfNotes() {
-		return notesList.size();
+		return notes.size();
 	}
 	
 	
@@ -71,7 +94,18 @@ public class Story {
 	
 	
 	public void addNote(Note note) {
-		notesList.add(note);
+		if (note!=null) {
+			notes.add(note);
+			vBox.getChildren().add(note.getGraphic());
+		}
+	}
+	
+	
+	public void removeNote(Note note) {
+		if (note!=null) {
+			notes.remove(note);
+			vBox.getChildren().remove(note.getGraphic());
+		}
 	}
 	
 	
@@ -85,8 +119,18 @@ public class Story {
 	}
 	
 	
-	public Note[] getNotes() {
-		return notesList.toArray(new Note[notesList.size()]);
+	public ArrayList<Note> getNotes() {
+		return notes;
+	}
+	
+	
+	public VBox getGraphic() {
+		return vBox;
+	}
+	
+	
+	public String toString() {
+		return name+" - contains "+notes.size()+" notes";
 	}
 
 }

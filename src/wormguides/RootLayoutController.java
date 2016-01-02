@@ -26,7 +26,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -43,7 +42,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -52,6 +50,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
+import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -127,8 +126,8 @@ public class RootLayoutController implements Initializable{
 	private StringProperty selectedName;
 	
 	// layers tab
-	private Layers layers;
-	private Layers shapeLayers;
+	private DisplayLayer rulesLayer;
+	private DisplayLayer shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
@@ -149,7 +148,11 @@ public class RootLayoutController implements Initializable{
 	
 	//scene elements stuff
 	SceneElementsList elementsList;
+	
+	// story stuff
 	StoriesList storiesList;
+	StoriesLayer storiesLayer;
+	@FXML private ListView<Story> storiesListView;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -368,7 +371,7 @@ public class RootLayoutController implements Initializable{
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
 	}
 	
-	private void getPropertiesFrom3DWindow() {
+	private void setPropertiesFrom3DWindow() {
 		time = window3D.getTimeProperty();
 		window3D.getZoomProperty();
 		totalNuclei = window3D.getTotalNucleiProperty();
@@ -405,7 +408,6 @@ public class RootLayoutController implements Initializable{
 			public void changed(
 					ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				setSelectedInfo(newValue);
 				selectedName.set(newValue);
 			}
 		});
@@ -427,6 +429,15 @@ public class RootLayoutController implements Initializable{
             public void handle(MouseEvent event) {
                 event.consume();
             }
+		});
+		
+		allStructuresListView.getSelectionModel().selectedItemProperty()
+							.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue,
+								String newValue) {
+				selectedName.set(newValue);
+			}
 		});
 		
 		// Modify font for ListView's of String's
@@ -474,11 +485,10 @@ public class RootLayoutController implements Initializable{
 	private void setSelectedInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
-
+		
 		if (name.indexOf("(")!=-1) 
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
-		
 		
 		cellName.setText(name);
 		if (Search.isStructureWithComment(name))
@@ -618,12 +628,10 @@ public class RootLayoutController implements Initializable{
 		searchField.textProperty().addListener(search.getTextFieldListener());
 	}
 	
-	private void initLayers() {
-		LayersListViewCallback callback = new LayersListViewCallback();
-		
+	private void initDisplayLayer() {		
 		// color rules layers
-		layers = new Layers(rulesListView);
-		rulesListView.setCellFactory(callback);
+		rulesLayer = new DisplayLayer(rulesListView);
+		rulesListView.setCellFactory(rulesLayer.getRuleCellFactory());
 	}
 	
 	
@@ -724,13 +732,15 @@ public class RootLayoutController implements Initializable{
 		assert (structureRuleColorPicker != null);
 		assert (structuresSearchListView != null);
 		assert (allStructuresListView != null);
+		
+		assert (storiesListView != null);
 	}
 	
 	private void initStructuresLayer() {
 		structuresLayer = new StructuresLayer(elementsList);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
-		structuresLayer.setRulesList(layers.getRulesList());
+		structuresLayer.setRulesList(rulesLayer.getRulesList());
 		
 		// TODO: Add rules for all structures search results if one structure
 		// is not specifically selected in the list of ALL structures
@@ -740,6 +750,40 @@ public class RootLayoutController implements Initializable{
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
+	}
+	
+	
+	private void initStoriesList() {
+		if (elementsList!=null) {
+			storiesList = new StoriesList(elementsList);
+			window3D.setStoriesList(storiesList);
+		}
+	}
+	
+	
+	private void initStoriesLayer() {
+		if (storiesList!=null)
+			storiesLayer = new StoriesLayer(storiesList.getStories());
+		
+		storiesListView.setItems(storiesLayer.getStories());
+		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+	}
+	
+	
+	private void initSceneElementsList() {
+		elementsList = new SceneElementsList();
+		
+		if (window3D!=null)
+			window3D.setSceneElementsList(elementsList);
+		
+		Search.setSceneElementsList(elementsList);
+	}
+	
+	
+	private void initConnectome() {
+		connectome = new Connectome();
+		Search.setConnectome(connectome);
 	}
 
 	
@@ -752,7 +796,7 @@ public class RootLayoutController implements Initializable{
 		assertFXMLNodes();
 		
 		initToggleGroup();
-		initLayers();
+		initDisplayLayer();
 		
 		initializeWithLineageData(data);
 	}
@@ -761,7 +805,7 @@ public class RootLayoutController implements Initializable{
 	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
 		init3DWindow(data);
-		getPropertiesFrom3DWindow();
+		setPropertiesFrom3DWindow();
 		
 		setSlidersProperties();
 		
@@ -769,23 +813,21 @@ public class RootLayoutController implements Initializable{
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
 		// unchecked casts
-		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)layers.getRulesList());
+		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)rulesLayer.getRulesList());
 		search.setColorRulesList(colorTempList);
 		window3D.setColorRulesList(colorTempList);
 		
-		elementsList = new SceneElementsList();
-		storiesList = new StoriesList(elementsList);
-		window3D.setSceneElementsList(elementsList);
-		window3D.setStoriesList(storiesList);
-		Search.setSceneElementsList(elementsList);
+		initSceneElementsList();
 		
-		//set up the connectome
-		connectome = new Connectome();
-		connectome.buildConnectome();
-		Search.setConnectome(connectome);
+		// connectome
+		initConnectome();
 		
-		//set up the structure layer
+		// structures layer
 		initStructuresLayer();
+		
+		// stories layer
+		initStoriesList();
+		initStoriesLayer();
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
@@ -802,45 +844,6 @@ public class RootLayoutController implements Initializable{
         
         sizeSubscene();
         sizeInfoPane();
-	}
-	
-	
-	/*
-	private void addShapeRulesForSceneElements(SceneElementsList sceneElementsList) {
-		for (int i = 0; i < sceneElementsList.sceneElementsList.size(); i++) {
-			SceneElement currSE = sceneElementsList.sceneElementsList.get(i);
-			 
-			 add shape rule for each cell shape 
-			 use scene element description as functional name
-			
-			String functionalName = currSE.getSceneName();
-			
-			 this will cause setCells(name) to be given the scene name as the cell (Search.java line 253)
-			  -- is this the behavior we want?
-			
-			Search.addShapeRule(functionalName, Color.WHITE);
-		}
-	}
-	*/
-	
-	/*
-	 * Renderer for rules in ListView's in Layers tab
-	 */
-	private class LayersListViewCallback implements Callback<ListView<Rule>, ListCell<Rule>> {
-		@Override
-		public ListCell<Rule> call(ListView<Rule> param) {
-			ListCell<Rule> cell = new ListCell<Rule>(){
-                @Override
-                protected void updateItem(Rule item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item != null) 
-                    	setGraphic(item.getHBox());
-                	else
-                		setGraphic(null);
-            	}
-        	};
-        	return cell;
-		}
 	}
 	
 	

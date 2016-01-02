@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -56,7 +56,7 @@
                                  <content>
                                     <AnchorPane>
                                        <children>
-                                          <VBox maxWidth="280.0" prefHeight="499.0" prefWidth="280.0" spacing="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <VBox maxWidth="280.0" prefHeight="499.0" prefWidth="280.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="15.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -327,11 +327,13 @@
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                                    <children>
+                                                      <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                                       <Button fx:id="addSearchBtn" focusTraversable="false" graphicTextGap="5.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Add" textAlignment="CENTER">
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font>
                                                       </Button>
+                                                      <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -353,7 +355,7 @@
                     <content>
                       <AnchorPane>
                            <children>
-                              <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
                                     <HBox prefHeight="16.0" prefWidth="302.0" VBox.vgrow="NEVER">
                                        <children>
@@ -380,13 +382,11 @@
                                           <Label text="(cell/structure name, keyword, phrase)" />
                                        </children>
                                     </HBox>
-                                    <Region layoutX="25.0" layoutY="593.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <AnchorPane maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                        <children>
                                           <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
-                                    <Region layoutX="25.0" layoutY="69.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
                                        <font>
                                           <Font size="14.0" />
@@ -402,24 +402,19 @@
                                           <Region prefHeight="22.0" prefWidth="300.0" />
                                        </children>
                                     </HBox>
-                                    <Region layoutX="25.0" layoutY="678.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <HBox>
                                        <children>
                                           <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="60.0" prefWidth="256.0" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" />
                                     <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
                                        <children>
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <Button fx:id="addStructureRuleBtn" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Add" />
+                                          <Button fx:id="addStructureRuleBtn" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="110.0" text="Add" />
                                           <Region HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                  </children>
-                                 <padding>
-                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                 </padding>
                               </VBox>
                            </children></AnchorPane>
                     </content>
@@ -428,21 +423,19 @@
 			              <content>
 			                <AnchorPane>
                            <children>
-                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
+                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
                                     <CheckBox fx:id="uniformSizeCheckBox" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="22.0" text="Uniform Small Nuclei">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </CheckBox>
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Layers:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <ListView fx:id="rulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
-                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
                                     <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
                                        <font>
                                           <Font size="14.0" />
@@ -455,6 +448,35 @@
                         </AnchorPane>
 			              </content>
 			            </Tab>
+                  <Tab text="Stories">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+                                    <Label text="Stories:">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <ListView fx:id="storiesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <HBox>
+                                       <children>
+                                          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                          <Button maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Button>
+                                          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
 			        </tabs>
 			         <GridPane.margin>
 			            <Insets />
@@ -507,7 +529,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
                                           </Text>
-                                          <Text fx:id="cellDescription" strokeType="OUTSIDE" strokeWidth="0.0">
+                                          <Text fx:id="cellDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

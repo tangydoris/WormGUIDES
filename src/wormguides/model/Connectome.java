@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import wormguides.ConnectomeToHTML;
 
+import wormguides.ConnectomeLoader;
+
 public class Connectome {
 	private ArrayList<NeuronalSynapse> connectome;
 	private ConnectomeLoader connectomeLoader;
@@ -12,9 +14,11 @@ public class Connectome {
 	public Connectome() {
 		connectome = new ArrayList<NeuronalSynapse>();
 		connectomeLoader = new ConnectomeLoader(connectomeFilePath);
+		
+		buildConnectome();
 	}
 	
-	public void buildConnectome() {
+	private void buildConnectome() {
 		connectome = connectomeLoader.loadConnectome();
 	}
 	

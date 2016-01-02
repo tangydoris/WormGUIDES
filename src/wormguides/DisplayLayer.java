@@ -8,14 +8,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.util.Callback;
 
-public class Layers {
+public class DisplayLayer {
 	
 	private ObservableList<Rule> rulesList;
 	private HashMap<Rule, Button> buttonMap;
 	
-	public Layers(ListView<Rule> listView) {
+	public DisplayLayer(ListView<Rule> listView) {
 		if (listView==null)
 			listView = new ListView<Rule>();
 		
@@ -52,5 +54,29 @@ public class Layers {
 	public ObservableList<Rule> getRulesList() {
 		return rulesList;
 	}
+	
+	
+	/*
+	 * Renderer for rules in ListView's in Layers tab
+	 */
+	public Callback<ListView<Rule>, ListCell<Rule>> getRuleCellFactory() {
+		return new Callback<ListView<Rule>, ListCell<Rule>>() {
+			@Override
+			public ListCell<Rule> call(ListView<Rule> param) {
+				ListCell<Rule> cell = new ListCell<Rule>(){
+	                @Override
+	                protected void updateItem(Rule item, boolean empty) {
+	                    super.updateItem(item, empty);
+	                    if (item != null) 
+	                    	setGraphic(item.getGraphic());
+	                	else
+	                		setGraphic(null);
+	            	}
+	        	};
+	        	return cell;
+			}
+		};
+	}
+
 	
 }

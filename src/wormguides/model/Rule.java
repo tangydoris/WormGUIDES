@@ -257,7 +257,7 @@ public abstract class Rule {
 	}
 	
 	
-	public HBox getHBox() {
+	public HBox getGraphic() {
 		return hbox;
 	}
 	

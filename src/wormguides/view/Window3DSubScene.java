@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import com.sun.javafx.scene.CameraHelper;
 
-import wormguides.model.StoriesList;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -71,6 +71,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.ShapeRule;
+import wormguides.model.StoriesList;
 
 public class Window3DSubScene{
 
@@ -431,13 +432,12 @@ public class Window3DSubScene{
 				
 				if (b!=null) {
 					node.getTransforms().clear();
+					Point2D p = CameraHelper.project(camera, new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
 					
-					double x = b.getMaxX();
-					double y = b.getMaxY();
-					double z = b.getMaxZ();
-					Point2D p = CameraHelper.project(camera, new Point3D(x, y, z));
-					
-					node.getTransforms().add(new Translate(p.getX(), p.getY()));
+					double radius = spriteSphereMap.get(node).getRadius();
+					double x = p.getX()-radius;
+					double y = p.getY()-radius;
+					node.getTransforms().add(new Translate(x, y));
 				}
 			}
 		}
@@ -511,18 +511,14 @@ public class Window3DSubScene{
 //-------------------------STORY ELEMENTS---------------------
 		if (storiesList!=null) {
 			spriteSphereMap.clear();
-			//billboardSphereMap.clear();
 			
-			// Clear sprites
 			if (parentAnchorPane!=null) {
-				ArrayList<Node> toRemove = new ArrayList<Node>();
-				for (Node node : parentAnchorPane.getChildren()) {
-					if (node.getStyleClass().contains(NOTE_SPRITE))
-						toRemove.add(node);
-				}
-				
-				for (Node node : toRemove) {
-					parentAnchorPane.getChildren().remove(node);
+				Node current;
+				for (Iterator<Node> iter = parentAnchorPane.getChildren().iterator(); 
+											iter.hasNext(); ) {
+					current = iter.next();
+					if (current.getStyleClass().contains(NOTE_SPRITE))
+						iter.remove();
 				}
 			}
 			
@@ -535,9 +531,6 @@ public class Window3DSubScene{
 					}
 				}
 			}
-			
-			
-			
 		}
 //---------------------------------------------------------------
 		
@@ -582,6 +575,7 @@ public class Window3DSubScene{
 
 	
 	private void addEntitiesToScene() {
+		//System.out.println(storiesList.toString());
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
 		ArrayList<Node> notes = new ArrayList<Node>();
 
@@ -591,34 +585,19 @@ public class Window3DSubScene{
 		// making the notes
 		addSpheresToList(entities);
  		addMeshesToList(entities);
+ 		addNotesGeometryToList(notes);
  		
  		// render opaque entities first
-		addNotesGeometryToList(notes);
 		root.getChildren().addAll(notes);
 		repositionNoteSprites();
  			
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
-		
-		// TODO Remove this later
-		for (int i=0; i<currentSceneElements.size(); i++) {
-			SceneElement se = currentSceneElements.get(i);
-			if (se.belongsToNote()) {
-				MeshView mesh = currentSceneElementMeshes.get(i);
-				mesh.getTransforms().addAll(new Translate(
-											newOriginX+se.getX(),
-											newOriginY+se.getY(),
-											newOriginZ+se.getZ()),
-											new Scale(150, -150, -150));
-				mesh.setMaterial(colorHash.getNoteMaterial());
-			}
-		}
 	}
 	
 	
 	private void addNotesGeometryToList(ArrayList<Node> list) {
 		for (Note note : currentNotes) {
-			
 			// Revert to overlay display if we have invalid display/attachment 
 			// type combination
 			if (note.hasLocationError() || note.hasCellNameError() 
@@ -688,21 +667,17 @@ public class Window3DSubScene{
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName())) {
 					if (spheres[i]!=null) {
-						if (note.isBillboard()) {
-							node.getTransforms().addAll(spheres[i].getTransforms());
-							
-							// offset billboard from sphere
-							double offset = 5;
-							if (!uniformSize)
-								offset = spheres[i].getRadius()+2;
-							node.getTransforms().add(new Translate(offset, offset));
-						}
 						
-						else if (note.isSprite()) {
+						node.getTransforms().addAll(spheres[i].getTransforms());
+						
+						double offset = 5;
+						if (note.isBillboard() && !uniformSize)
+							offset = spheres[i].getRadius()+2;
+						
+						else if (note.isSprite())
 							spriteSphereMap.put(node, spheres[i]);
-							node.getTransforms().addAll(spheres[i].getTransforms());
-							node.toFront();
-						}
+						
+						node.getTransforms().add(new Translate(offset, offset));
 						
 						return true;
 					}
@@ -757,23 +732,36 @@ public class Window3DSubScene{
 		// process only if meshes at this time point
 		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
+				SceneElement se = currentSceneElements.get(i);
+				MeshView mesh = currentSceneElementMeshes.get(i);
+				
 				// in search mode
 				if (inSearch) {
 	 				if (cellBodyTicked && searchedMeshes[i])
-	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getHighlightMaterial());
+	 					mesh.setMaterial(colorHash.getHighlightMaterial());
 	 				else 
-	 					currentSceneElementMeshes.get(i).setMaterial(colorHash.getTranslucentMaterial());
+	 					mesh.setMaterial(colorHash.getTranslucentMaterial());
 	 			}
+				
+				else if (se.belongsToNote()) {
+					mesh.setMaterial(colorHash.getNoteMaterial());
+					mesh.getTransforms().addAll(new Translate(
+												newOriginX+se.getX(),
+												newOriginY+se.getY(),
+												newOriginZ+se.getZ()),
+												new Scale(150, -150, -150));
+					
+				}
 				
 				else {
 					// in regular view mode
-					ArrayList<String> allNames = currentSceneElements.get(i).getAllCellNames();
-					String sceneName = currentSceneElements.get(i).getSceneName();
+					ArrayList<String> allNames = se.getAllCellNames();
+					String sceneName = se.getSceneName();
 					
 					// default white meshes
 					if (allNames.isEmpty()) {
-						currentSceneElementMeshes.get(i).setMaterial(new PhongMaterial(Color.WHITE));
-						currentSceneElementMeshes.get(i).setCullFace(CullFace.NONE);
+						mesh.setMaterial(new PhongMaterial(Color.WHITE));
+						mesh.setCullFace(CullFace.NONE);
 					}
 					
 					// If mesh has with name(s), then process rules (cell or shape)
@@ -802,13 +790,13 @@ public class Window3DSubScene{
 						
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty())
-							currentSceneElementMeshes.get(i).setMaterial(colorHash.getMaterial(colors));
+							mesh.setMaterial(colorHash.getMaterial(colors));
 						else
-							currentSceneElementMeshes.get(i).setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 					}
 				}
 				
-				list.add(currentSceneElementMeshes.get(i));
+				list.add(mesh);
 			}
 		}
 	}

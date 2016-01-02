@@ -2,6 +2,9 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
+import javafx.scene.control.Label;
+import wormguides.view.AppFont;
+
 public class Note {
 
 	// TODO Refactor this to be a single scene element?
@@ -21,6 +24,9 @@ public class Note {
 	private String comments;
 	private String url;
 	
+	// Graphical display
+	private Label label;
+	
 	
 	public Note() {
 		elements = null;
@@ -33,12 +39,24 @@ public class Note {
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
+		
+		label = new Label();
+		label.setWrapText(true);
+		label.setFont(AppFont.getFont());
+	}
+	
+	
+	public Label getGraphic() {
+		return label;
 	}
 	
 	
 	public Note(String tagName, String tagContents) {
 		this();
+		
 		this.tagName = tagName;
+		label.setText("• "+tagName);
+		
 		this.tagContents = tagContents;
 	}
 	
@@ -50,8 +68,10 @@ public class Note {
 	
 	
 	public void setTagName(String tagName) {
-		if (tagName!=null)
+		if (tagName!=null) {
 			this.tagName = tagName;
+			label.setText("• "+tagName);
+		}
 		
 		if (elements!=null) {
 			for (SceneElement se : elements)
@@ -186,6 +206,7 @@ public class Note {
 			SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource,
 											resourceLocation, startTime, endTime+1, comments);
 			se.setBelongsToNote(true);
+			se.setLocation(x, y, z);
 			elements.add(se);
 		}
 	}
@@ -275,7 +296,7 @@ public class Note {
 	
 	
 	public void addSceneElementsToList(SceneElementsList list) {
-		if (elements!=null) {
+		if (list!=null && elements!=null) {
 			for (SceneElement se : elements) {
 				list.addSceneElement(se);
 			}
@@ -487,7 +508,7 @@ public class Note {
 			if (startTime<=time && time<=endTime)
 				return true;
 		}
-			
+		
 		return false;
 	}
 	
