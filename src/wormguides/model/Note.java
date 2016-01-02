@@ -508,7 +508,7 @@ public class Note {
 			if (startTime<=time && time<=endTime)
 				return true;
 		}
-			
+		
 		return false;
 	}
 	

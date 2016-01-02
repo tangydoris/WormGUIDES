@@ -42,24 +42,22 @@ public class Story {
 	
 	
 	public ArrayList<Note> getNotesWithCell() {
-		ArrayList<Note> notes = new ArrayList<Note>();
+		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
 			if (note.isAttachedToCell() || note.isAttachedToCellTime())
-				notes.add(note);
+				list.add(note);
 		}
-		return notes;
+		return list;
 	}
 	
 	
 	public ArrayList<Note> getNotesAtTime(int time) {
-		ArrayList<Note> notes = new ArrayList<Note>();
+		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note.existsAtTime(time)) {
-				//System.out.println("Story: "+note.getTagName()+" exists at time "+time);
-				notes.add(note);
-			}
+			if (note.existsAtTime(time))
+				list.add(note);
 		}
-		return notes;
+		return list;
 	}
 	
 	
@@ -130,5 +128,9 @@ public class Story {
 		return vBox;
 	}
 	
+	
+	public String toString() {
+		return name+" - contains "+notes.size()+" notes";
+	}
 
 }

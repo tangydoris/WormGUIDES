@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import com.sun.javafx.scene.CameraHelper;
@@ -303,9 +304,7 @@ public class Window3DSubScene{
 	
 	public void setStoriesList(StoriesList list) {
 		if (list!=null) {
-			System.out.println("Set stories list in window3d");
 			storiesList = list;
-			System.out.println(storiesList.toString());
 			buildScene(time.get());
 		}
 	}
@@ -433,13 +432,12 @@ public class Window3DSubScene{
 				
 				if (b!=null) {
 					node.getTransforms().clear();
+					Point2D p = CameraHelper.project(camera, new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
 					
-					double x = b.getMaxX();
-					double y = b.getMaxY();
-					double z = b.getMaxZ();
-					Point2D p = CameraHelper.project(camera, new Point3D(x, y, z));
-					
-					node.getTransforms().add(new Translate(p.getX(), p.getY()));
+					double radius = spriteSphereMap.get(node).getRadius();
+					double x = p.getX()-radius;
+					double y = p.getY()-radius;
+					node.getTransforms().add(new Translate(x, y));
 				}
 			}
 		}
@@ -512,12 +510,17 @@ public class Window3DSubScene{
 		
 //-------------------------STORY ELEMENTS---------------------
 		if (storiesList!=null) {
+			spriteSphereMap.clear();
+			
 			if (parentAnchorPane!=null) {
-				for (Node node : spriteSphereMap.keySet()) {
-					parentAnchorPane.getChildren().remove(node);
+				Node current;
+				for (Iterator<Node> iter = parentAnchorPane.getChildren().iterator(); 
+											iter.hasNext(); ) {
+					current = iter.next();
+					if (current.getStyleClass().contains(NOTE_SPRITE))
+						iter.remove();
 				}
 			}
-			spriteSphereMap.clear();
 			
 			currentNotes = storiesList.getNotesAtTime(time);
 			for (Note note : storiesList.getNotesWithCell()) {
@@ -572,6 +575,7 @@ public class Window3DSubScene{
 
 	
 	private void addEntitiesToScene() {
+		//System.out.println(storiesList.toString());
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
 		ArrayList<Node> notes = new ArrayList<Node>();
 
@@ -663,21 +667,17 @@ public class Window3DSubScene{
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName())) {
 					if (spheres[i]!=null) {
-						if (note.isBillboard()) {
-							node.getTransforms().addAll(spheres[i].getTransforms());
-							
-							// offset billboard from sphere
-							double offset = 5;
-							if (!uniformSize)
-								offset = spheres[i].getRadius()+2;
-							node.getTransforms().add(new Translate(offset, offset));
-						}
 						
-						else if (note.isSprite()) {
+						node.getTransforms().addAll(spheres[i].getTransforms());
+						
+						double offset = 5;
+						if (note.isBillboard() && !uniformSize)
+							offset = spheres[i].getRadius()+2;
+						
+						else if (note.isSprite())
 							spriteSphereMap.put(node, spheres[i]);
-							node.getTransforms().addAll(spheres[i].getTransforms());
-							node.toFront();
-						}
+						
+						node.getTransforms().add(new Translate(offset, offset));
 						
 						return true;
 					}
