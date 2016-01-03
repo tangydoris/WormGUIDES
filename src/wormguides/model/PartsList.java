@@ -10,13 +10,13 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import wormguides.PartsListToHTML;
+
 public class PartsList {
 	
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> lineageNames;
 	private static ArrayList<String> descriptions;
-	
-	private static ArrayList<String> partsListAsArrayList;
 	
 	private final static String JAR_NAME = "WormGUIDES.jar";
 	private final static String PARTSLIST_NAME = "wormguides/model/partslist.txt";
@@ -26,7 +26,6 @@ public class PartsList {
 		functionalNames = new ArrayList<String>();
 		lineageNames = new ArrayList<String>();
 		descriptions = new ArrayList<String>();
-		partsListAsArrayList = new ArrayList<String>();
 		
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
@@ -42,7 +41,6 @@ public class PartsList {
 					
 					String line;
 					while ((line = br.readLine()) != null) {
-						partsListAsArrayList.add(line);
 						
 						String[] lineArray = line.split("\t");
 						functionalNames.add(lineArray[0]);
@@ -145,12 +143,9 @@ public class PartsList {
 		return descriptions;
 	}
 	
-	public static String getPartsListAsString() {
-		String partsListAsString = "";
-		for (String line : partsListAsArrayList) {
-			partsListAsString += (line + "<br>");
-		}
-		return partsListAsString;
+	public static String getPartsListAsHTMLTable() {
+		PartsListToHTML plToHTML = new PartsListToHTML();
+		return plToHTML.buildPartsListAsHTML();
 	}
 
 }

@@ -6,7 +6,7 @@ import java.util.Collections;
 import wormguides.model.Connectome;
 import wormguides.model.NeuronalSynapse;
 
-public class ConnectomeToHTML extends HTMLTableGenerator {
+public class ConnectomeToHTML extends HTMLGenerator {
 	private Connectome connectome;
 	
 	public ConnectomeToHTML(Connectome connectome) {
@@ -49,7 +49,7 @@ public class ConnectomeToHTML extends HTMLTableGenerator {
 				htmlTables += (table + breakLine + breakLine);
 			}
 
-			return generateFullHTML(htmlTables);
+			return generateCompleteHTML(htmlTables);
 		}
 		return "";
 	}
@@ -126,7 +126,7 @@ public class ConnectomeToHTML extends HTMLTableGenerator {
 		}
 		
 		//format wiring partners as HTML --> only format if > 0 partners
-		String queryCellTableHeaderRow = openTableRowHTML + openTableHeaderHTML + 
+		String queryCellTableHeaderRow = openTableRowHTML + openTableHeader2SpanHTML + 
 				cellTitle + queryCell +
 				closeTableHeaderHTML + closeTableRowHTML;
 		
@@ -177,7 +177,7 @@ public class ConnectomeToHTML extends HTMLTableGenerator {
 		
 		//check if need to generate a full html page
 		if (generateFullHTML) {
-			return generateFullHTML(table);
+			return generateCompleteHTML(table);
 		} else {
 			return table;
 		}

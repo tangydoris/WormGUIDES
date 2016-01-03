@@ -1,16 +1,28 @@
 package wormguides;
 
-/*
- * This class constructs HTML tables for connectome, parts list, and cell shapes
- */
-public class HTMLTableGenerator {
+import java.io.File;
 
-	public HTMLTableGenerator() {
+/*
+ * This class constructs HTML formatted tables for connectome, parts list, and cell shapes
+ */
+public class HTMLGenerator {
+
+	public HTMLGenerator() {
 		
 	}
 	
-	public String generateFullHTML(String body) {
+	public String generateCompleteHTML(String body) {
 		return htmlStart + body + htmlEnd;
+	}
+	
+	public File generateHTMLFile(String fileName, String body) {
+		String HTMLAsString = htmlStart + body + htmlEnd;
+		
+		File html = new File(fileName);
+		
+		//write HTMLAsString to file
+		
+		return html;
 	}
 	
 	//static vars
@@ -38,7 +50,8 @@ public class HTMLTableGenerator {
 	public final static String closeTableTagHTML = newLine + "</table>";
 	public final static String openTableRowHTML = newLine + "<tr>";
 	public final static String closeTableRowHTML = newLine + "</tr>";
-	public final static String openTableHeaderHTML = newLine + "<th colspan=\"2\">";
+	public final static String openTableHeader2SpanHTML = newLine + "<th colspan=\"2\">";
+	public final static String openTableHeaderHTML = newLine + "<th>";
 	public final static String closeTableHeaderHTML = "</th>";
 	public final static String openTableDataHTML = newLine + "<td>";
 	public final static String closeTableDataHTML = "</td>";

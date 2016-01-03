@@ -308,7 +308,7 @@ public class RootLayoutController implements Initializable{
 			
 			//build webview scene to render parts list
 			WebView partsListWebView = new WebView();
-			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsString());
+			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsHTMLTable());
 			
 			VBox root = new VBox();
 			root.getChildren().addAll(partsListWebView);
