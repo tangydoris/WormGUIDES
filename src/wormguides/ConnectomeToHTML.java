@@ -46,11 +46,10 @@ public class ConnectomeToHTML extends HTMLTableGenerator {
 				
 			String htmlTables = "";
 			for (String table : wiringPartnersAsHTMLTables) {
-				htmlTables += (newLine + table);
+				htmlTables += (table + breakLine + breakLine);
 			}
-				
-			String htmlFile = htmlStart + htmlTables + htmlEnd;
-			return htmlFile;
+
+			return generateFullHTML(htmlTables);
 		}
 		return "";
 	}
@@ -178,8 +177,7 @@ public class ConnectomeToHTML extends HTMLTableGenerator {
 		
 		//check if need to generate a full html page
 		if (generateFullHTML) {
-			String queryCellResultsAsHTML = htmlStart + table + htmlEnd;
-			return queryCellResultsAsHTML;
+			return generateFullHTML(table);
 		} else {
 			return table;
 		}
