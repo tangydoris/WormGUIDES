@@ -275,18 +275,11 @@ public class RootLayoutController implements Initializable{
 			cellShapesIndexStage.setWidth(805);
 			cellShapesIndexStage.setHeight(625);
 			
-			//format cell shapes as string for webview
-			String cellShapesIndex = "Scene Name, Cell Names, Marker, Start Time, End Time, Comments" + "<br>";
-			for (SceneElement se : elementsList.elementsList) {
-				String sceneElementAsString = se.getSceneName() + ", " + se.getAllCellNames().toString()
-						+ ", " + se.getMarkerName() + ", " + se.getStartTime() + ", " + se.getEndTime()
-						+ ", " + se.getComments() + "<br>";
-				cellShapesIndex += sceneElementAsString;
-			}
+			CellShapesIndexToHTML cellShapesToHTML = new CellShapesIndexToHTML(elementsList);
 			
 			//webview to render cell shapes list i.e. elementsList
 			WebView cellShapesIndexWebView = new WebView();
-			cellShapesIndexWebView.getEngine().loadContent(cellShapesIndex);
+			cellShapesIndexWebView.getEngine().loadContent(cellShapesToHTML.buildCellShapesIndexAsHTML());
 			
 			VBox root = new VBox();
 			root.getChildren().addAll(cellShapesIndexWebView);

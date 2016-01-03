@@ -36,7 +36,7 @@ public class HTMLGenerator {
 												newLine + "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
 												newLine + "<title>Connectome</title>" +
 												newLine + "<style type=\"text/css\">" +
-												newLine + "table, td {" +
+												newLine + "table, th, td {" +
 												newLine + "border: 1px solid black;" +
 												newLine + "}" +
 												newLine + "</style>" +
