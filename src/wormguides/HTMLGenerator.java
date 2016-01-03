@@ -1,6 +1,10 @@
 package wormguides;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 /*
  * This class constructs HTML formatted tables for connectome, parts list, and cell shapes
@@ -15,12 +19,44 @@ public class HTMLGenerator {
 		return htmlStart + body + htmlEnd;
 	}
 	
+	public boolean isCompleteHTML(String html) {
+		return html.contains(htmlStart) && html.contains(htmlEnd);
+	}
+	
 	public File generateHTMLFile(String fileName, String body) {
-		String HTMLAsString = htmlStart + body + htmlEnd;
+		String HTMLAsString = body;
 		
-		File html = new File(fileName);
+		//check if complete HTML file
+		if (!isCompleteHTML(body)) {
+			HTMLAsString = htmlStart + body + htmlEnd;
+		}
 		
-		//write HTMLAsString to file
+		
+		File html = null;
+		fileName += htmlExt;
+		
+		BufferedWriter bw = null;
+		try {
+			html = new File(fileName);
+			
+			if (!html.exists()) {
+				html.createNewFile();
+			}
+			
+			Writer writer = new FileWriter(html);
+			bw = new BufferedWriter(writer);
+			bw.write(HTMLAsString);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} finally {
+			try {
+				if (bw != null) {
+					bw.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		return html;
 	}
@@ -57,4 +93,5 @@ public class HTMLGenerator {
 	public final static String closeTableDataHTML = "</td>";
 	
 	public final static String breakLine = "<br>";
+	private final static String htmlExt = ".html";
 }

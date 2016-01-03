@@ -48,9 +48,10 @@ public class ConnectomeToHTML extends HTMLGenerator {
 			for (String table : wiringPartnersAsHTMLTables) {
 				htmlTables += (table + breakLine + breakLine);
 			}
-
+			
 			return generateCompleteHTML(htmlTables);
 		}
+		
 		return "";
 	}
 	
