@@ -75,6 +75,9 @@ public class HTMLGenerator {
 												newLine + "table, th, td {" +
 												newLine + "border: 1px solid black;" +
 												newLine + "}" +
+												newLine + "body {" +
+												newLine + "font-size: 13pt;" +
+												newLine + "}" +
 												newLine + "</style>" +
 												newLine + "</head>" +
 												newLine + "<body>" + newLine;

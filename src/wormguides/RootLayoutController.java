@@ -272,8 +272,6 @@ public class RootLayoutController implements Initializable{
 		if (cellShapesIndexStage == null) {
 			cellShapesIndexStage = new Stage();
 			cellShapesIndexStage.setTitle("Cell Shapes Index");
-			cellShapesIndexStage.setWidth(805);
-			cellShapesIndexStage.setHeight(625);
 			
 			CellShapesIndexToHTML cellShapesToHTML = new CellShapesIndexToHTML(elementsList);
 			
@@ -287,6 +285,7 @@ public class RootLayoutController implements Initializable{
 			scene.setRoot(root);
 			
 			cellShapesIndexStage.setScene(scene);
+			cellShapesIndexStage.setResizable(false);
 		}
 		cellShapesIndexStage.show();
 	}
@@ -295,9 +294,7 @@ public class RootLayoutController implements Initializable{
 	public void viewPartsList() {
 		if (partsListStage == null) {
 			partsListStage = new Stage();
-			partsListStage.setTitle("Parts List");
-			partsListStage.setWidth(805);
-			partsListStage.setHeight(625);
+			partsListStage.setTitle("Parts List");	
 			
 			//build webview scene to render parts list
 			WebView partsListWebView = new WebView();
@@ -309,6 +306,7 @@ public class RootLayoutController implements Initializable{
 			scene.setRoot(root);
 			
 			partsListStage.setScene(scene);
+			partsListStage.setResizable(false);
 		}
 		partsListStage.show();
 	}
@@ -318,8 +316,6 @@ public class RootLayoutController implements Initializable{
 		if (connectomeStage == null) {
 			connectomeStage = new Stage();
 			connectomeStage.setTitle("Connectome");
-			connectomeStage.setWidth(805);
-			connectomeStage.setHeight(625);
 			
 			//build webview scene to render html
 			WebView connectomeHTML = new WebView();
@@ -331,6 +327,7 @@ public class RootLayoutController implements Initializable{
 			scene.setRoot(root);
 			
 			connectomeStage.setScene(scene);
+			connectomeStage.setResizable(false);
 		}
 		connectomeStage.show();
 	}
