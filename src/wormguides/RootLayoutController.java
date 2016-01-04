@@ -47,6 +47,7 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
+import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
 import wormguides.model.Story;
@@ -57,6 +58,14 @@ import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.Window3DSubScene;
 
+
+//FOR CONNECTOME WINDOW
+import javafx.scene.web.WebView;
+//import java.io.BufferedWriter;
+//import java.io.File;
+//import java.io.FileWriter;
+import javafx.scene.Group;
+
 public class RootLayoutController implements Initializable{
 	
 	// popup windows
@@ -64,6 +73,9 @@ public class RootLayoutController implements Initializable{
 	private Stage treeStage;
 	private Stage urlStage;
 	private Stage urlLoadStage;
+	private Stage connectomeStage;
+	private Stage partsListStage;
+	private Stage cellShapesIndexStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -251,6 +263,76 @@ public class RootLayoutController implements Initializable{
 		
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
+	}
+	
+	@FXML
+	public void viewCellShapesIndex() {
+		if (elementsList == null) return;
+		
+		if (cellShapesIndexStage == null) {
+			cellShapesIndexStage = new Stage();
+			cellShapesIndexStage.setTitle("Cell Shapes Index");
+			cellShapesIndexStage.setWidth(805);
+			cellShapesIndexStage.setHeight(625);
+			
+			CellShapesIndexToHTML cellShapesToHTML = new CellShapesIndexToHTML(elementsList);
+			
+			//webview to render cell shapes list i.e. elementsList
+			WebView cellShapesIndexWebView = new WebView();
+			cellShapesIndexWebView.getEngine().loadContent(cellShapesToHTML.buildCellShapesIndexAsHTML());
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(cellShapesIndexWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			cellShapesIndexStage.setScene(scene);
+		}
+		cellShapesIndexStage.show();
+	}
+	
+	@FXML
+	public void viewPartsList() {
+		if (partsListStage == null) {
+			partsListStage = new Stage();
+			partsListStage.setTitle("Parts List");
+			partsListStage.setWidth(805);
+			partsListStage.setHeight(625);
+			
+			//build webview scene to render parts list
+			WebView partsListWebView = new WebView();
+			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsHTMLTable());
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(partsListWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			partsListStage.setScene(scene);
+		}
+		partsListStage.show();
+	}
+	
+	@FXML
+	public void viewConnectome() {
+		if (connectomeStage == null) {
+			connectomeStage = new Stage();
+			connectomeStage.setTitle("Connectome");
+			connectomeStage.setWidth(805);
+			connectomeStage.setHeight(625);
+			
+			//build webview scene to render html
+			WebView connectomeHTML = new WebView();
+			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(connectomeHTML);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			connectomeStage.setScene(scene);
+		}
+		connectomeStage.show();
 	}
 	
 	public void init3DWindow(LineageData data) {

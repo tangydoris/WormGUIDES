@@ -368,25 +368,25 @@ public class Search {
 	
 	/*
 	 * Method which returns the cells which pertain to a connectome rule
-	 * If a systematic name is searched in the connectome e.g. ABa, the query if translated to a functional name prior to adding cells
+	 * If a systematic name is searched in the connectome e.g. ABa, the query is translated to a functional name prior to adding cells
 	 * If a functional name is searched in the connectome e.g. ASAL, no translation is done
 	 */
 	// TODO Look into this
-	private static ArrayList<String> setConnectomeRuleCells(String searched) {
-		ArrayList<String> cells = new ArrayList<String>();
-		
-		//if a systematic name is searched, translate to functional before searching connectome
-		if (PartsList.containsLineageName(searched)) {
-			searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
-		}
-		searched = searched.toLowerCase();
-		for (String name : functionalNames) {
-			if (name.toLowerCase().startsWith(searched)) {
-				cells.add(PartsList.getLineageNameByFunctionalName(name));
-			}
-		}
-		return cells;
-	}
+//	private static ArrayList<String> setConnectomeRuleCells(String searched) {
+//		ArrayList<String> cells = new ArrayList<String>();
+//		
+//		//if a systematic name is searched, translate to functional before searching connectome
+//		if (PartsList.containsLineageName(searched)) {
+//			searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+//		}
+//		searched = searched.toLowerCase();
+//		for (String name : functionalNames) {
+//			if (name.toLowerCase().startsWith(searched)) {
+//				cells.add(PartsList.getLineageNameByFunctionalName(name));
+//			}
+//		}
+//		return cells;
+//	}
 	
 	
 	private static ArrayList<String> getCellsList(String searched) {

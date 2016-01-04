@@ -10,6 +10,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import wormguides.PartsListToHTML;
+
 public class PartsList {
 	
 	private static ArrayList<String> functionalNames;
@@ -39,6 +41,7 @@ public class PartsList {
 					
 					String line;
 					while ((line = br.readLine()) != null) {
+						
 						String[] lineArray = line.split("\t");
 						functionalNames.add(lineArray[0]);
 						lineageNames.add(lineArray[1]);
@@ -138,6 +141,11 @@ public class PartsList {
 	
 	public static ArrayList<String> getDescriptions() {
 		return descriptions;
+	}
+	
+	public static String getPartsListAsHTMLTable() {
+		PartsListToHTML plToHTML = new PartsListToHTML();
+		return plToHTML.buildPartsListAsHTML();
 	}
 
 }

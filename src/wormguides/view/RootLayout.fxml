@@ -22,9 +22,9 @@
             <Menu mnemonicParsing="false" text="View">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
-                  <MenuItem disable="true" mnemonicParsing="false" text="Cell Shapes Index" />
-                  <MenuItem disable="true" mnemonicParsing="false" text="Parts List" />
-                  <MenuItem disable="true" mnemonicParsing="false" text="Connectome" />
+                  <MenuItem mnemonicParsing="false" onAction="#viewCellShapesIndex" text="Cell Shapes Index" />
+                  <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
+                  <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
                   <MenuItem disable="true" mnemonicParsing="false" text="Product Information" />
               </items>
             </Menu>

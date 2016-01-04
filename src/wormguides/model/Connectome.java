@@ -1,6 +1,9 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+//import java.util.Collections;
+
+import wormguides.ConnectomeToHTML;
 
 import wormguides.ConnectomeLoader;
 
@@ -19,6 +22,11 @@ public class Connectome {
 		connectome = connectomeLoader.loadConnectome();
 	}
 	
+	
+	public ArrayList<NeuronalSynapse> getConnectomeList() {
+		return this.connectome;
+	}
+ 
 	public ArrayList<String> getAllConnectomeCellNames() {
 		//iterate through connectome arraylist and add all cell names
 		ArrayList<String> allConnectomeCellNames = new ArrayList<String>();
@@ -50,12 +58,6 @@ public class Connectome {
 	public ArrayList<String> querryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
 			boolean electricalTicked, boolean neuromuscularTicked) {
-		
-		/* TODO
-		 * - add synapse types to check (add to search class)
-		 * - build color rule
-		 * - add search spec from email --> translation in search class
-		 */
 		
 		ArrayList<String> searchResults = new ArrayList<String>();
 
@@ -131,15 +133,15 @@ public class Connectome {
 			if (lineageName!=null)
 				lineageNameResults.add(lineageName);
 		}
-		
 		return lineageNameResults;
 	}
 	
-	public String generateHTML(String queryCell) {
-		String HTML = "";
-		
-		return HTML;
-		
+	public String connectomeAsHTML() {
+		if (connectome != null) {
+			ConnectomeToHTML connectomeToHTML = new ConnectomeToHTML(this);
+			return connectomeToHTML.buildConnectomeAsHTML();
+		}
+			return "";
 	}
 	
 	public void debug() {
@@ -156,7 +158,12 @@ public class Connectome {
 		querryConnectivity(queryCell, true, true, true, true);
 	}
 	
+	//static vars
+
+	//connectome config file location
 	private final static String connectomeFilePath = "src/wormguides/model/connectome_file/NeuronConnect.csv";
+	
+	//synapse types as strings for search logic
 	private final static String s_presynapticDescription = "S presynaptic";
 	private final static String r_postsynapticDescription = "R postsynaptic";
 	private final static String ej_electricalDescription = "EJ electrical";
