@@ -47,7 +47,6 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
-import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
 import wormguides.model.Story;
@@ -61,9 +60,6 @@ import wormguides.view.Window3DSubScene;
 
 //FOR CONNECTOME WINDOW
 import javafx.scene.web.WebView;
-//import java.io.BufferedWriter;
-//import java.io.File;
-//import java.io.FileWriter;
 import javafx.scene.Group;
 
 public class RootLayoutController implements Initializable{

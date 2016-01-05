@@ -9,16 +9,18 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class PartsListToHTML extends HTMLGenerator {
+import wormguides.HTMLGenerator.HTMLTags;
+
+public class PartsListToHTML {
 	
 	
 	public PartsListToHTML() {
 		super();
-		
 	}
 	
+	
 	public String buildPartsListAsHTML() {
-		String html = openTableTagHTML;
+		String html = HTMLTags.openTableTagHTML;
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 	
@@ -33,7 +35,8 @@ public class PartsListToHTML extends HTMLGenerator {
 					
 					String line;
 					while ((line = br.readLine()) != null) {
-						html += (openTableRowHTML + openTableDataHTML + line + closeTableDataHTML + closeTableRowHTML);
+						html += (HTMLTags.openTableRowHTML + HTMLTags.openTableDataHTML 
+								+ line + HTMLTags.closeTableDataHTML + HTMLTags.closeTableRowHTML);
 					}
 					break;
 				}
@@ -44,11 +47,13 @@ public class PartsListToHTML extends HTMLGenerator {
 			ioe.printStackTrace();
 		}
 		
-		html += (closeTableRowHTML + closeTableTagHTML);
+		html += (HTMLTags.closeTableRowHTML + HTMLTags.closeTableTagHTML);
 		
-		return generateCompleteHTML(html);
+		return HTMLGenerator.generateCompleteHTML(html);
 	}
 	
-	private final static String JAR_NAME = "WormGUIDES.jar";
-	private final static String PARTSLIST_NAME = "wormguides/model/partslist.txt";
+	
+	private final String JAR_NAME = "WormGUIDES.jar";
+	private final String PARTSLIST_NAME = "wormguides/model/partslist.txt";
+	
 }
