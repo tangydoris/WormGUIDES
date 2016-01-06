@@ -143,12 +143,13 @@ public class RootLayoutController implements Initializable{
 	@FXML private Text cellDescription;
 	
 	//scene elements stuff
-	SceneElementsList elementsList;
+	private SceneElementsList elementsList;
 	
 	// story stuff
-	StoriesList storiesList;
-	StoriesLayer storiesLayer;
+	private StoriesList storiesList;
+	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
+	@FXML private Button noteEditorBtn;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -159,14 +160,14 @@ public class RootLayoutController implements Initializable{
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
 	
-	@FXML
-	public void menuCloseAction() {
+	
+	// ----- Begin menu items and buttons listeners -----
+	@FXML public void menuCloseAction() {
 		System.out.println("exiting...");
 		System.exit(0);
 	}
 	
-	@FXML
-	public void menuAboutAction() {
+	@FXML public void menuAboutAction() {
 		if (aboutStage==null) {
 			aboutStage = new Stage();
 			aboutStage.setScene(new Scene(new AboutPane()));
@@ -180,8 +181,7 @@ public class RootLayoutController implements Initializable{
 		aboutStage.show();
 	}
 	
-	@FXML
-	public void viewTreeAction() {
+	@FXML public void viewTreeAction() {
 		if (treeStage==null) {
 			treeStage = new Stage();
 			treeStage.setScene(new Scene(new TreePane(lineageTreeRoot)));
@@ -191,8 +191,7 @@ public class RootLayoutController implements Initializable{
 		treeStage.show();
 	}
 	
-	@FXML
-	public void generateURLAction() {
+	@FXML public void generateURLAction() {
 		if (urlStage==null) {
 			urlStage = new Stage();
 			
@@ -215,8 +214,7 @@ public class RootLayoutController implements Initializable{
 		urlStage.show();
 	}
 	
-	@FXML
-	public void loadURLAction() {
+	@FXML public void loadURLAction() {
 		if (urlLoadStage==null) {
 			urlLoadStage = new Stage();
 			
@@ -261,8 +259,7 @@ public class RootLayoutController implements Initializable{
 		urlLoadStage.show();
 	}
 	
-	@FXML
-	public void viewCellShapesIndex() {
+	@FXML public void viewCellShapesIndex() {
 		if (elementsList == null) return;
 		
 		if (cellShapesIndexStage == null) {
@@ -287,8 +284,7 @@ public class RootLayoutController implements Initializable{
 		cellShapesIndexStage.show();
 	}
 	
-	@FXML
-	public void viewPartsList() {
+	@FXML public void viewPartsList() {
 		if (partsListStage == null) {
 			partsListStage = new Stage();
 			partsListStage.setTitle("Parts List");
@@ -309,8 +305,7 @@ public class RootLayoutController implements Initializable{
 		partsListStage.show();
 	}
 	
-	@FXML
-	public void viewConnectome() {
+	@FXML public void viewConnectome() {
 		if (connectomeStage == null) {
 			connectomeStage = new Stage();
 			connectomeStage.setTitle("Connectome");
@@ -330,6 +325,8 @@ public class RootLayoutController implements Initializable{
 		}
 		connectomeStage.show();
 	}
+	// ----- End menu items and buttons listeners -----
+	
 	
 	public void init3DWindow(LineageData data) {
 		window3D = new Window3DSubScene(modelAnchorPane.widthProperty(), 
@@ -723,6 +720,7 @@ public class RootLayoutController implements Initializable{
 		assert (allStructuresListView != null);
 		
 		assert (storiesListView != null);
+		assert (noteEditorBtn != null);
 	}
 	
 	private void initStructuresLayer() {
@@ -757,6 +755,8 @@ public class RootLayoutController implements Initializable{
 		storiesListView.setItems(storiesLayer.getStories());
 		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
 		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+		
+		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 	}
 	
 	
@@ -790,6 +790,7 @@ public class RootLayoutController implements Initializable{
 		initializeWithLineageData(data);
 	}
 	
+
 	
 	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
