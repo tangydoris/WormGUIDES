@@ -18,7 +18,7 @@ public class PartsListToHTML extends HTMLGenerator {
 	}
 	
 	public String buildPartsListAsHTML() {
-		String html = openTableTagHTML;
+		String html = HTMLGenerator.openTableTagHTML;
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 	

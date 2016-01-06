@@ -52,6 +52,8 @@ import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
@@ -794,6 +796,25 @@ public class RootLayoutController implements Initializable{
 	
 	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
+		//DEBUGGING HTML NODES AND DOM
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+		HTMLNode div = new HTMLNode("div", "firstDiv", "text-align: center;");
+		HTMLNode p = new HTMLNode("p", "firstP", "font-size: 13pt;", "hello!");
+		HTMLNode img = new HTMLNode("firstImg", "imgSrc", "altText", "float: left;", 35, 42);
+		div.addChild(p);
+		div.addChild(img);
+		body.addChild(div);
+		html.addChild(head);
+		html.addChild(body);
+		InfoWindowDOM dom = new InfoWindowDOM(head);
+		dom.buildStyleNode();
+		System.out.println(head.formatNode(head));
+		System.exit(0);
+		//-------------------
+		
+		
 		init3DWindow(data);
 		setPropertiesFrom3DWindow();
 		
