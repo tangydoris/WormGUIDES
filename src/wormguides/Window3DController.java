@@ -123,7 +123,6 @@ public class Window3DController {
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<Rule> rulesList;
-	//private ObservableList<ShapeRule> shapeRulesList;
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
 
@@ -272,7 +271,6 @@ public class Window3DController {
 		uniformSize = false;
 		
 		rulesList = FXCollections.observableArrayList();
-		//shapeRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
@@ -283,7 +281,6 @@ public class Window3DController {
 		
 		currentNotes = new ArrayList<Note>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
-		//billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
 
@@ -781,7 +778,7 @@ public class Window3DController {
 							if (rule instanceof ShapeRule) {
 								//check equivalence of shape rule to scene name
 								if (((ShapeRule)rule).appliesTo(sceneName)) {
-									colors.add(Color.web(((ShapeRule)rule).getColor().toString()));
+									colors.add(Color.web(rule.getColor().toString()));
 								}
 								
 							}
@@ -789,18 +786,17 @@ public class Window3DController {
 								//iterate over cells and check if cells apply
 								for (String name: allNames) {
 									if(((ColorRule)rule).appliesToBody(name)) {
-										colors.add(((ColorRule)rule).getColor());
+										colors.add(rule.getColor());
 									}
 								}	
 							}
 						}
 						
-						// if ShapeRule(s) applied
+						// if any rules applied
 						if (!colors.isEmpty())
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						else {
+						else
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
-						}
 					}
 				}
 				
@@ -1001,6 +997,10 @@ public class Window3DController {
 						});
 						buildScene(time.get());
 					}
+					
+					for (Rule rule : change.getRemoved()) {
+						buildScene(time.get());
+					}
 				}
 			}
 		});
@@ -1022,35 +1022,6 @@ public class Window3DController {
 		if (pane!=null)
 			parentAnchorPane = pane;
 	}
-	
-	
-	// Sets anything associated with shape rules
-	/*
-	public void setShapeRulesList(ObservableList<ShapeRule> list) {
-		if (list == null)
-			return;
-		
-		shapeRulesList = list;
-		shapeRulesList.addListener(new ListChangeListener<ShapeRule>() {
-			@Override
-			public void onChanged(
-					ListChangeListener.Change<? extends ShapeRule> change) {
-				while (change.next()) {
-					for (ShapeRule rule : change.getAddedSubList()) {
-						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable,
-									Boolean oldValue, Boolean newValue) {
-								if (newValue)
-									buildScene(time.get());
-							}
-						});
-					}
-				}
-			}
-		});
-	}
-	*/
 
 	
 	public ArrayList<ColorRule> getColorRulesList() {
@@ -1062,16 +1033,6 @@ public class Window3DController {
 		}
 		return list;
 	}
-	
-	
-	/*
-	public ArrayList<ShapeRule> getShapeRulesList() {
-		ArrayList<ShapeRule> list = new ArrayList<ShapeRule>();
-		for (ShapeRule rule : shapeRulesList)
-			list.add(rule);
-		return list;
-	}
-	*/
 
 	
 	public ObservableList<Rule> getObservableColorRulesList() {

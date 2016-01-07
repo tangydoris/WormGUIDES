@@ -86,8 +86,7 @@ public class StructuresLayer {
 			name = name.trim();
 			ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 			optionsArray.add(SearchOption.MULTICELLULAR);
-			ShapeRule rule = new ShapeRule(name, color, optionsArray);
-			rulesList.add(rule);
+			rulesList.add(new ShapeRule(name, color, optionsArray));
 		}
 	}
 	

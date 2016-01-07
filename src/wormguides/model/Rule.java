@@ -37,7 +37,7 @@ import wormguides.view.AppFont;
 
 /*
  * Superclass for ColorRule and ShapeRule, which have
- * the same layout (label, space, buttons)
+ * the same layout (label, some space, 4 buttons)
  */
 
 public abstract class Rule {
@@ -210,7 +210,6 @@ public abstract class Rule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		//infoPacket = new RuleInfoPacket(text, color, options, shapeRule);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override

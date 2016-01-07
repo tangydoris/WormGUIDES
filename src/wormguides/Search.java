@@ -46,7 +46,6 @@ public class Search {
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	private static ObservableList<Rule> rulesList;
-	//private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
 	
 	private final static Service<Void> resultsUpdateService;
@@ -532,7 +531,6 @@ public class Search {
 	}
 	
 	
-	/*
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -553,7 +551,6 @@ public class Search {
 			}
 		};
 	}
-	*/
 	
 	
 	public ChangeListener<Boolean> getAncestorTickListner() {

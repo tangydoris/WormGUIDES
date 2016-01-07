@@ -588,8 +588,8 @@ public class RootLayoutController implements Initializable{
 		electricalTick.selectedProperty().addListener(search.getElectricalTickListener());
 		neuromuscularTick.selectedProperty().addListener(search.getNeuromuscularTickListener());
 		
-		//cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
-		//cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
+		cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
