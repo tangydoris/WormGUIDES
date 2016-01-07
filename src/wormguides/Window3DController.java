@@ -798,8 +798,9 @@ public class Window3DController {
 						// if ShapeRule(s) applied
 						if (!colors.isEmpty())
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						else
+						else {
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+						}
 					}
 				}
 				
@@ -992,15 +993,14 @@ public class Window3DController {
 					for (Rule rule : change.getAddedSubList()) {
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
-							public void changed(
-									ObservableValue<? extends Boolean> observable,
+							public void changed(ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
 								if (newValue)
 									buildScene(time.get());
 							}
 						});
 					}
-					buildScene(time.get());
+					//buildScene(time.get());
 				}
 			}
 		});
@@ -1038,16 +1038,18 @@ public class Window3DController {
 					for (ShapeRule rule : change.getAddedSubList()) {
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
-							public void changed(
-									ObservableValue<? extends Boolean> observable,
+							public void changed(ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
 								if (newValue)
 									buildScene(time.get());
 							}
 						});
 					}
+					System.out.println("blah2");
 					buildScene(time.get());
 				}
+				System.out.println("blah1");
+				buildScene(time.get());
 			}
 		});
 	}

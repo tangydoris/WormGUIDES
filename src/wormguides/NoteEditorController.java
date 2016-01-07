@@ -32,18 +32,14 @@ public class NoteEditorController implements Initializable{
 	@FXML private ToggleGroup displayToggle;
 	
 	
-	//public NoteEditorController() { }
-	
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
 		assertFXMLNodes();
 	}
 	
 	
 	private void assertFXMLNodes() {
-		
+		// TODO fill this stuff in
 	}
 	
 	

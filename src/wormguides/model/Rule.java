@@ -1,5 +1,6 @@
 package wormguides.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,7 +12,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -19,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -27,9 +31,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.ImageLoader;
+import wormguides.RuleEditorController;
 import wormguides.SearchOption;
 import wormguides.view.AppFont;
-import wormguides.view.RuleEditPane;
 
 /*
  * Superclass for ColorRule and ShapeRule, which have
@@ -66,7 +70,7 @@ public abstract class Rule {
 	
 	private Tooltip toolTip = new Tooltip();
 	
-	private RuleInfoPacket infoPacket;
+	private RuleEditorController editController;
 	private SubmitHandler handler;
 	
 	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean shapeRule) {
@@ -116,16 +120,48 @@ public abstract class Rule {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editStage = new Stage();
-					editStage.setScene(new Scene(new RuleEditPane(
-										infoPacket, handler)));
+					editController = new RuleEditorController();
 					
-					editStage.setTitle("Edit Rule");
+					FXMLLoader loader = new FXMLLoader();
+					loader.setLocation(getClass().getResource("../view/RuleEditorLayout.fxml"));
 					
-					editStage.initModality(Modality.NONE);
-					editStage.setResizable(false);
+					loader.setController(editController);
+					loader.setRoot(editController);
+					
+					try {
+						editStage = new Stage();
+						editStage.setScene(new Scene((AnchorPane) loader.load()));
+						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
+			            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
+			            					"-fx-faint-focus-color: transparent;");
+			            }
+						
+						editStage.setTitle("Edit Rule");
+						editStage.initModality(Modality.NONE);
+						editStage.setResizable(false);
+						
+						editController.setHeading(text);
+						editController.setSubmitHandler(handler);
+						editController.setColor(color);
+						editController.setCellTicked(isCellSelected());
+						editController.setCellBodyTicked(isCellBodySelected());
+						editController.setAncestorsTicked(isAncestorSelected());
+						editController.setDescendantsTicked(isDescendantSelected());
+						
+						if (textLowerCase.contains("functional") 
+								|| textLowerCase.contains("description"))
+							editController.disableDescendantOption();
+						else if (isShapeRule)
+							editController.disableOptionsForShapeRule();
+						
+					} catch (IOException e) {
+						System.out.println("error in instantiating rule editor - input/output exception");
+						e.printStackTrace();
+					} catch (NullPointerException npe) {
+						System.out.println("error in instantiating rule editor - null pointer exception");
+						npe.printStackTrace();
+					}
 				}
-				ruleChanged.set(false);
 				editStage.show();
 			}
 		});
@@ -147,11 +183,14 @@ public abstract class Rule {
 			@Override
 			public void handle(ActionEvent event) {
 				ruleChanged.set(true);
+				
 				if (visible)
 					visibleBtn.setGraphic(eyeInvertIcon);
 				else
 					visibleBtn.setGraphic(eyeIcon);
+				
 				visible = !visible;
+				
 				ruleChanged.set(false);
 			}
 		});
@@ -172,24 +211,19 @@ public abstract class Rule {
 		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
 									visibleBtn, deleteBtn);
 		
-		infoPacket = new RuleInfoPacket(text, color, options, shapeRule);
+		//infoPacket = new RuleInfoPacket(text, color, options, shapeRule);
 		ruleChanged = new SimpleBooleanProperty(false);
 		ruleChanged.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
 					Boolean oldValue, Boolean newValue) {
-				if (newValue) {
-					setColorButton(infoPacket.getColor());
+				if (newValue && editController!=null) {
+					setColorButton(editController.getColor());
 				}
 			}
 		});
 		
 		visible = true;
-	}
-	
-	
-	public void disableDescendantOption() {
-		infoPacket.disableDescendantOption();
 	}
 	
 	
@@ -229,6 +263,7 @@ public abstract class Rule {
 	
 	public void setColor(Color color) {
 		this.color = color;
+		setColorButton(color);
 	}
 	
 	
@@ -372,16 +407,6 @@ public abstract class Rule {
 	}
 	
 	
-	public void setVisible(Boolean visible) {
-		if (!visible)
-			visibleBtn.setGraphic(eyeInvertIcon);
-		else
-			visibleBtn.setGraphic(eyeIcon);
-		
-		this.visible = visible;
-	}
-	
-	
 	public boolean isVisible() {
 		return visible;
 	}
@@ -390,14 +415,15 @@ public abstract class Rule {
 	private class SubmitHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			setColor(infoPacket.getColor());
-			setOptions(infoPacket.getOptions().toArray(
-					new SearchOption[infoPacket.getOptions().size()]));
-			editStage.hide();
-			setOptions(infoPacket.getOptions());
-			resetLabel();
-			toolTip.setText(toStringFull());
-			ruleChanged.set(true);
+			if (editController!=null) {
+				setColor(editController.getColor());
+				editStage.hide();
+				setOptions(editController.getOptions());
+				resetLabel();
+				toolTip.setText(toStringFull());
+				ruleChanged.set(true);
+				ruleChanged.set(false);
+			}
 		}
 	}
 
