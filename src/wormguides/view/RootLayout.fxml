@@ -383,6 +383,12 @@
                                           <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
+                                    <HBox>
+                                       <children>
+                                          <Text fontSmoothingType="LCD" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="(If no structures are selected below, a new rule is added for all search results)" wrappingWidth="280.0" />
+                                       </children>
+                                    </HBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                     <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
                                        <font>
                                           <Font size="14.0" />

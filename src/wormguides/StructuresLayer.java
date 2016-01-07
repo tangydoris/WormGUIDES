@@ -186,14 +186,12 @@ public class StructuresLayer {
 				}
 				
 				// search in comments if name does not already apply
-				if (!appliesToName) {
-					String comment = nameToCommentsMap.get(nameLower);
-					String commentLower = comment.toLowerCase();
-					for (String term : terms) {
-						if (!commentLower.contains(term)) {
-							appliesToComment = false;
-							break;
-						}
+				String comment = nameToCommentsMap.get(nameLower);
+				String commentLower = comment.toLowerCase();
+				for (String term : terms) {
+					if (!commentLower.contains(term)) {
+						appliesToComment = false;
+						break;
 					}
 				}
 				
