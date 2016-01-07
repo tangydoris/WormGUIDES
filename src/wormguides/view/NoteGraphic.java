@@ -7,12 +7,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import wormguides.model.Note;
 
 /*
@@ -35,6 +32,7 @@ public class NoteGraphic extends VBox{
 	// note is the parent note to which this graphic belongs to
 	public NoteGraphic(Note note) {
 		super();
+		setPadding(new Insets(5, 5, 5, 5));
 		
 		parent = note;
 		
@@ -68,11 +66,23 @@ public class NoteGraphic extends VBox{
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				if (newValue)
-					setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+					highlightCell(true);
 				else
-					setBackground(Background.EMPTY);
+					highlightCell(false);
 			}
 		});
+	}
+	
+	
+	private void highlightCell(boolean highlight) {
+		if (highlight) {
+			setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
+					+ "-fx-background-insets: 0, 1, 2; "
+					+ "-fx-background: -fx-accent;"
+					+ "-fx-text-fill: -fx-selection-bar-text;");
+		}
+		else
+			setStyle("-fx-background-color: white;");
 	}
 	
 	
@@ -94,6 +104,11 @@ public class NoteGraphic extends VBox{
 	
 	public BooleanProperty getSelectedBooleanProperty() {
 		return selected;
+	}
+	
+	
+	public boolean isSelected() {
+		return selected.get();
 	}
 	
 	

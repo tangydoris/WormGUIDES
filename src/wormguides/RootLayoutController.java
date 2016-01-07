@@ -414,6 +414,15 @@ public class RootLayoutController implements Initializable{
             }
 		});
 		
+		// TODO use this?
+		allStructuresListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+		});
+		
+		/*
 		allStructuresListView.getSelectionModel().selectedItemProperty()
 							.addListener(new ChangeListener<String>() {
 			@Override
@@ -422,10 +431,12 @@ public class RootLayoutController implements Initializable{
 				selectedName.set(newValue);
 			}
 		});
+		*/
 		
 		// Modify font for ListView's of String's
 		structuresSearchListView.setCellFactory(new StringCellCallback());
-		allStructuresListView.setCellFactory(new StringCellCallback());
+		//allStructuresListView.setCellFactory(new StringCellCallback());
+		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
 		
@@ -734,6 +745,15 @@ public class RootLayoutController implements Initializable{
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
+		
+		structuresLayer.addSelectedNameListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+								String oldValue, String newValue) {
+				if (newValue!=null && !newValue.isEmpty())
+					selectedName.set(newValue);
+			}
+		});
 	}
 	
 	

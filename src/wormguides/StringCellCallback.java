@@ -9,7 +9,7 @@ import wormguides.view.AppFont;
 
 
 /*
- * Callback for ListCell for String so that fonts are uniform
+ * Callback for ListCell<String> so that fonts are uniform
  */
 public class StringCellCallback implements Callback<ListView<String>, ListCell<String>> {
 	
@@ -34,8 +34,13 @@ public class StringCellCallback implements Callback<ListView<String>, ListCell<S
 		HBox hbox = new HBox();
     	Label label = new Label(name);
     	label.setFont(AppFont.getFont());
-    	label.setPrefHeight(22);
+    	label.setPrefHeight(UI_HEIGHT);
+    	label.setMinHeight(UI_HEIGHT);
+    	label.setStyle("-fx-fill-color: black;");
     	hbox.getChildren().add(label);
     	return hbox;
 	}
+	
+	
+	private final double UI_HEIGHT = 28.0;
 }

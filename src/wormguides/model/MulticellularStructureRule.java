@@ -8,9 +8,9 @@ import wormguides.SearchOption;
 /*
  * Rule used for multicellular structures
  */
-public class ShapeRule extends Rule {
+public class MulticellularStructureRule extends Rule {
 	
-	public ShapeRule(String searched, Color color, ArrayList<SearchOption> options) {
+	public MulticellularStructureRule(String searched, Color color, ArrayList<SearchOption> options) {
 		super(searched, color, options, true);
 	}
 		

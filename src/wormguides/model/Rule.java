@@ -36,7 +36,7 @@ import wormguides.SearchOption;
 import wormguides.view.AppFont;
 
 /*
- * Superclass for ColorRule and ShapeRule, which have
+ * Superclass for ColorRule and MulticellularStructureRule, which have
  * the same layout (label, some space, 4 buttons)
  */
 
@@ -58,7 +58,7 @@ public abstract class Rule {
 	private ArrayList<String> cells;
 	private boolean cellsSet;
 	
-	private boolean isShapeRule;
+	private boolean isStructureRule;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -73,13 +73,13 @@ public abstract class Rule {
 	private RuleEditorController editController;
 	private SubmitHandler handler;
 	
-	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean shapeRule) {
+	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean structureRule) {
 		setSearchedText(searched);
 		setColor(color);
 		
 		handler = new SubmitHandler();
 		
-		isShapeRule = shapeRule;
+		isStructureRule = structureRule;
 		
 		cells = new ArrayList<String>();
 		// if the cells list from Search is set for this rule, cellsSet is true
@@ -150,8 +150,8 @@ public abstract class Rule {
 						
 						if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
 							editController.disableDescendantOption();
-						else if (isShapeRule)
-							editController.disableOptionsForShapeRule();
+						else if (isStructureRule)
+							editController.disableOptionsForStructureRule();
 						
 					} catch (IOException e) {
 						System.out.println("error in instantiating rule editor - input/output exception");

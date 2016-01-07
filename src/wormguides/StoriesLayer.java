@@ -19,7 +19,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -40,7 +39,6 @@ public class StoriesLayer {
 	
 	private Stage editStage;
 	private ObservableList<NoteGraphic> noteGraphics;
-	//private NoteEditorController editController;
 	
 	
 	public StoriesLayer(ObservableList<Story> list) {
@@ -50,8 +48,6 @@ public class StoriesLayer {
 			stories = FXCollections.observableArrayList();
 		
 		width = 0;
-		
-		//noteCellFactory = new NoteCellFactory();
 		
 		noteGraphics = FXCollections.observableArrayList(new Callback<NoteGraphic, Observable[]>() {
 			@Override
@@ -164,17 +160,6 @@ public class StoriesLayer {
 	
 	
 	/*
-	 * Highlight input note graphic
-	 */
-	private void selectNoteGraphic(NoteGraphic graphic) {
-		for (NoteGraphic g : noteGraphics) {
-			if (g==graphic)
-				g.select();
-		}
-	}
-	
-	
-	/*
 	 * Renderer for story item
 	 */
 	public Callback<ListView<Story>, ListCell<Story>> getStoryCellFactory() {
@@ -189,12 +174,6 @@ public class StoriesLayer {
 	                    	// Create story graphic
 	                    	VBox box = makeStoryGraphic(story, width);
 	                    	
-	                    	Region r1 = new Region();
-	                    	r1.setPrefHeight(10);
-	                    	r1.setMinHeight(USE_PREF_SIZE);
-	                    	r1.setMaxHeight(USE_PREF_SIZE);
-	                    	box.getChildren().add(r1);
-	                    	
 	                    	// Add list view for notes inside story graphic
 	                    	for (Note note : story.getNotesObservable()) {
 	                    		NoteGraphic graphic = note.getGraphic(width);
@@ -206,18 +185,15 @@ public class StoriesLayer {
 									@Override
 									public void handle(MouseEvent event) {
 										graphic.setExpanded(!graphic.isExpanded());
-										deselectAllNoteGraphics();
-										selectNoteGraphic(graphic);
+										
+										if (graphic.isSelected())
+											graphic.deselect();
+										else
+											deselectAllExcept(graphic);
 									}
 	                    		});
 	                    	}
 	                    	
-	                    	Region r2 = new Region();
-	                    	r2.setPrefHeight(10);
-	                    	r2.setMinHeight(USE_PREF_SIZE);
-	                    	r2.setMaxHeight(USE_PREF_SIZE);
-	                    	
-	                    	box.getChildren().add(r2);
 	                    	box.getChildren().add(new Separator(Orientation.HORIZONTAL));
 	                    	
 	                    	setGraphic(box);

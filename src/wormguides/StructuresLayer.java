@@ -3,17 +3,26 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
+import wormguides.view.StructureListCellGraphic;
+import wormguides.model.MulticellularStructureRule;
 
 
 public class StructuresLayer {
@@ -25,6 +34,8 @@ public class StructuresLayer {
 	private String searchText;
 	private HashMap<String, String> nameToCommentsMap;
 	
+	private HashMap<String, StructureListCellGraphic> nameListCellMap;
+	private StringProperty selectedNameProperty;
 	
 	public StructuresLayer(SceneElementsList sceneElementsList) {
 		selectedColor = Color.WHITE; //default color
@@ -32,8 +43,46 @@ public class StructuresLayer {
 		allStructuresList = FXCollections.observableArrayList();
 		searchResultsList = FXCollections.observableArrayList();
 		
+		nameListCellMap = new HashMap<String, StructureListCellGraphic>();
+		selectedNameProperty = new SimpleStringProperty("");
+		
+		allStructuresList.addListener(new ListChangeListener<String>() {
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends String> change) {
+				while (change.next()) {
+					if (!change.wasUpdated()) {
+						for (String string : change.getAddedSubList()) {
+							StructureListCellGraphic graphic = new StructureListCellGraphic(string);
+							graphic.setOnMouseClicked(new EventHandler<Event>() {
+					    		@Override
+					    		public void handle(Event event) {
+					    			if (graphic.isSelected())
+					    				graphic.deselect();
+					    			else
+					    				deselectAllExcept(graphic);
+					    			
+					    			resetSelectedNameProperty(string);
+					    		}
+					    	});
+							nameListCellMap.put(string, graphic);
+						}
+					}
+				}
+			}
+		});
+		
 		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
 		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
+	}
+
+	
+	/*
+	 * Un-hilights all cells except for input cell graphic
+	 */
+	private void deselectAllExcept(StructureListCellGraphic graphic) {
+		for (StructureListCellGraphic g : nameListCellMap.values())
+			g.deselect();
+		graphic.select();
 	}
 	
 	
@@ -65,19 +114,19 @@ public class StructuresLayer {
 			}
 		};
 	}
-
+	
 	
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				addShapeRule(selectedStructure, selectedColor);
+				addStructureRule(selectedStructure, selectedColor);
 			}
 		};
 	}
 	
 	
-	public void addShapeRule(String name, Color color) {
+	public void addStructureRule(String name, Color color) {
 		if (name==null || color==null)
 			return;
 		
@@ -86,7 +135,7 @@ public class StructuresLayer {
 			name = name.trim();
 			ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 			optionsArray.add(SearchOption.MULTICELLULAR);
-			rulesList.add(new ShapeRule(name, color, optionsArray));
+			rulesList.add(new MulticellularStructureRule(name, color, optionsArray));
 		}
 	}
 	
@@ -111,11 +160,10 @@ public class StructuresLayer {
 				boolean nameSearched = true;
 				boolean commentSearched = true;
 				
-				String comment = nameToCommentsMap.get(name).toLowerCase();
-				name = name.toLowerCase();
+				String comment = nameToCommentsMap.get(name);
 				
 				for (String word : terms) {
-					if (nameSearched && !name.contains(word))
+					if (nameSearched && !name.toLowerCase().contains(word))
 						nameSearched = false;
 					if (comment!=null && commentSearched && !comment.contains(word))
 						commentSearched = false;
@@ -138,6 +186,16 @@ public class StructuresLayer {
 		};
 	}
 	
+	
+	/*
+	 * Resets the selected name so the change can be detected by
+	 * the root layout controller
+	 */
+	private void resetSelectedNameProperty(String name) {
+		selectedNameProperty.set("");
+		selectedNameProperty.set(name);
+	}
+	
 
 	/*
 	 * Called by RootLayourController to set reference to global rules list
@@ -155,6 +213,38 @@ public class StructuresLayer {
 	
 	public ObservableList<String> getStructuresSearchResultsList() {
 		return searchResultsList;
+	}
+	
+	
+	public void addSelectedNameListener(ChangeListener<String> listener) {
+		if (listener!=null)
+			selectedNameProperty.addListener(listener);
+	}
+	
+	
+	public Callback<ListView<String>, ListCell<String>> getCellFactory() {
+		return new Callback<ListView<String>, ListCell<String>>() {
+			@Override
+			public ListCell<String> call(ListView<String> param) {
+				ListCell<String> cell = new ListCell<String>() {
+					@Override
+		            protected void updateItem(String name, boolean empty) {
+		                super.updateItem(name, empty);
+		                if (name != null) {
+		                	setGraphic(nameListCellMap.get(name));
+		                }
+		            	else {
+		            		setGraphic(null);
+		            		
+		            	}
+		                setStyle("-fx-focus-color: transparent;"
+	            				+ "-fx-background-color: transparent;");
+		                setPadding(Insets.EMPTY);
+		        	}
+				};
+				return cell;
+			}
+		};
 	}
 	
 }

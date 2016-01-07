@@ -68,7 +68,7 @@ import wormguides.model.Note.Type;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
+import wormguides.model.MulticellularStructureRule;
 import wormguides.model.StoriesList;
 
 public class Window3DController {
@@ -732,7 +732,7 @@ public class Window3DController {
 	
 	
 	private void addMeshesToList(ArrayList<Shape3D> list) {
-		// consult ShapeRule(s)
+		// consult StructureRule(s)
 		// process only if meshes at this time point
 		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
@@ -775,9 +775,9 @@ public class Window3DController {
 						
 						//iterate over rulesList
 						for (Rule rule: rulesList) {
-							if (rule instanceof ShapeRule) {
+							if (rule instanceof MulticellularStructureRule) {
 								//check equivalence of shape rule to scene name
-								if (((ShapeRule)rule).appliesTo(sceneName)) {
+								if (((MulticellularStructureRule)rule).appliesTo(sceneName)) {
 									colors.add(Color.web(rule.getColor().toString()));
 								}
 								
