@@ -54,7 +54,7 @@ public abstract class Rule {
 	private ArrayList<String> cells;
 	private boolean cellsSet;
 	
-	private boolean shapeRule;
+	private boolean isShapeRule;
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
@@ -67,12 +67,15 @@ public abstract class Rule {
 	private Tooltip toolTip = new Tooltip();
 	
 	private RuleInfoPacket infoPacket;
+	private SubmitHandler handler;
 	
 	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean shapeRule) {
 		setSearchedText(searched);
 		setColor(color);
 		
-		this.shapeRule = shapeRule;
+		handler = new SubmitHandler();
+		
+		isShapeRule = shapeRule;
 		
 		cells = new ArrayList<String>();
 		// if the cells list from Search is set for this rule, cellsSet is true
@@ -115,7 +118,7 @@ public abstract class Rule {
 				if (editStage==null) {
 					editStage = new Stage();
 					editStage.setScene(new Scene(new RuleEditPane(
-										infoPacket, getSubmitHandler())));
+										infoPacket, handler)));
 					
 					editStage.setTitle("Edit Rule");
 					
@@ -384,20 +387,18 @@ public abstract class Rule {
 	}
 	
 	
-	private EventHandler<ActionEvent> getSubmitHandler() {
-		return new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				setColor(infoPacket.getColor());
-				setOptions(infoPacket.getOptions().toArray(
-						new SearchOption[infoPacket.getOptions().size()]));
-				editStage.hide();
-				setOptions(infoPacket.getOptions());
-				resetLabel();
-				toolTip.setText(toStringFull());
-				ruleChanged.set(true);
-			}
-		};
+	private class SubmitHandler implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			setColor(infoPacket.getColor());
+			setOptions(infoPacket.getOptions().toArray(
+					new SearchOption[infoPacket.getOptions().size()]));
+			editStage.hide();
+			setOptions(infoPacket.getOptions());
+			resetLabel();
+			toolTip.setText(toStringFull());
+			ruleChanged.set(true);
+		}
 	}
 
 	

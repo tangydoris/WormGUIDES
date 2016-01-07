@@ -146,13 +146,13 @@
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
                                     <HBox maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Label maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
+                                          <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="40.0" HBox.hgrow="ALWAYS" />
-                                          <ComboBox fx:id="structureComboBox" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="SOMETIMES" />
+                                          <ComboBox fx:id="structureComboBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="SOMETIMES" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -160,7 +160,7 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label minWidth="160.0" text="Sub-Structure Location:">
+                                    <Label disable="true" minWidth="160.0" text="Sub-Structure Location:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -170,37 +170,37 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="34.0" text="Axon">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="34.0" text="Axon">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
+                                    <Label disable="true" layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label layoutX="114.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="63.0" text="Cell Body">
+                                    <Label disable="true" layoutX="114.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="63.0" text="Cell Body">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -212,13 +212,13 @@
                                  <children>
                                     <HBox prefWidth="110.0">
                                        <children>
-                                          <Label minWidth="47.0" text="Callout">
+                                          <Label disable="true" minWidth="47.0" text="Callout">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Label>
                                           <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                          <CheckBox fx:id="calloutTick" mnemonicParsing="false" />
+                                          <CheckBox fx:id="calloutTick" disable="true" mnemonicParsing="false" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -226,13 +226,13 @@
                               <HBox>
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="71.0" text="Upper Left">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="71.0" text="Upper Left">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -241,13 +241,13 @@
                                        </toggleGroup>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="80.0" text="Upper Right">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="80.0" text="Upper Right">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -258,25 +258,25 @@
                               <HBox layoutX="16.0" layoutY="450.0">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="71.0" text="Lower Left">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="71.0" text="Lower Left">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="80.0" text="Lower Right">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="80.0" text="Lower Right">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>

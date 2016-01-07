@@ -2,42 +2,46 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import wormguides.view.AppFont;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.util.Callback;
 
 public class Story {
 	
 	private String name;
 	private String description;
-	private ArrayList<Note> notes;
-	private VBox vBox;
-	
+	private ObservableList<Note> notes;
+	private BooleanProperty activeBooleanProperty;
+		
 	
 	public Story(String name, String description) {
 		this.name = name;
 		this.description = description;
-		notes = new ArrayList<Note>();
-		
-		makeGraphic();
+		activeBooleanProperty = new SimpleBooleanProperty();
+		notes = FXCollections.observableArrayList(new Callback<Note, Observable[]>() {
+			@Override
+			public Observable[] call(Note note) {
+				return new Observable[]{note.getChangedProperty()};
+			}
+		});
 	}
 	
 	
-	private void makeGraphic() {
-		vBox = new VBox(5);
-		
-		Label titleLabel = new Label(name);
-		titleLabel.setFont(AppFont.getBoldFont());
-		titleLabel.setWrapText(true);
-		
-		Text descriptionText = new Text(description);
-		descriptionText.setFont(AppFont.getFont());
-		descriptionText.wrappingWidthProperty().bind(vBox.widthProperty());
-		
-		vBox.getChildren().addAll(titleLabel, descriptionText);
-		
-		// TODO Add graphic for Note in this class?
+	public boolean isActive() {
+		return activeBooleanProperty.get();
+	}
+	
+	
+	public void setActive(boolean isActive) {
+		activeBooleanProperty.set(isActive);
+	}
+	
+	
+	public BooleanProperty getIsActiveBooleanProperty() {
+		return activeBooleanProperty;
 	}
 	
 	
@@ -94,18 +98,14 @@ public class Story {
 	
 	
 	public void addNote(Note note) {
-		if (note!=null) {
+		if (note!=null)
 			notes.add(note);
-			vBox.getChildren().add(note.getGraphic());
-		}
 	}
 	
 	
 	public void removeNote(Note note) {
-		if (note!=null) {
+		if (note!=null)
 			notes.remove(note);
-			vBox.getChildren().remove(note.getGraphic());
-		}
 	}
 	
 	
@@ -119,13 +119,16 @@ public class Story {
 	}
 	
 	
-	public ArrayList<Note> getNotes() {
+	public ObservableList<Note> getNotesObservable() {
 		return notes;
 	}
 	
 	
-	public VBox getGraphic() {
-		return vBox;
+	public ArrayList<Note> getNotes() {
+		ArrayList<Note> array = new ArrayList<Note>();
+		for (Note note : notes)
+			array.add(note);
+		return array;
 	}
 	
 	

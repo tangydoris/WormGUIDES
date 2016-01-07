@@ -11,8 +11,10 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
@@ -25,7 +27,12 @@ public class StoriesList {
 	
 	
 	public StoriesList(SceneElementsList list) {
-		stories = FXCollections.observableArrayList();
+		stories = FXCollections.observableArrayList(new Callback<Story, Observable[]>() {
+			@Override
+			public Observable[] call(Story story) {
+				return new Observable[]{story.getIsActiveBooleanProperty()};
+			}
+		});
 		elementsList = list;
 		buildStories();
 	}
@@ -115,7 +122,9 @@ public class StoriesList {
 						System.out.println(e.toString());
 						System.out.println(line);
 					} finally {
-						stories.get(storyCounter).addNote(note);
+						Story story = stories.get(storyCounter);
+						story.addNote(note);
+						note.setParent(story);
 					}
 				}	
 			}
@@ -195,6 +204,12 @@ public class StoriesList {
 		}
 		
 		return sb.toString();
+	}
+	
+	
+	public void makeAllStoriesInactive() {
+		for (Story story : stories)
+			story.setActive(false);
 	}
 	
 	

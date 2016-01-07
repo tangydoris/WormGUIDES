@@ -2,9 +2,13 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
-import javafx.scene.control.Label;
-import wormguides.view.AppFont;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import wormguides.view.NoteGraphic;
 
+/*
+ * This class represents a note that belongs to a story (its parent)
+ */
 public class Note {
 
 	// TODO Refactor this to be a single scene element?
@@ -23,9 +27,11 @@ public class Note {
 	private int startTime, endTime;
 	private String comments;
 	private String url;
+	private Story parent;
 	
-	// Graphical display
-	private Label label;
+	private NoteGraphic graphic;
+	
+	private BooleanProperty changedBooleanProperty;
 	
 	
 	public Note() {
@@ -39,25 +45,45 @@ public class Note {
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
-		
-		label = new Label();
-		label.setWrapText(true);
-		label.setFont(AppFont.getFont());
+		changedBooleanProperty = new SimpleBooleanProperty();
+		graphic = new NoteGraphic(this);
 	}
 	
 	
-	public Label getGraphic() {
-		return label;
+	public BooleanProperty getChangedProperty() {
+		return changedBooleanProperty;
 	}
-	
+
 	
 	public Note(String tagName, String tagContents) {
 		this();
 		
 		this.tagName = tagName;
-		label.setText("• "+tagName);
+		graphic.setTitle(tagName);
 		
 		this.tagContents = tagContents;
+		graphic.setContents(tagContents);
+	}
+	
+	
+	public NoteGraphic getGraphic(double width) {
+		if (width>0) {
+			graphic.setPrefWidth(width);
+	    	graphic.setMaxWidth(width);
+		}
+		
+    	return graphic;
+	}
+	
+	
+	public void setParent(Story story) {
+		if (story!=null)
+			parent = story;
+	}
+	
+	
+	public Story getParent() {
+		return parent;
 	}
 	
 	
@@ -70,7 +96,7 @@ public class Note {
 	public void setTagName(String tagName) {
 		if (tagName!=null) {
 			this.tagName = tagName;
-			label.setText("• "+tagName);
+			graphic.setTitle(tagName);
 		}
 		
 		if (elements!=null) {
@@ -81,8 +107,10 @@ public class Note {
 	
 	
 	public void setTagContents(String tagContents) {
-		if (tagContents!=null)
+		if (tagContents!=null) {
 			this.tagContents = tagContents;
+			graphic.setTitle(tagContents);
+		}
 	}
 	
 	

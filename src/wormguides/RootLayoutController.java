@@ -55,9 +55,6 @@ import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-import wormguides.view.Window3DSubScene;
-
-
 //FOR CONNECTOME WINDOW
 import javafx.scene.web.WebView;
 import javafx.scene.Group;
@@ -79,7 +76,7 @@ public class RootLayoutController implements Initializable{
 	private URLLoadWarningDialog warning;
 	
 	// 3D subscene stuff
-	private Window3DSubScene window3D;
+	private Window3DController window3D;
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
@@ -329,7 +326,7 @@ public class RootLayoutController implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DSubScene(modelAnchorPane.widthProperty(), 
+		window3D = new Window3DController(modelAnchorPane.widthProperty(), 
 										modelAnchorPane.heightProperty(), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);

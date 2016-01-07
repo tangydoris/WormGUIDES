@@ -32,14 +32,13 @@ public class DisplayLayer {
 					if (!change.wasUpdated()) {
 						// added to list
 						for (Rule rule : change.getAddedSubList()) {
-							Rule ruleToRemove = rule;
-							buttonMap.put(ruleToRemove, rule.getDeleteButton());
+							buttonMap.put(rule, rule.getDeleteButton());
 							
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(ActionEvent event) {
-									rulesList.remove(ruleToRemove);
-									buttonMap.remove(ruleToRemove);
+									rulesList.remove(rule);
+									buttonMap.remove(rule);
 								}
 							});
 						}

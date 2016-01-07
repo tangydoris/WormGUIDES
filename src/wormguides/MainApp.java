@@ -57,6 +57,7 @@ public class MainApp extends Application {
             rootLayout = (BorderPane) loader.load();
             
             scene = new Scene(rootLayout);
+            //scene.getStylesheets().add("MainApp.css");
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
             
