@@ -17,9 +17,7 @@ public class DisplayLayer {
 	private ObservableList<Rule> rulesList;
 	private HashMap<Rule, Button> buttonMap;
 	
-	public DisplayLayer(ListView<Rule> listView) {
-		if (listView==null)
-			listView = new ListView<Rule>();
+	public DisplayLayer() {
 		
 		buttonMap = new HashMap<Rule, Button>();
 		
@@ -47,7 +45,6 @@ public class DisplayLayer {
 			}
 		});
 			
-		listView.setItems(rulesList);
 	}
 	
 	public ObservableList<Rule> getRulesList() {
@@ -70,6 +67,7 @@ public class DisplayLayer {
 	                    	setGraphic(item.getGraphic());
 	                	else
 	                		setGraphic(null);
+	                    setPickOnBounds(false);
 	            	}
 	        	};
 	        	return cell;

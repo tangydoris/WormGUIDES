@@ -622,9 +622,11 @@ public class RootLayoutController implements Initializable{
 		searchField.textProperty().addListener(search.getTextFieldListener());
 	}
 	
-	private void initDisplayLayer() {		
-		// color rules layers
-		displayLayer = new DisplayLayer(rulesListView);
+	
+	private void initDisplayLayer() {
+		displayLayer = new DisplayLayer();
+		
+		rulesListView.setItems(displayLayer.getRulesList());
 		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
 	}
 	

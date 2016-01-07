@@ -61,7 +61,7 @@ public class NoteGraphic extends VBox{
 		
 		expanded = false;
 		
-		selected = new SimpleBooleanProperty(false);
+		selected = new SimpleBooleanProperty(true);
 		selected.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -71,6 +71,7 @@ public class NoteGraphic extends VBox{
 					highlightCell(false);
 			}
 		});
+		selected.set(false);
 	}
 	
 	
@@ -80,9 +81,14 @@ public class NoteGraphic extends VBox{
 					+ "-fx-background-insets: 0, 1, 2; "
 					+ "-fx-background: -fx-accent;"
 					+ "-fx-text-fill: -fx-selection-bar-text;");
+			title.setStyle("-fx-text-fill: white");
+			contents.setStyle("-fx-text-fill: white");
 		}
-		else
+		else {
 			setStyle("-fx-background-color: white;");
+			title.setStyle("-fx-text-fill: black");
+			contents.setStyle("-fx-text-fill: black");
+		}
 	}
 	
 	

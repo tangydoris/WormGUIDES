@@ -56,12 +56,14 @@ public class StructuresLayer {
 							graphic.setOnMouseClicked(new EventHandler<Event>() {
 					    		@Override
 					    		public void handle(Event event) {
-					    			if (graphic.isSelected())
+					    			if (graphic.isSelected()) {
 					    				graphic.deselect();
-					    			else
+					    				selectedNameProperty.set("");
+					    			}
+					    			else {
 					    				deselectAllExcept(graphic);
-					    			
-					    			resetSelectedNameProperty(string);
+					    				selectedNameProperty.set(string);
+					    			}
 					    		}
 					    	});
 							nameListCellMap.put(string, graphic);
@@ -110,7 +112,7 @@ public class StructuresLayer {
 				if (searchText.isEmpty())
 					searchResultsList.clear();
 				else
-					searchStructures(newValue.toLowerCase());
+					searchAndUpdateResults(newValue.toLowerCase());
 			}
 		};
 	}
@@ -120,7 +122,16 @@ public class StructuresLayer {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				addStructureRule(selectedStructure, selectedColor);
+				String name = selectedNameProperty.get();
+				
+				if (!name.isEmpty())
+					addStructureRule(name, selectedColor);
+				
+				// if no name is selected, add all results from search
+				else {
+					for (String string : searchResultsList)
+						addStructureRule(string, selectedColor);
+				}
 			}
 		};
 	}
@@ -151,25 +162,42 @@ public class StructuresLayer {
 	
 	
 	// Only searches names for now
-	public void searchStructures(String searched) {
+	public void searchAndUpdateResults(String searched) {
+		if (searched==null || searched.isEmpty())
+			return;
+		
 		String[] terms = searched.toLowerCase().split(" ");
 		searchResultsList.clear();
+		
 		for (String name : allStructuresList) {
+			
 			if (!searchResultsList.contains(name)) {
-				// Look at scene names
-				boolean nameSearched = true;
-				boolean commentSearched = true;
+				// search in structure scene names
+				String nameLower = name.toLowerCase();
 				
-				String comment = nameToCommentsMap.get(name);
+				boolean appliesToName = true;
+				boolean appliesToComment = true;
 				
-				for (String word : terms) {
-					if (nameSearched && !name.toLowerCase().contains(word))
-						nameSearched = false;
-					if (comment!=null && commentSearched && !comment.contains(word))
-						commentSearched = false;
+				for (String term : terms) {
+					if (!nameLower.contains(term)) {
+						appliesToName = false;
+						break;
+					}
 				}
 				
-				if (nameSearched || commentSearched)
+				// search in comments if name does not already apply
+				if (!appliesToName) {
+					String comment = nameToCommentsMap.get(nameLower);
+					String commentLower = comment.toLowerCase();
+					for (String term : terms) {
+						if (!commentLower.contains(term)) {
+							appliesToComment = false;
+							break;
+						}
+					}
+				}
+				
+				if (appliesToName || appliesToComment)
 					searchResultsList.add(name);
 			}
 		}
@@ -191,10 +219,12 @@ public class StructuresLayer {
 	 * Resets the selected name so the change can be detected by
 	 * the root layout controller
 	 */
+	/*
 	private void resetSelectedNameProperty(String name) {
 		selectedNameProperty.set("");
 		selectedNameProperty.set(name);
 	}
+	*/
 	
 
 	/*
@@ -230,13 +260,11 @@ public class StructuresLayer {
 					@Override
 		            protected void updateItem(String name, boolean empty) {
 		                super.updateItem(name, empty);
-		                if (name != null) {
+		                if (name != null)
 		                	setGraphic(nameListCellMap.get(name));
-		                }
-		            	else {
+		            	else
 		            		setGraphic(null);
-		            		
-		            	}
+
 		                setStyle("-fx-focus-color: transparent;"
 	            				+ "-fx-background-color: transparent;");
 		                setPadding(Insets.EMPTY);

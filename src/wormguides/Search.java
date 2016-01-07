@@ -425,20 +425,39 @@ public class Search {
 	
 	// Tests if name contains all parts of a search string
 	// returns true if it does, false otherwise
+	// TODO extend functionality to search comments
 	private static boolean isNameSearched(String name, String searched) {
 		if (name==null || searched==null)
 			return false;
 		
-		boolean isSearched = true;
-		name = name.trim().toLowerCase();
-		String[] searchedTokens = searched.trim().toLowerCase().split(" ");
-		for (String keyword : searchedTokens) {
-			if (!name.contains(keyword)) {
-				isSearched = false;
+		// search in structure scene names
+		String nameLower = name.toLowerCase();
+		
+		boolean appliesToName = true;
+		boolean appliesToComment = true;
+		
+		String[] terms = searched.trim().toLowerCase().split(" ");
+		
+		for (String term : terms) {
+			if (!nameLower.contains(term)) {
+				appliesToName = false;
 				break;
 			}
 		}
-		return isSearched;
+		
+		// search in comments if name does not already apply
+		if (!appliesToName) {
+			String comment = sceneElementsList.nameCommentsMap.get(nameLower);
+			String commentLower = comment.toLowerCase();
+			for (String term : terms) {
+				if (!commentLower.contains(term)) {
+					appliesToComment = false;
+					break;
+				}
+			}
+		}
+		
+		return appliesToName || appliesToComment;
 	}
 	
 	

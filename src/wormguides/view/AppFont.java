@@ -12,7 +12,7 @@ public class AppFont {
 	
 	static {
 		font = new Font(14);
-		bolderFont = Font.font("System", FontWeight.BLACK, 14);
+		bolderFont = Font.font("System", FontWeight.EXTRA_BOLD, 14);
 		boldFont = Font.font("System", FontWeight.BOLD, 14);
 	}
 	

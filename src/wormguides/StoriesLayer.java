@@ -140,12 +140,9 @@ public class StoriesLayer {
 	 * Un-highlight all notes except for the input note
 	 */
 	private void deselectAllExcept(NoteGraphic graphic) {
-		for (NoteGraphic g : noteGraphics) {
-			if (g!=graphic)
-				graphic.select();
-			else
-				graphic.deselect();
-		}
+		for (NoteGraphic g : noteGraphics)
+			g.deselect();
+		graphic.select();
 	}
 	
 	
@@ -194,7 +191,9 @@ public class StoriesLayer {
 	                    		});
 	                    	}
 	                    	
-	                    	box.getChildren().add(new Separator(Orientation.HORIZONTAL));
+	                    	Separator s = new Separator(Orientation.HORIZONTAL);
+	                    	s.setStyle("");
+	                    	box.getChildren().add(s);
 	                    	
 	                    	setGraphic(box);
 	                    }

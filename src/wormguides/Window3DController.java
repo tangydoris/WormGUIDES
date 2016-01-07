@@ -775,13 +775,14 @@ public class Window3DController {
 						
 						//iterate over rulesList
 						for (Rule rule: rulesList) {
+							
 							if (rule instanceof MulticellularStructureRule) {
 								//check equivalence of shape rule to scene name
 								if (((MulticellularStructureRule)rule).appliesTo(sceneName)) {
 									colors.add(Color.web(rule.getColor().toString()));
 								}
-								
 							}
+							
 							else if(rule instanceof ColorRule) {
 								//iterate over cells and check if cells apply
 								for (String name: allNames) {
