@@ -148,8 +148,7 @@ public abstract class Rule {
 						editController.setAncestorsTicked(isAncestorSelected());
 						editController.setDescendantsTicked(isDescendantSelected());
 						
-						if (textLowerCase.contains("functional") 
-								|| textLowerCase.contains("description"))
+						if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
 							editController.disableDescendantOption();
 						else if (isShapeRule)
 							editController.disableOptionsForShapeRule();

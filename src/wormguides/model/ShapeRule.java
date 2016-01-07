@@ -14,7 +14,7 @@ public class ShapeRule extends Rule {
 		super(searched, color, options, true);
 	}
 		
-	// @param name : lineageName of cell body
+	// @param name : lineageName of multicellular structure
 	public boolean appliesTo(String name) {
 		if (isVisible()) {
 			return this.getSearchedText().equals(name);

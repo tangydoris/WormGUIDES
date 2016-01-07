@@ -123,7 +123,7 @@ public class Window3DController {
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<Rule> rulesList;
-	private ObservableList<ShapeRule> shapeRulesList;
+	//private ObservableList<ShapeRule> shapeRulesList;
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
 
@@ -272,7 +272,7 @@ public class Window3DController {
 		uniformSize = false;
 		
 		rulesList = FXCollections.observableArrayList();
-		shapeRulesList = FXCollections.observableArrayList();
+		//shapeRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
@@ -980,7 +980,7 @@ public class Window3DController {
 
 	
 	// sets everything associated with color rules
-	public void setColorRulesList(ObservableList<Rule> list) {
+	public void setRulesList(ObservableList<Rule> list) {
 		if (list == null)
 			return;
 		
@@ -999,8 +999,8 @@ public class Window3DController {
 									buildScene(time.get());
 							}
 						});
+						buildScene(time.get());
 					}
-					//buildScene(time.get());
 				}
 			}
 		});
@@ -1025,6 +1025,7 @@ public class Window3DController {
 	
 	
 	// Sets anything associated with shape rules
+	/*
 	public void setShapeRulesList(ObservableList<ShapeRule> list) {
 		if (list == null)
 			return;
@@ -1045,14 +1046,11 @@ public class Window3DController {
 							}
 						});
 					}
-					System.out.println("blah2");
-					buildScene(time.get());
 				}
-				System.out.println("blah1");
-				buildScene(time.get());
 			}
 		});
 	}
+	*/
 
 	
 	public ArrayList<ColorRule> getColorRulesList() {
@@ -1066,33 +1064,24 @@ public class Window3DController {
 	}
 	
 	
+	/*
 	public ArrayList<ShapeRule> getShapeRulesList() {
 		ArrayList<ShapeRule> list = new ArrayList<ShapeRule>();
 		for (ShapeRule rule : shapeRulesList)
 			list.add(rule);
 		return list;
 	}
+	*/
 
 	
 	public ObservableList<Rule> getObservableColorRulesList() {
 		return rulesList;
-	}
-	
-	
-	public ObservableList<ShapeRule> getObservableShapeRulesList() {
-		return shapeRulesList;
 	}
 
 	
 	public void setColorRulesList(ArrayList<ColorRule> list) {
 		rulesList.clear();
 		rulesList.setAll(list);
-	}
-	
-	
-	public void setShapeRulesList(ArrayList<ShapeRule> list) {
-		shapeRulesList.clear();
-		shapeRulesList.setAll(list);
 	}
 
 	

@@ -119,7 +119,7 @@ public class RootLayoutController implements Initializable{
 	private StringProperty selectedName;
 	
 	// layers tab
-	private DisplayLayer rulesLayer;
+	private DisplayLayer displayLayer;
 	private DisplayLayer shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
@@ -613,8 +613,8 @@ public class RootLayoutController implements Initializable{
 	
 	private void initDisplayLayer() {		
 		// color rules layers
-		rulesLayer = new DisplayLayer(rulesListView);
-		rulesListView.setCellFactory(rulesLayer.getRuleCellFactory());
+		displayLayer = new DisplayLayer(rulesListView);
+		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
 	}
 	
 	
@@ -724,7 +724,7 @@ public class RootLayoutController implements Initializable{
 		structuresLayer = new StructuresLayer(elementsList);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
-		structuresLayer.setRulesList(rulesLayer.getRulesList());
+		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
 		// TODO: Add rules for all structures search results if one structure
 		// is not specifically selected in the list of ALL structures
@@ -787,9 +787,7 @@ public class RootLayoutController implements Initializable{
 		initializeWithLineageData(data);
 	}
 	
-
 	
-	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
 		init3DWindow(data);
 		setPropertiesFrom3DWindow();
@@ -799,10 +797,9 @@ public class RootLayoutController implements Initializable{
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
-		// unchecked casts
-		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)rulesLayer.getRulesList());
-		search.setColorRulesList(colorTempList);
-		window3D.setColorRulesList(colorTempList);
+		ObservableList<Rule> list = displayLayer.getRulesList();
+		search.setRulesList(list);
+		window3D.setRulesList(list);
 		
 		initSceneElementsList();
 		
