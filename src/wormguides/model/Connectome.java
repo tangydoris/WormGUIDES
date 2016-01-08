@@ -11,6 +11,8 @@ public class Connectome {
 	private ArrayList<NeuronalSynapse> connectome;
 	private ConnectomeLoader connectomeLoader;
 	
+	//terminal cell case
+	
 	public Connectome() {
 		connectome = new ArrayList<NeuronalSynapse>();
 		connectomeLoader = new ConnectomeLoader(connectomeFilePath);

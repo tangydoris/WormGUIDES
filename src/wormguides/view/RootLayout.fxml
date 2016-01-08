@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -26,6 +26,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
                   <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
                   <MenuItem disable="true" mnemonicParsing="false" text="Product Information" />
+                  <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

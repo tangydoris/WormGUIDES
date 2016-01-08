@@ -20,7 +20,7 @@ public class HTMLNode {
 	private int height;
 	private int width;
 	
-	//children - DOM
+	//children --> DOM
 	private ArrayList<HTMLNode> children;
 	
 	//container node with no ID - e.g. head, body
@@ -125,12 +125,16 @@ public class HTMLNode {
 		}
 	}
 	
+	public String formatNode() {
+		return formatNode(this);
+	}
+	
 	/*
 	 * TODO
 	 * - add remove child method
 	 */
 	
-	public String formatNode(HTMLNode node) {
+	private String formatNode(HTMLNode node) {
 		/*
 		 * TODO
 		 * - container without ID --> <head>
@@ -228,7 +232,7 @@ public class HTMLNode {
 		return 0;
 	}
 	
-	public boolean hasChildren() {
+	private boolean hasChildren() {
 		if (children != null) {
 			return this.children.size() > 0;
 		}

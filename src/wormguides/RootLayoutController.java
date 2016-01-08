@@ -42,6 +42,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import wormguides.model.CellCases;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -53,6 +54,7 @@ import wormguides.model.StoriesList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindow;
 import wormguides.view.InfoWindowDOM;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -158,6 +160,10 @@ public class RootLayoutController implements Initializable{
 	
 	// url stuff
 	private URLLoader urlLoader;
+	
+	//InfoWindow Stuff
+	CellCases cellCases;
+	InfoWindow infoWindow;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -265,6 +271,26 @@ public class RootLayoutController implements Initializable{
 		
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
+	}
+	
+	@FXML
+	public void openInfoWindow() {
+		System.out.println("OPENING INFO WINDOW");
+		
+		if (cellCases == null) {
+			cellCases = new CellCases();
+		}
+		
+		if (infoWindow == null) {
+			infoWindow = new InfoWindow();
+			
+			
+			//testing purposes
+			infoWindow.addDOM();
+			infoWindow.domToTab("CELL TITLE");
+		}
+
+		infoWindow.showWindow();
 	}
 	
 	@FXML
@@ -497,6 +523,22 @@ public class RootLayoutController implements Initializable{
 				cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 			}
 		}
+		
+		//set tab in InfoWindow
+		if (cellCases.containsCase(name)) {
+			System.out.println(name);
+		} else {
+			System.out.println(name);
+		}
+		// ----cellCases.add (new case if not in there)
+		//     ----cell cases will handle whether to put in info window or not
+		
+		/*pass name to connectome search --> 
+		*     if (hit) , check if generate a TerminalCellCase
+		*     else generate nonterminal case
+		*     
+		*  pass case to info window
+		*/ 
 	}
 	
 	private void sizeSubscene() {
@@ -777,6 +819,10 @@ public class RootLayoutController implements Initializable{
 		connectome = new Connectome();
 		Search.setConnectome(connectome);
 	}
+	
+	private void initCellCases() {
+		cellCases = new CellCases();
+	}
 
 	
 	@Override
@@ -796,25 +842,6 @@ public class RootLayoutController implements Initializable{
 	
 	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
-		//DEBUGGING HTML NODES AND DOM
-		HTMLNode html = new HTMLNode("html");
-		HTMLNode head = new HTMLNode("head");
-		HTMLNode body = new HTMLNode("body");
-		HTMLNode div = new HTMLNode("div", "firstDiv", "text-align: center;");
-		HTMLNode p = new HTMLNode("p", "firstP", "font-size: 13pt;", "hello!");
-		HTMLNode img = new HTMLNode("firstImg", "imgSrc", "altText", "float: left;", 35, 42);
-		div.addChild(p);
-		div.addChild(img);
-		body.addChild(div);
-		html.addChild(head);
-		html.addChild(body);
-		InfoWindowDOM dom = new InfoWindowDOM(head);
-		dom.buildStyleNode();
-		System.out.println(head.formatNode(head));
-		System.exit(0);
-		//-------------------
-		
-		
 		init3DWindow(data);
 		setPropertiesFrom3DWindow();
 		
@@ -832,6 +859,9 @@ public class RootLayoutController implements Initializable{
 		
 		// connectome
 		initConnectome();
+		
+		//init cell cases
+		initCellCases();
 		
 		// structures layer
 		initStructuresLayer();
@@ -856,8 +886,7 @@ public class RootLayoutController implements Initializable{
         sizeSubscene();
         sizeInfoPane();
 	}
-	
-	
+
 	private static final String JAR_NAME = "WormGUIDES.jar";
 	
 }
