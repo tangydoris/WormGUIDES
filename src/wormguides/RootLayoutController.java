@@ -268,13 +268,7 @@ public class RootLayoutController implements Initializable{
 	public void openInfoWindow() {
 		if (infoWindow == null) {
 			initInfoWindow();
-		
-			
-			//testing purposes
-//			infoWindow.addDOM();
-//			infoWindow.domToTab("CELL TITLE");
 		}
-
 		infoWindow.showWindow();
 	}
 	
@@ -520,6 +514,7 @@ public class RootLayoutController implements Initializable{
 			}
 		}
 		
+		//GENERATE CELL TAB ON CLICK
 		if (cellCases == null) return; //error check
 						
 		if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
@@ -528,9 +523,9 @@ public class RootLayoutController implements Initializable{
 				//show the tab
 			} else {
 				//translate the name if necessary
-				name = connectome.checkQueryCell(name).toUpperCase();
+				String tabTitle = connectome.checkQueryCell(name).toUpperCase();
 				//add a terminal case --> pass the wiring partners
-				cellCases.makeTerminalCase(name, 
+				cellCases.makeTerminalCase(tabTitle, 
 						connectome.querryConnectivity(name, true, false, false, false),
 						connectome.querryConnectivity(name, false, true, false, false),
 						connectome.querryConnectivity(name, false, false, true, false),

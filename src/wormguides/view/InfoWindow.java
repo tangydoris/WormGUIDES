@@ -40,6 +40,7 @@ public class InfoWindow {
 	
 	public void addTab(InfoWindowDOM dom) {
 		WebView webview = new WebView();
+		System.out.println(dom.DOMtoString());
 		webview.getEngine().loadContent(dom.DOMtoString());
 		Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(tab);

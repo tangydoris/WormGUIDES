@@ -8,13 +8,13 @@ public class TerminalCellCase {
 	private String partsListDescription;
 	private String imageURL;
 	private String functionWORMATLAS;
-	private String anatomy;
 	
 	private ArrayList<String> presynapticPartners;
 	private ArrayList<String> postsynapticPartners;
 	private ArrayList<String> electricalPartners;
 	private ArrayList<String> neuromuscularPartners;
 	
+	private ArrayList<String> anatomy;
 	private ArrayList<String> expressesWORMBASE;
 	private ArrayList<String> homologues;
 	private ArrayList<String> referencesTEXTPRESSO;
@@ -26,6 +26,7 @@ public class TerminalCellCase {
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
 		this.imageURL = "WILL BE THE IMAGE URL";
+		this.functionWORMATLAS = "temp holder for function WORMATLAS";
 		
 		this.presynapticPartners = presynapticPartners;
 		this.postsynapticPartners = postsynapticPartners;
@@ -33,10 +34,25 @@ public class TerminalCellCase {
 		this.neuromuscularPartners = neuromuscularPartners;
 		
 		//FIGURE OUT HOW TO GENERATE THESE
+		this.anatomy = new ArrayList<String>();
 		this.expressesWORMBASE = new ArrayList<String>();
 		this.homologues = new ArrayList<String>();
 		this.referencesTEXTPRESSO = new ArrayList<String>();
 		this.links = new ArrayList<String>();
+		
+		/*
+		 * testing purposes
+		 */
+		anatomy.add("anatomy entry");
+		anatomy.add("another anatomy entry");
+		expressesWORMBASE.add("expresses entry");
+		expressesWORMBASE.add("woah look! another Expresses entry");
+		homologues.add("homologues entry");
+		homologues.add("second homologue");
+		referencesTEXTPRESSO.add("references entry");
+		referencesTEXTPRESSO.add("second reference");
+		links.add("link entry");
+		links.add("LINK");
 	}
 	
 	public String getCellName() {
@@ -74,11 +90,8 @@ public class TerminalCellCase {
 		return "";
 	}
 	
-	public String getAnatomy() {
-		if (this.anatomy != null) {
-			return this.anatomy;
-		}
-		return "";
+	public ArrayList<String> getAnatomy() {
+		return this.anatomy;
 	}
 	
 	public ArrayList<String> getPresynapticPartners() {

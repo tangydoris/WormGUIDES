@@ -16,13 +16,10 @@ public class HTMLNode {
 	
 	//image vars
 	private String imgSrc;
-	private String alt;
-	private int height;
-	private int width;
 
 	private ArrayList<HTMLNode> children;
 	
-	//container node with no ID - e.g. head, body
+	//container node with no ID - e.g. head, body, ul
 	public HTMLNode(String tag) {
 		this.tag = tag;
 	
@@ -35,7 +32,6 @@ public class HTMLNode {
 		this.style = null;
 		this.innerHTML = null;
 		this.imgSrc = null;
-		this.alt = null;
 		
 		this.children = new ArrayList<HTMLNode>();
 	}
@@ -54,7 +50,6 @@ public class HTMLNode {
 		
 		this.innerHTML = null;
 		this.imgSrc = null;
-		this.alt = null;
 		
 		this.children = new ArrayList<HTMLNode>();
 	}
@@ -72,23 +67,17 @@ public class HTMLNode {
 		this.isStyle = false;
 		
 		this.imgSrc = null;
-		this.alt = null;
 		
 		children = null;
 	}
 	
 	//img node
-	public HTMLNode(String ID, String imgSrc, String alt, String style, int height, int width) {
+	public HTMLNode(String imgSrc, boolean isImage) {
 		this.tag = "img";
-		this.ID = ID;
 		this.imgSrc = imgSrc;
-		this.alt = alt;
-		this.style = style;
-		this.height = height;
-		this.width = width;
 		
 		this.isContainer = false;
-		this.hasID = true;
+		this.hasID = false;
 		this.isImage = true;
 		this.isStyle = false;
 		
@@ -111,7 +100,6 @@ public class HTMLNode {
 		this.isStyle = true;
 		
 		this.imgSrc = null;
-		this.alt = null;
 		this.style = null;
 		this.children = null;
 	}
@@ -164,9 +152,8 @@ public class HTMLNode {
 			nodeStr = newLine + "<" + node.getTag() + " id=\"" + node.getID() + "\">" 
 						+ newLine + node.getInnerHTML() 
 						+ newLine +  "</" + node.getTag() + ">"; 
-		} else if (node.isImage() && node.hasID()) { //e.g. <img id...
-			nodeStr = newLine + "<" + node.getTag() + " id=\"" + node.getID() + "\" src=\"" + node.getImgSrc() +
-				"\" alt=\"" + node.getAlt() + "\" height=\"" + node.getHeight() + "\" width=\"" + node.getWidth() + "\">"; 
+		} else if (node.isImage()) { //e.g. <img id...
+			nodeStr = newLine + "<" + node.getTag() + " src=\"" + node.getImgSrc() + "\" alt=\"" + node.getImgSrc() + "\">"; 
 		} else if (node.isStyle()) {
 			nodeStr = newLine + "<" + node.getTag() + " type=\"" + node.getID() + "\">"
 					+ newLine + newLine + node.getStyle() + newLine + "</" + node.getTag() + ">";
@@ -208,27 +195,6 @@ public class HTMLNode {
 			return this.imgSrc;
 		}
 		return "";
-	}
-	
-	public String getAlt() {
-		if (isImage) {
-			return this.alt;
-		}
-		return "";
-	}
-	
-	public int getHeight() {
-		if (isImage) {
-			return this.height;
-		}
-		return 0;
-	}
-	
-	public int getWidth() {
-		if (isImage) {
-			return this.width;
-		}
-		return 0;
 	}
 	
 	private boolean hasChildren() {
