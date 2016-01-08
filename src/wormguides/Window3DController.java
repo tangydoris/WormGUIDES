@@ -533,8 +533,6 @@ public class Window3DController {
 				if (!note.getParent().isActive())
 					note.getParent().setActive(true);
 			}
-			
-			// TODO update stories layer
 		}
 //---------------------------------------------------------------
 		

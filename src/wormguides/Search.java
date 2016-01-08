@@ -185,9 +185,9 @@ public class Search {
 		searchResultsList.clear();
 		for (String result : list) {
 			if (PartsList.getFunctionalNameByLineageName(result)!=null)
-				result += " ("+
-						PartsList.getFunctionalNameByLineageName(result)+
-						")";
+				result += " ("
+						+ PartsList.getFunctionalNameByLineageName(result)
+						+ ")";
 			searchResultsList.add(result);
 		}
 	}
@@ -233,10 +233,10 @@ public class Search {
 	public void addDefaultColorRules() {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0xb30a95"), SearchOption.CELL);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL);
 	}
 	
@@ -326,6 +326,7 @@ public class Search {
 		rulesList.add(rule);
 		searchResultsList.clear();
 	}
+	
 	
 	/*
 	 * Method which returns the cells which pertain to a connectome rule
@@ -753,8 +754,7 @@ public class Search {
 	
 	
 	public static boolean isStructureWithComment(String name) {
-		if (sceneElementsList!=null && (sceneElementsList.isMulticellStructureName(name)
-				|| sceneElementsList.isNoteStructureName(name)))
+		if (sceneElementsList!=null && (sceneElementsList.isMulticellStructureName(name)))
 			return true;
 		
 		return false;

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="725.0" prefWidth="330.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.NoteEditorController">
+<fx:root prefHeight="725.0" prefWidth="330.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="30.0" layoutY="83.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -71,12 +71,26 @@
                                     <Button maxWidth="1.7976931348623157E308" minWidth="85.0" mnemonicParsing="false" onAction="#newNote" text="New Note" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
-                                       </font></Button>
+                                       </font>
+                                       <tooltip>
+                                          <Tooltip text="Create new note within current story">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Tooltip>
+                                       </tooltip></Button>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="20.0" HBox.hgrow="ALWAYS" />
                                     <Button maxWidth="1.7976931348623157E308" minWidth="99.0" mnemonicParsing="false" onAction="#deleteNote" text="Delete Note" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
-                                       </font></Button>
+                                       </font>
+                                       <tooltip>
+                                          <Tooltip text="Delete current note">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Tooltip>
+                                       </tooltip></Button>
                                  </children>
                               </HBox>
                               <HBox maxWidth="1.7976931348623157E308">
@@ -406,4 +420,4 @@
          </padding>
       </ScrollPane>
    </children>
-</AnchorPane>
+</fx:root>

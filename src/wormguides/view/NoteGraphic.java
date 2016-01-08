@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -36,12 +35,9 @@ public class NoteGraphic extends VBox{
 		
 		parent = note;
 		
-		setBackground(Background.EMPTY);
-		
 		title = new Label();
 		title.setWrapText(true);
 		title.setFont(AppFont.getBoldFont());
-		title.setStyle("-fx-text-fill: black");
 		title.setText(note.getTagName());
 		
 		contentsContainer = new HBox(0);
@@ -52,7 +48,6 @@ public class NoteGraphic extends VBox{
 		contents = new Label();
 		contents.setWrapText(true);
 		contents.setFont(AppFont.getFont());
-		contents.setStyle("-fx-text-fill: black");
 		contentsContainer.getChildren().addAll(r, contents);
 		contents.setText(note.getTagContents());
 		

@@ -191,15 +191,6 @@ public class SceneElementsList {
 	}
 	
 	
-	public boolean isNoteStructureName(String name) {
-		for (SceneElement se : elementsList) {
-			if (se.belongsToNote() || se.getSceneName().equalsIgnoreCase(name.trim()))
-				return true;
-		}
-		return false;
-	}
-	
-	
 	public boolean isMulticellStructureName(String name) {
 		for (String cellName : getAllMulticellSceneNames()) {
 			if (cellName.equalsIgnoreCase(name.trim()))

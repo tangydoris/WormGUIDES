@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -40,6 +41,8 @@ public class StoriesLayer {
 	private Stage editStage;
 	private ObservableList<NoteGraphic> noteGraphics;
 	
+	private NoteEditorController editController;
+	
 	
 	public StoriesLayer(ObservableList<Story> list) {
 		if (list!=null)
@@ -55,6 +58,8 @@ public class StoriesLayer {
 				return new Observable[]{graphic.getSelectedBooleanProperty()};
 			}
 		});
+		
+		editController = new NoteEditorController();
 	}
 	
 	
@@ -87,10 +92,13 @@ public class StoriesLayer {
 				if (editStage==null) {
 					editStage = new Stage();
 					
+					FXMLLoader loader = new FXMLLoader();
+					loader.setLocation(getClass().getResource("view/NoteEditorLayout.fxml"));
+					
+					loader.setController(editController);
+					loader.setRoot(editController);
+					
 					try {
-						FXMLLoader loader = new FXMLLoader();
-						loader.setLocation(getClass().getResource("view/NoteEditorLayout.fxml"));
-						
 						editStage.setScene(new Scene((AnchorPane) loader.load()));
 						
 						editStage.setTitle("Note Editor");
@@ -116,23 +124,8 @@ public class StoriesLayer {
 	/*
 	 * make vbox graphic to show a story
 	 */
-	private VBox makeStoryGraphic(Story story, double width) {
-		VBox box = new VBox(0);
-		box.setPrefWidth(width);
-		box.setMaxWidth(width);
-		box.setMinWidth(width);
-		
-		Label title = new Label(story.getName());
-		title.setFont(AppFont.getBolderFont());
-		title.setWrapText(true);
-		title.setStyle("-fx-text-fill: black");
-		
-		Text desription = new Text(story.getDescription());
-		desription.setFont(AppFont.getFont());
-		desription.wrappingWidthProperty().bind(box.widthProperty());
-		
-		box.getChildren().addAll(title, desription);
-		return box;
+	private StoryListCellGraphic makeStoryGraphic(Story story, double width) {
+		return new StoryListCellGraphic(story, width);
 	}
 	
 	
@@ -157,6 +150,16 @@ public class StoriesLayer {
 	
 	
 	/*
+	 * Grey out (disable) child nodes of input parent box
+	 */
+	private void disableContents(VBox box, boolean disable) {
+		//System.out.println("disable is "+disable);
+		for (Node node : box.getChildren())
+			node.setDisable(disable);
+	}
+	
+	
+	/*
 	 * Renderer for story item
 	 */
 	public Callback<ListView<Story>, ListCell<Story>> getStoryCellFactory() {
@@ -167,9 +170,10 @@ public class StoriesLayer {
 	                @Override
 	                protected void updateItem(Story story, boolean empty) {
 	                    super.updateItem(story, empty);
+	                    
 	                    if (story!=null && !empty)  {
 	                    	// Create story graphic
-	                    	VBox box = makeStoryGraphic(story, width);
+	                    	StoryListCellGraphic box = makeStoryGraphic(story, width);
 	                    	
 	                    	// Add list view for notes inside story graphic
 	                    	for (Note note : story.getNotesObservable()) {
@@ -177,12 +181,12 @@ public class StoriesLayer {
 	                    		box.getChildren().add(graphic);
 	                    		
 	                    		// Add graphic to observable list for note selection
+	                    		// TODO fix text wrapping in note graphic
 	                    		noteGraphics.add(graphic);
 	                    		graphic.setOnMouseClicked(new EventHandler<MouseEvent>() {
 									@Override
 									public void handle(MouseEvent event) {
 										graphic.setExpanded(!graphic.isExpanded());
-										
 										if (graphic.isSelected())
 											graphic.deselect();
 										else
@@ -192,8 +196,23 @@ public class StoriesLayer {
 	                    	}
 	                    	
 	                    	Separator s = new Separator(Orientation.HORIZONTAL);
-	                    	s.setStyle("");
 	                    	box.getChildren().add(s);
+	                    	
+	                    	// TODO disable (grey out) story
+	                    	// Grey out story cell when
+	                    	story.getIsActiveBooleanProperty().addListener(new ChangeListener<Boolean>() {
+								@Override
+								public void changed(ObservableValue<? extends Boolean> observable, 
+													Boolean oldValue, Boolean newValue) {
+									// corrective activeness is being set here, just need to grey out children nodes
+									if (newValue) {
+										box.enable();
+									}
+									else {
+										box.disable();
+									}
+								}
+	                    	});
 	                    	
 	                    	setGraphic(box);
 	                    }
@@ -201,11 +220,52 @@ public class StoriesLayer {
 	                		setGraphic(null);
 	                    setStyle("-fx-focus-color: transparent;"
 	                    		+ "-fx-background-color: transparent;");
+	                    setPadding(Insets.EMPTY);
 	            	}
 	        	};
 	        	return cell;
 			}
 		};
+	}
+	
+	
+	private class StoryListCellGraphic extends VBox {
+		
+		private Label title;
+		private Text description;
+		
+		public StoryListCellGraphic(Story story, double width) {
+			super(0);
+			setPadding(new Insets(10));
+			setPrefWidth(width);
+			setMaxWidth(width);
+			setMinWidth(width);
+			
+			title = new Label(story.getName());
+			title.setFont(AppFont.getBolderFont());
+			title.setWrapText(true);
+			title.setStyle("-fx-text-fill: black");
+			
+			description = new Text(story.getDescription());
+			description.setFont(AppFont.getFont());
+			description.wrappingWidthProperty().bind(widthProperty());
+			
+			getChildren().addAll(title, description);
+		}
+		
+		public void disable() {
+			title.setDisable(true);
+			title.setStyle("-fx-fill-color: grey");
+			description.setDisable(true);
+			description.setStyle("-fx-fill-color: grey");
+		}
+		
+		public void enable() {
+			title.setDisable(false);
+			title.setStyle("-fx-fill-color: black");
+			description.setDisable(false);
+			description.setStyle("-fx-fill-color: black");
+		}
 	}
 	
 }
