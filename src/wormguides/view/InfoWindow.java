@@ -1,6 +1,5 @@
 package wormguides.view;
 
-import java.util.ArrayList;
 
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -12,40 +11,24 @@ import javafx.stage.Stage;
 public class InfoWindow {
 	private Stage infoWindowStage;
 	private TabPane tabPane;
-	private ArrayList<InfoWindowDOM> cellTabs;
+	Scene scene;
 	
-	//resizable vars and setters
+	/*
+	 * TODO
+	 * if tab is closed --> remove case from cell cases i.e. internal memory
+	 * //resizable vars and setters
+	 */
 	
-	//listeners on InfoWindowDOM objects
-	
-	//add webview to tabpane --> tabpane is list of tabs --> each tab gets a webview
 	public InfoWindow() {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Info Window");
 		
 		tabPane = new TabPane();
-		cellTabs = new ArrayList<InfoWindowDOM>();
-	}
-	
-
-	public void domToTab(String cellName) {
-		//iterate through the DOMs and find the correct cell
-		for (InfoWindowDOM dom : cellTabs) {
-			if (dom.getCellName().equals(cellName)) {
-				WebView newWebView = new WebView();
-				newWebView.getEngine().loadContent(dom.toString());
-				Tab tab2 = new Tab(dom.getCellName(), newWebView);
-				tabPane.getTabs().add(tab2);
-				
-				Scene scene = new Scene(new Group());
-				scene.setRoot(tabPane);
-				
-				infoWindowStage.setScene(scene);
-				infoWindowStage.show();
-			}
-		}
 		
+		scene = new Scene(new Group());
+		scene.setRoot(tabPane);
 		
+		infoWindowStage.setScene(scene);
 	}
 	
 	public void showWindow() {
@@ -54,52 +37,10 @@ public class InfoWindow {
 		}
 	}
 	
-	/*
-	 * debug
-	 */
-	public void addDOM() {
-		HTMLNode html = new HTMLNode("html");
-		HTMLNode head = new HTMLNode("head");
-		HTMLNode body = new HTMLNode("body");
-		HTMLNode div = new HTMLNode("div", "firstDiv", "text-align: center;");
-		HTMLNode p = new HTMLNode("p", "firstP", "font-size: 13pt;", "hello!");
-		HTMLNode p2 = new HTMLNode("p", "secondP", "font-size: 15pt;", "oh heyyy");
-		HTMLNode img = new HTMLNode("firstImg", "imgSrc", "altText", "float: left;", 35, 42);
-		div.addChild(img);
-		body.addChild(p);
-		body.addChild(div);
-		body.addChild(p2);
-		html.addChild(head);
-		html.addChild(body);
-		InfoWindowDOM dom = new InfoWindowDOM(html);
-		dom.buildStyleNode();
-		
-		cellTabs.add(dom);
+	public void addTab(InfoWindowDOM dom) {
+		WebView webview = new WebView();
+		webview.getEngine().loadContent(dom.DOMtoString());
+		Tab tab2 = new Tab(dom.getCellName(), webview);
+		tabPane.getTabs().add(tab2);
 	}
-	
 }
-
-//@FXML
-//public void viewCellShapesIndex() {
-//	if (elementsList == null) return;
-//	
-//	if (cellShapesIndexStage == null) {
-//		cellShapesIndexStage = new Stage();
-//		cellShapesIndexStage.setTitle("Cell Shapes Index");
-//		
-//		CellShapesIndexToHTML cellShapesToHTML = new CellShapesIndexToHTML(elementsList);
-//		
-//		//webview to render cell shapes list i.e. elementsList
-//		WebView cellShapesIndexWebView = new WebView();
-//		cellShapesIndexWebView.getEngine().loadContent(cellShapesToHTML.buildCellShapesIndexAsHTML());
-//		
-//		VBox root = new VBox();
-//		root.getChildren().addAll(cellShapesIndexWebView);
-//		Scene scene = new Scene(new Group());
-//		scene.setRoot(root);
-//		
-//		cellShapesIndexStage.setScene(scene);
-//		cellShapesIndexStage.setResizable(false);
-//	}
-//	cellShapesIndexStage.show();
-//}

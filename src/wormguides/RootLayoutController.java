@@ -266,19 +266,13 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void openInfoWindow() {
-		System.out.println("OPENING INFO WINDOW");
-		
-		if (cellCases == null) {
-			cellCases = new CellCases();
-		}
-		
 		if (infoWindow == null) {
-			infoWindow = new InfoWindow();
-			
+			initInfoWindow();
+		
 			
 			//testing purposes
-			infoWindow.addDOM();
-			infoWindow.domToTab("CELL TITLE");
+//			infoWindow.addDOM();
+//			infoWindow.domToTab("CELL TITLE");
 		}
 
 		infoWindow.showWindow();
@@ -527,39 +521,28 @@ public class RootLayoutController implements Initializable{
 		}
 		
 		if (cellCases == null) return; //error check
-		
-		
-
-//INFO WINDOW CELL CASE TABS --> FOR NOW, CHECK ON CLICK OF EVERY CELL
-		//IF IN CONNECTOME, DO THE FOLLOWING:
-		/*
-		 * 
-		 * 
-		 * //testing purposes
-			infoWindow.addDOM();
-			infoWindow.domToTab("CELL TITLE");
-		 */
-		
+						
 		if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
 			if (cellCases.containsTerminalCase(name)) {
 				
 				//show the tab
-				System.out.println("showing tab for terminal cell: " + name);
-				
 			} else {
-				//add a terminal case
-				//cellCases.makeTerminalCase(name);
-				
-				System.out.println("making terminal cell case, adding to info window");
+				//translate the name if necessary
+				name = connectome.checkQueryCell(name).toUpperCase();
+				//add a terminal case --> pass the wiring partners
+				cellCases.makeTerminalCase(name, 
+						connectome.querryConnectivity(name, true, false, false, false),
+						connectome.querryConnectivity(name, false, true, false, false),
+						connectome.querryConnectivity(name, false, false, true, false),
+						connectome.querryConnectivity(name, false, false, false, true));
 			}
 		} else { //not in connectome --> non terminal case
 			if (cellCases.containsNonTerminalCase(name)) {
-				System.out.println("showing tab for non terminal cell: " + name);	
+
+				//show tab
 			} else {
 				//add a non terminal case
-				//cellCases.makeNonTerminalCase(name);
-				
-				System.out.println("making non terminal cell case, adding to info window");
+				cellCases.makeNonTerminalCase(name);
 			}
 		}
 	}
@@ -857,8 +840,16 @@ public class RootLayoutController implements Initializable{
 		Search.setConnectome(connectome);
 	}
 	
+	private void initInfoWindow() {
+		infoWindow = new InfoWindow();
+	}
+	
 	private void initCellCases() {
-		cellCases = new CellCases();
+		if (infoWindow == null) {
+			initInfoWindow();
+		}
+		
+		cellCases = new CellCases(infoWindow);
 	}
 
 	
@@ -894,6 +885,9 @@ public class RootLayoutController implements Initializable{
 		
 		// connectome
 		initConnectome();
+		
+		//info window
+		initInfoWindow();
 		
 		//init cell cases
 		initCellCases();

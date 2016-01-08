@@ -1,11 +1,20 @@
 package wormguides.view;
 
 import javafx.scene.web.WebView;
+import wormguides.model.NonTerminalCellCase;
+import wormguides.model.TerminalCellCase;
 
 public class InfoWindowDOM {
 	private HTMLNode html;
 	private WebView webView;
 	private String cellName;
+	
+	//terminal or non terminal case
+	private boolean isCellCase;
+	private TerminalCellCase terminalCase;
+	private NonTerminalCellCase nonTerminalCase;
+
+	//other dom uses: connectome, parts list, cell shapes index
 	
 	/*
 	 * TODO
@@ -20,8 +29,9 @@ public class InfoWindowDOM {
 		webView = new WebView();
 		cellName = "CELL TITLE";
 		
-//		WebView cellShapesIndexWebView = new WebView();
-//		cellShapesIndexWebView.getEngine().loadContent(cellShapesToHTML.buildCellShapesIndexAsHTML());
+		this.isCellCase = false;
+		this.terminalCase = null;
+		this.nonTerminalCase = null;
 	}
 	
 	//pass the cell name as a string which will be the name at the top of the tab
@@ -34,6 +44,41 @@ public class InfoWindowDOM {
 		
 		webView = new WebView();
 		cellName = "CELL TITLE";
+		
+		this.isCellCase = false;
+		this.terminalCase = null;
+		this.nonTerminalCase = null;
+	}
+	
+	/*
+	 * TERMINAL CELL CASE
+	 */
+	public InfoWindowDOM(TerminalCellCase terminalCase) {
+		this.html = new HTMLNode("html");
+		this.webView = new WebView();
+		this.cellName = terminalCase.getCellName();
+		
+		this.isCellCase = true;
+		this.terminalCase = terminalCase;
+		this.nonTerminalCase = null;
+		
+		/*
+		 * TODO
+		 * construct the dom from terminal cell case accessor methods
+		 */
+	}
+	
+	/*
+	 * NON TERMINAL CELL CASE
+	 */
+	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
+		this.html = new HTMLNode("html");
+		this.webView = new WebView();
+		this.cellName = nonTerminalCase.getCellName();
+		
+		this.isCellCase = true;
+		this.terminalCase = null;
+		this.nonTerminalCase = nonTerminalCase;
 	}
 	
 
@@ -41,15 +86,29 @@ public class InfoWindowDOM {
 	/*
 	 * TODO
 	 */
-	@Override
-	public String toString() {
+	public String DOMtoString() {
 		//add doctype tag to top -- <!DOCTYPE html> tag before loadContent on the webview
-		return "the first tab";
+		
+		
+		if (isCellCase) {
+			//check if terminal or non terminal
+			if (terminalCase != null) {
+				return this.cellName;
+			} else {
+				return this.cellName;
+			}
+		}
+		
+		return "not a cell case tab";
 	}
 	
-	public void loadContent(String domAsString) {
-		webView.getEngine().loadContent(domAsString);
+	public void loadContent() {
+		webView.getEngine().loadContent(this.DOMtoString());
 	}
+	
+//	public void loadContent(String domAsString) {
+//		webView.getEngine().loadContent(domAsString);
+//	}
 	
 	/*
 	 * iterates through the DOM and builds the style tag add to the head node
