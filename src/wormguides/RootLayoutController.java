@@ -264,7 +264,6 @@ public class RootLayoutController implements Initializable{
 		urlLoadStage.show();
 	}
 	
-<<<<<<< HEAD
 	@FXML
 	public void openInfoWindow() {
 		System.out.println("OPENING INFO WINDOW");
@@ -287,9 +286,6 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void viewCellShapesIndex() {
-=======
-	@FXML public void viewCellShapesIndex() {
->>>>>>> upstream/master
 		if (elementsList == null) return;
 		
 		if (cellShapesIndexStage == null) {
@@ -530,21 +526,42 @@ public class RootLayoutController implements Initializable{
 			}
 		}
 		
-		//set tab in InfoWindow
-		if (cellCases.containsCase(name)) {
-			System.out.println(name);
-		} else {
-			System.out.println(name);
-		}
-		// ----cellCases.add (new case if not in there)
-		//     ----cell cases will handle whether to put in info window or not
+		if (cellCases == null) return; //error check
 		
-		/*pass name to connectome search --> 
-		*     if (hit) , check if generate a TerminalCellCase
-		*     else generate nonterminal case
-		*     
-		*  pass case to info window
-		*/ 
+		
+
+//INFO WINDOW CELL CASE TABS --> FOR NOW, CHECK ON CLICK OF EVERY CELL
+		//IF IN CONNECTOME, DO THE FOLLOWING:
+		/*
+		 * 
+		 * 
+		 * //testing purposes
+			infoWindow.addDOM();
+			infoWindow.domToTab("CELL TITLE");
+		 */
+		
+		if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
+			if (cellCases.containsTerminalCase(name)) {
+				
+				//show the tab
+				System.out.println("showing tab for terminal cell: " + name);
+				
+			} else {
+				//add a terminal case
+				//cellCases.makeTerminalCase(name);
+				
+				System.out.println("making terminal cell case, adding to info window");
+			}
+		} else { //not in connectome --> non terminal case
+			if (cellCases.containsNonTerminalCase(name)) {
+				System.out.println("showing tab for non terminal cell: " + name);	
+			} else {
+				//add a non terminal case
+				//cellCases.makeNonTerminalCase(name);
+				
+				System.out.println("making non terminal cell case, adding to info window");
+			}
+		}
 	}
 	
 	private void sizeSubscene() {

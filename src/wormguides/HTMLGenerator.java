@@ -17,23 +17,12 @@ public class HTMLGenerator {
 		return htmlStart + body + htmlEnd;
 	}
 	
-<<<<<<< HEAD
 	public boolean isCompleteHTML(String html) {
 		return html.contains(htmlStart) && html.contains(htmlEnd);
 	}
 	
-	public File generateHTMLFile(String fileName, String body) {
-		String HTMLAsString = body;
-		
-		//check if complete HTML file
-		if (!isCompleteHTML(body)) {
-			HTMLAsString = htmlStart + body + htmlEnd;
-		}
-=======
-	
 	public static File generateHTMLFile(String fileName, String body) {
 		String HTMLAsString = htmlStart + body + htmlEnd;
->>>>>>> upstream/master
 		
 		
 		File html = null;
@@ -93,7 +82,6 @@ public class HTMLGenerator {
 	
 	
 	//html table tags
-<<<<<<< HEAD
 	public final static String openTableTagHTML = newLine + "<table>";
 	public final static String closeTableTagHTML = newLine + "</table>";
 	public final static String openTableRowHTML = newLine + "<tr>";
@@ -106,7 +94,7 @@ public class HTMLGenerator {
 	
 	public final static String breakLine = "<br>";
 	private final static String htmlExt = ".html";
-=======
+	
 	public class HTMLTags {
 		public final static String openTableTagHTML = newLine + "<table>";
 		public final static String closeTableTagHTML = newLine + "</table>";
@@ -119,6 +107,4 @@ public class HTMLGenerator {
 		public final static String closeTableDataHTML = "</td>";
 		public final static String breakLine = "<br>";
 	}
-	
->>>>>>> upstream/master
 }

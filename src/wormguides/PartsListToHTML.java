@@ -20,11 +20,7 @@ public class PartsListToHTML {
 	
 	
 	public String buildPartsListAsHTML() {
-<<<<<<< HEAD
-		String html = HTMLGenerator.openTableTagHTML;
-=======
 		String html = HTMLTags.openTableTagHTML;
->>>>>>> upstream/master
 		try {
 			JarFile jarFile = new JarFile(new File(JAR_NAME));
 	

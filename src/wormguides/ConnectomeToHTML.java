@@ -52,13 +52,7 @@ public class ConnectomeToHTML {
 			for (String table : wiringPartnersAsHTMLTables) {
 				htmlTables += (table + HTMLTags.breakLine + HTMLTags.breakLine);
 			}
-<<<<<<< HEAD
-			
-			return generateCompleteHTML(htmlTables);
-=======
-
 			return HTMLGenerator.generateCompleteHTML(htmlTables);
->>>>>>> upstream/master
 		}
 		
 		return "";

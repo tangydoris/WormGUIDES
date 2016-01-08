@@ -54,12 +54,37 @@ public class Connectome {
 	}
 	
 	/*
+	 * provides name translation from systematic to functional
+	 */
+	public String checkQueryCell(String queryCell) {
+		if (PartsList.containsLineageName(queryCell)) {
+			queryCell = PartsList.getFunctionalNameByLineageName(queryCell).toLowerCase();
+		}
+		
+		return queryCell;
+	}
+	
+	public boolean containsCell(String queryCell) {
+		queryCell = checkQueryCell(queryCell);
+		
+		for (NeuronalSynapse ns : connectome) {
+			if (ns.getCell1().toLowerCase().equals(queryCell) || ns.getCell2().toLowerCase().equals(queryCell)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/*
 	 * Search function which takes cell and filters results based on filter toggles
 	 * filter toggles = 4 Synapse Types
 	 */
 	public ArrayList<String> querryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
 			boolean electricalTicked, boolean neuromuscularTicked) {
+		
+		queryCell = checkQueryCell(queryCell);
 		
 		ArrayList<String> searchResults = new ArrayList<String>();
 

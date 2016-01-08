@@ -21,14 +21,26 @@ public class CellCases {
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
 	}
 	
-	public void addTerminalCase(TerminalCellCase terminalCase) {
+	public void makeTerminalCase(String cellName) {
+		TerminalCellCase tCase = new TerminalCellCase(cellName);
+		
+		addTerminalCase(tCase);
+	}
+	
+	private void addTerminalCase(TerminalCellCase terminalCase) {
 		if (terminalCases != null) {
 			terminalCases.add(terminalCase);
 			//update tabpane
 		}
 	}
 	
-	public void addNonTerminalCase(NonTerminalCellCase nonTerminalCase) {
+	public void makeNonTerminalCase(String cellName) {
+		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName);
+		
+		addNonTerminalCase(ntCase);
+	}
+	
+	private void addNonTerminalCase(NonTerminalCellCase nonTerminalCase) {
 		if (nonTerminalCases != null) {
 			nonTerminalCases.add(nonTerminalCase);
 			
@@ -36,11 +48,7 @@ public class CellCases {
 		}
 	}
 	
-	public boolean containsCase(String cellName) {
-		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName);
-	}
-	
-	private boolean containsTerminalCase(String cellName) {
+	public boolean containsTerminalCase(String cellName) {
 		if (terminalCases != null) {
 			for (TerminalCellCase tCase : terminalCases) {
 				if (tCase.getCellName().equals(cellName)) {
@@ -52,7 +60,7 @@ public class CellCases {
 		return false;
 	}
 	
-	private boolean containsNonTerminalCase(String cellName) {
+	public boolean containsNonTerminalCase(String cellName) {
 		if (nonTerminalCases != null) {
 			for (NonTerminalCellCase ntCase : nonTerminalCases) {
 				if (ntCase.getCellName().equals(cellName)) {
@@ -63,6 +71,5 @@ public class CellCases {
 		}
 		return false;
 	}
-	
 	
 }

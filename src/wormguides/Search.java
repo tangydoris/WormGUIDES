@@ -410,10 +410,10 @@ public class Search {
 							
 			case CONNECTOME:
 							if (connectome != null) {
-								//if a systematic name is searched, translate to functional before searching connectome
-								if (PartsList.containsLineageName(searched)) {
-									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
-								}
+//								//if a systematic name is searched, translate to functional before searching connectome
+//								if (PartsList.containsLineageName(searched)) {
+//									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+//								}
 								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
 										postsynapticTicked, electricalTicked, neuromuscularTicked));
 							}
