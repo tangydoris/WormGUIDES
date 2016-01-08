@@ -17,6 +17,7 @@ public class InfoWindow {
 	 * TODO
 	 * if tab is closed --> remove case from cell cases i.e. internal memory
 	 * //resizable vars and setters
+	 * SET SIZE OF INFO WINDOW
 	 */
 	
 	public InfoWindow() {
@@ -40,7 +41,7 @@ public class InfoWindow {
 	public void addTab(InfoWindowDOM dom) {
 		WebView webview = new WebView();
 		webview.getEngine().loadContent(dom.DOMtoString());
-		Tab tab2 = new Tab(dom.getCellName(), webview);
-		tabPane.getTabs().add(tab2);
+		Tab tab = new Tab(dom.getName(), webview);
+		tabPane.getTabs().add(tab);
 	}
 }

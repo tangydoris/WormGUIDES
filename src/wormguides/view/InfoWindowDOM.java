@@ -1,18 +1,11 @@
 package wormguides.view;
 
-import javafx.scene.web.WebView;
 import wormguides.model.NonTerminalCellCase;
 import wormguides.model.TerminalCellCase;
 
 public class InfoWindowDOM {
 	private HTMLNode html;
-	private WebView webView;
-	private String cellName;
-	
-	//terminal or non terminal case
-	private boolean isCellCase;
-	private TerminalCellCase terminalCase;
-	private NonTerminalCellCase nonTerminalCase;
+	private String name;
 
 	//other dom uses: connectome, parts list, cell shapes index
 	
@@ -26,12 +19,7 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM() {
 		this.html = new HTMLNode("html");
-		webView = new WebView();
-		cellName = "CELL TITLE";
-		
-		this.isCellCase = false;
-		this.terminalCase = null;
-		this.nonTerminalCase = null;
+		this.name = "CELL TITLE";
 	}
 	
 	//pass the cell name as a string which will be the name at the top of the tab
@@ -41,13 +29,8 @@ public class InfoWindowDOM {
 		} else {
 			this.html = html;
 		}
-		
-		webView = new WebView();
-		cellName = "CELL TITLE";
-		
-		this.isCellCase = false;
-		this.terminalCase = null;
-		this.nonTerminalCase = null;
+
+		this.name = "CELL TITLE";
 	}
 	
 	/*
@@ -55,17 +38,61 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM(TerminalCellCase terminalCase) {
 		this.html = new HTMLNode("html");
-		this.webView = new WebView();
-		this.cellName = terminalCase.getCellName();
-		
-		this.isCellCase = true;
-		this.terminalCase = terminalCase;
-		this.nonTerminalCase = null;
-		
+		//this.webView = new WebView();
+		this.name = terminalCase.getCellName();
+	
 		/*
 		 * TODO
 		 * construct the dom from terminal cell case accessor methods
 		 */
+		HTMLNode head = new HTMLNode("head");
+		
+		/*
+		 * TODO
+		 * meta tags
+		 * title
+		 */
+		
+		HTMLNode body = new HTMLNode("body");
+		
+		//divs
+		HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; float: left; background-color: green;"); //will contain external info and parts list description. float left for img on right
+		HTMLNode externalInfoDiv = new HTMLNode("div", "externalInfo", "background-color: red;"); 
+		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "background-color: green;");
+		topContainerDiv.addChild(externalInfoDiv);
+		topContainerDiv.addChild(partsListDescrDiv);
+		
+		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; float: left; background-color: red;");
+		
+		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "background-color: green;");
+		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "background-color: red;");
+		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "background-color: green;");
+		HTMLNode expressesWORMBASEDiv = new HTMLNode("div", "expressesWORMBASE", "background-color: red;");
+		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "referencesTEXTPRESS", "background-color: green;");
+		HTMLNode linksDiv = new HTMLNode("div", "links", "background-color: red;");
+		
+		//build data tags from terminal case
+		HTMLNode externalInfoP = new HTMLNode("p", "", "", terminalCase.getExternalInfo());
+		
+		//add data tags to divs
+		externalInfoDiv.addChild(externalInfoP);
+		
+		//add divs to body
+		body.addChild(topContainerDiv);
+		body.addChild(imgDiv);
+		body.addChild(functionWORMATLASDiv);
+		body.addChild(anatomyDiv);
+		body.addChild(wiringPartnersDiv);
+		body.addChild(expressesWORMBASEDiv);
+		body.addChild(referencesTEXTPRESSODiv);
+		body.addChild(linksDiv);
+		
+		//add head and body to html
+		html.addChild(head);
+		html.addChild(body);
+		
+		//add style node
+		buildStyleNode();
 	}
 	
 	/*
@@ -73,42 +100,13 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
-		this.webView = new WebView();
-		this.cellName = nonTerminalCase.getCellName();
-		
-		this.isCellCase = true;
-		this.terminalCase = null;
-		this.nonTerminalCase = nonTerminalCase;
+		this.name = nonTerminalCase.getCellName();
 	}
 	
-
-	
-	/*
-	 * TODO
-	 */
 	public String DOMtoString() {
-		//add doctype tag to top -- <!DOCTYPE html> tag before loadContent on the webview
-		
-		
-		if (isCellCase) {
-			//check if terminal or non terminal
-			if (terminalCase != null) {
-				return this.cellName;
-			} else {
-				return this.cellName;
-			}
-		}
-		
-		return "not a cell case tab";
+		String domAsString = doctypeTag;
+		return domAsString += html.formatNode();
 	}
-	
-	public void loadContent() {
-		webView.getEngine().loadContent(this.DOMtoString());
-	}
-	
-//	public void loadContent(String domAsString) {
-//		webView.getEngine().loadContent(domAsString);
-//	}
 	
 	/*
 	 * iterates through the DOM and builds the style tag add to the head node
@@ -136,16 +134,14 @@ public class InfoWindowDOM {
 	 * - only called if node is body tag and if body has children
 	 */
 	private String findStyleInSubTree(HTMLNode node) {
-		//if ()
-		String style = null;
+		String style = "";
 		for (HTMLNode n : node.getChildren()) {
 				if (n.hasID()) {
-				style += (newLine + n.getID() + " {"
+				style += (newLine + "#" + n.getID() + " {"
 						+ newLine + n.getStyle()
 						+ newLine + "}");
 			}
 		}
-		
 		return style;
 	}
 	
@@ -155,8 +151,8 @@ public class InfoWindowDOM {
 		}
 	}
 	
-	public String getCellName() {
-		return this.cellName;
+	public String getName() {
+		return this.name;
 	}
 	
 	private final static String doctypeTag = "<!DOCTYPE html>";

@@ -19,8 +19,7 @@ public class HTMLNode {
 	private String alt;
 	private int height;
 	private int width;
-	
-	//children --> DOM
+
 	private ArrayList<HTMLNode> children;
 	
 	//container node with no ID - e.g. head, body
@@ -60,7 +59,7 @@ public class HTMLNode {
 		this.children = new ArrayList<HTMLNode>();
 	}
 	
-	//inner node with text - e.g. <p>
+	//inner node - e.g. <p>
 	public HTMLNode(String tag, String ID, String style, String innerHTML) {
 		this.tag = tag;
 		this.ID = ID;
