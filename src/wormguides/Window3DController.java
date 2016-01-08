@@ -1,4 +1,4 @@
-package wormguides.view;
+package wormguides;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,8 +59,6 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
-import wormguides.ColorComparator;
-import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
@@ -70,10 +68,10 @@ import wormguides.model.Note.Type;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
+import wormguides.model.MulticellularStructureRule;
 import wormguides.model.StoriesList;
 
-public class Window3DSubScene{
+public class Window3DController {
 
 	private LineageData data;
 
@@ -81,9 +79,8 @@ public class Window3DSubScene{
 	private VBox overlayVBox;
 	private AnchorPane parentAnchorPane;
 	
-	// for note sprites/billboards attached to cell/celltime
+	// map of note sprites attached to cell, or cell and time
 	private HashMap<Node, Sphere> spriteSphereMap;
-	//private HashMap<Node, Sphere> billboardSphereMap;
 
 	// transformation stuff
 	private Group root;
@@ -126,7 +123,6 @@ public class Window3DSubScene{
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<Rule> rulesList;
-	private ObservableList<ShapeRule> shapeRulesList;
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
 
@@ -163,7 +159,7 @@ public class Window3DSubScene{
 	private boolean cellBodyTicked;
 	private boolean multicellMode;
 
-	//Story elements stuff
+	// Story elements stuff
 	private StoriesList storiesList;
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
@@ -172,7 +168,7 @@ public class Window3DSubScene{
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DSubScene(ReadOnlyDoubleProperty width, ReadOnlyDoubleProperty height, LineageData data) {
+	public Window3DController(ReadOnlyDoubleProperty width, ReadOnlyDoubleProperty height, LineageData data) {
 		root = new Group();
 		this.data = data;
 
@@ -275,7 +271,6 @@ public class Window3DSubScene{
 		uniformSize = false;
 		
 		rulesList = FXCollections.observableArrayList();
-		shapeRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
@@ -286,7 +281,6 @@ public class Window3DSubScene{
 		
 		currentNotes = new ArrayList<Note>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
-		//billboardSphereMap = new HashMap<Node, Sphere>();
 	}
 	
 
@@ -522,6 +516,8 @@ public class Window3DSubScene{
 				}
 			}
 			
+			storiesList.makeAllStoriesInactive();
+			
 			currentNotes = storiesList.getNotesAtTime(time);
 			for (Note note : storiesList.getNotesWithCell()) {
 				for (String name : cellNames) {
@@ -531,6 +527,14 @@ public class Window3DSubScene{
 					}
 				}
 			}
+			
+			// make story active if 1 or more of its notes are visible
+			for (Note note : currentNotes) {
+				if (!note.getParent().isActive())
+					note.getParent().setActive(true);
+			}
+			
+			// TODO update stories layer
 		}
 //---------------------------------------------------------------
 		
@@ -728,7 +732,7 @@ public class Window3DSubScene{
 	
 	
 	private void addMeshesToList(ArrayList<Shape3D> list) {
-		// consult ShapeRule(s)
+		// consult StructureRule(s)
 		// process only if meshes at this time point
 		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
@@ -771,24 +775,25 @@ public class Window3DSubScene{
 						
 						//iterate over rulesList
 						for (Rule rule: rulesList) {
-							if (rule instanceof ShapeRule) {
+							
+							if (rule instanceof MulticellularStructureRule) {
 								//check equivalence of shape rule to scene name
-								if (((ShapeRule)rule).appliesTo(sceneName)) {
-									colors.add(Color.web(((ShapeRule)rule).getColor().toString()));
+								if (((MulticellularStructureRule)rule).appliesTo(sceneName)) {
+									colors.add(Color.web(rule.getColor().toString()));
 								}
-								
 							}
+							
 							else if(rule instanceof ColorRule) {
 								//iterate over cells and check if cells apply
 								for (String name: allNames) {
 									if(((ColorRule)rule).appliesToBody(name)) {
-										colors.add(((ColorRule)rule).getColor());
+										colors.add(rule.getColor());
 									}
 								}	
 							}
 						}
 						
-						// if ShapeRule(s) applied
+						// if any rules applied
 						if (!colors.isEmpty())
 							mesh.setMaterial(colorHash.getMaterial(colors));
 						else
@@ -972,7 +977,7 @@ public class Window3DSubScene{
 
 	
 	// sets everything associated with color rules
-	public void setColorRulesList(ObservableList<Rule> list) {
+	public void setRulesList(ObservableList<Rule> list) {
 		if (list == null)
 			return;
 		
@@ -985,15 +990,18 @@ public class Window3DSubScene{
 					for (Rule rule : change.getAddedSubList()) {
 						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
-							public void changed(
-									ObservableValue<? extends Boolean> observable,
+							public void changed(ObservableValue<? extends Boolean> observable,
 									Boolean oldValue, Boolean newValue) {
 								if (newValue)
 									buildScene(time.get());
 							}
 						});
+						buildScene(time.get());
 					}
-					buildScene(time.get());
+					
+					for (Rule rule : change.getRemoved()) {
+						buildScene(time.get());
+					}
 				}
 			}
 		});
@@ -1015,35 +1023,6 @@ public class Window3DSubScene{
 		if (pane!=null)
 			parentAnchorPane = pane;
 	}
-	
-	
-	// Sets anything associated with shape rules
-	public void setShapeRulesList(ObservableList<ShapeRule> list) {
-		if (list == null)
-			return;
-		
-		shapeRulesList = list;
-		shapeRulesList.addListener(new ListChangeListener<ShapeRule>() {
-			@Override
-			public void onChanged(
-					ListChangeListener.Change<? extends ShapeRule> change) {
-				while (change.next()) {
-					for (ShapeRule rule : change.getAddedSubList()) {
-						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(
-									ObservableValue<? extends Boolean> observable,
-									Boolean oldValue, Boolean newValue) {
-								if (newValue)
-									buildScene(time.get());
-							}
-						});
-					}
-					buildScene(time.get());
-				}
-			}
-		});
-	}
 
 	
 	public ArrayList<ColorRule> getColorRulesList() {
@@ -1055,35 +1034,16 @@ public class Window3DSubScene{
 		}
 		return list;
 	}
-	
-	
-	public ArrayList<ShapeRule> getShapeRulesList() {
-		ArrayList<ShapeRule> list = new ArrayList<ShapeRule>();
-		for (ShapeRule rule : shapeRulesList)
-			list.add(rule);
-		return list;
-	}
 
 	
 	public ObservableList<Rule> getObservableColorRulesList() {
 		return rulesList;
-	}
-	
-	
-	public ObservableList<ShapeRule> getObservableShapeRulesList() {
-		return shapeRulesList;
 	}
 
 	
 	public void setColorRulesList(ArrayList<ColorRule> list) {
 		rulesList.clear();
 		rulesList.setAll(list);
-	}
-	
-	
-	public void setShapeRulesList(ArrayList<ShapeRule> list) {
-		shapeRulesList.clear();
-		shapeRulesList.setAll(list);
 	}
 
 	
@@ -1455,6 +1415,6 @@ public class Window3DSubScene{
     private static final double SIZE_SCALE = .9;
     private static final double UNIFORM_RADIUS = 4;
     
-    private static final String NOTE_SPRITE = ".sprite";
+    private static final String NOTE_SPRITE = "sprite";
 
 }

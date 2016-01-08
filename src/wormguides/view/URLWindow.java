@@ -20,11 +20,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import wormguides.ImageLoader;
 import wormguides.URLGenerator;
+import wormguides.Window3DController;
 import wormguides.model.ColorRule;
 
 public class URLWindow extends AnchorPane {
 	
-	Window3DSubScene scene;
+	Window3DController scene;
 	
 	private Label iOSLabel;
 	private Label androidLabel;
@@ -176,7 +177,7 @@ public class URLWindow extends AnchorPane {
 	}
 	
 	
-	public void setScene(Window3DSubScene window3D) {
+	public void setScene(Window3DController window3D) {
 		this.scene = window3D;
 	}
 	

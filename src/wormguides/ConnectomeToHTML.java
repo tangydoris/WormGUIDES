@@ -3,16 +3,20 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import wormguides.HTMLGenerator.HTMLTags;
 import wormguides.model.Connectome;
 import wormguides.model.NeuronalSynapse;
 
-public class ConnectomeToHTML extends HTMLGenerator {
+public class ConnectomeToHTML {
+	
 	private Connectome connectome;
+	
 	
 	public ConnectomeToHTML(Connectome connectome) {
 		super();
 		this.connectome = connectome;
 	}
+	
 	
 	public String buildConnectomeAsHTML() {
 		if (connectome != null) {
@@ -46,14 +50,20 @@ public class ConnectomeToHTML extends HTMLGenerator {
 				
 			String htmlTables = "";
 			for (String table : wiringPartnersAsHTMLTables) {
-				htmlTables += (table + breakLine + breakLine);
+				htmlTables += (table + HTMLTags.breakLine + HTMLTags.breakLine);
 			}
+<<<<<<< HEAD
 			
 			return generateCompleteHTML(htmlTables);
+=======
+
+			return HTMLGenerator.generateCompleteHTML(htmlTables);
+>>>>>>> upstream/master
 		}
 		
 		return "";
 	}
+	
 	
 	/*
 	 * Method that generates a legible summary of the wiring partners given a query cell in the connectome
@@ -127,27 +137,26 @@ public class ConnectomeToHTML extends HTMLGenerator {
 		}
 		
 		//format wiring partners as HTML --> only format if > 0 partners
-		String queryCellTableHeaderRow = openTableRowHTML + openTableHeader2SpanHTML + 
+		String queryCellTableHeaderRow = HTMLTags.openTableRowHTML + HTMLTags.openTableHeader2SpanHTML + 
 				cellTitle + queryCell +
-				closeTableHeaderHTML + closeTableRowHTML;
+				HTMLTags.closeTableHeaderHTML + HTMLTags.closeTableRowHTML;
 		
 		String presynapticPartnersTableRow;
 		Collections.sort(presynapticPartners); //alphabetize
 		if (presynapticPartners.size() > 0) {
-			presynapticPartnersTableRow = openTableRowHTML + openTableDataHTML +
-					presynapticPartnersTitle + closeTableDataHTML + openTableDataHTML +
-					presynapticPartners.toString() + closeTableDataHTML + closeTableRowHTML;
+			presynapticPartnersTableRow = HTMLTags.openTableRowHTML + HTMLTags.openTableDataHTML +
+					presynapticPartnersTitle + HTMLTags.closeTableDataHTML + HTMLTags.openTableDataHTML +
+					presynapticPartners.toString() + HTMLTags.closeTableDataHTML + HTMLTags.closeTableRowHTML;
 		} else {
 			presynapticPartnersTableRow = "";
 		}
 		
-		
 		String postsynapticPartnersTableRow;
 		Collections.sort(postsynapticPartners); //alphabetize
 		if (postsynapticPartners.size() > 0) {
-			postsynapticPartnersTableRow = openTableRowHTML + openTableDataHTML + 
-					postsynapticPartnersTitle + closeTableDataHTML + openTableDataHTML +
-					postsynapticPartners.toString() + closeTableDataHTML + closeTableRowHTML;
+			postsynapticPartnersTableRow = HTMLTags.openTableRowHTML + HTMLTags.openTableDataHTML + 
+					postsynapticPartnersTitle + HTMLTags.closeTableDataHTML + HTMLTags.openTableDataHTML +
+					postsynapticPartners.toString() + HTMLTags.closeTableDataHTML + HTMLTags.closeTableRowHTML;
 		} else {
 			postsynapticPartnersTableRow = "";
 		}
@@ -155,9 +164,9 @@ public class ConnectomeToHTML extends HTMLGenerator {
 		String electricalPartnersTableRow;
 		Collections.sort(electricalPartners); //alphabetize
 		if (electricalPartners.size() > 0) {
-			electricalPartnersTableRow = openTableRowHTML + openTableDataHTML +
-					electricalPartnersTitle + closeTableDataHTML + openTableDataHTML +
-					electricalPartners.toString() + closeTableDataHTML + closeTableRowHTML;
+			electricalPartnersTableRow = HTMLTags.openTableRowHTML + HTMLTags.openTableDataHTML +
+					electricalPartnersTitle + HTMLTags.closeTableDataHTML + HTMLTags.openTableDataHTML +
+					electricalPartners.toString() + HTMLTags.closeTableDataHTML + HTMLTags.closeTableRowHTML;
 		} else {
 			electricalPartnersTableRow = "";
 		}
@@ -165,39 +174,41 @@ public class ConnectomeToHTML extends HTMLGenerator {
 		String neuromuscularPartnersTableRow;
 		Collections.sort(neuromuscularPartners); //alphabetize
 		if (neuromuscularPartners.size() > 0) {
-			neuromuscularPartnersTableRow = openTableRowHTML + openTableDataHTML +
-					neuromusclarPartnersTitle + closeTableDataHTML + openTableDataHTML +
-					neuromuscularPartners.toString() + closeTableDataHTML + closeTableRowHTML;
+			neuromuscularPartnersTableRow = HTMLTags.openTableRowHTML + HTMLTags.openTableDataHTML +
+					neuromusclarPartnersTitle + HTMLTags.closeTableDataHTML + HTMLTags.openTableDataHTML +
+					neuromuscularPartners.toString() + HTMLTags.closeTableDataHTML + HTMLTags.closeTableRowHTML;
 		} else {
 			neuromuscularPartnersTableRow = "";
 		}
  		
-		String table = openTableTagHTML + queryCellTableHeaderRow + presynapticPartnersTableRow
+		String table = HTMLTags.openTableTagHTML + queryCellTableHeaderRow + presynapticPartnersTableRow
 				+ postsynapticPartnersTableRow + electricalPartnersTableRow  
-				+ neuromuscularPartnersTableRow + closeTableTagHTML;
+				+ neuromuscularPartnersTableRow + HTMLTags.closeTableTagHTML;
 		
 		//check if need to generate a full html page
 		if (generateFullHTML) {
-			return generateCompleteHTML(table);
+			return HTMLGenerator.generateCompleteHTML(table);
 		} else {
 			return table;
 		}
 	}
 		
+	
 	private String formatNumberOfSynapses(String numberOfSynapses) {
 		return "(" + numberOfSynapses + ")";
 	}
 	
+	
 	private final static String cellTitle = "Cell: ";
 	
-	private final static String s_presynapticDescription = "S presynaptic";
-	private final static String r_postsynapticDescription = "R postsynaptic";
-	private final static String ej_electricalDescription = "EJ electrical";
-	private final static String nmj_neuromuscularDescrpition = "Nmj neuromuscular";
+	private final String s_presynapticDescription = "S presynaptic";
+	private final String r_postsynapticDescription = "R postsynaptic";
+	private final String ej_electricalDescription = "EJ electrical";
+	private final String nmj_neuromuscularDescrpition = "Nmj neuromuscular";
 	
-	private final static String presynapticPartnersTitle = "Presynaptic: ";
-	private final static String postsynapticPartnersTitle = "Postsynaptic: ";
-	private final static String electricalPartnersTitle = "Electrical: ";
-	private final static String neuromusclarPartnersTitle = "Neuromusclar: ";
+	private final String presynapticPartnersTitle = "Presynaptic: ";
+	private final String postsynapticPartnersTitle = "Postsynaptic: ";
+	private final String electricalPartnersTitle = "Electrical: ";
+	private final String neuromusclarPartnersTitle = "Neuromusclar: ";
 	
 }

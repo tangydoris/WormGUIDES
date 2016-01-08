@@ -9,16 +9,15 @@ import java.io.Writer;
 /*
  * This class constructs HTML formatted tables for connectome, parts list, and cell shapes
  */
-public class HTMLGenerator {
 
-	public HTMLGenerator() {
-		
-	}
+public class HTMLGenerator {
 	
-	public String generateCompleteHTML(String body) {
+	
+	public static String generateCompleteHTML(String body) {
 		return htmlStart + body + htmlEnd;
 	}
 	
+<<<<<<< HEAD
 	public boolean isCompleteHTML(String html) {
 		return html.contains(htmlStart) && html.contains(htmlEnd);
 	}
@@ -30,6 +29,11 @@ public class HTMLGenerator {
 		if (!isCompleteHTML(body)) {
 			HTMLAsString = htmlStart + body + htmlEnd;
 		}
+=======
+	
+	public static File generateHTMLFile(String fileName, String body) {
+		String HTMLAsString = htmlStart + body + htmlEnd;
+>>>>>>> upstream/master
 		
 		
 		File html = null;
@@ -61,8 +65,10 @@ public class HTMLGenerator {
 		return html;
 	}
 	
+	
 	//static vars
 	public final static String newLine = "\n";
+	
 	
 	//html page structuring
 	private final static String htmlStart = "<!DOCTYPE html>" + 
@@ -81,10 +87,13 @@ public class HTMLGenerator {
 												newLine + "</style>" +
 												newLine + "</head>" +
 												newLine + "<body>" + newLine;
+	
 	private final static String htmlEnd = newLine + "</body>" +
 											  newLine + "</html>";
-
+	
+	
 	//html table tags
+<<<<<<< HEAD
 	public final static String openTableTagHTML = newLine + "<table>";
 	public final static String closeTableTagHTML = newLine + "</table>";
 	public final static String openTableRowHTML = newLine + "<tr>";
@@ -97,4 +106,19 @@ public class HTMLGenerator {
 	
 	public final static String breakLine = "<br>";
 	private final static String htmlExt = ".html";
+=======
+	public class HTMLTags {
+		public final static String openTableTagHTML = newLine + "<table>";
+		public final static String closeTableTagHTML = newLine + "</table>";
+		public final static String openTableRowHTML = newLine + "<tr>";
+		public final static String closeTableRowHTML = newLine + "</tr>";
+		public final static String openTableHeader2SpanHTML = newLine + "<th colspan=\"2\">";
+		public final static String openTableHeaderHTML = newLine + "<th>";
+		public final static String closeTableHeaderHTML = "</th>";
+		public final static String openTableDataHTML = newLine + "<td>";
+		public final static String closeTableDataHTML = "</td>";
+		public final static String breakLine = "<br>";
+	}
+	
+>>>>>>> upstream/master
 }

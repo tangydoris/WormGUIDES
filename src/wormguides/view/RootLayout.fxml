@@ -53,11 +53,11 @@
 			            <content>
 			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
                            <children>
-                              <ScrollPane layoutX="1.0" layoutY="1.0" prefViewportHeight="723.0" prefViewportWidth="288.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="1.0" layoutY="1.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="1.0">
                                  <content>
                                     <AnchorPane>
                                        <children>
-                                          <VBox maxWidth="280.0" prefHeight="499.0" prefWidth="280.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <VBox maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="15.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -73,13 +73,13 @@
                                                       </TextField>
                                                    </children>
                                                 </HBox>
-                                                <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <HBox fillHeight="false" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                                       <Label text="(cell/structure name, keyword, phrase)" />
                                                    </children>
                                                 </HBox>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                 <HBox VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
@@ -233,10 +233,10 @@
                                                       </HBox>
                                                    </children>
                                                 </HBox>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                 <ListView fx:id="searchResultsListView" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="210.0" />
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
+                                                <HBox VBox.vgrow="NEVER">
                                                    <children>
                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Add to Display:">
                                                          <font>
@@ -277,22 +277,18 @@
                                                       </HBox>
                                                    </children>
                                                 </HBox>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
+                                                <HBox maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                                                    <children>
-                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="60.0" prefWidth="247.0" HBox.hgrow="ALWAYS" />
+                                                      <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="70.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
-                                                   <children>
-                                                      <Label text="Propagate Colors to:">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </HBox>
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
+                                                <Label maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="22.0" text="Propagate Colors to:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Label>
                                                 <HBox prefHeight="22.0" VBox.vgrow="NEVER">
                                                    <children>
                                                       <HBox prefWidth="190.0">
@@ -325,8 +321,8 @@
                                                       </HBox>
                                                    </children>
                                                 </HBox>
-                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" />
-                                                <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                                                <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
+                                                <HBox maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                                                    <children>
                                                       <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                                       <Button fx:id="addSearchBtn" focusTraversable="false" graphicTextGap="5.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Add" textAlignment="CENTER">
@@ -388,6 +384,12 @@
                                           <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
+                                    <HBox>
+                                       <children>
+                                          <Text fontSmoothingType="LCD" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="(If no structures are selected below, a new rule is added for all search results)" wrappingWidth="280.0" />
+                                       </children>
+                                    </HBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                     <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
                                        <font>
                                           <Font size="14.0" />
@@ -464,7 +466,7 @@
                                     <HBox>
                                        <children>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <Button maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor">
+                                          <Button fx:id="noteEditorBtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

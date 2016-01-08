@@ -53,10 +53,11 @@ public class MainApp extends Application {
 		try {
             // Load root layout from FXML file.
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
-            this.rootLayout = (BorderPane) loader.load();
+            loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
+            rootLayout = (BorderPane) loader.load();
             
-            this.scene = new Scene(rootLayout);
+            scene = new Scene(rootLayout);
+            //scene.getStylesheets().add("MainApp.css");
             primaryStage.setScene(scene);
             primaryStage.setResizable(true);
             

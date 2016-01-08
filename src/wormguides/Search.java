@@ -27,7 +27,6 @@ import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.ShapeRule;
 
 public class Search {
 
@@ -47,7 +46,6 @@ public class Search {
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	private static ObservableList<Rule> rulesList;
-	private static ObservableList<ShapeRule> shapeRulesList;
 	private static Color selectedColor;
 	
 	private final static Service<Void> resultsUpdateService;
@@ -206,13 +204,8 @@ public class Search {
 	}
 	
 	
-	public void setColorRulesList(ObservableList<Rule> observableList) {
-		rulesList = observableList;
-	}
-	
-	
-	public void setShapeRulesList(ObservableList<ShapeRule> observableList) {
-		shapeRulesList = observableList;
+	public void setRulesList(ObservableList<Rule> list) {
+		rulesList = list;
 	}
 	
 	
@@ -238,14 +231,6 @@ public class Search {
 	
 	
 	public void addDefaultColorRules() {
-		/*
-		addColorRule("ABa", Color.RED, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("ABp", Color.BLUE, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("EMS", Color.GREEN, SearchOption.CELL, SearchOption.DESCENDANT);
-		addColorRule("P2", Color.YELLOW, SearchOption.ANCESTOR, SearchOption.CELL, 
-														SearchOption.DESCENDANT);
-		*/
-		
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb31a1a"), SearchOption.CELL, SearchOption.CELLBODY);
@@ -256,31 +241,7 @@ public class Search {
 	}
 	
 	
-	public static void addShapeRule(String name, Color color) {
-		addShapeRule(name, color, SearchOption.CELLBODY);
-	}
-	
-	
-	public static void addShapeRule(String name, Color color, SearchOption...options) {
-		if (name == null)
-			return;
-		
-		name = name.trim();
-		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
-		for (SearchOption option : options)
-			optionsArray.add(option);
-		
-		ShapeRule rule = new ShapeRule(name, color, optionsArray);
-		rulesList.add(rule);
-	}
-	
-	
-	public void clearShapeRules() {
-		shapeRulesList.clear();
-	}
-	
-	
-	public void clearColorRules() {
+	public void clearRules() {
 		rulesList.clear();
 	}
 	
@@ -409,6 +370,8 @@ public class Search {
 						
 			case DESCRIPTION:
 							// TODO some cells with the searched term are not showing up in results list
+							// this is because some cells have the same description and it 
+							// gives the first one found
 							//System.out.println("\nShowing found description names:");
 							for (int i=0; i<descriptions.size(); i++) {
 								String textLowerCase = descriptions.get(i).toLowerCase();
@@ -462,20 +425,37 @@ public class Search {
 	
 	// Tests if name contains all parts of a search string
 	// returns true if it does, false otherwise
+	// TODO extend functionality to search comments
 	private static boolean isNameSearched(String name, String searched) {
 		if (name==null || searched==null)
 			return false;
 		
-		boolean isSearched = true;
-		name = name.trim().toLowerCase();
-		String[] searchedTokens = searched.trim().toLowerCase().split(" ");
-		for (String keyword : searchedTokens) {
-			if (!name.contains(keyword)) {
-				isSearched = false;
+		// search in structure scene names
+		String nameLower = name.toLowerCase();
+		
+		boolean appliesToName = true;
+		boolean appliesToComment = true;
+		
+		String[] terms = searched.trim().toLowerCase().split(" ");
+		
+		for (String term : terms) {
+			if (!nameLower.contains(term)) {
+				appliesToName = false;
 				break;
 			}
 		}
-		return isSearched;
+		
+		// search in comments if name does not already apply
+		String comment = sceneElementsList.nameCommentsMap.get(nameLower);
+		String commentLower = comment.toLowerCase();
+		for (String term : terms) {
+			if (!commentLower.contains(term)) {
+				appliesToComment = false;
+				break;
+			}
+		}
+		
+		return appliesToName || appliesToComment;
 	}
 	
 	
@@ -557,10 +537,10 @@ public class Search {
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
 				
-				
 				addColorRule(getSearchedText(), selectedColor, options);
 				
 				searchResultsList.clear();
+				
 				if (clearSearchFieldProperty != null)
 					clearSearchFieldProperty.set(true);
 			}
@@ -568,7 +548,6 @@ public class Search {
 	}
 	
 	
-	/*
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -589,7 +568,6 @@ public class Search {
 			}
 		};
 	}
-	*/
 	
 	
 	public ChangeListener<Boolean> getAncestorTickListner() {

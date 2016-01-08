@@ -17,9 +17,7 @@ public class DisplayLayer {
 	private ObservableList<Rule> rulesList;
 	private HashMap<Rule, Button> buttonMap;
 	
-	public DisplayLayer(ListView<Rule> listView) {
-		if (listView==null)
-			listView = new ListView<Rule>();
+	public DisplayLayer() {
 		
 		buttonMap = new HashMap<Rule, Button>();
 		
@@ -32,14 +30,13 @@ public class DisplayLayer {
 					if (!change.wasUpdated()) {
 						// added to list
 						for (Rule rule : change.getAddedSubList()) {
-							Rule ruleToRemove = rule;
-							buttonMap.put(ruleToRemove, rule.getDeleteButton());
+							buttonMap.put(rule, rule.getDeleteButton());
 							
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(ActionEvent event) {
-									rulesList.remove(ruleToRemove);
-									buttonMap.remove(ruleToRemove);
+									rulesList.remove(rule);
+									buttonMap.remove(rule);
 								}
 							});
 						}
@@ -48,7 +45,6 @@ public class DisplayLayer {
 			}
 		});
 			
-		listView.setItems(rulesList);
 	}
 	
 	public ObservableList<Rule> getRulesList() {
@@ -71,6 +67,7 @@ public class DisplayLayer {
 	                    	setGraphic(item.getGraphic());
 	                	else
 	                		setGraphic(null);
+	                    setPickOnBounds(false);
 	            	}
 	        	};
 	        	return cell;

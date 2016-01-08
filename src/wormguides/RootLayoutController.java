@@ -48,7 +48,6 @@ import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
-import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.model.StoriesList;
 import wormguides.model.Story;
@@ -60,14 +59,8 @@ import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-import wormguides.view.Window3DSubScene;
-
-
 //FOR CONNECTOME WINDOW
 import javafx.scene.web.WebView;
-//import java.io.BufferedWriter;
-//import java.io.File;
-//import java.io.FileWriter;
 import javafx.scene.Group;
 
 public class RootLayoutController implements Initializable{
@@ -87,7 +80,7 @@ public class RootLayoutController implements Initializable{
 	private URLLoadWarningDialog warning;
 	
 	// 3D subscene stuff
-	private Window3DSubScene window3D;
+	private Window3DController window3D;
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
@@ -130,7 +123,7 @@ public class RootLayoutController implements Initializable{
 	private StringProperty selectedName;
 	
 	// layers tab
-	private DisplayLayer rulesLayer;
+	private DisplayLayer displayLayer;
 	private DisplayLayer shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
@@ -151,12 +144,13 @@ public class RootLayoutController implements Initializable{
 	@FXML private Text cellDescription;
 	
 	//scene elements stuff
-	SceneElementsList elementsList;
+	private SceneElementsList elementsList;
 	
 	// story stuff
-	StoriesList storiesList;
-	StoriesLayer storiesLayer;
+	private StoriesList storiesList;
+	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
+	@FXML private Button noteEditorBtn;
 	
 	// url stuff
 	private URLLoader urlLoader;
@@ -171,14 +165,14 @@ public class RootLayoutController implements Initializable{
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
 	
-	@FXML
-	public void menuCloseAction() {
+	
+	// ----- Begin menu items and buttons listeners -----
+	@FXML public void menuCloseAction() {
 		System.out.println("exiting...");
 		System.exit(0);
 	}
 	
-	@FXML
-	public void menuAboutAction() {
+	@FXML public void menuAboutAction() {
 		if (aboutStage==null) {
 			aboutStage = new Stage();
 			aboutStage.setScene(new Scene(new AboutPane()));
@@ -192,8 +186,7 @@ public class RootLayoutController implements Initializable{
 		aboutStage.show();
 	}
 	
-	@FXML
-	public void viewTreeAction() {
+	@FXML public void viewTreeAction() {
 		if (treeStage==null) {
 			treeStage = new Stage();
 			treeStage.setScene(new Scene(new TreePane(lineageTreeRoot)));
@@ -203,8 +196,7 @@ public class RootLayoutController implements Initializable{
 		treeStage.show();
 	}
 	
-	@FXML
-	public void generateURLAction() {
+	@FXML public void generateURLAction() {
 		if (urlStage==null) {
 			urlStage = new Stage();
 			
@@ -227,8 +219,7 @@ public class RootLayoutController implements Initializable{
 		urlStage.show();
 	}
 	
-	@FXML
-	public void loadURLAction() {
+	@FXML public void loadURLAction() {
 		if (urlLoadStage==null) {
 			urlLoadStage = new Stage();
 			
@@ -273,6 +264,7 @@ public class RootLayoutController implements Initializable{
 		urlLoadStage.show();
 	}
 	
+<<<<<<< HEAD
 	@FXML
 	public void openInfoWindow() {
 		System.out.println("OPENING INFO WINDOW");
@@ -295,6 +287,9 @@ public class RootLayoutController implements Initializable{
 	
 	@FXML
 	public void viewCellShapesIndex() {
+=======
+	@FXML public void viewCellShapesIndex() {
+>>>>>>> upstream/master
 		if (elementsList == null) return;
 		
 		if (cellShapesIndexStage == null) {
@@ -318,8 +313,7 @@ public class RootLayoutController implements Initializable{
 		cellShapesIndexStage.show();
 	}
 	
-	@FXML
-	public void viewPartsList() {
+	@FXML public void viewPartsList() {
 		if (partsListStage == null) {
 			partsListStage = new Stage();
 			partsListStage.setTitle("Parts List");	
@@ -339,8 +333,7 @@ public class RootLayoutController implements Initializable{
 		partsListStage.show();
 	}
 	
-	@FXML
-	public void viewConnectome() {
+	@FXML public void viewConnectome() {
 		if (connectomeStage == null) {
 			connectomeStage = new Stage();
 			connectomeStage.setTitle("Connectome");
@@ -359,9 +352,11 @@ public class RootLayoutController implements Initializable{
 		}
 		connectomeStage.show();
 	}
+	// ----- End menu items and buttons listeners -----
+	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DSubScene(modelAnchorPane.widthProperty(), 
+		window3D = new Window3DController(modelAnchorPane.widthProperty(), 
 										modelAnchorPane.heightProperty(), data);
 		subscene = window3D.getSubScene();
 		modelAnchorPane.getChildren().add(subscene);
@@ -449,6 +444,15 @@ public class RootLayoutController implements Initializable{
             }
 		});
 		
+		// TODO use this?
+		allStructuresListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+		});
+		
+		/*
 		allStructuresListView.getSelectionModel().selectedItemProperty()
 							.addListener(new ChangeListener<String>() {
 			@Override
@@ -457,10 +461,12 @@ public class RootLayoutController implements Initializable{
 				selectedName.set(newValue);
 			}
 		});
+		*/
 		
 		// Modify font for ListView's of String's
 		structuresSearchListView.setCellFactory(new StringCellCallback());
-		allStructuresListView.setCellFactory(new StringCellCallback());
+		//allStructuresListView.setCellFactory(new StringCellCallback());
+		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
 		
@@ -639,8 +645,8 @@ public class RootLayoutController implements Initializable{
 		electricalTick.selectedProperty().addListener(search.getElectricalTickListener());
 		neuromuscularTick.selectedProperty().addListener(search.getNeuromuscularTickListener());
 		
-		//cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
-		//cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
+		cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
 		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
 		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
@@ -662,10 +668,12 @@ public class RootLayoutController implements Initializable{
 		searchField.textProperty().addListener(search.getTextFieldListener());
 	}
 	
-	private void initDisplayLayer() {		
-		// color rules layers
-		rulesLayer = new DisplayLayer(rulesListView);
-		rulesListView.setCellFactory(rulesLayer.getRuleCellFactory());
+	
+	private void initDisplayLayer() {
+		displayLayer = new DisplayLayer();
+		
+		rulesListView.setItems(displayLayer.getRulesList());
+		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
 	}
 	
 	
@@ -768,13 +776,14 @@ public class RootLayoutController implements Initializable{
 		assert (allStructuresListView != null);
 		
 		assert (storiesListView != null);
+		assert (noteEditorBtn != null);
 	}
 	
 	private void initStructuresLayer() {
 		structuresLayer = new StructuresLayer(elementsList);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
-		structuresLayer.setRulesList(rulesLayer.getRulesList());
+		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
 		// TODO: Add rules for all structures search results if one structure
 		// is not specifically selected in the list of ALL structures
@@ -784,6 +793,15 @@ public class RootLayoutController implements Initializable{
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
+		
+		structuresLayer.addSelectedNameListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+								String oldValue, String newValue) {
+				if (newValue!=null && !newValue.isEmpty())
+					selectedName.set(newValue);
+			}
+		});
 	}
 	
 	
@@ -802,6 +820,8 @@ public class RootLayoutController implements Initializable{
 		storiesListView.setItems(storiesLayer.getStories());
 		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
 		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+		
+		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 	}
 	
 	
@@ -840,7 +860,6 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public void initializeWithLineageData(LineageData data) {
 		init3DWindow(data);
 		setPropertiesFrom3DWindow();
@@ -850,10 +869,9 @@ public class RootLayoutController implements Initializable{
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
 		
-		// unchecked casts
-		ObservableList<Rule> colorTempList = (ObservableList<Rule>)((ObservableList<? extends Rule>)rulesLayer.getRulesList());
-		search.setColorRulesList(colorTempList);
-		window3D.setColorRulesList(colorTempList);
+		ObservableList<Rule> list = displayLayer.getRulesList();
+		search.setRulesList(list);
+		window3D.setRulesList(list);
 		
 		initSceneElementsList();
 		
