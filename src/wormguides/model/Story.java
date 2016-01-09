@@ -20,7 +20,7 @@ public class Story {
 	public Story(String name, String description) {
 		this.name = name;
 		this.description = description;
-		activeBooleanProperty = new SimpleBooleanProperty();
+		activeBooleanProperty = new SimpleBooleanProperty(false);
 		notes = FXCollections.observableArrayList(new Callback<Note, Observable[]>() {
 			@Override
 			public Observable[] call(Note note) {
@@ -40,7 +40,7 @@ public class Story {
 	}
 	
 	
-	public BooleanProperty getIsActiveBooleanProperty() {
+	public BooleanProperty getActiveProperty() {
 		return activeBooleanProperty;
 	}
 	
@@ -62,23 +62,6 @@ public class Story {
 				list.add(note);
 		}
 		return list;
-	}
-	
-	
-	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		//System.out.println("getting scene elements for story "+name+" at time "+time);
-		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-		for (Note note : notes) {
-			if (note.hasSceneElements()) {
-				for (SceneElement element : note.getSceneElements()) {
-					if (element.existsAtTime(time) && !elements.contains(element)) {
-						//System.out.println("Got scene element from "+note.getTagName());
-						elements.add(element);
-					}
-				}
-			}
-		}
-		return elements;
 	}
 	
 	

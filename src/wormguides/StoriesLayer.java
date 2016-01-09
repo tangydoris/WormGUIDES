@@ -1,8 +1,10 @@
 package wormguides;
 
 import java.io.IOException;
+import java.util.HashMap;
 
-import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -14,13 +16,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -28,7 +33,6 @@ import javafx.util.Callback;
 import wormguides.model.Note;
 import wormguides.model.Story;
 import wormguides.view.AppFont;
-import wormguides.view.NoteGraphic;
 
 /*
  * Controller of the ListView in the 'Stories' tab
@@ -36,10 +40,16 @@ import wormguides.view.NoteGraphic;
 public class StoriesLayer {
 
 	private ObservableList<Story> stories;
+	
+	private HashMap<Story, StoryListCellGraphic> storyGraphicMap;
+	
+	private ObservableList<NoteListCellGraphic> noteGraphics;
+	
 	private double width;
 	
 	private Stage editStage;
-	private ObservableList<NoteGraphic> noteGraphics;
+	
+	private BooleanProperty rebuildSceneFlag;
 	
 	private NoteEditorController editController;
 	
@@ -50,14 +60,13 @@ public class StoriesLayer {
 		else
 			stories = FXCollections.observableArrayList();
 		
+		storyGraphicMap = new HashMap<Story, StoryListCellGraphic>();
+		
 		width = 0;
 		
-		noteGraphics = FXCollections.observableArrayList(new Callback<NoteGraphic, Observable[]>() {
-			@Override
-			public Observable[] call(NoteGraphic graphic) {
-				return new Observable[]{graphic.getSelectedBooleanProperty()};
-			}
-		});
+		noteGraphics = FXCollections.observableArrayList();
+		
+		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		
 		editController = new NoteEditorController();
 	}
@@ -68,23 +77,20 @@ public class StoriesLayer {
 	}
 	
 	
-	/*
-	 * Used for sizing the widths each story item in the list view
-	 */
+	// Used for sizing the widths each story item in the list view
 	public ChangeListener<Number> getListViewWidthListener() {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 								Number oldValue, Number newValue) {
-				width = observable.getValue().doubleValue()-20;
+				// subtract off list view border and/or padding
+				width = observable.getValue().doubleValue()-2;
 			}
 		};
 	}
 	
 	
-	/*
-	 * Listener for edit button under stories list view
-	 */
+	// Listener for edit button under stories list view
 	public EventHandler<ActionEvent> getEditButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -121,47 +127,30 @@ public class StoriesLayer {
 	}
 	
 	
-	/*
-	 * make vbox graphic to show a story
-	 */
-	private StoryListCellGraphic makeStoryGraphic(Story story, double width) {
-		return new StoryListCellGraphic(story, width);
+	// Un-highlight all notes except for the input note
+	private void deselectAllNotesExcept(NoteListCellGraphic graphic) {
+		for (NoteListCellGraphic g : noteGraphics)
+			g.setSelected(false);
+		
+		graphic.setSelected(true);
 	}
 	
 	
-	/*
-	 * Un-highlight all notes except for the input note
-	 */
-	private void deselectAllExcept(NoteGraphic graphic) {
-		for (NoteGraphic g : noteGraphics)
-			g.deselect();
-		graphic.select();
+	public BooleanProperty getRebuildSceneFlag() {
+		return rebuildSceneFlag;
 	}
 	
 	
-	/*
-	 * Un-highlights all note graphics
-	 */
-	private void deselectAllNoteGraphics() {
-		for (NoteGraphic graphic : noteGraphics) {
-			graphic.deselect();
-		}
+	// Make all stories inactive except for the input story
+	private void disableAllStoriesExcept(Story story) {
+		for (Story s : stories)
+			s.setActive(false);
+		
+		story.setActive(true);
 	}
 	
 	
-	/*
-	 * Grey out (disable) child nodes of input parent box
-	 */
-	private void disableContents(VBox box, boolean disable) {
-		//System.out.println("disable is "+disable);
-		for (Node node : box.getChildren())
-			node.setDisable(disable);
-	}
-	
-	
-	/*
-	 * Renderer for story item
-	 */
+	// Renderer for story item
 	public Callback<ListView<Story>, ListCell<Story>> getStoryCellFactory() {
 		return new Callback<ListView<Story>, ListCell<Story>>() {
 			@Override
@@ -172,52 +161,42 @@ public class StoriesLayer {
 	                    super.updateItem(story, empty);
 	                    
 	                    if (story!=null && !empty)  {
+	                    	
 	                    	// Create story graphic
-	                    	StoryListCellGraphic box = makeStoryGraphic(story, width);
+	                    	StoryListCellGraphic storyGraphic = new StoryListCellGraphic(story, width);
+	                    	storyGraphicMap.put(story, storyGraphic);
 	                    	
 	                    	// Add list view for notes inside story graphic
 	                    	for (Note note : story.getNotesObservable()) {
-	                    		NoteGraphic graphic = note.getGraphic(width);
-	                    		box.getChildren().add(graphic);
+	                    		NoteListCellGraphic noteGraphic = new NoteListCellGraphic(note);
+	                    		storyGraphic.getChildren().add(noteGraphic);
 	                    		
 	                    		// Add graphic to observable list for note selection
-	                    		// TODO fix text wrapping in note graphic
-	                    		noteGraphics.add(graphic);
-	                    		graphic.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	                    		noteGraphics.add(noteGraphic);
+	                    		noteGraphic.setOnMouseClicked(new EventHandler<MouseEvent>() {
 									@Override
 									public void handle(MouseEvent event) {
-										graphic.setExpanded(!graphic.isExpanded());
-										if (graphic.isSelected())
-											graphic.deselect();
-										else
-											deselectAllExcept(graphic);
+										if (!(event.getPickResult().getIntersectedNode()
+												==noteGraphic.getExpandIcon())) {
+											if (noteGraphic.isSelected())
+												noteGraphic.setSelected(false);
+											else
+												deselectAllNotesExcept(noteGraphic);
+										}
 									}
 	                    		});
 	                    	}
 	                    	
 	                    	Separator s = new Separator(Orientation.HORIZONTAL);
-	                    	box.getChildren().add(s);
+	                    	s.setStyle("-fx-focus-color: transparent; "
+	            						+ "-fx-faint-focus-color: transparent;");
+	                    	storyGraphic.getChildren().add(s);
 	                    	
-	                    	// TODO disable (grey out) story
-	                    	// Grey out story cell when
-	                    	story.getIsActiveBooleanProperty().addListener(new ChangeListener<Boolean>() {
-								@Override
-								public void changed(ObservableValue<? extends Boolean> observable, 
-													Boolean oldValue, Boolean newValue) {
-									// corrective activeness is being set here, just need to grey out children nodes
-									if (newValue) {
-										box.enable();
-									}
-									else {
-										box.disable();
-									}
-								}
-	                    	});
-	                    	
-	                    	setGraphic(box);
+	                    	setGraphic(storyGraphic);
 	                    }
 	                	else
 	                		setGraphic(null);
+	                    
 	                    setStyle("-fx-focus-color: transparent;"
 	                    		+ "-fx-background-color: transparent;");
 	                    setPadding(Insets.EMPTY);
@@ -229,43 +208,242 @@ public class StoriesLayer {
 	}
 	
 	
+	// Used by story and note list cell graphics
+	public void colorTexts(Color color, Text... texts) {
+		for (Text text : texts)
+			text.setStyle("-fx-fill:"+color.toString().toLowerCase().replace("0x", "#"));
+	}
+	
+	
+	// Graphical representation of a story
+	// story becomes active when the title/description is clicked
 	private class StoryListCellGraphic extends VBox {
 		
-		private Label title;
+		private Text title;
 		private Text description;
 		
+		
 		public StoryListCellGraphic(Story story, double width) {
-			super(0);
-			setPadding(new Insets(10));
+			super();
+			
+			setPadding(Insets.EMPTY);
+			
 			setPrefWidth(width);
-			setMaxWidth(width);
-			setMinWidth(width);
+			setMaxWidth(USE_PREF_SIZE);
+			setMinWidth(USE_PREF_SIZE);
 			
-			title = new Label(story.getName());
+			VBox container = new VBox(3);
+			title = new Text(story.getName());
 			title.setFont(AppFont.getBolderFont());
-			title.setWrapText(true);
-			title.setStyle("-fx-text-fill: black");
+			title.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			title.setFontSmoothingType(FontSmoothingType.LCD);
 			
+			container.getChildren().add(title);
+			container.setPickOnBounds(false);
+			container.setPadding(new Insets(5));
+
 			description = new Text(story.getDescription());
 			description.setFont(AppFont.getFont());
-			description.wrappingWidthProperty().bind(widthProperty());
+			description.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			description.setFontSmoothingType(FontSmoothingType.LCD);
 			
-			getChildren().addAll(title, description);
+			container.getChildren().add(description);
+			
+			getChildren().addAll(container);
+			
+			container.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					story.setActive(!story.isActive());
+					if (story.isActive())
+						disableAllStoriesExcept(story);
+					
+					rebuildSceneFlag.set(!rebuildSceneFlag.get());
+				}
+			});
+			
+			story.getActiveProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+									Boolean oldValue, Boolean newValue) {
+						if (observable.getValue())
+							makeDisabled(false);
+						else
+							makeDisabled(true);
+				}
+			});
+			
+			if (story.isActive())
+				makeDisabled(false);
+			else
+				makeDisabled(true);
 		}
 		
-		public void disable() {
-			title.setDisable(true);
-			title.setStyle("-fx-fill-color: grey");
-			description.setDisable(true);
-			description.setStyle("-fx-fill-color: grey");
+		
+		public void makeDisabled(boolean disabled) {
+			if (!disabled)
+				colorTexts(Color.BLACK, title, description);
+			else
+				colorTexts(Color.GREY, title, description);
+		}
+	}
+	
+	
+	// Graphical representation of a note
+	public class NoteListCellGraphic extends VBox{
+		
+		private Story story;
+		
+		private Text expandIcon;
+		private Text title;
+		
+		private HBox contentsContainer;
+		private Text contents;
+		
+		private boolean expanded;
+		private BooleanProperty selected;
+		
+		
+		// note is the note to which this graphic belongs to
+		public NoteListCellGraphic(Note note) {
+			super();
+			
+			story = note.getParent();
+			
+			setPadding(new Insets(3));
+			
+			// title heading graphics
+			HBox titleContainer = new HBox(0);
+			
+			expandIcon = new Text("▸");
+			expandIcon.setPickOnBounds(true);
+			expandIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					setExpanded(!isExpanded());
+				}
+			});
+			expandIcon.setFont(AppFont.getExpandIconFont());
+			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
+			expandIcon.toFront();
+			
+			Region r1 = new Region();
+			r1.setPrefWidth(5);
+			r1.setMinWidth(USE_PREF_SIZE);
+			r1.setMaxWidth(USE_PREF_SIZE);
+			
+			title = new Text(note.getTagName());
+			title.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			title.setFont(AppFont.getBoldFont());
+			title.setFontSmoothingType(FontSmoothingType.LCD);
+			
+			titleContainer.getChildren().addAll(expandIcon, r1, title);
+			
+			// contents graphics
+			contentsContainer = new HBox(0);
+			
+			Region r2 = new Region();
+			r2.setPrefWidth(15);
+			r2.setMinWidth(USE_PREF_SIZE);
+			r2.setMaxWidth(USE_PREF_SIZE);
+			
+			contents = new Text(note.getTagContents());
+			contents.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			contents.setFont(AppFont.getFont());
+			contents.setFontSmoothingType(FontSmoothingType.LCD);
+			contentsContainer.getChildren().addAll(r2, contents);
+			
+			getChildren().add(titleContainer);
+			
+			setPickOnBounds(false);
+			
+			expanded = false;
+			
+			selected = new SimpleBooleanProperty(true);
+			selected.addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+									Boolean oldValue, Boolean newValue) {
+					if (newValue)
+						highlightCell(true);
+					else
+						highlightCell(false);
+				}
+			});
+			selected.set(false);
+			
+			story.getActiveProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+									Boolean oldValue, Boolean newValue) {
+					if (!isSelected()) {
+						if (observable.getValue())
+							colorTexts(Color.BLACK, expandIcon, title, contents);
+						else
+							colorTexts(Color.GREY, expandIcon, title, contents);
+					}
+				}
+			});
 		}
 		
-		public void enable() {
-			title.setDisable(false);
-			title.setStyle("-fx-fill-color: black");
-			description.setDisable(false);
-			description.setStyle("-fx-fill-color: black");
+		
+		public Text getExpandIcon() {
+			return expandIcon;
 		}
+		
+		
+		private void highlightCell(boolean highlight) {
+			if (highlight) {
+				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
+						+ "-fx-background: -fx-accent;");
+				colorTexts(Color.WHITE, expandIcon, title, contents);
+			}
+			else {
+				setStyle("-fx-background-color: white;");
+				
+				if (story.isActive())
+					colorTexts(Color.BLACK, expandIcon, title, contents);
+				else
+					colorTexts(Color.GREY, expandIcon, title, contents);
+			}
+		}
+
+		
+		public void setSelected(boolean isSelected) {
+			selected.set(isSelected);
+		}
+		
+		
+		public BooleanProperty getSelectedBooleanProperty() {
+			return selected;
+		}
+		
+		
+		public boolean isSelected() {
+			return selected.get();
+		}
+		
+		
+		// When the graphic is 'expanded' we can view the note contents
+		// otherwise, we just see the note title
+		public boolean isExpanded() {
+			return expanded;
+		}
+		
+		
+		public void setExpanded(boolean expanded) {
+			this.expanded = expanded;
+			
+			if (expanded) {
+				getChildren().add(contentsContainer);
+				expandIcon.setText(expandIcon.getText().replace("▸", "▾"));
+			}
+			else {
+				getChildren().remove(contentsContainer);
+				expandIcon.setText(expandIcon.getText().replace("▾", "▸"));
+			}
+		}
+		
 	}
 	
 }

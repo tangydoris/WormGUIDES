@@ -751,14 +751,17 @@ public class RootLayoutController implements Initializable{
 	
 	
 	private void initStoriesLayer() {
-		if (storiesList!=null)
+		if (storiesList!=null) {
 			storiesLayer = new StoriesLayer(storiesList.getStories());
 		
-		storiesListView.setItems(storiesLayer.getStories());
-		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
-		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
-		
-		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+			storiesListView.setItems(storiesLayer.getStories());
+			storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+			storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+			
+			noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+			
+			storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
+		}
 	}
 	
 	

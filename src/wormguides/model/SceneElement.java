@@ -19,9 +19,8 @@ public class SceneElement {
 	private int endTime;
 	private String comments;
 	private boolean completeResourceFlag;
-	private boolean belongsToNote;
-	// x y z coordinates used when element belongs to a note
-	private int x, y, z;
+	
+	private int x, y, z; // coordinates used when element belongs to a note
 	
 
 	public SceneElement(String sceneName, ArrayList<String> cellNames,
@@ -38,7 +37,6 @@ public class SceneElement {
 		this.endTime = endTime;
 		this.comments = comments;
 		completeResourceFlag = isResourceComplete();
-		belongsToNote = false;
 		
 		// make sure there is proper capitalization in cell names
 		// specificially "Ab" instead of "AB"
@@ -71,17 +69,6 @@ public class SceneElement {
 		this.comments = comments;
 
 		completeResourceFlag = isResourceComplete();
-		belongsToNote = false;
-	}
-	
-	
-	public void setBelongsToNote(boolean belongsToNote) {
-		this.belongsToNote = belongsToNote;
-	}
-	
-	
-	public boolean belongsToNote() {
-		return belongsToNote;
 	}
 	
 	

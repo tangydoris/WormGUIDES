@@ -32,6 +32,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
+import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -39,6 +40,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
 import javafx.scene.layout.AnchorPane;
@@ -50,9 +52,8 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
-import javafx.scene.shape.StrokeLineJoin;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
@@ -81,7 +82,7 @@ public class Window3DController {
 	
 	// map of note sprites attached to cell, or cell and time
 	private HashMap<Node, Sphere> spriteSphereMap;
-
+	
 	// transformation stuff
 	private Group root;
 	private PerspectiveCamera camera;
@@ -142,7 +143,6 @@ public class Window3DController {
 	private SceneElementsList sceneElementsList;
 	private ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
-	//reference of successfully rendered scene elements for click responsiveness
 	private ArrayList<SceneElement> currentSceneElements;
 	
 	// Uniform nuclei size
@@ -164,6 +164,8 @@ public class Window3DController {
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
+	private ArrayList<MeshView> currentNoteMeshes;
+	private DropShadow textShadow;
 	
 	private SubsceneSizeListener subsceneSizeListener;
 
@@ -235,12 +237,10 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
 					Boolean oldValue, Boolean newValue) {
-				if (newValue) {
+				if (newValue)
 					playService.restart();
-				}
-				else {
+				else
 					playService.cancel();
-				}
 			}
 		});
 
@@ -280,6 +280,7 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
+		currentNoteMeshes = new ArrayList<MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 	}
 	
@@ -359,7 +360,6 @@ public class Window3DController {
 	                rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
 	        		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
 	        		repositionNoteSprites();
-	        		//System.out.println("x: "+rotateX.getAngle()+" y: "+rotateY.getAngle());
 				}
 
 				else if (me.isSecondaryButtonDown()) {
@@ -426,7 +426,8 @@ public class Window3DController {
 				
 				if (b!=null) {
 					node.getTransforms().clear();
-					Point2D p = CameraHelper.project(camera, new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+					Point2D p = CameraHelper.project(camera, 
+							new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
 					
 					double radius = spriteSphereMap.get(node).getRadius();
 					double x = p.getX()-radius;
@@ -502,7 +503,7 @@ public class Window3DController {
 		// End scene element mesh loading/building
 		
 		
-//-------------------------STORY ELEMENTS---------------------
+		// Begin story stuff
 		if (storiesList!=null) {
 			spriteSphereMap.clear();
 			
@@ -516,26 +517,36 @@ public class Window3DController {
 				}
 			}
 			
-			storiesList.makeAllStoriesInactive();
+			currentNotes.clear();
+			currentNoteMeshes.clear();
 			
-			currentNotes = storiesList.getNotesAtTime(time);
+			currentNotes = storiesList.getActiveNotes(time);
 			for (Note note : storiesList.getNotesWithCell()) {
 				for (String name : cellNames) {
-					if (name.equalsIgnoreCase(note.getCellName())) {
+					if (!currentNotes.contains(note) 
+							&& name.equalsIgnoreCase(note.getCellName())) {
 						currentNotes.add(note);
 						break;
 					}
 				}
 			}
 			
-			// make story active if 1 or more of its notes are visible
 			for (Note note : currentNotes) {
-				if (!note.getParent().isActive())
-					note.getParent().setActive(true);
+				if (note.hasSceneElements()) {
+					for (SceneElement se : note.getSceneElements()) {
+						MeshView mesh = se.buildGeometry(time);
+						mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
+						mesh.getTransforms().addAll(new Translate(
+													newOriginX+se.getX(),
+													newOriginY+se.getY(),
+													newOriginZ+se.getZ()),
+													new Scale(150, -150, -150));
+						currentNoteMeshes.add(mesh);	
+					}
+				}
 			}
 		}
-//---------------------------------------------------------------
-		
+		// End story stuff
 
 		if (localSearchResults.isEmpty()) {
 			searchedCells = new boolean[cellNames.length];
@@ -562,6 +573,17 @@ public class Window3DController {
 		}
 
 		buildScene(time.get());
+	}
+	
+	
+	public ChangeListener<Boolean> getRebuildFlagListener() {
+		return new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+								Boolean oldValue, Boolean newValue) {
+				buildScene(time.get());
+			}
+		};
 	}
 
 	
@@ -662,7 +684,6 @@ public class Window3DController {
 				node.getTransforms().add(new Translate(note.getX(), note.getY()));
 				return true;
 			}
-			
 		}
 		else if (note.isAttachedToCell() 
 				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
@@ -694,28 +715,29 @@ public class Window3DController {
 	// Makes an anchor pane that contains the text to be shown
 	// if isOverlay is true, then the text is larger
 	private Node makeShowTextNode(Note note) {
-		//AnchorPane pane = new AnchorPane();
 		Text t = new Text(note.getTagName());
+		t.setWrappingWidth(140);
+		t.setFill(Color.WHITE);
+		t.setCacheHint(CacheHint.SPEED);
+		t.setFontSmoothingType(FontSmoothingType.LCD);
 		
 		switch (note.getTagDisplay()) {
 		
 			case OVERLAY:
-						t.setWrappingWidth(120);
+						addDropShadowToText(t);
 						t.setFont(Font.font("System", FontWeight.MEDIUM, 18));
 						break;
 			
 			case SPRITE:
-						t.setWrappingWidth(110);
-						t.setFont(Font.font("System", FontWeight.MEDIUM, 14));
+						addDropShadowToText(t);
+						t.setFont(Font.font("System", FontWeight.MEDIUM, 17));
 						break;
 						
 			case BILLBOARD:
-						t.setWrappingWidth(100);
+						t.setWrappingWidth(110);
 						t.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
 						t.setSmooth(false);
-						t.setStrokeLineJoin(StrokeLineJoin.MITER);
-						t.setStrokeType(StrokeType.OUTSIDE);
-						t.setStrokeWidth(2);
+						t.setCacheHint(CacheHint.QUALITY);
 						break;
 			
 			default:
@@ -723,15 +745,26 @@ public class Window3DController {
 						
 		}
 		
-		t.setFill(Color.WHITE);
-		
 		return t;
 	}
 	
 	
+	private void addDropShadowToText(Text text) {
+		if (textShadow==null) {
+			textShadow = new DropShadow();
+			textShadow.setOffsetX(0.5);
+			textShadow.setOffsetY(0.5);
+			textShadow.setColor(Color.BLACK);
+		}
+		text.setEffect(textShadow);
+	}
+	
+	
 	private void addMeshesToList(ArrayList<Shape3D> list) {
-		// consult StructureRule(s)
-		// process only if meshes at this time point
+		// Add meshes from active notes
+		list.addAll(currentNoteMeshes);
+		
+		// Consult rules
 		if (!currentSceneElements.isEmpty()) {	
 			for (int i=0; i<currentSceneElements.size(); i++) {
 				SceneElement se = currentSceneElements.get(i);
@@ -744,16 +777,6 @@ public class Window3DController {
 	 				else 
 	 					mesh.setMaterial(colorHash.getTranslucentMaterial());
 	 			}
-				
-				else if (se.belongsToNote()) {
-					mesh.setMaterial(colorHash.getNoteMaterial());
-					mesh.getTransforms().addAll(new Translate(
-												newOriginX+se.getX(),
-												newOriginY+se.getY(),
-												newOriginZ+se.getZ()),
-												new Scale(150, -150, -150));
-					
-				}
 				
 				else {
 					// in regular view mode

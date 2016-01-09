@@ -114,7 +114,7 @@ public class SceneElementsList {
 	
 	
 	private void addComments(SceneElement element) {
-		if (element!=null && (element.isMulticellular() || element.belongsToNote()))
+		if (element!=null && element.isMulticellular())
 			nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
 	}
 	
