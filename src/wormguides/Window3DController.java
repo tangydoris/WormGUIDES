@@ -716,7 +716,6 @@ public class Window3DController {
 	// if isOverlay is true, then the text is larger
 	private Node makeShowTextNode(Note note) {
 		Text t = new Text(note.getTagName());
-		t.setWrappingWidth(140);
 		t.setFill(Color.WHITE);
 		t.setCacheHint(CacheHint.SPEED);
 		t.setFontSmoothingType(FontSmoothingType.LCD);
@@ -724,13 +723,15 @@ public class Window3DController {
 		switch (note.getTagDisplay()) {
 		
 			case OVERLAY:
+						t.setWrappingWidth(140);
 						addDropShadowToText(t);
 						t.setFont(Font.font("System", FontWeight.MEDIUM, 18));
 						break;
 			
 			case SPRITE:
+						t.setWrappingWidth(120);
 						addDropShadowToText(t);
-						t.setFont(Font.font("System", FontWeight.MEDIUM, 17));
+						t.setFont(Font.font("System", FontWeight.MEDIUM, 16));
 						break;
 						
 			case BILLBOARD:
@@ -754,7 +755,7 @@ public class Window3DController {
 			textShadow = new DropShadow();
 			textShadow.setOffsetX(0.5);
 			textShadow.setOffsetY(0.5);
-			textShadow.setColor(Color.BLACK);
+			textShadow.setColor(Color.web(TEXT_SHADOW_COLOR));
 		}
 		text.setEffect(textShadow);
 	}
@@ -1412,30 +1413,31 @@ public class Window3DController {
 	}
 	
 
-	private static final String CS = ", ";
+	private final String CS = ", ";
 
-	private static final String FILL_COLOR_HEX = "#272727";
+	private final String FILL_COLOR_HEX = "#272727";
+	private final String TEXT_SHADOW_COLOR = "#101010";
 
-	private static final long WAIT_TIME_MILLI = 200;
+	private final long WAIT_TIME_MILLI = 200;
 
-	private static final double CAMERA_INITIAL_DISTANCE = -800;
+	private final double CAMERA_INITIAL_DISTANCE = -800;
 
-    private static final double CAMERA_NEAR_CLIP = 1,
+    private final double CAMERA_NEAR_CLIP = 1,
     							CAMERA_FAR_CLIP = 2000;
 
-    private static final int START_TIME = 1;
+    private final int START_TIME = 1;
 
-    private static final int X_COR_INDEX = 0,
+    private final int X_COR_INDEX = 0,
     						Y_COR_INDEX = 1,
     						Z_COR_INDEX = 2;
 
-    private static final double Z_SCALE = 5,
+    private final double Z_SCALE = 5,
 					    		X_SCALE = 1,
 					    		Y_SCALE = 1;
 
-    private static final double SIZE_SCALE = .9;
-    private static final double UNIFORM_RADIUS = 4;
+    private final double SIZE_SCALE = .9;
+    private final double UNIFORM_RADIUS = 4;
     
-    private static final String NOTE_SPRITE = "sprite";
+    private final String NOTE_SPRITE = "sprite";
 
 }
