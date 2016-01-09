@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import wormguides.view.NoteGraphic;
+//import wormguides.view.NoteGraphic;
 
 /*
  * This class represents a note that belongs to a story (its parent)
@@ -29,7 +29,7 @@ public class Note {
 	private String url;
 	private Story parent;
 	
-	private NoteGraphic graphic;
+	//private NoteGraphic graphic;
 	
 	private BooleanProperty changedBooleanProperty;
 	
@@ -45,8 +45,7 @@ public class Note {
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
-		changedBooleanProperty = new SimpleBooleanProperty();
-		graphic = new NoteGraphic(this);
+		changedBooleanProperty = new SimpleBooleanProperty(false);
 	}
 	
 	
@@ -57,22 +56,8 @@ public class Note {
 	
 	public Note(String tagName, String tagContents) {
 		this();
-		
 		this.tagName = tagName;
-		graphic.setTitle(tagName);
-		
 		this.tagContents = tagContents;
-		graphic.setContents(tagContents);
-	}
-	
-	
-	public NoteGraphic getGraphic(double width) {
-		if (width>0) {
-			graphic.setPrefWidth(width);
-	    	graphic.setMaxWidth(width);
-		}
-		
-    	return graphic;
 	}
 	
 	
@@ -96,7 +81,7 @@ public class Note {
 	public void setTagName(String tagName) {
 		if (tagName!=null) {
 			this.tagName = tagName;
-			graphic.setTitle(tagName);
+			//graphic.setTitle(tagName);
 		}
 		
 		if (elements!=null) {
@@ -109,7 +94,7 @@ public class Note {
 	public void setTagContents(String tagContents) {
 		if (tagContents!=null) {
 			this.tagContents = tagContents;
-			graphic.setTitle(tagContents);
+			//graphic.setTitle(tagContents);
 		}
 	}
 	
@@ -233,7 +218,6 @@ public class Note {
 			elements = new ArrayList<SceneElement>();
 			SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource,
 											resourceLocation, startTime, endTime+1, comments);
-			se.setBelongsToNote(true);
 			se.setLocation(x, y, z);
 			elements.add(se);
 		}
@@ -312,14 +296,6 @@ public class Note {
 					se.setComments(this.comments);
 			}
 		}
-	}
-	
-	
-	public void addSceneElement(SceneElement element) {
-		if (elements==null)
-			elements = new ArrayList<SceneElement>();
-		elements.add(element);
-		
 	}
 	
 	

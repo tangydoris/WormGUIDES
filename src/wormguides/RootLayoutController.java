@@ -415,7 +415,7 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				setSelectedInfo(selectedName.get());
+				setSelectedStructureInfo(selectedName.get());
 			}
 		});
 		
@@ -436,20 +436,8 @@ public class RootLayoutController implements Initializable{
             }
 		});
 		
-		/*
-		allStructuresListView.getSelectionModel().selectedItemProperty()
-							.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue,
-								String newValue) {
-				selectedName.set(newValue);
-			}
-		});
-		*/
-		
 		// Modify font for ListView's of String's
 		structuresSearchListView.setCellFactory(new StringCellCallback());
-		//allStructuresListView.setCellFactory(new StringCellCallback());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
@@ -465,32 +453,28 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	
-	// Adds multicellular strucuture name and comment in description panel
 	/*
-	private void setSelectedStructureNameAndComment(String name) {
-		//add the description to the text to be set on the GUI
-		String structureComment = "";
-		for (int i = 0; i < elementsList.sceneElementsList.size(); i++) {
-			SceneElement element = elementsList.sceneElementsList.get(i);
-			if (element.getSceneName().equals(name)) {
-				structureComment = element.getComments();
-				break;
-			}
+	private void setSelectedCellInfo(String name) {
+		if (name==null || name.isEmpty())
+			return;
+		
+		prepSelectedNameForInfo(name);
+		
+		String functionalName = PartsList.getFunctionalNameByLineageName(name);
+		
+		if (functionalName==null) {
+			cellName.setText(name);
+			cellDescription.setText("");
 		}
-		//add the comment to the newValue
-		if (!structureComment.equals("")) {
-			String description = name + "\n" + structureComment;
-			setSelectedInfo(description);
-			selectedName.set(description);
-		} else {
-			setSelectedInfo(name);
-			selectedName.set(name);
+		else {
+			cellName.setText(name+" ("+functionalName+")");
+			cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 		}
 	}
 	*/
 	
 	
-	private void setSelectedInfo(String name) {
+	private void setSelectedStructureInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
 		
@@ -499,16 +483,15 @@ public class RootLayoutController implements Initializable{
 		name = name.trim();
 		
 		cellName.setText(name);
+		cellDescription.setText("");
+		
 		if (Search.isStructureWithComment(name))
 			cellDescription.setText(Search.getStructureComment(name));
 		
 		else {
 			String functionalName = PartsList.getFunctionalNameByLineageName(name);
-			if (functionalName==null) {
-				cellName.setText(name);
-				cellDescription.setText("");
-			}
-			else {
+			
+			if (functionalName!=null) {
 				cellName.setText(name+" ("+functionalName+")");
 				cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 			}
@@ -809,14 +792,17 @@ public class RootLayoutController implements Initializable{
 	
 	
 	private void initStoriesLayer() {
-		if (storiesList!=null)
+		if (storiesList!=null) {
 			storiesLayer = new StoriesLayer(storiesList.getStories());
 		
-		storiesListView.setItems(storiesLayer.getStories());
-		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
-		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
-		
-		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+			storiesListView.setItems(storiesLayer.getStories());
+			storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+			storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+			
+			noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+			
+			storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
+		}
 	}
 	
 	
