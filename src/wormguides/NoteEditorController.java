@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -19,6 +21,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import wormguides.model.Story;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
 	
@@ -38,13 +41,19 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private ToggleGroup displayToggle;
 	
 	private NewStoryEditorController editController;
+	private BooleanProperty storyCreated;
+	private Story currentStory;
+	
 	private Stage editStage;
 	
 	
 	public NoteEditorController() {
 		super();
+		
 		editController = new NewStoryEditorController();
+		storyCreated = new SimpleBooleanProperty(false);
 	}
+	
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -65,6 +74,16 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		assert (attachmentToggle!=null);
 		assert (calloutToggle!=null);
 		assert (displayToggle!=null);
+	}
+	
+	
+	public BooleanProperty getStoryCreatedProperty() {
+		return storyCreated;
+	}
+	
+	
+	public Story getCurrentStory() {
+		return currentStory;
 	}
 	
 	
@@ -101,7 +120,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 					@Override
 					public void handle(ActionEvent event) {
 						// TODO create new story on click
-						
+						currentStory = new Story(editController.getTitle(), editController.getDescription());
+						storyCreated.set(true);
 						editStage.hide();
 					}
 				});
@@ -134,6 +154,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML protected void deleteNote() {
 		
 	}
+	
 	// ----- End button listeners -----
 
 

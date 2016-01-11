@@ -65,6 +65,15 @@ public class Story {
 	}
 	
 	
+	public String getNoteComment(String tagName) {
+		for (Note note : notes) {
+			if (note.getTagName().equalsIgnoreCase(tagName.trim()))
+				return note.getComments();
+		}
+		return "";
+	}
+	
+	
 	public int getNumberOfNotes() {
 		return notes.size();
 	}

@@ -522,12 +522,12 @@
                                  <content>
                                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Text fx:id="cellName" strokeType="OUTSIDE" strokeWidth="0.0">
+                                          <Text fx:id="displayedName" strokeType="OUTSIDE" strokeWidth="0.0">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
                                           </Text>
-                                          <Text fx:id="cellDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
+                                          <Text fx:id="displayedDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

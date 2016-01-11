@@ -49,7 +49,6 @@ import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
-import wormguides.model.StoriesList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.TreePane;
@@ -137,14 +136,13 @@ public class RootLayoutController implements Initializable{
 	private Service<Void> allStructuresListDeselect;
 	
 	// cell information
-	@FXML private Text cellName;
-	@FXML private Text cellDescription;
+	@FXML private Text displayedName;
+	@FXML private Text displayedDescription;
 	
 	//scene elements stuff
 	private SceneElementsList elementsList;
 	
 	// story stuff
-	private StoriesList storiesList;
 	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
 	@FXML private Button noteEditorBtn;
@@ -399,7 +397,8 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				setSelectedStructureInfo(selectedName.get());
+				if (!newValue.isEmpty())
+					setSelectedStructureInfo(selectedName.get());
 			}
 		});
 		
@@ -437,18 +436,24 @@ public class RootLayoutController implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		cellName.setText(name);
-		cellDescription.setText("");
+		displayedName.setText(name);
+		displayedDescription.setText("");
 		
+		// Note
+		if (storiesLayer!=null)
+			displayedDescription.setText(storiesLayer.getNoteComments(name));
+		
+		// Cell body/structue
 		if (Search.isStructureWithComment(name))
-			cellDescription.setText(Search.getStructureComment(name));
+			displayedDescription.setText(Search.getStructureComment(name));
 		
+		// Cell lineage name
 		else {
 			String functionalName = PartsList.getFunctionalNameByLineageName(name);
 			
 			if (functionalName!=null) {
-				cellName.setText(name+" ("+functionalName+")");
-				cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+				displayedName.setText(name+" ("+functionalName+")");
+				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 			}
 		}
 	}
@@ -470,8 +475,8 @@ public class RootLayoutController implements Initializable{
 	
 	private void sizeInfoPane() {
 		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(7));
-		cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-		cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 	}
 	
 	
@@ -621,7 +626,7 @@ public class RootLayoutController implements Initializable{
 			public void changed(ObservableValue<? extends Toggle> observable,
 								Toggle oldValue, Toggle newValue) {
 				SearchType type = (SearchType) observable.getValue().getToggleGroup()
-						.getSelectedToggle().getUserData();
+					.getSelectedToggle().getUserData();
 				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
 					descendantTick.setSelected(false);
 					descendantTick.disableProperty().set(true);
@@ -677,8 +682,8 @@ public class RootLayoutController implements Initializable{
 		assert (rulesListView != null);
 		assert (addSearchBtn != null);
 		
-		assert (cellName != null);
-		assert (cellDescription != null);
+		assert (displayedName != null);
+		assert (displayedDescription != null);
 		
 		assert (uniformSizeCheckBox != null);
 		assert (opacitySlider != null);
@@ -716,26 +721,17 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	
-	private void initStoriesList() {
-		if (elementsList!=null) {
-			storiesList = new StoriesList(elementsList);
-			window3D.setStoriesList(storiesList);
-		}
-	}
-	
-	
 	private void initStoriesLayer() {
-		if (storiesList!=null) {
-			storiesLayer = new StoriesLayer(storiesList.getStories());
+		storiesLayer = new StoriesLayer();
+		window3D.setStoriesLayer(storiesLayer);
+	
+		storiesListView.setItems(storiesLayer.getStories());
+		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
 		
-			storiesListView.setItems(storiesLayer.getStories());
-			storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
-			storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
-			
-			noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
-			
-			storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
-		}
+		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+		
+		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
 	}
 	
 	
@@ -792,7 +788,6 @@ public class RootLayoutController implements Initializable{
 		initStructuresLayer();
 		
 		// stories layer
-		initStoriesList();
 		initStoriesLayer();
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());

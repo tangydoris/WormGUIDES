@@ -70,7 +70,6 @@ import wormguides.model.Note.Type;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
-import wormguides.model.StoriesList;
 
 public class Window3DController {
 
@@ -160,11 +159,12 @@ public class Window3DController {
 	private boolean multicellMode;
 	
 	// Story elements stuff
-	private StoriesList storiesList;
+	private StoriesLayer storiesLayer;
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
-	private ArrayList<MeshView> currentNoteMeshes;
+	//private ArrayList<MeshView> currentNoteMeshes;
+	private HashMap<Note, MeshView> currentNoteMeshMap;
 	
 	private SubsceneSizeListener subsceneSizeListener;
 
@@ -280,7 +280,8 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
-		currentNoteMeshes = new ArrayList<MeshView>();
+		//currentNoteMeshes = new ArrayList<MeshView>();
+		currentNoteMeshMap = new HashMap<Note, MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
@@ -311,9 +312,9 @@ public class Window3DController {
 	}
 	
 	
-	public void setStoriesList(StoriesList list) {
-		if (list!=null) {
-			storiesList = list;
+	public void setStoriesLayer(StoriesLayer layer) {
+		if (layer!=null) {
+			storiesLayer = layer;
 			buildScene(time.get());
 		}
 	}
@@ -417,18 +418,19 @@ public class Window3DController {
 	private void handleMouseClicked(MouseEvent event) {
 		Node node = event.getPickResult().getIntersectedNode();
 		
-		// Billboard clicked
+		// Billboard
 		if (node instanceof Text) {
 			// TODO
 			System.out.println("billboard clicked");
 		}
 		
-		// Nucleus/scene element clicked
+		// Nucleus
 		if (node instanceof Sphere) {
 			selectedIndex.set(getPickedSphereIndex((Sphere)node));
 			selectedName.set(cellNames[selectedIndex.get()]);
 		}
 		else if (node instanceof MeshView) {
+			// Cell body/structure
 			for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 				MeshView curr = currentSceneElementMeshes.get(i);
 				if (curr.equals(node)) {
@@ -436,9 +438,19 @@ public class Window3DController {
 					selectedName.set(clickedSceneElement.getSceneName());
 				}
 			}
+			
+			// Note structure
+			if (selectedName.get().isEmpty()) {
+				for (Note note : currentNoteMeshMap.keySet()) {
+					if (currentNoteMeshMap.get(note).equals(node))
+						selectedName.set(note.getTagName());
+				}
+			}
 		}
-		else
+		else {
 			selectedIndex.set(-1);
+			selectedName.set("");
+		}
 	}
 	
 	
@@ -542,14 +554,15 @@ public class Window3DController {
 		
 		
 		// Begin story stuff
-		if (storiesList!=null) {
+		if (storiesLayer!=null) {
 			spriteSphereMap.clear();
 			
 			currentNotes.clear();
-			currentNoteMeshes.clear();
+			//currentNoteMeshes.clear();
+			currentNoteMeshMap.clear();
 			
-			currentNotes = storiesList.getActiveNotes(time);
-			for (Note note : storiesList.getNotesWithCell()) {
+			currentNotes = storiesLayer.getActiveNotes(time);
+			for (Note note : storiesLayer.getNotesWithCell()) {
 				for (String name : cellNames) {
 					if (!currentNotes.contains(note) 
 							&& name.equalsIgnoreCase(note.getCellName())) {
@@ -570,7 +583,8 @@ public class Window3DController {
 							newOriginY+se.getY(),
 							newOriginZ+se.getZ()),
 							new Scale(150, -150, -150));
-						currentNoteMeshes.add(mesh);	
+						//currentNoteMeshes.add(mesh);	
+						currentNoteMeshMap.put(note, mesh);
 					}
 				}
 			}
@@ -610,7 +624,8 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 								Boolean oldValue, Boolean newValue) {
-				buildScene(time.get());
+				if (newValue)
+					buildScene(time.get());
 			}
 		};
 	}
@@ -647,6 +662,8 @@ public class Window3DController {
 		// making the notes
 		addSpheresToList(entities);
  		addMeshesToList(entities);
+ 		
+ 		insertOverlayTitles();
  		addNoteGeometries(notes);
  		
  		// render opaque entities first
@@ -661,9 +678,7 @@ public class Window3DController {
 	// Inserts note geometries to scene
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
-	private void addNoteGeometries(ArrayList<Node> list) {
-		insertOverlayTitles();
-		
+	private void addNoteGeometries(ArrayList<Node> list) {		
 		for (Note note : currentNotes) {
 			// Revert to overlay display if we have invalid display/attachment 
 			// type combination
@@ -708,15 +723,13 @@ public class Window3DController {
 	
 	
 	private void insertOverlayTitles() {
-		if (!currentNotes.isEmpty()) {
+		if (storiesLayer.getActiveStory()!=null && overlayVBox!=null) {
 			Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
 			
-			Text storyTitle = makeNoteOverlayText(currentNotes.get(0).getParent().getName());
+			Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
 			storyTitle.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
 			
-			if (overlayVBox!=null) {
-				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
-			}
+			overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
 		}
 	}
 	
@@ -725,7 +738,8 @@ public class Window3DController {
 		Text text = new Text(title);
 		text.setFill(Color.WHITE);
 		text.setFontSmoothingType(FontSmoothingType.LCD);
-		text.setWrappingWidth(140);
+		if (overlayVBox!=null)
+			text.setWrappingWidth(overlayVBox.getWidth());
 		text.setFont(Font.font("System", FontWeight.MEDIUM, 16));
 		return text;
 	}
@@ -744,6 +758,7 @@ public class Window3DController {
 		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
 		text.setSmooth(false);
 		text.setCacheHint(CacheHint.QUALITY);
+		text.setFill(Color.WHITE);
 		return text;
 	}
 	
@@ -828,7 +843,9 @@ public class Window3DController {
 	
 	private void addMeshesToList(ArrayList<Shape3D> list) {
 		// Add meshes from active notes
-		list.addAll(currentNoteMeshes);
+		//list.addAll(currentNoteMeshes);
+		for (Note note : currentNoteMeshMap.keySet())
+			list.add(currentNoteMeshMap.get(note));
 		
 		// Consult rules
 		if (!currentSceneElements.isEmpty()) {	
@@ -1101,8 +1118,11 @@ public class Window3DController {
 			spritesPane = parentPane;
 			
 			overlayVBox = new VBox(5);
-			AnchorPane.setTopAnchor(overlayVBox, 0.0);
-			AnchorPane.setRightAnchor(overlayVBox, 0.0);
+			overlayVBox.setPrefWidth(130);
+			overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
+			AnchorPane.setTopAnchor(overlayVBox, 5.0);
+			AnchorPane.setRightAnchor(overlayVBox, 5.0);
+			
 			spritesPane.getChildren().add(overlayVBox);
 		}
 	}
