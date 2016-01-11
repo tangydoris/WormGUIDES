@@ -158,7 +158,7 @@ public class Window3DController {
 	private boolean cellNucleusTicked;
 	private boolean cellBodyTicked;
 	private boolean multicellMode;
-
+	
 	// Story elements stuff
 	private StoriesList storiesList;
 	// currentNotes contains all notes that are 'active' within a scene
@@ -283,7 +283,6 @@ public class Window3DController {
 		currentNoteMeshes = new ArrayList<MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 		
-		// TODO handler mouse events
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -350,7 +349,6 @@ public class Window3DController {
 	}
 	
 	
-	// TODO mouse handlers here
 	@SuppressWarnings("unchecked")
 	public void handleMouseEvent(MouseEvent me) {
 		EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
@@ -568,10 +566,10 @@ public class Window3DController {
 						mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
 						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
 						mesh.getTransforms().addAll(new Translate(
-													newOriginX+se.getX(),
-													newOriginY+se.getY(),
-													newOriginZ+se.getZ()),
-													new Scale(150, -150, -150));
+							newOriginX+se.getX(),
+							newOriginY+se.getY(),
+							newOriginZ+se.getZ()),
+							new Scale(150, -150, -150));
 						currentNoteMeshes.add(mesh);	
 					}
 				}
@@ -664,11 +662,13 @@ public class Window3DController {
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
 	private void addNoteGeometries(ArrayList<Node> list) {
+		insertOverlayTitles();
+		
 		for (Note note : currentNotes) {
 			// Revert to overlay display if we have invalid display/attachment 
 			// type combination
 			if (note.hasLocationError() || note.hasCellNameError() 
-										|| note.hasTimeError())
+					|| note.hasTimeError())
 				note.setTagDisplay(Display.OVERLAY);
 			
 			Node node = makeNoteGraphic(note);
@@ -704,6 +704,47 @@ public class Window3DController {
 						break;
 			}
 		}
+	}
+	
+	
+	private void insertOverlayTitles() {
+		if (!currentNotes.isEmpty()) {
+			Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
+			
+			Text storyTitle = makeNoteOverlayText(currentNotes.get(0).getParent().getName());
+			storyTitle.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
+			
+			if (overlayVBox!=null) {
+				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+			}
+		}
+	}
+	
+	
+	private Text makeNoteOverlayText(String title) {
+		Text text = new Text(title);
+		text.setFill(Color.WHITE);
+		text.setFontSmoothingType(FontSmoothingType.LCD);
+		text.setWrappingWidth(140);
+		text.setFont(Font.font("System", FontWeight.MEDIUM, 16));
+		return text;
+	}
+	
+	
+	private Text makeNoteSpriteText(String title) {
+		Text text = makeNoteOverlayText(title);
+		text.setWrappingWidth(130);
+		return text;
+	}
+	
+	
+	private Text makeNoteBillboardText(String title) {
+		Text text = new Text(title);
+		text.setWrappingWidth(110);
+		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
+		text.setSmooth(false);
+		text.setCacheHint(CacheHint.QUALITY);
+		return text;
 	}
 	
 	
@@ -767,35 +808,21 @@ public class Window3DController {
 	// Makes an anchor pane that contains the text to be shown
 	// if isOverlay is true, then the text is larger
 	private Node makeNoteGraphic(Note note) {
-		Text t = new Text(note.getTagName());
-		t.setFill(Color.WHITE);
-		t.setFontSmoothingType(FontSmoothingType.LCD);
-		
+		String title = note.getTagName();
 		switch (note.getTagDisplay()) {
-		
 			case OVERLAY:
-						t.setWrappingWidth(150);
-						t.setFont(Font.font("System", FontWeight.MEDIUM, 18));
-						break;
+						return makeNoteOverlayText(title);
 			
 			case SPRITE:
-						t.setWrappingWidth(130);
-						t.setFont(Font.font("System", FontWeight.NORMAL, 16));
-						break;
+						return makeNoteSpriteText(title);
 						
 			case BILLBOARD:
-						t.setWrappingWidth(110);
-						t.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
-						t.setSmooth(false);
-						t.setCacheHint(CacheHint.QUALITY);
-						break;
+						return makeNoteBillboardText(title);
 			
 			default:
-						break;
+						return null;
 						
 		}
-		
-		return t;
 	}
 	
 	
