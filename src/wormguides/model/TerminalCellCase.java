@@ -1,6 +1,9 @@
 package wormguides.model;
 
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TerminalCellCase {
 	private String cellName;
@@ -25,8 +28,8 @@ public class TerminalCellCase {
 		this.cellName = cellName;
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
-		this.imageURL = "WILL BE THE IMAGE URL";
-		this.functionWORMATLAS = "temp holder for function WORMATLAS";
+		this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT; 
+		setFunctionFromWORMATLAS();
 		
 		this.presynapticPartners = presynapticPartners;
 		this.postsynapticPartners = postsynapticPartners;
@@ -53,6 +56,36 @@ public class TerminalCellCase {
 		referencesTEXTPRESSO.add("second reference");
 		links.add("link entry");
 		links.add("LINK");
+	}
+	
+	private void setFunctionFromWORMATLAS() {
+		if (this.cellName == null) return;
+		
+		String content = "";
+		URLConnection connection = null;
+		
+		//extract root of cell name e.g. ribr --> RIB
+		String URL = wormatlasURL + 
+				this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
+				wormatlasURLEXT;
+		
+		try {
+			connection = new URL(URL).openConnection();
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
+			return;
+		}
+
+		//parse the html for "Function"
+		content = content.substring(content.indexOf("Function"));
+		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
+		this.functionWORMATLAS = content;
 	}
 	
 	public String getCellName() {
@@ -125,4 +158,10 @@ public class TerminalCellCase {
 	public ArrayList<String> getLinks() {
 		return this.links;
 	}
+	
+	private final static String graphicURL = "http://wormwiring.hpc.einstein.yu.edu/data/ccimages/";
+	private final static String jpgEXT = ".jpg";
+	
+	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
+	private final static String wormatlasURLEXT = "mainframe.htm";
 }

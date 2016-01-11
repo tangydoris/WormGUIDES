@@ -82,7 +82,7 @@ public class InfoWindowDOM {
 		String partsListDescription = "Parts List Description: " + terminalCase.getPartsListDescription();
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		
-		HTMLNode img = new HTMLNode("http://wormwiring.hpc.einstein.yu.edu/data/ccimages/RIBR.jpg", true);
+		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		
 		String functionWORMATLAS = "+Function (Wormatlas): " + terminalCase.getFunctionWORMATLAS();
 		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", functionWORMATLAS);
