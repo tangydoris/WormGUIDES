@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<fx:root prefHeight="230.0" prefWidth="400.0" type="AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="400.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox>
+               <children>
+                  <Label maxHeight="1.7976931348623157E308" text="Title:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="50.0" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="title" maxWidth="1.7976931348623157E308" minWidth="100.0" prefWidth="300.0" HBox.hgrow="SOMETIMES">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </HBox>
+            <Label text="Description:">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextArea fx:id="description" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </TextArea>
+            <HBox maxWidth="1.7976931348623157E308">
+               <children>
+                  <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="submit" maxWidth="100.0" minWidth="-Infinity" mnemonicParsing="false" prefWidth="80.0" text="Submit">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                  <Button fx:id="cancel" maxWidth="100.0" minWidth="-Infinity" mnemonicParsing="false" prefWidth="80.0" text="Cancel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Region layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </children>
+</fx:root>

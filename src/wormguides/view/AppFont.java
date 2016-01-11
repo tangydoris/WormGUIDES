@@ -6,14 +6,24 @@ import javafx.scene.text.FontWeight;
 public class AppFont {
 	
 	private static final Font font;
+	
 	private static final Font bolderFont;
 	private static final Font boldFont;
+	
+	private static final Font expandIconFont;
 	
 	
 	static {
 		font = new Font(14);
 		bolderFont = Font.font("System", FontWeight.EXTRA_BOLD, 14);
-		boldFont = Font.font("System", FontWeight.BOLD, 14);
+		boldFont = Font.font("System", FontWeight.SEMI_BOLD, 14);
+		
+		expandIconFont = new Font(18);
+	}
+	
+	
+	public static Font getExpandIconFont() {
+		return expandIconFont;
 	}
 	
 	

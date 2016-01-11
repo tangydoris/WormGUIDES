@@ -132,8 +132,8 @@ public abstract class Rule {
 						editStage = new Stage();
 						editStage.setScene(new Scene((AnchorPane) loader.load()));
 						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
-			            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
-			            					"-fx-faint-focus-color: transparent;");
+			            	node.setStyle("-fx-focus-color: -fx-outer-border; "
+			            					+"-fx-faint-focus-color: transparent;");
 			            }
 						
 						editStage.setTitle("Edit Rule");

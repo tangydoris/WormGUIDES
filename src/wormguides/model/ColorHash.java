@@ -41,7 +41,7 @@ public class ColorHash {
 	}
 	
 	
-	public Material getNoteMaterial() {
+	public Material getNoteSceneElementMaterial() {
 		return noteMaterial;
 	}
 	

@@ -11,10 +11,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.Callback;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
@@ -27,12 +25,7 @@ public class StoriesList {
 	
 	
 	public StoriesList(SceneElementsList list) {
-		stories = FXCollections.observableArrayList(new Callback<Story, Observable[]>() {
-			@Override
-			public Observable[] call(Story story) {
-				return new Observable[]{story.getIsActiveBooleanProperty()};
-			}
-		});
+		stories = FXCollections.observableArrayList();
 		elementsList = list;
 		buildStories();
 	}
@@ -96,15 +89,14 @@ public class StoriesList {
 						note.setAttachmentType(split[TYPE_INDEX]);
 						note.setLocation(split[LOCATION_INDEX]);
 						note.setCellName(split[CELLNAME_INDEX]);
-						// story.setMarker(?);
 						
 						note.setImagingSource(split[IMG_SOURCE_INDEX]);
-						
 						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
+						
 						note.setStartTime(split[START_TIME_INDEX]);
 						note.setEndTime(split[END_TIME_INDEX]);
+						
 						note.setComments(split[COMMENTS_INDEX]);
-						note.addSceneElementsToList(elementsList);
 						
 					} catch (ArrayIndexOutOfBoundsException e) {
 						System.out.println(e.toString());
@@ -155,31 +147,22 @@ public class StoriesList {
 	public ArrayList<Note> getNotesWithCell() {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		for (Story story : stories) {
-			notes.addAll(story.getNotesWithCell());
+			if (story.isActive())
+				notes.addAll(story.getNotesWithCell());
 		}
 		return notes;
 	}
 	
 	
-	public ArrayList<Note> getNotesAtTime(int time) {
+	public ArrayList<Note> getActiveNotes(int time) {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		
-		for (Story story : stories)
-			notes.addAll(story.getNotesAtTime(time));
+		for (Story story : stories) {
+			if (story.isActive())
+				notes.addAll(story.getNotesAtTime(time));
+		}
 		
 		return notes;
-	}
-	
-	
-	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-		for (Story story : stories) {
-			for (SceneElement element : story.getSceneElementsAtTime(time)) {
-				if (!elements.contains(element))
-					elements.add(element);
-			}
-		}
-		return elements;
 	}
 	
 	
@@ -204,12 +187,6 @@ public class StoriesList {
 		}
 		
 		return sb.toString();
-	}
-	
-	
-	public void makeAllStoriesInactive() {
-		for (Story story : stories)
-			story.setActive(false);
 	}
 	
 	

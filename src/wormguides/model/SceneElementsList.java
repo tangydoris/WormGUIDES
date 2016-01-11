@@ -114,7 +114,7 @@ public class SceneElementsList {
 	
 	
 	private void addComments(SceneElement element) {
-		if (element!=null && (element.isMulticellular() || element.belongsToNote()))
+		if (element!=null && element.isMulticellular())
 			nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
 	}
 	
@@ -188,15 +188,6 @@ public class SceneElementsList {
 				elements.add(se);
 		}
 		return elements;
-	}
-	
-	
-	public boolean isNoteStructureName(String name) {
-		for (SceneElement se : elementsList) {
-			if (se.belongsToNote() || se.getSceneName().equalsIgnoreCase(name.trim()))
-				return true;
-		}
-		return false;
 	}
 	
 	
