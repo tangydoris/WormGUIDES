@@ -29,8 +29,6 @@ public class Note {
 	private String url;
 	private Story parent;
 	
-	//private NoteGraphic graphic;
-	
 	private BooleanProperty changedBooleanProperty;
 	
 	
@@ -51,6 +49,11 @@ public class Note {
 	
 	public BooleanProperty getChangedProperty() {
 		return changedBooleanProperty;
+	}
+	
+	
+	public boolean changed() {
+		return changedBooleanProperty.get();
 	}
 
 	

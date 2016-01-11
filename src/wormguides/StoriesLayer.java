@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
@@ -323,7 +324,7 @@ public class StoriesLayer {
 					setExpanded(!isExpanded());
 				}
 			});
-			expandIcon.setFont(AppFont.getExpandIconFont());
+			expandIcon.setFont(AppFont.getBoldFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
 			expandIcon.toFront();
 			
@@ -333,11 +334,15 @@ public class StoriesLayer {
 			r1.setMaxWidth(USE_PREF_SIZE);
 			
 			title = new Text(note.getTagName());
-			title.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			title.wrappingWidthProperty().bind(widthProperty()
+										.subtract(2)
+										.subtract(expandIcon.prefWidth(-1))
+										.subtract(r1.prefWidth(-1)));
 			title.setFont(AppFont.getBoldFont());
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 			
 			titleContainer.getChildren().addAll(expandIcon, r1, title);
+			titleContainer.setAlignment(Pos.CENTER_LEFT);
 			
 			// contents graphics
 			contentsContainer = new HBox(0);
