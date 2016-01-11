@@ -624,8 +624,9 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 								Boolean oldValue, Boolean newValue) {
-				if (newValue)
+				if (newValue) {
 					buildScene(time.get());
+				}
 			}
 		};
 	}

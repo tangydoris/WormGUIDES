@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -66,8 +67,9 @@ public class StoriesLayer {
 	
 	private NoteEditorController editController;
 	
-	// Story being edited in note editor
+	// Story/note being edited in note editor
 	private Story currentStory;
+	private Note currentNote;
 	// Story being displayed
 	private Story activeStory;
 	
@@ -248,7 +250,7 @@ public class StoriesLayer {
 	
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder("Stories list:\n");
+		StringBuilder sb = new StringBuilder("Stories:\n");
 		for (int i=0; i<stories.size(); i++) {
 			Story story = stories.get(i);
 			sb.append(story.getName()).append(": ")
@@ -276,7 +278,7 @@ public class StoriesLayer {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
-								Number oldValue, Number newValue) {
+					Number oldValue, Number newValue) {
 				// subtract off list view border and/or padding
 				width = observable.getValue().doubleValue()-2;
 			}
@@ -309,16 +311,20 @@ public class StoriesLayer {
 							@Override
 							public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
-								Story newStory = editController.getCurrentStory();
+								if (newValue) {
+									Story newStory = editController.getCurrentStory();
+									stories.add(newStory);
+									editController.getStoryCreatedProperty().set(false);
+								}
 							}
 						});
 						
-						/*
+						editController.setCurrentNote(currentNote);
+						
 						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
 			            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
 			            					"-fx-faint-focus-color: transparent;");
 			            }
-			            */
 						
 					} catch (IOException e) {
 						System.out.println("error in initializing note editor.");
@@ -327,6 +333,7 @@ public class StoriesLayer {
 				}
 				
 				editStage.show();
+				editStage.toFront();
 			}
 		};
 	}
@@ -365,8 +372,7 @@ public class StoriesLayer {
 	                protected void updateItem(Story story, boolean empty) {
 	                    super.updateItem(story, empty);
 	                    
-	                    if (!empty && story!=null)  {
-	                    	
+	                    if (!empty)  {
 	                    	// Create story graphic
 	                    	StoryListCellGraphic storyGraphic = new StoryListCellGraphic(story, width);
 	                    	storyGraphicMap.put(story, storyGraphic);
@@ -392,9 +398,11 @@ public class StoriesLayer {
 	                    		});
 	                    	}
 	                    	
+	                    	
 	                    	Separator s = new Separator(Orientation.HORIZONTAL);
-	                    	s.setStyle("-fx-focus-color: transparent; "
-	            						+ "-fx-faint-focus-color: transparent;");
+	                    	s.setFocusTraversable(false);
+	                    	s.setStyle("-fx-focus-color: -fx-outer-border; "+
+	            					"-fx-faint-focus-color: transparent;");
 	                    	storyGraphic.getChildren().add(s);
 	                    	
 	                    	setGraphic(storyGraphic);
@@ -402,8 +410,7 @@ public class StoriesLayer {
 	                	else
 	                		setGraphic(null);
 	                    
-	                    setStyle("-fx-focus-color: transparent;"
-	                    		+ "-fx-background-color: transparent;");
+	                    setStyle("-fx-background-color: transparent;");
 	                    setPadding(Insets.EMPTY);
 	            	}
 	        	};
@@ -434,26 +441,24 @@ public class StoriesLayer {
 			setPadding(Insets.EMPTY);
 			
 			setPrefWidth(width);
-			setMaxWidth(USE_PREF_SIZE);
-			setMinWidth(USE_PREF_SIZE);
+			setMaxWidth(width);
+			setMinWidth(width);
 			
 			VBox container = new VBox(3);
-			title = new Text(story.getName());
-			title.setFont(AppFont.getBolderFont());
-			title.wrappingWidthProperty().bind(widthProperty().subtract(5));
-			title.setFontSmoothingType(FontSmoothingType.LCD);
-			
-			container.getChildren().add(title);
 			container.setPickOnBounds(false);
 			container.setPadding(new Insets(5));
+			
+			title = new Text(story.getName());
+			title.setFont(AppFont.getBolderFont());
+			title.setWrappingWidth(width-4);
+			title.setFontSmoothingType(FontSmoothingType.LCD);
 
 			description = new Text(story.getDescription());
 			description.setFont(AppFont.getFont());
-			description.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			description.setWrappingWidth(width-4);
 			description.setFontSmoothingType(FontSmoothingType.LCD);
 			
-			container.getChildren().add(description);
-			
+			container.getChildren().addAll(title, description);
 			getChildren().addAll(container);
 			
 			container.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -524,6 +529,9 @@ public class StoriesLayer {
 			
 			// title heading graphics
 			HBox titleContainer = new HBox(0);
+			titleContainer.setPrefWidth(width);
+			titleContainer.setMaxWidth(width);
+			titleContainer.setMinWidth(width);
 			
 			expandIcon = new Text("▸");
 			expandIcon.setPickOnBounds(true);
@@ -543,10 +551,7 @@ public class StoriesLayer {
 			r1.setMaxWidth(USE_PREF_SIZE);
 			
 			title = new Text(note.getTagName());
-			title.wrappingWidthProperty().bind(widthProperty()
-										.subtract(2)
-										.subtract(expandIcon.prefWidth(-1))
-										.subtract(r1.prefWidth(-1)));
+			title.setWrappingWidth(width-3-r1.prefWidth(-1)-expandIcon.prefWidth(-1));
 			title.setFont(AppFont.getBoldFont());
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 			
@@ -562,7 +567,7 @@ public class StoriesLayer {
 			r2.setMaxWidth(USE_PREF_SIZE);
 			
 			contents = new Text(note.getTagContents());
-			contents.wrappingWidthProperty().bind(widthProperty().subtract(5));
+			contents.setWrappingWidth(width-3-r2.prefWidth(-1));
 			contents.setFont(AppFont.getFont());
 			contents.setFontSmoothingType(FontSmoothingType.LCD);
 			contentsContainer.getChildren().addAll(r2, contents);
@@ -578,8 +583,13 @@ public class StoriesLayer {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
-					if (newValue)
+					if (newValue) {
 						highlightCell(true);
+						currentNote = note;
+						
+						if (editController!=null)
+							editController.updateFields();
+					}
 					else
 						highlightCell(false);
 				}

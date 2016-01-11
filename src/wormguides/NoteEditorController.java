@@ -21,6 +21,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import wormguides.model.Note;
 import wormguides.model.Story;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
@@ -43,6 +44,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private NewStoryEditorController editController;
 	private BooleanProperty storyCreated;
 	private Story currentStory;
+	private Note currentNote;
 	
 	private Stage editStage;
 	
@@ -82,6 +84,17 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
+	public void setCurrentNote(Note note) {
+		currentNote = note;
+		updateFields();
+	}
+	
+	
+	public void setCurrentStory(Story story) {
+		currentStory = story;
+	}
+	
+	
 	public Story getCurrentStory() {
 		return currentStory;
 	}
@@ -112,6 +125,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				editController.addCancelButtonListener(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
+						editController.clearFields();
 						editStage.hide();
 					}
 				});
@@ -122,6 +136,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 						// TODO create new story on click
 						currentStory = new Story(editController.getTitle(), editController.getDescription());
 						storyCreated.set(true);
+						editController.clearFields();
 						editStage.hide();
 					}
 				});
@@ -154,8 +169,14 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML protected void deleteNote() {
 		
 	}
-	
 	// ----- End button listeners -----
 
-
+	
+	public void updateFields() {
+		if (titleField!=null && contentArea!=null) {
+			titleField.setText(currentNote.getTagName());
+			contentArea.setText(currentNote.getTagContents());
+		}
+	}
+	
 }

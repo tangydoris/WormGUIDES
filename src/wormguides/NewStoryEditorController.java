@@ -37,6 +37,12 @@ public class NewStoryEditorController extends AnchorPane implements Initializabl
 	}
 	
 	
+	public void clearFields() {
+		title.clear();
+		description.clear();
+	}
+	
+	
 	private void assertFXMLNodes() {
 		assert (title!=null);
 		assert (description!=null);

@@ -113,7 +113,10 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="140.0" VBox.vgrow="ALWAYS" />
+                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="140.0" wrapText="true" VBox.vgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextArea>
                               <Label minWidth="119.0" prefHeight="28.0" text="Note is related to:">
                                  <font>
                                     <Font size="14.0" />
