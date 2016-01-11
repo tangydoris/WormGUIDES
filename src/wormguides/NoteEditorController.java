@@ -90,6 +90,11 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
+	public Note getCurrentNote() {
+		return currentNote;
+	}
+	
+	
 	public void setCurrentStory(Story story) {
 		currentStory = story;
 	}

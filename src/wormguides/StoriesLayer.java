@@ -587,8 +587,11 @@ public class StoriesLayer {
 						highlightCell(true);
 						currentNote = note;
 						
-						if (editController!=null)
+						if (editController!=null) {
+							editController.setCurrentNote(note);
 							editController.updateFields();
+							System.out.println("current note - "+editController.getCurrentNote());
+						}
 					}
 					else
 						highlightCell(false);
