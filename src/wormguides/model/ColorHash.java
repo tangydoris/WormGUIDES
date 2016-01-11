@@ -37,7 +37,7 @@ public class ColorHash {
 		highlightMaterial = makeMaterial(Color.GOLD);
 		translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
 		defaultMaterial = makeMaterial(Color.WHITE);
-		noteMaterial = makeMaterial(Color.CORNFLOWERBLUE);
+		noteMaterial = makeMaterial(Color.web("#749bc9"));
 	}
 	
 	

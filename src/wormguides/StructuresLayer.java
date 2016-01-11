@@ -15,13 +15,15 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
-import wormguides.view.StructureListCellGraphic;
+import wormguides.view.AppFont;
 import wormguides.model.MulticellularStructureRule;
 
 
@@ -56,10 +58,9 @@ public class StructuresLayer {
 							graphic.setOnMouseClicked(new EventHandler<Event>() {
 					    		@Override
 					    		public void handle(Event event) {
-					    			if (graphic.isSelected()) {
-					    				graphic.deselect();
-					    				selectedNameProperty.set("");
-					    			}
+					    			if (graphic.isSelected())
+					    				graphic.setSelected(false);
+					    			
 					    			else {
 					    				deselectAllExcept(graphic);
 					    				selectedNameProperty.set(string);
@@ -78,13 +79,14 @@ public class StructuresLayer {
 	}
 
 	
-	/*
-	 * Un-hilights all cells except for input cell graphic
-	 */
+	// Un-hilights all cells except for input cell graphic
 	private void deselectAllExcept(StructureListCellGraphic graphic) {
-		for (StructureListCellGraphic g : nameListCellMap.values())
-			g.deselect();
-		graphic.select();
+		for (StructureListCellGraphic g : nameListCellMap.values()) {
+			if (g==graphic)
+				g.setSelected(true);
+			else
+				g.setSelected(false);
+		}
 	}
 	
 	
@@ -212,22 +214,8 @@ public class StructuresLayer {
 		};
 	}
 	
-	
-	/*
-	 * Resets the selected name so the change can be detected by
-	 * the root layout controller
-	 */
-	/*
-	private void resetSelectedNameProperty(String name) {
-		selectedNameProperty.set("");
-		selectedNameProperty.set(name);
-	}
-	*/
-	
 
-	/*
-	 * Called by RootLayourController to set reference to global rules list
-	 */
+	// Called by RootLayourController to set reference to global rules list
 	public void setRulesList(ObservableList<Rule> list) {
 		if (list!=null)
 			rulesList = list;
@@ -271,6 +259,60 @@ public class StructuresLayer {
 				return cell;
 			}
 		};
+	}
+	
+	
+	// Graphical representation of a structure list cell
+	private class StructureListCellGraphic extends HBox{
+		
+		private boolean selected;
+		
+		public StructureListCellGraphic(String name) {
+			super();
+			
+			selected = false;
+			
+			Label label = new Label(name);
+	    	label.setFont(AppFont.getFont());
+	    	
+	    	label.setPrefHeight(UI_HEIGHT);
+	    	label.setMinHeight(USE_PREF_SIZE);
+	    	label.setMaxHeight(USE_PREF_SIZE);
+	    	
+	    	getChildren().add(label);
+	    	
+	    	setMaxWidth(Double.MAX_VALUE);
+	    	setPadding(new Insets(5, 5, 5, 5));
+	    	
+	    	setPickOnBounds(false);
+		}
+		
+		
+		public boolean isSelected() {
+			return selected;
+		}
+		
+		
+		public void setSelected(boolean selected) {
+			this.selected = selected;
+			highlightCell(selected);
+		}
+		
+		
+		private void highlightCell(boolean highlight) {
+			if (highlight) {
+				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
+						+ "-fx-background-insets: 0, 1, 2; "
+						+ "-fx-background: -fx-accent;"
+						+ "-fx-text-fill: white;");
+			}
+			else
+				setStyle("-fx-background-color: white;"
+						+ "-fx-text-fill: black;");
+		}
+		
+		
+		private final double UI_HEIGHT = 28.0;
 	}
 	
 }

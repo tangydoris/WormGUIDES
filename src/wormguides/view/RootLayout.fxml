@@ -56,7 +56,7 @@
                                  <content>
                                     <AnchorPane>
                                        <children>
-                                          <VBox maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <VBox maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0">
                                              <children>
                                                 <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="15.0" VBox.vgrow="NEVER">
                                                    <children>
@@ -65,7 +65,7 @@
                                                             <Font size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="searchField" focusTraversable="false" prefHeight="28.0" prefWidth="73.0" HBox.hgrow="ALWAYS">
+                                                      <TextField fx:id="searchField" focusTraversable="false" HBox.hgrow="ALWAYS">
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font>
@@ -235,7 +235,7 @@
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                 <HBox maxWidth="1.7976931348623157E308">
                                                    <children>
-                                                      <ListView fx:id="searchResultsListView" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="210.0" HBox.hgrow="ALWAYS" />
+                                                      <ListView fx:id="searchResultsListView" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="180.0" HBox.hgrow="ALWAYS" />
                                                    </children>
                                                 </HBox>
                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
@@ -340,9 +340,6 @@
                                              <opaqueInsets>
                                                 <Insets />
                                              </opaqueInsets>
-                                             <padding>
-                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                             </padding>
                                           </VBox>
                                        </children>
                                     </AnchorPane>
@@ -355,7 +352,7 @@
                     <content>
                       <AnchorPane>
                            <children>
-                              <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0" spacing="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
                                     <HBox prefHeight="16.0" prefWidth="302.0" VBox.vgrow="NEVER">
                                        <children>
@@ -370,7 +367,7 @@
                                              </font>
                                           </Label>
                                           <Region prefHeight="40.0" prefWidth="10.0" />
-                                          <TextField fx:id="structuresSearchField" prefHeight="32.0" prefWidth="149.0" HBox.hgrow="ALWAYS">
+                                          <TextField fx:id="structuresSearchField" HBox.hgrow="ALWAYS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font></TextField>
@@ -382,6 +379,7 @@
                                           <Label text="(cell/structure name, keyword, phrase)" />
                                        </children>
                                     </HBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                     <AnchorPane maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                        <children>
                                           <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
@@ -389,7 +387,7 @@
                                     </AnchorPane>
                                     <HBox>
                                        <children>
-                                          <Text fontSmoothingType="LCD" smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="(If no structures are selected below, a new rule is added for all search results)" wrappingWidth="280.0" />
+                                          <Text smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" text="(If no structures are selected below, a new rule is added for all search results)" wrappingWidth="300.0" />
                                        </children>
                                     </HBox>
                                     <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
@@ -403,6 +401,7 @@
                                           <ListView fx:id="allStructuresListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                     <HBox prefHeight="24.0" prefWidth="292.0" VBox.vgrow="NEVER">
                                        <children>
                                           <Region prefHeight="22.0" prefWidth="300.0" />
@@ -410,9 +409,10 @@
                                     </HBox>
                                     <HBox>
                                        <children>
-                                          <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="60.0" prefWidth="256.0" HBox.hgrow="ALWAYS" />
+                                          <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="70.0" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
+                                    <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                     <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
                                        <children>
                                           <Region HBox.hgrow="ALWAYS" />
@@ -429,7 +429,7 @@
 			              <content>
 			                <AnchorPane>
                            <children>
-                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
                                     <CheckBox fx:id="uniformSizeCheckBox" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="22.0" text="Uniform Small Nuclei">
                                        <font>
@@ -458,7 +458,7 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                              <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
                                     <Label text="Stories:">
                                        <font>
@@ -488,22 +488,22 @@
 			            <Insets />
 			         </GridPane.margin>
 			      </TabPane>
-            <AnchorPane GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+            <AnchorPane minHeight="300.0" minWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
-      			      <BorderPane fx:id="displayPanel" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" GridPane.columnIndex="1">
-      			         <opaqueInsets>
-      			            <Insets />
-      			         </opaqueInsets>
-      			         <GridPane.margin>
-      			            <Insets />
-      			         </GridPane.margin>
-                     <center>
-                        <AnchorPane fx:id="modelAnchorPane" BorderPane.alignment="CENTER">
+                  <VBox fx:id="displayVBox" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+                     <children>
+                        <AnchorPane fx:id="modelAnchorPane" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0">
                            <children>
-                              <Slider fx:id="timeSlider" focusTraversable="false" layoutX="111.0" layoutY="574.0" prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="97.0" AnchorPane.rightAnchor="65.0" />
-                              <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" layoutX="14.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                              <Button id="playButton" fx:id="playButton" focusTraversable="false" layoutX="38.0" layoutY="577.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="32.0" />
-                              <Button id="forwardButton" fx:id="forwardButton" layoutX="82.0" layoutY="573.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="66.0" />
+                              <HBox fx:id="sceneControlsBox" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                 <children>
+                                    <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                    <Button id="playButton" fx:id="playButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                    <Button id="forwardButton" fx:id="forwardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                    <Slider fx:id="timeSlider" focusTraversable="false" maxWidth="1.7976931348623157E308" prefHeight="30.0" HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="zoomOutButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                    <Button fx:id="zoomInButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
+                                 </children>
+                              </HBox>
                               <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="35.0" AnchorPane.rightAnchor="5.0">
                                  <font>
                                     <Font size="14.0" />
@@ -514,21 +514,13 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="zoomOutButton" layoutX="550.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                              <Button fx:id="zoomInButton" layoutX="502.0" layoutY="663.0" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="34.0" />
-                              <VBox fx:id="noteOverlayVBox" alignment="TOP_CENTER" layoutX="474.0" layoutY="21.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" spacing="10.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                            </children>
                         </AnchorPane>
-                     </center>
-                     <bottom>
-                        <AnchorPane>
+                        <AnchorPane maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0">
                            <children>
                               <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <VBox fillWidth="false" spacing="5.0" BorderPane.alignment="CENTER">
-                                       <padding>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                       </padding>
+                                    <VBox maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER">
                                        <children>
                                           <Text fx:id="cellName" strokeType="OUTSIDE" strokeWidth="0.0">
                                              <font>
@@ -544,16 +536,16 @@
                                        <BorderPane.margin>
                                           <Insets top="10.0" />
                                        </BorderPane.margin>
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
                                     </VBox>
                                  </content>
                               </ScrollPane>
                            </children>
-                           <padding>
-                              <Insets top="10.0" />
-                           </padding>
                         </AnchorPane>
-                     </bottom>
-      				</BorderPane>
+                     </children>
+                  </VBox>
                </children>
             </AnchorPane>
 			</children>

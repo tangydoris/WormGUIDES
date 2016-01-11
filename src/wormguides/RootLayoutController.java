@@ -38,6 +38,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -83,10 +84,10 @@ public class RootLayoutController implements Initializable{
 	
 	// panels stuff
 	@FXML private BorderPane rootBorderPane;
-	@FXML private BorderPane displayPanel;
+	@FXML private VBox displayVBox;
 	@FXML private AnchorPane modelAnchorPane;
 	@FXML private ScrollPane infoPane;
-	@FXML private VBox noteOverlayVBox;
+	@FXML private HBox sceneControlsBox;
 	
 	// subscene controls
 	@FXML private Button backwardButton, forwardButton, playButton;
@@ -326,12 +327,10 @@ public class RootLayoutController implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DController(modelAnchorPane.widthProperty(), 
-										modelAnchorPane.heightProperty(), data);
+		window3D = new Window3DController(modelAnchorPane, data);
 		subscene = window3D.getSubScene();
-		modelAnchorPane.getChildren().add(subscene);
-		window3D.setOverlayVBox(noteOverlayVBox);
-		window3D.setModelAnchorPane(modelAnchorPane);
+		
+		modelAnchorPane.setOnMouseClicked(window3D.getNoteClickHandler());
 		
 		backwardButton.setOnAction(window3D.getBackwardButtonListener());
 		forwardButton.setOnAction(window3D.getForwardButtonListener());
@@ -345,7 +344,6 @@ public class RootLayoutController implements Initializable{
 		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
 		window3D.addListenerToOpacitySlider(opacitySlider);
 		
-		// default to uniform small nuclei
 		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
 		
 		cellNucleusTick.selectedProperty().addListener(window3D.getCellNucleusTickListener());
@@ -367,7 +365,7 @@ public class RootLayoutController implements Initializable{
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
-											Number oldValue, Number newValue) {
+					Number oldValue, Number newValue) {
 				timeSlider.setValue(time.get());
 				if (time.get()>=window3D.getEndTime()-1) {
 					playButton.setGraphic(playIcon);
@@ -386,7 +384,7 @@ public class RootLayoutController implements Initializable{
 		});
 		
 		searchResultsListView.getSelectionModel().selectedItemProperty()
-							.addListener(new ChangeListener<String>() {
+				.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(
 					ObservableValue<? extends String> observable,
@@ -414,14 +412,6 @@ public class RootLayoutController implements Initializable{
             }
 		});
 		
-		// TODO use this?
-		allStructuresListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-			@Override
-            public void handle(MouseEvent event) {
-                event.consume();
-            }
-		});
-		
 		// Modify font for ListView's of String's
 		structuresSearchListView.setCellFactory(new StringCellCallback());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
@@ -437,27 +427,6 @@ public class RootLayoutController implements Initializable{
 		// Cell Nucleus search option
 		cellNucleusTick.setSelected(true);
 	}
-	
-	
-	/*
-	private void setSelectedCellInfo(String name) {
-		if (name==null || name.isEmpty())
-			return;
-		
-		prepSelectedNameForInfo(name);
-		
-		String functionalName = PartsList.getFunctionalNameByLineageName(name);
-		
-		if (functionalName==null) {
-			cellName.setText(name);
-			cellDescription.setText("");
-		}
-		else {
-			cellName.setText(name+" ("+functionalName+")");
-			cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
-		}
-	}
-	*/
 	
 	
 	private void setSelectedStructureInfo(String name) {
@@ -493,7 +462,6 @@ public class RootLayoutController implements Initializable{
 		AnchorPane.setTopAnchor(subscene, 0.0);
 		AnchorPane.setLeftAnchor(subscene, 0.0);
 		AnchorPane.setRightAnchor(subscene, 0.0);
-		AnchorPane.setBottomAnchor(subscene, 33.0);
 		
 		subscene.widthProperty().bind(subsceneWidth);
 		subscene.heightProperty().bind(subsceneHeight);
@@ -501,7 +469,7 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void sizeInfoPane() {
-		infoPane.prefHeightProperty().bind(displayPanel.heightProperty().divide(7));
+		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(7));
 		cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 		cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 	}
@@ -522,20 +490,28 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				totalNucleiLabel.setText(newValue.intValue()+" Nuclei");
+				String suffix = " Nuclei";
+				if (newValue.intValue()==1)
+					suffix = " Nucleus";
+				totalNucleiLabel.setText(newValue.intValue()+suffix);
 			}
 		});
+		
 		totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
 		totalNucleiLabel.toFront();
 	}
 	
 	private String makePaddedTime(int time) {
-		if (time < 10)
-			return "00"+time;
-		else if (time < 100)
-			return "0"+time;
+		if (time>=0) {
+			if (time < 10)
+				return "00"+time;
+			else if (time < 100)
+				return "0"+time;
+			else
+				return ""+time;
+		}
 		else
-			return ""+time;
+			return "";
 	}
 	
 	public void setIcons() {
@@ -664,8 +640,8 @@ public class RootLayoutController implements Initializable{
 	private void assertFXMLNodes() {
 		assert (rootBorderPane != null);
 		assert (modelAnchorPane != null);
-		assert (noteOverlayVBox != null);
-		assert (displayPanel != null);
+		assert (sceneControlsBox != null);
+		assert (displayVBox != null);
 		assert (infoPane != null);
 		
 		assert (timeSlider != null);
@@ -722,8 +698,6 @@ public class RootLayoutController implements Initializable{
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
-		// TODO: Add rules for all structures search results if one structure
-		// is not specifically selected in the list of ALL structures
 		allStructuresListView.getFocusModel().focusedItemProperty()
 							.addListener(structuresLayer.getSelectionListener());
 		
