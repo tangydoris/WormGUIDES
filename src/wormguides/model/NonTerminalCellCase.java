@@ -5,11 +5,14 @@ import java.util.ArrayList;
 public class NonTerminalCellCase {
 	private String cellName;
 	//private String externalInfo;
-	private String embyonicHomology;
+	private String embryonicHomology;
 	private ArrayList<TerminalDescendant> terminalDescendants;
 	
 	public NonTerminalCellCase(String cellName) {
 		this.cellName = cellName;
+		
+		//look in the csv file 
+		
 		terminalDescendants = new ArrayList<TerminalDescendant>();
 	}
 	
@@ -22,8 +25,8 @@ public class NonTerminalCellCase {
 		
 	}
 	
-	public String getEmbyonicHomology() {
-		return this.embyonicHomology;
+	public String getEmbryonicHomology() {
+		return this.embryonicHomology;
 	}
 	
 	public ArrayList<TerminalDescendant> getTerminalDescendants() {

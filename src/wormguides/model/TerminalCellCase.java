@@ -38,6 +38,9 @@ public class TerminalCellCase {
 		
 		//FIGURE OUT HOW TO GENERATE THESE
 		this.anatomy = new ArrayList<String>();
+		
+		setExpressions();
+		
 		this.expressesWORMBASE = new ArrayList<String>();
 		this.homologues = new ArrayList<String>();
 		this.referencesTEXTPRESSO = new ArrayList<String>();
@@ -86,6 +89,20 @@ public class TerminalCellCase {
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
 		this.functionWORMATLAS = content;
+	}
+	
+	private void setExpressions() {
+		if (this.cellName == null) return;
+		
+		String URL = "http://www.wormbase.org/db/get?name=" + 
+		this.cellName + ";class=Anatomy_term\");";
+		
+		System.out.println(URL);
+				
+//				File.openUrlAsString(\"http://www.wormbase.org/db/get?name="
+//						+ cellName
+//						+ ";class=Anatomy_term\");"
+//						+ "print(string);");
 	}
 	
 	public String getCellName() {
