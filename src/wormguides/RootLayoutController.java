@@ -45,6 +45,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.CellCases;
 import wormguides.model.Connectome;
+import wormguides.model.EmbryonicAnalogousCells;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
@@ -807,7 +808,6 @@ public class RootLayoutController implements Initializable{
 		cellCases = new CellCases(infoWindow);
 	}
 
-	
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();

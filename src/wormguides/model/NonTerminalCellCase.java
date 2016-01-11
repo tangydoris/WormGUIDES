@@ -4,25 +4,20 @@ import java.util.ArrayList;
 
 public class NonTerminalCellCase {
 	private String cellName;
-	//private String externalInfo;
 	private String embryonicHomology;
 	private ArrayList<TerminalDescendant> terminalDescendants;
 	
 	public NonTerminalCellCase(String cellName) {
-		this.cellName = cellName;
+		this.cellName = cellName; //use this for identifier and external information
 		
-		//look in the csv file 
+		//reference embryonic analogues cells db for homology
+		this.embryonicHomology = EmbryonicAnalogousCells.findEmbryonicHomology(this.cellName);
 		
 		terminalDescendants = new ArrayList<TerminalDescendant>();
 	}
 	
 	public String getCellName() {
 		return this.cellName;
-	}
-	
-	public void loadHomologues() {
-		//separate method for open file - load jar entry
-		
 	}
 	
 	public String getEmbryonicHomology() {

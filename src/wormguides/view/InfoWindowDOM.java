@@ -41,13 +41,8 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM(TerminalCellCase terminalCase) {
 		this.html = new HTMLNode("html");
-		//this.webView = new WebView();
 		this.name = terminalCase.getCellName();
 	
-		/*
-		 * TODO
-		 * construct the dom from terminal cell case accessor methods
-		 */
 		HTMLNode head = new HTMLNode("head");
 		
 		/*
@@ -76,25 +71,25 @@ public class InfoWindowDOM {
 		HTMLNode linksDiv = new HTMLNode("div", "links", "");
 		
 		//build data tags from terminal case
-		String externalInfo = "External Information: " + terminalCase.getExternalInfo();
+		String externalInfo = "<strong>External Information: </strong>" + terminalCase.getExternalInfo();
 		HTMLNode externalInfoP = new HTMLNode("p", "", "", externalInfo);
 		
-		String partsListDescription = "Parts List Description: " + terminalCase.getPartsListDescription();
+		String partsListDescription = "<strong>Parts List Description: </strong>" + terminalCase.getPartsListDescription();
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		
-		String functionWORMATLAS = "+Function (Wormatlas): " + terminalCase.getFunctionWORMATLAS();
+		String functionWORMATLAS = "<strong> - Function (Wormatlas): </strong>" + terminalCase.getFunctionWORMATLAS();
 		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", functionWORMATLAS);
 		
-		HTMLNode anatomyP = new HTMLNode("p", "", "", "- Anatomy: ");
+		HTMLNode anatomyP = new HTMLNode("p", "", "", "<strong>- Anatomy: </strong>");
 		HTMLNode anatomyUL = new HTMLNode("ul");
 		for (String anatomyEntry : terminalCase.getAnatomy()) {
 			HTMLNode li = new HTMLNode("li", "", "", anatomyEntry);
 			anatomyUL.addChild(li);
 		}
 		
-		HTMLNode wiringPartnersP = new HTMLNode("p", "", "", "- Wiring: ");
+		HTMLNode wiringPartnersP = new HTMLNode("p", "", "", "<strong>- Wiring: </strong>");
 		HTMLNode wiringPartnersUL = new HTMLNode("ul");
 		ArrayList<String> presynapticPartners = terminalCase.getPresynapticPartners();
 		ArrayList<String> postsynapticPartners = terminalCase.getPresynapticPartners();
@@ -102,41 +97,41 @@ public class InfoWindowDOM {
 		ArrayList<String> neuromuscularPartners = terminalCase.getNeuromuscularPartners();
 		if (presynapticPartners.size() > 0) {
 			Collections.sort(presynapticPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "Presynaptic to: " + presynapticPartners.toString());
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em>" + presynapticPartners.toString());
 			wiringPartnersUL.addChild(li);
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "Postsynaptic to: " + postsynapticPartners.toString());
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em>" + postsynapticPartners.toString());
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
 			Collections.sort(electricalPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "Electrical to: " + electricalPartners.toString());
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em>" + electricalPartners.toString());
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
 			Collections.sort(neuromuscularPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "Neuromusclar to: " + neuromuscularPartners.toString());
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em>" + neuromuscularPartners.toString());
 			wiringPartnersUL.addChild(li);
 		}
 		
-		String expressesWORMBASE = "- Expresses (Wormbase): " + terminalCase.getExpressesWORMBASE().toString();
+		String expressesWORMBASE = "<strong>- Expresses (Wormbase): </strong>" + terminalCase.getExpressesWORMBASE().toString();
 		HTMLNode expressesWORMBASEP = new HTMLNode("p", "", "", expressesWORMBASE);
 		
 		ArrayList<String> homologuesList = terminalCase.getHomologues();
 		Collections.sort(homologuesList);
-		String homologues = "- Homologues: " + homologuesList.toString();
+		String homologues = "<strong>- Homologues: </strong>" + homologuesList.toString();
 		HTMLNode homologuesP = new HTMLNode("p", "", "", homologues);
 		
-		HTMLNode referencesP = new HTMLNode("p", "", "", "- References (Textpresso)");
+		HTMLNode referencesP = new HTMLNode("p", "", "", "<strong>- References (Textpresso)</strong>");
 		HTMLNode referencesUL = new HTMLNode("ul");
 		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
 			HTMLNode li = new HTMLNode("li", "", "", reference);
 			referencesUL.addChild(li);
 		}
 		
-		HTMLNode linksP = new HTMLNode("p", "", "", "- Links");
+		HTMLNode linksP = new HTMLNode("p", "", "", "<strong>- Links</strong>");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			HTMLNode li = new HTMLNode("li", "", "", link);
@@ -175,7 +170,7 @@ public class InfoWindowDOM {
 		html.addChild(body);
 		
 		//add style node
-		buildStyleNode();
+		buildStyleNode();	
 	}
 	
 	/*
@@ -184,6 +179,53 @@ public class InfoWindowDOM {
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
 		this.name = nonTerminalCase.getCellName();
+	
+		HTMLNode head = new HTMLNode("head");
+		
+		/*
+		 * TODO
+		 * meta tags
+		 * title
+		 */
+		
+		HTMLNode body = new HTMLNode("body");
+		
+		//divs
+		HTMLNode externalInfoDiv = new HTMLNode("div", "externalInfo", ""); 
+		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "partsListDescr", "");
+		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "");
+		
+		//build data tags from terminal case
+		String externalInfo = "<strong>External Information: </strong>" + nonTerminalCase.getCellName();
+		HTMLNode externalInfoP = new HTMLNode("p", "", "", externalInfo);
+		
+		String embryonicHomology = "<strong>Embryonic Homology to: " + nonTerminalCase.getEmbryonicHomology();
+		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
+		
+		HTMLNode terminalDescendantsP = new HTMLNode("p", "", "", "<strong>- Terminal Descendants: </strong>");
+		HTMLNode terminalDescendantsUL = new HTMLNode("ul");
+//		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
+//			HTMLNode li = new HTMLNode("li", "", "", reference);
+//			referencesUL.addChild(li);
+//		}
+		
+		//add data tags to div
+		externalInfoDiv.addChild(externalInfoP);
+		embryonicHomologyDiv.addChild(embryonicHomologyP);
+		terminalDescendantsDiv.addChild(terminalDescendantsP);
+		terminalDescendantsDiv.addChild(terminalDescendantsUL);
+		
+		//add divs to body
+		body.addChild(externalInfoDiv);
+		body.addChild(embryonicHomologyDiv);
+		body.addChild(terminalDescendantsDiv);
+		
+		//add head and body to html
+		html.addChild(head);
+		html.addChild(body);
+				
+		//add style node
+		buildStyleNode();
 	}
 	
 	public String DOMtoString() {
