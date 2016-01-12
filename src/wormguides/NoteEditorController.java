@@ -6,6 +6,8 @@ import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -43,8 +45,12 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	private NewStoryEditorController editController;
 	private BooleanProperty storyCreated;
+	
 	private Story currentStory;
 	private Note currentNote;
+	
+	private ChangeListener<String> titleFieldListener;
+	private ChangeListener<String> contentAreaListener;
 	
 	private Stage editStage;
 	
@@ -52,14 +58,23 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	public NoteEditorController() {
 		super();
 		
-		editController = new NewStoryEditorController();
 		storyCreated = new SimpleBooleanProperty(false);
+		
+		currentStory = null;
+		currentNote = null;
 	}
 	
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		assertFXMLNodes();
+		
+		titleFieldListener = new TitleFieldListener();
+		contentAreaListener = new ContentAreaListener();
+		
+		updateFields();
+		titleField.textProperty().addListener(titleFieldListener);
+		contentArea.textProperty().addListener(contentAreaListener);
 	}
 	
 	
@@ -86,8 +101,41 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	public void setCurrentNote(Note note) {
 		currentNote = note;
-		updateFields();
+		
+		if (titleField!=null && contentArea!=null) {
+			titleField.textProperty().removeListener(titleFieldListener);
+			contentArea.textProperty().removeListener(contentAreaListener);
+			
+			updateFields();
+			
+			titleField.textProperty().addListener(titleFieldListener);
+			contentArea.textProperty().addListener(contentAreaListener);
+		}
 	}
+	
+	
+	private void updateFields() {
+		if (titleField!=null && contentArea!=null) {
+			if (currentNote!=null) {
+				titleField.setText(currentNote.getTagName());
+				contentArea.setText(currentNote.getTagContents());
+			}
+			else {
+				titleField.clear();
+				contentArea.clear();
+			}
+		}
+	}
+	
+	
+	/*
+	private void clearFields() {
+		if (titleField!=null && contentArea!=null && currentNote!=null) {
+			titleField.clear();
+			contentArea.clear();
+		}
+	}
+	*/
 	
 	
 	public Note getCurrentNote() {
@@ -105,9 +153,37 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
-	// ----- Begin button listeners -----
+	// ----- Begin text listeners ----
+	private class TitleFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (currentNote!=null) {
+				currentNote.setTagName(newValue);
+				currentNote.setChanged(true);
+			}
+		}
+	}
+	
+	
+	private class ContentAreaListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (currentNote!=null) {
+				currentNote.setTagContents(newValue);
+				currentNote.setChanged(true);
+			}
+		}
+	}
+	// ----- End text listeners ----
+	
+	
+	// ----- Begin button actions -----
 	@FXML protected void newStory() {
 		if (editStage==null) {
+			editController = new NewStoryEditorController();
+			
 			editStage = new Stage();
 			
 			FXMLLoader loader = new FXMLLoader();
@@ -138,7 +214,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				editController.addSubmitButtonListener(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						// TODO create new story on click
 						currentStory = new Story(editController.getTitle(), editController.getDescription());
 						storyCreated.set(true);
 						editController.clearFields();
@@ -174,14 +249,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML protected void deleteNote() {
 		
 	}
-	// ----- End button listeners -----
-
-	
-	public void updateFields() {
-		if (titleField!=null && contentArea!=null) {
-			titleField.setText(currentNote.getTagName());
-			contentArea.setText(currentNote.getTagContents());
-		}
-	}
+	// ----- End button actions -----
 	
 }

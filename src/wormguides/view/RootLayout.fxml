@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wormguides.RootLayoutController">
+<fx:root fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1000.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
         <menus>
@@ -551,4 +551,4 @@
 			</children>
 		</GridPane>
    </center>
-</BorderPane>
+</fx:root>

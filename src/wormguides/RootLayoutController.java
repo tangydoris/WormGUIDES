@@ -59,7 +59,10 @@ import wormguides.view.URLWindow;
 import javafx.scene.web.WebView;
 import javafx.scene.Group;
 
-public class RootLayoutController implements Initializable{
+public class RootLayoutController extends BorderPane implements Initializable{
+	
+	// root layout's own stage
+	private Stage mainStage;
 	
 	// popup windows
 	private Stage aboutStage;
@@ -357,6 +360,12 @@ public class RootLayoutController implements Initializable{
 		playingMovie = window3D.getPlayingMovieProperty();
 		selectedName = window3D.getSelectedName();
 	}
+	
+	
+	public void setStage(Stage stage) {
+		mainStage = stage;
+	}
+	
 	
 	private void addListeners() {
 		// time integer property that dictates the current time point
@@ -722,7 +731,7 @@ public class RootLayoutController implements Initializable{
 	
 	
 	private void initStoriesLayer() {
-		storiesLayer = new StoriesLayer();
+		storiesLayer = new StoriesLayer(mainStage);
 		window3D.setStoriesLayer(storiesLayer);
 	
 		storiesListView.setItems(storiesLayer.getStories());

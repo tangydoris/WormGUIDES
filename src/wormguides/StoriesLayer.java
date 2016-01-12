@@ -8,15 +8,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -52,15 +53,14 @@ import wormguides.view.AppFont;
  * Controller of the ListView in the 'Stories' tab
  */
 public class StoriesLayer {
+	
+	private Stage parentStage;
 
 	private ObservableList<Story> stories;
-	
-	private HashMap<Story, StoryListCellGraphic> storyGraphicMap;
-	
+	//private HashMap<Story, StoryListCellGraphic> storyGraphicMap;
 	private ObservableList<NoteListCellGraphic> noteGraphics;
 	
 	private double width;
-	
 	private Stage editStage;
 	
 	private BooleanProperty rebuildSceneFlag;
@@ -74,19 +74,37 @@ public class StoriesLayer {
 	private Story activeStory;
 	
 	
-	public StoriesLayer() {
-		stories = FXCollections.observableArrayList();
+	public StoriesLayer(Stage parent) {
+		parentStage = parent;
 		
-		storyGraphicMap = new HashMap<Story, StoryListCellGraphic>();
+		stories = FXCollections.observableArrayList(
+				story -> new Observable[]{story.getChangedProperty()});
+		/*
+		stories.addListener(new ListChangeListener<Story>() {
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends Story> c) {
+				while (c.next()) {
+					if (c.wasUpdated()) {
+						//System.out.println("stories updated");
+					}
+					else {
+						for (Story story : c.getAddedSubList()) {
+							System.out.println("added - "+story.getName());
+						}
+						for (Story story : c.getRemoved()) {
+							System.out.println("removed - "+story.getName());
+						}
+					}
+				}
+			}
+		});
+		*/
 		
 		width = 0;
 		
 		noteGraphics = FXCollections.observableArrayList();
 		
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
-		
-		editController = new NoteEditorController();
-		currentStory = editController.getCurrentStory();
 		
 		buildStories();
 	}
@@ -166,7 +184,10 @@ public class StoriesLayer {
 					storyCounter++;
 				}
 				else {
-					Note note = new Note(split[NAME_INDEX], split[CONTENTS_INDEX]);
+					Story story = stories.get(storyCounter);
+					Note note = new Note(story, split[NAME_INDEX], split[CONTENTS_INDEX]);
+					story.addNote(note);
+					
 					try {
 						note.setTagDisplay(split[DISPLAY_INDEX]);
 						note.setAttachmentType(split[TYPE_INDEX]);
@@ -196,10 +217,6 @@ public class StoriesLayer {
 					} catch (TimeStringFormatException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
-					} finally {
-						Story story = stories.get(storyCounter);
-						story.addNote(note);
-						note.setParent(story);
 					}
 				}	
 			}
@@ -292,6 +309,11 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
+					editController = new NoteEditorController();
+					editController.setCurrentNote(currentNote);
+					if (currentNote!=null)
+						editController.setCurrentStory(currentNote.getParent());
+					
 					editStage = new Stage();
 					
 					FXMLLoader loader = new FXMLLoader();
@@ -304,6 +326,7 @@ public class StoriesLayer {
 						editStage.setScene(new Scene((AnchorPane) loader.load()));
 						
 						editStage.setTitle("Note Editor");
+						editStage.initOwner(parentStage);
 						editStage.initModality(Modality.NONE);
 						editStage.setResizable(true);
 						
@@ -318,8 +341,6 @@ public class StoriesLayer {
 								}
 							}
 						});
-						
-						editController.setCurrentNote(currentNote);
 						
 						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
 			            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
@@ -375,10 +396,10 @@ public class StoriesLayer {
 	                    if (!empty)  {
 	                    	// Create story graphic
 	                    	StoryListCellGraphic storyGraphic = new StoryListCellGraphic(story, width);
-	                    	storyGraphicMap.put(story, storyGraphic);
+	                    	//storyGraphicMap.put(story, storyGraphic);
 	                    	
 	                    	// Add list view for notes inside story graphic
-	                    	for (Note note : story.getNotesObservable()) {
+	                    	for (Note note : story.getNotes()) {
 	                    		NoteListCellGraphic noteGraphic = new NoteListCellGraphic(note);
 	                    		storyGraphic.getChildren().add(noteGraphic);
 	                    		
@@ -389,10 +410,22 @@ public class StoriesLayer {
 									public void handle(MouseEvent event) {
 										if (!(event.getPickResult().getIntersectedNode()
 												==noteGraphic.getExpandIcon())) {
-											if (noteGraphic.isSelected())
+											if (noteGraphic.isSelected()) {
 												noteGraphic.setSelected(false);
-											else
+												
+												if (editController!=null) {
+													editController.setCurrentNote(null);
+													editController.setCurrentStory(null);
+												}
+											}
+											else {
 												deselectAllNotesExcept(noteGraphic);
+												
+												if (editController!=null) {
+													editController.setCurrentNote(note);
+													editController.setCurrentStory(note.getParent());
+												}
+											}
 										}
 									}
 	                    		});
@@ -450,12 +483,12 @@ public class StoriesLayer {
 			
 			title = new Text(story.getName());
 			title.setFont(AppFont.getBolderFont());
-			title.setWrappingWidth(width-4);
+			title.setWrappingWidth(width-5);
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 
 			description = new Text(story.getDescription());
 			description.setFont(AppFont.getFont());
-			description.setWrappingWidth(width-4);
+			description.setWrappingWidth(width-5);
 			description.setFontSmoothingType(FontSmoothingType.LCD);
 			
 			container.getChildren().addAll(title, description);
@@ -508,23 +541,24 @@ public class StoriesLayer {
 	public class NoteListCellGraphic extends VBox{
 		
 		private Story story;
-		
-		private Text expandIcon;
-		private Text title;
+		private Note note;
 		
 		private HBox contentsContainer;
+		private Text expandIcon;
+		private Text title;
+
 		private Text contents;
 		
-		private boolean expanded;
 		private BooleanProperty selected;
 		
 		
-		// note is the note to which this graphic belongs to
+		// Input note is the note to which this graphic belongs to
 		public NoteListCellGraphic(Note note) {
 			super();
 			
 			story = note.getParent();
-			
+			this.note = note;
+
 			setPadding(new Insets(3));
 			
 			// title heading graphics
@@ -538,10 +572,10 @@ public class StoriesLayer {
 			expandIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					setExpanded(!isExpanded());
+					setExpanded(!note.isExpanded());
 				}
 			});
-			expandIcon.setFont(AppFont.getBoldFont());
+			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
 			expandIcon.toFront();
 			
@@ -551,8 +585,8 @@ public class StoriesLayer {
 			r1.setMaxWidth(USE_PREF_SIZE);
 			
 			title = new Text(note.getTagName());
-			title.setWrappingWidth(width-3-r1.prefWidth(-1)-expandIcon.prefWidth(-1));
-			title.setFont(AppFont.getBoldFont());
+			title.setWrappingWidth(width-5-r1.prefWidth(-1)-expandIcon.prefWidth(-1));
+			title.setFont(AppFont.getBolderFont());
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 			
 			titleContainer.getChildren().addAll(expandIcon, r1, title);
@@ -567,7 +601,7 @@ public class StoriesLayer {
 			r2.setMaxWidth(USE_PREF_SIZE);
 			
 			contents = new Text(note.getTagContents());
-			contents.setWrappingWidth(width-3-r2.prefWidth(-1));
+			contents.setWrappingWidth(width-5-r2.prefWidth(-1));
 			contents.setFont(AppFont.getFont());
 			contents.setFontSmoothingType(FontSmoothingType.LCD);
 			contentsContainer.getChildren().addAll(r2, contents);
@@ -576,28 +610,36 @@ public class StoriesLayer {
 			
 			setPickOnBounds(false);
 			
-			expanded = false;
+			selected = new SimpleBooleanProperty(note.isSelected());
+			highlightCell(note.isSelected());
 			
-			selected = new SimpleBooleanProperty(true);
+			// listener to selection/unselection
 			selected.addListener(new ChangeListener<Boolean>() {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
+					note.setSelected(newValue);
 					if (newValue) {
 						highlightCell(true);
 						currentNote = note;
-						
-						if (editController!=null) {
-							editController.setCurrentNote(note);
-							editController.updateFields();
-							System.out.println("current note - "+editController.getCurrentNote());
-						}
+						currentStory = note.getParent();
 					}
 					else
 						highlightCell(false);
 				}
 			});
-			selected.set(false);
+			
+			// render note changes
+			note.getChangedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+						Boolean oldValue, Boolean newValue) {
+					if (newValue) {
+						title.setText(note.getTagName());
+						contents.setText(note.getTagContents());
+					}
+				}
+			});
 			
 			story.getActiveProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
@@ -611,6 +653,8 @@ public class StoriesLayer {
 					}
 				}
 			});
+			
+			setExpanded(note.isExpanded());
 		}
 		
 		
@@ -637,6 +681,7 @@ public class StoriesLayer {
 
 		
 		public void setSelected(boolean isSelected) {
+			note.setSelected(isSelected);
 			selected.set(isSelected);
 		}
 		
@@ -651,15 +696,8 @@ public class StoriesLayer {
 		}
 		
 		
-		// When the graphic is 'expanded' we can view the note contents
-		// otherwise, we just see the note title
-		public boolean isExpanded() {
-			return expanded;
-		}
-		
-		
 		public void setExpanded(boolean expanded) {
-			this.expanded = expanded;
+			note.setExpanded(expanded);
 			
 			if (expanded) {
 				getChildren().add(contentsContainer);

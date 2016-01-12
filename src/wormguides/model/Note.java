@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-//import wormguides.view.NoteGraphic;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 /*
  * This class represents a note that belongs to a story (its parent)
@@ -27,12 +28,20 @@ public class Note {
 	private int startTime, endTime;
 	private String comments;
 	private String url;
+	
 	private Story parent;
 	
+	// True when any field value changes, false otherwise
 	private BooleanProperty changedBooleanProperty;
+	// True when graphical representation is expanded, false otherwise
+	private boolean isExpanded;
+	// True when graphical representation is selected, false otherwise
+	private boolean isSelected;
 	
 	
-	public Note() {
+	public Note(Story parent) {
+		this.parent = parent;
+		
 		elements = null;
 		tagName = "";
 		tagContents = "";
@@ -43,7 +52,45 @@ public class Note {
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
+		
 		changedBooleanProperty = new SimpleBooleanProperty(false);
+		changedBooleanProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					setChanged(false);
+			}
+		});
+		
+		isExpanded = false;
+		isSelected = false;
+	}
+	
+	public Note(Story parent, String tagName, String tagContents) {
+		this(parent);
+		this.tagName = tagName;
+		this.tagContents = tagContents;
+	}
+	
+	
+	public boolean isSelected() {
+		return isSelected;
+	}
+	
+	
+	public void setSelected(boolean selected) {
+		isSelected = selected;
+	}
+	
+	
+	public boolean isExpanded() {
+		return isExpanded;
+	}
+	
+	
+	public void setExpanded(boolean expanded) {
+		isExpanded = expanded;
 	}
 	
 	
@@ -52,21 +99,13 @@ public class Note {
 	}
 	
 	
+	public void setChanged(boolean changed) {
+		changedBooleanProperty.set(changed);
+	}
+	
+	
 	public boolean changed() {
 		return changedBooleanProperty.get();
-	}
-
-	
-	public Note(String tagName, String tagContents) {
-		this();
-		this.tagName = tagName;
-		this.tagContents = tagContents;
-	}
-	
-	
-	public void setParent(Story story) {
-		if (story!=null)
-			parent = story;
 	}
 	
 	
@@ -606,23 +645,24 @@ public class Note {
 	
 	public class TagDisplayEnumException extends Exception {
 		public TagDisplayEnumException() {
-			super("Invalid note tag display enum, must be one of the following: "
-					+ Display.values());
+			super("Invalid note tag display enum, must be one of the "
+					+ "following: " + Display.values());
 		}
 	}
 	
 	
 	public class AttachmentTypeEnumException extends Exception {
 		public AttachmentTypeEnumException() {
-			super("Invalid note attachment type enum, must be one of the following: "
-					+ Type.values());
+			super("Invalid note attachment type enum, must be one of the "
+					+ "following: " + Type.values());
 		}
 	}
 	
 	
 	public class LocationStringFormatException extends Exception {
 		public LocationStringFormatException() {
-			super("Invalid note location string format, must be 3 integers separated by spaces.");
+			super("Invalid note location string format, must be 3 "
+					+ "integers separated by spaces.");
 		}
 	}
 	

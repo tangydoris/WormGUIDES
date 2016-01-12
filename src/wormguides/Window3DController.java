@@ -711,8 +711,8 @@ public class Window3DController {
 				// always faces user
 				case SPRITE:
 						if (spritesPane!=null) {
-							spritesPane.getChildren().add(node);
-							positionSprite(note, node);
+							if (positionSprite(note, node))
+								spritesPane.getChildren().add(node);
 						}
 						break;
 						
@@ -724,13 +724,15 @@ public class Window3DController {
 	
 	
 	private void insertOverlayTitles() {
-		if (storiesLayer.getActiveStory()!=null && overlayVBox!=null) {
-			Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
-			
-			Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
-			storyTitle.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
-			
-			overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+		if (storiesLayer!=null) {
+			if (storiesLayer.getActiveStory()!=null && overlayVBox!=null) {
+				Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
+				
+				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
+				storyTitle.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
+				
+				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+			}
 		}
 	}
 	
@@ -779,7 +781,7 @@ public class Window3DController {
 			}
 		}
 		
-		else if (note.isAttachedToCell() 
+		else if (note.isAttachedToCell()
 				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
