@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
@@ -31,6 +32,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private TextField titleField;
 	@FXML private TextArea contentArea;
 	
+	@FXML private Button delete;
+	
 	@FXML private ComboBox<String> structuresComboBox;
 	
 	@FXML private CheckBox calloutTick;
@@ -45,6 +48,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	private NewStoryEditorController editController;
 	private BooleanProperty storyCreated;
+	private BooleanProperty noteCreated;
 	
 	private Story currentStory;
 	private Note currentNote;
@@ -59,6 +63,16 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
+		
+		noteCreated = new SimpleBooleanProperty(false);
+		noteCreated.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					setNoteCreated(false);
+			}
+		});
 		
 		currentStory = null;
 		currentNote = null;
@@ -81,6 +95,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private void assertFXMLNodes() {
 		assert (titleField!=null);
 		assert (contentArea!=null);
+		
+		assert (delete!=null);
+		
 		assert (structuresComboBox!=null);
 		assert (calloutTick!=null);
 		
@@ -94,8 +111,23 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
+	public void setStoryCreated(boolean created) {
+		storyCreated.set(created);
+	}
+	
+	
 	public BooleanProperty getStoryCreatedProperty() {
 		return storyCreated;
+	}
+	
+	
+	public void setNoteCreated(boolean created) {
+		noteCreated.set(created);
+	}
+	
+	
+	public BooleanProperty getNoteCreatedProperty() {
+		return noteCreated;
 	}
 	
 	
@@ -126,16 +158,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			}
 		}
 	}
-	
-	
-	/*
-	private void clearFields() {
-		if (titleField!=null && contentArea!=null && currentNote!=null) {
-			titleField.clear();
-			contentArea.clear();
-		}
-	}
-	*/
 	
 	
 	public Note getCurrentNote() {
@@ -195,7 +217,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			try {
 				editStage.setScene(new Scene((AnchorPane) loader.load()));
 				
-				editStage.setTitle("New Storys");
+				editStage.setTitle("New Story");
 				editStage.initModality(Modality.NONE);
 				
 				for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
@@ -215,7 +237,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 					@Override
 					public void handle(ActionEvent event) {
 						currentStory = new Story(editController.getTitle(), editController.getDescription());
-						storyCreated.set(true);
+						setStoryCreated(true);
+						
 						editController.clearFields();
 						editStage.hide();
 					}
@@ -228,27 +251,40 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		}
 		
 		editStage.show();
+		editStage.toFront();
 	}
 	
 	
 	@FXML protected void loadStory() {
-		
+		// TODO
 	}
 	
 	
 	@FXML protected void saveStory() {
-		
+		// TODO
 	}
 	
 	
 	@FXML protected void newNote() {
-		
-	}
-	
-	
-	@FXML protected void deleteNote() {
-		
+		if (currentStory!=null) {
+			
+			if (currentNote!=null)
+				currentNote.setSelected(false);
+			
+			currentNote = new Note(currentStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS);
+			currentNote.setSelected(true);
+			currentStory.addNote(currentNote);
+			
+			setNoteCreated(true);
+		}
+		else {
+			System.out.println("no story to add note to");
+		}
 	}
 	// ----- End button actions -----
+	
+	
+	private final String NEW_NOTE_TITLE = "New Note";
+	private final String NEW_NOTE_CONTENTS = "New Note Contents";
 	
 }

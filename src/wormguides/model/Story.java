@@ -43,21 +43,29 @@ public class Story {
 			public void onChanged(ListChangeListener.Change<? extends Note> c) {
 				while (c.next()) {
 					// note was edited
-					if (c.wasUpdated()) {
+					if (c.wasUpdated())
 						setChanged(true);
-					}
 					
-					/*
-					// note was added
-					for (Note note : c.getAddedSubList()) {
-						//System.out.println("added note - "+note);
+					else {
+						if (c.wasAdded())
+							setChanged(true);
+						
+						else if (c.wasRemoved())
+							setChanged(true);
+						/*
+						// note was added
+						for (Note note : c.getAddedSubList()) {
+							//System.out.println("added note - "+note);
+							setChanged(true);
+						}
+						
+						// note was deleted
+						for (Note note : c.getRemoved()) {
+							//System.out.println("removed note - "+note);
+							setChanged(true);
+						}
+						*/
 					}
-					
-					// note was deleted
-					for (Note note : c.getRemoved()) {
-						//System.out.println("removed note - "+note);
-					}
-					*/
 				}
 			}
 		});
@@ -163,20 +171,5 @@ public class Story {
 	public String toString() {
 		return name+" - contains "+notes.size()+" notes";
 	}
-	
-	
-	/*
-	private class NoteChangeListener implements ChangeListener<Boolean> {
-		@Override
-		public void changed(ObservableValue<? extends Boolean> observable, 
-				Boolean oldValue, Boolean newValue) {
-			if (newValue) {
-				// this get propagated to listview extractor
-				//System.out.println("story changed due to note change");
-				changedBooleanProperty.set(true);
-			}
-		}
-	}
-	*/
 
 }

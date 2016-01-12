@@ -79,7 +79,6 @@ public class StoriesLayer {
 		
 		stories = FXCollections.observableArrayList(
 				story -> new Observable[]{story.getChangedProperty()});
-		/*
 		stories.addListener(new ListChangeListener<Story>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
@@ -89,7 +88,7 @@ public class StoriesLayer {
 					}
 					else {
 						for (Story story : c.getAddedSubList()) {
-							System.out.println("added - "+story.getName());
+							//System.out.println("added - "+story.getName());
 						}
 						for (Story story : c.getRemoved()) {
 							System.out.println("removed - "+story.getName());
@@ -98,7 +97,6 @@ public class StoriesLayer {
 				}
 			}
 		});
-		*/
 		
 		width = 0;
 		
@@ -290,6 +288,11 @@ public class StoriesLayer {
 	}
 	
 	
+	public void setCurrentStory(Story story) {
+		currentStory = story;
+	}
+	
+	
 	// Used for sizing the widths each story item in the list view
 	public ChangeListener<Number> getListViewWidthListener() {
 		return new ChangeListener<Number>() {
@@ -310,6 +313,7 @@ public class StoriesLayer {
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
 					editController = new NoteEditorController();
+					
 					editController.setCurrentNote(currentNote);
 					if (currentNote!=null)
 						editController.setCurrentStory(currentNote.getParent());
@@ -336,8 +340,20 @@ public class StoriesLayer {
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
 									Story newStory = editController.getCurrentStory();
+									currentStory = newStory;
 									stories.add(newStory);
-									editController.getStoryCreatedProperty().set(false);
+									
+									editController.setStoryCreated(false);
+								}
+							}
+						});
+						
+						editController.getNoteCreatedProperty().addListener(new ChangeListener<Boolean>() {
+							@Override
+							public void changed(ObservableValue<? extends Boolean> observable, 
+									Boolean oldValue, Boolean newValue) {
+								if (newValue) {
+									currentNote = editController.getCurrentNote();
 								}
 							}
 						});

@@ -692,32 +692,33 @@ public class Window3DController {
 			Type type = note.getAttachmentType();
 			Display display = note.getTagDisplay();
 			
-			switch (display) {
-			
-				// Overlay: text is always facing the user in upper right corner
-				case OVERLAY:
-						// set overlay position relative to parent anchor pane
-						if (overlayVBox!=null)
-							overlayVBox.getChildren().add(node);
-						break;
-				
-				// Billboard: text transforms with the scene meshes/spheres
-				case BILLBOARD:
-						if (positionBillboard(note, node));
-							list.add(node);
-						break;
-				
-				// Sprite: text moves with whatever it is attached to and
-				// always faces user
-				case SPRITE:
-						if (spritesPane!=null) {
-							if (positionSprite(note, node))
-								spritesPane.getChildren().add(node);
-						}
-						break;
-						
-				default:
-						break;
+			if (display!=null) {
+				switch (display) {
+					// Overlay: text is always facing the user in upper right corner
+					case OVERLAY:
+							// set overlay position relative to parent anchor pane
+							if (overlayVBox!=null)
+								overlayVBox.getChildren().add(node);
+							break;
+					
+					// Billboard: text transforms with the scene meshes/spheres
+					case BILLBOARD:
+							if (positionBillboard(note, node));
+								list.add(node);
+							break;
+					
+					// Sprite: text moves with whatever it is attached to and
+					// always faces user
+					case SPRITE:
+							if (spritesPane!=null) {
+								if (positionSprite(note, node))
+									spritesPane.getChildren().add(node);
+							}
+							break;
+							
+					default:
+							break;
+				}
 			}
 		}
 	}
@@ -827,20 +828,23 @@ public class Window3DController {
 	// if isOverlay is true, then the text is larger
 	private Node makeNoteGraphic(Note note) {
 		String title = note.getTagName();
-		switch (note.getTagDisplay()) {
-			case OVERLAY:
-						return makeNoteOverlayText(title);
-			
-			case SPRITE:
-						return makeNoteSpriteText(title);
-						
-			case BILLBOARD:
-						return makeNoteBillboardText(title);
-			
-			default:
-						return null;
-						
+		if (note.getTagDisplay()!=null) {
+			switch (note.getTagDisplay()) {
+				case OVERLAY:
+							return makeNoteOverlayText(title);
+				
+				case SPRITE:
+							return makeNoteSpriteText(title);
+							
+				case BILLBOARD:
+							return makeNoteBillboardText(title);
+				
+				default:
+							return null;
+							
+			}
 		}
+		return null;
 	}
 	
 	

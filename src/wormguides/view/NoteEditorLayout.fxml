@@ -80,7 +80,7 @@
                                           </Tooltip>
                                        </tooltip></Button>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="20.0" HBox.hgrow="ALWAYS" />
-                                    <Button maxWidth="1.7976931348623157E308" minWidth="99.0" mnemonicParsing="false" onAction="#deleteNote" text="Delete Note" HBox.hgrow="SOMETIMES">
+                                    <Button fx:id="delete" maxWidth="1.7976931348623157E308" minWidth="99.0" mnemonicParsing="false" text="Delete Note" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
