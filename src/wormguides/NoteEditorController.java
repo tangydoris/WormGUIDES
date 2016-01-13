@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -28,6 +29,8 @@ import wormguides.model.Note;
 import wormguides.model.Story;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
+	
+	@FXML private Label activeStoryLabel;
 	
 	@FXML private TextField titleField;
 	@FXML private TextArea contentArea;
@@ -50,8 +53,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private BooleanProperty storyCreated;
 	private BooleanProperty noteCreated;
 	
-	private Story currentStory;
-	private Note currentNote;
+	private Story activeStory;
+	private Note activeNote;
 	
 	private ChangeListener<String> titleFieldListener;
 	private ChangeListener<String> contentAreaListener;
@@ -65,6 +68,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		storyCreated = new SimpleBooleanProperty(false);
 		
 		noteCreated = new SimpleBooleanProperty(false);
+		/*
 		noteCreated.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
@@ -73,9 +77,10 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 					setNoteCreated(false);
 			}
 		});
+		*/
 		
-		currentStory = null;
-		currentNote = null;
+		activeStory = null;
+		activeNote = null;
 	}
 	
 	
@@ -87,12 +92,17 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		contentAreaListener = new ContentAreaListener();
 		
 		updateFields();
+		
 		titleField.textProperty().addListener(titleFieldListener);
 		contentArea.textProperty().addListener(contentAreaListener);
+		
+		changeActiveStoryLabel();
 	}
 	
 	
 	private void assertFXMLNodes() {
+		assert (activeStoryLabel!=null);
+		
 		assert (titleField!=null);
 		assert (contentArea!=null);
 		
@@ -131,8 +141,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
-	public void setCurrentNote(Note note) {
-		currentNote = note;
+	public void setActiveNote(Note note) {
+		activeNote = note;
 		
 		if (titleField!=null && contentArea!=null) {
 			titleField.textProperty().removeListener(titleFieldListener);
@@ -148,9 +158,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	private void updateFields() {
 		if (titleField!=null && contentArea!=null) {
-			if (currentNote!=null) {
-				titleField.setText(currentNote.getTagName());
-				contentArea.setText(currentNote.getTagContents());
+			if (activeNote!=null) {
+				titleField.setText(activeNote.getTagName());
+				contentArea.setText(activeNote.getTagContents());
 			}
 			else {
 				titleField.clear();
@@ -160,18 +170,35 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
-	public Note getCurrentNote() {
-		return currentNote;
+	public Note getActiveNote() {
+		return activeNote;
 	}
 	
 	
-	public void setCurrentStory(Story story) {
-		currentStory = story;
+	public void setActiveStory(Story story) {
+		activeStory = story;
+		
+		changeActiveStoryLabel();
 	}
 	
 	
-	public Story getCurrentStory() {
-		return currentStory;
+	public Story getActiveStory() {
+		return activeStory;
+	}
+	
+	
+	private void changeActiveStoryLabel() {
+		if (activeStoryLabel!=null) {
+			if (activeStory!=null)
+				activeStoryLabel.setText("Active Story: "+activeStory.getName());
+			else
+				activeStoryLabel.setText("No Active Story");
+		}
+	}
+	
+	
+	public void addDeleteButtonListener(EventHandler<ActionEvent> handler) {
+		delete.setOnAction(handler);
 	}
 	
 	
@@ -180,9 +207,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		@Override
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
-			if (currentNote!=null) {
-				currentNote.setTagName(newValue);
-				currentNote.setChanged(true);
+			if (activeNote!=null) {
+				activeNote.setTagName(newValue);
+				activeNote.setChanged(true);
 			}
 		}
 	}
@@ -192,9 +219,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		@Override
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
-			if (currentNote!=null) {
-				currentNote.setTagContents(newValue);
-				currentNote.setChanged(true);
+			if (activeNote!=null) {
+				activeNote.setTagContents(newValue);
+				activeNote.setChanged(true);
 			}
 		}
 	}
@@ -236,7 +263,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				editController.addSubmitButtonListener(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						currentStory = new Story(editController.getTitle(), editController.getDescription());
+						activeStory = new Story(editController.getTitle(), editController.getDescription());
 						setStoryCreated(true);
 						
 						editController.clearFields();
@@ -266,15 +293,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	
 	@FXML protected void newNote() {
-		if (currentStory!=null) {
-			
-			if (currentNote!=null)
-				currentNote.setSelected(false);
-			
-			currentNote = new Note(currentStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS);
-			currentNote.setSelected(true);
-			currentStory.addNote(currentNote);
-			
+		if (activeStory!=null) {
+			setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
 			setNoteCreated(true);
 		}
 		else {

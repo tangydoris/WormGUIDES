@@ -25,6 +25,13 @@ public class Story {
 		this.description = description;
 		
 		activeBooleanProperty = new SimpleBooleanProperty(false);
+		activeBooleanProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				changedBooleanProperty.set(true);
+			}
+		});
 		
 		changedBooleanProperty = new SimpleBooleanProperty(false);
 		changedBooleanProperty.addListener(new ChangeListener<Boolean>() {
@@ -52,19 +59,6 @@ public class Story {
 						
 						else if (c.wasRemoved())
 							setChanged(true);
-						/*
-						// note was added
-						for (Note note : c.getAddedSubList()) {
-							//System.out.println("added note - "+note);
-							setChanged(true);
-						}
-						
-						// note was deleted
-						for (Note note : c.getRemoved()) {
-							//System.out.println("removed note - "+note);
-							setChanged(true);
-						}
-						*/
 					}
 				}
 			}

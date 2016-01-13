@@ -58,6 +58,18 @@
                            </children>
                         </HBox>
                         <Region maxWidth="1.7976931348623157E308" prefHeight="5.0" />
+                        <HBox>
+                           <children>
+                              <Region layoutX="99.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                              <Label fx:id="activeStoryLabel" text="No Active Story" wrapText="true">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Region maxWidth="1.7976931348623157E308" prefHeight="5.0" />
                         <VBox depthTest="ENABLE" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" style="-fx-border-color: #aaaaaa; -fx-background-color: #eeeeee; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
                            <children>
                               <HBox maxWidth="1.7976931348623157E308">

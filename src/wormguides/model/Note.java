@@ -34,9 +34,9 @@ public class Note {
 	// True when any field value changes, false otherwise
 	private BooleanProperty changedBooleanProperty;
 	// True when graphical representation is expanded, false otherwise
-	private boolean isExpanded;
+	private BooleanProperty expandedBooleanProperty;
 	// True when graphical representation is selected, false otherwise
-	private boolean isSelected;
+	private BooleanProperty activeBooleanProperty;
 	
 	
 	public Note(Story parent) {
@@ -63,8 +63,8 @@ public class Note {
 			}
 		});
 		
-		isExpanded = false;
-		isSelected = false;
+		expandedBooleanProperty = new SimpleBooleanProperty(false);
+		activeBooleanProperty = new SimpleBooleanProperty(false);
 	}
 	
 	public Note(Story parent, String tagName, String tagContents) {
@@ -74,23 +74,33 @@ public class Note {
 	}
 	
 	
-	public boolean isSelected() {
-		return isSelected;
+	public BooleanProperty getActiveBooleanProperty() {
+		return activeBooleanProperty;
 	}
 	
 	
-	public void setSelected(boolean selected) {
-		isSelected = selected;
+	public boolean isActive() {
+		return activeBooleanProperty.get();
+	}
+	
+	
+	public void setActive(boolean active) {
+		activeBooleanProperty.set(active);
+	}
+	
+	
+	public BooleanProperty getExpandedBooleanProperty() {
+		return expandedBooleanProperty;
 	}
 	
 	
 	public boolean isExpanded() {
-		return isExpanded;
+		return expandedBooleanProperty.get();
 	}
 	
 	
 	public void setExpanded(boolean expanded) {
-		isExpanded = expanded;
+		expandedBooleanProperty.set(expanded);
 	}
 	
 	

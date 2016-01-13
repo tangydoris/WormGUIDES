@@ -57,8 +57,6 @@ public class StoriesLayer {
 	private Stage parentStage;
 
 	private ObservableList<Story> stories;
-	//private HashMap<Story, StoryListCellGraphic> storyGraphicMap;
-	private ObservableList<NoteListCellGraphic> noteGraphics;
 	
 	private double width;
 	private Stage editStage;
@@ -67,10 +65,7 @@ public class StoriesLayer {
 	
 	private NoteEditorController editController;
 	
-	// Story/note being edited in note editor
-	private Story currentStory;
-	private Note currentNote;
-	// Story being displayed
+	private Note activeNote;
 	private Story activeStory;
 	
 	
@@ -100,16 +95,42 @@ public class StoriesLayer {
 		
 		width = 0;
 		
-		noteGraphics = FXCollections.observableArrayList();
-		
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		
 		buildStories();
 	}
 	
 	
-	public Story getCurrentStory() {
-		return currentStory;
+	public void setActiveStory(Story story) {
+		// disable previous active story
+		if (activeStory!=null)
+			activeStory.setActive(false);
+		
+		setActiveNote(null);
+		
+		activeStory = story;
+		if (activeStory!=null)
+			activeStory.setActive(true);
+		
+		if (editController!=null)
+			editController.setActiveStory(activeStory);
+		
+		rebuildSceneFlag.set(true);
+		rebuildSceneFlag.set(false);
+	}
+	
+	
+	public void setActiveNote(Note note) {
+		// deactivate the previous active note
+		if (activeNote!=null)
+			activeNote.setActive(false);
+		
+		activeNote = note;
+		if (activeNote!=null)
+			activeNote.setActive(true);
+		
+		if (editController!=null)
+			editController.setActiveNote(activeNote);
 	}
 	
 	
@@ -288,11 +309,6 @@ public class StoriesLayer {
 	}
 	
 	
-	public void setCurrentStory(Story story) {
-		currentStory = story;
-	}
-	
-	
 	// Used for sizing the widths each story item in the list view
 	public ChangeListener<Number> getListViewWidthListener() {
 		return new ChangeListener<Number>() {
@@ -314,9 +330,8 @@ public class StoriesLayer {
 				if (editStage==null) {
 					editController = new NoteEditorController();
 					
-					editController.setCurrentNote(currentNote);
-					if (currentNote!=null)
-						editController.setCurrentStory(currentNote.getParent());
+					editController.setActiveNote(activeNote);
+					editController.setActiveStory(activeStory);
 					
 					editStage = new Stage();
 					
@@ -339,9 +354,10 @@ public class StoriesLayer {
 							public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
-									Story newStory = editController.getCurrentStory();
-									currentStory = newStory;
+									Story newStory = editController.getActiveStory();
 									stories.add(newStory);
+									setActiveStory(newStory);
+									setActiveNote(null);
 									
 									editController.setStoryCreated(false);
 								}
@@ -353,8 +369,21 @@ public class StoriesLayer {
 							public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
 								if (newValue) {
-									currentNote = editController.getCurrentNote();
+									Note newNote = editController.getActiveNote();
+									editController.setNoteCreated(false);
+									activeStory.addNote(newNote);
+									setActiveNote(newNote);
 								}
+							}
+						});
+						
+						editController.addDeleteButtonListener(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								if (activeNote!=null)
+									activeStory.removeNote(activeNote);
+								
+								setActiveNote(null);
 							}
 						});
 						
@@ -376,26 +405,8 @@ public class StoriesLayer {
 	}
 	
 	
-	// Un-highlight all notes except for the input note
-	private void deselectAllNotesExcept(NoteListCellGraphic graphic) {
-		for (NoteListCellGraphic g : noteGraphics)
-			g.setSelected(false);
-		
-		graphic.setSelected(true);
-	}
-	
-	
 	public BooleanProperty getRebuildSceneFlag() {
 		return rebuildSceneFlag;
-	}
-	
-	
-	// Make all stories inactive except for the input story
-	private void disableAllStoriesExcept(Story story) {
-		for (Story s : stories)
-			s.setActive(false);
-		
-		story.setActive(true);
 	}
 	
 	
@@ -412,41 +423,14 @@ public class StoriesLayer {
 	                    if (!empty)  {
 	                    	// Create story graphic
 	                    	StoryListCellGraphic storyGraphic = new StoryListCellGraphic(story, width);
-	                    	//storyGraphicMap.put(story, storyGraphic);
 	                    	
 	                    	// Add list view for notes inside story graphic
-	                    	for (Note note : story.getNotes()) {
-	                    		NoteListCellGraphic noteGraphic = new NoteListCellGraphic(note);
-	                    		storyGraphic.getChildren().add(noteGraphic);
-	                    		
-	                    		// Add graphic to observable list for note selection
-	                    		noteGraphics.add(noteGraphic);
-	                    		noteGraphic.setOnMouseClicked(new EventHandler<MouseEvent>() {
-									@Override
-									public void handle(MouseEvent event) {
-										if (!(event.getPickResult().getIntersectedNode()
-												==noteGraphic.getExpandIcon())) {
-											if (noteGraphic.isSelected()) {
-												noteGraphic.setSelected(false);
-												
-												if (editController!=null) {
-													editController.setCurrentNote(null);
-													editController.setCurrentStory(null);
-												}
-											}
-											else {
-												deselectAllNotesExcept(noteGraphic);
-												
-												if (editController!=null) {
-													editController.setCurrentNote(note);
-													editController.setCurrentStory(note.getParent());
-												}
-											}
-										}
-									}
-	                    		});
+	                    	if (story.isActive()) {
+		                    	for (Note note : story.getNotes()) {
+		                    		NoteListCellGraphic noteGraphic = new NoteListCellGraphic(note);
+		                    		storyGraphic.getChildren().add(noteGraphic);
+		                    	}
 	                    	}
-	                    	
 	                    	
 	                    	Separator s = new Separator(Orientation.HORIZONTAL);
 	                    	s.setFocusTraversable(false);
@@ -514,15 +498,10 @@ public class StoriesLayer {
 				@Override
 				public void handle(MouseEvent event) {
 					story.setActive(!story.isActive());
-					if (story.isActive()) {
-						activeStory = story;
-						disableAllStoriesExcept(story);
-					}
+					if (story.isActive())
+						setActiveStory(story);
 					else
-						activeStory = null;
-					
-					rebuildSceneFlag.set(true);
-					rebuildSceneFlag.set(false);
+						setActiveStory(null);
 				}
 			});
 			
@@ -565,8 +544,6 @@ public class StoriesLayer {
 
 		private Text contents;
 		
-		private BooleanProperty selected;
-		
 		
 		// Input note is the note to which this graphic belongs to
 		public NoteListCellGraphic(Note note) {
@@ -585,15 +562,16 @@ public class StoriesLayer {
 			
 			expandIcon = new Text("▸");
 			expandIcon.setPickOnBounds(true);
-			expandIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					setExpanded(!note.isExpanded());
-				}
-			});
 			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
 			expandIcon.toFront();
+			expandIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					note.setExpanded(!note.isExpanded());
+					expandNote(note.isExpanded());
+				}
+			});
 			
 			Region r1 = new Region();
 			r1.setPrefWidth(5);
@@ -608,6 +586,8 @@ public class StoriesLayer {
 			titleContainer.getChildren().addAll(expandIcon, r1, title);
 			titleContainer.setAlignment(Pos.CENTER_LEFT);
 			
+			getChildren().add(titleContainer);
+			
 			// contents graphics
 			contentsContainer = new HBox(0);
 			
@@ -620,30 +600,34 @@ public class StoriesLayer {
 			contents.setWrappingWidth(width-5-r2.prefWidth(-1));
 			contents.setFont(AppFont.getFont());
 			contents.setFontSmoothingType(FontSmoothingType.LCD);
-			contentsContainer.getChildren().addAll(r2, contents);
 			
-			getChildren().add(titleContainer);
+			contentsContainer.getChildren().addAll(r2, contents);
+			expandNote(note.isExpanded());
 			
 			setPickOnBounds(false);
-			
-			selected = new SimpleBooleanProperty(note.isSelected());
-			highlightCell(note.isSelected());
-			
-			// listener to selection/unselection
-			selected.addListener(new ChangeListener<Boolean>() {
+			setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					if (event.getPickResult().getIntersectedNode()!=expandIcon) {
+						note.setActive(!note.isActive());
+						if (note.isActive())
+							setActiveNote(note);
+						else
+							setActiveNote(null);
+					}
+				}
+			});
+			note.getActiveBooleanProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, 
-									Boolean oldValue, Boolean newValue) {
-					note.setSelected(newValue);
-					if (newValue) {
+						Boolean oldValue, Boolean newValue) {
+					if (newValue)
 						highlightCell(true);
-						currentNote = note;
-						currentStory = note.getParent();
-					}
 					else
 						highlightCell(false);
 				}
 			});
+			highlightCell(note.isActive());
 			
 			// render note changes
 			note.getChangedProperty().addListener(new ChangeListener<Boolean>() {
@@ -656,26 +640,6 @@ public class StoriesLayer {
 					}
 				}
 			});
-			
-			story.getActiveProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> observable, 
-									Boolean oldValue, Boolean newValue) {
-					if (!isSelected()) {
-						if (observable.getValue())
-							colorTexts(Color.BLACK, expandIcon, title, contents);
-						else
-							colorTexts(Color.GREY, expandIcon, title, contents);
-					}
-				}
-			});
-			
-			setExpanded(note.isExpanded());
-		}
-		
-		
-		public Text getExpandIcon() {
-			return expandIcon;
 		}
 		
 		
@@ -687,34 +651,12 @@ public class StoriesLayer {
 			}
 			else {
 				setStyle("-fx-background-color: white;");
-				
-				if (story.isActive())
-					colorTexts(Color.BLACK, expandIcon, title, contents);
-				else
-					colorTexts(Color.GREY, expandIcon, title, contents);
+				colorTexts(Color.BLACK, expandIcon, title, contents);
 			}
 		}
-
-		
-		public void setSelected(boolean isSelected) {
-			note.setSelected(isSelected);
-			selected.set(isSelected);
-		}
 		
 		
-		public BooleanProperty getSelectedBooleanProperty() {
-			return selected;
-		}
-		
-		
-		public boolean isSelected() {
-			return selected.get();
-		}
-		
-		
-		public void setExpanded(boolean expanded) {
-			note.setExpanded(expanded);
-			
+		private void expandNote(boolean expanded) {
 			if (expanded) {
 				getChildren().add(contentsContainer);
 				expandIcon.setText(expandIcon.getText().replace("▸", "▾"));
