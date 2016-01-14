@@ -21,5 +21,9 @@ public class EmbryonicHomology {
 			return this.cell_2;
 		}
 		return "";
-	}	
+	}
+	
+	public String getHomology() {
+		return this.getCell1() + ":" + this.getCell2();
+	}
 }

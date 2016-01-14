@@ -52,17 +52,40 @@ public class EmbryonicAnalogousCells {
 		}
 	}
 	
+	/*
+	 * find a match in the database given a query cell
+	 * Case 1: matches a homologous listing
+	 * Case 2: descendant of a listed homology
+	 */
 	public static String findEmbryonicHomology(String cell) {
 		for (EmbryonicHomology eh : homologues) {
-			if (eh.getCell1().equals(cell)) {
-				return eh.getCell2();
+			if (cell.startsWith(eh.getCell1())) {
+				
+				//check if case 1 i.e. complete match
+				if (cell.equals(eh.getCell1())) {
+					return eh.getCell2();
+				}
+				
+				//otherwise, case 1 i.e. descendant --> add suffix
+				String suffix = cell.substring(eh.getCell2().length() - 1);
+				String descendantHomology = eh.getCell2() + suffix;
+				return descendantHomology;
+				
 			}
 			
-			if (eh.getCell2().equals(cell)) {
-				return eh.getCell1();
+			if (cell.startsWith(eh.getCell2())) {
+				
+				//check if case 1 i.e. complete match
+				if (cell.equals(eh.getCell2())) {
+					return eh.getCell1();
+				}
+				
+				//otherwise, case 1 i.e. descendant --> add suffix
+				String suffix = cell.substring(eh.getCell1().length() - 1);
+				String descendantHomology = eh.getCell1() + suffix;
+				return descendantHomology;
 			}
 		}
-		
 		return "N/A";
 	}
 }
