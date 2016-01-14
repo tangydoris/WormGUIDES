@@ -91,10 +91,13 @@ public abstract class Rule {
 		// format UI elements
 		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
 		
-		hbox.setSpacing(2);	
+		hbox.setSpacing(3);
+		hbox.setPadding(new Insets(3));
+		
 		label.setFont(AppFont.getFont());
 		label.prefHeightProperty().bind(sideLength);
-		label.setMaxWidth(150);
+		label.setMaxWidth(180);
+		HBox.setHgrow(label, Priority.ALWAYS);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		resetLabel();
 		

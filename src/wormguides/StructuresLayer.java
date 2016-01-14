@@ -70,19 +70,6 @@ public class StructuresLayer {
 		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
 		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 	}
-
-	
-	/*
-	// Un-hilights all cells except for input cell graphic
-	private void deselectAllExcept(StructureListCellGraphic graphic) {
-		for (StructureListCellGraphic g : nameListCellMap.values()) {
-			if (g==graphic)
-				g.setSelected(true);
-			else
-				g.setSelected(false);
-		}
-	}
-	*/
 	
 	
 	public ObservableList<String> getAllStructuresList() {
@@ -114,10 +101,14 @@ public class StructuresLayer {
 			public void changed(ObservableValue<? extends String> observable,
 										String oldValue, String newValue) {
 				searchText = newValue.toLowerCase();
+				
 				if (searchText.isEmpty())
 					searchResultsList.clear();
-				else
+				
+				else {
 					searchAndUpdateResults(newValue.toLowerCase());
+					setSelectedStructure("");
+				}
 			}
 		};
 	}
