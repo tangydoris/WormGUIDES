@@ -474,6 +474,21 @@ public class Search {
 		return false;
 	}
 	
+	/*
+	 * non terminal cell case will use this search to find the 
+	 * terminal descendants for a given cell
+	 */
+	public static ArrayList<String> getDescendantsList(String queryCell) {
+		ArrayList<String> descendants = new ArrayList<String>();
+		if (queryCell != null) {
+			for (String name : activeLineageNames) {
+				if (!descendants.contains(name) && LineageTree.isDescendant(name, queryCell)) {
+					descendants.add(name);
+				}	
+			}
+		}
+		return descendants;
+	}
 	
 	// Generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {

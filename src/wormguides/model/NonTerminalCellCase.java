@@ -1,6 +1,7 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import wormguides.Search;
 
 public class NonTerminalCellCase {
 	private String cellName;
@@ -13,7 +14,21 @@ public class NonTerminalCellCase {
 		//reference embryonic analogues cells db for homology
 		this.embryonicHomology = EmbryonicAnalogousCells.findEmbryonicHomology(this.cellName);
 		
-		terminalDescendants = new ArrayList<TerminalDescendant>();
+		buildTerminalDescendants();
+	}
+	
+	private void buildTerminalDescendants() {
+		if (terminalDescendants == null) {
+			terminalDescendants = new ArrayList<TerminalDescendant>();
+		}
+
+		ArrayList<String> descendantsList = Search.getDescendantsList(this.cellName);
+		
+		//add each descendant as terminal descendant object
+		for (String descendant : descendantsList) {
+			terminalDescendants.add
+						(new TerminalDescendant(descendant, PartsList.getDescriptionByLineageName(descendant)));
+		}
 	}
 	
 	public String getCellName() {
@@ -27,27 +42,4 @@ public class NonTerminalCellCase {
 	public ArrayList<TerminalDescendant> getTerminalDescendants() {
 		return this.terminalDescendants;
 	}
-	
-	
-	/*
-	 * private inner class which holds a cell name and parts list entry for each terminal descendant (neuron)
-	 */
-	private class TerminalDescendant {
-		private String cellName;
-		private String partsListEntry;
-		
-		public TerminalDescendant(String cellName, String partsListEntry) {
-			this.cellName = cellName;
-			this.partsListEntry = partsListEntry;
-		}
-		
-		public String getCellName() {
-			return this.cellName;
-		}
-		
-		public String getPartsListEntry() {
-			return this.partsListEntry;
-		}
-	}
-	
 }

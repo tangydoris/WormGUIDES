@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import wormguides.model.NonTerminalCellCase;
+import wormguides.model.PartsList;
 import wormguides.model.TerminalCellCase;
+import wormguides.model.TerminalDescendant;
 
 public class InfoWindowDOM {
 	private HTMLNode html;
@@ -204,10 +206,24 @@ public class InfoWindowDOM {
 		
 		HTMLNode terminalDescendantsP = new HTMLNode("p", "", "", "<strong>- Terminal Descendants: </strong>");
 		HTMLNode terminalDescendantsUL = new HTMLNode("ul");
-//		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
-//			HTMLNode li = new HTMLNode("li", "", "", reference);
-//			referencesUL.addChild(li);
-//		}
+		for (TerminalDescendant terminalDescendant : nonTerminalCase.getTerminalDescendants()) {
+			String descendant = "";
+			String functionalName = PartsList.getFunctionalNameByLineageName(terminalDescendant.getCellName());
+			
+			if (functionalName != null) {
+				descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName() + ")</strong>";
+			} else {
+				descendant = "<strong>" + terminalDescendant.getCellName() + "</strong>";
+			}
+			
+			String partsListEntry = terminalDescendant.getPartsListEntry();
+			if (!partsListEntry.equals("N/A")) {
+				descendant += (", " + partsListEntry);
+			}
+			
+			HTMLNode li = new HTMLNode("li", "", "", descendant);
+			terminalDescendantsUL.addChild(li);
+		}
 		
 		//add data tags to div
 		externalInfoDiv.addChild(externalInfoP);
