@@ -19,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -26,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.Note;
+import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
@@ -37,17 +39,33 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private Button delete;
 	
-	@FXML private ComboBox<String> structuresComboBox;
-	
-	@FXML private CheckBox calloutTick;
-	
+	// time stuff
 	@FXML private CheckBox timeTick;
 	@FXML private TextField startTimeField;
 	@FXML private TextField endTimeField;
 	
+	// attachment type stuff
 	@FXML private ToggleGroup attachmentToggle;
+	@FXML private RadioButton cellRadioBtn;
+	@FXML private RadioButton globalRadioBtn;
+	@FXML private ComboBox<String> structuresComboBox;
+	@FXML private RadioButton axonRadioBtn;
+	@FXML private RadioButton dendriteRadioBtn;
+	@FXML private RadioButton cellBodyRadioBtn;
+	
+	// callout stuff
+	@FXML private CheckBox calloutTick;
 	@FXML private ToggleGroup calloutToggle;
+	@FXML private RadioButton upLeftRadioBtn;
+	@FXML private RadioButton upRightRadioBtn;
+	@FXML private RadioButton lowLeftRadioBtn;
+	@FXML private RadioButton lowRightRadioBtn;
+	
+	// display type stuff
 	@FXML private ToggleGroup displayToggle;
+	@FXML private RadioButton infoPaneRadioBtn;
+	@FXML private RadioButton locationRadioBtn;
+	@FXML private RadioButton billboardRadioBtn;
 	
 	private NewStoryEditorController editController;
 	private BooleanProperty storyCreated;
@@ -66,18 +84,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
-		
 		noteCreated = new SimpleBooleanProperty(false);
-		/*
-		noteCreated.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
-				if (newValue)
-					setNoteCreated(false);
-			}
-		});
-		*/
 		
 		activeStory = null;
 		activeNote = null;
@@ -97,6 +104,14 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		contentArea.textProperty().addListener(contentAreaListener);
 		
 		changeActiveStoryLabel();
+		
+		initToggleData();
+	}
+	
+	
+	private void initToggleData() {
+		cellRadioBtn.setUserData(Type.CELL);
+		
 	}
 	
 	
@@ -108,16 +123,29 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		assert (delete!=null);
 		
-		assert (structuresComboBox!=null);
-		assert (calloutTick!=null);
-		
 		assert (timeTick!=null);
 		assert (startTimeField!=null);
 		assert (endTimeField!=null);
 		
 		assert (attachmentToggle!=null);
+		assert (cellRadioBtn!=null);
+		assert (globalRadioBtn!=null);
+		assert (structuresComboBox!=null);
+		assert (axonRadioBtn!=null);
+		assert (dendriteRadioBtn!=null);
+		assert (cellBodyRadioBtn!=null);
+		
 		assert (calloutToggle!=null);
+		assert (calloutTick!=null);
+		assert (upLeftRadioBtn!=null);
+		assert (upRightRadioBtn!=null);
+		assert (lowLeftRadioBtn!=null);
+		assert (lowRightRadioBtn!=null);
+		
 		assert (displayToggle!=null);
+		assert (infoPaneRadioBtn!=null);
+		assert (locationRadioBtn!=null);
+		assert (billboardRadioBtn!=null);
 	}
 	
 	
@@ -296,9 +324,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		if (activeStory!=null) {
 			setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
 			setNoteCreated(true);
-		}
-		else {
-			System.out.println("no story to add note to");
 		}
 	}
 	// ----- End button actions -----

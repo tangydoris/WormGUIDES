@@ -145,10 +145,13 @@
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <RadioButton mnemonicParsing="false">
+                                          <RadioButton fx:id="cellRadioBtn" mnemonicParsing="false">
                                              <toggleGroup>
-                                                <ToggleGroup fx:id="noteAttachmentToggle" />
+                                                <ToggleGroup fx:id="attachmentToggle" />
                                              </toggleGroup>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
                                           </RadioButton>
                                        </children>
                                     </HBox>
@@ -165,7 +168,10 @@
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <RadioButton mnemonicParsing="false" toggleGroup="$noteAttachmentToggle" />
+                                          <RadioButton fx:id="globalRadioBtn" mnemonicParsing="false" toggleGroup="$attachmentToggle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></RadioButton>
                                        </children>
                                     </HBox>
                                  </children>
@@ -205,7 +211,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -217,7 +223,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -229,7 +235,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$noteAttachmentToggle">
+                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -261,7 +267,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
+                                    <RadioButton fx:id="upLeftRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -276,7 +282,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton fx:id="upRightRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -293,7 +299,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton fx:id="lowLeftRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -305,7 +311,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
+                                    <RadioButton fx:id="lowRightRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$calloutToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -324,7 +330,10 @@
                                              </font>
                                           </Label>
                                           <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                          <CheckBox fx:id="timeTick" mnemonicParsing="false" />
+                                          <CheckBox fx:id="timeTick" mnemonicParsing="false">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></CheckBox>
                                        </children>
                                     </HBox>
                                  </children>
@@ -379,9 +388,12 @@
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <RadioButton mnemonicParsing="false">
+                                          <RadioButton fx:id="infoPaneRadioBtn" mnemonicParsing="false">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
                                              <toggleGroup>
-                                                <ToggleGroup fx:id="noteDisplayToggle" />
+                                                <ToggleGroup fx:id="displayToggle" />
                                              </toggleGroup>
                                           </RadioButton>
                                        </children>
@@ -399,7 +411,10 @@
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <RadioButton mnemonicParsing="false" toggleGroup="$noteDisplayToggle" />
+                                          <RadioButton fx:id="locationRadioBtn" mnemonicParsing="false" toggleGroup="$displayToggle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></RadioButton>
                                        </children>
                                     </HBox>
                                  </children>
@@ -415,7 +430,10 @@
                                              </font>
                                           </Label>
                                           <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <RadioButton mnemonicParsing="false" toggleGroup="$noteDisplayToggle" />
+                                          <RadioButton fx:id="billboardRadioBtn" mnemonicParsing="false" toggleGroup="$displayToggle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font></RadioButton>
                                        </children>
                                     </HBox>
                                  </children>

@@ -18,6 +18,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -265,14 +266,13 @@ public class StructuresLayer {
 	// Graphical representation of a structure list cell
 	private class StructureListCellGraphic extends HBox{
 		
-		private boolean selected;
+		private boolean isSelected;
+		private Label label;
 		
 		public StructureListCellGraphic(String name) {
 			super();
 			
-			selected = false;
-			
-			Label label = new Label(name);
+			label = new Label(name);
 	    	label.setFont(AppFont.getFont());
 	    	
 	    	label.setPrefHeight(UI_HEIGHT);
@@ -285,30 +285,37 @@ public class StructuresLayer {
 	    	setPadding(new Insets(5, 5, 5, 5));
 	    	
 	    	setPickOnBounds(false);
+	    	setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					setSelected(!isSelected);
+				}
+	    	});
+	    	setSelected(false);
 		}
 		
 		
 		public boolean isSelected() {
-			return selected;
+			return isSelected;
 		}
 		
 		
 		public void setSelected(boolean selected) {
-			this.selected = selected;
-			highlightCell(selected);
+			isSelected = selected;
+			highlightCell(isSelected);
 		}
 		
 		
 		private void highlightCell(boolean highlight) {
 			if (highlight) {
 				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
-						+ "-fx-background-insets: 0, 1, 2; "
-						+ "-fx-background: -fx-accent;"
-						+ "-fx-text-fill: white;");
+						+ "-fx-background: -fx-accent;");
+				label.setTextFill(Color.WHITE);
 			}
-			else
-				setStyle("-fx-background-color: white;"
-						+ "-fx-text-fill: black;");
+			else {
+				setStyle("-fx-background-color: white;");
+				label.setTextFill(Color.BLACK);
+			}
 		}
 		
 		
