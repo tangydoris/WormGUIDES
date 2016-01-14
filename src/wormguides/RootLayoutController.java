@@ -407,7 +407,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				if (!newValue.isEmpty())
-					setSelectedStructureInfo(selectedName.get());
+					setSelectedEntityInfo(selectedName.get());
 			}
 		});
 		
@@ -437,7 +437,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	
-	private void setSelectedStructureInfo(String name) {
+	private void setSelectedEntityInfo(String name) {
 		if (name==null || name.isEmpty())
 			return;
 		
@@ -712,8 +712,19 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
+		/*
 		allStructuresListView.getFocusModel().focusedItemProperty()
 							.addListener(structuresLayer.getSelectionListener());
+		*/
+		structuresLayer.getSelectedNameProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (newValue!=null && !newValue.isEmpty()) {
+					// TODO
+				}
+			}
+		});
 		
 		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
@@ -723,7 +734,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
-				if (newValue!=null && !newValue.isEmpty())
+				if (!newValue.isEmpty())
 					selectedName.set(newValue);
 			}
 		});

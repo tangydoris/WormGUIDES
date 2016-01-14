@@ -3,6 +3,8 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -11,7 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
@@ -29,12 +30,15 @@ import wormguides.model.MulticellularStructureRule;
 
 
 public class StructuresLayer {
+	
+	private ObservableList<Rule> rulesList;
+	
 	private ObservableList<String> allStructuresList;
 	private ObservableList<String> searchResultsList;
-	private ObservableList<Rule> rulesList;
+	
 	private Color selectedColor;
-	private String selectedStructure;
 	private String searchText;
+	
 	private HashMap<String, String> nameToCommentsMap;
 	
 	private HashMap<String, StructureListCellGraphic> nameListCellMap;
@@ -56,18 +60,6 @@ public class StructuresLayer {
 					if (!change.wasUpdated()) {
 						for (String string : change.getAddedSubList()) {
 							StructureListCellGraphic graphic = new StructureListCellGraphic(string);
-							graphic.setOnMouseClicked(new EventHandler<Event>() {
-					    		@Override
-					    		public void handle(Event event) {
-					    			if (graphic.isSelected())
-					    				graphic.setSelected(false);
-					    			
-					    			else {
-					    				deselectAllExcept(graphic);
-					    				selectedNameProperty.set(string);
-					    			}
-					    		}
-					    	});
 							nameListCellMap.put(string, graphic);
 						}
 					}
@@ -80,6 +72,7 @@ public class StructuresLayer {
 	}
 
 	
+	/*
 	// Un-hilights all cells except for input cell graphic
 	private void deselectAllExcept(StructureListCellGraphic graphic) {
 		for (StructureListCellGraphic g : nameListCellMap.values()) {
@@ -89,6 +82,7 @@ public class StructuresLayer {
 				g.setSelected(false);
 		}
 	}
+	*/
 	
 	
 	public ObservableList<String> getAllStructuresList() {
@@ -97,7 +91,15 @@ public class StructuresLayer {
 	
 	
 	public void setSelectedStructure(String structure) {
-		selectedStructure = structure;
+		// unhighlight previous selected structure
+		if (!selectedNameProperty.get().isEmpty())
+			nameListCellMap.get(selectedNameProperty.get()).setSelected(false);
+		
+		selectedNameProperty.set(structure);
+		
+		// highlight new selected structure
+		if (!selectedNameProperty.get().isEmpty())
+			nameListCellMap.get(selectedNameProperty.get()).setSelected(true);
 	}
 	
 	
@@ -205,14 +207,8 @@ public class StructuresLayer {
 	}
 	
 	
-	public ChangeListener<String> getSelectionListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-										String oldValue, String newValue) {
-				setSelectedStructure(newValue);
-			}
-		};
+	public StringProperty getSelectedNameProperty() {
+		return selectedNameProperty;
 	}
 	
 
@@ -266,7 +262,7 @@ public class StructuresLayer {
 	// Graphical representation of a structure list cell
 	private class StructureListCellGraphic extends HBox{
 		
-		private boolean isSelected;
+		private BooleanProperty isSelected;
 		private Label label;
 		
 		public StructureListCellGraphic(String name) {
@@ -285,30 +281,44 @@ public class StructuresLayer {
 	    	setPadding(new Insets(5, 5, 5, 5));
 	    	
 	    	setPickOnBounds(false);
+	    	isSelected = new SimpleBooleanProperty(false);
 	    	setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					setSelected(!isSelected);
+					isSelected.set(!isSelected());
+					if (isSelected())
+						setSelectedStructure(label.getText());
+					else
+						setSelectedStructure("");
 				}
 	    	});
-	    	setSelected(false);
+	    	isSelected.addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+						Boolean oldValue, Boolean newValue) {
+					if (newValue)
+						highlightCell(true);
+					else
+						highlightCell(false);
+				}
+	    	});
+	    	highlightCell(isSelected());
 		}
 		
 		
 		public boolean isSelected() {
-			return isSelected;
+			return isSelected.get();
 		}
 		
 		
 		public void setSelected(boolean selected) {
-			isSelected = selected;
-			highlightCell(isSelected);
+			isSelected.set(selected);
 		}
 		
 		
 		private void highlightCell(boolean highlight) {
 			if (highlight) {
-				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
+				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;"
 						+ "-fx-background: -fx-accent;");
 				label.setTextFill(Color.WHITE);
 			}
