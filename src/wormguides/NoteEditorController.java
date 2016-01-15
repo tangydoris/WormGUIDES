@@ -24,21 +24,17 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.Note;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
-import wormguides.view.AppFont;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private Label activeStoryLabel;
 	@FXML private Label activeCellLabel;
-	private StringProperty activeCellProperty;
-	private Tooltip cellNameTooltip;
 	
 	@FXML private TextField titleField;
 	@FXML private TextArea contentArea;
@@ -86,7 +82,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private Stage editStage;
 	
 	
-	public NoteEditorController(StringProperty cellNameProperty) {
+	public NoteEditorController() {
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
@@ -94,11 +90,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		activeStory = null;
 		activeNote = null;
-		
-		activeCellProperty = cellNameProperty;
-		cellNameTooltip = new Tooltip();
-		cellNameTooltip.setFont(AppFont.getFont());
-		cellNameTooltip.setText("(none)");
 	}
 	
 	
@@ -117,24 +108,33 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		changeActiveStoryLabel();
 		
 		initToggleData();
+	}
+	
+	
+	private String removeFunctionalName(String name) {
+		if (name.indexOf("(") > -1)
+			name = name.substring(0, name.indexOf("("));
+		name.trim();
 		
-		activeCellLabel.setTooltip(cellNameTooltip);
-		activeCellProperty.addListener(new ChangeListener<String>() {
+		return name;
+	}
+	
+	
+	public void setActiveCellNameProperty(StringProperty nameProperty) {
+		nameProperty.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 					String oldValue, String newValue) {
-				if (!newValue.isEmpty()) {
-					// remove functional part of name
-					if (newValue.indexOf("(") > -1)
-						newValue = newValue.substring(0, newValue.indexOf("("));
-					newValue.trim();
-					
-					cellNameTooltip.setText(newValue);
-					activeCellLabel.setText("Active Cell ("+newValue+")");
-				}
+				if (!newValue.isEmpty())
+					activeCellLabel.setText("Active Cell ("+removeFunctionalName(newValue)+")");
 			}
 		});
-		activeCellLabel.setText("ActiveCell (none)");
+		
+		String name = nameProperty.get();
+		if (name.isEmpty())
+			activeCellLabel.setText("Active Cell (none)");
+		else
+			activeCellLabel.setText("Active Cell ("+removeFunctionalName(name)+")");
 	}
 	
 	

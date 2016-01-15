@@ -333,7 +333,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new NoteEditorController(activeCellProperty);
+					editController = new NoteEditorController();
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
@@ -353,6 +353,8 @@ public class StoriesLayer {
 						editStage.initOwner(parentStage);
 						editStage.initModality(Modality.NONE);
 						editStage.setResizable(true);
+						
+						editController.setActiveCellNameProperty(activeCellProperty);
 						
 						editController.getStoryCreatedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override

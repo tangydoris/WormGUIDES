@@ -631,6 +631,7 @@ public class Note {
 	public enum Display {
 		OVERLAY("overlay"),
 		BILLBOARD("billboard"),
+		BILLBOARD_FRONT_FACING("billboard front-facing"),
 		SPRITE("sprite");
 		
 		private String display;
