@@ -707,26 +707,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void initStructuresLayer() {
-		structuresLayer = new StructuresLayer(elementsList);
+		structuresLayer = new StructuresLayer(elementsList, structuresSearchField);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
-		/*
-		allStructuresListView.getFocusModel().focusedItemProperty()
-							.addListener(structuresLayer.getSelectionListener());
-		*/
-		structuresLayer.getSelectedNameProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-					String oldValue, String newValue) {
-				if (newValue!=null && !newValue.isEmpty()) {
-					// TODO
-				}
-			}
-		});
-		
-		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 		

@@ -19,6 +19,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -40,11 +41,13 @@ public class StructuresLayer {
 	private String searchText;
 	
 	private HashMap<String, String> nameToCommentsMap;
-	
 	private HashMap<String, StructureListCellGraphic> nameListCellMap;
+	
 	private StringProperty selectedNameProperty;
 	
-	public StructuresLayer(SceneElementsList sceneElementsList) {
+	private TextField searchField;
+	
+	public StructuresLayer(SceneElementsList sceneElementsList, TextField searchField) {
 		selectedColor = Color.WHITE; //default color
 		
 		allStructuresList = FXCollections.observableArrayList();
@@ -69,6 +72,8 @@ public class StructuresLayer {
 		
 		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
 		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
+		
+		setSearchField(searchField);
 	}
 	
 	
@@ -95,22 +100,34 @@ public class StructuresLayer {
 	}
 	
 	
-	public ChangeListener<String> getStructuresTextFieldListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-										String oldValue, String newValue) {
-				searchText = newValue.toLowerCase();
-				
-				if (searchText.isEmpty())
-					searchResultsList.clear();
-				
-				else {
-					searchAndUpdateResults(newValue.toLowerCase());
-					setSelectedStructure("");
+	private void setSearchField(TextField field) {
+		if (field!=null) {
+			searchField = field;
+			
+			searchField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, 
+						String oldValue, String newValue) {
+					searchText = newValue.toLowerCase();
+					
+					if (searchText.isEmpty())
+						searchResultsList.clear();
+					
+					else {
+						searchAndUpdateResults(newValue.toLowerCase());
+						deselectAllStructures();
+						setSelectedStructure("");
+					}
 				}
-			}
-		};
+			});
+		}
+	}
+	
+	
+	private void deselectAllStructures() {
+		for (String name : nameListCellMap.keySet()) {
+			nameListCellMap.get(name).setSelected(false);
+		}
 	}
 	
 	
@@ -120,13 +137,16 @@ public class StructuresLayer {
 			public void handle(ActionEvent event) {
 				String name = selectedNameProperty.get();
 				
-				if (!name.isEmpty())
+				if (!name.isEmpty()) {
 					addStructureRule(name, selectedColor);
+					deselectAllStructures();
+				}
 				
 				// if no name is selected, add all results from search
 				else {
 					for (String string : searchResultsList)
 						addStructureRule(string, selectedColor);
+					searchField.clear();
 				}
 			}
 		};
@@ -277,20 +297,21 @@ public class StructuresLayer {
 				@Override
 				public void handle(MouseEvent event) {
 					isSelected.set(!isSelected());
-					if (isSelected())
-						setSelectedStructure(label.getText());
-					else
-						setSelectedStructure("");
+					searchField.clear();
 				}
 	    	});
 	    	isSelected.addListener(new ChangeListener<Boolean>() {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, 
 						Boolean oldValue, Boolean newValue) {
-					if (newValue)
+					if (newValue) {
+						setSelectedStructure(label.getText());
 						highlightCell(true);
-					else
+					}
+					else {
+						setSelectedStructure("");
 						highlightCell(false);
+					}
 				}
 	    	});
 	    	highlightCell(isSelected());
