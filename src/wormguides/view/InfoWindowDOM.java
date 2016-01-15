@@ -126,18 +126,18 @@ public class InfoWindowDOM {
 		String homologues = "<strong>- Homologues: </strong>" + homologuesList.toString();
 		HTMLNode homologuesP = new HTMLNode("p", "", "", homologues);
 		
-		HTMLNode referencesP = new HTMLNode("p", "", "", "<strong>- References (Textpresso)</strong>");
-		HTMLNode referencesUL = new HTMLNode("ul");
-		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
-			HTMLNode li = new HTMLNode("li", "", "", reference);
-			referencesUL.addChild(li);
-		}
-		
 		HTMLNode linksP = new HTMLNode("p", "", "", "<strong>- Links</strong>");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			HTMLNode li = new HTMLNode("li", "", "", link);
 			linksUL.addChild(li);
+		}
+		
+		HTMLNode referencesP = new HTMLNode("p", "", "", "<strong>- References (Textpresso)</strong>");
+		HTMLNode referencesUL = new HTMLNode("ul");
+		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
+			HTMLNode li = new HTMLNode("li", "", "", reference);
+			referencesUL.addChild(li);
 		}
 		
 		//add data tags to divs
@@ -151,10 +151,10 @@ public class InfoWindowDOM {
 		wiringPartnersDiv.addChild(wiringPartnersUL);
 		expressesWORMBASEDiv.addChild(expressesWORMBASEP);
 		homologuesDiv.addChild(homologuesP);
-		referencesTEXTPRESSODiv.addChild(referencesP);
-		referencesTEXTPRESSODiv.addChild(referencesUL);
 		linksDiv.addChild(linksP);
 		linksDiv.addChild(linksUL);
+		referencesTEXTPRESSODiv.addChild(referencesP);
+		referencesTEXTPRESSODiv.addChild(referencesUL);
 
 		//add divs to body
 		body.addChild(topContainerDiv);
@@ -164,8 +164,8 @@ public class InfoWindowDOM {
 		body.addChild(wiringPartnersDiv);
 		body.addChild(expressesWORMBASEDiv);
 		body.addChild(homologuesDiv);
-		body.addChild(referencesTEXTPRESSODiv);
 		body.addChild(linksDiv);
+		body.addChild(referencesTEXTPRESSODiv);
 		
 		//add head and body to html
 		html.addChild(head);
