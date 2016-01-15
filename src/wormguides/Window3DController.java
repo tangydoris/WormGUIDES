@@ -259,9 +259,7 @@ public class Window3DController {
 
 		geneResultsUpdated = new SimpleBooleanProperty();
 
-		// get completely opaque 'other' material first
 		othersOpacity = new SimpleDoubleProperty(1);
-		
 		otherCells = new ArrayList<String>();
 
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
@@ -280,7 +278,6 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
-		//currentNoteMeshes = new ArrayList<MeshView>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 		
@@ -300,10 +297,8 @@ public class Window3DController {
 	}
 	
 
-	/*
-	 * Called by RootLayoutController to set the loaded SceneElementsList
-	 * after the list is set, the SceneElements are loaded
-	 */
+	// Called by RootLayoutController to set the loaded SceneElementsList
+	// after the list is set, the SceneElements are loaded
 	public void setSceneElementsList(SceneElementsList list) {
 		if (list!=null) {
 			sceneElementsList = list;

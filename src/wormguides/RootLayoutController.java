@@ -112,7 +112,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Button addSearchBtn;
 	
 	//connectome stuff
-	Connectome connectome;
+	private Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
 	// lineage tree
@@ -123,7 +123,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	// layers tab
 	private DisplayLayer displayLayer;
-	private DisplayLayer shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
@@ -441,7 +440,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		if (name==null || name.isEmpty())
 			return;
 		
-		if (name.indexOf("(")!=-1) 
+		if (name.indexOf("(") > -1) 
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
@@ -727,7 +726,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer() {
-		storiesLayer = new StoriesLayer(mainStage);
+		storiesLayer = new StoriesLayer(mainStage, selectedName);
 		window3D.setStoriesLayer(storiesLayer);
 	
 		storiesListView.setItems(storiesLayer.getStories());

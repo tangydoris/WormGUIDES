@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -23,16 +24,21 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.Note;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
+import wormguides.view.AppFont;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private Label activeStoryLabel;
+	@FXML private Label activeCellLabel;
+	private StringProperty activeCellProperty;
+	private Tooltip cellNameTooltip;
 	
 	@FXML private TextField titleField;
 	@FXML private TextArea contentArea;
@@ -80,7 +86,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private Stage editStage;
 	
 	
-	public NoteEditorController() {
+	public NoteEditorController(StringProperty cellNameProperty) {
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
@@ -88,6 +94,11 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		activeStory = null;
 		activeNote = null;
+		
+		activeCellProperty = cellNameProperty;
+		cellNameTooltip = new Tooltip();
+		cellNameTooltip.setFont(AppFont.getFont());
+		cellNameTooltip.setText("(none)");
 	}
 	
 	
@@ -106,6 +117,24 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		changeActiveStoryLabel();
 		
 		initToggleData();
+		
+		activeCellLabel.setTooltip(cellNameTooltip);
+		activeCellProperty.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (!newValue.isEmpty()) {
+					// remove functional part of name
+					if (newValue.indexOf("(") > -1)
+						newValue = newValue.substring(0, newValue.indexOf("("));
+					newValue.trim();
+					
+					cellNameTooltip.setText(newValue);
+					activeCellLabel.setText("Active Cell ("+newValue+")");
+				}
+			}
+		});
+		activeCellLabel.setText("ActiveCell (none)");
 	}
 	
 	
@@ -117,6 +146,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	private void assertFXMLNodes() {
 		assert (activeStoryLabel!=null);
+		assert (activeCellLabel!=null);
 		
 		assert (titleField!=null);
 		assert (contentArea!=null);

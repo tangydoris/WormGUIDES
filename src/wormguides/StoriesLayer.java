@@ -14,6 +14,7 @@ import java.util.jar.JarFile;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -68,8 +69,10 @@ public class StoriesLayer {
 	private Note activeNote;
 	private Story activeStory;
 	
+	private StringProperty activeCellProperty;
 	
-	public StoriesLayer(Stage parent) {
+	
+	public StoriesLayer(Stage parent, StringProperty cellNameProperty) {
 		parentStage = parent;
 		
 		stories = FXCollections.observableArrayList(
@@ -96,6 +99,8 @@ public class StoriesLayer {
 		width = 0;
 		
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
+		
+		activeCellProperty = cellNameProperty;
 		
 		buildStories();
 	}
@@ -328,7 +333,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new NoteEditorController();
+					editController = new NoteEditorController(activeCellProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);

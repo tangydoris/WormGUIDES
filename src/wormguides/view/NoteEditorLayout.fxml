@@ -137,9 +137,9 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                                    <HBox prefWidth="180.0">
+                                    <HBox prefWidth="220.0">
                                        <children>
-                                          <Label minWidth="71.0" text="Active Cell">
+                                          <Label fx:id="activeCellLabel" minWidth="71.0" text="Active Cell">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -160,7 +160,7 @@
                               <HBox layoutX="16.0" layoutY="292.0" maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                                    <HBox prefWidth="180.0">
+                                    <HBox prefWidth="220.0">
                                        <children>
                                           <Label minWidth="84.0" text="Global Event">
                                              <font>
