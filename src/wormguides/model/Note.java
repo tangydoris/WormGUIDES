@@ -184,7 +184,7 @@ public class Note {
 	}
 	
 	
-	private void setAttachmentType(Type type) {
+	public void setAttachmentType(Type type) {
 		if (type!=null)
 			attachmentType = type;
 	}
@@ -473,7 +473,7 @@ public class Note {
 	
 	
 	public boolean isWithoutTypeScope() {
-		return attachmentType==Type.NULL;
+		return attachmentType==Type.BLANK;
 	}
 	
 	
@@ -606,7 +606,7 @@ public class Note {
 		CELL("cell"),
 		CELLTIME("cell time"), 
 		TIME("time"),
-		NULL("");
+		BLANK("");
 		
 		private String type;
 		
@@ -631,7 +631,7 @@ public class Note {
 	public enum Display {
 		OVERLAY("overlay"),
 		BILLBOARD("billboard"),
-		BILLBOARD_FRONT_FACING("billboard front-facing"),
+		BILLBOARD_FRONT("billboard front"),
 		SPRITE("sprite");
 		
 		private String display;
