@@ -70,9 +70,10 @@ public class StoriesLayer {
 	private Story activeStory;
 	
 	private StringProperty activeCellProperty;
+	private BooleanProperty cellClickedProperty;
 	
 	
-	public StoriesLayer(Stage parent, StringProperty cellNameProperty) {
+	public StoriesLayer(Stage parent, StringProperty cellNameProperty, BooleanProperty cellClicked) {
 		parentStage = parent;
 		
 		stories = FXCollections.observableArrayList(
@@ -101,6 +102,8 @@ public class StoriesLayer {
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		
 		activeCellProperty = cellNameProperty;
+		
+		cellClickedProperty = cellClicked;
 		
 		buildStories();
 	}
@@ -333,7 +336,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new NoteEditorController();
+					editController = new NoteEditorController(activeCellProperty, cellClickedProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
@@ -353,8 +356,6 @@ public class StoriesLayer {
 						editStage.initOwner(parentStage);
 						editStage.initModality(Modality.NONE);
 						editStage.setResizable(true);
-						
-						editController.setActiveCellNameProperty(activeCellProperty);
 						
 						editController.getStoryCreatedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override

@@ -65,6 +65,9 @@ public class Note {
 		
 		expandedBooleanProperty = new SimpleBooleanProperty(false);
 		activeBooleanProperty = new SimpleBooleanProperty(false);
+		
+		setAttachmentType(Type.BLANK);
+		setTagDisplay(Display.BLANK);
 	}
 	
 	public Note(Story parent, String tagName, String tagContents) {
@@ -452,8 +455,12 @@ public class Note {
 	// Notes in error mode should not be displayed
 	// Returns true if time is not specified for CELLTIME and TIME attachment types
 	// or if cell name is not specified for CELL and CELLTIME attachment types
+	// or if there is no tag display method specified
 	// false otherwise
 	public boolean isWithoutScope() {
+		if (tagDisplay==Display.BLANK)
+			return true;
+		
 		if (tagDisplay!=Display.OVERLAY) {
 			if ((attachmentType==Type.CELLTIME || attachmentType==Type.TIME)
 					&& !isTimeSpecified())
@@ -466,7 +473,6 @@ public class Note {
 			if (isWithoutTypeScope())
 				return true;
 		}
-		
 		
 		return false;
 	}
@@ -632,7 +638,8 @@ public class Note {
 		OVERLAY("overlay"),
 		BILLBOARD("billboard"),
 		BILLBOARD_FRONT("billboard front"),
-		SPRITE("sprite");
+		SPRITE("sprite"),
+		BLANK("");
 		
 		private String display;
 		

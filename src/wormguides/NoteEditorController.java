@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,6 +31,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
+import wormguides.model.Note.TimeStringFormatException;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
@@ -91,7 +93,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private Stage editStage;
 	
 	
-	public NoteEditorController() {
+	// Input nameProperty is the string property that changes with clicking
+	// on an entity in the 3d window
+	public NoteEditorController(StringProperty nameProperty, BooleanProperty cellClickedProperty) {
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
@@ -99,6 +103,41 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		activeStory = null;
 		activeNote = null;
+		
+		activeCellProperty = new SimpleStringProperty();
+		nameProperty.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (!newValue.isEmpty())
+					activeCellProperty.set(newValue);
+			}
+		});
+		activeCellProperty.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (newValue.isEmpty())
+					newValue = nameProperty.get();
+				setCellLabelName(newValue);
+				setActiveCellName(newValue);
+			}
+		});
+		if (activeNote!=null && activeNote.existsWithCell())
+			activeCellProperty.set(activeNote.getCellName());
+		else
+			activeCellProperty.set("");
+		
+		cellClickedProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					activeCellProperty.set(nameProperty.get());
+					cellClickedProperty.set(false);
+				}
+			}
+		});
 	}
 	
 	
@@ -133,6 +172,16 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
+	private void setActiveCellName(String name) {
+		if (activeNote!=null) {
+			Toggle current = attachmentToggle.getSelectedToggle();
+			if (current!=null && ((Type)current.getUserData()).equals(Type.CELL)) {
+				activeNote.setCellName(name);
+			}
+		}
+	}
+	
+	
 	private void setTime(int start, int end) {
 		if (activeNote.isTimeSpecified()) {
 			startTimeField.setText(Integer.toString(activeNote.getStartTime()));
@@ -153,12 +202,16 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		start = start.trim();
 		end = end.trim();
 		
-		if (activeNote!=null && !start.isEmpty() && !end.isEmpty()) {
-			try {
-				activeNote.setStartAndEndTimes(Integer.parseInt(start), Integer.parseInt(end));
-			} catch (NumberFormatException e) {
-				System.out.println("invalid start/end time - must be integer");
+		if (activeNote!=null) {
+			if (!start.isEmpty() && !end.isEmpty()) {
+				try {
+					activeNote.setStartAndEndTimes(Integer.parseInt(start), Integer.parseInt(end));
+				} catch (NumberFormatException e) {
+					//System.out.println("invalid start/end time - must be integer");
+				}
 			}
+			else
+				activeNote.setStartAndEndTimes(Integer.MIN_VALUE, Integer.MIN_VALUE);
 		}
 	}
 	
@@ -173,8 +226,13 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		if (activeNote!=null) {
 			activeNote.setAttachmentType(type);
 			
-			if (type.equals(Type.CELL) || type.equals(Type.CELLTIME))
-				activeNote.setCellName(activeCellProperty.get());
+			if (type.equals(Type.CELL) || type.equals(Type.CELLTIME)) {
+				if (activeCellLabel!=null) {
+					// TODO take label name instead of property name
+					if (!activeCellProperty.get().isEmpty())
+						activeNote.setCellName(activeCellProperty.get());
+				}
+			}
 		}
 	}
 	
@@ -185,24 +243,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		name.trim();
 		
 		return name;
-	}
-	
-	
-	public void setActiveCellNameProperty(StringProperty nameProperty) {
-		activeCellProperty = nameProperty;
-		activeCellProperty.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-					String oldValue, String newValue) {
-				if (!newValue.isEmpty())
-					setCellLabelName(newValue);
-			}
-		});
-		
-		if (activeNote!=null && activeNote.existsWithCell())
-			setCellLabelName(activeNote.getCellName());
-		else
-			setCellLabelName(activeCellProperty.get());
 	}
 	
 	
@@ -276,12 +316,15 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	public void setActiveNote(Note note) {
 		activeNote = note;
 		
+		// TODO remove this
+		/*
 		if (activeNote!=null) {
 			System.out.println(activeNote);
 			System.out.println(activeNote.getAttachmentType());
 			System.out.println(activeNote.getTagDisplay());
 			System.out.println("cell - "+activeNote.getCellName());
 		}
+		*/
 		
 		updateFields();
 		updateType();
@@ -296,32 +339,33 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				switch (activeNote.getAttachmentType()) {
 				case CELL:
 								attachmentToggle.selectToggle(cellRadioBtn);
-								setCellLabelName(activeNote.getCellName());
+								activeCellProperty.set(activeNote.getCellName());
 								resetTime();
 								break;
 								
 				case TIME:		
 								timeTick.setSelected(true);
 								setTime(activeNote.getStartTime(), activeNote.getEndTime());
-								setCellLabelName(null);
+								activeCellProperty.set("");
 								break;
 								
 				case CELLTIME:
 								attachmentToggle.selectToggle(cellRadioBtn);
-								setCellLabelName(activeNote.getCellName());
+								activeCellProperty.set(activeNote.getCellName());
+								timeTick.setSelected(true);
 								setTime(activeNote.getStartTime(), activeNote.getEndTime());
 								break;
 								
 				case BLANK:
 								globalRadioBtn.setSelected(true);
-								setCellLabelName(null);
+								activeCellProperty.set("");
 								resetTime();
 								break;
 								
 				default:
 								resetTime();
 								resetToggle(attachmentToggle);
-								setCellLabelName(null);
+								activeCellProperty.set("");
 								break;
 				}	
 			}
@@ -329,17 +373,22 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			else {
 				resetTime();
 				resetToggle(attachmentToggle);
-				setCellLabelName(null);
+				activeCellProperty.set("");
 			}
 		}
 	}
 	
 	
 	private void setCellLabelName(String name) {
-		if (name==null || name.isEmpty())
-			activeCellLabel.setText("Active Cell (none)");
-		else
-			activeCellLabel.setText("Active Cell ("+removeFunctionalName(name)+")");
+		if (activeCellLabel!=null) {
+			if (name==null || name.isEmpty()) {
+				activeCellLabel.setText("Active Cell (none)");
+			}
+			else {
+				String lineageName = removeFunctionalName(name);
+				activeCellLabel.setText("Active Cell ("+lineageName+")");
+			}
+		}
 	}
 
 	
@@ -437,80 +486,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
-	private class TimeTickListener implements ChangeListener<Boolean> {
-		@Override
-		public void changed(ObservableValue<? extends Boolean> observable, 
-				Boolean oldValue, Boolean newValue) {
-			/*
-			if (newValue) {
-				Toggle current = attachmentToggle.getSelectedToggle();
-				if (current!=null && ((Type) current.getUserData()).equals(Type.CELL))
-					setActiveNoteAttachmentType(Type.CELLTIME);
-				else
-					setActiveNoteAttachmentType(Type.TIME);
-				
-				setActiveNoteTimes(startTimeField.getText(), endTimeField.getText());
-			}
-			*/
-		}
-	}
-	
-	
-	private class DisplayToggleListener implements ChangeListener<Toggle> {
-		@Override
-		public void changed(ObservableValue<? extends Toggle> observable, 
-				Toggle oldValue, Toggle newValue) {
-			/*
-			if (newValue!=null) {
-				switch ((Display) newValue.getUserData()) {
-				
-				case OVERLAY:
-								setActiveNoteTagDisplay(Display.OVERLAY);
-								break;
-								
-				case SPRITE:
-								setActiveNoteTagDisplay(Display.SPRITE);
-								break;
-								
-				case BILLBOARD_FRONT:
-								setActiveNoteTagDisplay(Display.BILLBOARD_FRONT);
-								break;
-								
-				default:
-								break;
-				}
-			}
-			*/
-		}
-	}
-	
-	
-	private class AttachmentToggleListener implements ChangeListener<Toggle> {
-		@Override
-		public void changed(ObservableValue<? extends Toggle> observable, 
-				Toggle oldValue, Toggle newValue) {
-			/*
-			if (newValue!=null) {
-				switch ((Type) newValue.getUserData()) {
-				
-				case CELL:
-								setActiveNoteAttachmentType(Type.CELL);
-								break;
-								
-				case BLANK:		setActiveNoteAttachmentType(Type.BLANK);
-								break;
-								
-				default:
-								break;
-				
-				}
-			}
-			*/
-		}
-	}
-	
-	
-	// ----- Begin text listeners ----
+	// ----- Begin listeners ----
 	private class TitleFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, 
@@ -533,7 +509,123 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			}
 		}
 	}
-	// ----- End text listeners ----
+	
+	
+	private class TimeTickListener implements ChangeListener<Boolean> {
+		@Override
+		public void changed(ObservableValue<? extends Boolean> observable, 
+				Boolean oldValue, Boolean newValue) {
+			if (activeNote!=null) {
+				Toggle current = attachmentToggle.getSelectedToggle();
+				if (newValue) {
+					if (current!=null && ((Type) current.getUserData()).equals(Type.CELL))
+						setActiveNoteAttachmentType(Type.CELLTIME);
+					else
+						setActiveNoteAttachmentType(Type.TIME);
+					
+					setActiveNoteTimes(startTimeField.getText(), endTimeField.getText());
+				}
+				else {
+					if (current!=null && ((Type) current.getUserData()).equals(Type.CELL))
+						setActiveNoteAttachmentType(Type.CELL);
+					else
+						setActiveNoteAttachmentType(Type.BLANK);
+				}
+			}
+		}
+	}
+	
+	
+	private class StartTimeFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (activeNote!=null) {
+				try {
+					activeNote.setStartTime(newValue);
+				} catch (TimeStringFormatException e) {
+					//System.out.println(e.toString());
+				}
+			}
+		}
+	}
+	
+	
+	private class EndTimeFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (activeNote!=null) {
+				try {
+					activeNote.setEndTime(newValue);
+				} catch (TimeStringFormatException e) {
+					//System.out.println(e.toString());
+				}
+			}
+		}
+	}
+	
+	
+	private class DisplayToggleListener implements ChangeListener<Toggle> {
+		@Override
+		public void changed(ObservableValue<? extends Toggle> observable, 
+				Toggle oldValue, Toggle newValue) {
+			if (activeNote!=null) {
+				if (newValue!=null) {
+					switch ((Display) newValue.getUserData()) {
+					
+					case OVERLAY:
+									setActiveNoteTagDisplay(Display.OVERLAY);
+									break;
+									
+					case SPRITE:
+									setActiveNoteTagDisplay(Display.SPRITE);
+									break;
+									
+					case BILLBOARD_FRONT:
+									setActiveNoteTagDisplay(Display.BILLBOARD_FRONT);
+									break;
+									
+					default:
+									break;
+					}
+				}
+				else
+					setActiveNoteTagDisplay(Display.BLANK);
+			}
+		}
+	}
+	
+	
+	private class AttachmentToggleListener implements ChangeListener<Toggle> {
+		@Override
+		public void changed(ObservableValue<? extends Toggle> observable, 
+				Toggle oldValue, Toggle newValue) {
+			if (activeNote!=null) {
+				if (newValue!=null) {
+					switch ((Type) newValue.getUserData()) {
+					
+					case CELL:
+									if (timeTick.isSelected())
+										setActiveNoteAttachmentType(Type.CELLTIME);
+									else
+										setActiveNoteAttachmentType(Type.CELL);
+									break;
+									
+					case BLANK:		setActiveNoteAttachmentType(Type.BLANK);
+									break;
+									
+					default:
+									break;
+					
+					}
+				}
+				else
+					setActiveNoteAttachmentType(Type.BLANK);
+			}
+		}
+	}
+	// ----- End listeners ----
 	
 	
 	// ----- Begin button actions -----

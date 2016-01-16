@@ -114,6 +114,7 @@ public class Window3DController {
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
+	private BooleanProperty cellClicked;
 
 	// searched highlighting stuff
 	private boolean inSearch;
@@ -194,11 +195,9 @@ public class Window3DController {
 		searchedCells = new boolean[1];
 		searchedMeshes = new boolean[1];
 
-		selectedIndex = new SimpleIntegerProperty();
-		selectedIndex.set(-1);
+		selectedIndex = new SimpleIntegerProperty(-1);
 
-		selectedName = new SimpleStringProperty();
-		selectedName.set("");
+		selectedName = new SimpleStringProperty("");
 		selectedName.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
@@ -208,6 +207,8 @@ public class Window3DController {
 					selectedIndex.set(selected);
 			}
 		});
+		
+		cellClicked = new SimpleBooleanProperty(false);
 
 		inSearch = false;
 
@@ -333,6 +334,11 @@ public class Window3DController {
 	public StringProperty getSelectedName() {
 		return selectedName;
 	}
+	
+	
+	public BooleanProperty getCellClicked() {
+		return cellClicked;
+	}
 
 	
 	public IntegerProperty getTotalNucleiProperty() {
@@ -423,6 +429,7 @@ public class Window3DController {
 		if (node instanceof Sphere) {
 			selectedIndex.set(getPickedSphereIndex((Sphere)node));
 			selectedName.set(cellNames[selectedIndex.get()]);
+			cellClicked.set(true);
 		}
 		else if (node instanceof MeshView) {
 			// Cell body/structure

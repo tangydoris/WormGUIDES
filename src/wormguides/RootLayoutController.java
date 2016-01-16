@@ -726,7 +726,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer() {
-		storiesLayer = new StoriesLayer(mainStage, selectedName);
+		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked());
 		window3D.setStoriesLayer(storiesLayer);
 	
 		storiesListView.setItems(storiesLayer.getStories());
@@ -736,6 +736,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
+		
 	}
 	
 	
