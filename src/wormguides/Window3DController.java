@@ -79,8 +79,9 @@ public class Window3DController {
 	private VBox overlayVBox;
 	private Pane spritesPane;
 	
-	// map of note sprites attached to cell, or cell and time
+	// maps of note attached to cell, or cell and time
 	private HashMap<Node, Sphere> spriteSphereMap;
+	private HashMap<Node, Sphere> billboardFrontSphereMap;
 	
 	// transformation stuff
 	private Group root;
@@ -253,6 +254,7 @@ public class Window3DController {
 					Number oldValue, Number newValue) {
 				xform.setScale(zoom.get());
 				repositionNoteSprites();
+				repositionNoteBillboardFronts();
 			}
 		});
 
@@ -281,6 +283,7 @@ public class Window3DController {
 		currentNotes = new ArrayList<Note>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
+		billboardFrontSphereMap = new HashMap<Node, Sphere>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
@@ -394,6 +397,7 @@ public class Window3DController {
     		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
     		
     		repositionNoteSprites();
+    		repositionNoteBillboardFronts();
 		}
 
 		else if (event.isSecondaryButtonDown()) {
@@ -406,6 +410,7 @@ public class Window3DController {
 				xform.t.setY(ty);
 			
 			repositionNoteSprites();
+			repositionNoteBillboardFronts();
 		}
 	}
 	
@@ -469,8 +474,28 @@ public class Window3DController {
 	}
 	
 	
+	private void repositionNoteBillboardFronts() {
+		for (Node node : billboardFrontSphereMap.keySet()) {
+			Sphere s = billboardFrontSphereMap.get(node);
+			if (s!=null) {
+				Bounds b = s.getBoundsInParent();
+				
+				if (b!=null) {
+					node.getTransforms().clear();
+					double radius = s.getRadius();
+					double x = b.getMaxX()-radius;
+					double y = b.getMaxY()-radius;
+					double z = b.getMaxZ()-radius;
+					node.getTransforms().add(new Translate(x, y, z));
+				}
+			}
+		}
+	}
+	
+	
+	// Reposition sprites by projecting the sphere's 3d coordinate 
+	// onto the front of the subscene
 	private void repositionNoteSprites() {
-		// Reposition sprites
 		for (Node node : spriteSphereMap.keySet()) {
 			Sphere s = spriteSphereMap.get(node);
 			if (s!=null) {
@@ -481,7 +506,7 @@ public class Window3DController {
 					Point2D p = CameraHelper.project(camera, 
 							new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
 					
-					double radius = spriteSphereMap.get(node).getRadius();
+					double radius = s.getRadius();
 					double x = p.getX()-radius;
 					double y = p.getY()-radius;
 					node.getTransforms().add(new Translate(x, y));
@@ -669,8 +694,10 @@ public class Window3DController {
  		addNoteGeometries(notes);
  		
  		// render opaque entities first
-		root.getChildren().addAll(notes);
+ 		if (!notes.isEmpty())
+ 			root.getChildren().addAll(notes);
 		repositionNoteSprites();
+		repositionNoteBillboardFronts();
  			
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
@@ -697,28 +724,35 @@ public class Window3DController {
 				switch (display) {
 					// Overlay: text is always facing the user in upper right corner
 					case OVERLAY:
-							// set overlay position relative to parent anchor pane
-							if (overlayVBox!=null)
-								overlayVBox.getChildren().add(node);
-							break;
+								// set overlay position relative to parent anchor pane
+								if (overlayVBox!=null)
+									overlayVBox.getChildren().add(node);
+								break;
 					
 					// Billboard: text transforms with the scene meshes/spheres
 					case BILLBOARD:
-							if (positionBillboard(note, node));
-								list.add(node);
-							break;
+								if (positionBillboard(note, node))
+									list.add(node);
+								break;
+					
+					// Billboard front: text transforms with scene meshes/spheres
+					// but always faces the user
+					case BILLBOARD_FRONT:
+								if (positionBillboardFront(note, node))
+									list.add(node);
+								break;
 					
 					// Sprite: text moves with whatever it is attached to and
 					// always faces user
 					case SPRITE:
-							if (spritesPane!=null) {
-								if (positionSprite(note, node))
-									spritesPane.getChildren().add(node);
-							}
-							break;
+								if (spritesPane!=null) {
+									if (positionSprite(note, node))
+										spritesPane.getChildren().add(node);
+								}
+								break;
 							
 					default:
-							break;
+								break;
 				}
 			}
 		}
@@ -765,6 +799,35 @@ public class Window3DController {
 		text.setCacheHint(CacheHint.QUALITY);
 		text.setFill(Color.WHITE);
 		return text;
+	}
+	
+	
+	// Returns true if front-facing billboard is successfully positioned
+	// (whether it is to location or cell)
+	// false otherwise
+	private boolean positionBillboardFront(Note note, Node node) {
+		if (note.getAttachmentType()==Type.LOCATION) {
+			if (note.isBillboard()) {
+				node.getTransforms().add(new Translate(
+										newOriginX+note.getX(),
+										newOriginY+note.getY(),
+										newOriginZ+note.getZ()));
+				return true;
+			}
+		}
+		
+		else if (note.isAttachedToCell()
+				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
+			for (int i=0; i<cellNames.length; i++) {
+				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
+					billboardFrontSphereMap.put(node, spheres[i]);
+					//node.getTransforms().add(new Translate(5, 5));
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	
@@ -816,7 +879,7 @@ public class Window3DController {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					spriteSphereMap.put(node, spheres[i]);
-					node.getTransforms().add(new Translate(5, 5));
+					//node.getTransforms().add(new Translate(5, 5));
 					return true;
 				}
 			}
@@ -838,6 +901,9 @@ public class Window3DController {
 							return makeNoteSpriteText(title);
 							
 				case BILLBOARD:
+							return makeNoteBillboardText(title);
+							
+				case BILLBOARD_FRONT:
 							return makeNoteBillboardText(title);
 				
 				default:
@@ -1448,6 +1514,7 @@ public class Window3DController {
 		@Override
 		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 			repositionNoteSprites();
+			repositionNoteBillboardFronts();
 		}
 	}
 	
