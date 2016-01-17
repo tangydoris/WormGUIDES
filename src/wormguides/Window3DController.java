@@ -105,7 +105,6 @@ public class Window3DController {
 	private Integer[][] positions;
 	private Integer[] diameters;
 	private DoubleProperty zoom;
-	private double zScale;
 
 	// switching timepoints stuff
 	private BooleanProperty playingMovie;
@@ -184,8 +183,7 @@ public class Window3DController {
 			}
 		});
 
-		zoom = new SimpleDoubleProperty(1.0);
-		zScale = Z_SCALE;
+		zoom = new SimpleDoubleProperty(1);
 
 		spheres = new Sphere[1];
 		meshes = new MeshView[1];
@@ -793,9 +791,10 @@ public class Window3DController {
 	
 	private Text makeNoteBillboardText(String title) {
 		Text text = new Text(title);
-		text.setWrappingWidth(110);
-		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 12));
+		text.setWrappingWidth(120);
+		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 11));
 		text.setSmooth(false);
+		text.setFontSmoothingType(FontSmoothingType.GRAY);
 		text.setCacheHint(CacheHint.QUALITY);
 		text.setFill(Color.WHITE);
 		return text;
@@ -1022,7 +1021,7 @@ public class Window3DController {
 
  			double x = positions[i][X_COR_INDEX];
 	        double y = positions[i][Y_COR_INDEX];
-	        double z = positions[i][Z_COR_INDEX]*zScale;
+	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
 	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
 	        translateSphere(sphere, x, y, z);
 	        
@@ -1588,21 +1587,21 @@ public class Window3DController {
 
 	private final long WAIT_TIME_MILLI = 200;
 
-	private final double CAMERA_INITIAL_DISTANCE = -800;
+	private final double CAMERA_INITIAL_DISTANCE = -600;
 
     private final double CAMERA_NEAR_CLIP = 1,
-    							CAMERA_FAR_CLIP = 2000;
+						CAMERA_FAR_CLIP = 2000;
 
     private final int START_TIME = 1;
 
     private final int X_COR_INDEX = 0,
-    						Y_COR_INDEX = 1,
-    						Z_COR_INDEX = 2;
+					Y_COR_INDEX = 1,
+					Z_COR_INDEX = 2;
 
     private final double Z_SCALE = 5,
-					    		X_SCALE = 1,
-					    		Y_SCALE = 1;
+			    		X_SCALE = 1,
+			    		Y_SCALE = 1;
 
-    private final double SIZE_SCALE = .9;
+    private final double SIZE_SCALE = 1;
     private final double UNIFORM_RADIUS = 4;
 }
