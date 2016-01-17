@@ -79,9 +79,12 @@ public class Window3DController {
 	private VBox overlayVBox;
 	private Pane spritesPane;
 	
-	// maps of note attached to cell, or cell and time
+	// maps of sprite/billboard front notes attached to cell, or cell and time
 	private HashMap<Node, Sphere> spriteSphereMap;
 	private HashMap<Node, Sphere> billboardFrontSphereMap;
+	// maps of sprite/billboard front notes attached to location
+	//private HashMap<Node, Point3D> spriteLocationMap;
+	//private HashMap<Node, Point3D> billboardFrontLocationMap;
 	
 	// transformation stuff
 	private Group root;
@@ -145,7 +148,7 @@ public class Window3DController {
 	private ArrayList<MeshView> currentSceneElementMeshes;
 	private ArrayList<SceneElement> currentSceneElements;
 	
-	// Uniform nuclei size
+	// Uniform nuclei sizef
 	private boolean uniformSize;
 	
 	// connectome - synapse type checkboxes
@@ -182,8 +185,6 @@ public class Window3DController {
 				buildScene(time.get());
 			}
 		});
-
-		zoom = new SimpleDoubleProperty(1);
 
 		spheres = new Sphere[1];
 		meshes = new MeshView[1];
@@ -246,6 +247,8 @@ public class Window3DController {
 
 		renderService = new RenderService();
 
+		// TODO
+		zoom = new SimpleDoubleProperty(2.5);
 		zoom.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
@@ -255,6 +258,7 @@ public class Window3DController {
 				repositionNoteBillboardFronts();
 			}
 		});
+		xform.setScale(zoom.get());
 
 		localSearchResults = new ArrayList<String>();
 
@@ -282,6 +286,8 @@ public class Window3DController {
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 		billboardFrontSphereMap = new HashMap<Node, Sphere>();
+		//spriteLocationMap = new HashMap<Node, Point3D>();
+		//billboardFrontLocationMap = new HashMap<Node, Point3D>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
@@ -474,16 +480,21 @@ public class Window3DController {
 	
 	private void repositionNoteBillboardFronts() {
 		for (Node node : billboardFrontSphereMap.keySet()) {
-			Sphere s = billboardFrontSphereMap.get(node);
+			Node s = billboardFrontSphereMap.get(node);
 			if (s!=null) {
 				Bounds b = s.getBoundsInParent();
 				
 				if (b!=null) {
 					node.getTransforms().clear();
-					double radius = s.getRadius();
-					double x = b.getMaxX()-radius;
-					double y = b.getMaxY()-radius;
-					double z = b.getMaxZ()-radius;
+					double x = b.getMaxX();
+					double y = b.getMaxY();
+					double z = b.getMaxZ();
+					if (s instanceof Sphere) {
+						double radius = ((Sphere) s).getRadius();
+						x-=radius;
+						y-=-radius;
+						z-=radius;
+					}
 					node.getTransforms().add(new Translate(x, y, z));
 				}
 			}
@@ -495,7 +506,7 @@ public class Window3DController {
 	// onto the front of the subscene
 	private void repositionNoteSprites() {
 		for (Node node : spriteSphereMap.keySet()) {
-			Sphere s = spriteSphereMap.get(node);
+			Node s = spriteSphereMap.get(node);
 			if (s!=null) {
 				Bounds b = s.getBoundsInParent();
 				
@@ -504,9 +515,13 @@ public class Window3DController {
 					Point2D p = CameraHelper.project(camera, 
 							new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
 					
-					double radius = s.getRadius();
-					double x = p.getX()-radius;
-					double y = p.getY()-radius;
+					double x = p.getX();
+					double y = p.getY();
+					if (s instanceof Sphere) {
+						double radius = ((Sphere) s).getRadius();
+						x-=radius;
+						y-=-radius;
+					}
 					node.getTransforms().add(new Translate(x, y));
 				}
 			}
@@ -794,10 +809,20 @@ public class Window3DController {
 		text.setWrappingWidth(120);
 		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 11));
 		text.setSmooth(false);
-		text.setFontSmoothingType(FontSmoothingType.GRAY);
+		text.setStrokeWidth(0);
+		text.setFontSmoothingType(FontSmoothingType.LCD);
 		text.setCacheHint(CacheHint.QUALITY);
 		text.setFill(Color.WHITE);
 		return text;
+	}
+	
+	
+	private Sphere createLocationSphereMarker(double x, double y, double z) {
+		Sphere sphere = new Sphere(1);
+		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ,
+				new Translate(newOriginX+x, 
+						newOriginY+y, newOriginZ+z));
+		return sphere;
 	}
 	
 	
@@ -806,13 +831,9 @@ public class Window3DController {
 	// false otherwise
 	private boolean positionBillboardFront(Note note, Node node) {
 		if (note.getAttachmentType()==Type.LOCATION) {
-			if (note.isBillboard()) {
-				node.getTransforms().add(new Translate(
-										newOriginX+note.getX(),
-										newOriginY+note.getY(),
-										newOriginZ+note.getZ()));
-				return true;
-			}
+			billboardFrontSphereMap.put(node, createLocationSphereMarker(note.getX(), 
+					note.getY(), note.getZ()));
+			return true;
 		}
 		
 		else if (note.isAttachedToCell()
@@ -820,7 +841,6 @@ public class Window3DController {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					billboardFrontSphereMap.put(node, spheres[i]);
-					//node.getTransforms().add(new Translate(5, 5));
 					return true;
 				}
 			}
@@ -835,14 +855,12 @@ public class Window3DController {
 	// false otherwise
 	private boolean positionBillboard(Note note, Node node) {
 		if (note.getAttachmentType()==Type.LOCATION) {
-			if (note.isBillboard()) {
-				node.getTransforms().addAll(rotateX, rotateY, rotateZ);
-				node.getTransforms().add(new Translate(
-										newOriginX+note.getX(),
-										newOriginY+note.getY(),
-										newOriginZ+note.getZ()));
-				return true;
-			}
+			node.getTransforms().addAll(rotateX, rotateY, rotateZ);
+			node.getTransforms().add(new Translate(
+									newOriginX+note.getX(),
+									newOriginY+note.getY(),
+									newOriginZ+note.getZ()));
+			return true;
 		}
 		
 		else if (note.isAttachedToCell()
@@ -852,6 +870,7 @@ public class Window3DController {
 					double offset = 5;
 					if (!uniformSize)
 						offset = spheres[i].getRadius()+2;
+					
 					node.getTransforms().addAll(spheres[i].getTransforms());
 					node.getTransforms().add(new Translate(offset, offset));
 					return true;
@@ -868,9 +887,10 @@ public class Window3DController {
 	// false otherwise
 	private boolean positionSprite(Note note, Node node) {
 		if (note.getAttachmentType()==Type.LOCATION) {
-				// Z coordinate is ignored for sprites - they reside on top of the subscene
-				node.getTransforms().add(new Translate(note.getX(), note.getY()));				
-				return true;
+			// Z coordinate is ignored for sprites - they reside on top of the subscene
+			spriteSphereMap.put(node, createLocationSphereMarker(note.getX(), 
+					note.getY(), note.getZ()));
+			return true;
 		}
 		
 		else if (note.isAttachedToCell() || (note.isAttachedToCellTime() 
@@ -878,7 +898,6 @@ public class Window3DController {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					spriteSphereMap.put(node, spheres[i]);
-					//node.getTransforms().add(new Translate(5, 5));
 					return true;
 				}
 			}
@@ -1397,8 +1416,14 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				double z = zoom.get();
-				if (z<=5 && z>0.25)
-					zoom.set(z-.25);
+				
+				z-=0.25;
+				if (z<0.25)
+					z = 0.25;
+				else if (z>5)
+					z = 5;
+				
+				zoom.set(z);
 			}
 		};
 	}
@@ -1409,8 +1434,14 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				double z = zoom.get();
-				if (z<5 && z>=0.25)
-					zoom.set(z+.25);
+
+				z+=0.25;
+				if (z<0.25)
+					z = 0.25;
+				else if (z>5)
+					z = 5;
+				
+				zoom.set(z);
 			}
 		};
 	}
@@ -1587,7 +1618,7 @@ public class Window3DController {
 
 	private final long WAIT_TIME_MILLI = 200;
 
-	private final double CAMERA_INITIAL_DISTANCE = -600;
+	private final double CAMERA_INITIAL_DISTANCE = -250;
 
     private final double CAMERA_NEAR_CLIP = 1,
 						CAMERA_FAR_CLIP = 2000;

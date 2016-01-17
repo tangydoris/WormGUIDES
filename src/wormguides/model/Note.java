@@ -594,7 +594,11 @@ public class Note {
 	
 	public boolean isBillboard() {
 		return tagDisplay==Display.BILLBOARD;
-		
+	}
+	
+	
+	public boolean isBillboardFront() {
+		return tagDisplay==Display.BILLBOARD_FRONT;
 	}
 	
 	

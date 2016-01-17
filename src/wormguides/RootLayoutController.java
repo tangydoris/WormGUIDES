@@ -470,11 +470,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		this.subsceneWidth = new SimpleDoubleProperty();
 		subsceneWidth.bind(modelAnchorPane.widthProperty());
 		this.subsceneHeight = new SimpleDoubleProperty();
-		subsceneHeight.bind(modelAnchorPane.heightProperty().subtract(33));
+		subsceneHeight.bind(modelAnchorPane.heightProperty());
 		
 		AnchorPane.setTopAnchor(subscene, 0.0);
 		AnchorPane.setLeftAnchor(subscene, 0.0);
 		AnchorPane.setRightAnchor(subscene, 0.0);
+		AnchorPane.setBottomAnchor(subscene, 0.0);
 		
 		subscene.widthProperty().bind(subsceneWidth);
 		subscene.heightProperty().bind(subsceneHeight);
