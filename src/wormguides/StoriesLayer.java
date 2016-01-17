@@ -13,7 +13,9 @@ import java.util.jar.JarFile;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -42,6 +44,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Story;
 import wormguides.model.Note.AttachmentTypeEnumException;
@@ -72,8 +75,13 @@ public class StoriesLayer {
 	private StringProperty activeCellProperty;
 	private BooleanProperty cellClickedProperty;
 	
+	private IntegerProperty timeProperty;
 	
-	public StoriesLayer(Stage parent, StringProperty cellNameProperty, BooleanProperty cellClicked) {
+	private LineageData cellData;
+	
+	
+	public StoriesLayer(Stage parent, StringProperty cellNameProperty, 
+			BooleanProperty cellClicked, LineageData data) {
 		parentStage = parent;
 		
 		stories = FXCollections.observableArrayList(
@@ -90,19 +98,20 @@ public class StoriesLayer {
 							//System.out.println("added - "+story.getName());
 						}
 						for (Story story : c.getRemoved()) {
-							System.out.println("removed - "+story.getName());
+							//System.out.println("removed - "+story.getName());
 						}
 					}
 				}
 			}
 		});
 		
+		timeProperty = new SimpleIntegerProperty(-1);
+		rebuildSceneFlag = new SimpleBooleanProperty(false);
+		cellData = data;
+		
 		width = 0;
 		
-		rebuildSceneFlag = new SimpleBooleanProperty(false);
-		
 		activeCellProperty = cellNameProperty;
-		
 		cellClickedProperty = cellClicked;
 		
 		buildStories();
@@ -134,11 +143,40 @@ public class StoriesLayer {
 			activeNote.setActive(false);
 		
 		activeNote = note;
-		if (activeNote!=null)
+		if (activeNote!=null) {
 			activeNote.setActive(true);
+			
+			// set time property to be read by 3d window
+			int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+			int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+			int noteStartTime = activeNote.getStartTime();
+			int noteEndTime = activeNote.getEndTime();
+			
+			if (activeNote.isTimeSpecified() && activeNote.isAttachedToCellTime()) {
+				// make sure times actually overlap
+				if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
+					timeProperty.set(cellStartTime);
+				else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
+					timeProperty.set(noteStartTime);
+			}
+			
+			else if (activeNote.isAttachedToCell())
+				timeProperty.set(cellStartTime);
+			
+			else if (activeNote.isTimeSpecified())
+				timeProperty.set(noteStartTime);
+			
+			else
+				timeProperty.set(1);
+		}
 		
 		if (editController!=null)
 			editController.setActiveNote(activeNote);
+	}
+	
+	
+	public IntegerProperty getTimeProperty() {
+		return timeProperty;
 	}
 	
 	

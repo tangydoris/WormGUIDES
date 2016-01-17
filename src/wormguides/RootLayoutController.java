@@ -726,8 +726,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	
-	private void initStoriesLayer() {
-		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked());
+	private void initStoriesLayer(LineageData data) {
+		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked(), data);
 		window3D.setStoriesLayer(storiesLayer);
 	
 		storiesListView.setItems(storiesLayer.getStories());
@@ -737,7 +737,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
-		
+		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
 	}
 	
 	
@@ -794,7 +794,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		initStructuresLayer();
 		
 		// stories layer
-		initStoriesLayer();
+		initStoriesLayer(data);
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());

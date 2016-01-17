@@ -67,6 +67,7 @@ import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.Note.Type;
+import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
@@ -246,8 +247,7 @@ public class Window3DController {
 		});
 
 		renderService = new RenderService();
-
-		// TODO
+		
 		zoom = new SimpleDoubleProperty(2.5);
 		zoom.addListener(new ChangeListener<Number>() {
 			@Override
@@ -495,7 +495,9 @@ public class Window3DController {
 						y-=-radius;
 						z-=radius;
 					}
-					node.getTransforms().add(new Translate(x, y, z));
+					// TODO
+					node.getTransforms().addAll(new Translate(x, y, z), 
+							new Scale(2, 2));
 				}
 			}
 		}
@@ -807,7 +809,9 @@ public class Window3DController {
 	private Text makeNoteBillboardText(String title) {
 		Text text = new Text(title);
 		text.setWrappingWidth(120);
-		text.setFont(Font.font("System", FontWeight.SEMI_BOLD, 11));
+		// TODO
+		text.setFont(AppFont.getBillboardFont());
+		text.setLineSpacing(0.5);
 		text.setSmooth(false);
 		text.setStrokeWidth(0);
 		text.setFontSmoothingType(FontSmoothingType.LCD);
@@ -833,6 +837,7 @@ public class Window3DController {
 		if (note.getAttachmentType()==Type.LOCATION) {
 			billboardFrontSphereMap.put(node, createLocationSphereMarker(note.getX(), 
 					note.getY(), note.getZ()));
+			// TODO
 			return true;
 		}
 		
@@ -856,10 +861,10 @@ public class Window3DController {
 	private boolean positionBillboard(Note note, Node node) {
 		if (note.getAttachmentType()==Type.LOCATION) {
 			node.getTransforms().addAll(rotateX, rotateY, rotateZ);
-			node.getTransforms().add(new Translate(
-									newOriginX+note.getX(),
-									newOriginY+note.getY(),
-									newOriginZ+note.getZ()));
+			node.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
+					newOriginY+note.getY(), newOriginZ+note.getZ()),
+					new Scale(2, 2));
+			
 			return true;
 		}
 		
@@ -872,7 +877,8 @@ public class Window3DController {
 						offset = spheres[i].getRadius()+2;
 					
 					node.getTransforms().addAll(spheres[i].getTransforms());
-					node.getTransforms().add(new Translate(offset, offset));
+					node.getTransforms().addAll(new Translate(offset, offset),
+							new Scale(2, 2));
 					return true;
 				}
 			}
@@ -1038,8 +1044,8 @@ public class Window3DController {
 
  			sphere.setMaterial(material);
 
- 			double x = positions[i][X_COR_INDEX];
-	        double y = positions[i][Y_COR_INDEX];
+ 			double x = positions[i][X_COR_INDEX]*X_SCALE;
+	        double y = positions[i][Y_COR_INDEX]*Y_SCALE;
 	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
 	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
 	        translateSphere(sphere, x, y, z);
@@ -1090,8 +1096,8 @@ public class Window3DController {
 			sumY += positions[i][Y_COR_INDEX];
 			sumZ += positions[i][Z_COR_INDEX];
 		}
-		this.newOriginX = Math.round(sumX/numCells);
-		this.newOriginY = Math.round(sumY/numCells);
+		this.newOriginX = (int) Math.round(X_SCALE*sumX/numCells);
+		this.newOriginY = (int) Math.round(Y_SCALE*sumY/numCells);
 		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 
 		// Set new origin to average X Y positions
@@ -1611,6 +1617,19 @@ public class Window3DController {
 		};
 	}
 	
+	
+	public ChangeListener<Number> getStoriesTimeListener() {
+		return new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, 
+					Number oldValue, Number newValue) {
+				int t = newValue.intValue();
+				if (t>=START_TIME && t<=endTime)
+					time.set(t);
+			}
+		};
+	}
+	
 
 	private final String CS = ", ";
 
@@ -1618,7 +1637,7 @@ public class Window3DController {
 
 	private final long WAIT_TIME_MILLI = 200;
 
-	private final double CAMERA_INITIAL_DISTANCE = -250;
+	private final double CAMERA_INITIAL_DISTANCE = -220;
 
     private final double CAMERA_NEAR_CLIP = 1,
 						CAMERA_FAR_CLIP = 2000;
