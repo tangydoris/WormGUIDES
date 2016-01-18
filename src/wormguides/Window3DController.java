@@ -428,12 +428,6 @@ public class Window3DController {
 	private void handleMouseClicked(MouseEvent event) {
 		Node node = event.getPickResult().getIntersectedNode();
 		
-		// Billboard
-		if (node instanceof Text) {
-			// TODO
-			System.out.println("billboard clicked");
-		}
-		
 		// Nucleus
 		if (node instanceof Sphere) {
 			selectedIndex.set(getPickedSphereIndex((Sphere)node));
@@ -495,7 +489,6 @@ public class Window3DController {
 						y-=-radius;
 						z-=radius;
 					}
-					// TODO
 					node.getTransforms().addAll(new Translate(x, y, z), 
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
@@ -809,7 +802,6 @@ public class Window3DController {
 	private Text makeNoteBillboardText(String title) {
 		Text text = new Text(title);
 		text.setWrappingWidth(100);
-		// TODO
 		text.setFont(AppFont.getBillboardFont());
 		text.setLineSpacing(0.5);
 		text.setSmooth(false);
