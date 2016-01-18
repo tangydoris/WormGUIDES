@@ -497,7 +497,7 @@ public class Window3DController {
 					}
 					// TODO
 					node.getTransforms().addAll(new Translate(x, y, z), 
-							new Scale(2, 2));
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 			}
 		}
@@ -808,7 +808,7 @@ public class Window3DController {
 	
 	private Text makeNoteBillboardText(String title) {
 		Text text = new Text(title);
-		text.setWrappingWidth(120);
+		text.setWrappingWidth(100);
 		// TODO
 		text.setFont(AppFont.getBillboardFont());
 		text.setLineSpacing(0.5);
@@ -837,7 +837,6 @@ public class Window3DController {
 		if (note.getAttachmentType()==Type.LOCATION) {
 			billboardFrontSphereMap.put(node, createLocationSphereMarker(note.getX(), 
 					note.getY(), note.getZ()));
-			// TODO
 			return true;
 		}
 		
@@ -863,7 +862,7 @@ public class Window3DController {
 			node.getTransforms().addAll(rotateX, rotateY, rotateZ);
 			node.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
 					newOriginY+note.getY(), newOriginZ+note.getZ()),
-					new Scale(2, 2));
+					new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 			
 			return true;
 		}
@@ -1651,7 +1650,8 @@ public class Window3DController {
     private final double Z_SCALE = 5,
 			    		X_SCALE = 1,
 			    		Y_SCALE = 1;
-
+    private final double BILLBOARD_SCALE = 1.8;
+    
     private final double SIZE_SCALE = 1;
     private final double UNIFORM_RADIUS = 4;
 }
