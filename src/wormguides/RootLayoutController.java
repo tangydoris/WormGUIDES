@@ -729,7 +729,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private void initStoriesLayer(LineageData data) {
 		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked(), data);
 		window3D.setStoriesLayer(storiesLayer);
-	
+		
 		storiesListView.setItems(storiesLayer.getStories());
 		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
 		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());

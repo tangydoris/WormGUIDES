@@ -41,7 +41,6 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.PickResult;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -52,9 +51,7 @@ import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
-import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
@@ -83,9 +80,6 @@ public class Window3DController {
 	// maps of sprite/billboard front notes attached to cell, or cell and time
 	private HashMap<Node, Sphere> spriteSphereMap;
 	private HashMap<Node, Sphere> billboardFrontSphereMap;
-	// maps of sprite/billboard front notes attached to location
-	//private HashMap<Node, Point3D> spriteLocationMap;
-	//private HashMap<Node, Point3D> billboardFrontLocationMap;
 	
 	// transformation stuff
 	private Group root;
@@ -168,7 +162,8 @@ public class Window3DController {
 	// currentNotes contains all notes that are 'active' within a scene
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
-	//private ArrayList<MeshView> currentNoteMeshes;
+	// Map of current notes to their scene elements
+	private HashMap<Text, Note> currentGraphicNoteMap;
 	private HashMap<Note, MeshView> currentNoteMeshMap;
 	
 	private SubsceneSizeListener subsceneSizeListener;
@@ -283,11 +278,10 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
+		currentGraphicNoteMap = new HashMap<Text, Note>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
 		spriteSphereMap = new HashMap<Node, Sphere>();
 		billboardFrontSphereMap = new HashMap<Node, Sphere>();
-		//spriteLocationMap = new HashMap<Node, Point3D>();
-		//billboardFrontLocationMap = new HashMap<Node, Point3D>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
@@ -593,8 +587,8 @@ public class Window3DController {
 			spriteSphereMap.clear();
 			
 			currentNotes.clear();
-			//currentNoteMeshes.clear();
 			currentNoteMeshMap.clear();
+			currentGraphicNoteMap.clear();
 			
 			currentNotes = storiesLayer.getActiveNotes(time);
 			for (Note note : storiesLayer.getNotesWithCell()) {
@@ -618,7 +612,6 @@ public class Window3DController {
 							newOriginY+se.getY(),
 							newOriginZ+se.getZ()),
 							new Scale(150, -150, -150));
-						//currentNoteMeshes.add(mesh);	
 						currentNoteMeshMap.put(note, mesh);
 					}
 				}
@@ -771,10 +764,7 @@ public class Window3DController {
 		if (storiesLayer!=null) {
 			if (storiesLayer.getActiveStory()!=null && overlayVBox!=null) {
 				Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
-				
 				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
-				storyTitle.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
-				
 				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
 			}
 		}
@@ -787,7 +777,7 @@ public class Window3DController {
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		if (overlayVBox!=null)
 			text.setWrappingWidth(overlayVBox.getWidth());
-		text.setFont(Font.font("System", FontWeight.MEDIUM, 16));
+		text.setFont(AppFont.getSpriteAndOverlayFont());
 		return text;
 	}
 	
@@ -801,11 +791,10 @@ public class Window3DController {
 	
 	private Text makeNoteBillboardText(String title) {
 		Text text = new Text(title);
-		text.setWrappingWidth(100);
+		text.setWrappingWidth(90);
 		text.setFont(AppFont.getBillboardFont());
-		text.setLineSpacing(0.5);
 		text.setSmooth(false);
-		text.setStrokeWidth(0);
+		text.setStrokeWidth(2);
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		text.setCacheHint(CacheHint.QUALITY);
 		text.setFill(Color.WHITE);
@@ -869,7 +858,7 @@ public class Window3DController {
 					
 					node.getTransforms().addAll(spheres[i].getTransforms());
 					node.getTransforms().addAll(new Translate(offset, offset),
-							new Scale(2, 2));
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 					return true;
 				}
 			}
@@ -907,26 +896,38 @@ public class Window3DController {
 	// if isOverlay is true, then the text is larger
 	private Node makeNoteGraphic(Note note) {
 		String title = note.getTagName();
+		if (note.isSceneExpanded())
+			title += ": "+note.getTagContents();
+		
+		Text node = null;
 		if (note.getTagDisplay()!=null) {
 			switch (note.getTagDisplay()) {
 				case OVERLAY:
-							return makeNoteOverlayText(title);
+							node = makeNoteOverlayText(title);
+							currentGraphicNoteMap.put(node, note);
+							break;
 				
 				case SPRITE:
-							return makeNoteSpriteText(title);
+							node = makeNoteSpriteText(title);
+							currentGraphicNoteMap.put(node, note);
+							break;
 							
 				case BILLBOARD:
-							return makeNoteBillboardText(title);
+							node = makeNoteBillboardText(title);
+							currentGraphicNoteMap.put(node, note);
+							break;
 							
 				case BILLBOARD_FRONT:
-							return makeNoteBillboardText(title);
+							node = makeNoteBillboardText(title);
+							currentGraphicNoteMap.put(node, note);
+							break;
 				
 				default:
-							return null;
+							return node;
 							
 			}
 		}
-		return null;
+		return node;
 	}
 	
 	
@@ -1207,7 +1208,7 @@ public class Window3DController {
 			spritesPane = parentPane;
 			
 			overlayVBox = new VBox(5);
-			overlayVBox.setPrefWidth(130);
+			overlayVBox.setPrefWidth(170);
 			overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
 			AnchorPane.setTopAnchor(overlayVBox, 5.0);
 			AnchorPane.setRightAnchor(overlayVBox, 5.0);
@@ -1599,10 +1600,17 @@ public class Window3DController {
 		return new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				PickResult result = event.getPickResult();
-				if (result.getIntersectedNode() instanceof Text) {
-					// TODO
-					System.out.println("note clicked");
+				Node result = event.getPickResult().getIntersectedNode();
+				if (result instanceof Text) {
+					Text picked = (Text) result;
+					Note note = currentGraphicNoteMap.get(picked);
+					if (note!=null) {
+						note.setSceneExpanded(!note.isSceneExpanded());
+						if (note.isSceneExpanded())
+							picked.setText(note.getTagName()+": "+note.getTagContents());
+						else
+							picked.setText(note.getTagName());
+					}
 				}
 			}
 		};
@@ -1642,7 +1650,7 @@ public class Window3DController {
     private final double Z_SCALE = 5,
 			    		X_SCALE = 1,
 			    		Y_SCALE = 1;
-    private final double BILLBOARD_SCALE = 1.8;
+    private final double BILLBOARD_SCALE = 0.9;
     
     private final double SIZE_SCALE = 1;
     private final double UNIFORM_RADIUS = 4;

@@ -11,6 +11,7 @@ public class AppFont {
 	private static final Font boldFont;
 	
 	private static final Font billboardFont;
+	private static final Font spriteAndOverlayFont;
 	
 	
 	static {
@@ -19,7 +20,13 @@ public class AppFont {
 		bolderFont = Font.font("System", FontWeight.EXTRA_BOLD, 14);
 		boldFont = Font.font("System", FontWeight.SEMI_BOLD, 14);
 		
-		billboardFont = Font.font("System", FontWeight.SEMI_BOLD, 6);
+		billboardFont = Font.font("System", FontWeight.BOLD, 10);
+		spriteAndOverlayFont = Font.font("System", FontWeight.BOLD, 16);
+	}
+	
+	
+	public static Font getSpriteAndOverlayFont() {
+		return spriteAndOverlayFont;
 	}
 	
 	

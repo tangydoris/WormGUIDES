@@ -32,11 +32,13 @@ public class Note {
 	private Story parent;
 	
 	// True when any field value changes, false otherwise
-	private BooleanProperty changedBooleanProperty;
-	// True when graphical representation is expanded, false otherwise
-	private BooleanProperty expandedBooleanProperty;
+	private BooleanProperty changedProperty;
+	// True when graphic in stories list view is expanded, false otherwise
+	private BooleanProperty listExpandedProperty;
+	// True when graphic in 3d subscene is expanded, false otherwise
+	private BooleanProperty sceneExpandedProperty;
 	// True when graphical representation is selected, false otherwise
-	private BooleanProperty activeBooleanProperty;
+	private BooleanProperty activeProperty;
 	
 	
 	public Note(Story parent) {
@@ -53,8 +55,8 @@ public class Note {
 		comments = "";
 		url = "";
 		
-		changedBooleanProperty = new SimpleBooleanProperty(false);
-		changedBooleanProperty.addListener(new ChangeListener<Boolean>() {
+		changedProperty = new SimpleBooleanProperty(false);
+		changedProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
@@ -63,8 +65,9 @@ public class Note {
 			}
 		});
 		
-		expandedBooleanProperty = new SimpleBooleanProperty(false);
-		activeBooleanProperty = new SimpleBooleanProperty(false);
+		listExpandedProperty = new SimpleBooleanProperty(false);
+		sceneExpandedProperty = new SimpleBooleanProperty(false);
+		activeProperty = new SimpleBooleanProperty(false);
 		
 		setAttachmentType(Type.BLANK);
 		setTagDisplay(Display.BLANK);
@@ -77,48 +80,63 @@ public class Note {
 	}
 	
 	
-	public BooleanProperty getActiveBooleanProperty() {
-		return activeBooleanProperty;
+	public BooleanProperty getActiveProperty() {
+		return activeProperty;
 	}
 	
 	
 	public boolean isActive() {
-		return activeBooleanProperty.get();
+		return activeProperty.get();
 	}
 	
 	
 	public void setActive(boolean active) {
-		activeBooleanProperty.set(active);
+		activeProperty.set(active);
 	}
 	
 	
-	public BooleanProperty getExpandedBooleanProperty() {
-		return expandedBooleanProperty;
+	public BooleanProperty getSceneExpandedProperty() {
+		return sceneExpandedProperty;
 	}
 	
 	
-	public boolean isExpanded() {
-		return expandedBooleanProperty.get();
+	public boolean isSceneExpanded() {
+		return sceneExpandedProperty.get();
 	}
 	
 	
-	public void setExpanded(boolean expanded) {
-		expandedBooleanProperty.set(expanded);
+	public void setSceneExpanded(boolean expanded) {
+		sceneExpandedProperty.set(expanded);
+	}
+	
+	
+	public BooleanProperty getListExpandedProperty() {
+		return listExpandedProperty;
+	}
+	
+	
+	public boolean isListExpanded() {
+		return listExpandedProperty.get();
+	}
+	
+	
+	public void setListExpanded(boolean expanded) {
+		listExpandedProperty.set(expanded);
 	}
 	
 	
 	public BooleanProperty getChangedProperty() {
-		return changedBooleanProperty;
+		return changedProperty;
 	}
 	
 	
 	public void setChanged(boolean changed) {
-		changedBooleanProperty.set(changed);
+		changedProperty.set(changed);
 	}
 	
 	
 	public boolean changed() {
-		return changedBooleanProperty.get();
+		return changedProperty.get();
 	}
 	
 	

@@ -614,8 +614,8 @@ public class StoriesLayer {
 			expandIcon.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					note.setExpanded(!note.isExpanded());
-					expandNote(note.isExpanded());
+					note.setListExpanded(!note.isListExpanded());
+					expandNote(note.isListExpanded());
 				}
 			});
 			
@@ -648,7 +648,7 @@ public class StoriesLayer {
 			contents.setFontSmoothingType(FontSmoothingType.LCD);
 			
 			contentsContainer.getChildren().addAll(r2, contents);
-			expandNote(note.isExpanded());
+			expandNote(note.isListExpanded());
 			
 			setPickOnBounds(false);
 			setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -663,7 +663,7 @@ public class StoriesLayer {
 					}
 				}
 			});
-			note.getActiveBooleanProperty().addListener(new ChangeListener<Boolean>() {
+			note.getActiveProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
 				public void changed(ObservableValue<? extends Boolean> observable, 
 						Boolean oldValue, Boolean newValue) {
