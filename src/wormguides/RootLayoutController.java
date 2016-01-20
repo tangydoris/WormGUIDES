@@ -423,7 +423,7 @@ public class RootLayoutController implements Initializable{
 		structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event) {
-                event.consume();
+                event.consume(); 
             }
 		});
 		
