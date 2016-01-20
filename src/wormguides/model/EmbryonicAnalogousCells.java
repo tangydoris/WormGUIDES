@@ -67,7 +67,7 @@ public class EmbryonicAnalogousCells {
 				}
 				
 				//otherwise, case 1 i.e. descendant --> add suffix
-				String suffix = cell.substring(eh.getCell2().length() - 1);
+				String suffix = cell.substring(eh.getCell2().length());
 				String descendantHomology = eh.getCell2() + suffix;
 				return descendantHomology;
 				
@@ -81,7 +81,7 @@ public class EmbryonicAnalogousCells {
 				}
 				
 				//otherwise, case 1 i.e. descendant --> add suffix
-				String suffix = cell.substring(eh.getCell1().length() - 1);
+				String suffix = cell.substring(eh.getCell1().length());
 				String descendantHomology = eh.getCell1() + suffix;
 				return descendantHomology;
 			}

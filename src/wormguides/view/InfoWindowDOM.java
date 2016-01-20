@@ -64,6 +64,12 @@ public class InfoWindowDOM {
 		
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
 		
+		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "width: 100%;");
+		HTMLNode collapseFunctionButton = new HTMLNode("button", "HEY THERE CLICK ME", "functionButton", "width: 40%; float: left;", "+", true);
+		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 40%; float: left; background-color: blue;",
+				"<strong> Function (Wormatlas): </strong>");
+
+		
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "");
 		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "");
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
@@ -81,8 +87,7 @@ public class InfoWindowDOM {
 		
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		
-		String functionWORMATLAS = "<strong> - Function (Wormatlas): </strong>" + terminalCase.getFunctionWORMATLAS();
-		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", functionWORMATLAS);
+		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
 		
 		HTMLNode anatomyP = new HTMLNode("p", "", "", "<strong>- Anatomy: </strong>");
 		HTMLNode anatomyUL = new HTMLNode("ul");
@@ -99,22 +104,39 @@ public class InfoWindowDOM {
 		ArrayList<String> neuromuscularPartners = terminalCase.getNeuromuscularPartners();
 		if (presynapticPartners.size() > 0) {
 			Collections.sort(presynapticPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em>" + presynapticPartners.toString());
+			
+			//remove brackets
+			String prePartners = presynapticPartners.toString();
+			prePartners = prePartners.substring(1, prePartners.length()-2);
+			
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em>" + prePartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em>" + postsynapticPartners.toString());
+			String postPartners = postsynapticPartners.toString();
+			
+			postPartners = postPartners.substring(1, postPartners.length()-2);
+			
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
 			Collections.sort(electricalPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em>" + electricalPartners.toString());
+			
+			String electPartners = electricalPartners.toString();
+			electPartners = electPartners.substring(1, electPartners.length()-2);
+			
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em>" + electPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
 			Collections.sort(neuromuscularPartners);
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em>" + neuromuscularPartners.toString());
+			
+			String neuroPartners = neuromuscularPartners.toString();
+			neuroPartners = neuroPartners.substring(1, neuroPartners.length()-2);
+			
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		
@@ -144,6 +166,8 @@ public class InfoWindowDOM {
 		externalInfoDiv.addChild(externalInfoP);
 		partsListDescrDiv.addChild(partsListDescrP);
 		imgDiv.addChild(img);
+		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
+		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		functionWORMATLASDiv.addChild(functionWORMATLASP);
 		anatomyDiv.addChild(anatomyP);
 		anatomyDiv.addChild(anatomyUL);
@@ -159,6 +183,7 @@ public class InfoWindowDOM {
 		//add divs to body
 		body.addChild(topContainerDiv);
 		body.addChild(imgDiv);
+		body.addChild(functionWORMATLASTopContainerDiv);
 		body.addChild(functionWORMATLASDiv);
 		body.addChild(anatomyDiv);
 		body.addChild(wiringPartnersDiv);
@@ -246,7 +271,9 @@ public class InfoWindowDOM {
 	
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
+		System.out.println(domAsString += html.formatNode());
 		return domAsString += html.formatNode();
+		
 	}
 	
 	/*
@@ -276,11 +303,19 @@ public class InfoWindowDOM {
 	 */
 	private String findStyleInSubTree(HTMLNode node) {
 		String style = "";
-		for (HTMLNode n : node.getChildren()) {
-				if (n.hasID()) {
-				style += (newLine + "#" + n.getID() + " {"
-						+ newLine + n.getStyle()
-						+ newLine + "}");
+		if (node.hasChildren()) {
+			for (HTMLNode n : node.getChildren()) {
+				if (n.hasID() && !n.getStyle().equals("")) {
+					style += (newLine + "#" + n.getID() + " {"
+							+ newLine + n.getStyle()
+							+ newLine + "}");
+				}
+					
+				if (n.hasChildren()) {
+					for (HTMLNode n1 : n.getChildren()) {
+						style += findStyleInSubTree(n1);
+					}
+				}
 			}
 		}
 		return style;

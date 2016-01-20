@@ -13,6 +13,7 @@ public class HTMLNode {
 	private boolean hasID;
 	private boolean isImage;
 	private boolean isStyle;
+	private boolean isButton;
 	
 	//image vars
 	private String imgSrc;
@@ -27,6 +28,7 @@ public class HTMLNode {
 		this.hasID = false;
 		this.isImage = false;
 		this.isStyle = false;
+		this.isButton = false;
 		
 		this.ID = null;
 		this.style = null;
@@ -46,7 +48,7 @@ public class HTMLNode {
 		this.hasID = true;
 		this.isImage = false;
 		this.isStyle = false;
-		
+		this.isButton = false;
 		
 		this.innerHTML = null;
 		this.imgSrc = null;
@@ -65,9 +67,9 @@ public class HTMLNode {
 		this.hasID = true;
 		this.isImage = false;
 		this.isStyle = false;
+		this.isButton = false;
 		
 		this.imgSrc = null;
-		
 		children = null;
 	}
 	
@@ -80,6 +82,7 @@ public class HTMLNode {
 		this.hasID = false;
 		this.isImage = true;
 		this.isStyle = false;
+		this.isButton = false;
 		
 		this.children = null;
 		this.innerHTML = null;
@@ -98,9 +101,28 @@ public class HTMLNode {
 		this.hasID = false;
 		this.isImage = false;
 		this.isStyle = true;
+		this.isButton = false;
 		
 		this.imgSrc = null;
 		this.style = null;
+		this.children = null;
+	}
+	
+	//button node
+	public HTMLNode(String tag, String onclick, String ID, String style, String buttonText, boolean button) {
+		this.tag = tag;
+		this.imgSrc = onclick; //will use this for the onlick="function()"
+		this.ID = ID;  
+		this.style = style;
+		this.innerHTML = buttonText;
+		
+		this.isContainer = false;
+		this.hasID = true;
+		this.isImage = false;
+		this.isStyle = false;
+		this.isButton = true;
+		
+		this.imgSrc = null;
 		this.children = null;
 	}
 	
@@ -148,7 +170,7 @@ public class HTMLNode {
 			}
 			
 			nodeStr += (newLine + "</" + node.tag + ">");
-		} else if (!node.isContainer() && !node.isImage()) { //e.g. <p id...
+		} else if (!node.isContainer() && !node.isImage() && !node.isButton()) { //e.g. <p id...
 			nodeStr = newLine + "<" + node.getTag() + " id=\"" + node.getID() + "\">" 
 						+ newLine + node.getInnerHTML() 
 						+ newLine +  "</" + node.getTag() + ">"; 
@@ -157,6 +179,10 @@ public class HTMLNode {
 		} else if (node.isStyle()) {
 			nodeStr = newLine + "<" + node.getTag() + " type=\"" + node.getID() + "\">"
 					+ newLine + newLine + node.getStyle() + newLine + "</" + node.getTag() + ">";
+		} else if (node.isButton()) { //using imgSrc for onlick and innerHTML for button text
+			nodeStr = newLine + "<" + node.getTag() + " onlick=\"" + node.getImgSrc() + "\"" + 
+						" id=\"" + node.getID() + "\">" +
+					node.innerHTML + "</" + node.getTag() + ">";
 		}
 		
 		return nodeStr;
@@ -191,13 +217,13 @@ public class HTMLNode {
 	}
 	
 	public String getImgSrc() {
-		if (isImage) {
+		if (this.imgSrc != null) {
 			return this.imgSrc;
 		}
 		return "";
 	}
 	
-	private boolean hasChildren() {
+	public boolean hasChildren() {
 		if (children != null) {
 			return this.children.size() > 0;
 		}
@@ -225,6 +251,10 @@ public class HTMLNode {
 	
 	public boolean isStyle() {
 		return this.isStyle;
+	}
+	
+	public boolean isButton() {
+		return this.isButton;
 	}
 	
 	private final static String newLine = "\n";
