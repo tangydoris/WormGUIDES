@@ -30,6 +30,7 @@ public class InfoWindow {
 		scene.setRoot(tabPane);
 		
 		infoWindowStage.setScene(scene);
+		infoWindowStage.setResizable(false);
 	}
 	
 	public void showWindow() {

@@ -251,8 +251,6 @@ public class HTMLNode {
 				+ newLine + "    }"
 				+ newLine + "}";
 
-		System.out.println(script);
-
 		/*
 		 * 
 		 * function functionWORMATLASCollapse() { 

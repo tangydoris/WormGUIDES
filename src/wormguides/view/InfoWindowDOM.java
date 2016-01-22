@@ -55,55 +55,62 @@ public class InfoWindowDOM {
 		
 		HTMLNode body = new HTMLNode("body");
 		
-		//divs
-		HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
-		HTMLNode externalInfoDiv = new HTMLNode("div", "externalInfo", ""); 
+		//external info
+		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
+		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
+		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName);
+		cellNameDiv.addChild(cellNameP);
+		
+		//parts list descriptions
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
-		topContainerDiv.addChild(externalInfoDiv);
+		String partsListDescription = terminalCase.getPartsListDescription();
+		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
+		partsListDescrDiv.addChild(partsListDescrP);
+		
+		//container for external info & parts list description
+		HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
+		topContainerDiv.addChild(cellNameDiv);
 		topContainerDiv.addChild(partsListDescrDiv);
 		
+		//image
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
-		
+		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
+		imgDiv.addChild(img);
+			
 		//function (wormatlas)
-		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "width: 100%;");
-		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
+		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
 		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; float: left;",
 				"<strong> Function (Wormatlas): </strong>");
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "");
+		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
+		functionWORMATLASDiv.addChild(functionWORMATLASP);
 		
 		//anatomy
+		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
+		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; float: left;",
+				"<strong> Anatomy: </strong>");
+		anatomyTopContainerDiv.addChild(collapseAnatomyButton);
+		anatomyTopContainerDiv.addChild(anatomyTitle);
 		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "");
-		
-		//wiring
-		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
-		
-		//expresses
-		HTMLNode expressesWORMBASEDiv = new HTMLNode("div", "expressesWORMBASE", "");
-		HTMLNode homologuesDiv = new HTMLNode("div", "homologuesDiv", "");
-		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "referencesTEXTPRESS", "");
-		HTMLNode linksDiv = new HTMLNode("div", "links", "");
-		
-		//build data tags from terminal case
-		String externalInfo = "<strong>External Information: </strong>" + terminalCase.getExternalInfo();
-		HTMLNode externalInfoP = new HTMLNode("p", "", "", externalInfo);
-		
-		String partsListDescription = "<strong>Parts List Description: </strong>" + terminalCase.getPartsListDescription();
-		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
-		
-		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
-		
-		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
-		
-		HTMLNode anatomyP = new HTMLNode("p", "", "", "<strong>- Anatomy: </strong>");
 		HTMLNode anatomyUL = new HTMLNode("ul");
 		for (String anatomyEntry : terminalCase.getAnatomy()) {
 			HTMLNode li = new HTMLNode("li", "", "", anatomyEntry);
 			anatomyUL.addChild(li);
 		}
+		anatomyDiv.addChild(anatomyUL);
 		
-		HTMLNode wiringPartnersP = new HTMLNode("p", "", "", "<strong>- Wiring: </strong>");
+		//wiring
+		HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
+		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse", "wiringPartnersCollapseButton","width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode wiringPartnersTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; float: left;",
+				"<strong> Wiring Partners: </strong>");
+		wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
+		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
+		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
 		HTMLNode wiringPartnersUL = new HTMLNode("ul");
 		ArrayList<String> presynapticPartners = terminalCase.getPresynapticPartners();
 		ArrayList<String> postsynapticPartners = terminalCase.getPresynapticPartners();
@@ -146,59 +153,94 @@ public class InfoWindowDOM {
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
+		wiringPartnersDiv.addChild(wiringPartnersUL);
 		
-		String expressesWORMBASE = "<strong>- Expresses (Wormbase): </strong>" + terminalCase.getExpressesWORMBASE().toString();
-		HTMLNode expressesWORMBASEP = new HTMLNode("p", "", "", expressesWORMBASE);
+		//expresses
+		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
+		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse", "geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle", "width: 95%; float: left;",
+				"<strong> Gene Expression: </strong>");
+		geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
+		geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
+		HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "");
+		ArrayList<String> expresses = terminalCase.getExpressesWORMBASE();
+		Collections.sort(expresses);
+		String geneExpressionStr = expresses.toString();
+		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
+		geneExpressionDiv.addChild(geneExpression);
 		
+		//terminal homologues
+		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
+		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
+				"<strong> Homologues: </strong>");
+		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
+		homologuesTopContainerDiv.addChild(homologuesTitle);
+		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
 		ArrayList<String> homologuesList = terminalCase.getHomologues();
 		Collections.sort(homologuesList);
-		String homologues = "<strong>- Homologues: </strong>" + homologuesList.toString();
-		HTMLNode homologuesP = new HTMLNode("p", "", "", homologues);
+		String homologuesStr = homologuesList.toString();
+		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
+		homologuesDiv.addChild(homologues);
 		
-		HTMLNode linksP = new HTMLNode("p", "", "", "<strong>- Links</strong>");
+		//links
+		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "");
+		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; float: left;",
+				"<strong> External Links: </strong>");
+		linksTopContainerDiv.addChild(collapseLinksButton);
+		linksTopContainerDiv.addChild(linksTitle);
+		HTMLNode linksDiv = new HTMLNode("div", "links", "");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			HTMLNode li = new HTMLNode("li", "", "", link);
 			linksUL.addChild(li);
 		}
+		linksDiv.addChild(linksUL);
 		
-		HTMLNode referencesP = new HTMLNode("p", "", "", "<strong>- References (Textpresso)</strong>");
+		//references
+		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
+		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; float: left;",
+				"<strong> References: </strong>");
+		referencesTopContainerDiv.addChild(collapseReferencesButton);
+		referencesTopContainerDiv.addChild(referencesTitle);
+		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "references", "");
 		HTMLNode referencesUL = new HTMLNode("ul");
-		for (String reference : terminalCase.getReferencesTEXTPRESSO()) {
+		for (String reference : terminalCase.getReferences()) {
 			HTMLNode li = new HTMLNode("li", "", "", reference);
 			referencesUL.addChild(li);
 		}
-		
-		//add data tags to divs
-		externalInfoDiv.addChild(externalInfoP);
-		partsListDescrDiv.addChild(partsListDescrP);
-		imgDiv.addChild(img);
-		functionWORMATLASDiv.addChild(functionWORMATLASP);
-		anatomyDiv.addChild(anatomyP);
-		anatomyDiv.addChild(anatomyUL);
-		wiringPartnersDiv.addChild(wiringPartnersP);
-		wiringPartnersDiv.addChild(wiringPartnersUL);
-		expressesWORMBASEDiv.addChild(expressesWORMBASEP);
-		homologuesDiv.addChild(homologuesP);
-		linksDiv.addChild(linksP);
-		linksDiv.addChild(linksUL);
-		referencesTEXTPRESSODiv.addChild(referencesP);
 		referencesTEXTPRESSODiv.addChild(referencesUL);
+		
 
 		//add divs to body
 		body.addChild(topContainerDiv);
 		body.addChild(imgDiv);
 		body.addChild(functionWORMATLASTopContainerDiv);
 		body.addChild(functionWORMATLASDiv);
+		body.addChild(anatomyTopContainerDiv);
 		body.addChild(anatomyDiv);
+		body.addChild(wiringPartnersTopContainerDiv);
 		body.addChild(wiringPartnersDiv);
-		body.addChild(expressesWORMBASEDiv);
+		body.addChild(geneExpressionTopContainerDiv);
+		body.addChild(geneExpressionDiv);
+		body.addChild(homologuesTopContainerDiv);
 		body.addChild(homologuesDiv);
+		body.addChild(linksTopContainerDiv);
 		body.addChild(linksDiv);
+		body.addChild(referencesTopContainerDiv);
 		body.addChild(referencesTEXTPRESSODiv);
 		
 		//add collapse scripts to body
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
+		body.addChild(collapseAnatomyButton.makeCollapseButtonScript());
+		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
+		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
+		body.addChild(collapseHomologuesButton.makeCollapseButtonScript());
+		body.addChild(collapseLinksButton.makeCollapseButtonScript());
+		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -234,7 +276,7 @@ public class InfoWindowDOM {
 		String externalInfo = "<strong>External Information: </strong>" + nonTerminalCase.getCellName();
 		HTMLNode externalInfoP = new HTMLNode("p", "", "", externalInfo);
 		
-		String embryonicHomology = "<strong>Embryonic Homology to: " + nonTerminalCase.getEmbryonicHomology();
+		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
 		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
 		
 		HTMLNode terminalDescendantsP = new HTMLNode("p", "", "", "<strong>- Terminal Descendants: </strong>");
@@ -279,7 +321,10 @@ public class InfoWindowDOM {
 	
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
-		//System.out.println(domAsString += html.formatNode());
+		
+//		String str = domAsString += html.formatNode();
+//		System.out.println(str);
+//		return str;
 		return domAsString += html.formatNode();
 		
 	}
@@ -290,7 +335,11 @@ public class InfoWindowDOM {
 	public void buildStyleNode() {
 		if (html == null) return;
 		
-		String style = "";
+		//start with rule for unorder list --> no bullets
+		String style = newLine + "ul li {"
+				+ newLine + "list-style-type: none;"
+				+ newLine + "margin-bottom: 2%;"
+				+ newLine + "}";
 		HTMLNode head = null; //saved to add style node as child of head
 		if (html.hasChildren()) {
 			for (HTMLNode node : html.getChildren()) {
