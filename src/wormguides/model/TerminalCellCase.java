@@ -18,9 +18,9 @@ public class TerminalCellCase {
 	private ArrayList<String> neuromuscularPartners;
 	
 	private ArrayList<String> anatomy;
-	private ArrayList<String> expressesWORMBASE;
+	private ArrayList<String> geneExpression;
 	private ArrayList<String> homologues;
-	private ArrayList<String> referencesTEXTPRESSO;
+	private ArrayList<String> references;
 	private ArrayList<String> links;
 	
 	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
@@ -41,9 +41,9 @@ public class TerminalCellCase {
 		
 		setExpressions();
 		
-		this.expressesWORMBASE = new ArrayList<String>();
+		this.geneExpression = new ArrayList<String>();
 		this.homologues = new ArrayList<String>();
-		this.referencesTEXTPRESSO = new ArrayList<String>();
+		this.references = new ArrayList<String>();
 		this.links = new ArrayList<String>();
 		
 		/*
@@ -51,12 +51,12 @@ public class TerminalCellCase {
 		 */
 		anatomy.add("anatomy entry");
 		anatomy.add("another anatomy entry");
-		expressesWORMBASE.add("expresses entry");
-		expressesWORMBASE.add("woah look! another Expresses entry");
+		geneExpression.add("expresses entry");
+		geneExpression.add("expresses entry 2");
 		homologues.add("homologues entry");
 		homologues.add("second homologue");
-		referencesTEXTPRESSO.add("references entry");
-		referencesTEXTPRESSO.add("second reference");
+		references.add("references entry");
+		references.add("second reference");
 		links.add("link entry");
 		links.add("LINK");
 	}
@@ -182,15 +182,15 @@ public class TerminalCellCase {
 	}
 	
 	public ArrayList<String> getExpressesWORMBASE() {
-		return this.expressesWORMBASE;
+		return this.geneExpression;
 	}
 	
 	public ArrayList<String> getHomologues() {
 		return this.homologues;
 	}
 	
-	public ArrayList<String> getReferencesTEXTPRESSO() {
-		return this.referencesTEXTPRESSO;
+	public ArrayList<String> getReferences() {
+		return this.references;
 	}
 	
 	public ArrayList<String> getLinks() {
