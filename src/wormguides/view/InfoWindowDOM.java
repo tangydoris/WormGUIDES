@@ -214,6 +214,24 @@ public class InfoWindowDOM {
 		}
 		referencesTEXTPRESSODiv.addChild(referencesUL);
 		
+		//production info
+		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
+		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; float: left;",
+				"<strong> Production Information: </strong>");
+		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
+		productionInfoTopContainerDiv.addChild(productionInfoTitle);
+		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
+		HTMLNode productionInfoUL = new HTMLNode("ul");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em> ...");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em> ...");
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em> ...");
+		productionInfoUL.addChild(nuclearLI);
+		productionInfoUL.addChild(cellShapeLI);
+		productionInfoUL.addChild(additionalEmbryosLI);
+		productionInfoDiv.addChild(productionInfoUL);
+		
 
 		//add divs to body
 		body.addChild(topContainerDiv);
@@ -232,6 +250,8 @@ public class InfoWindowDOM {
 		body.addChild(linksDiv);
 		body.addChild(referencesTopContainerDiv);
 		body.addChild(referencesTEXTPRESSODiv);
+		body.addChild(productionInfoTopContainerDiv);
+		body.addChild(productionInfoDiv);
 		
 		//add collapse scripts to body
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
@@ -241,6 +261,7 @@ public class InfoWindowDOM {
 		body.addChild(collapseHomologuesButton.makeCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
+		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -300,6 +321,24 @@ public class InfoWindowDOM {
 			terminalDescendantsUL.addChild(li);
 		}
 		
+		//production info
+		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
+		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; float: left;",
+				"<strong> Production Information: </strong>");
+		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
+		productionInfoTopContainerDiv.addChild(productionInfoTitle);
+		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
+		HTMLNode productionInfoUL = new HTMLNode("ul");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em> ...");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em> ...");
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em> ...");
+		productionInfoUL.addChild(nuclearLI);
+		productionInfoUL.addChild(cellShapeLI);
+		productionInfoUL.addChild(additionalEmbryosLI);
+		productionInfoDiv.addChild(productionInfoUL);
+		
 		//add data tags to div
 		externalInfoDiv.addChild(externalInfoP);
 		embryonicHomologyDiv.addChild(embryonicHomologyP);
@@ -310,6 +349,11 @@ public class InfoWindowDOM {
 		body.addChild(externalInfoDiv);
 		body.addChild(embryonicHomologyDiv);
 		body.addChild(terminalDescendantsDiv);
+		body.addChild(productionInfoTopContainerDiv);
+		body.addChild(productionInfoDiv);
+		
+		//add collapse scripts to body
+		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
