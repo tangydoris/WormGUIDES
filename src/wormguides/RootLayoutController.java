@@ -479,10 +479,10 @@ public class RootLayoutController implements Initializable{
 				String tabTitle = connectome.checkQueryCell(name).toUpperCase();
 				//add a terminal case --> pass the wiring partners
 				cellCases.makeTerminalCase(tabTitle, 
-						connectome.querryConnectivity(name, true, false, false, false),
-						connectome.querryConnectivity(name, false, true, false, false),
-						connectome.querryConnectivity(name, false, false, true, false),
-						connectome.querryConnectivity(name, false, false, false, true));
+						connectome.querryConnectivity(name, true, false, false, false, false),
+						connectome.querryConnectivity(name, false, true, false, false, false),
+						connectome.querryConnectivity(name, false, false, true, false, false),
+						connectome.querryConnectivity(name, false, false, false, true, false));
 			}
 		} else { //not in connectome --> non terminal case
 			if (cellCases.containsNonTerminalCase(name)) {

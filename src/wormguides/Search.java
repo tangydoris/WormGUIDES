@@ -416,7 +416,7 @@ public class Search {
 //									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
 //								}
 								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
-										postsynapticTicked, electricalTicked, neuromuscularTicked));
+										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
 							}
 							break;
 		}
