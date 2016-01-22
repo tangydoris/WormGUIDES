@@ -47,12 +47,6 @@ public class InfoWindowDOM {
 	
 		HTMLNode head = new HTMLNode("head");
 		
-		/*
-		 * TODO
-		 * meta tags
-		 * title
-		 */
-		
 		HTMLNode body = new HTMLNode("body");
 		
 		//external info
@@ -181,18 +175,33 @@ public class InfoWindowDOM {
 		geneExpressionDiv.addChild(geneExpression);
 		
 		//terminal homologues
-		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
+		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
 		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
 		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
-		ArrayList<String> homologuesList = terminalCase.getHomologues();
-		Collections.sort(homologuesList);
-		String homologuesStr = homologuesList.toString();
-		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
-		homologuesDiv.addChild(homologues);
+		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
+		HTMLNode lrUL = new HTMLNode("ul");
+		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
+		HTMLNode lrLI2 = new HTMLNode("li", "", "", "l/r entry");
+		lrUL.addChild(lrLI);
+		lrUL.addChild(lrLI2);
+		homologuesLeftRightListDiv.addChild(lrUL);
+		HTMLNode homologuesOtherDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
+		HTMLNode otherUL = new HTMLNode("ul");
+		HTMLNode otherLI = new HTMLNode("li", "", "", "<strong>Other</strong>");
+		HTMLNode otherLI2 = new HTMLNode("li", "", "", "other entry");
+		otherUL.addChild(otherLI);
+		otherUL.addChild(otherLI2);
+		homologuesOtherDiv.addChild(otherUL);
+//		ArrayList<String> homologuesList = terminalCase.getHomologues();
+//		Collections.sort(homologuesList);
+//		String homologuesStr = homologuesList.toString();
+//		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
+		homologuesDiv.addChild(homologuesLeftRightListDiv);
+		homologuesDiv.addChild(homologuesOtherDiv);
 		
 		//links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "");
@@ -272,7 +281,7 @@ public class InfoWindowDOM {
 		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
 		body.addChild(collapseViewWDButton.makeCollapseButtonScript());
 		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
-		body.addChild(collapseHomologuesButton.makeCollapseButtonScript());
+		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
@@ -305,7 +314,6 @@ public class InfoWindowDOM {
 		//divs
 		HTMLNode externalInfoDiv = new HTMLNode("div", "externalInfo", ""); 
 		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "partsListDescr", "");
-		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "");
 		
 		//build data tags from terminal case
 		String externalInfo = "<strong>External Information: </strong>" + nonTerminalCase.getCellName();
@@ -314,7 +322,14 @@ public class InfoWindowDOM {
 		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
 		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
 		
-		HTMLNode terminalDescendantsP = new HTMLNode("p", "", "", "<strong>- Terminal Descendants: </strong>");
+		HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
+		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; float: left;",
+				"<strong> TerminalDescendants: </strong>");
+		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
+		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
+		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "");
 		HTMLNode terminalDescendantsUL = new HTMLNode("ul");
 		for (TerminalDescendant terminalDescendant : nonTerminalCase.getTerminalDescendants()) {
 			String descendant = "";
@@ -334,6 +349,7 @@ public class InfoWindowDOM {
 			HTMLNode li = new HTMLNode("li", "", "", descendant);
 			terminalDescendantsUL.addChild(li);
 		}
+		terminalDescendantsDiv.addChild(terminalDescendantsUL);
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -356,18 +372,19 @@ public class InfoWindowDOM {
 		//add data tags to div
 		externalInfoDiv.addChild(externalInfoP);
 		embryonicHomologyDiv.addChild(embryonicHomologyP);
-		terminalDescendantsDiv.addChild(terminalDescendantsP);
-		terminalDescendantsDiv.addChild(terminalDescendantsUL);
+		
 		
 		//add divs to body
 		body.addChild(externalInfoDiv);
 		body.addChild(embryonicHomologyDiv);
+		body.addChild(terminalDescendantsTopContainerDiv);
 		body.addChild(terminalDescendantsDiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 		
 		//add collapse scripts to body
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
+		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -380,10 +397,10 @@ public class InfoWindowDOM {
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
 		
-//		String str = domAsString += html.formatNode();
-//		System.out.println(str);
-//		return str;
-		return domAsString += html.formatNode();
+		String str = domAsString += html.formatNode();
+		System.out.println(str);
+		return str;
+		//return domAsString += html.formatNode();
 		
 	}
 	
@@ -436,6 +453,10 @@ public class InfoWindowDOM {
 					}
 				}
 			}
+			
+			if (node.hasID() && !node.getStyle().equals("")) {
+				style += styleAsStr(node);
+			}
 		} else {
 			if (node.hasID() && !node.getStyle().equals("")) {
 				style += styleAsStr(node);
@@ -456,6 +477,6 @@ public class InfoWindowDOM {
 	
 	private final static String doctypeTag = "<!DOCTYPE html>";
 	private final static String newLine = "\n";
-	private final static String meta_charset = "<meta charset=\"utf-8\">";
-	private final static String meta_httpequiv_content = "<meta http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong Bao\">";
+//	private final static String meta_charset = "<meta charset=\"utf-8\">";
+//	private final static String meta_httpequiv_content = "<meta http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong Bao\">";
 }

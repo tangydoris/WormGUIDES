@@ -242,7 +242,7 @@ public class HTMLNode {
 		String script = functionName 
 				+ newLine + "    if (document.getElementById('" + this.getID() + "').innerHTML == \"+\") {"
 				+ newLine + "        document.getElementById('" + this.getID() + "').innerHTML = \"-\";"
-				+ newLine + "        document.getElementById(\"" + divToCollapseID + "\").style.height = '20%'; "
+				+ newLine + "        document.getElementById('" + divToCollapseID + "').style.height = '20%'; "
 				+ newLine + "        document.getElementById('" + divToCollapseID + "').style.visibility = 'visible'; "
 				+ newLine + "    } else {"
 				+ newLine + "        document.getElementById('" + this.getID() + "').innerHTML = \"+\";"
@@ -267,6 +267,33 @@ public class HTMLNode {
 		 */
 
 
+		return new HTMLNode("script", script, true);
+	}
+	
+	public HTMLNode makeHomologuesCollapseButtonScript() {
+		if (!this.isButton()) return null;
+		
+		String script = "function homologuesCollapse() {"
+				+ newLine + "if (document.getElementById('homologuesCollapseButton').innerHTML == \"+\") {"
+				+ newLine + "document.getElementById('homologuesCollapseButton').innerHTML = \"-\";"
+				+ newLine + "document.getElementById('homologues').style.height = '20%';"
+				+ newLine + "document.getElementById('homologues').style.visibility = 'visible'; "
+				+ newLine + "document.getElementById('homologuesLR').style.height = '20%';"
+				+ newLine + "document.getElementById('homologuesLR').style.visibility = 'visible';"
+				+ newLine + "document.getElementById('homologuesOther').style.height = '20%';"
+				+ newLine + "document.getElementById('homologuesOther').style.visibility = 'visible';"
+				+ newLine + "} else {"
+				+ newLine + "document.getElementById('homologuesCollapseButton').innerHTML = \"+\";"
+				+ newLine + "document.getElementById('homologues').style.height = '0px'; "
+				+ newLine + "document.getElementById('homologues').style.visibility = 'hidden';"
+				+ newLine + "document.getElementById('homologuesLR').style.height = '0px';"
+				+ newLine + "document.getElementById('homologuesLR').style.visibility = 'hidden';"
+				+ newLine + "document.getElementById('homologuesOther').style.height = '0px';"
+				+ newLine + "document.getElementById('homologuesOther').style.visibility = 'hidden';"
+				+ newLine + "}"
+				+ newLine + "}";
+		
+		
 		return new HTMLNode("script", script, true);
 	}
 
