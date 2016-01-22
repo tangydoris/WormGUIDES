@@ -67,6 +67,11 @@ public class TerminalCellCase {
 		String content = "";
 		URLConnection connection = null;
 		
+		
+		/* 
+		 * USING FRAMESET.HTML EXT
+		 * Leaving code for mainframe.htm check
+		 */
 		//extract root of cell name e.g. ribr --> RIB
 		String URL = wormatlasURL + 
 				this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
@@ -79,13 +84,29 @@ public class TerminalCellCase {
 			content = scanner.next();
 			scanner.close();
 		} catch (Exception e) {
-			//e.printStackTrace();
-			//a page wasn't found on wormatlas
+			//try second extension
+//			URL = wormatlasURL + 
+//					this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
+//					wormatlasURLEXT2;
+//			try {
+//				connection = new URL(URL).openConnection();
+//				Scanner scanner = new Scanner(connection.getInputStream());
+//				scanner.useDelimiter("\\Z");
+//				content = scanner.next();
+//				scanner.close();
+//			} catch (Exception e1) {
+//				//e1.printStackTrace();
+//				//a page wasn't found on wormatlas
+//				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
+//				return;
+//			}
+			
 			this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
 			return;
 		}
 
 		//parse the html for "Function"
+		//System.out.println(content);
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
 		this.functionWORMATLAS = content;
@@ -181,4 +202,5 @@ public class TerminalCellCase {
 	
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
+	private final static String wormatlasURLEXT2 = "frameset.html";
 }

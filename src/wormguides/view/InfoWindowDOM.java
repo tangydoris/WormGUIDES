@@ -64,15 +64,22 @@ public class InfoWindowDOM {
 		
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
 		
+		//function (wormatlas)
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "width: 100%;");
-		HTMLNode collapseFunctionButton = new HTMLNode("button", "HEY THERE CLICK ME", "functionButton", "width: 40%; float: left;", "+", true);
-		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 40%; float: left; background-color: blue;",
+		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; float: left;",
 				"<strong> Function (Wormatlas): </strong>");
-
-		
+		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
+		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "");
+		
+		//anatomy
 		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "");
+		
+		//wiring
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
+		
+		//expresses
 		HTMLNode expressesWORMBASEDiv = new HTMLNode("div", "expressesWORMBASE", "");
 		HTMLNode homologuesDiv = new HTMLNode("div", "homologuesDiv", "");
 		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "referencesTEXTPRESS", "");
@@ -166,8 +173,6 @@ public class InfoWindowDOM {
 		externalInfoDiv.addChild(externalInfoP);
 		partsListDescrDiv.addChild(partsListDescrP);
 		imgDiv.addChild(img);
-		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
-		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		functionWORMATLASDiv.addChild(functionWORMATLASP);
 		anatomyDiv.addChild(anatomyP);
 		anatomyDiv.addChild(anatomyUL);
@@ -191,6 +196,9 @@ public class InfoWindowDOM {
 		body.addChild(homologuesDiv);
 		body.addChild(linksDiv);
 		body.addChild(referencesTEXTPRESSODiv);
+		
+		//add collapse scripts to body
+		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -271,7 +279,7 @@ public class InfoWindowDOM {
 	
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
-		System.out.println(domAsString += html.formatNode());
+		//System.out.println(domAsString += html.formatNode());
 		return domAsString += html.formatNode();
 		
 	}
@@ -284,17 +292,23 @@ public class InfoWindowDOM {
 		
 		String style = "";
 		HTMLNode head = null; //saved to add style node as child of head
-		//if (html.hasChildren()) {
-		for (HTMLNode node : html.getChildren()) {
-			if (node.getTag().equals("head")) { //save head
-				head = node;
-			} else if (node.getTag().equals("body")) { //get style
-					style += findStyleInSubTree(node);
+		if (html.hasChildren()) {
+			for (HTMLNode node : html.getChildren()) {
+				if (node.getTag().equals("head")) { //save head
+					head = node;
+				} else if (node.getTag().equals("body")) { //get style
+						style += findStyleInSubTree(node);
+				}
+					
 			}
-				
 		}
-
 		addStyleNodeToHead(head, style);
+	}
+	
+	private void addStyleNodeToHead(HTMLNode head, String style) {
+		if (head != null) {
+			head.addChild(new HTMLNode(style, "text/css"));
+		}
 	}
 	
 	/*
@@ -306,9 +320,7 @@ public class InfoWindowDOM {
 		if (node.hasChildren()) {
 			for (HTMLNode n : node.getChildren()) {
 				if (n.hasID() && !n.getStyle().equals("")) {
-					style += (newLine + "#" + n.getID() + " {"
-							+ newLine + n.getStyle()
-							+ newLine + "}");
+					style += styleAsStr(n);
 				}
 					
 				if (n.hasChildren()) {
@@ -317,14 +329,18 @@ public class InfoWindowDOM {
 					}
 				}
 			}
+		} else {
+			if (node.hasID() && !node.getStyle().equals("")) {
+				style += styleAsStr(node);
+			}
 		}
 		return style;
 	}
 	
-	private void addStyleNodeToHead(HTMLNode head, String style) {
-		if (head != null) {
-			head.addChild(new HTMLNode(style, "text/css"));
-		}
+	private String styleAsStr(HTMLNode node) {
+	 return (newLine + "#" + node.getID() + " {"
+				+ newLine + node.getStyle()
+				+ newLine + "}");
 	}
 	
 	public String getName() {
