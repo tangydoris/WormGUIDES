@@ -1,5 +1,7 @@
 package wormguides.model;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -25,10 +27,13 @@ public class TerminalCellCase {
 	
 	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
 			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners) {
+		this.links = new ArrayList<String>();
 		this.cellName = cellName;
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
 		this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT; 
+		
+		//parse wormatlas for the "Function" field
 		setFunctionFromWORMATLAS();
 		
 		this.presynapticPartners = presynapticPartners;
@@ -39,12 +44,12 @@ public class TerminalCellCase {
 		//FIGURE OUT HOW TO GENERATE THESE
 		this.anatomy = new ArrayList<String>();
 		
-		setExpressions();
+		//set expressions
+		setExpressionsFromWORMBASE();
 		
 		this.expressesWORMBASE = new ArrayList<String>();
 		this.homologues = new ArrayList<String>();
 		this.referencesTEXTPRESSO = new ArrayList<String>();
-		this.links = new ArrayList<String>();
 		
 		/*
 		 * testing purposes
@@ -57,8 +62,6 @@ public class TerminalCellCase {
 		homologues.add("second homologue");
 		referencesTEXTPRESSO.add("references entry");
 		referencesTEXTPRESSO.add("second reference");
-		links.add("link entry");
-		links.add("LINK");
 	}
 	
 	private void setFunctionFromWORMATLAS() {
@@ -89,20 +92,37 @@ public class TerminalCellCase {
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
 		this.functionWORMATLAS = content;
+		
+		//add the link to the list
+		links.add(URL);
 	}
 	
-	private void setExpressions() {
+	private void setExpressionsFromWORMBASE() {
 		if (this.cellName == null) return;
 		
 		String URL = "http://www.wormbase.org/db/get?name=" + 
-		this.cellName + ";class=Anatomy_term\");";
+		this.cellName + ";class=Anatomy_term";
 		
-		System.out.println(URL);
-				
-//				File.openUrlAsString(\"http://www.wormbase.org/db/get?name="
-//						+ cellName
-//						+ ";class=Anatomy_term\");"
-//						+ "print(string);");
+		String content = "";
+		URLConnection connection = null;
+		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			this.functionWORMATLAS = this.cellName + " page not found on Wormbase";
+			return;
+		}
+		
+		//parse the html
+		
+		//add the link to the list
+		links.add(URL);
 	}
 	
 	public String getCellName() {

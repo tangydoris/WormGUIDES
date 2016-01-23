@@ -129,7 +129,14 @@ public class InfoWindowDOM {
 		HTMLNode linksP = new HTMLNode("p", "", "", "<strong>- Links</strong>");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
-			HTMLNode li = new HTMLNode("li", "", "", link);
+			String placeholder = link.substring(link.indexOf("www.")+4);
+			placeholder = placeholder.substring(0, placeholder.indexOf("."));
+			
+			String anchor = "<a href=\"" + link + "\">" +
+			terminalCase.getCellName() + " on " + placeholder +
+			"</a>";
+
+			HTMLNode li = new HTMLNode("li", "", "", anchor);
 			linksUL.addChild(li);
 		}
 		
