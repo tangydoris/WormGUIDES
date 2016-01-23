@@ -11,6 +11,8 @@ public class Connectome {
 	private ArrayList<NeuronalSynapse> connectome;
 	private ConnectomeLoader connectomeLoader;
 	
+	//terminal cell case
+	
 	public Connectome() {
 		connectome = new ArrayList<NeuronalSynapse>();
 		connectomeLoader = new ConnectomeLoader(connectomeFilePath);
@@ -52,12 +54,37 @@ public class Connectome {
 	}
 	
 	/*
+	 * provides name translation from systematic to functional
+	 */
+	public String checkQueryCell(String queryCell) {
+		if (PartsList.containsLineageName(queryCell)) {
+			queryCell = PartsList.getFunctionalNameByLineageName(queryCell).toLowerCase();
+		}
+		
+		return queryCell;
+	}
+	
+	public boolean containsCell(String queryCell) {
+		queryCell = checkQueryCell(queryCell);
+		
+		for (NeuronalSynapse ns : connectome) {
+			if (ns.getCell1().toLowerCase().equals(queryCell) || ns.getCell2().toLowerCase().equals(queryCell)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/*
 	 * Search function which takes cell and filters results based on filter toggles
 	 * filter toggles = 4 Synapse Types
 	 */
 	public ArrayList<String> querryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
-			boolean electricalTicked, boolean neuromuscularTicked) {
+			boolean electricalTicked, boolean neuromuscularTicked, boolean getLineage) {
+		
+		queryCell = checkQueryCell(queryCell);
 		
 		ArrayList<String> searchResults = new ArrayList<String>();
 
@@ -125,15 +152,18 @@ public class Connectome {
 			}
 		}
 		
-		// Return lineage names instead of functional names
-		ArrayList<String> lineageNameResults = new ArrayList<String>();
-		for (String result : searchResults) {
-			String lineageName = PartsList.getLineageNameByFunctionalName(result);
-			
-			if (lineageName!=null)
-				lineageNameResults.add(lineageName);
+		// Return lineage names instead of functional names if flag is true
+		if (getLineage) {
+			ArrayList<String> lineageNameResults = new ArrayList<String>();
+			for (String result : searchResults) {
+				String lineageName = PartsList.getLineageNameByFunctionalName(result);
+				
+				if (lineageName!=null)
+					lineageNameResults.add(lineageName);
+			}
+			return lineageNameResults;
 		}
-		return lineageNameResults;
+		return searchResults;
 	}
 	
 	public String connectomeAsHTML() {
@@ -155,7 +185,7 @@ public class Connectome {
 		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
 		
 		String queryCell = "AIZL";
-		querryConnectivity(queryCell, true, true, true, true);
+		querryConnectivity(queryCell, true, true, true, true, true);
 	}
 	
 	//static vars

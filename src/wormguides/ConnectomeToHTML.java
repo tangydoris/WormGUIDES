@@ -52,9 +52,9 @@ public class ConnectomeToHTML {
 			for (String table : wiringPartnersAsHTMLTables) {
 				htmlTables += (table + HTMLTags.breakLine + HTMLTags.breakLine);
 			}
-
 			return HTMLGenerator.generateCompleteHTML(htmlTables);
 		}
+		
 		return "";
 	}
 	
