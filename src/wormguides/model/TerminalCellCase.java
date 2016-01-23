@@ -57,11 +57,11 @@ public class TerminalCellCase {
 		 */
 		anatomy.add("anatomy entry");
 		anatomy.add("another anatomy entry");
-		geneExpression.add("expresses entry");
+		geneExpression.add("WORMBASE"); //how do we want to use Wormbase here???
 		geneExpression.add("expresses entry 2");
 		homologues.add("homologues entry");
 		homologues.add("second homologue entry");
-		references.add("references entry");
+		references.add("TEXTPRESSO"); //how do we want to use TEXTPRESSO here???
 		references.add("second reference");
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
 
@@ -113,7 +113,7 @@ public class TerminalCellCase {
 		//parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
-		this.functionWORMATLAS = content;
+		this.functionWORMATLAS = "<a href=\"" + URL + "\">" + URL + "</a><br><br>" + content;
 		
 		//add the link to the list
 		links.add(URL);
