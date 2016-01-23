@@ -413,12 +413,12 @@ public class Search {
 							
 			case CONNECTOME:
 							if (connectome != null) {
-								//if a systematic name is searched, translate to functional before searching connectome
-								if (PartsList.containsLineageName(searched)) {
-									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
-								}
+//								//if a systematic name is searched, translate to functional before searching connectome
+//								if (PartsList.containsLineageName(searched)) {
+//									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
+//								}
 								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
-										postsynapticTicked, electricalTicked, neuromuscularTicked));
+										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
 							}
 							break;
 		}
@@ -476,6 +476,29 @@ public class Search {
 		return false;
 	}
 	
+	/*
+	 * non terminal cell case will use this search to find the 
+	 * terminal descendants for a given cell
+	 * 
+	 * 
+	 */
+	public static ArrayList<String> getDescendantsList(String queryCell) {
+		ArrayList<String> descendants = new ArrayList<String>();
+		if (queryCell != null) {
+			for (String name : PartsList.getLineageNames()) {
+				if (!descendants.contains(name) && LineageTree.isDescendant(name, queryCell)) {
+					
+					/*
+					 * 
+					 */
+					
+					
+					descendants.add(name);
+				}	
+			}
+		}
+		return descendants;
+	}
 	
 	// Generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
