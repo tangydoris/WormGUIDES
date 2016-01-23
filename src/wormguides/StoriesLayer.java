@@ -16,6 +16,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -72,6 +73,7 @@ public class StoriesLayer {
 	private Note activeNote;
 	private Story activeStory;
 	
+	private StringProperty activeStoryProperty;
 	private StringProperty activeCellProperty;
 	private BooleanProperty cellClickedProperty;
 	
@@ -111,10 +113,25 @@ public class StoriesLayer {
 		
 		width = 0;
 		
+		activeStoryProperty = new SimpleStringProperty("");
+		
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = cellClicked;
 		
 		buildStories();
+	}
+	
+	
+	public StringProperty getActiveStoryProperty() {
+		return activeStoryProperty;
+	}
+	
+	
+	public String getActiveStoryDescription() {
+		if (activeStory!=null)
+			return activeStory.getDescription();
+		else
+			return "";
 	}
 	
 	
@@ -126,8 +143,12 @@ public class StoriesLayer {
 		setActiveNote(null);
 		
 		activeStory = story;
-		if (activeStory!=null)
+		if (activeStory!=null) {
 			activeStory.setActive(true);
+			activeStoryProperty.set(activeStory.getName());
+		}
+		else
+			activeStoryProperty.set("");
 		
 		if (editController!=null)
 			editController.setActiveStory(activeStory);

@@ -520,18 +520,29 @@
                               </HBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="100.0">
+                        <AnchorPane maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0">
                            <children>
                               <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
                                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Text fx:id="displayedName" strokeType="OUTSIDE" strokeWidth="0.0">
+                                          <Text fx:id="displayedName" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Cell: none">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
                                           </Text>
                                           <Text fx:id="displayedDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <Region />
+                                          <Text fx:id="displayedStory" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <Text fx:id="displayedStoryDescription" strokeType="OUTSIDE" strokeWidth="0.0">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

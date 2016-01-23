@@ -141,6 +141,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Text displayedName;
 	@FXML private Text displayedDescription;
 	
+	// story information
+	@FXML private Text displayedStory;
+	@FXML private Text displayedStoryDescription;
+	
 	//scene elements stuff
 	private SceneElementsList elementsList;
 	
@@ -437,14 +441,17 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void setSelectedEntityInfo(String name) {
-		if (name==null || name.isEmpty())
+		if (name==null || name.isEmpty()) {
+			displayedName.setText("Active Cell: none");
+			displayedDescription.setText("");
 			return;
+		}
 		
 		if (name.indexOf("(") > -1) 
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		displayedName.setText(name);
+		displayedName.setText("Active Cell: "+name);
 		displayedDescription.setText("");
 		
 		// Note
@@ -460,7 +467,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			String functionalName = PartsList.getFunctionalNameByLineageName(name);
 			
 			if (functionalName!=null) {
-				displayedName.setText(name+" ("+functionalName+")");
+				displayedName.setText("Active Cell: "+name+" ("+functionalName+")");
 				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 			}
 		}
@@ -694,6 +701,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		assert (displayedName != null);
 		assert (displayedDescription != null);
 		
+		assert (displayedStory != null);
+		assert (displayedStoryDescription != null);
+		
 		assert (uniformSizeCheckBox != null);
 		assert (opacitySlider != null);
 		
@@ -738,6 +748,21 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
 		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
+		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (newValue.isEmpty()) {
+					displayedStory.setText("Active Story: none");
+					displayedStoryDescription.setText("");
+				}
+				else {
+					displayedStory.setText("Active Story: "+newValue);
+					displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
+				}
+			}
+		});
 	}
 	
 	

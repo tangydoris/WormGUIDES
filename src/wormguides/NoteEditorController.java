@@ -37,7 +37,6 @@ import wormguides.model.Story;
 
 public class NoteEditorController extends AnchorPane implements Initializable{
 	
-	@FXML private Label activeStoryLabel;
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
 	
@@ -161,8 +160,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		attachmentToggleListener = new AttachmentToggleListener();
 		displayToggleListener = new DisplayToggleListener();
 		
-		changeActiveStoryLabel();
-		
 		updateType();
 		updateDisplay();
 		
@@ -259,7 +256,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	
 	private void assertFXMLNodes() {
-		assert (activeStoryLabel!=null);
 		assert (activeCellLabel!=null);
 		
 		assert (titleField!=null);
@@ -461,23 +457,11 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	public void setActiveStory(Story story) {
 		activeStory = story;
-		
-		changeActiveStoryLabel();
 	}
 	
 	
 	public Story getActiveStory() {
 		return activeStory;
-	}
-	
-	
-	private void changeActiveStoryLabel() {
-		if (activeStoryLabel!=null) {
-			if (activeStory!=null)
-				activeStoryLabel.setText("Active Story: "+activeStory.getName());
-			else
-				activeStoryLabel.setText("No Active Story");
-		}
 	}
 	
 	
