@@ -20,9 +20,9 @@ public class TerminalCellCase {
 	private ArrayList<String> neuromuscularPartners;
 	
 	private ArrayList<String> anatomy;
-	private ArrayList<String> expressesWORMBASE;
+	private ArrayList<String> geneExpression;
 	private ArrayList<String> homologues;
-	private ArrayList<String> referencesTEXTPRESSO;
+	private ArrayList<String> references;
 	private ArrayList<String> links;
 	
 	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
@@ -47,21 +47,33 @@ public class TerminalCellCase {
 		//set expressions
 		setExpressionsFromWORMBASE();
 		
-		this.expressesWORMBASE = new ArrayList<String>();
+		this.geneExpression = new ArrayList<String>();
 		this.homologues = new ArrayList<String>();
-		this.referencesTEXTPRESSO = new ArrayList<String>();
+
+		this.references = new ArrayList<String>();
+
+		this.references = new ArrayList<String>();
+		this.links = new ArrayList<String>();
+
 		
 		/*
 		 * testing purposes
 		 */
 		anatomy.add("anatomy entry");
 		anatomy.add("another anatomy entry");
-		expressesWORMBASE.add("expresses entry");
-		expressesWORMBASE.add("woah look! another Expresses entry");
+		geneExpression.add("expresses entry");
+		geneExpression.add("expresses entry 2");
 		homologues.add("homologues entry");
 		homologues.add("second homologue");
-		referencesTEXTPRESSO.add("references entry");
-		referencesTEXTPRESSO.add("second reference");
+
+		references.add("references entry");
+		references.add("second reference");
+
+		references.add("references entry");
+		references.add("second reference");
+//		links.add("link entry");
+//		links.add("LINK");
+
 	}
 	
 	private void setFunctionFromWORMATLAS() {
@@ -70,6 +82,11 @@ public class TerminalCellCase {
 		String content = "";
 		URLConnection connection = null;
 		
+		
+		/* 
+		 * USING FRAMESET.HTML EXT
+		 * Leaving code for mainframe.htm check
+		 */
 		//extract root of cell name e.g. ribr --> RIB
 		String URL = wormatlasURL + 
 				this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
@@ -82,13 +99,29 @@ public class TerminalCellCase {
 			content = scanner.next();
 			scanner.close();
 		} catch (Exception e) {
-			//e.printStackTrace();
-			//a page wasn't found on wormatlas
+			//try second extension
+//			URL = wormatlasURL + 
+//					this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
+//					wormatlasURLEXT2;
+//			try {
+//				connection = new URL(URL).openConnection();
+//				Scanner scanner = new Scanner(connection.getInputStream());
+//				scanner.useDelimiter("\\Z");
+//				content = scanner.next();
+//				scanner.close();
+//			} catch (Exception e1) {
+//				//e1.printStackTrace();
+//				//a page wasn't found on wormatlas
+//				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
+//				return;
+//			}
+			
 			this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
 			return;
 		}
 
 		//parse the html for "Function"
+		//System.out.println(content);
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
 		this.functionWORMATLAS = content;
@@ -181,15 +214,15 @@ public class TerminalCellCase {
 	}
 	
 	public ArrayList<String> getExpressesWORMBASE() {
-		return this.expressesWORMBASE;
+		return this.geneExpression;
 	}
 	
 	public ArrayList<String> getHomologues() {
 		return this.homologues;
 	}
 	
-	public ArrayList<String> getReferencesTEXTPRESSO() {
-		return this.referencesTEXTPRESSO;
+	public ArrayList<String> getReferences() {
+		return this.references;
 	}
 	
 	public ArrayList<String> getLinks() {
@@ -201,4 +234,5 @@ public class TerminalCellCase {
 	
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
+	private final static String wormatlasURLEXT2 = "frameset.html";
 }

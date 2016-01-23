@@ -82,7 +82,7 @@ public class Connectome {
 	 */
 	public ArrayList<String> querryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
-			boolean electricalTicked, boolean neuromuscularTicked) {
+			boolean electricalTicked, boolean neuromuscularTicked, boolean getLineage) {
 		
 		queryCell = checkQueryCell(queryCell);
 		
@@ -152,15 +152,18 @@ public class Connectome {
 			}
 		}
 		
-		// Return lineage names instead of functional names
-		ArrayList<String> lineageNameResults = new ArrayList<String>();
-		for (String result : searchResults) {
-			String lineageName = PartsList.getLineageNameByFunctionalName(result);
-			
-			if (lineageName!=null)
-				lineageNameResults.add(lineageName);
+		// Return lineage names instead of functional names if flag is true
+		if (getLineage) {
+			ArrayList<String> lineageNameResults = new ArrayList<String>();
+			for (String result : searchResults) {
+				String lineageName = PartsList.getLineageNameByFunctionalName(result);
+				
+				if (lineageName!=null)
+					lineageNameResults.add(lineageName);
+			}
+			return lineageNameResults;
 		}
-		return lineageNameResults;
+		return searchResults;
 	}
 	
 	public String connectomeAsHTML() {
@@ -182,7 +185,7 @@ public class Connectome {
 		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
 		
 		String queryCell = "AIZL";
-		querryConnectivity(queryCell, true, true, true, true);
+		querryConnectivity(queryCell, true, true, true, true, true);
 	}
 	
 	//static vars
