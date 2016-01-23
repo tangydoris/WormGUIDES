@@ -57,7 +57,7 @@ import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-//FOR CONNECTOME WINDOW
+
 import javafx.scene.web.WebView;
 import javafx.scene.Group;
 
