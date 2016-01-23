@@ -61,10 +61,10 @@ import javafx.scene.Group;
 
 public class RootLayoutController extends BorderPane implements Initializable{
 	
-	// root layout's own stage
+	// Root layout's own stage
 	private Stage mainStage;
 	
-	// popup windows
+	// Popup windows
 	private Stage aboutStage;
 	private Stage treeStage;
 	private Stage urlStage;
@@ -84,20 +84,20 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
 	
-	// panels stuff
+	// Panels stuff
 	@FXML private BorderPane rootBorderPane;
 	@FXML private VBox displayVBox;
 	@FXML private AnchorPane modelAnchorPane;
 	@FXML private ScrollPane infoPane;
 	@FXML private HBox sceneControlsBox;
 	
-	// subscene controls
+	// Subscene controls
 	@FXML private Button backwardButton, forwardButton, playButton;
 	@FXML private Label timeLabel, totalNucleiLabel;
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
-	// cells tab
+	// Cells tab
 	private Search search;
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -111,17 +111,17 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private ColorPicker colorPicker;
 	@FXML private Button addSearchBtn;
 	
-	//connectome stuff
+	// Connectome stuff
 	private Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
-	// lineage tree
+	// Lineage tree
 	private TreeItem<String> lineageTreeRoot;
 	
-	// cell selection
+	// Cell selection
 	private StringProperty selectedName;
 	
-	// layers tab
+	// Layers tab
 	private DisplayLayer displayLayer;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
@@ -428,7 +428,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
-		
 		// 'Others' opacity
 		opacitySlider.setValue(50);
 		
@@ -501,10 +500,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				timeLabel.setText("Time "+makePaddedTime(time.get()));
+				timeLabel.setText(makePaddedTime(time.get()+19)+" min p.f.c.");
 			}
 		});
-		timeLabel.setText("Time "+makePaddedTime(time.get()));
+		timeLabel.setText(makePaddedTime(time.get()+19)+" min p.f.c.");
 		timeLabel.toFront();
 		
 		totalNuclei.addListener(new ChangeListener<Number>() {

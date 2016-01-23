@@ -251,7 +251,8 @@ public class Search {
 	}
 	
 	
-	public static void addColorRule(SearchType type, String searched, Color color, SearchOption...options) {
+	public static void addColorRule(SearchType type, String searched, Color color, 
+			SearchOption...options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 		for (SearchOption option : options)
 			optionsArray.add(option);
@@ -260,7 +261,7 @@ public class Search {
 	
 	
 	public static void addColorRule(SearchType type, String searched, Color color, 
-													ArrayList<SearchOption> options) {
+			ArrayList<SearchOption> options) {
 		SearchType tempType = Search.type;
 		Search.type = type;
 		addColorRule(searched, color, options);
@@ -314,8 +315,9 @@ public class Search {
 		ArrayList<String> cells;
 		if (type==SearchType.GENE) {
 			WormBaseQuery.doSearch(searched);
-		} else if (type == SearchType.CONNECTOME) { //separate case for name translation purposes (see setConnectomeRuleCells())
-			//cells = setConnectomeRuleCells(searched);
+		} 
+		//separate case for name translation purposes (see setConnectomeRuleCells())
+		else if (type == SearchType.CONNECTOME) { 
 			cells = getCellsList(searched);
 			rule.setCells(cells);
 		} else {
