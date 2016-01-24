@@ -44,7 +44,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private Button delete;
 	
 	// time stuff
-	@FXML private CheckBox timeTick;
+	//@FXML private CheckBox timeTick;
 	@FXML private TextField startTimeField;
 	@FXML private TextField endTimeField;
 	
@@ -53,7 +53,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton cellRadioBtn;
 	@FXML private RadioButton globalRadioBtn;
 	@FXML private ComboBox<String> structuresComboBox;
-	private ObservableList<String> structureComboItems;
+	//private ObservableList<String> structureComboItems;
 	private Callback<ListView<String>, ListCell<String>> factory;
 	@FXML private RadioButton axonRadioBtn;
 	@FXML private RadioButton dendriteRadioBtn;
@@ -145,8 +145,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			}
 		});
 		
-		structureComboItems = FXCollections.observableArrayList();
-		structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
+		//structureComboItems = FXCollections.observableArrayList();
+		//structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
 	}
 	
 	
@@ -177,21 +177,19 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		updateType();
 		updateDisplay();
 		
-		timeTick.selectedProperty().addListener(timeTickListener);
+		//timeTick.selectedProperty().addListener(timeTickListener);
 		attachmentToggle.selectedToggleProperty().addListener(attachmentToggleListener);
 		displayToggle.selectedToggleProperty().addListener(displayToggleListener);
 		
 		factory = new StringCellCallback();
-		structuresComboBox.setItems(structureComboItems);
+		//structuresComboBox.setItems(structureComboItems);
 		structuresComboBox.setButtonCell(factory.call(null));
 		structuresComboBox.setCellFactory(factory);
 		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
-
 			@Override
 			public void changed(ObservableValue<? extends SingleSelectionModel<String>> observable,
 					SingleSelectionModel<String> oldValue, SingleSelectionModel<String> newValue) {
 				// TODO
-				//structuresComboBox.setButtonCell(factory.call(newValue.getSelectedItem()));
 			}
 		});
 	}
@@ -213,14 +211,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			endTimeField.setText(Integer.toString(activeNote.getEndTime()));
 		}
 	}
-	
-	
-	/*
-	private void turnOnCellType(String cellName) {
-		attachmentToggle.selectToggle(cellRadioBtn);
-		setCellLabelName(cellName);
-	}
-	*/
 	
 	
 	private void setActiveNoteTimes(String start, String end) {
@@ -293,7 +283,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		assert (delete!=null);
 		
-		assert (timeTick!=null);
+		//assert (timeTick!=null);
 		assert (startTimeField!=null);
 		assert (endTimeField!=null);
 		
@@ -360,7 +350,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 								break;
 								
 				case TIME:		
-								timeTick.setSelected(true);
+								//timeTick.setSelected(true);
 								setTime(activeNote.getStartTime(), activeNote.getEndTime());
 								activeCellProperty.set("");
 								break;
@@ -368,7 +358,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				case CELLTIME:
 								attachmentToggle.selectToggle(cellRadioBtn);
 								activeCellProperty.set(activeNote.getCellName());
-								timeTick.setSelected(true);
+								//timeTick.setSelected(true);
 								setTime(activeNote.getStartTime(), activeNote.getEndTime());
 								break;
 								
@@ -415,7 +405,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	
 	private void resetTime() {
-		timeTick.setSelected(false);
+		//timeTick.setSelected(false);
 		startTimeField.setText("");
 		endTimeField.setText("");
 	}
@@ -649,10 +639,14 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 					switch ((Type) newValue.getUserData()) {
 					
 					case CELL:
+									/*
 									if (timeTick.isSelected())
 										setActiveNoteAttachmentType(Type.CELLTIME);
 									else
 										setActiveNoteAttachmentType(Type.CELL);
+									*/
+									
+									setActiveNoteAttachmentType(Type.CELL);
 									break;
 									
 					case BLANK:		setActiveNoteAttachmentType(Type.BLANK);
