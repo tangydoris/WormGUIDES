@@ -30,6 +30,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.scene.CacheHint;
@@ -39,6 +40,7 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -112,6 +114,7 @@ public class Window3DController {
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
+	private Label selectedNameLabel;
 	private BooleanProperty cellClicked;
 
 	// searched highlighting stuff
@@ -204,6 +207,14 @@ public class Window3DController {
 			}
 		});
 		
+		selectedNameLabel = new Label();
+		selectedNameLabel.setPadding(new Insets(3));
+		selectedNameLabel.setFont(AppFont.getFont());
+		selectedNameLabel.setText("ipsum ipsum ipsum (ipsum)");
+		selectedNameLabel.setTextFill(Color.BLACK);
+		selectedNameLabel.setStyle("-fx-background-color: lightyellow;"
+				+ "-fx-border-color: black;");
+		
 		cellClicked = new SimpleBooleanProperty(false);
 
 		inSearch = false;
@@ -234,6 +245,8 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
 					Boolean oldValue, Boolean newValue) {
+				selectedNameLabel.setVisible(false);
+				
 				if (newValue)
 					playService.restart();
 				else
@@ -375,6 +388,8 @@ public class Window3DController {
 	
 	
 	private void handleMouseDragged(MouseEvent event) {
+		selectedNameLabel.setVisible(false);
+		
 		if (spritesPane!=null)
 			spritesPane.setCursor(Cursor.CLOSED_HAND);
 
@@ -420,13 +435,36 @@ public class Window3DController {
 	
 	
 	private void handleMouseClicked(MouseEvent event) {
+		selectedNameLabel.setVisible(false);
+		
 		Node node = event.getPickResult().getIntersectedNode();
 		
 		// Nucleus
 		if (node instanceof Sphere) {
-			selectedIndex.set(getPickedSphereIndex((Sphere)node));
-			selectedName.set(cellNames[selectedIndex.get()]);
+			Sphere picked = (Sphere) node;
+			selectedIndex.set(getPickedSphereIndex(picked));
+			String name = cellNames[selectedIndex.get()];
+			selectedName.set(name);
+			selectedNameLabel.setText(name);
 			cellClicked.set(true);
+			
+			// TODO make label popup
+			Bounds b = picked.getBoundsInParent();
+			
+			if (b!=null) {
+				selectedNameLabel.getTransforms().clear();
+				Point2D p = CameraHelper.project(camera, 
+						new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+				
+				double x = p.getX();
+				double y = p.getY();
+				double radius = picked.getRadius();
+				x += 3;
+				y -= 3*radius;
+				
+				selectedNameLabel.getTransforms().add(new Translate(x, y));
+				selectedNameLabel.setVisible(true);
+			}
 		}
 		else if (node instanceof MeshView) {
 			// Cell body/structure
@@ -434,7 +472,27 @@ public class Window3DController {
 				MeshView curr = currentSceneElementMeshes.get(i);
 				if (curr.equals(node)) {
 					SceneElement clickedSceneElement = currentSceneElements.get(i);
-					selectedName.set(clickedSceneElement.getSceneName());
+					String name = clickedSceneElement.getSceneName();
+					if (name.indexOf("(")>-1)
+						name = name.substring(0, name.indexOf("("));
+					selectedName.set(name);
+					
+					// TODO make label popup
+					selectedNameLabel.setText(name);
+					Bounds b = curr.getBoundsInParent();
+					
+					if (b!=null) {
+						selectedNameLabel.getTransforms().clear();
+						Point2D p = CameraHelper.project(camera, 
+								new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+						
+						double x = p.getX();
+						double y = p.getY();
+						
+						selectedNameLabel.getTransforms().add(new Translate(x, y));
+						selectedNameLabel.setVisible(true);
+					}
+					break;
 				}
 			}
 			
@@ -1214,6 +1272,9 @@ public class Window3DController {
 			AnchorPane.setRightAnchor(overlayVBox, 5.0);
 			
 			spritesPane.getChildren().add(overlayVBox);
+			
+			spritesPane.getChildren().add(selectedNameLabel);
+			selectedNameLabel.setVisible(false);
 		}
 	}
 
@@ -1245,8 +1306,10 @@ public class Window3DController {
 
 	
 	public void setTime(int t) {
-		if (t > 0 && t < endTime)
+		if (t > 0 && t < endTime) {
 			time.set(t);
+			selectedNameLabel.setVisible(false);
+		}
 	}
 	
 	
@@ -1413,8 +1476,9 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				double z = zoom.get();
+				selectedNameLabel.setVisible(false);
 				
+				double z = zoom.get();
 				z-=0.25;
 				if (z<0.25)
 					z = 0.25;
@@ -1431,8 +1495,9 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				selectedNameLabel.setVisible(false);
+				
 				double z = zoom.get();
-
 				z+=0.25;
 				if (z<0.25)
 					z = 0.25;
@@ -1449,6 +1514,8 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				selectedNameLabel.setVisible(false);
+				
 				if (!playingMovie.get()) {
 					int t = time.get();
 					if (t>1 && t<=getEndTime())
@@ -1463,6 +1530,8 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				selectedNameLabel.setVisible(false);
+				
 				if (!playingMovie.get()) {
 					int t = time.get();
 					if (t>=1 && t<getEndTime()-1)
@@ -1520,9 +1589,9 @@ public class Window3DController {
 							@Override
 							public void run() {
 								if (time.get()<endTime-1)
-									time.set(time.get()+1);
+									setTime(time.get()+1);
 								else
-									time.set(endTime-1);
+									setTime(endTime-1);
 							}
 						});
 						try {
@@ -1654,4 +1723,7 @@ public class Window3DController {
     
     private final double SIZE_SCALE = 1;
     private final double UNIFORM_RADIUS = 4;
+    
+    //private final String NAME_LABEL = "nameLabel";
+    
 }

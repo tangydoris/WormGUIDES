@@ -281,7 +281,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	public void openInfoWindow() {
 		if (infoWindow == null) {
 			initInfoWindow();
+			initCellCases();
 		}
+		
 		infoWindow.showWindow();
 	}
 	
@@ -410,8 +412,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				if (newValue.intValue() != timeSlider.getValue())
-					time.set(newValue.intValue());
+				if (newValue.intValue() != timeSlider.getValue() && window3D!=null)
+					window3D.setTime(newValue.intValue());
 			}
 		});
 		
@@ -809,7 +811,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
 		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
-
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 					String oldValue, String newValue) {
@@ -846,9 +847,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void initCellCases() {
-		if (infoWindow == null) {
+		if (infoWindow == null)
 			initInfoWindow();
-		}
 		
 		cellCases = new CellCases(infoWindow);
 	}
@@ -887,10 +887,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		initConnectome();
 		
 		//info window
-		initInfoWindow();
+		//initInfoWindow();
 		
 		//init cell cases
-		initCellCases();
+		//initCellCases();
 		
 		// structures layer
 		initStructuresLayer();

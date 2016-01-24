@@ -16,8 +16,10 @@
             <items>
                   <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Generate URL" />
                   <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load URL" />
-                  <MenuItem mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
-                  <MenuItem mnemonicParsing="false" onAction="#menuSaveStory" text="Save Story" />
+                  <MenuItem disable="true" mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
+                  <MenuItem disable="true" mnemonicParsing="false" onAction="#menuSaveStory" text="Save Story" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Save Movie" />
+                  <MenuItem disable="true" mnemonicParsing="false" text="Save Image" />
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>
@@ -96,9 +98,9 @@
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMinWidth="80.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMinWidth="75.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <tabs>
-                  			          <Tab closable="false" text="Cells">
+                  			          <Tab closable="false" text="Find Cells">
                   			            <content>
                   			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
                                              <children>
@@ -399,7 +401,7 @@
                                           </AnchorPane>
                   			            </content>
                   			          </Tab>
-                                    <Tab closable="false" text="Structures">
+                                    <Tab closable="false" text="Find Structures">
                                       <content>
                                         <AnchorPane>
                                              <children>
@@ -478,7 +480,7 @@
                                           </AnchorPane>
                                       </content>
                                     </Tab>
-                  			            <Tab closable="false" text="Display">
+                  			            <Tab closable="false" text="Display Options">
                   			              <content>
                   			                <AnchorPane>
                                              <children>
