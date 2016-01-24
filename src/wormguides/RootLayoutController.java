@@ -59,6 +59,7 @@ import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 
 import javafx.scene.web.WebView;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 
 public class RootLayoutController extends BorderPane implements Initializable{
@@ -141,6 +142,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	// cell information
 	@FXML private Text displayedName;
+	@FXML private Text moreInfoClickableText;
 	@FXML private Text displayedDescription;
 	
 	// story information
@@ -456,12 +458,34 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		// Cell Nucleus search option
 		cellNucleusTick.setSelected(true);
+		
+		// More info clickable text
+		// TODO
+		moreInfoClickableText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				openInfoWindow();
+			}
+		});
+		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				moreInfoClickableText.setCursor(Cursor.HAND);
+			}
+		});
+		moreInfoClickableText.setOnMouseExited(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				moreInfoClickableText.setCursor(Cursor.DEFAULT);
+			}
+		});
 	}
 	
 	
 	private void setSelectedEntityInfo(String name) {
 		if (name==null || name.isEmpty()) {
 			displayedName.setText("Active Cell: none");
+			moreInfoClickableText.setVisible(false);
 			displayedDescription.setText("");
 			return;
 		}
@@ -471,6 +495,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		name = name.trim();
 		
 		displayedName.setText("Active Cell: "+name);
+		moreInfoClickableText.setVisible(true);
 		displayedDescription.setText("");
 		
 		// Note
@@ -536,9 +561,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void sizeInfoPane() {
-		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(7));
-		displayedName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(6.5));
 		displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedStory.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedStoryDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 	}
 	
 	
@@ -547,10 +573,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				timeLabel.setText(makePaddedTime(time.get()+19)+" min p.f.c.");
+				timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
 			}
 		});
-		timeLabel.setText(makePaddedTime(time.get()+19)+" min p.f.c.");
+		timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
 		timeLabel.toFront();
 		
 		totalNuclei.addListener(new ChangeListener<Number>() {
@@ -566,19 +592,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
 		totalNucleiLabel.toFront();
-	}
-	
-	private String makePaddedTime(int time) {
-		if (time>=0) {
-			if (time < 10)
-				return "00"+time;
-			else if (time < 100)
-				return "0"+time;
-			else
-				return ""+time;
-		}
-		else
-			return "";
 	}
 	
 	public void setIcons() {
@@ -745,6 +758,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		assert (addSearchBtn != null);
 		
 		assert (displayedName != null);
+		assert (moreInfoClickableText != null);
 		assert (displayedDescription != null);
 		
 		assert (displayedStory != null);

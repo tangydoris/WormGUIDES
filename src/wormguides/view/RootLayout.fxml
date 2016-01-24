@@ -51,7 +51,7 @@
 			   <children>
 			      <TabPane fx:id="dataPanel" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMinWidth="80.0">
 			        <tabs>
-                  <Tab text="Stories">
+                  <Tab closable="false" text="Stories">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -92,7 +92,7 @@
                         </AnchorPane>
                     </content>
                   </Tab>
-                  <Tab text="Coloring and Display">
+                  <Tab closable="false" text="Coloring and Display">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -556,18 +556,31 @@
                                  <content>
                                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Text fx:id="displayedName" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Cell: none">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Text>
+                                          <HBox>
+                                             <children>
+                                                <Text fx:id="displayedName" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Cell: none">
+                                                   <font>
+                                                      <Font name="System Bold" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                                <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                <Text fx:id="moreInfoClickableText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="[more info]" visible="false">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </HBox>
                                           <Text fx:id="displayedDescription" strokeType="OUTSIDE" strokeWidth="0.0" VBox.vgrow="ALWAYS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                           </Text>
                                           <Region />
-                                          <Text fx:id="displayedStory" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
+                                          <Text fx:id="displayedStory" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
