@@ -457,6 +457,11 @@
                         </AnchorPane>
 			              </content>
 			            </Tab>
+                  <Tab text="Coloring and Display">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                  </Tab>
                   <Tab text="Stories">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -472,10 +477,22 @@
                                     <HBox>
                                        <children>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                          <Button fx:id="noteEditorBtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="160.0" text="Launch Note Editor">
+                                          <Button fx:id="noteEditorBtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Edit Selected Story">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
+                                             <padding>
+                                                <Insets left="10.0" right="10.0" />
+                                             </padding>
+                                          </Button>
+                                          <Region prefWidth="20.0" />
+                                          <Button fx:id="noteEditorBtn1" layoutX="85.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Create Story">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="20.0" right="20.0" />
+                                             </padding>
                                           </Button>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                        </children>

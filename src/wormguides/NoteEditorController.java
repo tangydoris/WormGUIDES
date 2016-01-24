@@ -9,18 +9,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextArea;
@@ -29,7 +24,6 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.Note.TimeStringFormatException;
@@ -45,6 +39,10 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	// time stuff
 	//@FXML private CheckBox timeTick;
+	@FXML private ToggleGroup timeToggle;
+	@FXML private RadioButton globalTimeRadioBtn;
+	@FXML private RadioButton currentTimeRadioBtn;
+	@FXML private RadioButton rangeTimeRadioBtn;
 	@FXML private TextField startTimeField;
 	@FXML private TextField endTimeField;
 	
@@ -54,25 +52,25 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton globalRadioBtn;
 	@FXML private ComboBox<String> structuresComboBox;
 	//private ObservableList<String> structureComboItems;
-	private Callback<ListView<String>, ListCell<String>> factory;
+	//private Callback<ListView<String>, ListCell<String>> factory;
 	@FXML private RadioButton axonRadioBtn;
 	@FXML private RadioButton dendriteRadioBtn;
 	@FXML private RadioButton cellBodyRadioBtn;
 	private Type type;
 	
 	// callout stuff
-	@FXML private CheckBox calloutTick;
-	@FXML private ToggleGroup calloutToggle;
-	@FXML private RadioButton upLeftRadioBtn;
-	@FXML private RadioButton upRightRadioBtn;
-	@FXML private RadioButton lowLeftRadioBtn;
-	@FXML private RadioButton lowRightRadioBtn;
+	//@FXML private CheckBox calloutTick;
+	//@FXML private ToggleGroup calloutToggle;
 	
 	// display type stuff
 	@FXML private ToggleGroup displayToggle;
 	@FXML private RadioButton infoPaneRadioBtn;
 	@FXML private RadioButton locationRadioBtn;
 	@FXML private RadioButton billboardRadioBtn;
+	@FXML private RadioButton upLeftRadioBtn;
+	@FXML private RadioButton upRightRadioBtn;
+	@FXML private RadioButton lowLeftRadioBtn;
+	@FXML private RadioButton lowRightRadioBtn;
 	private Display display;
 	
 	//private NewStoryEditorController editController;
@@ -181,10 +179,10 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		attachmentToggle.selectedToggleProperty().addListener(attachmentToggleListener);
 		displayToggle.selectedToggleProperty().addListener(displayToggleListener);
 		
-		factory = new StringCellCallback();
+		//factory = new StringCellCallback();
 		//structuresComboBox.setItems(structureComboItems);
-		structuresComboBox.setButtonCell(factory.call(null));
-		structuresComboBox.setCellFactory(factory);
+		//structuresComboBox.setButtonCell(factory.call(null));
+		//structuresComboBox.setCellFactory(factory);
 		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
 			@Override
 			public void changed(ObservableValue<? extends SingleSelectionModel<String>> observable,
@@ -295,8 +293,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		assert (dendriteRadioBtn!=null);
 		assert (cellBodyRadioBtn!=null);
 		
-		assert (calloutToggle!=null);
-		assert (calloutTick!=null);
+		//assert (calloutToggle!=null);
+		//assert (calloutTick!=null);
 		assert (upLeftRadioBtn!=null);
 		assert (upRightRadioBtn!=null);
 		assert (lowLeftRadioBtn!=null);
