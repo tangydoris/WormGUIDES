@@ -263,9 +263,18 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		cellRadioBtn.setUserData(Type.CELL);
 		globalRadioBtn.setUserData(Type.BLANK);
 		
+		// time
+		globalTimeRadioBtn.setUserData(Time.GLOBAL);
+		currentTimeRadioBtn.setUserData(Time.CURRENT);
+		rangeTimeRadioBtn.setUserData(Time.RANGE);
+		
 		// display
 		infoPaneRadioBtn.setUserData(Display.OVERLAY);
 		locationRadioBtn.setUserData(Display.SPRITE);
+		upLeftRadioBtn.setUserData(Display.SPRITE);
+		upRightRadioBtn.setUserData(Display.SPRITE);
+		lowLeftRadioBtn.setUserData(Display.SPRITE);
+		lowRightRadioBtn.setUserData(Display.SPRITE);
 		billboardRadioBtn.setUserData(Display.BILLBOARD_FRONT);
 	}
 	
@@ -491,6 +500,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	public void addDeleteButtonListener(EventHandler<ActionEvent> handler) {
 		delete.setOnAction(handler);
 	}
+	
+	
+	public enum Time {GLOBAL, CURRENT, RANGE};
 	
 	
 	// ----- Begin listeners ----
