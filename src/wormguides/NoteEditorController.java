@@ -9,6 +9,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,13 +19,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.Note.TimeStringFormatException;
@@ -47,6 +53,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton cellRadioBtn;
 	@FXML private RadioButton globalRadioBtn;
 	@FXML private ComboBox<String> structuresComboBox;
+	private ObservableList<String> structureComboItems;
+	private Callback<ListView<String>, ListCell<String>> factory;
 	@FXML private RadioButton axonRadioBtn;
 	@FXML private RadioButton dendriteRadioBtn;
 	@FXML private RadioButton cellBodyRadioBtn;
@@ -136,6 +144,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				}
 			}
 		});
+		
+		structureComboItems = FXCollections.observableArrayList();
+		structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
 	}
 	
 	
@@ -169,6 +180,20 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		timeTick.selectedProperty().addListener(timeTickListener);
 		attachmentToggle.selectedToggleProperty().addListener(attachmentToggleListener);
 		displayToggle.selectedToggleProperty().addListener(displayToggleListener);
+		
+		factory = new StringCellCallback();
+		structuresComboBox.setItems(structureComboItems);
+		structuresComboBox.setButtonCell(factory.call(null));
+		structuresComboBox.setCellFactory(factory);
+		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
+
+			@Override
+			public void changed(ObservableValue<? extends SingleSelectionModel<String>> observable,
+					SingleSelectionModel<String> oldValue, SingleSelectionModel<String> newValue) {
+				// TODO
+				//structuresComboBox.setButtonCell(factory.call(newValue.getSelectedItem()));
+			}
+		});
 	}
 	
 	
@@ -648,7 +673,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	// ----- Begin button actions -----
 	@FXML protected void newStory() {
-		activeStory = new Story("New Story", "New story description");
+		activeStory = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION);
 		setStoryCreated(true);
 	}
 	
@@ -663,6 +688,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	
 	private final String NEW_NOTE_TITLE = "New Note";
-	private final String NEW_NOTE_CONTENTS = "New Note Contents";
+	private final String NEW_NOTE_CONTENTS = "New note contents here";
+	
+	private final String NEW_STORY_TITLE = "New Story";
+	private final String NEW_STORY_DESCRIPTION = "New story description here";
 	
 }

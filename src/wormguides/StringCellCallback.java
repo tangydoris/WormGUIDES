@@ -20,9 +20,11 @@ public class StringCellCallback implements Callback<ListView<String>, ListCell<S
             protected void updateItem(String name, boolean empty) {
                 super.updateItem(name, empty);
                 if (name != null)
-                	setGraphic(makeStructuresListCellGraphic(name));
+                	setGraphic(makeListCellGraphic(name));
             	else
             		setGraphic(null);
+                
+                setFocusTraversable(false);
         	}
 		};
 		return cell;
@@ -30,13 +32,15 @@ public class StringCellCallback implements Callback<ListView<String>, ListCell<S
 	
 	
 	// Creates the graphic for a ListCell in structures ListView's
-	private HBox makeStructuresListCellGraphic(String name) {
+	private HBox makeListCellGraphic(String name) {
 		HBox hbox = new HBox();
     	Label label = new Label(name);
     	label.setFont(AppFont.getFont());
     	label.setPrefHeight(UI_HEIGHT);
     	label.setMinHeight(UI_HEIGHT);
     	label.setStyle("-fx-fill-color: black;");
+    	label.setFocusTraversable(false);
+    	
     	hbox.getChildren().add(label);
     	return hbox;
 	}

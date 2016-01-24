@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<fx:root prefHeight="760.0" prefWidth="330.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="780.0" prefWidth="340.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="30.0" layoutY="83.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -34,7 +34,7 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="storyDescription" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true" VBox.vgrow="ALWAYS">
+                        <TextArea fx:id="storyDescription" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -55,7 +55,7 @@
                            <children>
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
-                                    <Label maxHeight="1.7976931348623157E308" minWidth="82.0" text="Note Editing">
+                                    <Label maxHeight="1.7976931348623157E308" minWidth="82.0" text="Select a note or">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -106,7 +106,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true" VBox.vgrow="ALWAYS">
+                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" prefHeight="60.0" wrapText="true" VBox.vgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font></TextArea>
@@ -115,9 +115,19 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
+                              <HBox>
+                                 <children>
+                                    <Region prefWidth="20.0" />
+                                    <Label text="Object">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                     <HBox prefWidth="220.0">
                                        <children>
                                           <Label fx:id="activeCellLabel" minWidth="71.0" text="Active Cell">
@@ -140,7 +150,7 @@
                               </HBox>
                               <HBox layoutX="16.0" layoutY="292.0" maxWidth="1.7976931348623157E308">
                                  <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
                                     <HBox prefWidth="220.0">
                                        <children>
                                           <Label minWidth="84.0" text="Global Event">
@@ -159,68 +169,14 @@
                               </HBox>
                               <HBox layoutX="16.0" layoutY="315.0" maxWidth="1.7976931348623157E308">
                                  <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                                    <HBox maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Region maxHeight="1.7976931348623157E308" maxWidth="40.0" HBox.hgrow="ALWAYS" />
-                                          <ComboBox fx:id="structureComboBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="SOMETIMES" />
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </HBox>
-                              <HBox maxWidth="1.7976931348623157E308">
-                                 <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" minWidth="160.0" text="Sub-Structure Location:">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                              <HBox maxWidth="1.7976931348623157E308">
-                                 <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="34.0" text="Axon">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </RadioButton>
-                                    <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </RadioButton>
-                                    <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" layoutX="114.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="63.0" text="Cell Body">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </RadioButton>
+                                    <Region maxHeight="1.7976931348623157E308" maxWidth="10.0" HBox.hgrow="ALWAYS" />
+                                    <ComboBox fx:id="structuresComboBox" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                               <Region maxWidth="1.7976931348623157E308" prefHeight="5.0" />
