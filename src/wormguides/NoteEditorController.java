@@ -648,59 +648,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	// ----- Begin button actions -----
 	@FXML protected void newStory() {
-		activeStory = new Story(storyTitle.getText(), storyDescription.getText());
+		activeStory = new Story("New Story", "New story description");
 		setStoryCreated(true);
-		/*
-		if (editStage==null) {
-			editController = new NewStoryEditorController();
-			
-			editStage = new Stage();
-			
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("view/NewStoryEditorLayout.fxml"));
-			
-			loader.setController(editController);
-			loader.setRoot(editController);
-			
-			try {
-				editStage.setScene(new Scene((AnchorPane) loader.load()));
-				
-				editStage.setTitle("New Story");
-				editStage.initModality(Modality.NONE);
-				
-				for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
-	            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
-	            					"-fx-faint-focus-color: transparent;");
-	            }
-				
-				editController.addCancelButtonListener(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						editController.clearFields();
-						editStage.hide();
-					}
-				});
-				
-				editController.addSubmitButtonListener(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						activeStory = new Story(editController.getTitle(), editController.getDescription());
-						setStoryCreated(true);
-						
-						editController.clearFields();
-						editStage.hide();
-					}
-				});
-				
-			} catch (IOException e) {
-				System.out.println("error in initializing new story editor.");
-				e.printStackTrace();
-			}
-		}
-		
-		editStage.show();
-		editStage.toFront();
-		*/
 	}
 	
 	

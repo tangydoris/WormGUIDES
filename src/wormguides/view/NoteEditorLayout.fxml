@@ -23,7 +23,10 @@
                                  </font>
                               </Label>
                               <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                              <TextField fx:id="storyTitle" maxWidth="1.7976931348623157E308" minWidth="100.0" HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="storyTitle" maxWidth="1.7976931348623157E308" minWidth="100.0" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
                            </children>
                         </HBox>
                         <Label text="Story Description:">

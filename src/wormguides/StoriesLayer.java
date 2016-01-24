@@ -416,7 +416,7 @@ public class StoriesLayer {
 					try {
 						editStage.setScene(new Scene((AnchorPane) loader.load()));
 						
-						editStage.setTitle("Note Editor");
+						editStage.setTitle("Story/Note Editor");
 						editStage.initOwner(parentStage);
 						editStage.initModality(Modality.NONE);
 						editStage.setResizable(true);
