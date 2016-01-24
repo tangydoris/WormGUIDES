@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<fx:root prefHeight="150.0" prefWidth="160.0" type="AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <children>
+            <HBox>
+               <children>
+                  <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Text fx:id="nameText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Cell Name" textAlignment="CENTER" wrappingWidth="150.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+                  <Region layoutX="38.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox>
+               <children>
+                  <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Button disable="true" mnemonicParsing="false" text="Show Info">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Region layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox>
+               <children>
+                  <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Button disable="true" mnemonicParsing="false" text="Send To Search">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Region layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox>
+               <children>
+                  <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                  <Button disable="true" mnemonicParsing="false" text="Show Neighbors">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Region layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" />
+   </padding>
+</fx:root>

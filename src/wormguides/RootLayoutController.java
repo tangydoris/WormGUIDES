@@ -355,7 +355,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DController(modelAnchorPane, data);
+		window3D = new Window3DController(mainStage, modelAnchorPane, data);
 		subscene = window3D.getSubScene();
 		
 		modelAnchorPane.setOnMouseClicked(window3D.getNoteClickHandler());

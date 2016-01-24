@@ -1,5 +1,6 @@
 package wormguides;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +30,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -38,10 +40,12 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -59,6 +63,8 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
@@ -72,6 +78,8 @@ import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 
 public class Window3DController {
+	
+	private Stage parentStage;
 
 	private LineageData data;
 
@@ -115,6 +123,8 @@ public class Window3DController {
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
 	private Label selectedNameLabel;
+	private Stage contextMenuStage;
+	private ContextMenuController contextMenuController;
 	private BooleanProperty cellClicked;
 
 	// searched highlighting stuff
@@ -172,7 +182,9 @@ public class Window3DController {
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DController(Pane parentPane, LineageData data) {
+	public Window3DController(Stage parent, Pane parentPane, LineageData data) {
+		parentStage = parent;
+		
 		root = new Group();
 		this.data = data;
 
@@ -245,7 +257,7 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable,
 					Boolean oldValue, Boolean newValue) {
-				selectedNameLabel.setVisible(false);
+				hideContextPopups();
 				
 				if (newValue)
 					playService.restart();
@@ -388,7 +400,7 @@ public class Window3DController {
 	
 	
 	private void handleMouseDragged(MouseEvent event) {
-		selectedNameLabel.setVisible(false);
+		hideContextPopups();
 		
 		if (spritesPane!=null)
 			spritesPane.setCursor(Cursor.CLOSED_HAND);
@@ -435,32 +447,37 @@ public class Window3DController {
 	
 	
 	private void handleMouseClicked(MouseEvent event) {
-		selectedNameLabel.setVisible(false);
+		hideContextPopups();
 		
 		Node node = event.getPickResult().getIntersectedNode();
 		
 		// Nucleus
-		if (node instanceof Sphere) {
+		if (node instanceof Sphere) {			
 			Sphere picked = (Sphere) node;
 			selectedIndex.set(getPickedSphereIndex(picked));
 			String name = cellNames[selectedIndex.get()];
-			selectedName.set(name);
+			selectedName.set(name);			
 			selectedNameLabel.setText(name);
 			cellClicked.set(true);
 			
-			Bounds b = picked.getBoundsInParent();
+			if (event.getButton()==MouseButton.SECONDARY)
+				showContextMenu(name, event.getScreenX(), event.getScreenY());
 			
-			if (b!=null) {
-				selectedNameLabel.getTransforms().clear();
-				Point2D p = CameraHelper.project(camera, 
-						new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+			else if (event.getButton()==MouseButton.PRIMARY) {
+				Bounds b = picked.getBoundsInParent();
 				
-				double x = p.getX();
-				double y = p.getY();
-				double radius = picked.getRadius();
-				
-				selectedNameLabel.getTransforms().add(new Translate(x, y));
-				selectedNameLabel.setVisible(true);
+				if (b!=null) {
+					selectedNameLabel.getTransforms().clear();
+					Point2D p = CameraHelper.project(camera, 
+							new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+					
+					double x = p.getX();
+					double y = p.getY();
+					double radius = picked.getRadius();
+					
+					selectedNameLabel.getTransforms().add(new Translate(x, y));
+					selectedNameLabel.setVisible(true);
+				}
 			}
 		}
 		else if (node instanceof MeshView) {
@@ -473,22 +490,27 @@ public class Window3DController {
 					if (name.indexOf("(")>-1)
 						name = name.substring(0, name.indexOf("("));
 					selectedName.set(name);
-					
 					selectedNameLabel.setText(name);
-					Bounds b = curr.getBoundsInParent();
 					
-					if (b!=null) {
-						selectedNameLabel.getTransforms().clear();
-						Point2D p1 = CameraHelper.project(camera, 
-								new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
-						Point2D p2 = CameraHelper.project(camera, 
-								new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
+					if (event.getButton()==MouseButton.SECONDARY)
+						showContextMenu(name, event.getScreenX(), event.getScreenY());
+					
+					else if (event.getButton()==MouseButton.PRIMARY){
+						Bounds b = curr.getBoundsInParent();
 						
-						double x = (p1.getX()+p2.getX())/2;
-						double y = (p1.getY()+p2.getY())/2;
-						
-						selectedNameLabel.getTransforms().add(new Translate(x, y));
-						selectedNameLabel.setVisible(true);
+						if (b!=null) {
+							selectedNameLabel.getTransforms().clear();
+							Point2D p1 = CameraHelper.project(camera, 
+									new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+							Point2D p2 = CameraHelper.project(camera, 
+									new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
+							
+							double x = (p1.getX()+p2.getX())/2;
+							double y = (p1.getY()+p2.getY())/2;
+							
+							selectedNameLabel.getTransforms().add(new Translate(x, y));
+							selectedNameLabel.setVisible(true);
+						}
 					}
 					break;
 				}
@@ -513,6 +535,44 @@ public class Window3DController {
 		mousePosX = event.getSceneX();
 		mousePosY = event.getSceneY();
 	}
+	
+	
+	private void showContextMenu(String name, double sceneX, double sceneY) {
+		// TODO
+		if (contextMenuStage==null) {
+			contextMenuController = new ContextMenuController();
+			
+			contextMenuStage = new Stage();
+			
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/ContextMenuLayout.fxml"));
+			
+			loader.setController(contextMenuController);
+			loader.setRoot(contextMenuController);
+			
+			try {
+				contextMenuStage.setScene(new Scene((AnchorPane) loader.load()));
+				contextMenuStage.initOwner(parentStage);
+				contextMenuStage.initModality(Modality.NONE);
+				contextMenuStage.setResizable(true);
+				contextMenuStage.setTitle("Menu");
+				
+				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
+	            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
+	            					"-fx-faint-focus-color: transparent;");
+	            }
+				
+			} catch (IOException e) {
+				System.out.println("error in initializing context menu for "+name+".");
+				e.printStackTrace();
+			}
+		}
+		
+		contextMenuController.setName(name);
+		contextMenuStage.setX(sceneX);
+		contextMenuStage.setY(sceneY);
+		contextMenuStage.show();
+	}
 
 	
 	private void createSubScene(Double width, Double height) {
@@ -533,8 +593,8 @@ public class Window3DController {
 					double x = b.getMaxX();
 					double y = b.getMaxY();
 					double z = b.getMaxZ();
-					node.getTransforms().addAll(new Translate(x, y, z), 
-							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+					node.getTransforms().addAll(new Translate(x, y, z),
+								new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 			}
 		}
@@ -1269,6 +1329,15 @@ public class Window3DController {
 			selectedNameLabel.setVisible(false);
 		}
 	}
+	
+	
+	// Hides cell name label/context menu
+	private void hideContextPopups() {
+		selectedNameLabel.setVisible(false);
+		
+		if (contextMenuStage!=null)
+			contextMenuStage.hide();
+	}
 
 	
 	public ArrayList<ColorRule> getColorRulesList() {
@@ -1300,7 +1369,7 @@ public class Window3DController {
 	public void setTime(int t) {
 		if (t > 0 && t < endTime) {
 			time.set(t);
-			selectedNameLabel.setVisible(false);
+			hideContextPopups();
 		}
 	}
 	
@@ -1468,7 +1537,7 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				selectedNameLabel.setVisible(false);
+				hideContextPopups();
 				
 				double z = zoom.get();
 				z-=0.25;
@@ -1487,7 +1556,7 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				selectedNameLabel.setVisible(false);
+				hideContextPopups();
 				
 				double z = zoom.get();
 				z+=0.25;
@@ -1506,7 +1575,7 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				selectedNameLabel.setVisible(false);
+				hideContextPopups();
 				
 				if (!playingMovie.get()) {
 					int t = time.get();
@@ -1522,7 +1591,7 @@ public class Window3DController {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				selectedNameLabel.setVisible(false);
+				hideContextPopups();
 				
 				if (!playingMovie.get()) {
 					int t = time.get();
