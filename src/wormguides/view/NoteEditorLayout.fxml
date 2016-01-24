@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<fx:root prefHeight="725.0" prefWidth="330.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="760.0" prefWidth="330.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="30.0" layoutY="83.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -15,61 +15,39 @@
                <children>
                   <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <HBox fillHeight="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-                           <children>
-                              <Button maxWidth="1.7976931348623157E308" minWidth="89.0" mnemonicParsing="false" onAction="#newStory" text="New Story" HBox.hgrow="SOMETIMES">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <tooltip>
-                                    <Tooltip text="Create a new story">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Tooltip>
-                                 </tooltip>
-                              </Button>
-                              <Region maxHeight="1.7976931348623157E308" maxWidth="20.0" HBox.hgrow="ALWAYS" />
-                              <Button maxWidth="1.7976931348623157E308" minWidth="92.0" mnemonicParsing="false" onAction="#loadStory" text="Load Story" HBox.hgrow="SOMETIMES">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <tooltip>
-                                    <Tooltip text="Load story from file system">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Tooltip>
-                                 </tooltip>
-                              </Button>
-                              <Region maxWidth="20.0" HBox.hgrow="ALWAYS" />
-                              <Button maxWidth="1.7976931348623157E308" minWidth="92.0" mnemonicParsing="false" onAction="#saveStory" text="Save Story" HBox.hgrow="SOMETIMES">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <tooltip>
-                                    <Tooltip text="Save current story">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Tooltip>
-                                 </tooltip>
-                              </Button>
-                           </children>
-                        </HBox>
-                        <Region maxWidth="1.7976931348623157E308" prefHeight="5.0" />
                         <HBox>
                            <children>
-                              <Region layoutX="99.0" layoutY="10.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                              <Label fx:id="activeStoryLabel" text="No Active Story" wrapText="true">
+                              <Label maxHeight="1.7976931348623157E308" text="Story Title:">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
+                              <TextField fx:id="storyTitle" maxWidth="1.7976931348623157E308" minWidth="100.0" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
-                        <Region maxWidth="1.7976931348623157E308" prefHeight="5.0" />
+                        <Label text="Story Description:">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="storyDescription" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </TextArea>
+                        <Button maxWidth="1.7976931348623157E308" minWidth="89.0" mnemonicParsing="false" onAction="#newStory" text="New Story">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <tooltip>
+                              <Tooltip text="Create a new story">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Tooltip>
+                           </tooltip>
+                        </Button>
                         <VBox depthTest="ENABLE" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" style="-fx-border-color: #aaaaaa; -fx-background-color: #eeeeee; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
                            <children>
                               <HBox maxWidth="1.7976931348623157E308">
@@ -112,7 +90,7 @@
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="35.0" HBox.hgrow="ALWAYS" />
+                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" HBox.hgrow="ALWAYS" />
                                     <TextField fx:id="titleField" maxWidth="1.7976931348623157E308" prefWidth="230.0" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
@@ -125,7 +103,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="140.0" wrapText="true" VBox.vgrow="ALWAYS">
+                              <TextArea fx:id="contentArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true" VBox.vgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font></TextArea>

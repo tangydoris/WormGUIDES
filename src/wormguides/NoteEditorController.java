@@ -1,6 +1,5 @@
 package wormguides;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -13,10 +12,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -27,7 +23,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
@@ -39,9 +34,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
-	
-	@FXML private TextField titleField;
-	@FXML private TextArea contentArea;
 	
 	@FXML private Button delete;
 	
@@ -75,15 +67,22 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton billboardRadioBtn;
 	private Display display;
 	
-	private NewStoryEditorController editController;
+	//private NewStoryEditorController editController;
 	private BooleanProperty storyCreated;
 	private BooleanProperty noteCreated;
 	
+	@FXML private TextField storyTitle;
+	@FXML private TextArea storyDescription;
 	private Story activeStory;
+	
+	@FXML private TextField titleField;
+	@FXML private TextArea contentArea;
 	private Note activeNote;
 	
 	private ChangeListener<String> titleFieldListener;
 	private ChangeListener<String> contentAreaListener;
+	private ChangeListener<String> storyTitleListener;
+	private ChangeListener<String> storyDescriptionListener;
 	
 	private ChangeListener<Boolean> timeTickListener;
 	private ChangeListener<Toggle> attachmentToggleListener;
@@ -147,11 +146,15 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		// text fields
 		titleFieldListener = new TitleFieldListener();
 		contentAreaListener = new ContentAreaListener();
-		
-		updateFields();
-		
+		updateNoteFields();
 		titleField.textProperty().addListener(titleFieldListener);
 		contentArea.textProperty().addListener(contentAreaListener);
+		
+		storyTitleListener = new StoryTitleFieldListener();
+		storyDescriptionListener = new StoryDescriptionAreaListener();
+		updateStoryFields();
+		storyTitle.textProperty().addListener(storyTitleListener);
+		storyDescription.textProperty().addListener(storyDescriptionListener);
 		
 		// attachment type/note display
 		initToggleData();
@@ -225,7 +228,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			
 			if (type.equals(Type.CELL) || type.equals(Type.CELLTIME)) {
 				if (activeCellLabel!=null) {
-					// TODO take label name instead of property name
 					if (!activeCellProperty.get().isEmpty())
 						activeNote.setCellName(activeCellProperty.get());
 				}
@@ -260,6 +262,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		assert (titleField!=null);
 		assert (contentArea!=null);
+		
+		assert (storyTitle!=null);
+		assert (storyDescription!=null);
 		
 		assert (delete!=null);
 		
@@ -312,17 +317,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	public void setActiveNote(Note note) {
 		activeNote = note;
 		
-		// TODO remove this
-		/*
-		if (activeNote!=null) {
-			System.out.println(activeNote);
-			System.out.println(activeNote.getAttachmentType());
-			System.out.println(activeNote.getTagDisplay());
-			System.out.println("cell - "+activeNote.getCellName());
-		}
-		*/
-		
-		updateFields();
+		updateNoteFields();
 		updateType();
 		updateDisplay();
 	}
@@ -436,7 +431,21 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
-	private void updateFields() {
+	private void updateStoryFields() {
+		if (storyTitle!=null && storyDescription!=null) {
+			if (activeStory!=null) {
+				storyTitle.setText(activeStory.getName());
+				storyDescription.setText(activeStory.getDescription());
+			}
+			else {
+				storyTitle.clear();
+				storyDescription.clear();
+			}
+		}
+	}
+	
+	
+	private void updateNoteFields() {
 		if (titleField!=null && contentArea!=null) {
 			if (activeNote!=null) {
 				titleField.setText(activeNote.getTagName());
@@ -457,6 +466,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	public void setActiveStory(Story story) {
 		activeStory = story;
+		updateStoryFields();
 	}
 	
 	
@@ -471,6 +481,30 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	
 	// ----- Begin listeners ----
+	private class StoryTitleFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (activeStory!=null) {
+				activeStory.setName(newValue);
+				activeStory.setChanged(true);
+			}
+		}
+	}
+	
+	
+	private class StoryDescriptionAreaListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable, 
+				String oldValue, String newValue) {
+			if (activeStory!=null) {
+				activeStory.setDescription(newValue);
+				activeStory.setChanged(true);
+			}
+		}
+	}
+	
+	
 	private class TitleFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, 
@@ -614,6 +648,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	// ----- Begin button actions -----
 	@FXML protected void newStory() {
+		activeStory = new Story(storyTitle.getText(), storyDescription.getText());
+		setStoryCreated(true);
+		/*
 		if (editStage==null) {
 			editController = new NewStoryEditorController();
 			
@@ -663,16 +700,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		editStage.show();
 		editStage.toFront();
-	}
-	
-	
-	@FXML protected void loadStory() {
-		// TODO
-	}
-	
-	
-	@FXML protected void saveStory() {
-		// TODO
+		*/
 	}
 	
 	

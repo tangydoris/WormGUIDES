@@ -16,7 +16,9 @@
             <items>
                   <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Generate URL" />
                   <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load URL" />
-              <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuSaveStory" text="Save Story" />
+              <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="View">

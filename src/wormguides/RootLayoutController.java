@@ -170,6 +170,14 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	// ----- Begin menu items and buttons listeners -----
+	@FXML public void menuLoadStory() {
+		// TODO
+	}
+	
+	@FXML public void menuSaveStory() {
+		// TODO
+	}
+	
 	@FXML public void menuCloseAction() {
 		System.out.println("exiting...");
 		System.exit(0);
