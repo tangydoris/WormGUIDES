@@ -28,6 +28,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.ImageLoader;
+import wormguides.MainApp;
 import wormguides.RuleEditorController;
 import wormguides.SearchOption;
 import wormguides.view.AppFont;
@@ -117,7 +118,7 @@ public abstract class Rule {
 					editController = new RuleEditorController();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(getClass().getResource("../view/RuleEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/RuleEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);

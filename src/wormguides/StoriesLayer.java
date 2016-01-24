@@ -408,7 +408,7 @@ public class StoriesLayer {
 					editStage = new Stage();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(getClass().getResource("view/NoteEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/NoteEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);

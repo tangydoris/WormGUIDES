@@ -75,7 +75,7 @@
                                              </padding>
                                           </Button>
                                           <Region prefWidth="20.0" />
-                                          <Button fx:id="noteEditorBtn1" layoutX="85.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Create Story">
+                                          <Button fx:id="noteEditorBtn1" disable="true" layoutX="85.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Create Story">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
