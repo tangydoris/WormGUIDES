@@ -448,7 +448,6 @@ public class Window3DController {
 			selectedNameLabel.setText(name);
 			cellClicked.set(true);
 			
-			// TODO make label popup
 			Bounds b = picked.getBoundsInParent();
 			
 			if (b!=null) {
@@ -459,8 +458,6 @@ public class Window3DController {
 				double x = p.getX();
 				double y = p.getY();
 				double radius = picked.getRadius();
-				x += 3;
-				y -= 3*radius;
 				
 				selectedNameLabel.getTransforms().add(new Translate(x, y));
 				selectedNameLabel.setVisible(true);
@@ -477,17 +474,18 @@ public class Window3DController {
 						name = name.substring(0, name.indexOf("("));
 					selectedName.set(name);
 					
-					// TODO make label popup
 					selectedNameLabel.setText(name);
 					Bounds b = curr.getBoundsInParent();
 					
 					if (b!=null) {
 						selectedNameLabel.getTransforms().clear();
-						Point2D p = CameraHelper.project(camera, 
+						Point2D p1 = CameraHelper.project(camera, 
 								new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+						Point2D p2 = CameraHelper.project(camera, 
+								new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
 						
-						double x = p.getX();
-						double y = p.getY();
+						double x = (p1.getX()+p2.getX())/2;
+						double y = (p1.getY()+p2.getY())/2;
 						
 						selectedNameLabel.getTransforms().add(new Translate(x, y));
 						selectedNameLabel.setVisible(true);
@@ -535,12 +533,6 @@ public class Window3DController {
 					double x = b.getMaxX();
 					double y = b.getMaxY();
 					double z = b.getMaxZ();
-					if (s instanceof Sphere) {
-						double radius = ((Sphere) s).getRadius();
-						x-=radius;
-						y-=-radius;
-						z-=radius;
-					}
 					node.getTransforms().addAll(new Translate(x, y, z), 
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
