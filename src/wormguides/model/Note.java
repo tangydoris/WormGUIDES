@@ -653,6 +653,19 @@ public class Note {
 		boolean equals(Type type) {
 			return this==type;
 		}
+		
+		static String valuesToString() {
+			StringBuilder sb = new StringBuilder();
+			int len = values().length;
+			Type[] values = values();
+			for (int i=0; i<len; i++) {
+				if (i<len-1)
+					sb.append(values[i]).append(", ");
+				else
+					sb.append(values[i]);
+			}
+			return sb.toString();
+		}
 	}
 	
 	
@@ -680,13 +693,26 @@ public class Note {
 		boolean equals(Display display) {
 			return this==display;
 		}
+		
+		static String valuesToString() {
+			StringBuilder sb = new StringBuilder();
+			int len = values().length;
+			Display[] values = values();
+			for (int i=0; i<len; i++) {
+				if (i<len-1)
+					sb.append(values[i]).append(", ");
+				else
+					sb.append(values[i]);
+			}
+			return sb.toString();
+		}
 	}
 	
 	
 	public class TagDisplayEnumException extends Exception {
 		public TagDisplayEnumException() {
 			super("Invalid note tag display enum, must be one of the "
-					+ "following: " + Display.values());
+					+ "following: " + Display.valuesToString());
 		}
 	}
 	
@@ -694,7 +720,7 @@ public class Note {
 	public class AttachmentTypeEnumException extends Exception {
 		public AttachmentTypeEnumException() {
 			super("Invalid note attachment type enum, must be one of the "
-					+ "following: " + Type.values());
+					+ "following: " + Type.valuesToString());
 		}
 	}
 	

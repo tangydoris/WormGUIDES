@@ -255,14 +255,18 @@ public class StoriesLayer {
 			reader.readLine();
 			
 			while ((line = reader.readLine()) != null) {
-				String[] split =  line.split(",", NUMBER_OF_CSV_FIELDS); //split the line up by commas
+				String[] split =  line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 				
-				int len = split.length;
-
-				if (len!=NUMBER_OF_CSV_FIELDS) {
+				if (split.length != NUMBER_OF_CSV_FIELDS) {
 					System.out.println("Missing fields in CSV file.");
 					continue;
 				}
+				
+				// get rid of quotes in story description/note contents since
+				// field might have contained commas
+				String contents = split[CONTENTS_INDEX];
+				if (contents.startsWith("\"") && contents.endsWith("\""))
+					split[CONTENTS_INDEX] = contents.substring(1, contents.length()-1);
 				
 				if (isStory(split)) {
 					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX]);
@@ -294,6 +298,7 @@ public class StoriesLayer {
 					} catch (TagDisplayEnumException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
+						e.printStackTrace();
 					} catch (AttachmentTypeEnumException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
@@ -752,5 +757,5 @@ public class StoriesLayer {
 					START_TIME_INDEX = 9,
 					END_TIME_INDEX = 10,
 					COMMENTS_INDEX = 11;
-	
+
 }

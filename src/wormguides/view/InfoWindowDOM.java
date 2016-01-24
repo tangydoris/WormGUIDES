@@ -49,11 +49,17 @@ public class InfoWindowDOM {
 		
 		HTMLNode body = new HTMLNode("body");
 		
+		
+		
+		
 		//external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName);
 		cellNameDiv.addChild(cellNameP);
+		
+		
+		
 		
 		//parts list descriptions
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
@@ -61,16 +67,14 @@ public class InfoWindowDOM {
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
 		
-		//container for external info & parts list description
-		HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
-		topContainerDiv.addChild(cellNameDiv);
-		topContainerDiv.addChild(partsListDescrDiv);
 		
 		//image
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
+		String imagetext=terminalCase.getImageURL();
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		imgDiv.addChild(img);
-			
+	
+		
 		//wormatlas function
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
 		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
@@ -160,8 +164,13 @@ public class InfoWindowDOM {
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em><br>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
-		wiringPartnersDiv.addChild(viewWDDiv);
-		wiringPartnersDiv.addChild(wiringPartnersUL);
+		
+		boolean isneuronpage=(presynapticPartners.size() > 0||electricalPartners.size()>0||neuromuscularPartners.size() > 0||postsynapticPartners.size() > 0);
+		// only add this section if it's a neuron (i.e. it appears in wiring diagram) -AS
+		if(isneuronpage){
+			wiringPartnersDiv.addChild(wiringPartnersUL);
+			wiringPartnersDiv.addChild(viewWDDiv); //reversed order of these elements -AS
+		}
 		
 		//expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
@@ -265,8 +274,8 @@ public class InfoWindowDOM {
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype)");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
 		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		productionInfoUL.addChild(cellShapeLI);
@@ -274,15 +283,32 @@ public class InfoWindowDOM {
 		productionInfoDiv.addChild(productionInfoUL);
 		
 
-		//add divs to body
-		body.addChild(topContainerDiv);
-		body.addChild(imgDiv);
-		body.addChild(functionWORMATLASTopContainerDiv);
-		body.addChild(functionWORMATLASDiv);
+		//container for external info & parts list description
+				
+		if(isneuronpage){
+			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
+		
+			topContainerDiv.addChild(cellNameDiv);
+			topContainerDiv.addChild(partsListDescrDiv);
+			//add divs to body
+			body.addChild(topContainerDiv);
+			System.out.println("image text not null"+imagetext);
+			body.addChild(imgDiv);
+			body.addChild(functionWORMATLASTopContainerDiv);
+			body.addChild(functionWORMATLASDiv);
+		}else{
+			body.addChild(cellNameDiv);
+			body.addChild(partsListDescrDiv);
+		}
+			
+
 		body.addChild(anatomyTopContainerDiv);
 		body.addChild(anatomyDiv);
-		body.addChild(wiringPartnersTopContainerDiv);
-		body.addChild(wiringPartnersDiv);
+		//only add this section if its contents exist
+		if(isneuronpage){			
+			body.addChild(wiringPartnersTopContainerDiv);
+			body.addChild(wiringPartnersDiv);
+		}
 //		body.addChild(viewWDTopContainerDiv);
 //		body.addChild(viewWDDiv);
 		body.addChild(geneExpressionTopContainerDiv);
@@ -332,6 +358,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo);
 		cellNameDiv.addChild(cellNameP);
 		
+		
 		//embryonic homology
 //		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "embryonicHomology", "");
 //		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
@@ -349,7 +376,7 @@ public class InfoWindowDOM {
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
-		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getCellName()); //is this the left/right option?
+		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getEmbryonicHomology()); //is this the left/right option?
 		lrUL.addChild(lrLI);
 		lrUL.addChild(lrLI2);
 		homologuesLeftRightListDiv.addChild(lrUL);
@@ -397,6 +424,14 @@ public class InfoWindowDOM {
 		}
 		terminalDescendantsDiv.addChild(terminalDescendantsUL);
 		
+		// description for non terminal cell
+		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
+		int terminalnum=nonTerminalCase.getTerminalDescendants().size();//# of terminals
+		String partsListDescription = "Embryonic progenitor cell that generates "+terminalnum+" cells at hatching.";
+		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
+		partsListDescrDiv.addChild(partsListDescrP);
+		
+		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
@@ -407,8 +442,8 @@ public class InfoWindowDOM {
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype)");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
 		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		productionInfoUL.addChild(cellShapeLI);
@@ -417,6 +452,7 @@ public class InfoWindowDOM {
 		
 		//add divs to body
 		body.addChild(cellNameDiv);
+		body.addChild( partsListDescrDiv); //added non terminal description -AS
 		body.addChild(homologuesTopContainerDiv);
 		body.addChild(homologuesDiv);
 		//body.addChild(embryonicHomologyDiv);
