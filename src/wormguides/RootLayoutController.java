@@ -149,7 +149,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Text displayedStory;
 	@FXML private Text displayedStoryDescription;
 	
-	//scene elements stuff
+	// scene elements stuff
 	private SceneElementsList elementsList;
 	
 	// story stuff
@@ -160,9 +160,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	// url stuff
 	private URLLoader urlLoader;
 	
-	//InfoWindow Stuff
-	CellCases cellCases;
-	InfoWindow infoWindow;
+	// info window Stuff
+	private CellCases cellCases;
+	private InfoWindow infoWindow;
+	private BooleanProperty bringUpInfoProperty;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -378,6 +379,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		cellBodyTick.selectedProperty().addListener(window3D.getCellBodyTickListener());
 		
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
+		
+		// for info window
+		bringUpInfoProperty = new SimpleBooleanProperty(false);
+		window3D.setBringUpInfoProperty(bringUpInfoProperty);
 	}
 	
 	private void setPropertiesFrom3DWindow() {
@@ -462,12 +467,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		cellNucleusTick.setSelected(true);
 		
 		// More info clickable text
-		// TODO
 		moreInfoClickableText.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				openInfoWindow();
-				bringUpInfoWindow(selectedName.get());
+				addToInfoWindow(selectedName.get());
 			}
 		});
 		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
@@ -482,11 +486,23 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				moreInfoClickableText.setCursor(Cursor.DEFAULT);
 			}
 		});
+		
+		// More info in context menu
+		bringUpInfoProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					openInfoWindow();
+					addToInfoWindow(selectedName.get());
+					bringUpInfoProperty.set(false);
+				}
+			}
+		});
 	}
 	
 	
-	// TODO
-	private void bringUpInfoWindow(String name) {
+	private void addToInfoWindow(String name) {
 		//GENERATE CELL TAB ON CLICK
 		if (name!=null && !name.isEmpty()) {
 			if (cellCases == null) return; //error check

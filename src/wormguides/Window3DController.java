@@ -179,6 +179,8 @@ public class Window3DController {
 	private HashMap<Text, Note> currentGraphicNoteMap;
 	private HashMap<Note, MeshView> currentNoteMeshMap;
 	
+	private BooleanProperty bringUpInfoProperty;
+	
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
@@ -323,14 +325,16 @@ public class Window3DController {
 		setNotesPane(parentPane);
 	}
 	
+	
+	public void setBringUpInfoProperty(BooleanProperty bringUpInfoProperty) {
+		this.bringUpInfoProperty = bringUpInfoProperty;
+	}
+	
 
 	// Called by RootLayoutController to set the loaded SceneElementsList
-	// after the list is set, the SceneElements are loaded
 	public void setSceneElementsList(SceneElementsList list) {
-		if (list!=null) {
+		if (list!=null)
 			sceneElementsList = list;
-			sceneElementsList.toString();
-		}
 	}
 	
 	
@@ -540,7 +544,7 @@ public class Window3DController {
 	private void showContextMenu(String name, double sceneX, double sceneY) {
 		// TODO
 		if (contextMenuStage==null) {
-			contextMenuController = new ContextMenuController();
+			contextMenuController = new ContextMenuController(bringUpInfoProperty);
 			
 			contextMenuStage = new Stage();
 			

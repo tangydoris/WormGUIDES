@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<fx:root prefHeight="150.0" prefWidth="160.0" type="AnchorPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<fx:root prefHeight="150.0" prefWidth="160.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -29,7 +28,7 @@
             <HBox>
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button disable="true" mnemonicParsing="false" text="Show Info">
+                  <Button mnemonicParsing="false" onAction="#showInfoAction" text="Show Info">
                      <font>
                         <Font size="14.0" />
                      </font>

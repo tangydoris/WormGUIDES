@@ -3,6 +3,7 @@ package wormguides;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
@@ -10,11 +11,13 @@ import javafx.scene.text.Text;
 
 public class ContextMenuController extends AnchorPane implements Initializable{
 	
-	@FXML Text nameText;
+	@FXML private Text nameText;
 	
+	private BooleanProperty bringUpInfoProperty;
 	
-	public ContextMenuController() {
+	public ContextMenuController(BooleanProperty bringUpInfoProperty) {
 		super();
+		this.bringUpInfoProperty = bringUpInfoProperty;
 	}
 
 	@Override
@@ -22,11 +25,16 @@ public class ContextMenuController extends AnchorPane implements Initializable{
 		assertFXMLNodes();
 	}
 	
-	private void assertFXMLNodes() {
-		assert (nameText!=null);
+	@FXML public void showInfoAction() {
+		if (bringUpInfoProperty!=null)
+			bringUpInfoProperty.set(true);
 	}
 	
 	public void setName(String name) {
 		nameText.setText(name);
+	}
+	
+	private void assertFXMLNodes() {
+		assert (nameText!=null);
 	}
 }
