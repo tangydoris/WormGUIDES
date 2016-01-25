@@ -90,7 +90,6 @@ public class TerminalCellCase {
 		lastChar = Character.toLowerCase(lastChar);
 		if (lastChar == 'r' || lastChar == 'l') {
 			cell = cell.substring(0, cell.length()-1);
-			System.out.println(cell);
 		}
 		String URL = wormatlasURL + cell + wormatlasURLEXT;
 		
@@ -102,30 +101,36 @@ public class TerminalCellCase {
 			scanner.close();
 		} catch (Exception e) {
 			//try second extension
-//			URL = wormatlasURL + 
-//					this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
-//					wormatlasURLEXT2;
-//			
-//			
-//			URL = wormatlasURL + cell + wormatlasURLEXT2;
-//			try {
-//				connection = new URL(URL).openConnection();
-//				Scanner scanner = new Scanner(connection.getInputStream());
-//				scanner.useDelimiter("\\Z");
-//				content = scanner.next();
-//				System.out.println(content);
-//				scanner.close();
-//			} catch (Exception e1) {
-//				//e1.printStackTrace();
-//				//a page wasn't found on wormatlas
-//				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
-//				return;
-//			}
-			
-			this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
-			return;
-		}
+			URL = wormatlasURL + cell.substring(0, cell.length()-1).toUpperCase() + "N" + wormatlasURLEXT;
+			//System.out.println("TRYING SECOND URL: " + URL);
 
+			try {
+				connection = new URL(URL).openConnection();
+				Scanner scanner = new Scanner(connection.getInputStream());
+				scanner.useDelimiter("\\Z");
+				content = scanner.next();
+				scanner.close();
+			} catch (Exception e1) {
+				//e1.printStackTrace();
+				//a page wasn't found on wormatlas
+				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
+				return;
+			}
+			
+//			System.out.println(content);
+//			
+//			//find the line <frame src="....mainframe.html" name="mainframe"
+//			int linkIDX = content.indexOf("mainframe.htm");
+//			if (linkIDX > 0) {
+//				//extract the mainframe link
+//				String newCellName = content.substring(linkIDX-4, linkIDX);
+//				System.out.println(newCellName);
+//			}
+		}
+		findFunctionInHTML(content, URL);
+	}
+	
+	private void findFunctionInHTML(String content, String URL) {
 		//parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text

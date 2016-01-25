@@ -67,6 +67,7 @@ public class InfoWindow {
 	public void addTab(InfoWindowDOM dom, ArrayList<String> links) {
 		WebView webview = new WebView();
 		webview.getEngine().loadContent(dom.DOMtoString());
+		webview.setContextMenuEnabled(false);
 		
 		
 		/*
@@ -74,8 +75,6 @@ public class InfoWindow {
 		 */
 		JSObject window = (JSObject) webview.getEngine().executeScript("window");
 		window.setMember("app", new InfoWindowLinkController(links));
-		
-		
 		
 		Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(tab);

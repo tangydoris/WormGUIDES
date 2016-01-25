@@ -17,10 +17,6 @@ public class InfoWindowLinkController {
 	
 	public InfoWindowLinkController(ArrayList<String> links) {
 		this.links = links;
-		
-		for (String link : links) {
-			System.out.println(link);
-		}
 	}
 	
 	public void wormatlas() throws IOException, URISyntaxException {

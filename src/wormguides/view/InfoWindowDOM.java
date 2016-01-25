@@ -239,7 +239,6 @@ public class InfoWindowDOM {
 					
 					//make anchor tag
 					String callbackMethod = "app." + placeholder + "()";
-					System.out.println(callbackMethod);
 					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 							terminalCase.getCellName() + " on " + placeholder +
 							"</a>";
@@ -283,11 +282,10 @@ public class InfoWindowDOM {
 		productionInfoUL.addChild(cellShapeLI);
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
-		
 
 		//container for external info & parts list description
 				
-		if(isneuronpage){
+		if(isneuronpage){ //what if neuron but no wiring partners??? - BK e.g. ABplppappap (DD1)
 			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
 		
 			topContainerDiv.addChild(cellNameDiv);
