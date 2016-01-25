@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-//import wormguides.view.NoteGraphic;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 /*
  * This class represents a note that belongs to a story (its parent)
@@ -27,12 +28,22 @@ public class Note {
 	private int startTime, endTime;
 	private String comments;
 	private String url;
+	
 	private Story parent;
 	
-	private BooleanProperty changedBooleanProperty;
+	// True when any field value changes, false otherwise
+	private BooleanProperty changedProperty;
+	// True when graphic in stories list view is expanded, false otherwise
+	private BooleanProperty listExpandedProperty;
+	// True when graphic in 3d subscene is expanded, false otherwise
+	private BooleanProperty sceneExpandedProperty;
+	// True when graphical representation is selected, false otherwise
+	private BooleanProperty activeProperty;
 	
 	
-	public Note() {
+	public Note(Story parent) {
+		this.parent = parent;
+		
 		elements = null;
 		tagName = "";
 		tagContents = "";
@@ -43,30 +54,89 @@ public class Note {
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
 		url = "";
-		changedBooleanProperty = new SimpleBooleanProperty(false);
+		
+		changedProperty = new SimpleBooleanProperty(false);
+		changedProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					setChanged(false);
+			}
+		});
+		
+		listExpandedProperty = new SimpleBooleanProperty(false);
+		sceneExpandedProperty = new SimpleBooleanProperty(false);
+		activeProperty = new SimpleBooleanProperty(false);
+		
+		setAttachmentType(Type.BLANK);
+		setTagDisplay(Display.BLANK);
 	}
 	
-	
-	public BooleanProperty getChangedProperty() {
-		return changedBooleanProperty;
-	}
-	
-	
-	public boolean changed() {
-		return changedBooleanProperty.get();
-	}
-
-	
-	public Note(String tagName, String tagContents) {
-		this();
+	public Note(Story parent, String tagName, String tagContents) {
+		this(parent);
 		this.tagName = tagName;
 		this.tagContents = tagContents;
 	}
 	
 	
-	public void setParent(Story story) {
-		if (story!=null)
-			parent = story;
+	public BooleanProperty getActiveProperty() {
+		return activeProperty;
+	}
+	
+	
+	public boolean isActive() {
+		return activeProperty.get();
+	}
+	
+	
+	public void setActive(boolean active) {
+		activeProperty.set(active);
+	}
+	
+	
+	public BooleanProperty getSceneExpandedProperty() {
+		return sceneExpandedProperty;
+	}
+	
+	
+	public boolean isSceneExpanded() {
+		return sceneExpandedProperty.get();
+	}
+	
+	
+	public void setSceneExpanded(boolean expanded) {
+		sceneExpandedProperty.set(expanded);
+	}
+	
+	
+	public BooleanProperty getListExpandedProperty() {
+		return listExpandedProperty;
+	}
+	
+	
+	public boolean isListExpanded() {
+		return listExpandedProperty.get();
+	}
+	
+	
+	public void setListExpanded(boolean expanded) {
+		listExpandedProperty.set(expanded);
+	}
+	
+	
+	public BooleanProperty getChangedProperty() {
+		return changedProperty;
+	}
+	
+	
+	public void setChanged(boolean changed) {
+		changedProperty.set(changed);
+	}
+	
+	
+	public boolean changed() {
+		return changedProperty.get();
 	}
 	
 	
@@ -135,7 +205,7 @@ public class Note {
 	}
 	
 	
-	private void setAttachmentType(Type type) {
+	public void setAttachmentType(Type type) {
 		if (type!=null)
 			attachmentType = type;
 	}
@@ -403,8 +473,12 @@ public class Note {
 	// Notes in error mode should not be displayed
 	// Returns true if time is not specified for CELLTIME and TIME attachment types
 	// or if cell name is not specified for CELL and CELLTIME attachment types
+	// or if there is no tag display method specified
 	// false otherwise
 	public boolean isWithoutScope() {
+		if (tagDisplay==Display.BLANK)
+			return true;
+		
 		if (tagDisplay!=Display.OVERLAY) {
 			if ((attachmentType==Type.CELLTIME || attachmentType==Type.TIME)
 					&& !isTimeSpecified())
@@ -418,13 +492,12 @@ public class Note {
 				return true;
 		}
 		
-		
 		return false;
 	}
 	
 	
 	public boolean isWithoutTypeScope() {
-		return attachmentType==Type.NULL;
+		return attachmentType==Type.BLANK;
 	}
 	
 	
@@ -539,7 +612,11 @@ public class Note {
 	
 	public boolean isBillboard() {
 		return tagDisplay==Display.BILLBOARD;
-		
+	}
+	
+	
+	public boolean isBillboardFront() {
+		return tagDisplay==Display.BILLBOARD_FRONT;
 	}
 	
 	
@@ -557,7 +634,7 @@ public class Note {
 		CELL("cell"),
 		CELLTIME("cell time"), 
 		TIME("time"),
-		NULL("");
+		BLANK("");
 		
 		private String type;
 		
@@ -576,13 +653,28 @@ public class Note {
 		boolean equals(Type type) {
 			return this==type;
 		}
+		
+		static String valuesToString() {
+			StringBuilder sb = new StringBuilder();
+			int len = values().length;
+			Type[] values = values();
+			for (int i=0; i<len; i++) {
+				if (i<len-1)
+					sb.append(values[i]).append(", ");
+				else
+					sb.append(values[i]);
+			}
+			return sb.toString();
+		}
 	}
 	
 	
 	public enum Display {
 		OVERLAY("overlay"),
 		BILLBOARD("billboard"),
-		SPRITE("sprite");
+		BILLBOARD_FRONT("billboard front"),
+		SPRITE("sprite"),
+		BLANK("");
 		
 		private String display;
 		
@@ -601,28 +693,42 @@ public class Note {
 		boolean equals(Display display) {
 			return this==display;
 		}
+		
+		static String valuesToString() {
+			StringBuilder sb = new StringBuilder();
+			int len = values().length;
+			Display[] values = values();
+			for (int i=0; i<len; i++) {
+				if (i<len-1)
+					sb.append(values[i]).append(", ");
+				else
+					sb.append(values[i]);
+			}
+			return sb.toString();
+		}
 	}
 	
 	
 	public class TagDisplayEnumException extends Exception {
 		public TagDisplayEnumException() {
-			super("Invalid note tag display enum, must be one of the following: "
-					+ Display.values());
+			super("Invalid note tag display enum, must be one of the "
+					+ "following: " + Display.valuesToString());
 		}
 	}
 	
 	
 	public class AttachmentTypeEnumException extends Exception {
 		public AttachmentTypeEnumException() {
-			super("Invalid note attachment type enum, must be one of the following: "
-					+ Type.values());
+			super("Invalid note attachment type enum, must be one of the "
+					+ "following: " + Type.valuesToString());
 		}
 	}
 	
 	
 	public class LocationStringFormatException extends Exception {
 		public LocationStringFormatException() {
-			super("Invalid note location string format, must be 3 integers separated by spaces.");
+			super("Invalid note location string format, must be 3 "
+					+ "integers separated by spaces.");
 		}
 	}
 	

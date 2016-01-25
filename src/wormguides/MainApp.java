@@ -18,6 +18,7 @@ public class MainApp extends Application {
 	private Scene scene;
 	private Stage primaryStage;
 	private BorderPane rootLayout;
+	private RootLayoutController controller;
 	
 	public MainApp() { }
 	
@@ -50,10 +51,16 @@ public class MainApp extends Application {
 	}
 	
 	public void initRootLayout() {
+		// Load root layout from FXML file.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
+        
+        controller = new RootLayoutController();
+        controller.setStage(primaryStage);
+        loader.setController(controller);
+        loader.setRoot(controller);
+        
 		try {
-            // Load root layout from FXML file.
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
             rootLayout = (BorderPane) loader.load();
             
             scene = new Scene(rootLayout);
@@ -66,6 +73,7 @@ public class MainApp extends Application {
             	node.setStyle("-fx-focus-color: -fx-outer-border; "+
             					"-fx-faint-focus-color: transparent;");
             }
+            
         } catch (IOException e) {
         	System.out.println("could not initialize root layout.");
             e.printStackTrace();

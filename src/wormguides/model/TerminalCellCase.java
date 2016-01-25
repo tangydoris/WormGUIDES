@@ -1,13 +1,12 @@
 package wormguides.model;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TerminalCellCase {
+	
 	private String cellName;
 	private String externalInfo;
 	private String partsListDescription;
@@ -25,8 +24,9 @@ public class TerminalCellCase {
 	private ArrayList<String> references;
 	private ArrayList<String> links;
 	
-	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
-			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners) {
+	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, 
+			ArrayList<String> postsynapticPartners,ArrayList<String> electricalPartners, 
+			ArrayList<String> neuromuscularPartners) {
 		this.links = new ArrayList<String>();
 		this.cellName = cellName;
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";

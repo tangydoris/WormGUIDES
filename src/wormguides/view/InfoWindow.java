@@ -9,6 +9,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 public class InfoWindow {
+	
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	Scene scene;
@@ -28,12 +29,19 @@ public class InfoWindow {
 		scene.setRoot(tabPane);
 		
 		infoWindowStage.setScene(scene);
-		infoWindowStage.setResizable(false);
+		
+		infoWindowStage.setMinHeight(400);
+		infoWindowStage.setMinWidth(500);
+		infoWindowStage.setHeight(600);
+		infoWindowStage.setWidth(700);
+		
+		infoWindowStage.setResizable(true);
 	}
 	
 	public void showWindow() {
 		if (infoWindowStage != null) {
 			infoWindowStage.show();
+			infoWindowStage.toFront();
 		}
 	}
 	
@@ -42,6 +50,7 @@ public class InfoWindow {
 		webview.getEngine().loadContent(dom.DOMtoString());
 		Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(tab);
+		tabPane.getSelectionModel().select(tab);
 		tabPane.setFocusTraversable(true);
 	}
 }

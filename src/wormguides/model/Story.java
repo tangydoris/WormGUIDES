@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.util.Callback;
 
 public class Story {
 	
@@ -15,18 +17,57 @@ public class Story {
 	private String description;
 	private ObservableList<Note> notes;
 	private BooleanProperty activeBooleanProperty;
+	private BooleanProperty changedBooleanProperty;
 		
 	
 	public Story(String name, String description) {
 		this.name = name;
 		this.description = description;
+		
 		activeBooleanProperty = new SimpleBooleanProperty(false);
-		notes = FXCollections.observableArrayList(new Callback<Note, Observable[]>() {
+		activeBooleanProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
-			public Observable[] call(Note note) {
-				return new Observable[]{note.getChangedProperty()};
+			public void changed(ObservableValue<? extends Boolean> observable,
+					Boolean oldValue, Boolean newValue) {
+				changedBooleanProperty.set(true);
 			}
 		});
+		
+		changedBooleanProperty = new SimpleBooleanProperty(false);
+		changedBooleanProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					setChanged(false);
+			}
+		});
+		
+		notes = FXCollections.observableArrayList(
+				note -> new Observable[]{note.getChangedProperty()});
+		notes.addListener(new ListChangeListener<Note>() {
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends Note> c) {
+				while (c.next()) {
+					// note was edited
+					if (c.wasUpdated())
+						setChanged(true);
+					
+					else {
+						if (c.wasAdded())
+							setChanged(true);
+						
+						else if (c.wasRemoved())
+							setChanged(true);
+					}
+				}
+			}
+		});
+	}
+	
+	
+	public BooleanProperty getChangedProperty() {
+		return changedBooleanProperty;
 	}
 	
 	
@@ -65,6 +106,15 @@ public class Story {
 	}
 	
 	
+	public String getNoteComment(String tagName) {
+		for (Note note : notes) {
+			if (note.getTagName().equalsIgnoreCase(tagName.trim()))
+				return note.getComments();
+		}
+		return "";
+	}
+	
+	
 	public int getNumberOfNotes() {
 		return notes.size();
 	}
@@ -86,6 +136,11 @@ public class Story {
 	}
 	
 	
+	public void setChanged(boolean changed) {
+		changedBooleanProperty.set(changed);
+	}
+	
+	
 	public void removeNote(Note note) {
 		if (note!=null)
 			notes.remove(note);
@@ -102,16 +157,8 @@ public class Story {
 	}
 	
 	
-	public ObservableList<Note> getNotesObservable() {
+	public ObservableList<Note> getNotes() {
 		return notes;
-	}
-	
-	
-	public ArrayList<Note> getNotes() {
-		ArrayList<Note> array = new ArrayList<Note>();
-		for (Note note : notes)
-			array.add(note);
-		return array;
 	}
 	
 	

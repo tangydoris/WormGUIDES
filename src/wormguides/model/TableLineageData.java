@@ -76,6 +76,47 @@ public class TableLineageData implements LineageData{
 		}
 	}
 	
+	public int getFirstOccurrenceOf(String name) {
+		int time = -1;
+		name = name.trim();
+		
+		outer:
+			for (int i=0; i<timeFrames.size(); i++) {
+				Frame frame = timeFrames.get(i);
+				for (String cell : frame.getNames()) {
+					if (cell.equalsIgnoreCase(name)) {
+						time = i;
+						break outer;
+					}
+				}
+			}
+		
+		return time+1;
+	}
+	
+	public int getLastOccurrenceOf(String name) {
+		name = name.trim();
+		int time = getFirstOccurrenceOf(name);
+		
+		if (time>-1) {
+			boolean exists = true;
+			outer:
+				for (int i=time; i<timeFrames.size() && exists; i++) {
+					Frame frame = timeFrames.get(i);
+					
+					for (String cell : frame.getNames()) {
+						if (cell.equalsIgnoreCase(name))
+							continue outer;
+					}
+					
+					time = i-1;
+					break;
+				}
+		}
+		
+		return time+1;
+	}
+	
 	public String toString() {
 		String out = "";
 		int totalFrames = getTotalTimePoints();
@@ -116,6 +157,10 @@ public class TableLineageData implements LineageData{
 			if (namesArray==null)
 				namesArray = names.toArray(new String[names.size()]);
 			return namesArray;
+		}
+		
+		private ArrayList<String> getNamesArrayList() {
+			return names;
 		}
 		
 		private Integer[][] getPositions() {

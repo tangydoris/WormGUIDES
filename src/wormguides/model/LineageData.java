@@ -8,4 +8,6 @@ public interface LineageData {
 	Integer[] getDiameters(int time);
 	ArrayList<String> getAllCellNames();
 	int getTotalTimePoints();
+	int getFirstOccurrenceOf(String name);
+	int getLastOccurrenceOf(String name);
 }

@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
  * Responsible for creation of a new story
  */
 public class NewStoryEditorController extends AnchorPane implements Initializable {
+	
 	@FXML private TextField title;
 	@FXML private TextArea description;
 	@FXML private Button submit;
@@ -36,11 +37,27 @@ public class NewStoryEditorController extends AnchorPane implements Initializabl
 	}
 	
 	
+	public void clearFields() {
+		title.clear();
+		description.clear();
+	}
+	
+	
 	private void assertFXMLNodes() {
 		assert (title!=null);
 		assert (description!=null);
 		assert (submit!=null);
 		assert (cancel!=null);
+	}
+	
+	
+	public String getTitle() {
+		return title.getText();
+	}
+	
+	
+	public String getDescription() {
+		return description.getText();
 	}
 	
 	

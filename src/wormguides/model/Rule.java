@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -25,12 +23,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.ImageLoader;
+import wormguides.MainApp;
 import wormguides.RuleEditorController;
 import wormguides.SearchOption;
 import wormguides.view.AppFont;
@@ -62,8 +60,8 @@ public abstract class Rule {
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
-	private Region region = new Region();
-	private Button colorBtn = new Button();
+	//private Region region = new Region();
+	private Rectangle colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
 	private Button editBtn = new Button();
 	private Button visibleBtn = new Button();
 	private Button deleteBtn = new Button();
@@ -88,32 +86,29 @@ public abstract class Rule {
 
 		setOptions(options);
 		
-		// format UI elements
-		DoubleProperty sideLength = new SimpleDoubleProperty(UI_SIDE_LENGTH);
+		hbox.setSpacing(3);
+		hbox.setPadding(new Insets(3));
+		hbox.setMaxWidth(290);
 		
-		hbox.setSpacing(2);	
 		label.setFont(AppFont.getFont());
-		label.prefHeightProperty().bind(sideLength);
-		label.setMaxWidth(150);
+		label.setPrefHeight(UI_SIDE_LENGTH);
+		label.setMaxHeight(UI_SIDE_LENGTH);
+		label.setMinHeight(UI_SIDE_LENGTH);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
+		label.setFont(AppFont.getFont());
+		HBox.setHgrow(label, Priority.ALWAYS);
 		resetLabel();
 		
-		colorBtn.prefHeightProperty().bind(sideLength);
-		colorBtn.prefWidthProperty().bind(sideLength);
-		colorBtn.maxHeightProperty().bind(sideLength);
-		colorBtn.maxWidthProperty().bind(sideLength);
-		colorBtn.minHeightProperty().bind(sideLength);
-		colorBtn.minWidthProperty().bind(sideLength);
-		colorBtn.setGraphicTextGap(0);
+		colorRectangle.setHeight(UI_SIDE_LENGTH);
+		colorRectangle.setWidth(UI_SIDE_LENGTH);
+		colorRectangle.setStroke(Color.LIGHTGREY);
 		setColorButton(color);
 		
-		editBtn.prefHeightProperty().bind(sideLength);
-		editBtn.prefWidthProperty().bind(sideLength);
-		editBtn.maxHeightProperty().bind(sideLength);
-		editBtn.maxWidthProperty().bind(sideLength);
-		editBtn.minHeightProperty().bind(sideLength);
-		editBtn.minWidthProperty().bind(sideLength);
+		editBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		editBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		editBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
 		editBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		editBtn.setPadding(Insets.EMPTY);
 		editBtn.setGraphic(ImageLoader.getEditIcon());
 		editBtn.setGraphicTextGap(0);
 		editBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -123,7 +118,7 @@ public abstract class Rule {
 					editController = new RuleEditorController();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(getClass().getResource("../view/RuleEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/RuleEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);
@@ -168,12 +163,9 @@ public abstract class Rule {
 		eyeIcon = ImageLoader.getEyeIcon();
 		eyeInvertIcon = ImageLoader.getEyeInvertIcon();
 		
-		visibleBtn.prefHeightProperty().bind(sideLength);
-		visibleBtn.prefWidthProperty().bind(sideLength);
-		visibleBtn.maxHeightProperty().bind(sideLength);
-		visibleBtn.maxWidthProperty().bind(sideLength);
-		visibleBtn.minHeightProperty().bind(sideLength);
-		visibleBtn.minWidthProperty().bind(sideLength);
+		visibleBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		visibleBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		visibleBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
 		visibleBtn.setPadding(Insets.EMPTY);
 		visibleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		visibleBtn.setGraphic(eyeIcon);
@@ -194,20 +186,19 @@ public abstract class Rule {
 			}
 		});
 		
-		deleteBtn.prefHeightProperty().bind(sideLength);
-		deleteBtn.prefWidthProperty().bind(sideLength);
-		deleteBtn.maxHeightProperty().bind(sideLength);
-		deleteBtn.maxWidthProperty().bind(sideLength);
-		deleteBtn.minHeightProperty().bind(sideLength);
-		deleteBtn.minWidthProperty().bind(sideLength);
+		deleteBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		deleteBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		deleteBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		deleteBtn.setPadding(Insets.EMPTY);
 		deleteBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		deleteBtn.setGraphic(ImageLoader.getCloseIcon());
 		
 		toolTip.setText(toStringFull());
+		toolTip.setFont(AppFont.getFont());
 		label.setTooltip(toolTip);
 		
-		HBox.setHgrow(region, Priority.ALWAYS);
-		hbox.getChildren().addAll(label, region, colorBtn, editBtn, 
+		//HBox.setHgrow(region, Priority.ALWAYS);
+		hbox.getChildren().addAll(label, colorRectangle, editBtn, 
 									visibleBtn, deleteBtn);
 		
 		ruleChanged = new SimpleBooleanProperty(false);
@@ -242,9 +233,7 @@ public abstract class Rule {
 	
 	
 	private void setColorButton(Color color) {
-		Rectangle rect = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH, color);
-		rect.setStroke(Color.LIGHTGREY);
-		colorBtn.setGraphic(rect);
+		colorRectangle.setFill(color);
 	}
 	
 	

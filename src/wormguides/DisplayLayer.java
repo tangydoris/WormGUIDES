@@ -24,8 +24,7 @@ public class DisplayLayer {
 		rulesList = FXCollections.observableArrayList();
 		rulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
-			public void onChanged(ListChangeListener
-									.Change<? extends Rule> change) {
+			public void onChanged(ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
 					if (!change.wasUpdated()) {
 						// added to list

@@ -45,29 +45,29 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.model.CellCases;
 import wormguides.model.Connectome;
-import wormguides.model.EmbryonicAnalogousCells;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
-import wormguides.model.StoriesList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
-import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindow;
-import wormguides.view.InfoWindowDOM;
 import wormguides.view.TreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-//FOR CONNECTOME WINDOW
+
 import javafx.scene.web.WebView;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 
-public class RootLayoutController implements Initializable{
+public class RootLayoutController extends BorderPane implements Initializable{
 	
-	// popup windows
+	// Root layout's own stage
+	private Stage mainStage;
+	
+	// Popup windows
 	private Stage aboutStage;
 	private Stage treeStage;
 	private Stage urlStage;
@@ -87,20 +87,20 @@ public class RootLayoutController implements Initializable{
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
 	
-	// panels stuff
+	// Panels stuff
 	@FXML private BorderPane rootBorderPane;
 	@FXML private VBox displayVBox;
 	@FXML private AnchorPane modelAnchorPane;
 	@FXML private ScrollPane infoPane;
 	@FXML private HBox sceneControlsBox;
 	
-	// subscene controls
+	// Subscene controls
 	@FXML private Button backwardButton, forwardButton, playButton;
 	@FXML private Label timeLabel, totalNucleiLabel;
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
-	// cells tab
+	// Cells tab
 	private Search search;
 	@FXML private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -114,19 +114,18 @@ public class RootLayoutController implements Initializable{
 	@FXML private ColorPicker colorPicker;
 	@FXML private Button addSearchBtn;
 	
-	//connectome stuff
-	Connectome connectome;
+	// Connectome stuff
+	private Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
-	// lineage tree
+	// Lineage tree
 	private TreeItem<String> lineageTreeRoot;
 	
-	// cell selection
+	// Cell selection
 	private StringProperty selectedName;
 	
-	// layers tab
+	// Layers tab
 	private DisplayLayer displayLayer;
-	private DisplayLayer shapeLayers;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
@@ -142,14 +141,18 @@ public class RootLayoutController implements Initializable{
 	private Service<Void> allStructuresListDeselect;
 	
 	// cell information
-	@FXML private Text cellName;
-	@FXML private Text cellDescription;
+	@FXML private Text displayedName;
+	@FXML private Text moreInfoClickableText;
+	@FXML private Text displayedDescription;
 	
-	//scene elements stuff
+	// story information
+	@FXML private Text displayedStory;
+	@FXML private Text displayedStoryDescription;
+	
+	// scene elements stuff
 	private SceneElementsList elementsList;
 	
 	// story stuff
-	private StoriesList storiesList;
 	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
 	@FXML private Button noteEditorBtn;
@@ -157,9 +160,10 @@ public class RootLayoutController implements Initializable{
 	// url stuff
 	private URLLoader urlLoader;
 	
-	//InfoWindow Stuff
-	CellCases cellCases;
-	InfoWindow infoWindow;
+	// info window Stuff
+	private CellCases cellCases;
+	private InfoWindow infoWindow;
+	private BooleanProperty bringUpInfoProperty;
 	
 	private ImageView playIcon, pauseIcon;
 	
@@ -169,6 +173,14 @@ public class RootLayoutController implements Initializable{
 	
 	
 	// ----- Begin menu items and buttons listeners -----
+	@FXML public void menuLoadStory() {
+		// TODO
+	}
+	
+	@FXML public void menuSaveStory() {
+		// TODO
+	}
+	
 	@FXML public void menuCloseAction() {
 		System.out.println("exiting...");
 		System.exit(0);
@@ -270,7 +282,9 @@ public class RootLayoutController implements Initializable{
 	public void openInfoWindow() {
 		if (infoWindow == null) {
 			initInfoWindow();
+			initCellCases();
 		}
+		
 		infoWindow.showWindow();
 	}
 	
@@ -342,7 +356,7 @@ public class RootLayoutController implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DController(modelAnchorPane, data);
+		window3D = new Window3DController(mainStage, modelAnchorPane, data);
 		subscene = window3D.getSubScene();
 		
 		modelAnchorPane.setOnMouseClicked(window3D.getNoteClickHandler());
@@ -365,6 +379,10 @@ public class RootLayoutController implements Initializable{
 		cellBodyTick.selectedProperty().addListener(window3D.getCellBodyTickListener());
 		
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
+		
+		// for info window
+		bringUpInfoProperty = new SimpleBooleanProperty(false);
+		window3D.setBringUpInfoProperty(bringUpInfoProperty);
 	}
 	
 	private void setPropertiesFrom3DWindow() {
@@ -374,6 +392,12 @@ public class RootLayoutController implements Initializable{
 		playingMovie = window3D.getPlayingMovieProperty();
 		selectedName = window3D.getSelectedName();
 	}
+	
+	
+	public void setStage(Stage stage) {
+		mainStage = stage;
+	}
+	
 	
 	private void addListeners() {
 		// time integer property that dictates the current time point
@@ -393,8 +417,8 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				if (newValue.intValue() != timeSlider.getValue())
-					time.set(newValue.intValue());
+				if (newValue.intValue() != timeSlider.getValue() && window3D!=null)
+					window3D.setTime(newValue.intValue());
 			}
 		});
 		
@@ -414,7 +438,8 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				setSelectedStructureInfo(selectedName.get());
+				if (!newValue.isEmpty())
+					setSelectedEntityInfo(selectedName.get());
 			}
 		});
 		
@@ -432,7 +457,6 @@ public class RootLayoutController implements Initializable{
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringCellCallback());
 		
-		
 		// 'Others' opacity
 		opacitySlider.setValue(50);
 		
@@ -441,56 +465,106 @@ public class RootLayoutController implements Initializable{
 		
 		// Cell Nucleus search option
 		cellNucleusTick.setSelected(true);
+		
+		// More info clickable text
+		moreInfoClickableText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				openInfoWindow();
+				addToInfoWindow(selectedName.get());
+			}
+		});
+		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				moreInfoClickableText.setCursor(Cursor.HAND);
+			}
+		});
+		moreInfoClickableText.setOnMouseExited(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				moreInfoClickableText.setCursor(Cursor.DEFAULT);
+			}
+		});
+		
+		// More info in context menu
+		bringUpInfoProperty.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue) {
+					openInfoWindow();
+					addToInfoWindow(selectedName.get());
+					bringUpInfoProperty.set(false);
+				}
+			}
+		});
 	}
 	
 	
-	private void setSelectedStructureInfo(String name) {
-		if (name==null || name.isEmpty())
+	private void addToInfoWindow(String name) {
+		//GENERATE CELL TAB ON CLICK
+		if (name!=null && !name.isEmpty()) {
+			if (cellCases == null) return; //error check
+							
+			if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
+				if (cellCases.containsTerminalCase(name)) {
+					
+					//show the tab
+				} else {
+					//translate the name if necessary
+					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
+					//add a terminal case --> pass the wiring partners
+					cellCases.makeTerminalCase(tabTitle, 
+							connectome.querryConnectivity(name, true, false, false, false, false),
+							connectome.querryConnectivity(name, false, true, false, false, false),
+							connectome.querryConnectivity(name, false, false, true, false, false),
+							connectome.querryConnectivity(name, false, false, false, true, false));
+				}
+			} else { //not in connectome --> non terminal case
+				if (cellCases.containsNonTerminalCase(name)) {
+	
+					//show tab
+				} else {
+					//add a non terminal case
+					cellCases.makeNonTerminalCase(name);
+				}
+			}
+		}
+	}
+	
+	
+	private void setSelectedEntityInfo(String name) {
+		if (name==null || name.isEmpty()) {
+			displayedName.setText("Active Cell: none");
+			moreInfoClickableText.setVisible(false);
+			displayedDescription.setText("");
 			return;
+		}
 		
-		if (name.indexOf("(")!=-1) 
+		if (name.indexOf("(") > -1) 
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		cellName.setText(name);
-		cellDescription.setText("");
+		displayedName.setText("Active Cell: "+name);
+		moreInfoClickableText.setVisible(true);
+		displayedDescription.setText("");
 		
+		// Note
+		if (storiesLayer!=null)
+			displayedDescription.setText(storiesLayer.getNoteComments(name));
+		
+		// Cell body/structue
 		if (Search.isStructureWithComment(name))
-			cellDescription.setText(Search.getStructureComment(name));
+			displayedDescription.setText(Search.getStructureComment(name));
 		
+		// Cell lineage name
 		else {
 			String functionalName = PartsList.getFunctionalNameByLineageName(name);
 			
 			if (functionalName!=null) {
-				cellName.setText(name+" ("+functionalName+")");
-				cellDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
-			}
-		}
-		
-		//GENERATE CELL TAB ON CLICK
-		if (cellCases == null) return; //error check
-						
-		if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
-			if (cellCases.containsTerminalCase(name)) {
-				
-				//show the tab
-			} else {
-				//translate the name if necessary
-				String tabTitle = connectome.checkQueryCell(name).toUpperCase();
-				//add a terminal case --> pass the wiring partners
-				cellCases.makeTerminalCase(tabTitle, 
-						connectome.querryConnectivity(name, true, false, false, false, false),
-						connectome.querryConnectivity(name, false, true, false, false, false),
-						connectome.querryConnectivity(name, false, false, true, false, false),
-						connectome.querryConnectivity(name, false, false, false, true, false));
-			}
-		} else { //not in connectome --> non terminal case
-			if (cellCases.containsNonTerminalCase(name)) {
-
-				//show tab
-			} else {
-				//add a non terminal case
-				cellCases.makeNonTerminalCase(name);
+				displayedName.setText("Active Cell: "+name+" ("+functionalName+")");
+				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
 			}
 		}
 	}
@@ -499,11 +573,12 @@ public class RootLayoutController implements Initializable{
 		this.subsceneWidth = new SimpleDoubleProperty();
 		subsceneWidth.bind(modelAnchorPane.widthProperty());
 		this.subsceneHeight = new SimpleDoubleProperty();
-		subsceneHeight.bind(modelAnchorPane.heightProperty().subtract(33));
+		subsceneHeight.bind(modelAnchorPane.heightProperty());
 		
 		AnchorPane.setTopAnchor(subscene, 0.0);
 		AnchorPane.setLeftAnchor(subscene, 0.0);
 		AnchorPane.setRightAnchor(subscene, 0.0);
+		AnchorPane.setBottomAnchor(subscene, 0.0);
 		
 		subscene.widthProperty().bind(subsceneWidth);
 		subscene.heightProperty().bind(subsceneHeight);
@@ -511,9 +586,10 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void sizeInfoPane() {
-		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(7));
-		cellName.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-		cellDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(6.5));
+		displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedStory.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+		displayedStoryDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
 	}
 	
 	
@@ -522,10 +598,10 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				timeLabel.setText("Time "+makePaddedTime(time.get()));
+				timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
 			}
 		});
-		timeLabel.setText("Time "+makePaddedTime(time.get()));
+		timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
 		timeLabel.toFront();
 		
 		totalNuclei.addListener(new ChangeListener<Number>() {
@@ -541,19 +617,6 @@ public class RootLayoutController implements Initializable{
 		
 		totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
 		totalNucleiLabel.toFront();
-	}
-	
-	private String makePaddedTime(int time) {
-		if (time>=0) {
-			if (time < 10)
-				return "00"+time;
-			else if (time < 100)
-				return "0"+time;
-			else
-				return ""+time;
-		}
-		else
-			return "";
 	}
 	
 	public void setIcons() {
@@ -663,7 +726,7 @@ public class RootLayoutController implements Initializable{
 			public void changed(ObservableValue<? extends Toggle> observable,
 								Toggle oldValue, Toggle newValue) {
 				SearchType type = (SearchType) observable.getValue().getToggleGroup()
-						.getSelectedToggle().getUserData();
+					.getSelectedToggle().getUserData();
 				if (type==SearchType.FUNCTIONAL || type==SearchType.DESCRIPTION) {
 					descendantTick.setSelected(false);
 					descendantTick.disableProperty().set(true);
@@ -719,8 +782,12 @@ public class RootLayoutController implements Initializable{
 		assert (rulesListView != null);
 		assert (addSearchBtn != null);
 		
-		assert (cellName != null);
-		assert (cellDescription != null);
+		assert (displayedName != null);
+		assert (moreInfoClickableText != null);
+		assert (displayedDescription != null);
+		
+		assert (displayedStory != null);
+		assert (displayedStoryDescription != null);
 		
 		assert (uniformSizeCheckBox != null);
 		assert (opacitySlider != null);
@@ -735,15 +802,11 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initStructuresLayer() {
-		structuresLayer = new StructuresLayer(elementsList);
+		structuresLayer = new StructuresLayer(elementsList, structuresSearchField);
 		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
 		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
 		structuresLayer.setRulesList(displayLayer.getRulesList());
 		
-		allStructuresListView.getFocusModel().focusedItemProperty()
-							.addListener(structuresLayer.getSelectionListener());
-		
-		structuresSearchField.textProperty().addListener(structuresLayer.getStructuresTextFieldListener());
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 		
@@ -751,33 +814,39 @@ public class RootLayoutController implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 								String oldValue, String newValue) {
-				if (newValue!=null && !newValue.isEmpty())
+				if (!newValue.isEmpty())
 					selectedName.set(newValue);
 			}
 		});
 	}
 	
 	
-	private void initStoriesList() {
-		if (elementsList!=null) {
-			storiesList = new StoriesList(elementsList);
-			window3D.setStoriesList(storiesList);
-		}
-	}
-	
-	
-	private void initStoriesLayer() {
-		if (storiesList!=null) {
-			storiesLayer = new StoriesLayer(storiesList.getStories());
+	private void initStoriesLayer(LineageData data) {
+		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked(), data);
+		window3D.setStoriesLayer(storiesLayer);
 		
-			storiesListView.setItems(storiesLayer.getStories());
-			storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
-			storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
-			
-			noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
-			
-			storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
-		}
+		storiesListView.setItems(storiesLayer.getStories());
+		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+		
+		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
+		
+		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
+		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
+		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (newValue.isEmpty()) {
+					displayedStory.setText("Active Story: none");
+					displayedStoryDescription.setText("");
+				}
+				else {
+					displayedStory.setText("Active Story: "+newValue);
+					displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
+				}
+			}
+		});
 	}
 	
 	
@@ -801,9 +870,8 @@ public class RootLayoutController implements Initializable{
 	}
 	
 	private void initCellCases() {
-		if (infoWindow == null) {
+		if (infoWindow == null)
 			initInfoWindow();
-		}
 		
 		cellCases = new CellCases(infoWindow);
 	}
@@ -842,17 +910,16 @@ public class RootLayoutController implements Initializable{
 		initConnectome();
 		
 		//info window
-		initInfoWindow();
+		//initInfoWindow();
 		
 		//init cell cases
-		initCellCases();
+		//initCellCases();
 		
 		// structures layer
 		initStructuresLayer();
 		
 		// stories layer
-		initStoriesList();
-		initStoriesLayer();
+		initStoriesLayer(data);
 		
 		window3D.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());

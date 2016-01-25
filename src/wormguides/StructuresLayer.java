@@ -3,6 +3,8 @@ package wormguides;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -11,13 +13,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -28,18 +31,23 @@ import wormguides.model.MulticellularStructureRule;
 
 
 public class StructuresLayer {
+	
+	private ObservableList<Rule> rulesList;
+	
 	private ObservableList<String> allStructuresList;
 	private ObservableList<String> searchResultsList;
-	private ObservableList<Rule> rulesList;
-	private Color selectedColor;
-	private String selectedStructure;
-	private String searchText;
-	private HashMap<String, String> nameToCommentsMap;
 	
+	private Color selectedColor;
+	private String searchText;
+	
+	private HashMap<String, String> nameToCommentsMap;
 	private HashMap<String, StructureListCellGraphic> nameListCellMap;
+	
 	private StringProperty selectedNameProperty;
 	
-	public StructuresLayer(SceneElementsList sceneElementsList) {
+	private TextField searchField;
+	
+	public StructuresLayer(SceneElementsList sceneElementsList, TextField searchField) {
 		selectedColor = Color.WHITE; //default color
 		
 		allStructuresList = FXCollections.observableArrayList();
@@ -55,18 +63,6 @@ public class StructuresLayer {
 					if (!change.wasUpdated()) {
 						for (String string : change.getAddedSubList()) {
 							StructureListCellGraphic graphic = new StructureListCellGraphic(string);
-							graphic.setOnMouseClicked(new EventHandler<Event>() {
-					    		@Override
-					    		public void handle(Event event) {
-					    			if (graphic.isSelected())
-					    				graphic.setSelected(false);
-					    			
-					    			else {
-					    				deselectAllExcept(graphic);
-					    				selectedNameProperty.set(string);
-					    			}
-					    		}
-					    	});
 							nameListCellMap.put(string, graphic);
 						}
 					}
@@ -76,17 +72,8 @@ public class StructuresLayer {
 		
 		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
 		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
-	}
-
-	
-	// Un-hilights all cells except for input cell graphic
-	private void deselectAllExcept(StructureListCellGraphic graphic) {
-		for (StructureListCellGraphic g : nameListCellMap.values()) {
-			if (g==graphic)
-				g.setSelected(true);
-			else
-				g.setSelected(false);
-		}
+		
+		setSearchField(searchField);
 	}
 	
 	
@@ -96,7 +83,15 @@ public class StructuresLayer {
 	
 	
 	public void setSelectedStructure(String structure) {
-		selectedStructure = structure;
+		// unhighlight previous selected structure
+		if (!selectedNameProperty.get().isEmpty())
+			nameListCellMap.get(selectedNameProperty.get()).setSelected(false);
+		
+		selectedNameProperty.set(structure);
+		
+		// highlight new selected structure
+		if (!selectedNameProperty.get().isEmpty())
+			nameListCellMap.get(selectedNameProperty.get()).setSelected(true);
 	}
 	
 	
@@ -105,18 +100,34 @@ public class StructuresLayer {
 	}
 	
 	
-	public ChangeListener<String> getStructuresTextFieldListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable,
-										String oldValue, String newValue) {
-				searchText = newValue.toLowerCase();
-				if (searchText.isEmpty())
-					searchResultsList.clear();
-				else
-					searchAndUpdateResults(newValue.toLowerCase());
-			}
-		};
+	private void setSearchField(TextField field) {
+		if (field!=null) {
+			searchField = field;
+			
+			searchField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observable, 
+						String oldValue, String newValue) {
+					searchText = newValue.toLowerCase();
+					
+					if (searchText.isEmpty())
+						searchResultsList.clear();
+					
+					else {
+						searchAndUpdateResults(newValue.toLowerCase());
+						deselectAllStructures();
+						setSelectedStructure("");
+					}
+				}
+			});
+		}
+	}
+	
+	
+	private void deselectAllStructures() {
+		for (String name : nameListCellMap.keySet()) {
+			nameListCellMap.get(name).setSelected(false);
+		}
 	}
 	
 	
@@ -126,13 +137,16 @@ public class StructuresLayer {
 			public void handle(ActionEvent event) {
 				String name = selectedNameProperty.get();
 				
-				if (!name.isEmpty())
+				if (!name.isEmpty()) {
 					addStructureRule(name, selectedColor);
+					deselectAllStructures();
+				}
 				
 				// if no name is selected, add all results from search
 				else {
 					for (String string : searchResultsList)
 						addStructureRule(string, selectedColor);
+					searchField.clear();
 				}
 			}
 		};
@@ -204,14 +218,8 @@ public class StructuresLayer {
 	}
 	
 	
-	public ChangeListener<String> getSelectionListener() {
-		return new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-										String oldValue, String newValue) {
-				setSelectedStructure(newValue);
-			}
-		};
+	public StringProperty getSelectedNameProperty() {
+		return selectedNameProperty;
 	}
 	
 
@@ -265,14 +273,13 @@ public class StructuresLayer {
 	// Graphical representation of a structure list cell
 	private class StructureListCellGraphic extends HBox{
 		
-		private boolean selected;
+		private BooleanProperty isSelected;
+		private Label label;
 		
 		public StructureListCellGraphic(String name) {
 			super();
 			
-			selected = false;
-			
-			Label label = new Label(name);
+			label = new Label(name);
 	    	label.setFont(AppFont.getFont());
 	    	
 	    	label.setPrefHeight(UI_HEIGHT);
@@ -285,30 +292,52 @@ public class StructuresLayer {
 	    	setPadding(new Insets(5, 5, 5, 5));
 	    	
 	    	setPickOnBounds(false);
+	    	isSelected = new SimpleBooleanProperty(false);
+	    	setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					isSelected.set(!isSelected());
+					searchField.clear();
+				}
+	    	});
+	    	isSelected.addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> observable, 
+						Boolean oldValue, Boolean newValue) {
+					if (newValue) {
+						setSelectedStructure(label.getText());
+						highlightCell(true);
+					}
+					else {
+						setSelectedStructure("");
+						highlightCell(false);
+					}
+				}
+	    	});
+	    	highlightCell(isSelected());
 		}
 		
 		
 		public boolean isSelected() {
-			return selected;
+			return isSelected.get();
 		}
 		
 		
 		public void setSelected(boolean selected) {
-			this.selected = selected;
-			highlightCell(selected);
+			isSelected.set(selected);
 		}
 		
 		
 		private void highlightCell(boolean highlight) {
 			if (highlight) {
-				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
-						+ "-fx-background-insets: 0, 1, 2; "
-						+ "-fx-background: -fx-accent;"
-						+ "-fx-text-fill: white;");
+				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;"
+						+ "-fx-background: -fx-accent;");
+				label.setTextFill(Color.WHITE);
 			}
-			else
-				setStyle("-fx-background-color: white;"
-						+ "-fx-text-fill: black;");
+			else {
+				setStyle("-fx-background-color: white;");
+				label.setTextFill(Color.BLACK);
+			}
 		}
 		
 		

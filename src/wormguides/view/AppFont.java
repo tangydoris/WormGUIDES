@@ -10,20 +10,28 @@ public class AppFont {
 	private static final Font bolderFont;
 	private static final Font boldFont;
 	
-	private static final Font expandIconFont;
+	private static final Font billboardFont;
+	private static final Font spriteAndOverlayFont;
 	
 	
 	static {
 		font = new Font(14);
+		
 		bolderFont = Font.font("System", FontWeight.EXTRA_BOLD, 14);
 		boldFont = Font.font("System", FontWeight.SEMI_BOLD, 14);
 		
-		expandIconFont = new Font(18);
+		billboardFont = Font.font("System", FontWeight.BOLD, 10);
+		spriteAndOverlayFont = Font.font("System", FontWeight.BOLD, 16);
 	}
 	
 	
-	public static Font getExpandIconFont() {
-		return expandIconFont;
+	public static Font getSpriteAndOverlayFont() {
+		return spriteAndOverlayFont;
+	}
+	
+	
+	public static Font getBillboardFont() {
+		return billboardFont;
 	}
 	
 	
