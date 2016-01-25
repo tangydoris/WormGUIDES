@@ -77,10 +77,21 @@ public class TerminalCellCase {
 		 * USING mainframe.htm EXT
 		 * Leaving code for frameset.htm check
 		 */
-		//extract root of cell name e.g. ribr --> RIB
-		String URL = wormatlasURL + 
-				this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
-				wormatlasURLEXT;
+		
+		/*
+		 * if R/L cell, find base name for URL
+		 * e.g. ribr --> RIB
+		 * 
+		 * if no R/L, leave as is
+		 * e.g. AVG
+		 */
+		String cell = this.cellName;
+		Character lastChar = cell.charAt(cell.length()-1);
+		lastChar = Character.toLowerCase(lastChar);
+		if (lastChar == 'r' || lastChar == 'l') {
+			cell = cell.substring(0, cell.length()-1);
+		}
+		String URL = wormatlasURL + cell + wormatlasURLEXT;
 		
 		try {
 			connection = new URL(URL).openConnection();
@@ -90,26 +101,36 @@ public class TerminalCellCase {
 			scanner.close();
 		} catch (Exception e) {
 			//try second extension
-//			URL = wormatlasURL + 
-//					this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
-//					wormatlasURLEXT2;
-//			try {
-//				connection = new URL(URL).openConnection();
-//				Scanner scanner = new Scanner(connection.getInputStream());
-//				scanner.useDelimiter("\\Z");
-//				content = scanner.next();
-//				scanner.close();
-//			} catch (Exception e1) {
-//				//e1.printStackTrace();
-//				//a page wasn't found on wormatlas
-//				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
-//				return;
-//			}
-			
-			this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
-			return;
-		}
+			URL = wormatlasURL + cell.substring(0, cell.length()-1).toUpperCase() + "N" + wormatlasURLEXT;
+			//System.out.println("TRYING SECOND URL: " + URL);
 
+			try {
+				connection = new URL(URL).openConnection();
+				Scanner scanner = new Scanner(connection.getInputStream());
+				scanner.useDelimiter("\\Z");
+				content = scanner.next();
+				scanner.close();
+			} catch (Exception e1) {
+				//e1.printStackTrace();
+				//a page wasn't found on wormatlas
+				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
+				return;
+			}
+			
+//			System.out.println(content);
+//			
+//			//find the line <frame src="....mainframe.html" name="mainframe"
+//			int linkIDX = content.indexOf("mainframe.htm");
+//			if (linkIDX > 0) {
+//				//extract the mainframe link
+//				String newCellName = content.substring(linkIDX-4, linkIDX);
+//				System.out.println(newCellName);
+//			}
+		}
+		findFunctionInHTML(content, URL);
+	}
+	
+	private void findFunctionInHTML(String content, String URL) {
 		//parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
