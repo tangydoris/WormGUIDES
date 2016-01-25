@@ -71,11 +71,11 @@ public class InfoWindowDOM {
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		imgDiv.addChild(img);
 			
-		//function (wormatlas)
+		//wormatlas function
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
 		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
 		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; float: left;",
-				"<strong> Function (Wormatlas): </strong>");
+				"<strong> Wormatlas Function: </strong>");
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "");
@@ -105,6 +105,19 @@ public class InfoWindowDOM {
 		wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
 		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
+		//view in wiring diagram
+//		HTMLNode viewWDTopContainerDiv = new HTMLNode("div", "viewWDTopContainer", "");
+//		HTMLNode collapseViewWDButton = new HTMLNode("button", "viewWDCollapse", "viewWDCollapseButton",  "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+//		HTMLNode viewWDTitle = new HTMLNode("p", "viewWDTitle", "width: 95%; float: left;",
+//				"<strong> View in Wiring Diagram Network: </strong>");
+//		viewWDTopContainerDiv.addChild(collapseViewWDButton);
+//		viewWDTopContainerDiv.addChild(viewWDTitle);
+		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
+		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network: </em>");
+		HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
+		viewWDDiv.addChild(viewWDP);
+		viewWDDiv.addChild(viewWDImg);
+		//wiring partners UL
 		HTMLNode wiringPartnersUL = new HTMLNode("ul");
 		ArrayList<String> presynapticPartners = terminalCase.getPresynapticPartners();
 		ArrayList<String> postsynapticPartners = terminalCase.getPresynapticPartners();
@@ -117,7 +130,7 @@ public class InfoWindowDOM {
 			String prePartners = presynapticPartners.toString();
 			prePartners = prePartners.substring(1, prePartners.length()-2);
 			
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em>" + prePartners);
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em><br>" + prePartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (postsynapticPartners.size() > 0) {
@@ -126,7 +139,7 @@ public class InfoWindowDOM {
 			
 			postPartners = postPartners.substring(1, postPartners.length()-2);
 			
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em>" + postPartners);
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
@@ -135,7 +148,7 @@ public class InfoWindowDOM {
 			String electPartners = electricalPartners.toString();
 			electPartners = electPartners.substring(1, electPartners.length()-2);
 			
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em>" + electPartners);
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em><br>" + electPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
@@ -144,21 +157,11 @@ public class InfoWindowDOM {
 			String neuroPartners = neuromuscularPartners.toString();
 			neuroPartners = neuroPartners.substring(1, neuroPartners.length()-2);
 			
-			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em>" + neuroPartners);
+			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em><br>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
+		wiringPartnersDiv.addChild(viewWDDiv);
 		wiringPartnersDiv.addChild(wiringPartnersUL);
-		
-		//view in wiring diagram
-		HTMLNode viewWDTopContainerDiv = new HTMLNode("div", "viewWDTopContainer", "");
-		HTMLNode collapseViewWDButton = new HTMLNode("button", "viewWDCollapse", "viewWDCollapseButton",  "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode viewWDTitle = new HTMLNode("p", "viewWDTitle", "width: 95%; float: left;",
-				"<strong> View in Wiring Diagram Network: </strong>");
-		viewWDTopContainerDiv.addChild(collapseViewWDButton);
-		viewWDTopContainerDiv.addChild(viewWDTitle);
-		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
-		HTMLNode wiringDiagram = new HTMLNode("p", "", "", "***view in wiring diagram network placeholder***");
-		viewWDDiv.addChild(wiringDiagram);
 		
 		//expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
@@ -174,7 +177,7 @@ public class InfoWindowDOM {
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
 		
-		//terminal homologues
+		//homologues
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
 		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
@@ -189,19 +192,19 @@ public class InfoWindowDOM {
 		lrUL.addChild(lrLI);
 		lrUL.addChild(lrLI2);
 		homologuesLeftRightListDiv.addChild(lrUL);
-		HTMLNode homologuesOtherDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
-		HTMLNode otherUL = new HTMLNode("ul");
-		HTMLNode otherLI = new HTMLNode("li", "", "", "<strong>Other</strong>");
-		HTMLNode otherLI2 = new HTMLNode("li", "", "", "other entry");
-		otherUL.addChild(otherLI);
-		otherUL.addChild(otherLI2);
-		homologuesOtherDiv.addChild(otherUL);
+		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
+		HTMLNode additionalSymmUL = new HTMLNode("ul");
+		HTMLNode additionaSymmLI = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
+		HTMLNode additionalSymmLI2 = new HTMLNode("li", "", "", "additional symmetry entry");
+		additionalSymmUL.addChild(additionaSymmLI);
+		additionalSymmUL.addChild(additionalSymmLI2);
+		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
 //		ArrayList<String> homologuesList = terminalCase.getHomologues();
 //		Collections.sort(homologuesList);
 //		String homologuesStr = homologuesList.toString();
 //		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
 		homologuesDiv.addChild(homologuesLeftRightListDiv);
-		homologuesDiv.addChild(homologuesOtherDiv);
+		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
 		
 		//links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "");
@@ -213,7 +216,25 @@ public class InfoWindowDOM {
 		HTMLNode linksDiv = new HTMLNode("div", "links", "");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
-			HTMLNode li = new HTMLNode("li", "", "", link);
+			String anchor = link; //replaced with anchor if valid link
+			
+			//begin after www.
+			int startIDX = link.indexOf("www.")+4;
+			if (startIDX > 0) {
+				String placeholder = link.substring(startIDX);
+				
+				//find end of site name using '.'
+				int dotIDX = placeholder.indexOf(".");
+				if (dotIDX > 0) {
+					placeholder = placeholder.substring(0, dotIDX);
+					
+					//make anchor tag
+					anchor = "<a href=\"" + link + "\">" +
+							terminalCase.getCellName() + " on " + placeholder +
+							"</a>";
+				}
+			}
+			HTMLNode li = new HTMLNode("li", "", "", anchor);
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
@@ -244,9 +265,9 @@ public class InfoWindowDOM {
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em> ...");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em> ...");
-		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em> ...");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype)");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		productionInfoUL.addChild(cellShapeLI);
 		productionInfoUL.addChild(additionalEmbryosLI);
@@ -262,8 +283,8 @@ public class InfoWindowDOM {
 		body.addChild(anatomyDiv);
 		body.addChild(wiringPartnersTopContainerDiv);
 		body.addChild(wiringPartnersDiv);
-		body.addChild(viewWDTopContainerDiv);
-		body.addChild(viewWDDiv);
+//		body.addChild(viewWDTopContainerDiv);
+//		body.addChild(viewWDDiv);
 		body.addChild(geneExpressionTopContainerDiv);
 		body.addChild(geneExpressionDiv);
 		body.addChild(homologuesTopContainerDiv);
@@ -279,7 +300,7 @@ public class InfoWindowDOM {
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
 		body.addChild(collapseAnatomyButton.makeCollapseButtonScript());
 		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
-		body.addChild(collapseViewWDButton.makeCollapseButtonScript());
+//		body.addChild(collapseViewWDButton.makeCollapseButtonScript());
 		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
@@ -302,26 +323,51 @@ public class InfoWindowDOM {
 		this.name = nonTerminalCase.getCellName();
 	
 		HTMLNode head = new HTMLNode("head");
-		
-		/*
-		 * TODO
-		 * meta tags
-		 * title
-		 */
-		
+
 		HTMLNode body = new HTMLNode("body");
 		
-		//divs
-		HTMLNode externalInfoDiv = new HTMLNode("div", "externalInfo", ""); 
-		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "partsListDescr", "");
+		//cell name
+		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
+		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
+		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo);
+		cellNameDiv.addChild(cellNameP);
 		
-		//build data tags from terminal case
-		String externalInfo = "<strong>External Information: </strong>" + nonTerminalCase.getCellName();
-		HTMLNode externalInfoP = new HTMLNode("p", "", "", externalInfo);
+		//embryonic homology
+//		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "embryonicHomology", "");
+//		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
+//		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
+//		embryonicHomologyDiv.addChild(embryonicHomologyP);
 		
-		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
-		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
+		//homologues
+		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
+		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
+				"<strong> Homologues: </strong>");
+		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
+		homologuesTopContainerDiv.addChild(homologuesTitle);
+		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
+		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
+		HTMLNode lrUL = new HTMLNode("ul");
+		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
+		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getCellName()); //is this the left/right option?
+		lrUL.addChild(lrLI);
+		lrUL.addChild(lrLI2);
+		homologuesLeftRightListDiv.addChild(lrUL);
+		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
+		HTMLNode additionalSymmUL = new HTMLNode("ul");
+		HTMLNode additionaSymmLI = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
+		HTMLNode additionalSymmLI2 = new HTMLNode("li", "", "", "additional symmetry entry");
+		additionalSymmUL.addChild(additionaSymmLI);
+		additionalSymmUL.addChild(additionalSymmLI2);
+		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
+//		ArrayList<String> homologuesList = terminalCase.getHomologues();
+//		Collections.sort(homologuesList);
+//		String homologuesStr = homologuesList.toString();
+//		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
+		homologuesDiv.addChild(homologuesLeftRightListDiv);
+		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
 		
+		//terminal descendants
 		HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
 		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
@@ -361,30 +407,28 @@ public class InfoWindowDOM {
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em> ...");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em> ...");
-		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em> ...");
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype)");
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		productionInfoUL.addChild(cellShapeLI);
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
 		
-		//add data tags to div
-		externalInfoDiv.addChild(externalInfoP);
-		embryonicHomologyDiv.addChild(embryonicHomologyP);
-		
-		
 		//add divs to body
-		body.addChild(externalInfoDiv);
-		body.addChild(embryonicHomologyDiv);
+		body.addChild(cellNameDiv);
+		body.addChild(homologuesTopContainerDiv);
+		body.addChild(homologuesDiv);
+		//body.addChild(embryonicHomologyDiv);
 		body.addChild(terminalDescendantsTopContainerDiv);
 		body.addChild(terminalDescendantsDiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 		
 		//add collapse scripts to body
-		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
+		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
+		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -397,10 +441,10 @@ public class InfoWindowDOM {
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
 		
-		String str = domAsString += html.formatNode();
-		System.out.println(str);
-		return str;
-		//return domAsString += html.formatNode();
+//		String str = domAsString += html.formatNode();
+//		System.out.println(str);
+//		return str;
+		return domAsString += html.formatNode();
 		
 	}
 	
