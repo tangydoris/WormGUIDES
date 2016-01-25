@@ -467,22 +467,9 @@ public class Window3DController {
 			if (event.getButton()==MouseButton.SECONDARY)
 				showContextMenu(name, event.getScreenX(), event.getScreenY());
 			
-			else if (event.getButton()==MouseButton.PRIMARY) {
-				Bounds b = picked.getBoundsInParent();
-				
-				if (b!=null) {
-					selectedNameLabel.getTransforms().clear();
-					Point2D p = CameraHelper.project(camera, 
-							new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
-					
-					double x = p.getX();
-					double y = p.getY();
-					double radius = picked.getRadius();
-					
-					selectedNameLabel.getTransforms().add(new Translate(x, y));
-					selectedNameLabel.setVisible(true);
-				}
-			}
+			else if (event.getButton()==MouseButton.PRIMARY)
+				showNameLabel(name, picked);
+
 		}
 		else if (node instanceof MeshView) {
 			// Cell body/structure
@@ -499,23 +486,9 @@ public class Window3DController {
 					if (event.getButton()==MouseButton.SECONDARY)
 						showContextMenu(name, event.getScreenX(), event.getScreenY());
 					
-					else if (event.getButton()==MouseButton.PRIMARY){
-						Bounds b = curr.getBoundsInParent();
-						
-						if (b!=null) {
-							selectedNameLabel.getTransforms().clear();
-							Point2D p1 = CameraHelper.project(camera, 
-									new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
-							Point2D p2 = CameraHelper.project(camera, 
-									new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
-							
-							double x = (p1.getX()+p2.getX())/2;
-							double y = (p1.getY()+p2.getY())/2;
-							
-							selectedNameLabel.getTransforms().add(new Translate(x, y));
-							selectedNameLabel.setVisible(true);
-						}
-					}
+					else if (event.getButton()==MouseButton.PRIMARY)
+						showNameLabel(name, curr);
+					
 					break;
 				}
 			}
@@ -538,6 +511,24 @@ public class Window3DController {
 	private void handleMousePressed(MouseEvent event) {
 		mousePosX = event.getSceneX();
 		mousePosY = event.getSceneY();
+	}
+	
+	
+	private void showNameLabel(String name, Node picked) {
+		Bounds b = picked.getBoundsInParent();
+		if (b!=null) {
+			selectedNameLabel.getTransforms().clear();
+			Point2D p1 = CameraHelper.project(camera, 
+					new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
+			Point2D p2 = CameraHelper.project(camera, 
+					new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
+			
+			double x = p1.getX();
+			double y = (p1.getY()+p2.getY())/2;
+			
+			selectedNameLabel.getTransforms().add(new Translate(x, y));
+			selectedNameLabel.setVisible(true);
+		}
 	}
 	
 	

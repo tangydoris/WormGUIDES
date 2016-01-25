@@ -568,7 +568,7 @@
                                                 <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                 <Text fx:id="moreInfoClickableText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="[more info]" visible="false">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="14.0" />
                                                    </font>
                                                 </Text>
                                              </children>

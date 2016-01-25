@@ -1,1 +1,22 @@
-Tag Name,Tag Contents,Tag Display,Attachment Type,xyz Location,Cells,Marker,Imaging Source,Resource Location,Start Time,End Time,CommentsWormGUIDES Intro,This story provides an overview of information present in the beta version WormGUIDES developmental atlas,,,,,,,,,,First scene Element,This is a bunny,SPRITE,LOCATION,80 40 20,,,,wormguides/model/obj_files/bunny.obj,5,15,example with geometry and tag attached to  to point in spaceNot a bunny,this is not a bunny,BILLBOARD FRONT,LOCATION,50 25 0,,,,,80,100,example with billboard at a time rangeEMS Billboard,EMS does something cool that we mark with a billboard,BILLBOARD FRONT,CELL,,EMS,,,,17,20,these are comments woohooBillboard with cell and time (whoa) blah blah blah blah,this billboard is attached to a cell and time blah blah blah blah blah,BILLBOARD FRONT,CELL TIME,60 22 10,abalap,,,,30,47,these comments are coolNota bene,Lots of cool stuff here.,OVERLAY,,,,,,,,,AVG ,Starts to grow,SPRITE,CELL TIME,,ABprpapppap,,,,371,372,Note Abala,This is a note attached to Abala,SPRITE,CELL,,Abala,,,,2,100,example with sprite on a cell time is ignored because attachment is celNerve Ring Development,This story highlights key events in nerve ring development,,,,,,,,,,Precursors,at some point there are precursors,OVERLAY,TIME,,,,,,200,200,example attached to time pointProcesses meet,"No, really they do.",SPRITE,CELL TIME,,Abarappapaa,,,,350,350,Something,this is not a cell,SPRITE,LOCATION,,,,,,200,300,location tag but no location specified revert to overlay with time specifiedSomething else,this is also not a cell,SPRITE,LOCATION,70 10 0,,,,,250,255,location at range of timesOverlay test,This is an overlay test,OVERLAY,,,,,,,255,400,example to test overlayLocation Sprite,WormGUIDES is bae,SPRITE,LOCATION,90 20 5,,,,,,,Front Facing Billboard Test,This story features the front-facing billboard with the enum Display.BILLBOARD_FRONT,,,,,,,,,,This is a billboard with a fixed orientation,This billboard always faces the user,BILLBOARD FRONT,CELL TIME,,EMS,,,,4,10,testing testing 123Billboard front at location,This billboard is fixed at a location,BILLBOARD FRONT,LOCATION,80 30 10,,,,,,,testing billboard front at a location
+Tag Name,Tag Contents,Tag Display,Attachment Type,xyz Location,Cells,Marker,Imaging Source,Resource Location,Start Time,End Time,Comments
+WormGUIDES Intro,This story provides an overview of totally imaginary developmental events.,,,,,,,,,,
+Rabbit attacks EMS,This presents a danger,SPRITE,LOCATION,80 40 20,,,,wormguides/model/obj_files/bunny.obj,1,25,Example of using geometry in note
+EMS,This is EMS,SPRITE,CELL,,EMS,,,,,,
+EMS Divides,"Escaping the rabbit, EMS divides successfully!",SPRITE,CELL,,MS,,,,36,40,no rabbits here
+Rabbit Threat!,This is particularly dangerous moment for E,BILLBOARD FRONT,CELL TIME,,E,,,,17,20,you can never trust a rabbit
+Safe From Rabbits Now,From this point forward the eggshell is impermeable to rabbits,OVERLAY,,,,,,,40,359,these comments are cool
+Nota bene,Lots of cool stuff here.,OVERLAY,,,,,,,,,
+AVG outgrowth,Starts to grow,SPRITE,CELL TIME,,ABprpapppap,,,,371,372,
+AVG keeps growing,"Yup, no doubt about it.",SPRITE,CELL TIME,,ABprpapppap,,,,380,390,example with sprite on a cell time is ignored because attachment is cel
+Safe From Rabbits Now(not),It seems this is not always the case,OVERLAY,TIME,,,,,,360,379,these comments are cool
+Note Phenotype,Note Late Onset Surprise Rabbit Attack (LOSRA) phenotype,SPRITE,CELL TIME,,ABplppappap,,,wormguides/model/obj_files/bunny.obj,360,379,just silly
+RIBR flees in fear,Rabbits are frightening.,SPRITE,CELL TIME,,ABprpaappap,,,,360,379,also silly
+Rabbit's return,it's back,SPRITE,LOCATION,100 20 20,,,,wormguides/model/obj_files/bunny.obj,360,379,also silly
+Nerve Ring Development,This story highlights key events in nerve ring development (or would if it contained content),,,,,,,,,,
+Precursors,at some point there are precursors,OVERLAY,TIME,,,,,,200,200,example attached to time point
+Processes meet,"No, really they do.",SPRITE,CELL TIME,,Abarappapaa,,,,350,350,
+Cool developmental stuff happens,really cool. ,SPRITE,LOCATION,,,,,,200,300,location tag but no location specified revert to overlay with time specified
+Nerve Ring,"The nerve ring is here, now, but you cant see it!",SPRITE,LOCATION,70 10 0,,,,,350,400,location at range of times
+Location of note,WormGUIDES is bae,SPRITE,LOCATION,90 20 5,,,,,,,
+ASHL does something,This billboard (3D) always faces the user,BILLBOARD FRONT,CELL TIME,,ABplpaappaa,,,,300,350,billboards are in 3D
+ASHR does something also,this is a 2D note not a billboard,SPRITE,CELL TIME,,ABprpaappaa,,,,300,350,sprites are 2D
