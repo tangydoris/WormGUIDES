@@ -1,12 +1,16 @@
 package wormguides.view;
 
 
+import java.util.ArrayList;
+
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import netscape.javascript.JSObject;
+import wormguides.InfoWindowLinkController;
 
 public class InfoWindow {
 	
@@ -45,9 +49,34 @@ public class InfoWindow {
 		}
 	}
 	
+	/*
+	 * Non terminal cell case tab --> no links
+	 */
 	public void addTab(InfoWindowDOM dom) {
 		WebView webview = new WebView();
 		webview.getEngine().loadContent(dom.DOMtoString());
+		Tab tab = new Tab(dom.getName(), webview);
+		tabPane.getTabs().add(tab);
+		tabPane.getSelectionModel().select(tab);
+		tabPane.setFocusTraversable(true);
+	}
+	
+	/*
+	 * Terminal cell case tab --> links
+	 */
+	public void addTab(InfoWindowDOM dom, ArrayList<String> links) {
+		WebView webview = new WebView();
+		webview.getEngine().loadContent(dom.DOMtoString());
+		
+		
+		/*
+		 * TESTING LINK CONTROLLER
+		 */
+		JSObject window = (JSObject) webview.getEngine().executeScript("window");
+		window.setMember("app", new InfoWindowLinkController(links));
+		
+		
+		
 		Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(tab);
 		tabPane.getSelectionModel().select(tab);

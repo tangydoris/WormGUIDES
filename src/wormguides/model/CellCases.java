@@ -44,7 +44,7 @@ public class CellCases {
 			InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
 			
 			//add dom(tab) to InfoWindow
-			infoWindow.addTab(tcDOM);
+			infoWindow.addTab(tcDOM, terminalCase.getLinks());
 		}
 	}
 	

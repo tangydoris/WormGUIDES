@@ -238,7 +238,9 @@ public class InfoWindowDOM {
 					placeholder = placeholder.substring(0, dotIDX);
 					
 					//make anchor tag
-					anchor = "<a href=\"" + link + "\">" +
+					String callbackMethod = "app." + placeholder + "()";
+					System.out.println(callbackMethod);
+					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 							terminalCase.getCellName() + " on " + placeholder +
 							"</a>";
 				}
@@ -292,7 +294,7 @@ public class InfoWindowDOM {
 			topContainerDiv.addChild(partsListDescrDiv);
 			//add divs to body
 			body.addChild(topContainerDiv);
-			System.out.println("image text not null"+imagetext);
+			System.out.println("image text not null - "+imagetext);
 			body.addChild(imgDiv);
 			body.addChild(functionWORMATLASTopContainerDiv);
 			body.addChild(functionWORMATLASDiv);
