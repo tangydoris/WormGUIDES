@@ -554,7 +554,7 @@ public class Window3DController {
 				contextMenuStage.setScene(new Scene((AnchorPane) loader.load()));
 				contextMenuStage.initOwner(parentStage);
 				contextMenuStage.initModality(Modality.NONE);
-				contextMenuStage.setResizable(true);
+				contextMenuStage.setResizable(false);
 				contextMenuStage.setTitle("Menu");
 				
 				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {

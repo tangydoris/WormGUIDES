@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TerminalCellCase {
+	
 	private String cellName;
 	private String externalInfo;
 	private String partsListDescription;

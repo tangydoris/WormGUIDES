@@ -467,6 +467,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void handle(MouseEvent event) {
 				openInfoWindow();
+				bringUpInfoWindow(selectedName.get());
 			}
 		});
 		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
@@ -481,6 +482,39 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				moreInfoClickableText.setCursor(Cursor.DEFAULT);
 			}
 		});
+	}
+	
+	
+	// TODO
+	private void bringUpInfoWindow(String name) {
+		//GENERATE CELL TAB ON CLICK
+		if (name!=null && !name.isEmpty()) {
+			if (cellCases == null) return; //error check
+							
+			if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
+				if (cellCases.containsTerminalCase(name)) {
+					
+					//show the tab
+				} else {
+					//translate the name if necessary
+					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
+					//add a terminal case --> pass the wiring partners
+					cellCases.makeTerminalCase(tabTitle, 
+							connectome.querryConnectivity(name, true, false, false, false, false),
+							connectome.querryConnectivity(name, false, true, false, false, false),
+							connectome.querryConnectivity(name, false, false, true, false, false),
+							connectome.querryConnectivity(name, false, false, false, true, false));
+				}
+			} else { //not in connectome --> non terminal case
+				if (cellCases.containsNonTerminalCase(name)) {
+	
+					//show tab
+				} else {
+					//add a non terminal case
+					cellCases.makeNonTerminalCase(name);
+				}
+			}
+		}
 	}
 	
 	
@@ -515,33 +549,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			if (functionalName!=null) {
 				displayedName.setText("Active Cell: "+name+" ("+functionalName+")");
 				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
-			}
-		}
-		
-		//GENERATE CELL TAB ON CLICK
-		if (cellCases == null) return; //error check
-						
-		if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
-			if (cellCases.containsTerminalCase(name)) {
-				
-				//show the tab
-			} else {
-				//translate the name if necessary
-				String tabTitle = connectome.checkQueryCell(name).toUpperCase();
-				//add a terminal case --> pass the wiring partners
-				cellCases.makeTerminalCase(tabTitle, 
-						connectome.querryConnectivity(name, true, false, false, false, false),
-						connectome.querryConnectivity(name, false, true, false, false, false),
-						connectome.querryConnectivity(name, false, false, true, false, false),
-						connectome.querryConnectivity(name, false, false, false, true, false));
-			}
-		} else { //not in connectome --> non terminal case
-			if (cellCases.containsNonTerminalCase(name)) {
-
-				//show tab
-			} else {
-				//add a non terminal case
-				cellCases.makeNonTerminalCase(name);
 			}
 		}
 	}
