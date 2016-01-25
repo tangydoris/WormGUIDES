@@ -39,7 +39,7 @@
             <HBox>
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button disable="true" mnemonicParsing="false" text="Send To Search">
+                  <Button mnemonicParsing="false" onAction="#sendToSearchAction" text="Send To Search">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -50,7 +50,7 @@
             <HBox>
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button disable="true" mnemonicParsing="false" text="Show Neighbors">
+                  <Button disable="true" mnemonicParsing="false" onAction="#showNeightborsAction" text="Show Neighbors">
                      <font>
                         <Font size="14.0" />
                      </font>

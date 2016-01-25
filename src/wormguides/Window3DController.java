@@ -65,6 +65,7 @@ import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
@@ -386,13 +387,10 @@ public class Window3DController {
 		EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
 		
 		if (type==MouseEvent.MOUSE_ENTERED_TARGET || type==MouseEvent.MOUSE_ENTERED
-				|| type==MouseEvent.MOUSE_RELEASED)
+				|| type==MouseEvent.MOUSE_RELEASED || type==MouseEvent.MOUSE_MOVED)
 			handleMouseReleasedOrEntered();
 		
-		else if (type==MouseEvent.MOUSE_MOVED)
-			handleMouseReleasedOrEntered();
-		
-		else if (type==MouseEvent.MOUSE_CLICKED)
+		else if (type==MouseEvent.MOUSE_CLICKED && me.isStillSincePress())
 			handleMouseClicked(me);
 		
 		else if (type==MouseEvent.MOUSE_DRAGGED)
@@ -519,12 +517,12 @@ public class Window3DController {
 		if (b!=null) {
 			selectedNameLabel.getTransforms().clear();
 			Point2D p1 = CameraHelper.project(camera, 
-					new Point3D(b.getMaxX(), b.getMaxY(), b.getMaxZ()));
-			Point2D p2 = CameraHelper.project(camera, 
-					new Point3D(b.getMinX(), b.getMinY(), b.getMinZ()));
+					new Point3D((b.getMaxX()+b.getMinX())/2, 
+							(b.getMaxY()+b.getMinY())/2, 
+							(b.getMaxZ()+b.getMinZ())/2));
 			
 			double x = p1.getX();
-			double y = (p1.getY()+p2.getY())/2;
+			double y = p1.getY();
 			
 			selectedNameLabel.getTransforms().add(new Translate(x, y));
 			selectedNameLabel.setVisible(true);
@@ -538,6 +536,7 @@ public class Window3DController {
 			contextMenuController = new ContextMenuController(bringUpInfoProperty);
 			
 			contextMenuStage = new Stage();
+			contextMenuStage.initStyle(StageStyle.UNDECORATED);
 			
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("view/ContextMenuLayout.fxml"));

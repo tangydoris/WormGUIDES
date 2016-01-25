@@ -25,6 +25,14 @@ public class ContextMenuController extends AnchorPane implements Initializable{
 		assertFXMLNodes();
 	}
 	
+	@FXML public void showNeightborsAction() {
+		// TODO
+	}
+	
+	@FXML public void sendToSearchAction() {
+		// TODO
+	}
+	
 	@FXML public void showInfoAction() {
 		if (bringUpInfoProperty!=null)
 			bringUpInfoProperty.set(true);
