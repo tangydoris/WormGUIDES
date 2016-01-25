@@ -77,10 +77,22 @@ public class TerminalCellCase {
 		 * USING mainframe.htm EXT
 		 * Leaving code for frameset.htm check
 		 */
-		//extract root of cell name e.g. ribr --> RIB
-		String URL = wormatlasURL + 
-				this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
-				wormatlasURLEXT;
+		
+		/*
+		 * if R/L cell, find base name for URL
+		 * e.g. ribr --> RIB
+		 * 
+		 * if no R/L, leave as is
+		 * e.g. AVG
+		 */
+		String cell = this.cellName;
+		Character lastChar = cell.charAt(cell.length()-1);
+		lastChar = Character.toLowerCase(lastChar);
+		if (lastChar == 'r' || lastChar == 'l') {
+			cell = cell.substring(0, cell.length()-1);
+			System.out.println(cell);
+		}
+		String URL = wormatlasURL + cell + wormatlasURLEXT;
 		
 		try {
 			connection = new URL(URL).openConnection();
@@ -93,11 +105,15 @@ public class TerminalCellCase {
 //			URL = wormatlasURL + 
 //					this.cellName.substring(0, this.cellName.length()-1).toUpperCase() + 
 //					wormatlasURLEXT2;
+//			
+//			
+//			URL = wormatlasURL + cell + wormatlasURLEXT2;
 //			try {
 //				connection = new URL(URL).openConnection();
 //				Scanner scanner = new Scanner(connection.getInputStream());
 //				scanner.useDelimiter("\\Z");
 //				content = scanner.next();
+//				System.out.println(content);
 //				scanner.close();
 //			} catch (Exception e1) {
 //				//e1.printStackTrace();
