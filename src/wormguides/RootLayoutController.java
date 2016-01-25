@@ -438,8 +438,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
-				if (!newValue.isEmpty())
-					setSelectedEntityInfo(selectedName.get());
+				if (newValue != null) {
+					if (!newValue.isEmpty())
+						setSelectedEntityInfo(selectedName.get());
+				}
 			}
 		});
 		
@@ -507,7 +509,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		if (name!=null && !name.isEmpty()) {
 			if (cellCases == null) return; //error check
 							
-			if (connectome.containsCell(name)) { //in connectome --> terminal case (neuron)
+			if (PartsList.containsLineageName(name)) { //in connectome --> terminal case (neuron)
 				if (cellCases.containsTerminalCase(name)) {
 					
 					//show the tab
