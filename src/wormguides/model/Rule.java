@@ -27,10 +27,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import wormguides.ImageLoader;
 import wormguides.MainApp;
-import wormguides.RuleEditorController;
 import wormguides.SearchOption;
+import wormguides.controllers.RuleEditorController;
+import wormguides.loaders.ImageLoader;
 import wormguides.view.AppFont;
 
 /*

@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import wormguides.SearchOption;
 
 public class RuleEditorController extends AnchorPane implements Initializable{
 	

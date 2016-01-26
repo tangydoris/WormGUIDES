@@ -1,7 +1,7 @@
 package wormguides.model;
 import java.util.ArrayList;
 import javafx.scene.shape.MeshView;
-import wormguides.GeometryLoader;
+import wormguides.loaders.GeometryLoader;
 
 /*
  * A SceneElement represents a cell body structure (uni or multicellular)
@@ -94,15 +94,15 @@ public class SceneElement {
 	public MeshView buildGeometry(int time) {
 		time++;
 		// TODO OPTIMIZE THIS LATER
-		GeometryLoader loader = new GeometryLoader();
+		//GeometryLoader loader = new GeometryLoader();
 		
 		//check if complete resource
 		if (completeResourceFlag) {
-			return loader.loadOBJ(resourceLocation);
+			return GeometryLoader.loadOBJ(resourceLocation);
 		} else {
 			//append time and ext to resource location
 			String objFile = resourceLocation + "_t" + time + OBJ_EXT;
-			return loader.loadOBJ(objFile);
+			return GeometryLoader.loadOBJ(objFile);
 		}
 	}
 	

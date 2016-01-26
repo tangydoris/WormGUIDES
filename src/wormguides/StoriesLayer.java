@@ -45,6 +45,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import wormguides.controllers.NoteEditorController;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Story;

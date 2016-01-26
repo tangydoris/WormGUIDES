@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,6 +43,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import wormguides.CellShapesIndexToHTML;
+import wormguides.DisplayLayer;
+import wormguides.Search;
+import wormguides.SearchType;
+import wormguides.StoriesLayer;
+import wormguides.StringCellCallback;
+import wormguides.StructuresLayer;
+import wormguides.URLLoader;
+import wormguides.loaders.AceTreeLoader;
+import wormguides.loaders.ImageLoader;
 import wormguides.model.CellCases;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;

@@ -4,8 +4,7 @@ import java.util.ArrayList;
 //import java.util.Collections;
 
 import wormguides.ConnectomeToHTML;
-
-import wormguides.ConnectomeLoader;
+import wormguides.loaders.ConnectomeLoader;
 
 public class Connectome {
 	private ArrayList<NeuronalSynapse> connectome;

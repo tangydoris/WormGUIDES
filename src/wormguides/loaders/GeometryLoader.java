@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.loaders;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,12 @@ public class GeometryLoader {
 	private static ArrayList<double[]> coords;
 	private static ArrayList<int[]> faces;
 	private static TriangleMesh mesh;
-
-	public GeometryLoader() {
+ 
+	public static MeshView loadOBJ(String fileName) {
 		coords = new ArrayList<double[]>();
 		faces = new ArrayList<int[]>();
 		mesh = new TriangleMesh();
-	}
- 
-	public MeshView loadOBJ(String fileName) {
+		
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -100,7 +98,8 @@ public class GeometryLoader {
 		return new MeshView(mesh);
 	}
 
-	public void createMesh() {
+	
+	private static void createMesh() {
 		int counter = 0;
 		int texCounter = 0;
 		float stripeSeparation = 1500;
@@ -132,7 +131,7 @@ public class GeometryLoader {
 	}
 
 	/*--------------------DEBUGGING------------------------*/
-	public void printCoords() {
+	public static void printCoords() {
 		System.out.println("-----------VERTICES------------- " + coords.size());
 		for (int i = 0; i < coords.size(); i++) {
 			System.out.print("v ");
@@ -143,7 +142,7 @@ public class GeometryLoader {
 		}
 	}
 
-	public void printFaces() {
+	public static void printFaces() {
 		System.out.println("-----------FACES-------------");
 		for (int i = 0; i < faces.size(); i++) {
 			System.out.print("f ");

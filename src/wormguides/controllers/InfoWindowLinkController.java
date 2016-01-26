@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.controllers;
 
 import java.awt.Desktop;
 import java.io.IOException;

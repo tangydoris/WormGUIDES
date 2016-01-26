@@ -18,9 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import wormguides.ImageLoader;
 import wormguides.URLGenerator;
-import wormguides.Window3DController;
+import wormguides.controllers.Window3DController;
+import wormguides.loaders.ImageLoader;
 import wormguides.model.ColorRule;
 
 public class URLWindow extends AnchorPane {

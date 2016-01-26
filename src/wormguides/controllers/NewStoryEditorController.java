@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;

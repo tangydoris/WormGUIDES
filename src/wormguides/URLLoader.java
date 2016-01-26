@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
+import wormguides.controllers.Window3DController;
 import wormguides.model.Rule;
 
 public class URLLoader {

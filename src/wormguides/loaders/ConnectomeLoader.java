@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;

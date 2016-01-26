@@ -11,7 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import wormguides.controllers.RootLayoutController;
 //import wormguides.view.RootLayout;
+import wormguides.loaders.ImageLoader;
 
 public class MainApp extends Application {
 	

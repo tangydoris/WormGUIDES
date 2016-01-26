@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +64,10 @@ import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import wormguides.ColorComparator;
+import wormguides.MainApp;
+import wormguides.StoriesLayer;
+import wormguides.Xform;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;

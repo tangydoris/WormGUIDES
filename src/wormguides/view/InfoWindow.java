@@ -10,7 +10,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
-import wormguides.InfoWindowLinkController;
+import wormguides.controllers.InfoWindowLinkController;
 
 public class InfoWindow {
 	
