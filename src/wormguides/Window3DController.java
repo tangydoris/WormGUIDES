@@ -175,13 +175,13 @@ public class Window3DController {
 	private Pane spritesPane;
 	
 	// maps of sprite/billboard front notes attached to cell, or cell and time
-	private HashMap<Text, Sphere> spriteSphereMap;
-	private HashMap<Text, Sphere> billboardFrontSphereMap;
+	private HashMap<Text, Node> spriteSphereMap;
+	private HashMap<Text, Node> billboardFrontSphereMap;
 	
 	// Label stuff
 	private ArrayList<String> labels;
 	private ArrayList<String> currentLabels;
-	private HashMap<Text, Sphere> labelSphereMap;
+	private HashMap<Text, Node> labelEntityMap;
 	
 	
 	private BooleanProperty bringUpInfoProperty;
@@ -304,12 +304,12 @@ public class Window3DController {
 		currentNotes = new ArrayList<Note>();
 		currentGraphicNoteMap = new HashMap<Text, Note>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
-		spriteSphereMap = new HashMap<Text, Sphere>();
-		billboardFrontSphereMap = new HashMap<Text, Sphere>();
+		spriteSphereMap = new HashMap<Text, Node>();
+		billboardFrontSphereMap = new HashMap<Text, Node>();
 		
 		labels = new ArrayList<String>();
 		currentLabels = new ArrayList<String>();
-		labelSphereMap = new HashMap<Text, Sphere>();
+		labelEntityMap = new HashMap<Text, Node>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
@@ -474,15 +474,14 @@ public class Window3DController {
 			}
 
 		}
+		
+		// Cell body/structure
 		else if (node instanceof MeshView) {
-			// Cell body/structure
 			for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 				MeshView curr = currentSceneElementMeshes.get(i);
 				if (curr.equals(node)) {
 					SceneElement clickedSceneElement = currentSceneElements.get(i);
-					String name = clickedSceneElement.getSceneName();
-					if (name.indexOf("(")>-1)
-						name = name.substring(0, name.indexOf("("));
+					String name = normalizeName(clickedSceneElement.getSceneName());
 					selectedName.set(name);
 					
 					if (event.getButton()==MouseButton.SECONDARY)
@@ -513,6 +512,14 @@ public class Window3DController {
 			selectedIndex.set(-1);
 			selectedName.set("");
 		}
+	}
+	
+	
+	private String normalizeName(String name) {
+		if (name.indexOf("(") > -1)
+			name = name.substring(0, name.indexOf("("));
+		name = name.trim();
+		return name;
 	}
 	
 	
@@ -593,8 +600,8 @@ public class Window3DController {
 		for (Text node : spriteSphereMap.keySet()) {
 			alignTextWithEntity(node, spriteSphereMap.get(node));
 		}
-		for (Text node : labelSphereMap.keySet()) {
-			alignTextWithEntity(node, labelSphereMap.get(node));
+		for (Text node : labelEntityMap.keySet()) {
+			alignTextWithEntity(node, labelEntityMap.get(node));
 		}
 	}
 	
@@ -611,9 +618,9 @@ public class Window3DController {
 						new Point3D((b.getMaxX()+b.getMinX())/2, 
 								(b.getMaxY()+b.getMinY())/2, 
 								(b.getMaxZ()+b.getMinZ())/2));
-				
 				double x = p.getX();
 				double y = p.getY();
+				
 				if (s instanceof Sphere) {
 					double radius = ((Sphere) s).getRadius();
 					x += radius;
@@ -689,11 +696,19 @@ public class Window3DController {
 		// End scene element mesh loading/building
 		
 		// Label stuff
-		labelSphereMap.clear();
+		labelEntityMap.clear();
 		currentLabels.clear();
 		for (String name : labels) {
 			for (String cell : cellNames) {
 				if (!currentLabels.contains(name) && cell.equalsIgnoreCase(name)) {
+					currentLabels.add(name);
+					break;
+				}
+			}
+			
+			for (int i=0; i<currentSceneElements.size(); i++) {
+				if (!currentLabels.contains(name) 
+						&& name.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
 					currentLabels.add(name);
 					break;
 				}
@@ -828,6 +843,8 @@ public class Window3DController {
 	private void addLabelGeometries() {
 		for (String name : currentLabels) {
 			Text node = makeNoteSpriteText(name);
+			node.setWrappingWidth(node.getWrappingWidth()+20);
+			
 			if (spritesPane!=null && positionLabelSprite(name, node))
 				spritesPane.getChildren().add(node);
 		}
@@ -836,9 +853,19 @@ public class Window3DController {
 	
 	
 	private boolean positionLabelSprite(String name, Text text) {
+		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
 			if (cellNames[i].equalsIgnoreCase(name) && spheres[i]!=null) {
-				labelSphereMap.put(text, spheres[i]);
+				labelEntityMap.put(text, spheres[i]);
+				return true;
+			}
+		}
+		
+		// mesh view label
+		for (int i=0; i<currentSceneElements.size(); i++) {
+			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+					&& currentSceneElementMeshes.get(i)!=null) {
+				labelEntityMap.put(text, currentSceneElementMeshes.get(i));
 				return true;
 			}
 		}

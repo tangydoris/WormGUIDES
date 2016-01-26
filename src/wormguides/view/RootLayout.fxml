@@ -130,7 +130,6 @@
                                                                         <Label text="(cell/structure name, keyword, phrase)" />
                                                                      </children>
                                                                   </HBox>
-                                                                  <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                                   <HBox VBox.vgrow="NEVER">
                                                                      <children>
                                                                         <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="By:">
