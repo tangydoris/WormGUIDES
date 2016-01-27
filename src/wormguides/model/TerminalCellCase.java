@@ -185,11 +185,45 @@ public class TerminalCellCase {
 		ArrayList<String> leftRightHomologues = new ArrayList<String>();
 		ArrayList<String> additionalSymmetries = new ArrayList<String>();
 		
+		if (this.cellName == null) return homologues;
+		
+		char lastChar = cellName.charAt(cellName.length()-1);
+		lastChar = Character.toLowerCase(lastChar);
+		
+		String cell = this.cellName;
+		//check for left, right, dorsal, or ventral suffix --> update cell
+		if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v') {
+			cell = cell.substring(0, cell.length()-1);
+		} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
+			cell = cell.substring(0, cell.length()-1);
+		}
+		
+		cell = cell.toLowerCase();
+		
+		//search parts list for matching prefix terms
+		ArrayList<String> partsListHits = new ArrayList<String>();
+		for (String lineageName : PartsList.getLineageNames()) {
+			lineageName = PartsList.getFunctionalNameByLineageName(lineageName);
+			if (lineageName.toLowerCase().startsWith(cell)) {
+				partsListHits.add(lineageName);
+			}
+		}
+		
 		/*
-		 * TESTING
+		 * Add hits to categories:
+		 * L/R: ends with l/r
+		 * AdditionalSymm: ends with d/v
 		 */
-		leftRightHomologues.add("L/R first entry");
-		additionalSymmetries.add("Additional Symmetries first entry");
+		for (String lineageName : partsListHits) {
+			lastChar = lineageName.charAt(lineageName.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			System.out.println(lastChar);
+			if (lastChar == 'l' || lastChar == 'r') {
+				leftRightHomologues.add(lineageName);
+			} else if (lastChar == 'd' || lastChar == 'v' || Character.isDigit(lastChar)) {
+				additionalSymmetries.add(lineageName);
+			}
+		}
 		
 		homologues.add(leftRightHomologues);
 		homologues.add(additionalSymmetries);

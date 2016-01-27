@@ -78,7 +78,7 @@ public class InfoWindowDOM {
 		//wormatlas function
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
 		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; float: left;",
+		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Wormatlas Function: </strong>");
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
@@ -89,7 +89,7 @@ public class InfoWindowDOM {
 		//anatomy
 		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
 		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; float: left;",
+		HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Anatomy: </strong>");
 		anatomyTopContainerDiv.addChild(collapseAnatomyButton);
 		anatomyTopContainerDiv.addChild(anatomyTitle);
@@ -104,7 +104,7 @@ public class InfoWindowDOM {
 		//wiring
 		HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
 		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse", "wiringPartnersCollapseButton","width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode wiringPartnersTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; float: left;",
+		HTMLNode wiringPartnersTitle = new HTMLNode("p", "wiringPartnersTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Wiring Partners: </strong>");
 		wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
 		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
@@ -175,7 +175,7 @@ public class InfoWindowDOM {
 		//expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
 		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse", "geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle", "width: 95%; float: left;",
+		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Gene Expression: </strong>");
 		geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
 		geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
@@ -188,14 +188,14 @@ public class InfoWindowDOM {
 		
 		//homologues
 		ArrayList<ArrayList<String>> terminalHomologues = terminalCase.getHomologues();
-		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
+		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
-		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
-		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
+		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "height: 20%");
+		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left;");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLIHeaeder = new HTMLNode("li", "", "", "<strong>L/R</strong>");
 		lrUL.addChild(lrLIHeaeder); //header
@@ -207,7 +207,8 @@ public class InfoWindowDOM {
 		}
 		homologuesLeftRightListDiv.addChild(lrUL);
 		
-		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
+		
+		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: left;");
 		HTMLNode additionalSymmUL = new HTMLNode("ul");
 		HTMLNode additionaSymmLIHeader = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
 		additionalSymmUL.addChild(additionaSymmLIHeader);
@@ -223,9 +224,9 @@ public class InfoWindowDOM {
 		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
 		
 		//links
-		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "");
+		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; float: left;",
+		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
@@ -260,7 +261,7 @@ public class InfoWindowDOM {
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
-		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; float: left;",
+		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> References: </strong>");
 		referencesTopContainerDiv.addChild(collapseReferencesButton);
 		referencesTopContainerDiv.addChild(referencesTitle);
@@ -276,7 +277,7 @@ public class InfoWindowDOM {
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
-		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; float: left;",
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Production Information: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
@@ -290,8 +291,7 @@ public class InfoWindowDOM {
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
 
-		//container for external info & parts list description
-				
+		
 		if(isneuronpage){ //what if neuron but no wiring partners??? - BK e.g. ABplppappap (DD1)
 			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
 		
@@ -375,7 +375,7 @@ public class InfoWindowDOM {
 		//homologues
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
@@ -389,15 +389,9 @@ public class InfoWindowDOM {
 		homologuesLeftRightListDiv.addChild(lrUL);
 		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
 		HTMLNode additionalSymmUL = new HTMLNode("ul");
-		HTMLNode additionaSymmLI = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
-		HTMLNode additionalSymmLI2 = new HTMLNode("li", "", "", "additional symmetry entry");
+		HTMLNode additionaSymmLI = new HTMLNode("li", "", "", "<strong>N/A</strong>");
 		additionalSymmUL.addChild(additionaSymmLI);
-		additionalSymmUL.addChild(additionalSymmLI2);
 		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
-//		ArrayList<String> homologuesList = terminalCase.getHomologues();
-//		Collections.sort(homologuesList);
-//		String homologuesStr = homologuesList.toString();
-//		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
 		homologuesDiv.addChild(homologuesLeftRightListDiv);
 		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
 		
@@ -405,7 +399,7 @@ public class InfoWindowDOM {
 		HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
 		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
-		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; float: left;",
+		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> TerminalDescendants: </strong>");
 		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
 		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
@@ -434,7 +428,7 @@ public class InfoWindowDOM {
 		// description for non terminal cell
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
 		int terminalnum=nonTerminalCase.getTerminalDescendants().size();//# of terminals
-		String partsListDescription = "Embryonic progenitor cell that generates "+terminalnum+" cells at hatching.";
+		String partsListDescription = "Embryonic progenitor cell that generates " + terminalnum + " cells at hatching.";
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
 		
@@ -442,8 +436,8 @@ public class InfoWindowDOM {
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
-		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; float: left;",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Production Information: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
@@ -498,10 +492,18 @@ public class InfoWindowDOM {
 		if (html == null) return;
 		
 		//start with rule for unorder list --> no bullets
-		String style = newLine + "ul li {"
+		String style = newLine + "ul {"
 				+ newLine + "list-style-type: none;"
+				+ newLine + "display: block;"
+				+ newLine + "width: 100%;"
+				+ newLine + "}"
+				+ newLine + newLine + "li {"
 				+ newLine + "margin-bottom: 2%;"
-				+ newLine + "}";
+				+ newLine + "}"
+				+ newLine + newLine + "div {"
+				+ newLine + "width: 100%;"
+				+ newLine + "overflow: hidden;"
+				+ newLine + "}" + newLine;
 		HTMLNode head = null; //saved to add style node as child of head
 		if (html.hasChildren()) {
 			for (HTMLNode node : html.getChildren()) {
@@ -561,7 +563,7 @@ public class InfoWindowDOM {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	private final static String doctypeTag = "<!DOCTYPE html>";
 	private final static String newLine = "\n";
 //	private final static String meta_charset = "<meta charset=\"utf-8\">";

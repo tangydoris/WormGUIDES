@@ -209,12 +209,22 @@ public class HTMLNode {
 					nodeStr += formatNode(n);
 				}
 			}
-
-			nodeStr += (newLine + "</" + node.tag + ">");
+			
+			if (!node.getTag().equals("br")) {
+				nodeStr += (newLine + "</" + node.getTag() + ">");
+			}
+			
 		} else if (!node.isContainer() && !node.isImage() && !node.isButton() && !node.isScript()) { //e.g. <p id...
-			nodeStr = newLine + "<" + node.getTag() + " id=\"" + node.getID() + "\">" 
-					+ newLine + node.getInnerHTML() 
-					+ newLine +  "</" + node.getTag() + ">"; 
+			if (!node.getID().equals("")) {
+				nodeStr = newLine + "<" + node.getTag() + " id=\"" + node.getID() + "\">" 
+						+ newLine + node.getInnerHTML() 
+						+ newLine +  "</" + node.getTag() + ">"; 
+			} else {
+				nodeStr = newLine + "<" + node.getTag() + ">"
+				+ newLine + node.getInnerHTML() 
+				+ newLine +  "</" + node.getTag() + ">";
+			}
+					 
 		} else if (node.isImage()) { //e.g. <img id...
 			nodeStr = newLine + "<" + node.getTag() + " src=\"" + node.getImgSrc() + "\" alt=\"" + node.getImgSrc() + "\">"; 
 		} else if (node.isStyle()) {
