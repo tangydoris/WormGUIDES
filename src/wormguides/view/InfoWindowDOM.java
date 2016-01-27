@@ -365,13 +365,6 @@ public class InfoWindowDOM {
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo);
 		cellNameDiv.addChild(cellNameP);
 		
-		
-		//embryonic homology
-//		HTMLNode embryonicHomologyDiv = new HTMLNode("div", "embryonicHomology", "");
-//		String embryonicHomology = "<strong>Embryonic Homology to: </strong>" + nonTerminalCase.getEmbryonicHomology();
-//		HTMLNode embryonicHomologyP = new HTMLNode("p", "", "", embryonicHomology);
-//		embryonicHomologyDiv.addChild(embryonicHomologyP);
-		
 		//homologues
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
