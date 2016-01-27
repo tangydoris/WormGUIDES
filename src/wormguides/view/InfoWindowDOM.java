@@ -187,6 +187,7 @@ public class InfoWindowDOM {
 		geneExpressionDiv.addChild(geneExpression);
 		
 		//homologues
+		ArrayList<ArrayList<String>> terminalHomologues = terminalCase.getHomologues();
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
 		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; float: left;",
@@ -196,22 +197,28 @@ public class InfoWindowDOM {
 		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
 		HTMLNode lrUL = new HTMLNode("ul");
-		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
-		HTMLNode lrLI2 = new HTMLNode("li", "", "", "l/r entry");
-		lrUL.addChild(lrLI);
-		lrUL.addChild(lrLI2);
+		HTMLNode lrLIHeaeder = new HTMLNode("li", "", "", "<strong>L/R</strong>");
+		lrUL.addChild(lrLIHeaeder); //header
+		if (terminalHomologues.size() > 0) {
+			for (String leftRightHomologue : terminalHomologues.get(0)) {
+				HTMLNode lrLI = new HTMLNode("li", "", "", leftRightHomologue);
+				lrUL.addChild(lrLI);
+			}
+		}
 		homologuesLeftRightListDiv.addChild(lrUL);
+		
 		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: right;");
 		HTMLNode additionalSymmUL = new HTMLNode("ul");
-		HTMLNode additionaSymmLI = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
-		HTMLNode additionalSymmLI2 = new HTMLNode("li", "", "", "additional symmetry entry");
-		additionalSymmUL.addChild(additionaSymmLI);
-		additionalSymmUL.addChild(additionalSymmLI2);
+		HTMLNode additionaSymmLIHeader = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
+		additionalSymmUL.addChild(additionaSymmLIHeader);
+		if (terminalHomologues.size() > 1) {
+			for (String additionalSymmetry : terminalHomologues.get(1)) {
+				HTMLNode additionalSymmLI = new HTMLNode("li", "", "", additionalSymmetry);
+				additionalSymmUL.addChild(additionalSymmLI);
+			}
+		}
 		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
-//		ArrayList<String> homologuesList = terminalCase.getHomologues();
-//		Collections.sort(homologuesList);
-//		String homologuesStr = homologuesList.toString();
-//		HTMLNode homologues = new HTMLNode("p", "", "", homologuesStr);
+		
 		homologuesDiv.addChild(homologuesLeftRightListDiv);
 		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
 		
