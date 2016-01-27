@@ -217,7 +217,6 @@ public class TerminalCellCase {
 		for (String lineageName : partsListHits) {
 			lastChar = lineageName.charAt(lineageName.length()-1);
 			lastChar = Character.toLowerCase(lastChar);
-			System.out.println(lastChar);
 			if (lastChar == 'l' || lastChar == 'r') {
 				leftRightHomologues.add(lineageName);
 			} else if (lastChar == 'd' || lastChar == 'v' || Character.isDigit(lastChar)) {

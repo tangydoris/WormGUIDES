@@ -427,10 +427,44 @@ public class InfoWindowDOM {
 		
 		// description for non terminal cell
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
-		int terminalnum=nonTerminalCase.getTerminalDescendants().size();//# of terminals
+		int terminalnum = nonTerminalCase.getTerminalDescendants().size();//# of terminals
 		String partsListDescription = "Embryonic progenitor cell that generates " + terminalnum + " cells at hatching.";
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
+		
+		//links
+		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
+		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+				"<strong> External Links: </strong>");
+		linksTopContainerDiv.addChild(collapseLinksButton);
+		linksTopContainerDiv.addChild(linksTitle);
+		HTMLNode linksDiv = new HTMLNode("div", "links", "");
+		HTMLNode linksUL = new HTMLNode("ul");
+		for (String link : nonTerminalCase.getLinks()) {
+			String anchor = link; //replaced with anchor if valid link
+			
+			//begin after www.
+			int startIDX = link.indexOf("www.")+4;
+			if (startIDX > 0) {
+				String placeholder = link.substring(startIDX);
+				
+				//find end of site name using '.'
+				int dotIDX = placeholder.indexOf(".");
+				if (dotIDX > 0) {
+					placeholder = placeholder.substring(0, dotIDX);
+					
+					//make anchor tag
+					String callbackMethod = "app." + placeholder + "()";
+					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+							nonTerminalCase.getCellName() + " on " + placeholder +
+							"</a>";
+				}
+			}
+			HTMLNode li = new HTMLNode("li", "", "", anchor);
+			linksUL.addChild(li);
+		}
+		linksDiv.addChild(linksUL);
 		
 		
 		//production info
@@ -459,12 +493,15 @@ public class InfoWindowDOM {
 		//body.addChild(embryonicHomologyDiv);
 		body.addChild(terminalDescendantsTopContainerDiv);
 		body.addChild(terminalDescendantsDiv);
+		body.addChild(linksTopContainerDiv);
+		body.addChild(linksDiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 		
 		//add collapse scripts to body
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
+		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
 		//add head and body to html
