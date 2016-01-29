@@ -43,6 +43,7 @@ import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -87,6 +88,8 @@ public class Window3DController {
 	private LineageData data;
 
 	private SubScene subscene;
+	
+	private TextField searchField;
 	
 	// transformation stuff
 	private Group root;
@@ -558,6 +561,15 @@ public class Window3DController {
 	            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
 	            					"-fx-faint-focus-color: transparent;");
 	            }
+				
+				contextMenuController.setSearchButtonListener(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						if (searchField!=null)
+							searchField.setText(contextMenuController.getName());
+						contextMenuStage.hide();
+					}
+				});
 				
 			} catch (IOException e) {
 				System.out.println("error in initializing context menu for "+name+".");
@@ -1576,6 +1588,12 @@ public class Window3DController {
 					inSearch = true;
 			}
 		};
+	}
+	
+	
+	public void setSearchField(TextField field) {
+		searchField = field;
+		searchField.textProperty().addListener(getSearchFieldListener());
 	}
 	
 

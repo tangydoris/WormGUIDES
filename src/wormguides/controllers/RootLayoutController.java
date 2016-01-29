@@ -376,7 +376,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
 		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
 		
-		searchField.textProperty().addListener(window3D.getSearchFieldListener());
+		window3D.setSearchField(searchField);
 		
 		// slider has to listen to 3D window's opacity value
 		// 3d window's opacity value has to listen to opacity slider's value
@@ -390,9 +390,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
 		
-		// for info window
+		// for context menu
+		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 		window3D.setBringUpInfoProperty(bringUpInfoProperty);
+		// send to search
 	}
 	
 	private void setPropertiesFrom3DWindow() {
