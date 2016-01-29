@@ -287,16 +287,37 @@ public class InfoWindowDOM {
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		
+		ArrayList<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
+		String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
+		if (nuclearInfo.size() == 2) {
+			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
+					+ "Image Series: " + nuclearInfo.get(1);
+		}
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
+		
+		boolean hasCellShapeData;
+		ArrayList<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
+		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
+		if (cellShapeInfo.size() == 2) {
+			hasCellShapeData = true;
+			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
+					+ "Image Series: " + cellShapeInfo.get(1);
+		} else {
+			hasCellShapeData = false;
+		}
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
+		
 		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
-		productionInfoUL.addChild(cellShapeLI);
+		if (hasCellShapeData) {
+			productionInfoUL.addChild(cellShapeLI);
+		}
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
 
 		
-		if(isneuronpage){ //what if neuron but no wiring partners??? - BK e.g. ABplppappap (DD1)
+		if(isneuronpage){
 			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
 		
 			topContainerDiv.addChild(cellNameDiv);
@@ -464,23 +485,44 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-		
+
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Production Information: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
-		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
+		
+		ArrayList<String> nuclearInfo = nonTerminalCase.getNuclearProductionInfo();
+		String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
+		if (nuclearInfo.size() == 2) {
+			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
+					+ "Image Series: " + nuclearInfo.get(1);
+		}
+		HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
+				
+		boolean hasCellShapeData;
+		ArrayList<String> cellShapeInfo = nonTerminalCase.getCellShapeProductionInfo();
+		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
+		if (cellShapeInfo.size() == 2) {
+			hasCellShapeData = true;
+			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
+					+ "Image Series: " + cellShapeInfo.get(1);
+		} else {
+			hasCellShapeData = false;
+		}
+		HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
+				
 		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
-		productionInfoUL.addChild(cellShapeLI);
+		if (hasCellShapeData) {
+			productionInfoUL.addChild(cellShapeLI);
+		}
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
 		

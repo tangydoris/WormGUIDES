@@ -12,8 +12,11 @@ public class NonTerminalCellCase {
 	private String embryonicHomology;
 	private ArrayList<TerminalDescendant> terminalDescendants;
 	private ArrayList<String> links;
+	ArrayList<String> nuclearProductionInfo;
+	ArrayList<String> cellShapeProductionInfo;
 	
-	public NonTerminalCellCase(String cellName) {
+	public NonTerminalCellCase(String cellName, 
+			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
 		this.cellName = cellName; //use this for identifier and external information
 		
 		//reference embryonic analogues cells db for homology
@@ -22,6 +25,9 @@ public class NonTerminalCellCase {
 		this.terminalDescendants = buildTerminalDescendants();
 		
 		this.links = buildLinks();
+		
+		this.nuclearProductionInfo = nuclearProductionInfo;
+		this.cellShapeProductionInfo = cellShapeProductionInfo;
 	}
 	
 	private ArrayList<TerminalDescendant> buildTerminalDescendants() {
@@ -77,5 +83,13 @@ public class NonTerminalCellCase {
 	
 	public ArrayList<String> getLinks() {
 		return this.links;
+	}
+	
+	public ArrayList<String> getNuclearProductionInfo() {
+		return this.nuclearProductionInfo;
+	}
+	
+	public ArrayList<String> getCellShapeProductionInfo() {
+		return this.cellShapeProductionInfo;
 	}
 }
