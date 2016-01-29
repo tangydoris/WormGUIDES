@@ -30,6 +30,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -109,6 +111,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Label timeLabel, totalNucleiLabel;
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
+	
+	// Tab
+	@FXML private TabPane mainTabPane;
+	@FXML private Tab colorAndDisplayTab;
+	@FXML private TabPane colorAndDisplayTabPane;
+	@FXML private Tab cellsTab;
 	
 	// Cells tab
 	private Search search;
@@ -434,6 +442,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			}
 		});
 		
+		// search stuff
 		searchResultsListView.getSelectionModel().selectedItemProperty()
 				.addListener(new ChangeListener<String>() {
 			@Override
@@ -441,6 +450,17 @@ public class RootLayoutController extends BorderPane implements Initializable{
 					ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				selectedName.set(newValue);
+			}
+		});
+		
+		searchField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (!newValue.isEmpty()) {
+					mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+					colorAndDisplayTabPane.getSelectionModel().select(cellsTab);
+				}
 			}
 		});
 		
@@ -771,6 +791,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		assert (totalNucleiLabel != null);
 		assert (zoomInButton != null);
 		assert (zoomOutButton != null);
+		
+		assert (mainTabPane != null);
+		assert (colorAndDisplayTab != null);
+		assert (colorAndDisplayTabPane != null);
+		assert (cellsTab != null);
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
