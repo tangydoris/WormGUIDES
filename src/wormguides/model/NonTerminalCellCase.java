@@ -3,8 +3,6 @@ package wormguides.model;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import wormguides.Search;
 
 public class NonTerminalCellCase {
