@@ -134,6 +134,8 @@ public class StoriesLoader {
 		return false;
 	}
 	
+	
+	
 	private static final int NUMBER_OF_CSV_FIELDS = 12;
 	private static final int STORY_NAME_INDEX = 0,
 					STORY_DESCRIPTION_INDEX = 1;

@@ -109,14 +109,14 @@ public class StoriesLayer {
 		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
 		
 		for (Story story : stories) {
-			story.sortNotes(new Comparator<Note>() {
+			story.setComparator(new Comparator<Note>() {
 				@Override
 				public int compare(Note o1, Note o2) {
 					return getEffectiveStartTime(o1, cellData)
 							.compareTo(getEffectiveStartTime(o2, cellData));
 				}
 			});
-			story.setChanged(true);
+			story.sortNotes();
 		}
 	}
 	

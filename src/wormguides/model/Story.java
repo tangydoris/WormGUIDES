@@ -20,6 +20,7 @@ public class Story {
 	private ObservableList<Note> notes;
 	private BooleanProperty activeBooleanProperty;
 	private BooleanProperty changedBooleanProperty;
+	private Comparator<Note> comparator;
 		
 	
 	public Story(String name, String description) {
@@ -69,9 +70,18 @@ public class Story {
 	
 	
 	// Sorts notes by start time
-	public void sortNotes(Comparator<Note> comparator) {
-		Collections.sort(notes, comparator);
-	}	
+	public void sortNotes() {
+		if (comparator!=null) {
+			Collections.sort(notes, comparator);
+			setChanged(true);
+		}
+	}
+	
+	
+	public void setComparator(Comparator<Note> comparator) {
+		this.comparator = comparator;
+	}
+	
 	
 	public BooleanProperty getChangedProperty() {
 		return changedBooleanProperty;
@@ -138,8 +148,14 @@ public class Story {
 	
 	
 	public void addNote(Note note) {
-		if (note!=null)
+		if (note!=null) {
 			notes.add(note);
+			
+			if (comparator!=null) {
+				Collections.sort(notes, comparator);
+				setChanged(true);
+			}
+		}
 	}
 	
 	
