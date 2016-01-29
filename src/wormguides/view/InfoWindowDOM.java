@@ -58,9 +58,6 @@ public class InfoWindowDOM {
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName);
 		cellNameDiv.addChild(cellNameP);
 		
-		
-		
-		
 		//parts list descriptions
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
 		String partsListDescription = terminalCase.getPartsListDescription();
@@ -77,23 +74,25 @@ public class InfoWindowDOM {
 		
 		//wormatlas function
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
-		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Wormatlas Function: </strong>");
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
-		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "");
+		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
 		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
 		functionWORMATLASDiv.addChild(functionWORMATLASP);
 		
 		//anatomy
 		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
-		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Anatomy: </strong>");
 		anatomyTopContainerDiv.addChild(collapseAnatomyButton);
 		anatomyTopContainerDiv.addChild(anatomyTitle);
-		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "");
+		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "height: 0px; visibility: hidden;");
 		HTMLNode anatomyUL = new HTMLNode("ul");
 		for (String anatomyEntry : terminalCase.getAnatomy()) {
 			HTMLNode li = new HTMLNode("li", "", "", anatomyEntry);
@@ -103,12 +102,13 @@ public class InfoWindowDOM {
 		
 		//wiring
 		HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
-		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse", "wiringPartnersCollapseButton","width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse", "wiringPartnersCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode wiringPartnersTitle = new HTMLNode("p", "wiringPartnersTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Wiring Partners: </strong>");
 		wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
 		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
-		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "");
+		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
 		//view in wiring diagram
 //		HTMLNode viewWDTopContainerDiv = new HTMLNode("div", "viewWDTopContainer", "");
 //		HTMLNode collapseViewWDButton = new HTMLNode("button", "viewWDCollapse", "viewWDCollapseButton",  "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
@@ -174,12 +174,13 @@ public class InfoWindowDOM {
 		
 		//expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
-		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse", "geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse", "geneExpressionCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Gene Expression: </strong>");
 		geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
 		geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
-		HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "");
+		HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
 		ArrayList<String> expresses = terminalCase.getExpressesWORMBASE();
 		Collections.sort(expresses);
 		String geneExpressionStr = expresses.toString();
@@ -190,12 +191,13 @@ public class InfoWindowDOM {
 		//homologues
 		ArrayList<ArrayList<String>> terminalHomologues = terminalCase.getHomologues();
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
-		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
-		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "height: 20%");
+		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "height: 20%; height: 0px; visibility: hidden;");
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left;");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLIHeaeder = new HTMLNode("li", "", "", "<strong>L/R</strong>");
@@ -226,12 +228,13 @@ public class InfoWindowDOM {
 		
 		//links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
-		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
-		HTMLNode linksDiv = new HTMLNode("div", "links", "");
+		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
@@ -261,12 +264,12 @@ public class InfoWindowDOM {
 		//references
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> References: </strong>");
 		referencesTopContainerDiv.addChild(collapseReferencesButton);
 		referencesTopContainerDiv.addChild(referencesTitle);
-		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "references", "");
+		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "references", "height: 0px; visibility: hidden;");
 		HTMLNode referencesUL = new HTMLNode("ul");
 		for (String reference : terminalCase.getReferences()) {
 			HTMLNode li = new HTMLNode("li", "", "", reference);
@@ -277,12 +280,12 @@ public class InfoWindowDOM {
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Production Information: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
-		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
+		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
 		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
 		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
@@ -368,12 +371,13 @@ public class InfoWindowDOM {
 		
 		//homologues
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
-		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
-		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "");
+		HTMLNode homologuesDiv = new HTMLNode("div", "homologues", "height: 0px; visibility: hidden;");
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
@@ -392,12 +396,12 @@ public class InfoWindowDOM {
 		//terminal descendants
 		HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
 		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "-", true);
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> TerminalDescendants: </strong>");
 		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
 		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
-		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "");
+		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "height: 0px; visibility: hidden;");
 		HTMLNode terminalDescendantsUL = new HTMLNode("ul");
 		for (TerminalDescendant terminalDescendant : nonTerminalCase.getTerminalDescendants()) {
 			String descendant = "";
@@ -428,12 +432,13 @@ public class InfoWindowDOM {
 		
 		//links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
-		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
-		HTMLNode linksDiv = new HTMLNode("div", "links", "");
+		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : nonTerminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
@@ -464,12 +469,12 @@ public class InfoWindowDOM {
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Production Information: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
-		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "");
+		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
 		HTMLNode nuclearLI = new HTMLNode("li", "", "", "<em>Nuclear: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
 		HTMLNode cellShapeLI = new HTMLNode("li", "", "", "<em>Cell Shape: </em><br>strain name: jim113(genotype) <br>image file name: 20140407_JIM113_SiO-0.15_1_s1");
