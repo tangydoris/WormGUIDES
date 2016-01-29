@@ -2,6 +2,8 @@ package wormguides;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -82,14 +84,11 @@ public class StoriesLayer {
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
 				while (c.next()) {
 					if (c.wasUpdated()) {
-						//System.out.println("stories updated");
 					}
 					else {
 						for (Story story : c.getAddedSubList()) {
-							//System.out.println("added - "+story.getName());
 						}
 						for (Story story : c.getRemoved()) {
-							//System.out.println("removed - "+story.getName());
 						}
 					}
 				}
@@ -108,6 +107,17 @@ public class StoriesLayer {
 		cellClickedProperty = cellClicked;
 		
 		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
+		
+		for (Story story : stories) {
+			story.sortNotes(new Comparator<Note>() {
+				@Override
+				public int compare(Note o1, Note o2) {
+					return getEffectiveStartTime(o1, cellData)
+							.compareTo(getEffectiveStartTime(o2, cellData));
+				}
+			});
+			story.setChanged(true);
+		}
 	}
 	
 	
@@ -157,32 +167,39 @@ public class StoriesLayer {
 			activeNote.setActive(true);
 			
 			// set time property to be read by 3d window
-			int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-			int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
-			int noteStartTime = activeNote.getStartTime();
-			int noteEndTime = activeNote.getEndTime();
-			
-			if (activeNote.isTimeSpecified() && activeNote.isAttachedToCellTime()) {
-				// make sure times actually overlap
-				if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
-					timeProperty.set(cellStartTime);
-				else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
-					timeProperty.set(noteStartTime);
-			}
-			
-			else if (activeNote.isAttachedToCell())
-				timeProperty.set(cellStartTime);
-			
-			else if (activeNote.isTimeSpecified())
-				timeProperty.set(noteStartTime);
-			
-			else
-				timeProperty.set(1);
+			timeProperty.set(getEffectiveStartTime(activeNote, cellData));
 		}
 		
 		if (editController!=null)
 			editController.setActiveNote(activeNote);
 	}
+	
+	
+	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
+		int time = 1;
+		
+		int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+		int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+		int noteStartTime = activeNote.getStartTime();
+		int noteEndTime = activeNote.getEndTime();
+		
+		if (activeNote.isTimeSpecified() && activeNote.isAttachedToCellTime()) {
+			// make sure times actually overlap
+			if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
+				time = cellStartTime;
+			else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
+				time = noteStartTime;
+		}
+		
+		else if (activeNote.isAttachedToCell())
+			time = cellStartTime;
+		
+		else if (activeNote.isTimeSpecified())
+			time = noteStartTime;
+		
+		return new Integer(time);
+	}
+
 	
 	
 	public IntegerProperty getTimeProperty() {

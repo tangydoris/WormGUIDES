@@ -1,6 +1,8 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -65,6 +67,11 @@ public class Story {
 		});
 	}
 	
+	
+	// Sorts notes by start time
+	public void sortNotes(Comparator<Note> comparator) {
+		Collections.sort(notes, comparator);
+	}	
 	
 	public BooleanProperty getChangedProperty() {
 		return changedBooleanProperty;
