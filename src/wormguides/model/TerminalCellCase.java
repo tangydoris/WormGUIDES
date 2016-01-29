@@ -335,7 +335,7 @@ public class TerminalCellCase {
 		return this.links;
 	}
 	
-	private final static String graphicURL = "http://wormwiring.hpc.einstein.yu.edu/data/ccimages/";
+	private final static String graphicURL = "http://www.wormatlas.org/neurons/Images/";
 	private final static String jpgEXT = ".jpg";
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
