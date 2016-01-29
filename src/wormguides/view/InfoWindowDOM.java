@@ -183,6 +183,7 @@ public class InfoWindowDOM {
 		ArrayList<String> expresses = terminalCase.getExpressesWORMBASE();
 		Collections.sort(expresses);
 		String geneExpressionStr = expresses.toString();
+		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length()-1); //remove surrounding brackets
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
 		

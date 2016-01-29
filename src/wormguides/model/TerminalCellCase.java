@@ -142,13 +142,7 @@ public class TerminalCellCase {
 		ArrayList<String> geneExpression = new ArrayList<String>();
 		
 		if (this.cellName == null) return geneExpression;
-		
-		/*
-		 * FOR TESTING PURPOSES
-		 */
-		geneExpression.add("WORMBASE"); //how do we want to use Wormbase here???
-		geneExpression.add("expresses entry 2");
-		
+
 		String URL = "http://www.wormbase.org/db/get?name=" + 
 		this.cellName + ";class=Anatomy_term";
 		
@@ -169,10 +163,41 @@ public class TerminalCellCase {
 		}
 		
 		/*
-		 * TODO
-		 * add expressions 
-		 * - generate list from cytoshow?
+		 * Snippet adapted from cytoshow
 		 */
+		String[] logLines = content.split("wname=\"associations\"");
+		String restString = "";
+		if (logLines != null && logLines.length > 1 && logLines[1].split("\"").length > 1) {
+			restString = logLines[1].split("\"")[1];
+		}
+		
+		URL = "http://www.wormbase.org" + restString;
+		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.cellName + " page not found on Wormbase (second URL)");
+			return geneExpression;
+		}
+		
+		//extract expressions
+		String[] genes = content.split("><");
+		for (String gene : genes) {
+			if (gene.startsWith("span class=\"locus\"")) {
+				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<")-1);
+				geneExpression.add(gene);
+			}
+			
+//			else {
+//				System.out.println("DIDN'T START: " + gene);
+//			}
+		}
 		
 		//add the link to the list
 		links.add(URL);
@@ -312,7 +337,6 @@ public class TerminalCellCase {
 	
 	private final static String graphicURL = "http://wormwiring.hpc.einstein.yu.edu/data/ccimages/";
 	private final static String jpgEXT = ".jpg";
-	
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
 	private final static String wormatlasURLEXT2 = "frameset.html";
