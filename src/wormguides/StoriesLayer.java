@@ -72,6 +72,8 @@ public class StoriesLayer {
 	
 	private LineageData cellData;
 	
+	private Comparator<Note> noteComparator;
+	
 	
 	public StoriesLayer(Stage parent, StringProperty cellNameProperty, 
 			BooleanProperty cellClicked, LineageData data) {
@@ -108,14 +110,20 @@ public class StoriesLayer {
 		
 		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
 		
+		noteComparator = new Comparator<Note>() {
+			@Override
+			public int compare(Note o1, Note o2) {
+				Integer t1 = getEffectiveStartTime(o1, cellData);
+				Integer t2 = getEffectiveStartTime(o2, cellData);
+				if (t1.equals(t2))
+					return o1.getTagName().compareTo(o2.getTagName());
+				else
+					return t1.compareTo(t2);
+			}
+		};
+		
 		for (Story story : stories) {
-			story.setComparator(new Comparator<Note>() {
-				@Override
-				public int compare(Note o1, Note o2) {
-					return getEffectiveStartTime(o1, cellData)
-							.compareTo(getEffectiveStartTime(o2, cellData));
-				}
-			});
+			story.setComparator(noteComparator);
 			story.sortNotes();
 		}
 	}

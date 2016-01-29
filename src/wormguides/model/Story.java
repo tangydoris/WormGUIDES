@@ -71,10 +71,8 @@ public class Story {
 	
 	// Sorts notes by start time
 	public void sortNotes() {
-		if (comparator!=null) {
-			Collections.sort(notes, comparator);
+		if (comparator!=null)
 			setChanged(true);
-		}
 	}
 	
 	
@@ -150,16 +148,16 @@ public class Story {
 	public void addNote(Note note) {
 		if (note!=null) {
 			notes.add(note);
+			setChanged(true);
 			
-			if (comparator!=null) {
-				Collections.sort(notes, comparator);
-				setChanged(true);
-			}
 		}
 	}
 	
 	
 	public void setChanged(boolean changed) {
+		if (comparator!=null)
+			Collections.sort(notes, comparator);
+
 		changedBooleanProperty.set(changed);
 	}
 	
