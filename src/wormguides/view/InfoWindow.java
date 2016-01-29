@@ -48,22 +48,7 @@ public class InfoWindow {
 			infoWindowStage.toFront();
 		}
 	}
-	
-	/*
-	 * Non terminal cell case tab --> no links
-	 */
-	public void addTab(InfoWindowDOM dom) {
-		WebView webview = new WebView();
-		webview.getEngine().loadContent(dom.DOMtoString());
-		Tab tab = new Tab(dom.getName(), webview);
-		tabPane.getTabs().add(tab);
-		tabPane.getSelectionModel().select(tab);
-		tabPane.setFocusTraversable(true);
-	}
-	
-	/*
-	 * Terminal cell case tab --> links
-	 */
+
 	public void addTab(InfoWindowDOM dom, ArrayList<String> links) {
 		WebView webview = new WebView();
 		webview.getEngine().loadContent(dom.DOMtoString());

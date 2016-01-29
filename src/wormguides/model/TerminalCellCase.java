@@ -20,55 +20,48 @@ public class TerminalCellCase {
 	
 	private ArrayList<String> anatomy;
 	private ArrayList<String> geneExpression;
-	private ArrayList<String> homologues;
+	private ArrayList<ArrayList<String>> homologues; //homologues[0] will contain L/R homologues, homologues[1] will contain additional symmetries
 	private ArrayList<String> references;
 	private ArrayList<String> links;
 	
 	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, 
 			ArrayList<String> postsynapticPartners,ArrayList<String> electricalPartners, 
 			ArrayList<String> neuromuscularPartners) {
+		
 		this.links = new ArrayList<String>();
+		
 		this.cellName = cellName;
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
 		this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT; 
 		
 		//parse wormatlas for the "Function" field
-		setFunctionFromWORMATLAS();
+		this.functionWORMATLAS = setFunctionFromWORMATLAS();
 		
+		//set the wiring partners from connectome
 		this.presynapticPartners = presynapticPartners;
 		this.postsynapticPartners = postsynapticPartners;
 		this.electricalPartners = electricalPartners;
 		this.neuromuscularPartners = neuromuscularPartners;
 		
-		//FIGURE OUT HOW TO GENERATE THESE
-		this.anatomy = new ArrayList<String>();
-		
-		//set expressions
-		setExpressionsFromWORMBASE();
-		
-		this.geneExpression = new ArrayList<String>();
-		this.homologues = new ArrayList<String>();
-		this.references = new ArrayList<String>();
+		/*
+		 * TODO
+		 */
+		this.anatomy = setAnatomy();
+		this.geneExpression = setExpressionsFromWORMBASE();
+		this.homologues = setHomologues();
+		this.references = setReferences();
 
 		
 		/*
 		 * testing purposes
 		 */
-		anatomy.add("anatomy entry");
-		anatomy.add("another anatomy entry");
-		geneExpression.add("WORMBASE"); //how do we want to use Wormbase here???
-		geneExpression.add("expresses entry 2");
-		homologues.add("homologues entry");
-		homologues.add("second homologue entry");
-		references.add("TEXTPRESSO"); //how do we want to use TEXTPRESSO here???
-		references.add("second reference");
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
 
 	}
 	
-	private void setFunctionFromWORMATLAS() {
-		if (this.cellName == null) return;
+	private String setFunctionFromWORMATLAS() {
+		if (this.cellName == null) return "";
 		
 		String content = "";
 		URLConnection connection = null;
@@ -113,36 +106,43 @@ public class TerminalCellCase {
 			} catch (Exception e1) {
 				//e1.printStackTrace();
 				//a page wasn't found on wormatlas
-				this.functionWORMATLAS = this.cellName + " page not found on Wormatlas";
-				return;
+				return this.cellName + " page not found on Wormatlas";
 			}
-			
-//			System.out.println(content);
-//			
-//			//find the line <frame src="....mainframe.html" name="mainframe"
-//			int linkIDX = content.indexOf("mainframe.htm");
-//			if (linkIDX > 0) {
-//				//extract the mainframe link
-//				String newCellName = content.substring(linkIDX-4, linkIDX);
-//				System.out.println(newCellName);
-//			}
 		}
-		findFunctionInHTML(content, URL);
+		return findFunctionInHTML(content, URL);
 	}
 	
-	private void findFunctionInHTML(String content, String URL) {
+	private String findFunctionInHTML(String content, String URL) {
 		//parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
-		this.functionWORMATLAS = "<a href=\"" + URL + "\">" + URL + "</a><br><br>" + content;
-		
+
 		//add the link to the list
 		links.add(URL);
+		
+		return "<a href=\"" + URL + "\">" + URL + "</a><br><br>" + content;
 	}
 	
-	private void setExpressionsFromWORMBASE() {
-		if (this.cellName == null) return;
+	private ArrayList<String> setAnatomy() {
+		ArrayList<String> anatomy = new ArrayList<String>();
 		
+		if (this.cellName == null) return anatomy;
+		
+		
+		/*
+		 * TESTING PURPOSES
+		 */
+		anatomy.add("anatomy entry");
+		anatomy.add("another anatomy entry");
+		
+		return anatomy;
+	}
+	
+	private ArrayList<String> setExpressionsFromWORMBASE() {
+		ArrayList<String> geneExpression = new ArrayList<String>();
+		
+		if (this.cellName == null) return geneExpression;
+
 		String URL = "http://www.wormbase.org/db/get?name=" + 
 		this.cellName + ";class=Anatomy_term";
 		
@@ -158,16 +158,112 @@ public class TerminalCellCase {
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
-			this.functionWORMATLAS = this.cellName + " page not found on Wormbase";
-			return;
+			System.out.println(this.cellName + " page not found on Wormbase");
+			return geneExpression;
 		}
 		
-		//parse the html
+		/*
+		 * Snippet adapted from cytoshow
+		 */
+		String[] logLines = content.split("wname=\"associations\"");
+		String restString = "";
+		if (logLines != null && logLines.length > 1 && logLines[1].split("\"").length > 1) {
+			restString = logLines[1].split("\"")[1];
+		}
+		
+		URL = "http://www.wormbase.org" + restString;
+		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.cellName + " page not found on Wormbase (second URL)");
+			return geneExpression;
+		}
+		
+		//extract expressions
+		String[] genes = content.split("><");
+		for (String gene : genes) {
+			if (gene.startsWith("span class=\"locus\"")) {
+				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<")-1);
+				geneExpression.add(gene);
+			}
+			
+//			else {
+//				System.out.println("DIDN'T START: " + gene);
+//			}
+		}
 		
 		//add the link to the list
 		links.add(URL);
+		
+		return geneExpression;
 	}
 	
+	private ArrayList<ArrayList<String>> setHomologues() {
+		ArrayList<ArrayList<String>> homologues = new ArrayList<ArrayList<String>>();
+		ArrayList<String> leftRightHomologues = new ArrayList<String>();
+		ArrayList<String> additionalSymmetries = new ArrayList<String>();
+		
+		if (this.cellName == null) return homologues;
+		
+		char lastChar = cellName.charAt(cellName.length()-1);
+		lastChar = Character.toLowerCase(lastChar);
+		
+		String cell = this.cellName;
+		//check for left, right, dorsal, or ventral suffix --> update cell
+		if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v') {
+			cell = cell.substring(0, cell.length()-1);
+		} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
+			cell = cell.substring(0, cell.length()-1);
+		}
+		
+		cell = cell.toLowerCase();
+		
+		//search parts list for matching prefix terms
+		ArrayList<String> partsListHits = new ArrayList<String>();
+		for (String lineageName : PartsList.getLineageNames()) {
+			lineageName = PartsList.getFunctionalNameByLineageName(lineageName);
+			if (lineageName.toLowerCase().startsWith(cell)) {
+				partsListHits.add(lineageName);
+			}
+		}
+		
+		/*
+		 * Add hits to categories:
+		 * L/R: ends with l/r
+		 * AdditionalSymm: ends with d/v
+		 */
+		for (String lineageName : partsListHits) {
+			lastChar = lineageName.charAt(lineageName.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'l' || lastChar == 'r') {
+				leftRightHomologues.add(lineageName);
+			} else if (lastChar == 'd' || lastChar == 'v' || Character.isDigit(lastChar)) {
+				additionalSymmetries.add(lineageName);
+			}
+		}
+		
+		homologues.add(leftRightHomologues);
+		homologues.add(additionalSymmetries);
+		
+		return homologues;
+	}
+	
+	private ArrayList<String> setReferences() {
+		ArrayList<String> references = new ArrayList<String>();
+		
+		references.add("TEXTPRESSO"); //how do we want to use TEXTPRESSO here???
+		references.add("second reference");
+		
+		return references;
+	}
+
 	public String getCellName() {
 		if (this.cellName != null) {
 			return this.cellName;
@@ -227,7 +323,7 @@ public class TerminalCellCase {
 		return this.geneExpression;
 	}
 	
-	public ArrayList<String> getHomologues() {
+	public ArrayList<ArrayList<String>> getHomologues() {
 		return this.homologues;
 	}
 	
@@ -241,7 +337,6 @@ public class TerminalCellCase {
 	
 	private final static String graphicURL = "http://wormwiring.hpc.einstein.yu.edu/data/ccimages/";
 	private final static String jpgEXT = ".jpg";
-	
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
 	private final static String wormatlasURLEXT2 = "frameset.html";
