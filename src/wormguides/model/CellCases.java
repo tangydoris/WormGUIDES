@@ -27,11 +27,13 @@ public class CellCases {
 		this.infoWindow = infoWindow;
 	}
 	
-	public void makeTerminalCase(String cellName, ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
-			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners) {
+	public void makeTerminalCase(String cellName, 
+			ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
+			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners, 
+			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
 		
 		TerminalCellCase tCase = new TerminalCellCase(cellName, presynapticPartners, postsynapticPartners,
-				electricalPartners, neuromuscularPartners);
+				electricalPartners, neuromuscularPartners, nuclearProductionInfo, cellShapeProductionInfo);
 		
 		addTerminalCase(tCase);
 	}
@@ -48,8 +50,9 @@ public class CellCases {
 		}
 	}
 	
-	public void makeNonTerminalCase(String cellName) {
-		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName);
+	public void makeNonTerminalCase(String cellName, 
+			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
+		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo);
 		
 		addNonTerminalCase(ntCase);
 	}

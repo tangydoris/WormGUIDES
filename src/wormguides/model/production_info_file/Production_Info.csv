@@ -1,0 +1,7 @@
+Production Information,,,,,,,
+Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link
+all-nuclear positions,20140407_JIM113_SiO-0.15_1_s1,-,JIM113,Y,1 min,Starrynite,-
+AVG,20141022_JIM113_UNC-86myrGFP_1_S1,UNC-86,BV190,Y,75 seconds,Imaris Manual,'-
+SABD; DD1; DD2; DD3; DD4; DD5; DD6; DA2; DA3; DA4; DA5,OU415_4_w1GFP-RFP 561_s3,CND-1,OU415,Y,90 seconds,Imaris Manual,'-
+ASHL/R; RIRL/R,20150827_LF_BV220_unc_s2,CND-1,BV220,N,1 min,Imaris Manual,'-
+names to appear,LF_BV286_20151107. S1 ,LIM-4,BV286,Y,75 seconds,Imaris Manual,'-
