@@ -38,7 +38,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import wormguides.controllers.NoteEditorController;
+import wormguides.controllers.StoryEditorController;
 import wormguides.loaders.StoriesLoader;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
@@ -59,7 +59,7 @@ public class StoriesLayer {
 	
 	private BooleanProperty rebuildSceneFlag;
 	
-	private NoteEditorController editController;
+	private StoryEditorController editController;
 	
 	private Note activeNote;
 	private Story activeStory;
@@ -297,7 +297,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new NoteEditorController(activeCellProperty, cellClickedProperty);
+					editController = new StoryEditorController(activeCellProperty, cellClickedProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
@@ -305,7 +305,7 @@ public class StoriesLayer {
 					editStage = new Stage();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/NoteEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/StoryEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);

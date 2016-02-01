@@ -3,6 +3,7 @@ package wormguides.controllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,7 +31,7 @@ import wormguides.model.Note.TimeStringFormatException;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
-public class NoteEditorController extends AnchorPane implements Initializable{
+public class StoryEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
@@ -45,6 +46,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton rangeTimeRadioBtn;
 	@FXML private TextField startTimeField;
 	@FXML private TextField endTimeField;
+	@FXML private Label currentTimeLabel;
 	
 	// attachment type stuff
 	@FXML private ToggleGroup attachmentToggle;
@@ -79,6 +81,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	@FXML private TextField storyTitle;
 	@FXML private TextArea storyDescription;
+	private Runnable storyRunnable;
 	private Story activeStory;
 	
 	@FXML private TextField titleField;
@@ -99,7 +102,7 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
-	public NoteEditorController(StringProperty nameProperty, BooleanProperty cellClickedProperty) {
+	public StoryEditorController(StringProperty nameProperty, BooleanProperty cellClickedProperty) {
 		super();
 		
 		storyCreated = new SimpleBooleanProperty(false);
@@ -152,6 +155,17 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	public void initialize(URL location, ResourceBundle resources) {
 		assertFXMLNodes();
 		
+		// for story title field unselection/caret position
+		storyRunnable = new Runnable() {
+			@Override
+			public void run() {
+				storyTitle.setText(activeStory.getName());
+				storyDescription.setText(activeStory.getDescription());
+				
+				storyTitle.positionCaret(storyTitle.getText().length());
+			}
+		};
+		
 		// text fields
 		titleFieldListener = new TitleFieldListener();
 		contentAreaListener = new ContentAreaListener();
@@ -199,14 +213,6 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 			if (current!=null && ((Type)current.getUserData()).equals(Type.CELL)) {
 				activeNote.setCellName(name);
 			}
-		}
-	}
-	
-	
-	private void setTime(int start, int end) {
-		if (activeNote.isTimeSpecified()) {
-			startTimeField.setText(Integer.toString(activeNote.getStartTime()));
-			endTimeField.setText(Integer.toString(activeNote.getEndTime()));
 		}
 	}
 	
@@ -290,9 +296,9 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 		
 		assert (delete!=null);
 		
-		//assert (timeTick!=null);
 		assert (startTimeField!=null);
 		assert (endTimeField!=null);
+		assert (currentTimeLabel!=null);
 		
 		assert (attachmentToggle!=null);
 		assert (cellRadioBtn!=null);
@@ -345,38 +351,38 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	}
 	
 	
+	// TODO
 	private void updateType() {
 		if (attachmentToggle!=null) {
+			resetTime();
+			clearTimeToggle();
 			
 			if (activeNote!=null) {
+				int start = activeNote.getStartTime();
+				int end = activeNote.getEndTime();
+				updateTimeFields(start, end);
+				
 				switch (activeNote.getAttachmentType()) {
 				case CELL:
 								attachmentToggle.selectToggle(cellRadioBtn);
 								activeCellProperty.set(activeNote.getCellName());
-								resetTime();
 								break;
 								
 				case TIME:		
-								//timeTick.setSelected(true);
-								setTime(activeNote.getStartTime(), activeNote.getEndTime());
 								activeCellProperty.set("");
 								break;
 								
 				case CELLTIME:
 								attachmentToggle.selectToggle(cellRadioBtn);
 								activeCellProperty.set(activeNote.getCellName());
-								//timeTick.setSelected(true);
-								setTime(activeNote.getStartTime(), activeNote.getEndTime());
 								break;
 								
 				case BLANK:
 								globalRadioBtn.setSelected(true);
 								activeCellProperty.set("");
-								resetTime();
 								break;
 								
 				default:
-								resetTime();
 								resetToggle(attachmentToggle);
 								activeCellProperty.set("");
 								break;
@@ -389,6 +395,13 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 				activeCellProperty.set("");
 			}
 		}
+	}
+	
+	
+	private void clearTimeToggle() {
+		Toggle selected = timeToggle.getSelectedToggle();
+		if (selected!=null)
+			selected.setSelected(false);
 	}
 	
 	
@@ -406,15 +419,24 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 
 	
 	private void updateTimeFields(int start, int end) {
-		startTimeField.setText(Integer.toString(start));
-		endTimeField.setText(Integer.toString(end));
+		if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE)
+			timeToggle.selectToggle(globalTimeRadioBtn);
+		else if (start==end) {
+			timeToggle.selectToggle(currentTimeRadioBtn);
+			currentTimeLabel.setText("Current Time ("+start+")");
+		}
+		else if (start<end) {
+			timeToggle.selectToggle(rangeTimeRadioBtn);
+			startTimeField.setText(Integer.toString(start));
+			endTimeField.setText(Integer.toString(end));
+		}			
 	}
 	
 	
 	private void resetTime() {
-		//timeTick.setSelected(false);
 		startTimeField.setText("");
 		endTimeField.setText("");
+		currentTimeLabel.setText("Current Time");
 	}
 	
 	
@@ -456,8 +478,8 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private void updateStoryFields() {
 		if (storyTitle!=null && storyDescription!=null) {
 			if (activeStory!=null) {
-				storyTitle.setText(activeStory.getName());
-				storyDescription.setText(activeStory.getDescription());
+				Platform.runLater(storyRunnable);
+				
 			}
 			else {
 				storyTitle.clear();
@@ -697,4 +719,5 @@ public class NoteEditorController extends AnchorPane implements Initializable{
 	private final String NEW_STORY_TITLE = "New Story";
 	private final String NEW_STORY_DESCRIPTION = "New story description here";
 	
+	private final int FRAME_OFFSET = 19;
 }
