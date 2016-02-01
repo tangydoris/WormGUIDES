@@ -3,6 +3,7 @@ package wormguides.model;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import wormguides.controllers.ProductionInfo;
@@ -292,9 +293,98 @@ public class TerminalCellCase {
 	private ArrayList<String> setReferences() {
 		ArrayList<String> references = new ArrayList<String>();
 		
-		references.add("TEXTPRESSO"); //how do we want to use TEXTPRESSO here???
-		references.add("second reference");
+		//open connection with the textpresso page
+		String URL = textpressoURL + this.cellName + textpressoURLEXT;
+				
+		String content = "";
+		URLConnection connection = null;
 		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.cellName + " page not found on Textpresso");
+			return geneExpression;
+		}
+		
+		int matchesIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">");
+		
+		if (matchesIDX > 0) {
+			matchesIDX--; //move back to the first digit
+			//find the start of the number of matches
+			String matchesStr = "";
+			for (;; matchesIDX--) {
+				char curr = content.charAt(matchesIDX);
+				if (Character.isDigit(curr)) {
+					matchesStr += curr;
+				} else {
+					break;
+				}
+			}
+			//reverse the string
+			matchesStr = new StringBuffer(matchesStr).reverse().toString();
+			
+			//find the number of documents
+			int documentsIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">")+57;
+			
+			String documentsStr = "";
+			for (;; documentsIDX++) {
+				char curr = content.charAt(documentsIDX);
+				if (Character.isDigit(curr)) {
+					documentsStr += curr;
+				} else {
+					break;
+				}
+			}
+			
+			//add matches and documents to top of references list
+			references.add("<em>Textpresso</em>: " + matchesStr + " matches found in " + documentsStr + " documents");
+			/*
+			 * TODO
+			 * add textpresso url to page with open in browser
+			 */
+			
+			//parse the document for "Title: "
+			int lastIDX = 0;
+			while (lastIDX != -1) {
+				lastIDX = content.indexOf(textpressoTitleStr, lastIDX);
+				
+				if (lastIDX != -1) {
+					lastIDX += textpressoTitleStr.length(); //skip the title just seen
+					
+					//extract the title
+					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					//System.out.println(title);
+					
+					//move the index past the authors section
+					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;
+					
+					lastIDX += textpressoAuthorsStr.length();
+					
+					//extract the authors
+					String authors = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					
+					//move the index past the year section
+					while (!content.substring(lastIDX).startsWith(textpressoYearStr)) lastIDX++;
+					
+					lastIDX += textpressoYearStr.length();
+					
+					//extract the year
+					String year = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					String reference = title + authors + ", " + year;
+					references.add(reference);
+				}
+			}
+		}
+		
+		//links.add(URL);
 		return references;
 	}
 
@@ -381,5 +471,10 @@ public class TerminalCellCase {
 	private final static String jpgEXT = ".jpg";
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
-	private final static String wormatlasURLEXT2 = "frameset.html";
+	//private final static String wormatlasURLEXT2 = "frameset.html";
+	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
+	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
+	private final static String textpressoTitleStr = "Title: </span>";
+	private final static String textpressoAuthorsStr = "Authors: </span>";
+	private final static String textpressoYearStr = "Year: </span>";
 }
