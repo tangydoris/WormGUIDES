@@ -245,24 +245,40 @@ public class InfoWindowDOM {
 			String anchor = link; //replaced with anchor if valid link
 			
 			//begin after www.
-			int startIDX = link.indexOf("www.")+4;
+			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
-				String placeholder = link.substring(startIDX);
-				
-				//find end of site name using '.'
-				int dotIDX = placeholder.indexOf(".");
-				if (dotIDX > 0) {
-					placeholder = placeholder.substring(0, dotIDX);
+				//check if textpresso link i.e. '-' before www
+				System.out.println(link.charAt(startIDX-1));
+				if (link.charAt(startIDX-1) == '-') {
+					String callbackMethod = "app.textpresso()";
+					anchor =  "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+							terminalCase.getCellName() + " on Textpresso</a>";
+				} else {
+
+					//move past www.
+					startIDX += 4;
 					
-					//make anchor tag
-					String callbackMethod = "app." + placeholder + "()";
-					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							terminalCase.getCellName() + " on " + placeholder +
-							"</a>";
-				}
+					String placeholder = link.substring(startIDX);
+					
+					//find end of site name using '.'
+					int dotIDX = placeholder.indexOf(".");
+					if (dotIDX > 0) {
+						placeholder = placeholder.substring(0, dotIDX);
+						
+						//make anchor tag
+						String callbackMethod = "app." + placeholder + "()";
+						anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+								terminalCase.getCellName() + " on " + placeholder +
+								"</a>";
+					}
+				}	
+			} 
+			
+			//make sure anchor has been built 
+			if (!anchor.equals(link)) {
+				HTMLNode li = new HTMLNode("li", "", "", anchor);
+				linksUL.addChild(li);
 			}
-			HTMLNode li = new HTMLNode("li", "", "", anchor);
-			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
 		

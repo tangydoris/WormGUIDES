@@ -384,7 +384,7 @@ public class TerminalCellCase {
 			}
 		}
 		
-		//links.add(URL);
+		links.add(URL);
 		return references;
 	}
 

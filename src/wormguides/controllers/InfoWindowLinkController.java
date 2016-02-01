@@ -27,6 +27,10 @@ public class InfoWindowLinkController {
 		openLink("www.wormbase.org");
 	}
 	
+	public void textpresso() throws IOException, URISyntaxException {
+			openLink("textpresso-www");
+	}
+	
 	private void openLink(String host) throws IOException, URISyntaxException {
 		for (String link : links) {
 			if (link.contains(host)) {
