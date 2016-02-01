@@ -92,9 +92,12 @@ public class TerminalCellCase {
 		lastChar = Character.toLowerCase(lastChar);
 		if (lastChar == 'r' || lastChar == 'l') {
 			cell = cell.substring(0, cell.length()-1);
+		} else if (Character.isDigit(lastChar)) {
+			cell = cell.substring(0, cell.length()-1).toUpperCase() + "N";
 		}
-		String URL = wormatlasURL + cell.toLowerCase() + wormatlasURLEXT;
 		
+		String URL = wormatlasURL + cell.toUpperCase() + wormatlasURLEXT;
+		System.out.println(URL);
 		try {
 			connection = new URL(URL).openConnection();
 			Scanner scanner = new Scanner(connection.getInputStream());
@@ -102,21 +105,24 @@ public class TerminalCellCase {
 			content = scanner.next();
 			scanner.close();
 		} catch (Exception e) {
-			//try second extension
-			URL = wormatlasURL + cell.substring(0, cell.length()-1).toUpperCase() + "N" + wormatlasURLEXT;
-			//System.out.println("TRYING SECOND URL: " + URL);
-
-			try {
-				connection = new URL(URL).openConnection();
-				Scanner scanner = new Scanner(connection.getInputStream());
-				scanner.useDelimiter("\\Z");
-				content = scanner.next();
-				scanner.close();
-			} catch (Exception e1) {
-				//e1.printStackTrace();
-				//a page wasn't found on wormatlas
-				return this.cellName + " page not found on Wormatlas";
-			}
+//			//try second extension
+//			URL = wormatlasURL + cell + wormatlasURLEXT;
+//			System.out.println("TRYING SECOND URL: " + URL);
+//
+//			try {
+//				connection = new URL(URL).openConnection();
+//				Scanner scanner = new Scanner(connection.getInputStream());
+//				scanner.useDelimiter("\\Z");
+//				content = scanner.next();
+//				scanner.close();
+//			} catch (Exception e1) {
+//				//e1.printStackTrace();
+//				//a page wasn't found on wormatlas
+//				return this.cellName + " page not found on Wormatlas";
+//			}
+			//e1.printStackTrace();
+			//a page wasn't found on wormatlas
+			return this.cellName + " page not found on Wormatlas";
 		}
 		return findFunctionInHTML(content, URL);
 	}
