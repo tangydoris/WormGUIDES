@@ -1814,7 +1814,6 @@ public class Window3DController {
 			}
 		};
 	}
-	
 
 	private final String CS = ", ";
 

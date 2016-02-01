@@ -521,9 +521,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void addToInfoWindow(String name) {
+		
 		//GENERATE CELL TAB ON CLICK
 		if (name!=null && !name.isEmpty()) {
-			if (cellCases == null) return; //error check
+			if (cellCases == null)  {
+				return; //error check
+			}
 							
 			if (PartsList.containsLineageName(name)) { //in connectome --> terminal case (neuron)
 				if (cellCases.containsTerminalCase(name)) {
@@ -551,6 +554,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				}
 			}
 		}
+
 	}
 	
 	

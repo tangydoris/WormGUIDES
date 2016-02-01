@@ -248,7 +248,6 @@ public class InfoWindowDOM {
 			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
 				//check if textpresso link i.e. '-' before www
-				System.out.println(link.charAt(startIDX-1));
 				if (link.charAt(startIDX-1) == '-') {
 					String callbackMethod = "app.textpresso()";
 					anchor =  "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
@@ -265,11 +264,28 @@ public class InfoWindowDOM {
 					if (dotIDX > 0) {
 						placeholder = placeholder.substring(0, dotIDX);
 						
-						//make anchor tag
-						String callbackMethod = "app." + placeholder + "()";
-						anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-								terminalCase.getCellName() + " on " + placeholder +
-								"</a>";
+						//check for google links
+						if (placeholder.equals("google")) {
+							//check if wormatlas specific search
+							if (link.contains("site:wormatlas.org")) {
+								String callbackMethod = "app.googleWormatlas()";
+								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+										"</a>";
+								System.out.println(anchor + ", " + link);
+							} else {
+								String callbackMethod = "app.google()";
+								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+										terminalCase.getCellName() + " on Google" +
+										"</a>";
+							}
+						} else {
+							//make anchor tag
+							String callbackMethod = "app." + placeholder + "()";
+							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+									terminalCase.getCellName() + " on " + placeholder +
+									"</a>";
+						}
 					}
 				}	
 			} 

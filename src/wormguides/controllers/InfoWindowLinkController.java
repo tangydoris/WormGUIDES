@@ -31,11 +31,20 @@ public class InfoWindowLinkController {
 			openLink("textpresso-www");
 	}
 	
+	public void googleWormatlas() throws IOException, URISyntaxException {
+		openLink("site:wormatlas.org+");
+	}
+	
+	public void google() throws IOException, URISyntaxException {
+		openLink("www.google.com/#q=");
+	}
+	
 	private void openLink(String host) throws IOException, URISyntaxException {
 		for (String link : links) {
 			if (link.contains(host)) {
 				if (Desktop.isDesktopSupported()) {
 					Desktop.getDesktop().browse(new URI(link));
+					break;
 				}
 			}
 		}

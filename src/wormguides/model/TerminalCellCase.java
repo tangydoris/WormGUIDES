@@ -66,9 +66,12 @@ public class TerminalCellCase {
 		this.nuclearProductionInfo = nuclearProductionInfo;
 		this.cellShapeProductionInfo = cellShapeProductionInfo;
 
+		links.add(addGoogleLink());
+		links.add(addGoogleWormatlasLink());
+		
 		/*
 		 * TODO
-		 * testing purposes
+		 * cytoshow stub
 		 */
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
 
@@ -387,6 +390,22 @@ public class TerminalCellCase {
 		links.add(URL);
 		return references;
 	}
+	
+	private String addGoogleLink() {
+		if (this.cellName != null) {
+			return googleURL + this.cellName;
+		}
+		
+		return "";
+	}
+	
+	private String addGoogleWormatlasLink() {
+		if (this.cellName != null) {
+			return googleWormatlasURL + this.cellName;
+		}
+		
+		return "";
+	}
 
 	public String getCellName() {
 		if (this.cellName != null) {
@@ -477,4 +496,6 @@ public class TerminalCellCase {
 	private final static String textpressoTitleStr = "Title: </span>";
 	private final static String textpressoAuthorsStr = "Authors: </span>";
 	private final static String textpressoYearStr = "Year: </span>";
+	private final static String googleURL = "https://www.google.com/#q=";
+	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
 }
