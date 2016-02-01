@@ -56,6 +56,15 @@ public class ConnectomeLoader {
 							String synapseTypeStr = tokenizer.nextToken();
 							String numberOfSynapsesStr = tokenizer.nextToken();
 							
+							//remove padding 0s from cell names
+							if (cell_1.contains("0")) {
+								cell_1 = removeZeroPad(cell_1);
+							}
+							
+							if (cell_2.contains("0")) {
+								cell_2 = removeZeroPad(cell_2);
+							}
+							
 							//unchecked --> number format exception unhandled
 							Integer numberOfSynapses = Integer.parseInt(numberOfSynapsesStr);
 							
@@ -102,6 +111,15 @@ public class ConnectomeLoader {
 		}
 		
 		return connectome;
+	}
+	
+	private String removeZeroPad(String cell) {
+		if (cell.contains("0")) {
+			int zeroIDX = cell.indexOf("0");
+			cell = cell.substring(0, zeroIDX) + cell.substring(zeroIDX+1);
+		}
+		
+		return cell;
 	}
 	
 	

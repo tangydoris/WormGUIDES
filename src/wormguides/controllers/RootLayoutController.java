@@ -178,6 +178,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	// url stuff
 	private URLLoader urlLoader;
 	
+	//production information
+	ProductionInfo productionInfo;
+	
+	
 	// info window Stuff
 	private CellCases cellCases;
 	private InfoWindow infoWindow;
@@ -299,8 +303,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML
 	public void openInfoWindow() {
 		if (infoWindow == null) {
+			
 			initInfoWindow();
 			initCellCases();
+			initProductionInfo();
 		}
 		
 		infoWindow.showWindow();
@@ -553,7 +559,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 							connectome.querryConnectivity(name, true, false, false, false, false),
 							connectome.querryConnectivity(name, false, true, false, false, false),
 							connectome.querryConnectivity(name, false, false, true, false, false),
-							connectome.querryConnectivity(name, false, false, false, true, false));
+							connectome.querryConnectivity(name, false, false, false, true, false),
+							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { //not in connectome --> non terminal case
 				if (cellCases.containsNonTerminalCase(name)) {
@@ -561,7 +568,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 					//show tab
 				} else {
 					//add a non terminal case
-					cellCases.makeNonTerminalCase(name);
+					cellCases.makeNonTerminalCase(name, 
+							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			}
 		}
@@ -914,6 +922,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		cellCases = new CellCases(infoWindow);
 	}
+	
+	private void initProductionInfo() {
+		productionInfo = new ProductionInfo();
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
@@ -947,9 +959,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		// connectome
 		initConnectome();
-		
-		//info window
-		//initInfoWindow();
 		
 		//init cell cases
 		//initCellCases();

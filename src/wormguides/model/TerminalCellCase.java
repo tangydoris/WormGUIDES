@@ -23,17 +23,25 @@ public class TerminalCellCase {
 	private ArrayList<ArrayList<String>> homologues; //homologues[0] will contain L/R homologues, homologues[1] will contain additional symmetries
 	private ArrayList<String> references;
 	private ArrayList<String> links;
+	private ArrayList<String> nuclearProductionInfo;
+	private ArrayList<String> cellShapeProductionInfo;
 	
 	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, 
 			ArrayList<String> postsynapticPartners,ArrayList<String> electricalPartners, 
-			ArrayList<String> neuromuscularPartners) {
+			ArrayList<String> neuromuscularPartners, ArrayList<String> nuclearProductionInfo,
+			ArrayList<String> cellShapeProductionInfo) {
 		
 		this.links = new ArrayList<String>();
 		
 		this.cellName = cellName;
 		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
-		this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT; 
+		
+		if (Character.isDigit(cellName.charAt(cellName.length() - 1))){
+			this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT;
+		} else {
+			this.imageURL = graphicURL + cellName.toLowerCase() + jpgEXT; 
+		}
 		
 		//parse wormatlas for the "Function" field
 		this.functionWORMATLAS = setFunctionFromWORMATLAS();
@@ -44,16 +52,15 @@ public class TerminalCellCase {
 		this.electricalPartners = electricalPartners;
 		this.neuromuscularPartners = neuromuscularPartners;
 		
-		/*
-		 * TODO
-		 */
 		this.anatomy = setAnatomy();
 		this.geneExpression = setExpressionsFromWORMBASE();
 		this.homologues = setHomologues();
 		this.references = setReferences();
+		this.nuclearProductionInfo = nuclearProductionInfo;
+		this.cellShapeProductionInfo = cellShapeProductionInfo;
 
-		
 		/*
+		 * TODO
 		 * testing purposes
 		 */
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
@@ -84,7 +91,7 @@ public class TerminalCellCase {
 		if (lastChar == 'r' || lastChar == 'l') {
 			cell = cell.substring(0, cell.length()-1);
 		}
-		String URL = wormatlasURL + cell + wormatlasURLEXT;
+		String URL = wormatlasURL + cell.toLowerCase() + wormatlasURLEXT;
 		
 		try {
 			connection = new URL(URL).openConnection();
@@ -335,7 +342,15 @@ public class TerminalCellCase {
 		return this.links;
 	}
 	
-	private final static String graphicURL = "http://wormwiring.hpc.einstein.yu.edu/data/ccimages/";
+	public ArrayList<String> getNuclearProductionInfo() {
+		return this.nuclearProductionInfo;
+	}
+	
+	public ArrayList<String> getCellShapeProductionInfo() {
+		return this.cellShapeProductionInfo;
+	}
+	
+	private final static String graphicURL = "http://www.wormatlas.org/neurons/Images/";
 	private final static String jpgEXT = ".jpg";
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
