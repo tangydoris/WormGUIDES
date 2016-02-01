@@ -81,8 +81,13 @@ public class InfoWindowDOM {
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
-		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
-		functionWORMATLASDiv.addChild(functionWORMATLASP);
+		boolean functionFound = false;
+		String functionWORMATLAS = terminalCase.getFunctionWORMATLAS();
+		if (!functionWORMATLAS.equals("")) {
+			functionFound = true;
+			HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
+			functionWORMATLASDiv.addChild(functionWORMATLASP);
+		}
 		
 		//anatomy
 		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
@@ -326,9 +331,11 @@ public class InfoWindowDOM {
 			body.addChild(topContainerDiv);
 			System.out.println("image text not null - "+imagetext);
 			body.addChild(imgDiv);
-			body.addChild(functionWORMATLASTopContainerDiv);
-			body.addChild(functionWORMATLASDiv);
-		}else{
+			if (functionFound) {
+				body.addChild(functionWORMATLASTopContainerDiv);
+				body.addChild(functionWORMATLASDiv);
+			}
+		} else {
 			body.addChild(cellNameDiv);
 			body.addChild(partsListDescrDiv);
 		}
@@ -336,6 +343,7 @@ public class InfoWindowDOM {
 
 		body.addChild(anatomyTopContainerDiv);
 		body.addChild(anatomyDiv);
+		
 		//only add this section if its contents exist
 		if(isneuronpage){			
 			body.addChild(wiringPartnersTopContainerDiv);

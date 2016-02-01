@@ -36,7 +36,11 @@ public class TerminalCellCase {
 		this.links = new ArrayList<String>();
 		
 		this.cellName = cellName;
-		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
+		this.externalInfo = this.cellName;
+		if (PartsList.getLineageNameByFunctionalName(cellName) != null) {
+			this.externalInfo += " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
+		}
+		
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
 		
 		if (Character.isDigit(cellName.charAt(cellName.length() - 1))){
@@ -92,12 +96,27 @@ public class TerminalCellCase {
 		lastChar = Character.toLowerCase(lastChar);
 		if (lastChar == 'r' || lastChar == 'l') {
 			cell = cell.substring(0, cell.length()-1);
+			
+			//check if preceding d/v
+			lastChar = cell.charAt(cell.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'd' || lastChar == 'v') {
+				cell = cell.substring(0, cell.length()-1);
+			}
+		} else if (lastChar == 'd' || lastChar == 'v') { //will l/r ever come before d/v
+			cell = cell.substring(0, cell.length()-1);
+			
+			//check if preceding l/r
+			lastChar = cell.charAt(cell.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'l' || lastChar == 'r') {
+				cell = cell.substring(0, cell.length()-1);
+			}
 		} else if (Character.isDigit(lastChar)) {
 			cell = cell.substring(0, cell.length()-1).toUpperCase() + "N";
 		}
 		
 		String URL = wormatlasURL + cell.toUpperCase() + wormatlasURLEXT;
-		System.out.println(URL);
 		try {
 			connection = new URL(URL).openConnection();
 			Scanner scanner = new Scanner(connection.getInputStream());
@@ -122,7 +141,7 @@ public class TerminalCellCase {
 //			}
 			//e1.printStackTrace();
 			//a page wasn't found on wormatlas
-			return this.cellName + " page not found on Wormatlas";
+			return null;
 		}
 		return findFunctionInHTML(content, URL);
 	}
@@ -205,7 +224,7 @@ public class TerminalCellCase {
 		String[] genes = content.split("><");
 		for (String gene : genes) {
 			if (gene.startsWith("span class=\"locus\"")) {
-				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<")-1);
+				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<"));
 				geneExpression.add(gene);
 			}
 			
