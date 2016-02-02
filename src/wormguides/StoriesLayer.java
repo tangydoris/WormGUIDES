@@ -89,6 +89,7 @@ public class StoriesLayer {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
 				while (c.next()) {
+					/*
 					if (c.wasUpdated()) {
 					}
 					else {
@@ -97,6 +98,7 @@ public class StoriesLayer {
 						for (Story story : c.getRemoved()) {
 						}
 					}
+					*/
 				}
 			}
 		});

@@ -77,22 +77,14 @@ public class SceneElementsList {
 			while ((line = reader.readLine()) != null) {
 				String[] splits =  line.split(",", 8);
 				
-				//BUIILD SCENE ELEMENT
-				
-				boolean billboardFlag = false;
-				if (splits[4].trim().toLowerCase().contains("billboard")) {
-					billboardFlag = true;
-				}
-				
+				//BUIILD SCENE ELEMENT			
 				// vector of cell names
 				ArrayList<String> cellNames = new ArrayList<String>();
 				StringTokenizer st = new StringTokenizer(splits[1]);
 				while (st.hasMoreTokens()) {
 					cellNames.add(st.nextToken());
 				}
-				
-				// check if complete resource location
-				String resourceLocation = splits[4];		
+						
 				SceneElement se = new SceneElement(//objEntries,
 						splits[0], cellNames,
 						splits[2], splits[3], splits[4],
