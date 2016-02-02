@@ -81,8 +81,13 @@ public class InfoWindowDOM {
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
-		HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
-		functionWORMATLASDiv.addChild(functionWORMATLASP);
+		boolean functionFound = false;
+		String functionWORMATLAS = terminalCase.getFunctionWORMATLAS();
+		if (!functionWORMATLAS.equals("")) {
+			functionFound = true;
+			HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
+			functionWORMATLASDiv.addChild(functionWORMATLASP);
+		}
 		
 		//anatomy
 		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
@@ -240,24 +245,56 @@ public class InfoWindowDOM {
 			String anchor = link; //replaced with anchor if valid link
 			
 			//begin after www.
-			int startIDX = link.indexOf("www.")+4;
+			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
-				String placeholder = link.substring(startIDX);
-				
-				//find end of site name using '.'
-				int dotIDX = placeholder.indexOf(".");
-				if (dotIDX > 0) {
-					placeholder = placeholder.substring(0, dotIDX);
+				//check if textpresso link i.e. '-' before www
+				if (link.charAt(startIDX-1) == '-') {
+					String callbackMethod = "app.textpresso()";
+					anchor =  "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+							terminalCase.getCellName() + " on Textpresso</a>";
+				} else {
+
+					//move past www.
+					startIDX += 4;
 					
-					//make anchor tag
-					String callbackMethod = "app." + placeholder + "()";
-					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							terminalCase.getCellName() + " on " + placeholder +
-							"</a>";
-				}
+					String placeholder = link.substring(startIDX);
+					
+					//find end of site name using '.'
+					int dotIDX = placeholder.indexOf(".");
+					if (dotIDX > 0) {
+						placeholder = placeholder.substring(0, dotIDX);
+						
+						//check for google links
+						if (placeholder.equals("google")) {
+							//check if wormatlas specific search
+							if (link.contains("site:wormatlas.org")) {
+								String callbackMethod = "app.googleWormatlas()";
+								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+										"</a>";
+								System.out.println(anchor + ", " + link);
+							} else {
+								String callbackMethod = "app.google()";
+								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+										terminalCase.getCellName() + " on Google" +
+										"</a>";
+							}
+						} else {
+							//make anchor tag
+							String callbackMethod = "app." + placeholder + "()";
+							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+									terminalCase.getCellName() + " on " + placeholder +
+									"</a>";
+						}
+					}
+				}	
+			} 
+			
+			//make sure anchor has been built 
+			if (!anchor.equals(link)) {
+				HTMLNode li = new HTMLNode("li", "", "", anchor);
+				linksUL.addChild(li);
 			}
-			HTMLNode li = new HTMLNode("li", "", "", anchor);
-			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
 		
@@ -326,9 +363,11 @@ public class InfoWindowDOM {
 			body.addChild(topContainerDiv);
 			System.out.println("image text not null - "+imagetext);
 			body.addChild(imgDiv);
-			body.addChild(functionWORMATLASTopContainerDiv);
-			body.addChild(functionWORMATLASDiv);
-		}else{
+			if (functionFound) {
+				body.addChild(functionWORMATLASTopContainerDiv);
+				body.addChild(functionWORMATLASDiv);
+			}
+		} else {
 			body.addChild(cellNameDiv);
 			body.addChild(partsListDescrDiv);
 		}
@@ -336,6 +375,7 @@ public class InfoWindowDOM {
 
 		body.addChild(anatomyTopContainerDiv);
 		body.addChild(anatomyDiv);
+		
 		//only add this section if its contents exist
 		if(isneuronpage){			
 			body.addChild(wiringPartnersTopContainerDiv);
