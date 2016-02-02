@@ -26,6 +26,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.Note.TimeStringFormatException;
@@ -33,6 +34,8 @@ import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
 public class StoryEditorController extends AnchorPane implements Initializable{
+	
+	private LineageData cellData;
 	
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
@@ -94,9 +97,11 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
-	public StoryEditorController(StringProperty nameProperty, BooleanProperty cellClickedProperty, 
+	public StoryEditorController(LineageData data, StringProperty nameProperty, BooleanProperty cellClickedProperty, 
 			IntegerProperty sceneTimeProperty) {
 		super();
+		
+		cellData = data;
 		
 		storyCreated = new SimpleBooleanProperty(false);
 		noteCreated = new SimpleBooleanProperty(false);
@@ -124,8 +129,9 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 					String oldValue, String newValue) {
-				if (newValue!=null && !newValue.isEmpty())
+				if (newValue!=null && !newValue.isEmpty() && cellData.isCellName(newValue)) {
 					activeCellProperty.set(newValue);
+				}
 			}
 		});
 		

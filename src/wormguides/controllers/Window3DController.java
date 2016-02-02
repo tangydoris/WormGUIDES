@@ -484,12 +484,14 @@ public class Window3DController {
 		
 		// Cell body/structure
 		else if (node instanceof MeshView) {
+			boolean found = false;
 			for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
 				MeshView curr = currentSceneElementMeshes.get(i);
 				if (curr.equals(node)) {
 					SceneElement clickedSceneElement = currentSceneElements.get(i);
 					String name = normalizeName(clickedSceneElement.getSceneName());
 					selectedName.set(name);
+					found = true;
 					
 					if (event.getButton()==MouseButton.SECONDARY)
 						showContextMenu(name, event.getScreenX(), event.getScreenY());
@@ -508,7 +510,7 @@ public class Window3DController {
 			}
 			
 			// Note structure
-			if (selectedName.get().isEmpty()) {
+			if (!found) {
 				for (Note note : currentNoteMeshMap.keySet()) {
 					if (currentNoteMeshMap.get(note).equals(node))
 						selectedName.set(note.getTagName());
@@ -762,6 +764,8 @@ public class Window3DController {
 							newOriginZ+se.getZ()),
 							new Scale(150, -150, -150));
 						currentNoteMeshMap.put(note, mesh);
+						//System.out.println("put current mesh - "+se.getSceneName());
+						//System.out.println("location - "+se.getX()+", "+se.getY()+", "+se.getZ());
 					}
 				}
 			}

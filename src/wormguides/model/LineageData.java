@@ -10,4 +10,5 @@ public interface LineageData {
 	int getTotalTimePoints();
 	int getFirstOccurrenceOf(String name);
 	int getLastOccurrenceOf(String name);
+	boolean isCellName(String name);
 }

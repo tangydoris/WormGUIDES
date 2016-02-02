@@ -290,7 +290,8 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new StoryEditorController(activeCellProperty, cellClickedProperty, timeProperty);
+					editController = new StoryEditorController(cellData, activeCellProperty, 
+							cellClickedProperty, timeProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);

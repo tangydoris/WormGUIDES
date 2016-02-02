@@ -117,6 +117,15 @@ public class TableLineageData implements LineageData{
 		return time+1;
 	}
 	
+	public boolean isCellName(String name) {
+		name = name.trim();
+		for (String cell : allCellNames) {
+			if (cell.equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
+	}
+	
 	public String toString() {
 		String out = "";
 		int totalFrames = getTotalTimePoints();
