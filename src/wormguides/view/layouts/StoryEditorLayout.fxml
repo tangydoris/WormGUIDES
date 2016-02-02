@@ -163,13 +163,13 @@
                               <HBox layoutX="16.0" layoutY="315.0" maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
+                                    <Label maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="10.0" HBox.hgrow="ALWAYS" />
-                                    <ComboBox fx:id="structuresComboBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="ALWAYS" />
+                                    <ComboBox fx:id="structuresComboBox" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="30.0" prefWidth="180.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                               <HBox maxWidth="1.7976931348623157E308">

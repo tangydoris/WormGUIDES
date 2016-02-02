@@ -1,9 +1,11 @@
 package wormguides;
 
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import wormguides.view.AppFont;
 
@@ -11,23 +13,16 @@ import wormguides.view.AppFont;
 /*
  * Callback for ListCell<String> so that fonts are uniform
  */
-public class StringCellCallback implements Callback<ListView<String>, ListCell<String>> {
+public class StringListCellFactory implements Callback<ListView<String>, ListCell<String>> {
 	
 	@Override
 	public ListCell<String> call(ListView<String> param) {
-		ListCell<String> cell = new ListCell<String>() {
-			@Override
-            protected void updateItem(String name, boolean empty) {
-                super.updateItem(name, empty);
-                if (name != null)
-                	setGraphic(makeListCellGraphic(name));
-            	else
-            		setGraphic(null);
-                
-                setFocusTraversable(false);
-        	}
-		};
-		return cell;
+		return new StringListCell();
+	}
+	
+	
+	public ListCell<String> getNewStringListCell() {
+		return new StringListCell();
 	}
 	
 	
@@ -39,12 +34,25 @@ public class StringCellCallback implements Callback<ListView<String>, ListCell<S
     	label.setPrefHeight(UI_HEIGHT);
     	label.setMinHeight(UI_HEIGHT);
     	label.setStyle("-fx-fill-color: black;");
-    	label.setFocusTraversable(false);
+    	label.setTextFill(Color.BLACK);
     	
     	hbox.getChildren().add(label);
     	return hbox;
 	}
 	
 	
-	private final double UI_HEIGHT = 28.0;
+	public class StringListCell extends ListCell<String> {
+		@Override
+		protected void updateItem(String item, boolean empty) {
+			super.updateItem(item, empty);
+			setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			
+			if (item!=null)
+            	setGraphic(makeListCellGraphic(item));
+        	else
+        		setGraphic(null);
+        }
+	}
+	
+	private final double UI_HEIGHT = 26.0;
 }

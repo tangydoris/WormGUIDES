@@ -55,7 +55,7 @@ public class MainApp extends Application {
 	public void initRootLayout() {
 		// Load root layout from FXML file.
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
+        loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
         
         controller = new RootLayoutController();
         controller.setStage(primaryStage);

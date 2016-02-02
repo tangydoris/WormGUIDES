@@ -41,6 +41,7 @@ import wormguides.controllers.StoryEditorController;
 import wormguides.loaders.StoriesLoader;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
+import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AppFont;
 
@@ -50,6 +51,8 @@ import wormguides.view.AppFont;
 public class StoriesLayer {
 	
 	private Stage parentStage;
+	
+	private SceneElementsList sceneElementsList;
 
 	private ObservableList<Story> stories;
 	
@@ -74,9 +77,11 @@ public class StoriesLayer {
 	private Comparator<Note> noteComparator;
 	
 	
-	public StoriesLayer(Stage parent, StringProperty cellNameProperty, 
+	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
 			IntegerProperty sceneTimeProperty, BooleanProperty cellClicked, LineageData data) {
 		parentStage = parent;
+		
+		sceneElementsList = elementsList;
 		
 		stories = FXCollections.observableArrayList(
 				story -> new Observable[]{story.getChangedProperty()});
@@ -290,8 +295,8 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new StoryEditorController(cellData, activeCellProperty, 
-							cellClickedProperty, timeProperty);
+					editController = new StoryEditorController(cellData, sceneElementsList.getAllMulticellSceneNames(),
+							activeCellProperty, cellClickedProperty, timeProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
@@ -299,7 +304,7 @@ public class StoriesLayer {
 					editStage = new Stage();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/StoryEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);

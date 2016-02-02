@@ -50,7 +50,7 @@ import wormguides.DisplayLayer;
 import wormguides.Search;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
-import wormguides.StringCellCallback;
+import wormguides.StringListCellFactory;
 import wormguides.StructuresLayer;
 import wormguides.URLLoader;
 import wormguides.loaders.AceTreeLoader;
@@ -493,9 +493,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		});
 		
 		// Modify font for ListView's of String's
-		structuresSearchListView.setCellFactory(new StringCellCallback());
+		structuresSearchListView.setCellFactory(new StringListCellFactory());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
-		searchResultsListView.setCellFactory(new StringCellCallback());
+		searchResultsListView.setCellFactory(new StringListCellFactory());
 		
 		// 'Others' opacity
 		opacitySlider.setValue(50);
@@ -873,7 +873,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer(LineageData data) {
-		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getTimeProperty(), 
+		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, window3D.getTimeProperty(), 
 				window3D.getCellClicked(), data);
 		window3D.setStoriesLayer(storiesLayer);
 		

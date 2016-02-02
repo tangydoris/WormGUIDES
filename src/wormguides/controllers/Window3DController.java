@@ -547,7 +547,7 @@ public class Window3DController {
 			contextMenuStage.initStyle(StageStyle.UNDECORATED);
 			
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/ContextMenuLayout.fxml"));
+			loader.setLocation(MainApp.class.getResource("view/layouts/ContextMenuLayout.fxml"));
 			
 			loader.setController(contextMenuController);
 			loader.setRoot(contextMenuController);

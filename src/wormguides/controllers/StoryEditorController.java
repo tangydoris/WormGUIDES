@@ -1,6 +1,7 @@
 package wormguides.controllers;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -11,6 +12,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -26,6 +29,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import wormguides.StringListCellFactory;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
@@ -33,7 +37,7 @@ import wormguides.model.Note.TimeStringFormatException;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
-public class StoryEditorController extends AnchorPane implements Initializable{
+public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private LineageData cellData;
 	
@@ -58,8 +62,8 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 	@FXML private RadioButton cellRadioBtn;
 	@FXML private RadioButton globalRadioBtn;
 	@FXML private ComboBox<String> structuresComboBox;
-	//private ObservableList<String> structureComboItems;
-	//private Callback<ListView<String>, ListCell<String>> factory;
+	private ObservableList<String> structureComboItems;
+	private StringListCellFactory factory;
 	@FXML private RadioButton axonRadioBtn;
 	@FXML private RadioButton dendriteRadioBtn;
 	@FXML private RadioButton cellBodyRadioBtn;
@@ -97,8 +101,10 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
-	public StoryEditorController(LineageData data, StringProperty nameProperty, BooleanProperty cellClickedProperty, 
+	public StoryEditorController(LineageData data, ArrayList<String> multiCellStructuresList, 
+			StringProperty nameProperty, BooleanProperty cellClickedProperty, 
 			IntegerProperty sceneTimeProperty) {
+		
 		super();
 		
 		cellData = data;
@@ -147,7 +153,8 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 			}
 		});
 		
-		//structureComboItems = FXCollections.observableArrayList();
+		structureComboItems = FXCollections.observableArrayList();
+		structureComboItems.addAll(multiCellStructuresList);
 		//structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
 	}
 	
@@ -189,15 +196,16 @@ public class StoryEditorController extends AnchorPane implements Initializable{
 		attachmentToggle.selectedToggleProperty().addListener(new AttachmentToggleListener());
 		displayToggle.selectedToggleProperty().addListener(new DisplayToggleListener());
 		
-		//factory = new StringCellCallback();
-		//structuresComboBox.setItems(structureComboItems);
-		//structuresComboBox.setButtonCell(factory.call(null));
-		//structuresComboBox.setCellFactory(factory);
+		factory = new StringListCellFactory();
+		structuresComboBox.setItems(structureComboItems);
+		structuresComboBox.setButtonCell(factory.getNewStringListCell());
+		structuresComboBox.setCellFactory(factory);
 		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
 			@Override
 			public void changed(ObservableValue<? extends SingleSelectionModel<String>> observable,
 					SingleSelectionModel<String> oldValue, SingleSelectionModel<String> newValue) {
 				// TODO
+				System.out.println(newValue.getSelectedItem());
 			}
 		});
 		
