@@ -137,18 +137,22 @@ public class StoriesLoader {
 	
 	
 	private static final int NUMBER_OF_CSV_FIELDS = 12;
+	
 	private static final int STORY_NAME_INDEX = 0,
-					STORY_DESCRIPTION_INDEX = 1;
+							STORY_DESCRIPTION_INDEX = 1,
+							STORY_AUTHOR_INDEX = 2,
+							STORY_DATE_INDEX = 3;
+	
 	private static final int NAME_INDEX = 0,
-					CONTENTS_INDEX = 1,
-					DISPLAY_INDEX = 2,
-					TYPE_INDEX = 3,
-					LOCATION_INDEX = 4,
-					CELLNAME_INDEX = 5,
-					MARKER_INDEX = 6,
-					IMG_SOURCE_INDEX = 7,
-					RESOURCE_LOCATION_INDEX = 8,
-					START_TIME_INDEX = 9,
-					END_TIME_INDEX = 10,
-					COMMENTS_INDEX = 11;
+							CONTENTS_INDEX = 1,
+							DISPLAY_INDEX = 2,
+							TYPE_INDEX = 3,
+							LOCATION_INDEX = 4,
+							CELLNAME_INDEX = 5,
+							MARKER_INDEX = 6,
+							IMG_SOURCE_INDEX = 7,
+							RESOURCE_LOCATION_INDEX = 8,
+							START_TIME_INDEX = 9,
+							END_TIME_INDEX = 10,
+							COMMENTS_INDEX = 11;
 }

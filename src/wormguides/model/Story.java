@@ -17,15 +17,27 @@ public class Story {
 	
 	private String name;
 	private String description;
+	
+	private String author;
+	private String date;
+	
 	private ObservableList<Note> notes;
 	private BooleanProperty activeBooleanProperty;
 	private BooleanProperty changedBooleanProperty;
 	private Comparator<Note> comparator;
-		
+	
 	
 	public Story(String name, String description) {
+		this(name, description, "", "");
+	}
+	
+	
+	public Story(String name, String description, String author, String date) {
 		this.name = name;
 		this.description = description;
+		
+		this.author = author;
+		this.date = date;
 		
 		activeBooleanProperty = new SimpleBooleanProperty(false);
 		activeBooleanProperty.addListener(new ChangeListener<Boolean>() {
@@ -132,6 +144,26 @@ public class Story {
 	
 	public int getNumberOfNotes() {
 		return notes.size();
+	}
+	
+	
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	
+	
+	public String getAuthor() {
+		return author;
+	}
+	
+	
+	public void setDate(String date) {
+		this.date = date;
+	}
+	
+	
+	public String getDate() {
+		return date;
 	}
 	
 	

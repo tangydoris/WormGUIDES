@@ -42,6 +42,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private LineageData cellData;
 	private int frameOffset;
 	
+	@FXML private TextField author;
+	@FXML private TextField date;
+	
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
 	private StringProperty sceneActiveCellProperty;
@@ -302,6 +305,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private void assertFXMLNodes() {
 		assert (activeCellLabel!=null);
+		
+		assert (author!=null);
+		assert (date!=null);
 		
 		assert (titleField!=null);
 		assert (contentArea!=null);
