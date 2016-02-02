@@ -8,7 +8,6 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -76,7 +75,7 @@ public class StoriesLayer {
 	
 	
 	public StoriesLayer(Stage parent, StringProperty cellNameProperty, 
-			BooleanProperty cellClicked, LineageData data) {
+			IntegerProperty sceneTimeProperty, BooleanProperty cellClicked, LineageData data) {
 		parentStage = parent;
 		
 		stories = FXCollections.observableArrayList(
@@ -97,7 +96,7 @@ public class StoriesLayer {
 			}
 		});
 		
-		timeProperty = new SimpleIntegerProperty(-1);
+		timeProperty = sceneTimeProperty;
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		cellData = data;
 		
@@ -186,32 +185,26 @@ public class StoriesLayer {
 	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
 		int time = 1;
 		
-		int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-		int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
-		int noteStartTime = activeNote.getStartTime();
-		int noteEndTime = activeNote.getEndTime();
-		
-		if (activeNote.isTimeSpecified() && activeNote.isAttachedToCellTime()) {
-			// make sure times actually overlap
-			if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
-				time = cellStartTime;
-			else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
-				time = noteStartTime;
+		if (activeNote!=null && activeNote.isTimeSpecified()) {
+			if (activeNote.existsWithCell()) {
+				int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+				int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				int noteStartTime = activeNote.getStartTime();
+				int noteEndTime = activeNote.getEndTime();
+				
+				// make sure times actually overlap
+				if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
+					time = cellStartTime;
+				else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
+					time = noteStartTime;
+			}
+			
+			else {
+				time = activeNote.getStartTime();
+			}
 		}
 		
-		else if (activeNote.isAttachedToCell())
-			time = cellStartTime;
-		
-		else if (activeNote.isTimeSpecified())
-			time = noteStartTime;
-		
 		return new Integer(time);
-	}
-
-	
-	
-	public IntegerProperty getTimeProperty() {
-		return timeProperty;
 	}
 	
 	
@@ -297,7 +290,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new StoryEditorController(activeCellProperty, cellClickedProperty);
+					editController = new StoryEditorController(activeCellProperty, cellClickedProperty, timeProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);

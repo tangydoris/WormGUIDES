@@ -869,7 +869,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer(LineageData data) {
-		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked(), data);
+		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getTimeProperty(), 
+				window3D.getCellClicked(), data);
 		window3D.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
@@ -879,7 +880,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
-		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 

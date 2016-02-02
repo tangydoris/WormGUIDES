@@ -104,7 +104,7 @@ public class Story {
 	public ArrayList<Note> getNotesWithCell() {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note.isAttachedToCell() || note.isAttachedToCellTime())
+			if (note!=null && note.existsWithCell())
 				list.add(note);
 		}
 		return list;

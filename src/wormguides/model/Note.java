@@ -297,11 +297,13 @@ public class Note {
 	}
 	
 	
+	// Input should be the time (with +19 offset) that user sees in range 20-419
+	// Time internally stored as values in range 1-400
 	public void setStartTime(String time) throws TimeStringFormatException {
 		if (time!=null && !time.isEmpty()) {
 			try {
 				int t = Integer.parseInt(time.trim());
-				setStartTime(t);
+				setStartTime(t-FRAME_OFFSET);
 			} catch (NumberFormatException e) {
 				throw new TimeStringFormatException();
 			}
@@ -325,7 +327,7 @@ public class Note {
 		if (time!=null && !time.isEmpty()) {
 			try {
 				int t = Integer.parseInt(time.trim());
-				setEndTime(t);
+				setEndTime(t-FRAME_OFFSET);
 			} catch (NumberFormatException e) {
 				throw new TimeStringFormatException();
 			}
@@ -476,92 +478,40 @@ public class Note {
 	// or if there is no tag display method specified
 	// false otherwise
 	public boolean isWithoutScope() {
-		if (tagDisplay==Display.BLANK)
+		if (tagDisplay.equals(Display.BLANK))
 			return true;
 		
-		if (tagDisplay!=Display.OVERLAY) {
-			if ((attachmentType==Type.CELLTIME || attachmentType==Type.TIME)
-					&& !isTimeSpecified())
-				return true;
-			
-			if ((attachmentType==Type.CELL || attachmentType==Type.CELLTIME)
-					&& !isCellSpecified())
-				return true;
-			
-			if (isWithoutTypeScope())
-				return true;
-		}
+		if (!tagDisplay.equals(Display.OVERLAY) && attachmentType.equals(Type.CELL) 
+				&& !isCellSpecified())
+			return true;
 		
 		return false;
 	}
 	
 	
-	public boolean isWithoutTypeScope() {
-		return attachmentType==Type.BLANK;
-	}
-	
-	
 	public boolean hasLocationError() {
-		if (tagDisplay!=Display.OVERLAY) {
-			
-			if (attachmentType==Type.LOCATION && !isLoctionSpecified())
+		if (attachmentType.equals(Type.LOCATION) && !isLoctionSpecified())
 				return true;
-			
-			if (isAttachedToTime())
-				return true;
-		}
 		
 		return false;
 	}
 	
 	
 	public boolean hasCellNameError() {
-		if (tagDisplay!=Display.OVERLAY && (attachmentType==Type.CELL 
-				|| attachmentType==Type.CELLTIME) && cellName.isEmpty())
+		if (!tagDisplay.equals(Display.OVERLAY) && attachmentType.equals(Type.CELL)  && cellName.isEmpty())
 			return true;
-		return false;
-	}
-	
-	
-	public boolean hasTimeError() {
-		if (tagDisplay==Display.SPRITE && attachmentType==Type.TIME)
-			return true;
+		
 		return false;
 	}
 	
 	
 	public boolean existsWithCell() {
-		return attachmentType==Type.CELL || attachmentType==Type.CELLTIME;
-	}
-	
-	
-	public boolean isValidTimeAttachment() {
-		return isAttachedToTime() && isTimeSpecified();
-	}
-	
-	
-	public boolean isAttachedToTime() {
-		return attachmentType==Type.TIME;
+		return attachmentType.equals(Type.CELL);
 	}
 	
 	
 	public boolean isValidCellAttachment() {
-		return isAttachedToCell() && isCellSpecified();
-	}
-	
-	
-	public boolean isValidCellTimeAttachment() {
-		return isAttachedToCellTime() && isCellSpecified() && isTimeSpecified();
-	}
-	
-	
-	public boolean isAttachedToCell() {
-		return attachmentType==Type.CELL;
-	}
-	
-	
-	public boolean isAttachedToCellTime() {
-		return attachmentType==Type.CELLTIME;
+		return existsWithCell() && isCellSpecified();
 	}
 	
 	
@@ -632,8 +582,6 @@ public class Note {
 	public enum Type {
 		LOCATION("location"),
 		CELL("cell"),
-		CELLTIME("cell time"), 
-		TIME("time"),
 		BLANK("");
 		
 		private String type;
@@ -741,4 +689,5 @@ public class Note {
 	
 	
 	private final String OBJ_EXT = ".obj";
+	private final int FRAME_OFFSET = 19;
 }

@@ -896,8 +896,7 @@ public class Window3DController {
 		for (Note note : currentNotes) {
 			// Revert to overlay display if we have invalid display/attachment 
 			// type combination
-			if (note.hasLocationError() || note.hasCellNameError() 
-					|| note.hasTimeError())
+			if (note.hasLocationError() || note.hasCellNameError())
 				note.setTagDisplay(Display.OVERLAY);
 			
 			Text node = makeNoteGraphic(note);
@@ -1003,8 +1002,7 @@ public class Window3DController {
 			return true;
 		}
 		
-		else if (note.isAttachedToCell()
-				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
+		else if (note.existsWithCell() && note.existsAtTime(time.get()-1)) {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					billboardFrontSphereMap.put(node, spheres[i]);
@@ -1030,8 +1028,7 @@ public class Window3DController {
 			return true;
 		}
 		
-		else if (note.isAttachedToCell()
-				|| (note.isAttachedToCellTime() && note.existsAtTime(time.get()-1))) {
+		else if (note.existsWithCell() && note.existsAtTime(time.get()-1)) {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					double offset = 5;
@@ -1062,8 +1059,7 @@ public class Window3DController {
 			return true;
 		}
 		
-		else if (note.isAttachedToCell() || (note.isAttachedToCellTime() 
-				&& note.existsAtTime(time.get()-1))) {
+		else if (note.existsWithCell() && note.existsAtTime(time.get()-1)) {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					spriteSphereMap.put(node, spheres[i]);
@@ -1804,31 +1800,20 @@ public class Window3DController {
 		return new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				Node result = event.getPickResult().getIntersectedNode();
-				if (result instanceof Text) {
-					Text picked = (Text) result;
-					Note note = currentGraphicNoteMap.get(picked);
-					if (note!=null) {
-						note.setSceneExpanded(!note.isSceneExpanded());
-						if (note.isSceneExpanded())
-							picked.setText(note.getTagName()+": "+note.getTagContents());
-						else
-							picked.setText(note.getTagName());
+				if (event.isStillSincePress()) {
+					Node result = event.getPickResult().getIntersectedNode();
+					if (result instanceof Text) {
+						Text picked = (Text) result;
+						Note note = currentGraphicNoteMap.get(picked);
+						if (note!=null) {
+							note.setSceneExpanded(!note.isSceneExpanded());
+							if (note.isSceneExpanded())
+								picked.setText(note.getTagName()+": "+note.getTagContents());
+							else
+								picked.setText(note.getTagName());
+						}
 					}
 				}
-			}
-		};
-	}
-	
-	
-	public ChangeListener<Number> getStoriesTimeListener() {
-		return new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, 
-					Number oldValue, Number newValue) {
-				int t = newValue.intValue();
-				if (t>=START_TIME && t<=endTime)
-					time.set(t);
 			}
 		};
 	}
