@@ -40,6 +40,7 @@ import wormguides.model.Story;
 public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private LineageData cellData;
+	private int frameOffset;
 	
 	@FXML private Label activeCellLabel;
 	private StringProperty activeCellProperty;
@@ -101,13 +102,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
-	public StoryEditorController(LineageData data, ArrayList<String> multiCellStructuresList, 
+	public StoryEditorController(int timeOffset, LineageData data, ArrayList<String> multiCellStructuresList, 
 			StringProperty nameProperty, BooleanProperty cellClickedProperty, 
 			IntegerProperty sceneTimeProperty) {
 		
 		super();
 		
 		cellData = data;
+		
+		frameOffset = timeOffset;
 		
 		storyCreated = new SimpleBooleanProperty(false);
 		noteCreated = new SimpleBooleanProperty(false);
@@ -123,7 +126,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				if (newValue!=null) {
 					Toggle selected = timeToggle.getSelectedToggle();
 					if (selected==null || ((Time)selected.getUserData())!=Time.CURRENT)
-						setCurrentTimeLabel(timeProperty.get()+FRAME_OFFSET);
+						setCurrentTimeLabel(timeProperty.get()+frameOffset);
 				}
 			}
 		});
@@ -370,7 +373,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			
 			startTimeField.setText("");
 			endTimeField.setText("");
-			setCurrentTimeLabel(timeProperty.get()+FRAME_OFFSET);
+			setCurrentTimeLabel(timeProperty.get()+frameOffset);
 			
 			if (activeNote!=null) {
 				int start = activeNote.getStartTime();
@@ -384,8 +387,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				
 				else if (start<end) {
 					timeToggle.selectToggle(rangeTimeRadioBtn);
-					startTimeField.setText(Integer.toString(start+FRAME_OFFSET));
-					endTimeField.setText(Integer.toString(end+FRAME_OFFSET));
+					startTimeField.setText(Integer.toString(start+frameOffset));
+					endTimeField.setText(Integer.toString(end+frameOffset));
 				}	
 			}
 		}
@@ -593,9 +596,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				case RANGE:		
 								try {
 									if (!startTimeField.getText().isEmpty())
-										start = Integer.parseInt(startTimeField.getText())-FRAME_OFFSET;
+										start = Integer.parseInt(startTimeField.getText())-frameOffset;
 									if (!endTimeField.getText().isEmpty())
-										end = Integer.parseInt(endTimeField.getText())-FRAME_OFFSET;
+										end = Integer.parseInt(endTimeField.getText())-frameOffset;
 								} catch (NumberFormatException e) {
 									System.out.println("Invalid time - must be integer.");
 									//e.printStackTrace();
@@ -723,5 +726,4 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private final String NEW_STORY_TITLE = "New Story";
 	private final String NEW_STORY_DESCRIPTION = "New story description here";
 	
-	private final int FRAME_OFFSET = 19;
 }

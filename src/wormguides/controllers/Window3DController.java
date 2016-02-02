@@ -423,18 +423,8 @@ public class Window3DController {
         mouseDeltaX /= 4;
         mouseDeltaY /= 4;
 
-		if (event.isPrimaryButtonDown()) {
-			mouseDeltaX /= 2;
-            mouseDeltaY /= 2;
-            
-            rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
-    		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
-    		
-    		repositionSprites();
-    		repositionNoteBillboardFronts();
-		}
-
-		else if (event.isSecondaryButtonDown()) {
+        if (event.isSecondaryButtonDown() || (event.isPrimaryButtonDown() 
+        		&& (event.isMetaDown() || event.isControlDown()))) {
 			double tx = xform.t.getTx()-mouseDeltaX;
 			double ty = xform.t.getTy()-mouseDeltaY;
 
@@ -445,6 +435,17 @@ public class Window3DController {
 			
 			repositionSprites();
 			repositionNoteBillboardFronts();
+		}
+        
+        else if (event.isPrimaryButtonDown()) {
+			mouseDeltaX /= 2;
+            mouseDeltaY /= 2;
+            
+            rotateX.setAngle((rotateX.getAngle()+mouseDeltaY)%360);
+    		rotateY.setAngle((rotateY.getAngle()-mouseDeltaX)%360);
+    		
+    		repositionSprites();
+    		repositionNoteBillboardFronts();
 		}
 	}
 	
@@ -615,23 +616,23 @@ public class Window3DController {
 	// Reposition sprites by projecting the sphere's 3d coordinate 
 	// onto the front of the subscene
 	private void repositionSprites() {
-		for (Text node : spriteSphereMap.keySet()) {
-			alignTextWithEntity(node, spriteSphereMap.get(node));
+		for (Text text : spriteSphereMap.keySet()) {
+			alignTextWithEntity(text, spriteSphereMap.get(text), false);
 		}
-		for (Text node : labelEntityMap.keySet()) {
-			alignTextWithEntity(node, labelEntityMap.get(node));
+		for (Text text : labelEntityMap.keySet()) {
+			alignTextWithEntity(text, labelEntityMap.get(text), true);
 		}
 	}
 	
 	
 	// Input text is the note/label geometry
 	// Input entity is the cell/body/mesh that the text should align with
-	private void alignTextWithEntity(Text node, Node s) {
-		if (s!=null) {
-			Bounds b = s.getBoundsInParent();
+	private void alignTextWithEntity(Text text, Node node, boolean isLabel) {
+		if (node!=null) {
+			Bounds b = node.getBoundsInParent();
 			
 			if (b!=null) {
-				node.getTransforms().clear();
+				text.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, 
 						new Point3D((b.getMaxX()+b.getMinX())/2, 
 								(b.getMaxY()+b.getMinY())/2, 
@@ -639,12 +640,18 @@ public class Window3DController {
 				double x = p.getX();
 				double y = p.getY();
 				
-				if (s instanceof Sphere) {
-					double radius = ((Sphere) s).getRadius();
-					x += radius;
-					y += radius;
+				if (node instanceof Sphere) {
+					double radius = ((Sphere) node).getRadius();
+					if (isLabel) {
+						x += radius;
+						y -= (radius+3);
+					}
+					else {
+						x += radius;
+						y += radius+3;
+					}
 				}
-				node.getTransforms().add(new Translate(x, y));
+				text.getTransforms().add(new Translate(x, y));
 			}
 		}
 	}
@@ -1846,7 +1853,5 @@ public class Window3DController {
     
     private final double SIZE_SCALE = 1;
     private final double UNIFORM_RADIUS = 4;
-    
-    //private final String NAME_LABEL = "nameLabel";
     
 }

@@ -192,23 +192,32 @@ public class StoriesLayer {
 	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
 		int time = 1;
 		
-		if (activeNote!=null && activeNote.isTimeSpecified()) {
+		if (activeNote!=null) {
 			if (activeNote.existsWithCell()) {
 				int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-				int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
-				int noteStartTime = activeNote.getStartTime();
-				int noteEndTime = activeNote.getEndTime();
 				
-				// make sure times actually overlap
-				if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
+				// attached to cell and time specified
+				if (activeNote.isTimeSpecified()) {
+					int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+					int noteStartTime = activeNote.getStartTime()-FRAME_OFFSET;
+					int noteEndTime = activeNote.getEndTime()-FRAME_OFFSET;
+					
+					// make sure times actually overlap
+					if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
+						time = cellStartTime;
+					else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
+						time = noteStartTime;
+				}
+				
+				// attached to cell and time not specified
+				else
 					time = cellStartTime;
-				else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
-					time = noteStartTime;
 			}
-			
-			else {
+				
+			else if (activeNote.isTimeSpecified()) {
 				time = activeNote.getStartTime();
 			}
+			
 		}
 		
 		return new Integer(time);
@@ -297,7 +306,8 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new StoryEditorController(cellData, sceneElementsList.getAllMulticellSceneNames(),
+					editController = new StoryEditorController(FRAME_OFFSET, cellData, 
+							sceneElementsList.getAllMulticellSceneNames(),
 							activeCellProperty, cellClickedProperty, timeProperty);
 					
 					editController.setActiveNote(activeNote);
@@ -640,4 +650,5 @@ public class StoriesLayer {
 
 	private static final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
 	
+	private final int FRAME_OFFSET = 19;
 }

@@ -82,8 +82,7 @@ public class TableLineageData implements LineageData{
 		
 		outer:
 			for (int i=0; i<timeFrames.size(); i++) {
-				Frame frame = timeFrames.get(i);
-				for (String cell : frame.getNames()) {
+				for (String cell : timeFrames.get(i).getNames()) {
 					if (cell.equalsIgnoreCase(name)) {
 						time = i;
 						break outer;
