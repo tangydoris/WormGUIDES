@@ -175,6 +175,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			public void run() {
 				storyTitle.setText(activeStory.getName());
 				storyDescription.setText(activeStory.getDescription());
+				author.setText(activeStory.getAuthor());
+				date.setText(activeStory.getDate());
 				
 				storyTitle.positionCaret(storyTitle.getText().length());
 			}
@@ -464,7 +466,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				case SPRITE:
 								locationRadioBtn.setSelected(true);
 								break;
-								
 				case BILLBOARD_FRONT:
 								billboardRadioBtn.setSelected(true);
 								break;
@@ -483,13 +484,14 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private void updateStoryFields() {
 		if (storyTitle!=null && storyDescription!=null) {
-			if (activeStory!=null) {
+			if (activeStory!=null)
 				Platform.runLater(storyRunnable);
-				
-			}
+			
 			else {
 				storyTitle.clear();
 				storyDescription.clear();
+				author.clear();
+				date.clear();
 			}
 		}
 	}

@@ -70,7 +70,8 @@ public class StoriesLoader {
 					split[CONTENTS_INDEX] = contents.substring(1, contents.length()-1);
 				
 				if (isStory(split)) {
-					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX]);
+					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX], 
+							split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX]);
 					stories.add(story);
 					storyCounter++;
 				}
@@ -126,7 +127,7 @@ public class StoriesLoader {
 	
 	private static boolean isStory(String[] csvLine) {
 		try {
-			if (csvLine[DISPLAY_INDEX].isEmpty())
+			if (csvLine[DISPLAY_INDEX].isEmpty() && csvLine[TYPE_INDEX].isEmpty())
 				return true;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
@@ -136,12 +137,12 @@ public class StoriesLoader {
 	
 	
 	
-	private static final int NUMBER_OF_CSV_FIELDS = 12;
+	private static final int NUMBER_OF_CSV_FIELDS = 14;
 	
 	private static final int STORY_NAME_INDEX = 0,
 							STORY_DESCRIPTION_INDEX = 1,
-							STORY_AUTHOR_INDEX = 2,
-							STORY_DATE_INDEX = 3;
+							STORY_AUTHOR_INDEX = 12,
+							STORY_DATE_INDEX = 13;
 	
 	private static final int NAME_INDEX = 0,
 							CONTENTS_INDEX = 1,
