@@ -34,7 +34,10 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="author" HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="author" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
                            </children>
                         </HBox>
                         <HBox layoutX="10.0" layoutY="10.0" spacing="5.0">
@@ -44,7 +47,10 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="date" HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="date" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
                            </children>
                         </HBox>
                         <HBox spacing="5.0">

@@ -141,9 +141,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
 					String oldValue, String newValue) {
-				if (newValue!=null && !newValue.isEmpty() && cellData.isCellName(newValue)) {
+				if (newValue!=null && !newValue.isEmpty() && cellData.isCellName(newValue))
 					activeCellProperty.set(newValue);
-				}
 			}
 		});
 		
@@ -190,6 +189,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		updateStoryFields();
 		storyTitle.textProperty().addListener(new StoryTitleFieldListener());
 		storyDescription.textProperty().addListener(new StoryDescriptionAreaListener());
+		author.textProperty().addListener(new AuthorFieldListener());
+		date.textProperty().addListener(new DateFieldListener());
 		
 		// attachment type/note display
 		initToggleData();
@@ -536,6 +537,26 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	
 	// ----- Begin listeners ----
+	private class AuthorFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable,
+				String oldValue, String newValue) {
+			if (activeStory!=null)
+				activeStory.setAuthor(newValue);
+		}
+	}
+	
+	
+	private class DateFieldListener implements ChangeListener<String> {
+		@Override
+		public void changed(ObservableValue<? extends String> observable,
+				String oldValue, String newValue) {
+			if (activeStory!=null)
+				activeStory.setDate(newValue);
+		}
+	}
+	
+	
 	private class StoryTitleFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, 
