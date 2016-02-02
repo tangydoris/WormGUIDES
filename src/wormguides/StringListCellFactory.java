@@ -46,6 +46,7 @@ public class StringListCellFactory implements Callback<ListView<String>, ListCel
 		protected void updateItem(String item, boolean empty) {
 			super.updateItem(item, empty);
 			setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+			setFocusTraversable(false);
 			
 			if (item!=null)
             	setGraphic(makeListCellGraphic(item));

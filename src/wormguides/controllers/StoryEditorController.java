@@ -199,6 +199,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		factory = new StringListCellFactory();
 		structuresComboBox.setItems(structureComboItems);
 		structuresComboBox.setButtonCell(factory.getNewStringListCell());
+		// TODO make note attach on here
 		structuresComboBox.setCellFactory(factory);
 		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
 			@Override
@@ -358,21 +359,45 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		
 		updateNoteFields();
 		updateType();
+		updateTime();
 		updateDisplay();
+	}
+	
+	
+	private void updateTime() {
+		if (timeToggle!=null) {
+			resetToggle(timeToggle);
+			
+			startTimeField.setText("");
+			endTimeField.setText("");
+			setCurrentTimeLabel(timeProperty.get()+FRAME_OFFSET);
+			
+			if (activeNote!=null) {
+				int start = activeNote.getStartTime();
+				int end = activeNote.getEndTime();
+				
+				if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE)
+					timeToggle.selectToggle(globalTimeRadioBtn);
+				
+				else if (start==end)
+					timeToggle.selectToggle(currentTimeRadioBtn);
+				
+				else if (start<end) {
+					timeToggle.selectToggle(rangeTimeRadioBtn);
+					startTimeField.setText(Integer.toString(start+FRAME_OFFSET));
+					endTimeField.setText(Integer.toString(end+FRAME_OFFSET));
+				}	
+			}
+		}
 	}
 	
 	
 	// TODO
 	private void updateType() {
-		if (attachmentToggle!=null && timeToggle!=null) {
-			resetTime();
+		if (attachmentToggle!=null) {
 			resetToggle(attachmentToggle);
 			
 			if (activeNote!=null) {
-				int start = activeNote.getStartTime();
-				int end = activeNote.getEndTime();
-				updateTimeFields(start, end);
-				
 				switch (activeNote.getAttachmentType()) {
 				case CELL:
 								String cellName = activeNote.getCellName();
@@ -381,15 +406,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 								attachmentToggle.selectToggle(cellRadioBtn);
 								break;
 								
-				case BLANK:
+				case BLANK:		// fall to default case
+								
+				default:
 								globalRadioBtn.setSelected(true);
 								activeCellProperty.set(sceneActiveCellProperty.get());
 								break;
-								
-				default:
-								activeCellProperty.set(sceneActiveCellProperty.get());
-								break;
-				}	
+				}
 			}
 		}
 	}
@@ -411,30 +434,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			}
 		}
 	}
-
-	
-	private void updateTimeFields(int start, int end) {
-		if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE)
-			timeToggle.selectToggle(globalTimeRadioBtn);
-		
-		else if (start==end)
-			timeToggle.selectToggle(currentTimeRadioBtn);
-		
-		else if (start<end) {
-			timeToggle.selectToggle(rangeTimeRadioBtn);
-			startTimeField.setText(Integer.toString(start+FRAME_OFFSET));
-			endTimeField.setText(Integer.toString(end+FRAME_OFFSET));
-		}			
-	}
-	
-	
-	private void resetTime() {
-		resetToggle(timeToggle);
-		
-		startTimeField.setText("");
-		endTimeField.setText("");
-		setCurrentTimeLabel(timeProperty.get()+FRAME_OFFSET);
-	}
 	
 	
 	private void resetToggle(ToggleGroup group) {
@@ -447,6 +446,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private void updateDisplay() {
 		if (displayToggle!=null) {
 			if (activeNote!=null) {
+				
 				switch (activeNote.getTagDisplay()) {
 				case OVERLAY:
 								infoPaneRadioBtn.setSelected(true);

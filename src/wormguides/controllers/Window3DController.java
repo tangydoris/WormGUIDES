@@ -904,8 +904,6 @@ public class Window3DController {
 				note.setTagDisplay(Display.OVERLAY);
 			
 			Text node = makeNoteGraphic(note);
-			
-			Type type = note.getAttachmentType();
 			Display display = note.getTagDisplay();
 			
 			if (display!=null) {
@@ -1376,9 +1374,8 @@ public class Window3DController {
 						buildScene(time.get());
 					}
 					
-					for (Rule rule : change.getRemoved()) {
+					if (!change.getRemoved().isEmpty())
 						buildScene(time.get());
-					}
 				}
 			}
 		});
