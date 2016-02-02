@@ -66,4 +66,5 @@ public class InfoWindow {
 		tabPane.getSelectionModel().select(tab);
 		tabPane.setFocusTraversable(true);
 	}
+
 }

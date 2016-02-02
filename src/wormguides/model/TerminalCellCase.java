@@ -34,7 +34,11 @@ public class TerminalCellCase {
 		this.links = new ArrayList<String>();
 		
 		this.cellName = cellName;
-		this.externalInfo = this.cellName + " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
+		this.externalInfo = this.cellName;
+		if (PartsList.getLineageNameByFunctionalName(cellName) != null) {
+			this.externalInfo += " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
+		}
+		
 		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
 		
 		if (Character.isDigit(cellName.charAt(cellName.length() - 1))){
@@ -59,9 +63,12 @@ public class TerminalCellCase {
 		this.nuclearProductionInfo = nuclearProductionInfo;
 		this.cellShapeProductionInfo = cellShapeProductionInfo;
 
+		links.add(addGoogleLink());
+		links.add(addGoogleWormatlasLink());
+		
 		/*
 		 * TODO
-		 * testing purposes
+		 * cytoshow stub
 		 */
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
 
@@ -90,9 +97,27 @@ public class TerminalCellCase {
 		lastChar = Character.toLowerCase(lastChar);
 		if (lastChar == 'r' || lastChar == 'l') {
 			cell = cell.substring(0, cell.length()-1);
+			
+			//check if preceding d/v
+			lastChar = cell.charAt(cell.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'd' || lastChar == 'v') {
+				cell = cell.substring(0, cell.length()-1);
+			}
+		} else if (lastChar == 'd' || lastChar == 'v') { //will l/r ever come before d/v
+			cell = cell.substring(0, cell.length()-1);
+			
+			//check if preceding l/r
+			lastChar = cell.charAt(cell.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'l' || lastChar == 'r') {
+				cell = cell.substring(0, cell.length()-1);
+			}
+		} else if (Character.isDigit(lastChar)) {
+			cell = cell.substring(0, cell.length()-1).toUpperCase() + "N";
 		}
-		String URL = wormatlasURL + cell.toLowerCase() + wormatlasURLEXT;
 		
+		String URL = wormatlasURL + cell.toUpperCase() + wormatlasURLEXT;
 		try {
 			connection = new URL(URL).openConnection();
 			Scanner scanner = new Scanner(connection.getInputStream());
@@ -100,21 +125,24 @@ public class TerminalCellCase {
 			content = scanner.next();
 			scanner.close();
 		} catch (Exception e) {
-			//try second extension
-			URL = wormatlasURL + cell.substring(0, cell.length()-1).toUpperCase() + "N" + wormatlasURLEXT;
-			//System.out.println("TRYING SECOND URL: " + URL);
-
-			try {
-				connection = new URL(URL).openConnection();
-				Scanner scanner = new Scanner(connection.getInputStream());
-				scanner.useDelimiter("\\Z");
-				content = scanner.next();
-				scanner.close();
-			} catch (Exception e1) {
-				//e1.printStackTrace();
-				//a page wasn't found on wormatlas
-				return this.cellName + " page not found on Wormatlas";
-			}
+//			//try second extension
+//			URL = wormatlasURL + cell + wormatlasURLEXT;
+//			System.out.println("TRYING SECOND URL: " + URL);
+//
+//			try {
+//				connection = new URL(URL).openConnection();
+//				Scanner scanner = new Scanner(connection.getInputStream());
+//				scanner.useDelimiter("\\Z");
+//				content = scanner.next();
+//				scanner.close();
+//			} catch (Exception e1) {
+//				//e1.printStackTrace();
+//				//a page wasn't found on wormatlas
+//				return this.cellName + " page not found on Wormatlas";
+//			}
+			//e1.printStackTrace();
+			//a page wasn't found on wormatlas
+			return null;
 		}
 		return findFunctionInHTML(content, URL);
 	}
@@ -197,7 +225,7 @@ public class TerminalCellCase {
 		String[] genes = content.split("><");
 		for (String gene : genes) {
 			if (gene.startsWith("span class=\"locus\"")) {
-				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<")-1);
+				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<"));
 				geneExpression.add(gene);
 			}
 			
@@ -265,10 +293,115 @@ public class TerminalCellCase {
 	private ArrayList<String> setReferences() {
 		ArrayList<String> references = new ArrayList<String>();
 		
-		references.add("TEXTPRESSO"); //how do we want to use TEXTPRESSO here???
-		references.add("second reference");
+		//open connection with the textpresso page
+		String URL = textpressoURL + this.cellName + textpressoURLEXT;
+				
+		String content = "";
+		URLConnection connection = null;
 		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.cellName + " page not found on Textpresso");
+			return geneExpression;
+		}
+		
+		int matchesIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">");
+		
+		if (matchesIDX > 0) {
+			matchesIDX--; //move back to the first digit
+			//find the start of the number of matches
+			String matchesStr = "";
+			for (;; matchesIDX--) {
+				char curr = content.charAt(matchesIDX);
+				if (Character.isDigit(curr)) {
+					matchesStr += curr;
+				} else {
+					break;
+				}
+			}
+			//reverse the string
+			matchesStr = new StringBuffer(matchesStr).reverse().toString();
+			
+			//find the number of documents
+			int documentsIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">")+57;
+			
+			String documentsStr = "";
+			for (;; documentsIDX++) {
+				char curr = content.charAt(documentsIDX);
+				if (Character.isDigit(curr)) {
+					documentsStr += curr;
+				} else {
+					break;
+				}
+			}
+			
+			//add matches and documents to top of references list
+			references.add("<em>Textpresso</em>: " + matchesStr + " matches found in " + documentsStr + " documents");
+			/*
+			 * TODO
+			 * add textpresso url to page with open in browser
+			 */
+			
+			//parse the document for "Title: "
+			int lastIDX = 0;
+			while (lastIDX != -1) {
+				lastIDX = content.indexOf(textpressoTitleStr, lastIDX);
+				
+				if (lastIDX != -1) {
+					lastIDX += textpressoTitleStr.length(); //skip the title just seen
+					
+					//extract the title
+					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					//System.out.println(title);
+					
+					//move the index past the authors section
+					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;
+					
+					lastIDX += textpressoAuthorsStr.length();
+					
+					//extract the authors
+					String authors = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					
+					//move the index past the year section
+					while (!content.substring(lastIDX).startsWith(textpressoYearStr)) lastIDX++;
+					
+					lastIDX += textpressoYearStr.length();
+					
+					//extract the year
+					String year = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					String reference = title + authors + ", " + year;
+					references.add(reference);
+				}
+			}
+		}
+		
+		links.add(URL);
 		return references;
+	}
+	
+	private String addGoogleLink() {
+		if (this.cellName != null) {
+			return googleURL + this.cellName;
+		}
+		
+		return "";
+	}
+	
+	private String addGoogleWormatlasLink() {
+		if (this.cellName != null) {
+			return googleWormatlasURL + this.cellName;
+		}
+		
+		return "";
 	}
 
 	public String getCellName() {
@@ -354,5 +487,12 @@ public class TerminalCellCase {
 	private final static String jpgEXT = ".jpg";
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
-	private final static String wormatlasURLEXT2 = "frameset.html";
+	//private final static String wormatlasURLEXT2 = "frameset.html";
+	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
+	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
+	private final static String textpressoTitleStr = "Title: </span>";
+	private final static String textpressoAuthorsStr = "Authors: </span>";
+	private final static String textpressoYearStr = "Year: </span>";
+	private final static String googleURL = "https://www.google.com/#q=";
+	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
 }
