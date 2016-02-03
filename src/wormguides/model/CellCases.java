@@ -70,9 +70,11 @@ public class CellCases {
 	}
 	
 	public boolean containsTerminalCase(String cellName) {
+		System.out.print(cellName + " - ");
 		if (terminalCases != null) {
 			for (TerminalCellCase tCase : terminalCases) {
-				if (tCase.getCellName().equals(cellName)) {
+				System.out.println(tCase.getCellName());
+				if (tCase.getCellName().equals(PartsList.getFunctionalNameByLineageName(cellName))) {
 					return true;
 				}
 			}
