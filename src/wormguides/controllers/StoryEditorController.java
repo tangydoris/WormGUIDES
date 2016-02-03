@@ -617,6 +617,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				switch ((Time)newValue.getUserData()) {
 								
 				case CURRENT:
+								// TODO
 								System.out.println(timeProperty.get());
 								start = timeProperty.get();
 								end = start;
