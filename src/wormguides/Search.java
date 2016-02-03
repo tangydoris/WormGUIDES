@@ -431,6 +431,7 @@ public class Search {
 		String nameLower = name.toLowerCase();
 		
 		boolean appliesToName = true;
+		boolean appliesToCell = false;
 		boolean appliesToComment = true;
 		
 		String[] terms = searched.trim().toLowerCase().split(" ");
@@ -439,6 +440,17 @@ public class Search {
 			if (!nameLower.contains(term)) {
 				appliesToName = false;
 				break;
+			}
+		}
+		
+		//search in cells
+		for (SceneElement se : sceneElementsList.elementsList) {
+			if (se.getSceneName().toLowerCase().equals(nameLower)) {
+				for (String cell : se.getAllCellNames()) {
+					if (cell.toLowerCase().contains(searched.toLowerCase())) {
+						appliesToCell = true;
+					}
+				}
 			}
 		}
 		
@@ -452,7 +464,7 @@ public class Search {
 			}
 		}
 		
-		return appliesToName || appliesToComment;
+		return appliesToName || appliesToCell || appliesToComment;
 	}
 	
 	
