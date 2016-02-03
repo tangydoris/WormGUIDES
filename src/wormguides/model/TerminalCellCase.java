@@ -63,9 +63,10 @@ public class TerminalCellCase {
 		this.nuclearProductionInfo = nuclearProductionInfo;
 		this.cellShapeProductionInfo = cellShapeProductionInfo;
 
+		links.add(addWormWiringLink());
 		links.add(addGoogleLink());
 		links.add(addGoogleWormatlasLink());
-		links.add(addWormWiringLink());
+		
 		
 		/*
 		 * TODO
@@ -179,8 +180,7 @@ public class TerminalCellCase {
 		
 		if (this.cellName == null) return geneExpression;
 
-		String URL = "http://www.wormbase.org/db/get?name=" + 
-		this.cellName + ";class=Anatomy_term";
+		String URL = wormbaseURL + this.cellName + wormbaseEXT;
 		
 		String content = "";
 		URLConnection connection = null;
@@ -197,6 +197,9 @@ public class TerminalCellCase {
 			System.out.println(this.cellName + " page not found on Wormbase");
 			return geneExpression;
 		}
+		
+		//add the link to the list before parsing with cytoshow snippet (first link is more human readable)
+		links.add(URL);
 		
 		/*
 		 * Snippet adapted from cytoshow
@@ -219,6 +222,15 @@ public class TerminalCellCase {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
 			System.out.println(this.cellName + " page not found on Wormbase (second URL)");
+			
+			//remove the link
+			for (int i = 0; i < links.size(); i++) {
+				if (links.get(i).startsWith(wormbaseURL)) {
+					links.remove(i);
+				}
+					
+			}
+			
 			return geneExpression;
 		}
 		
@@ -234,9 +246,6 @@ public class TerminalCellCase {
 //				System.out.println("DIDN'T START: " + gene);
 //			}
 		}
-		
-		//add the link to the list
-		links.add(URL);
 		
 		return geneExpression;
 	}
@@ -407,10 +416,33 @@ public class TerminalCellCase {
 	
 	private String addWormWiringLink() {
 		if (this.cellName != null) {
-			//check if N2U or n2y image series 
+			String cell = this.cellName;
+			//check if N2U, n2y or n930 image series 
+//			boolean N2U = true;
+//			boolean N2Y = false;
+//			boolean N930 = false;
 			
 			//need to zero pad in link generation
+			char lastChar = cellName.charAt(cellName.length()-1);
+			if (Character.isDigit(lastChar)) {
+				for (int i = 0; i < cellName.length(); i++) {
+					if (Character.isDigit(cellName.charAt(i))) {
+						if (i != 0) { //error check
+							cell = cellName.substring(0, i) + "0" + cellName.substring(i);
+						}
+					}
+				}
+			}
 			
+			return wormwiringBaseURL + cell.toUpperCase() + wormwiringN2UEXT;
+			
+//			if (N2U) {
+//				return wormwiringBaseURL + cell.toUpperCase() + wormwiringN2UEXT;
+//			} else if (N2Y) {
+//				return wormwiringBaseURL + cell.toUpperCase() + wormwiringN2YEXT;
+//			} else if (N930) {
+//				return wormwiringBaseURL + cell.toUpperCase() + wormwiringN930EXT;
+//			}
 		}
 		
 		return "";
@@ -500,6 +532,8 @@ public class TerminalCellCase {
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
 	//private final static String wormatlasURLEXT2 = "frameset.html";
+	private final static String wormbaseURL = "http://www.wormbase.org/db/get?name=";
+	private final static String wormbaseEXT = ";class=Anatomy_term";
 	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
 	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
 	private final static String textpressoTitleStr = "Title: </span>";
@@ -509,7 +543,7 @@ public class TerminalCellCase {
 	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
 	private final static String wormwiringBaseURL = "http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=";
 	private final static String wormwiringN2UEXT = "&db=N2U";
-	private final static String wormwiringN2YEXT = "&db=n2y";
-	private final static String wormwiringN930EXT = "&db=n930";
+//	private final static String wormwiringN2YEXT = "&db=n2y";
+//	private final static String wormwiringN930EXT = "&db=n930";
 	
 }

@@ -287,7 +287,11 @@ public class InfoWindowDOM {
 						}
 					}
 				}	
-			} 
+			} else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
+				anchor = "<a href=\"#\" onclick=\"app.wormwiring()\">" +
+						terminalCase.getCellName() + " on Wormwiring" +
+						"</a>";
+			}
 			
 			//make sure anchor has been built 
 			if (!anchor.equals(link)) {
