@@ -266,6 +266,8 @@ public class TerminalCellCase {
 			cell = cell.substring(0, cell.length()-1);
 		} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
 			cell = cell.substring(0, cell.length()-1);
+		} else { //if no suffix, no homologues e.g. AVG, M
+			return homologues;
 		}
 		
 		cell = cell.toLowerCase();
