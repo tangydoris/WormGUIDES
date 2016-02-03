@@ -68,6 +68,7 @@ public class TerminalCellCase {
 
 		links.add(addGoogleLink());
 		links.add(addGoogleWormatlasLink());
+		links.add(addWormWiringLink());
 		
 		/*
 		 * TODO
@@ -406,6 +407,17 @@ public class TerminalCellCase {
 		
 		return "";
 	}
+	
+	private String addWormWiringLink() {
+		if (this.cellName != null) {
+			//check if N2U or n2y image series 
+			
+			//need to zero pad in link generation
+			
+		}
+		
+		return "";
+	}
 
 	public String getCellName() {
 		if (this.cellName != null) {
@@ -498,4 +510,9 @@ public class TerminalCellCase {
 	private final static String textpressoYearStr = "Year: </span>";
 	private final static String googleURL = "https://www.google.com/#q=";
 	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
+	private final static String wormwiringBaseURL = "http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=";
+	private final static String wormwiringN2UEXT = "&db=N2U";
+	private final static String wormwiringN2YEXT = "&db=n2y";
+	private final static String wormwiringN930EXT = "&db=n930";
+	
 }

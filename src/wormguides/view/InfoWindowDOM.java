@@ -272,7 +272,6 @@ public class InfoWindowDOM {
 								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
 										"</a>";
-								System.out.println(anchor + ", " + link);
 							} else {
 								String callbackMethod = "app.google()";
 								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
@@ -459,7 +458,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> TerminalDescendants: </strong>");
+				"<strong> Terminal Descendants: </strong>");
 		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
 		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
 		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "height: 0px; visibility: hidden;");
