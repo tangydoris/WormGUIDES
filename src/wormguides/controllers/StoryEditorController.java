@@ -22,7 +22,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -65,6 +64,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML private ToggleGroup attachmentToggle;
 	@FXML private RadioButton cellRadioBtn;
 	@FXML private RadioButton globalRadioBtn;
+	@FXML private RadioButton structureRadioBtn;
+	
+	@FXML private ToggleGroup subStructureToggle;
 	@FXML private ComboBox<String> structuresComboBox;
 	private ObservableList<String> structureComboItems;
 	private StringListCellFactory factory;
@@ -208,14 +210,16 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		factory = new StringListCellFactory();
 		structuresComboBox.setItems(structureComboItems);
 		structuresComboBox.setButtonCell(factory.getNewStringListCell());
-		// TODO make note attach on here
 		structuresComboBox.setCellFactory(factory);
-		structuresComboBox.selectionModelProperty().addListener(new ChangeListener<SingleSelectionModel<String>>() {
+		structuresComboBox.getSelectionModel().selectedItemProperty()
+				.addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends SingleSelectionModel<String>> observable,
-					SingleSelectionModel<String> oldValue, SingleSelectionModel<String> newValue) {
-				// TODO
-				System.out.println(newValue.getSelectedItem());
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				Toggle selected = attachmentToggle.getSelectedToggle();
+				if (activeNote!=null && selected!=null && selected.equals(structureRadioBtn)) {
+					activeNote.setCellName(newValue);
+				}
 			}
 		});
 		
@@ -289,6 +293,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		// attachment type
 		cellRadioBtn.setUserData(Type.CELL);
 		globalRadioBtn.setUserData(Type.BLANK);
+		structureRadioBtn.setUserData(Type.STRUCTURE);
+		
+		// sub structure
+		
 		
 		// time
 		globalTimeRadioBtn.setUserData(Time.GLOBAL);
@@ -327,6 +335,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		assert (attachmentToggle!=null);
 		assert (cellRadioBtn!=null);
 		assert (globalRadioBtn!=null);
+		assert (structureRadioBtn!=null);
 		assert (structuresComboBox!=null);
 		assert (axonRadioBtn!=null);
 		assert (dendriteRadioBtn!=null);
@@ -378,10 +387,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private void updateTime() {
 		if (timeToggle!=null) {
-			resetToggle(timeToggle);
-			
-			startTimeField.setText("");
-			endTimeField.setText("");
 			setCurrentTimeLabel(timeProperty.get()+frameOffset);
 			
 			if (activeNote!=null) {
@@ -400,14 +405,22 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					endTimeField.setText(Integer.toString(end+frameOffset));
 				}	
 			}
+			
+			else {
+				resetToggle(timeToggle);
+				
+				startTimeField.setText("");
+				endTimeField.setText("");
+			}
 		}
 	}
 	
 	
-	// TODO
 	private void updateType() {
 		if (attachmentToggle!=null) {
 			resetToggle(attachmentToggle);
+			resetToggle(subStructureToggle);
+			structuresComboBox.getSelectionModel().clearSelection();
 			
 			if (activeNote!=null) {
 				switch (activeNote.getAttachmentType()) {
@@ -416,6 +429,18 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 								activeCellProperty.set(cellName);
 								setCellLabelName(cellName);
 								attachmentToggle.selectToggle(cellRadioBtn);
+								break;
+				
+				case STRUCTURE:
+								String name = activeNote.getCellName();
+								for (String structure : structureComboItems) {
+									if (structure.equalsIgnoreCase(name)) {
+										name = structure;
+										structuresComboBox.getSelectionModel().select(structure);
+										break;
+									}
+								}
+								attachmentToggle.selectToggle(structureRadioBtn);
 								break;
 								
 				case BLANK:		// fall to default case
@@ -611,13 +636,12 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				Toggle oldValue, Toggle newValue) {
 			if (activeNote!=null && newValue!=null) {
 				int start = Integer.MIN_VALUE;
-				int end = start;
+				int end = Integer.MIN_VALUE;
 				
 				switch ((Time)newValue.getUserData()) {
-				case GLOBAL:
-								break;
 								
 				case CURRENT:
+								System.out.println(timeProperty.get());
 								start = timeProperty.get();
 								end = start;
 								break;
@@ -633,6 +657,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									//e.printStackTrace();
 								}
 								break;
+								
+				case GLOBAL:	// fall to default case
 				
 				default:
 								break;
@@ -720,6 +746,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									
 					case BLANK:
 									setActiveNoteAttachmentType(Type.BLANK);
+									break;
+									
+					case STRUCTURE:
+									setActiveNoteAttachmentType(Type.STRUCTURE);
 									break;
 									
 					default:

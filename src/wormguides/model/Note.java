@@ -482,7 +482,7 @@ public class Note {
 			return true;
 		
 		if (!tagDisplay.equals(Display.OVERLAY) && attachmentType.equals(Type.CELL) 
-				&& !isCellSpecified())
+				&& !isEntitySpecified())
 			return true;
 		
 		return false;
@@ -505,17 +505,31 @@ public class Note {
 	}
 	
 	
+	/*
+	 * Returns true is note exists with multicell structure
+	 * False otherwise
+	 */
+	public boolean existsWithStructure() {
+		return attachmentType.equals(Type.STRUCTURE);
+	}
+	
+	
+	public boolean isValidStructureAttachment() {
+		return existsWithStructure() && isEntitySpecified();
+	}
+	
+	
 	public boolean existsWithCell() {
 		return attachmentType.equals(Type.CELL);
 	}
 	
 	
 	public boolean isValidCellAttachment() {
-		return existsWithCell() && isCellSpecified();
+		return existsWithCell() && isEntitySpecified();
 	}
 	
 	
-	public boolean isCellSpecified() {
+	public boolean isEntitySpecified() {
 		return !cellName.isEmpty();
 	}
 	
@@ -582,6 +596,7 @@ public class Note {
 	public enum Type {
 		LOCATION("location"),
 		CELL("cell"),
+		STRUCTURE("structure"),
 		BLANK("");
 		
 		private String type;

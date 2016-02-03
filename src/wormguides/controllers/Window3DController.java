@@ -644,11 +644,11 @@ public class Window3DController {
 					double radius = ((Sphere) node).getRadius();
 					if (isLabel) {
 						x += radius;
-						y -= (radius+3);
+						y -= (radius+5);
 					}
 					else {
 						x += radius;
-						y += radius+3;
+						y += radius+5;
 					}
 				}
 				text.getTransforms().add(new Translate(x, y));
@@ -760,6 +760,9 @@ public class Window3DController {
 			}
 			
 			for (Note note : currentNotes) {
+				// TODO
+				System.out.println(note.toString());
+				
 				if (note.hasSceneElements()) {
 					for (SceneElement se : note.getSceneElements()) {
 						MeshView mesh = se.buildGeometry(time);
@@ -771,8 +774,6 @@ public class Window3DController {
 							newOriginZ+se.getZ()),
 							new Scale(150, -150, -150));
 						currentNoteMeshMap.put(note, mesh);
-						//System.out.println("put current mesh - "+se.getSceneName());
-						//System.out.println("location - "+se.getX()+", "+se.getY()+", "+se.getZ());
 					}
 				}
 			}
@@ -1061,17 +1062,28 @@ public class Window3DController {
 	// false otherwise
 	// Input node is the note geometry
 	private boolean positionNoteSprite(Note note, Text node) {
-		if (note.getAttachmentType()==Type.LOCATION) {
+		
+		if (note.getAttachmentType().equals(Type.LOCATION)) {
 			// Z coordinate is ignored for sprites - they reside on top of the subscene
 			spriteSphereMap.put(node, createLocationSphereMarker(note.getX(), 
 					note.getY(), note.getZ()));
 			return true;
 		}
 		
-		else if (note.existsWithCell() && note.existsAtTime(time.get()-1)) {
+		else if (note.isValidCellAttachment() && note.existsAtTime(time.get()-1)) {
 			for (int i=0; i<cellNames.length; i++) {
 				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
 					spriteSphereMap.put(node, spheres[i]);
+					return true;
+				}
+			}
+		}
+		
+		else if (note.isValidStructureAttachment() && note.existsAtTime(time.get()-1)) {
+			for (int i=0; i<currentSceneElements.size(); i++) {
+				if (currentSceneElements.get(i).getSceneName()
+						.equalsIgnoreCase(note.getCellName())) {
+					spriteSphereMap.put(node, currentSceneElementMeshes.get(i));
 					return true;
 				}
 			}
