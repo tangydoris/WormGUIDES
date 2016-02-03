@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<fx:root prefHeight="800.0" prefWidth="380.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="800.0" prefWidth="390.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="30.0" layoutY="83.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -15,30 +15,6 @@
                <children>
                   <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <HBox>
-                           <children>
-                              <Label maxHeight="1.7976931348623157E308" text="Story Title:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                              <TextField fx:id="storyTitle" maxWidth="1.7976931348623157E308" minWidth="100.0" HBox.hgrow="ALWAYS">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font></TextField>
-                           </children>
-                        </HBox>
-                        <Label text="Story Description:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <TextArea fx:id="storyDescription" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true" VBox.vgrow="ALWAYS">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </TextArea>
                         <Button maxWidth="1.7976931348623157E308" minWidth="89.0" mnemonicParsing="false" onAction="#newStory" text="New Story">
                            <font>
                               <Font size="14.0" />
@@ -51,6 +27,55 @@
                               </Tooltip>
                            </tooltip>
                         </Button>
+                        <HBox spacing="5.0">
+                           <children>
+                              <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" text="Author:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="author" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
+                           </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="10.0" spacing="5.0">
+                           <children>
+                              <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" text="Date:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="date" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
+                           </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                           <children>
+                              <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" text="Story Title:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="storyTitle" maxWidth="1.7976931348623157E308" minWidth="100.0" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font></TextField>
+                           </children>
+                        </HBox>
+                        <Label text="Story Description:">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="storyDescription" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="55.0" wrapText="true" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </TextArea>
                         <VBox depthTest="ENABLE" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="3.0" style="-fx-border-color: #aaaaaa; -fx-background-color: #eeeeee; -fx-border-width: 1;" VBox.vgrow="ALWAYS">
                            <children>
                               <HBox maxWidth="1.7976931348623157E308">
@@ -86,14 +111,13 @@
                                        </tooltip></Button>
                                  </children>
                               </HBox>
-                              <HBox maxWidth="1.7976931348623157E308">
+                              <HBox maxWidth="1.7976931348623157E308" spacing="5.0">
                                  <children>
                                     <Label maxHeight="1.7976931348623157E308" minWidth="34.0" text="Title:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" HBox.hgrow="ALWAYS" />
                                     <TextField fx:id="titleField" maxWidth="1.7976931348623157E308" prefWidth="230.0" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
@@ -106,7 +130,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <TextArea fx:id="contentArea" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="50.0" wrapText="true">
+                              <TextArea fx:id="contentArea" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="55.0" wrapText="true">
                                  <font>
                                     <Font size="14.0" />
                                  </font></TextArea>
@@ -160,16 +184,26 @@
                                     </RadioButton>
                                  </children>
                               </HBox>
-                              <HBox layoutX="16.0" layoutY="315.0" maxWidth="1.7976931348623157E308">
+                              <HBox layoutX="16.0" layoutY="231.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                                  <children>
                                     <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="62.0" text="Structure">
+                                    <Label minWidth="62.0" text="Structure">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="10.0" HBox.hgrow="ALWAYS" />
-                                    <ComboBox fx:id="structuresComboBox" disable="true" maxWidth="1.7976931348623157E308" prefWidth="180.0" HBox.hgrow="ALWAYS" />
+                                    <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                    <RadioButton fx:id="structureRadioBtn" mnemonicParsing="false" toggleGroup="$attachmentToggle">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </RadioButton>
+                                 </children>
+                              </HBox>
+                              <HBox layoutX="16.0" layoutY="315.0" maxWidth="1.7976931348623157E308">
+                                 <children>
+                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
+                                    <ComboBox fx:id="structuresComboBox" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="30.0" prefWidth="180.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                               <HBox maxWidth="1.7976931348623157E308">
@@ -191,10 +225,13 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
+                                    <RadioButton fx:id="axonRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="subStructureToggle" />
+                                       </toggleGroup>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                     <Label disable="true" layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
@@ -203,7 +240,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
+                                    <RadioButton fx:id="dendriteRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -215,7 +252,7 @@
                                        </font>
                                     </Label>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$attachmentToggle">
+                                    <RadioButton fx:id="cellBodyRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -225,7 +262,7 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="15.0" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" minWidth="33.0" text="Time">
+                                    <Label minWidth="33.0" text="Time">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -235,13 +272,13 @@
                               <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" text="Global">
+                                    <Label text="Global">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <RadioButton fx:id="globalTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" disable="true" mnemonicParsing="false">
+                                    <RadioButton fx:id="globalTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -254,13 +291,13 @@
                               <HBox layoutX="16.0" layoutY="422.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" text="Current Time">
+                                    <Label fx:id="currentTimeLabel" text="Current Time">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <RadioButton fx:id="currentTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" disable="true" mnemonicParsing="false" toggleGroup="$timeToggle">
+                                    <RadioButton fx:id="currentTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" toggleGroup="$timeToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -270,13 +307,13 @@
                               <HBox layoutX="16.0" layoutY="422.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" text="Range">
+                                    <Label text="Range">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <RadioButton fx:id="rangeTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" disable="true" mnemonicParsing="false" toggleGroup="$timeToggle">
+                                    <RadioButton fx:id="rangeTimeRadioBtn" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" toggleGroup="$timeToggle">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -286,31 +323,31 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="100.0" text="Specify Range:">
+                                    <Label maxHeight="1.7976931348623157E308" minWidth="100.0" text="Specify Range:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region maxWidth="25.0" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="37.0" text="Start:">
+                                    <Label maxHeight="1.7976931348623157E308" minWidth="37.0" text="Start:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region prefWidth="5.0" />
-                                    <TextField fx:id="startTimeField" disable="true" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="45.0" HBox.hgrow="SOMETIMES">
+                                    <TextField fx:id="startTimeField" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="45.0" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </TextField>
                                     <Region maxWidth="20.0" prefWidth="10.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="30.0" text="End:">
+                                    <Label maxHeight="1.7976931348623157E308" minWidth="30.0" text="End:">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </Label>
                                     <Region prefWidth="5.0" />
-                                    <TextField fx:id="endTimeField" disable="true" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="45.0" HBox.hgrow="SOMETIMES">
+                                    <TextField fx:id="endTimeField" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="45.0" HBox.hgrow="SOMETIMES">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -392,7 +429,7 @@
                                        </font>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" text="Right">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="35.0" text="Right">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -414,7 +451,7 @@
                                        </font>
                                     </RadioButton>
                                     <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" text="Right">
+                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="35.0" text="Right">
                                        <font>
                                           <Font size="14.0" />
                                        </font>

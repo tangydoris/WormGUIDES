@@ -1,7 +1,6 @@
 package wormguides;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -243,11 +242,6 @@ public class Search {
 	
 	public void clearRules() {
 		rulesList.clear();
-	}
-	
-	
-	private void addColorRule(String searched, Color color, SearchOption...options) {
-		addColorRule(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
 	
 	

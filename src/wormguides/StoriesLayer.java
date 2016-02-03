@@ -1,21 +1,13 @@
 package wormguides;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.Comparator;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -45,14 +37,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import wormguides.controllers.NoteEditorController;
+import wormguides.controllers.StoryEditorController;
+import wormguides.loaders.StoriesLoader;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
+import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
-import wormguides.model.Note.AttachmentTypeEnumException;
-import wormguides.model.Note.LocationStringFormatException;
-import wormguides.model.Note.TagDisplayEnumException;
-import wormguides.model.Note.TimeStringFormatException;
 import wormguides.view.AppFont;
 
 /*
@@ -61,6 +51,8 @@ import wormguides.view.AppFont;
 public class StoriesLayer {
 	
 	private Stage parentStage;
+	
+	private SceneElementsList sceneElementsList;
 
 	private ObservableList<Story> stories;
 	
@@ -69,7 +61,7 @@ public class StoriesLayer {
 	
 	private BooleanProperty rebuildSceneFlag;
 	
-	private NoteEditorController editController;
+	private StoryEditorController editController;
 	
 	private Note activeNote;
 	private Story activeStory;
@@ -82,10 +74,14 @@ public class StoriesLayer {
 	
 	private LineageData cellData;
 	
+	private Comparator<Note> noteComparator;
 	
-	public StoriesLayer(Stage parent, StringProperty cellNameProperty, 
-			BooleanProperty cellClicked, LineageData data) {
+	
+	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
+			IntegerProperty sceneTimeProperty, BooleanProperty cellClicked, LineageData data) {
 		parentStage = parent;
+		
+		sceneElementsList = elementsList;
 		
 		stories = FXCollections.observableArrayList(
 				story -> new Observable[]{story.getChangedProperty()});
@@ -93,22 +89,13 @@ public class StoriesLayer {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
 				while (c.next()) {
-					if (c.wasUpdated()) {
-						//System.out.println("stories updated");
-					}
-					else {
-						for (Story story : c.getAddedSubList()) {
-							//System.out.println("added - "+story.getName());
-						}
-						for (Story story : c.getRemoved()) {
-							//System.out.println("removed - "+story.getName());
-						}
-					}
+					// need this listener to detect change for some reason
+					// leave this empty
 				}
 			}
 		});
 		
-		timeProperty = new SimpleIntegerProperty(-1);
+		timeProperty = sceneTimeProperty;
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		cellData = data;
 		
@@ -119,7 +106,24 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = cellClicked;
 		
-		buildStories();
+		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
+		
+		noteComparator = new Comparator<Note>() {
+			@Override
+			public int compare(Note o1, Note o2) {
+				Integer t1 = getEffectiveStartTime(o1, cellData);
+				Integer t2 = getEffectiveStartTime(o2, cellData);
+				if (t1.equals(t2))
+					return o1.getTagName().compareTo(o2.getTagName());
+				else
+					return t1.compareTo(t2);
+			}
+		};
+		
+		for (Story story : stories) {
+			story.setComparator(noteComparator);
+			story.sortNotes();
+		}
 	}
 	
 	
@@ -169,27 +173,7 @@ public class StoriesLayer {
 			activeNote.setActive(true);
 			
 			// set time property to be read by 3d window
-			int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-			int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
-			int noteStartTime = activeNote.getStartTime();
-			int noteEndTime = activeNote.getEndTime();
-			
-			if (activeNote.isTimeSpecified() && activeNote.isAttachedToCellTime()) {
-				// make sure times actually overlap
-				if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
-					timeProperty.set(cellStartTime);
-				else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
-					timeProperty.set(noteStartTime);
-			}
-			
-			else if (activeNote.isAttachedToCell())
-				timeProperty.set(cellStartTime);
-			
-			else if (activeNote.isTimeSpecified())
-				timeProperty.set(noteStartTime);
-			
-			else
-				timeProperty.set(1);
+			timeProperty.set(getEffectiveStartTime(activeNote, cellData));
 		}
 		
 		if (editController!=null)
@@ -197,8 +181,48 @@ public class StoriesLayer {
 	}
 	
 	
-	public IntegerProperty getTimeProperty() {
-		return timeProperty;
+	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
+		int time = 1;
+		
+		if (activeNote!=null) {
+			if (activeNote.existsWithCell() || activeNote.existsWithStructure()) {
+				
+				int entityStartTime = Integer.MIN_VALUE;
+				int entityEndTime = Integer.MIN_VALUE;
+				
+				if (activeNote.existsWithCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				else {
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				
+				// attached to cell/structure and time is specified
+				if (activeNote.isTimeSpecified()) {
+					int noteStartTime = activeNote.getStartTime();
+					int noteEndTime = activeNote.getEndTime();
+					
+					// make sure times actually overlap
+					if (noteStartTime<=entityStartTime && entityStartTime<=noteEndTime)
+						time = entityStartTime;
+					else if (entityStartTime<=noteStartTime && noteStartTime<entityEndTime)
+						time = noteStartTime;
+				}
+				
+				// attached to cell/structure and time not specified
+				else
+					time = entityStartTime;
+			}
+				
+			else if (activeNote.isTimeSpecified()) {
+				time = activeNote.getStartTime();
+			}
+			
+		}
+		
+		return new Integer(time);
 	}
 	
 	
@@ -216,123 +240,6 @@ public class StoriesLayer {
 			}
 		}
 		return comments;
-	}
-	
-	
-	public void buildStories() {
-		try {
-			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
-			Enumeration<JarEntry> entries = jarFile.entries();
-			JarEntry entry;
-			
-			while (entries.hasMoreElements()) {
-				entry = entries.nextElement();
-				
-				if (entry.getName().equals("wormguides/model/story_file/"+STORY_CONFIG_FILE_NAME)) {
-					InputStream stream = jarFile.getInputStream(entry);
-					processStream(stream);
-				}
-			}
-			
-			jarFile.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
-		} catch (IOException e) {
-			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
-		}
-	}
-	
-	
-	public void processStream(InputStream stream) {
-		int storyCounter = -1; //used for accessing the current story for adding scene elements
-
-		try {
-			InputStreamReader streamReader = new InputStreamReader(stream);
-			BufferedReader reader = new BufferedReader(streamReader);
-			
-			String line;
-			
-			// Skip heading line
-			reader.readLine();
-			
-			while ((line = reader.readLine()) != null) {
-				String[] split =  line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
-				
-				if (split.length != NUMBER_OF_CSV_FIELDS) {
-					System.out.println("Missing fields in CSV file.");
-					continue;
-				}
-				
-				// get rid of quotes in story description/note contents since
-				// field might have contained commas
-				String contents = split[CONTENTS_INDEX];
-				if (contents.startsWith("\"") && contents.endsWith("\""))
-					split[CONTENTS_INDEX] = contents.substring(1, contents.length()-1);
-				
-				if (isStory(split)) {
-					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX]);
-					stories.add(story);
-					storyCounter++;
-				}
-				else {
-					Story story = stories.get(storyCounter);
-					Note note = new Note(story, split[NAME_INDEX], split[CONTENTS_INDEX]);
-					story.addNote(note);
-					
-					try {
-						note.setTagDisplay(split[DISPLAY_INDEX]);
-						note.setAttachmentType(split[TYPE_INDEX]);
-						note.setLocation(split[LOCATION_INDEX]);
-						note.setCellName(split[CELLNAME_INDEX]);
-						
-						note.setImagingSource(split[IMG_SOURCE_INDEX]);
-						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
-						
-						note.setStartTime(split[START_TIME_INDEX]);
-						note.setEndTime(split[END_TIME_INDEX]);
-						
-						note.setComments(split[COMMENTS_INDEX]);
-						
-					} catch (ArrayIndexOutOfBoundsException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					} catch (TagDisplayEnumException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-						e.printStackTrace();
-					} catch (AttachmentTypeEnumException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					} catch (LocationStringFormatException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					} catch (TimeStringFormatException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					}
-				}	
-			}
-			
-			reader.close();
-			
-		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("Unable to process file '" + STORY_CONFIG_FILE_NAME + "'.");
-		} catch (NumberFormatException e) {
-			System.out.println("Number Format Error in file '" + STORY_CONFIG_FILE_NAME + "'.");
-		} catch (IOException e) {
-			System.out.println("The config file '" + STORY_CONFIG_FILE_NAME + "' wasn't found on the system.");
-		}
-	}
-	
-	
-	public boolean isStory(String[] csvLine) {
-		try {
-			if (csvLine[DISPLAY_INDEX].isEmpty())
-				return true;
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return false;
-		}
-		return false;
 	}
 	
 	
@@ -401,7 +308,9 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new NoteEditorController(activeCellProperty, cellClickedProperty);
+					editController = new StoryEditorController(FRAME_OFFSET, cellData, 
+							sceneElementsList.getAllMulticellSceneNames(),
+							activeCellProperty, cellClickedProperty, timeProperty);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
@@ -409,7 +318,7 @@ public class StoriesLayer {
 					editStage = new Stage();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/NoteEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);
@@ -608,9 +517,6 @@ public class StoriesLayer {
 	// Graphical representation of a note
 	public class NoteListCellGraphic extends VBox{
 		
-		private Story story;
-		private Note note;
-		
 		private HBox contentsContainer;
 		private Text expandIcon;
 		private Text title;
@@ -622,9 +528,7 @@ public class StoriesLayer {
 		public NoteListCellGraphic(Note note) {
 			super();
 			
-			story = note.getParent();
-			this.note = note;
-
+			note.getParent();
 			setPadding(new Insets(3));
 			
 			// title heading graphics
@@ -740,23 +644,8 @@ public class StoriesLayer {
 			}
 		}	
 	}
-	
-	
-	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
-	private final int NUMBER_OF_CSV_FIELDS = 12;
-	private final int STORY_NAME_INDEX = 0,
-					STORY_DESCRIPTION_INDEX = 1;
-	private final int NAME_INDEX = 0,
-					CONTENTS_INDEX = 1,
-					DISPLAY_INDEX = 2,
-					TYPE_INDEX = 3,
-					LOCATION_INDEX = 4,
-					CELLNAME_INDEX = 5,
-					MARKER_INDEX = 6,
-					IMG_SOURCE_INDEX = 7,
-					RESOURCE_LOCATION_INDEX = 8,
-					START_TIME_INDEX = 9,
-					END_TIME_INDEX = 10,
-					COMMENTS_INDEX = 11;
 
+	private static final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
+	
+	private final int FRAME_OFFSET = 19;
 }

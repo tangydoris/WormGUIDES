@@ -118,7 +118,7 @@ public abstract class Rule {
 					editController = new RuleEditorController();
 					
 					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/RuleEditorLayout.fxml"));
+					loader.setLocation(MainApp.class.getResource("view/layouts/RuleEditorLayout.fxml"));
 					
 					loader.setController(editController);
 					loader.setRoot(editController);

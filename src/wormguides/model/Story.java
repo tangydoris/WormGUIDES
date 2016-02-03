@@ -1,6 +1,8 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -15,14 +17,27 @@ public class Story {
 	
 	private String name;
 	private String description;
+	
+	private String author;
+	private String date;
+	
 	private ObservableList<Note> notes;
 	private BooleanProperty activeBooleanProperty;
 	private BooleanProperty changedBooleanProperty;
-		
+	private Comparator<Note> comparator;
+	
 	
 	public Story(String name, String description) {
+		this(name, description, "", "");
+	}
+	
+	
+	public Story(String name, String description, String author, String date) {
 		this.name = name;
 		this.description = description;
+		
+		this.author = author;
+		this.date = date;
 		
 		activeBooleanProperty = new SimpleBooleanProperty(false);
 		activeBooleanProperty.addListener(new ChangeListener<Boolean>() {
@@ -66,6 +81,18 @@ public class Story {
 	}
 	
 	
+	// Sorts notes by start time
+	public void sortNotes() {
+		if (comparator!=null)
+			setChanged(true);
+	}
+	
+	
+	public void setComparator(Comparator<Note> comparator) {
+		this.comparator = comparator;
+	}
+	
+	
 	public BooleanProperty getChangedProperty() {
 		return changedBooleanProperty;
 	}
@@ -89,7 +116,7 @@ public class Story {
 	public ArrayList<Note> getNotesWithCell() {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note.isAttachedToCell() || note.isAttachedToCellTime())
+			if (note!=null && note.existsWithCell())
 				list.add(note);
 		}
 		return list;
@@ -120,6 +147,26 @@ public class Story {
 	}
 	
 	
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	
+	
+	public String getAuthor() {
+		return author;
+	}
+	
+	
+	public void setDate(String date) {
+		this.date = date;
+	}
+	
+	
+	public String getDate() {
+		return date;
+	}
+	
+	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -131,12 +178,18 @@ public class Story {
 	
 	
 	public void addNote(Note note) {
-		if (note!=null)
+		if (note!=null) {
 			notes.add(note);
+			setChanged(true);
+			
+		}
 	}
 	
 	
 	public void setChanged(boolean changed) {
+		if (comparator!=null)
+			Collections.sort(notes, comparator);
+
 		changedBooleanProperty.set(changed);
 	}
 	

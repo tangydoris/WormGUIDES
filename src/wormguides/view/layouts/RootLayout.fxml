@@ -51,7 +51,7 @@
 			    <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
 			  </rowConstraints>
 			   <children>
-			      <TabPane fx:id="dataPanel" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMinWidth="80.0">
+			      <TabPane fx:id="mainTabPane" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
 			        <tabs>
                   <Tab closable="false" text="Stories">
                     <content>
@@ -76,15 +76,6 @@
                                                 <Insets left="10.0" right="10.0" />
                                              </padding>
                                           </Button>
-                                          <Region prefWidth="20.0" />
-                                          <Button fx:id="noteEditorBtn1" disable="true" layoutX="85.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Create Story">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="20.0" right="20.0" />
-                                             </padding>
-                                          </Button>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
@@ -94,13 +85,13 @@
                         </AnchorPane>
                     </content>
                   </Tab>
-                  <Tab closable="false" text="Coloring and Display">
+                  <Tab fx:id="colorAndDisplayTab" closable="false" text="Coloring and Display">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" tabMinWidth="75.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TabPane fx:id="colorAndDisplayTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <tabs>
-                  			          <Tab closable="false" text="Find Cells">
+                  			          <Tab fx:id="cellsTab" closable="false" text="Find Cells">
                   			            <content>
                   			              <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
                                              <children>

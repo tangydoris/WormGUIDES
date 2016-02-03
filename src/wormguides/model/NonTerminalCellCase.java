@@ -1,10 +1,6 @@
 package wormguides.model;
 
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import wormguides.Search;
 
 public class NonTerminalCellCase {
@@ -59,7 +55,7 @@ public class NonTerminalCellCase {
 		this.cellName + ";class=Anatomy_term";
 		
 		try {
-			URLConnection connection = new URL(URL).openConnection();			
+			//URLConnection connection = new URL(URL).openConnection();			
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas

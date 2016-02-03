@@ -14,7 +14,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -30,6 +29,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
@@ -48,7 +49,7 @@ import wormguides.DisplayLayer;
 import wormguides.Search;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
-import wormguides.StringCellCallback;
+import wormguides.StringListCellFactory;
 import wormguides.StructuresLayer;
 import wormguides.URLLoader;
 import wormguides.loaders.AceTreeLoader;
@@ -110,6 +111,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Slider timeSlider;
 	@FXML private Button zoomInButton, zoomOutButton;
 	
+	// Tab
+	@FXML private TabPane mainTabPane;
+	@FXML private Tab colorAndDisplayTab;
+	@FXML private TabPane colorAndDisplayTabPane;
+	@FXML private Tab cellsTab;
+	
 	// Cells tab
 	private Search search;
 	@FXML private TextField searchField;
@@ -147,9 +154,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
-	private Service<Void> structuresSearchListDeselect;
-	private Service<Void> allStructuresListDeselect;
-	
 	// cell information
 	@FXML private Text displayedName;
 	@FXML private Text moreInfoClickableText;
@@ -382,7 +386,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
 		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
 		
-		searchField.textProperty().addListener(window3D.getSearchFieldListener());
+		window3D.setSearchField(searchField);
 		
 		// slider has to listen to 3D window's opacity value
 		// 3d window's opacity value has to listen to opacity slider's value
@@ -396,9 +400,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
 		
-		// for info window
+		// for context menu
+		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 		window3D.setBringUpInfoProperty(bringUpInfoProperty);
+		// send to search
 	}
 	
 	private void setPropertiesFrom3DWindow() {
@@ -438,6 +444,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			}
 		});
 		
+		// search stuff
 		searchResultsListView.getSelectionModel().selectedItemProperty()
 				.addListener(new ChangeListener<String>() {
 			@Override
@@ -445,6 +452,17 @@ public class RootLayoutController extends BorderPane implements Initializable{
 					ObservableValue<? extends String> observable,
 					String oldValue, String newValue) {
 				selectedName.set(newValue);
+			}
+		});
+		
+		searchField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (!newValue.isEmpty()) {
+					mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+					colorAndDisplayTabPane.getSelectionModel().select(cellsTab);
+				}
 			}
 		});
 		
@@ -471,9 +489,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		});
 		
 		// Modify font for ListView's of String's
-		structuresSearchListView.setCellFactory(new StringCellCallback());
+		structuresSearchListView.setCellFactory(new StringListCellFactory());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
-		searchResultsListView.setCellFactory(new StringCellCallback());
+		searchResultsListView.setCellFactory(new StringListCellFactory());
 		
 		// 'Others' opacity
 		opacitySlider.setValue(50);
@@ -782,6 +800,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		assert (zoomInButton != null);
 		assert (zoomOutButton != null);
 		
+		assert (mainTabPane != null);
+		assert (colorAndDisplayTab != null);
+		assert (colorAndDisplayTabPane != null);
+		assert (cellsTab != null);
+		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
 		assert (sysRadioBtn != null);
@@ -846,7 +869,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer(LineageData data) {
-		storiesLayer = new StoriesLayer(mainStage, selectedName, window3D.getCellClicked(), data);
+		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, window3D.getTimeProperty(), 
+				window3D.getCellClicked(), data);
 		window3D.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
@@ -856,7 +880,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
 		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
-		storiesLayer.getTimeProperty().addListener(window3D.getStoriesTimeListener());
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
