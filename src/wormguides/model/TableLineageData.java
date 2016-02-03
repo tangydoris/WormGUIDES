@@ -167,10 +167,6 @@ public class TableLineageData implements LineageData{
 			return namesArray;
 		}
 		
-		private ArrayList<String> getNamesArrayList() {
-			return names;
-		}
-		
 		private Integer[][] getPositions() {
 			if (positionsArray==null)
 				positionsArray = positions.toArray(new Integer[positions.size()][3]);

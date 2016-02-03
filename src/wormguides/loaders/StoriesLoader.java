@@ -150,7 +150,7 @@ public class StoriesLoader {
 							TYPE_INDEX = 3,
 							LOCATION_INDEX = 4,
 							CELLNAME_INDEX = 5,
-							MARKER_INDEX = 6,
+							//MARKER_INDEX = 6,
 							IMG_SOURCE_INDEX = 7,
 							RESOURCE_LOCATION_INDEX = 8,
 							START_TIME_INDEX = 9,

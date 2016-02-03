@@ -515,9 +515,6 @@ public class StoriesLayer {
 	// Graphical representation of a note
 	public class NoteListCellGraphic extends VBox{
 		
-		private Story story;
-		private Note note;
-		
 		private HBox contentsContainer;
 		private Text expandIcon;
 		private Text title;
@@ -529,9 +526,7 @@ public class StoriesLayer {
 		public NoteListCellGraphic(Note note) {
 			super();
 			
-			story = note.getParent();
-			this.note = note;
-
+			note.getParent();
 			setPadding(new Insets(3));
 			
 			// title heading graphics
@@ -540,7 +535,7 @@ public class StoriesLayer {
 			titleContainer.setMaxWidth(width);
 			titleContainer.setMinWidth(width);
 			
-			expandIcon = new Text("▸");
+			expandIcon = new Text("►");
 			expandIcon.setPickOnBounds(true);
 			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
@@ -639,11 +634,11 @@ public class StoriesLayer {
 		private void expandNote(boolean expanded) {
 			if (expanded) {
 				getChildren().add(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▸", "▾"));
+				expandIcon.setText(expandIcon.getText().replace("►", "▼"));
 			}
 			else {
 				getChildren().remove(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▾", "▸"));
+				expandIcon.setText(expandIcon.getText().replace("▼", "►"));
 			}
 		}	
 	}

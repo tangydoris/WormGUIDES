@@ -27,8 +27,6 @@ public class Note {
 	private String resourceLocation;
 	private int startTime, endTime;
 	private String comments;
-	private String url;
-	
 	private Story parent;
 	
 	// True when any field value changes, false otherwise
@@ -53,8 +51,6 @@ public class Note {
 		resourceLocation = "";
 		startTime = endTime = Integer.MIN_VALUE;
 		comments = "";
-		url = "";
-		
 		changedProperty = new SimpleBooleanProperty(false);
 		changedProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
@@ -146,8 +142,8 @@ public class Note {
 	
 	
 	public void setUrl(String url) {
-		if (url!=null)
-			this.url = url;
+		if (url!=null) {
+		}
 	}
 	
 	

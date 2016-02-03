@@ -28,7 +28,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import wormguides.StringListCellFactory;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
@@ -71,7 +70,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML private RadioButton axonRadioBtn;
 	@FXML private RadioButton dendriteRadioBtn;
 	@FXML private RadioButton cellBodyRadioBtn;
-	private Type type;
+	
 	
 	// callout stuff
 	//@FXML private CheckBox calloutTick;
@@ -86,8 +85,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML private RadioButton upRightRadioBtn;
 	@FXML private RadioButton lowLeftRadioBtn;
 	@FXML private RadioButton lowRightRadioBtn;
-	private Display display;
-	
 	private BooleanProperty storyCreated;
 	private BooleanProperty noteCreated;
 	
@@ -99,9 +96,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML private TextField titleField;
 	@FXML private TextArea contentArea;
 	private Note activeNote;
-	
-	private Stage editStage;
-	
 	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
@@ -239,24 +233,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private void setActiveNoteCellName(String name) {
 		if (activeNote!=null)
 			activeNote.setCellName(name);
-	}
-	
-	
-	private void setActiveNoteTimes(String start, String end) {
-		start = start.trim();
-		end = end.trim();
-		
-		if (activeNote!=null) {
-			if (!start.isEmpty() && !end.isEmpty()) {
-				try {
-					activeNote.setStartAndEndTimes(Integer.parseInt(start), Integer.parseInt(end));
-				} catch (NumberFormatException e) {
-					//System.out.println("invalid start/end time - must be integer");
-				}
-			}
-			else
-				activeNote.setStartAndEndTimes(Integer.MIN_VALUE, Integer.MIN_VALUE);
-		}
 	}
 	
 	

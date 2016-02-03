@@ -158,17 +158,9 @@ public class Window3DController {
 	// Uniform nuclei sizef
 	private boolean uniformSize;
 	
-	// connectome - synapse type checkboxes
-	private boolean presynapticTicked;
-	private boolean postsynapticTicked;
-	private boolean electricalTicked;
-	private boolean neuromuscularTicked;
-	
 	// Cell body and cell nucleus highlighting in search mode
 	private boolean cellNucleusTicked;
 	private boolean cellBodyTicked;
-	private boolean multicellMode;
-	
 	// Story elements stuff
 	private StoriesLayer storiesLayer;
 	// currentNotes contains all notes that are 'active' within a scene
@@ -1798,7 +1790,6 @@ public class Window3DController {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				multicellMode = newValue;
 			}
 		};
 	}

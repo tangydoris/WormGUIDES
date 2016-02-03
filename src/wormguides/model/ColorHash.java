@@ -20,7 +20,6 @@ public class ColorHash {
 	private HashMap<Material, Double> opacityHash;
 	private Material highlightMaterial;
 	private Material translucentMaterial;
-	private Material defaultMaterial;
 	private Material noteMaterial;
 	
 	// Used for 'others' opacity
@@ -36,7 +35,7 @@ public class ColorHash {
 		
 		highlightMaterial = makeMaterial(Color.GOLD);
 		translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
-		defaultMaterial = makeMaterial(Color.WHITE);
+		makeMaterial(Color.WHITE);
 		noteMaterial = makeMaterial(Color.web("#749bc9"));
 	}
 	

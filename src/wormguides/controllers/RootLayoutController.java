@@ -14,7 +14,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -155,9 +154,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
-	private Service<Void> structuresSearchListDeselect;
-	private Service<Void> allStructuresListDeselect;
-	
 	// cell information
 	@FXML private Text displayedName;
 	@FXML private Text moreInfoClickableText;
