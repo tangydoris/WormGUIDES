@@ -299,6 +299,13 @@ public class InfoWindowDOM {
 				linksUL.addChild(li);
 			}
 		}
+		/*
+		 * TODO
+		 * cytoshow stub
+		 */
+		HTMLNode liSTUB = new HTMLNode("li", "", "", "Cytoshow: [cytoshow link to this cell in EM data]");
+		linksUL.addChild(liSTUB);
+		
 		linksDiv.addChild(linksUL);
 		
 		//references

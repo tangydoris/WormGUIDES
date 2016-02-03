@@ -26,11 +26,15 @@
             <Menu mnemonicParsing="false" text="View">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
-                  <MenuItem mnemonicParsing="false" onAction="#viewCellShapesIndex" text="Cell Shapes Index" />
-                  <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
-                  <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
-                  <MenuItem disable="true" mnemonicParsing="false" text="Product Information" />
-                  <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
+                  <Menu mnemonicParsing="false" text="Primary Documents">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#viewCellShapesIndex" text="Cell Shapes Index" />
+                        <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
+                        <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Experimental Data" />
+                    </items>
+                  </Menu>
+                  <MenuItem disable="true" mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

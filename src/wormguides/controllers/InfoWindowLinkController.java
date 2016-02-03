@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+//http://java-buddy.blogspot.com/2012/05/communication-between-javafx-and.html
+
 /*
  * Callback class for our HTML page for a terminal cell case to open link in default browser
  * 
