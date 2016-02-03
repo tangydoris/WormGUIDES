@@ -77,20 +77,20 @@ public class TableLineageData implements LineageData{
 	}
 	
 	public int getFirstOccurrenceOf(String name) {
-		int time = -1;
+		int time = Integer.MIN_VALUE;
 		name = name.trim();
 		
 		outer:
 			for (int i=0; i<timeFrames.size(); i++) {
 				for (String cell : timeFrames.get(i).getNames()) {
 					if (cell.equalsIgnoreCase(name)) {
-						time = i;
+						time = i+1;
 						break outer;
 					}
 				}
 			}
 		
-		return time+1;
+		return time;
 	}
 	
 	public int getLastOccurrenceOf(String name) {

@@ -89,16 +89,8 @@ public class StoriesLayer {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
 				while (c.next()) {
-					/*
-					if (c.wasUpdated()) {
-					}
-					else {
-						for (Story story : c.getAddedSubList()) {
-						}
-						for (Story story : c.getRemoved()) {
-						}
-					}
-					*/
+					// need this listener to detect change for some reason
+					// leave this empty
 				}
 			}
 		});
@@ -193,25 +185,35 @@ public class StoriesLayer {
 		int time = 1;
 		
 		if (activeNote!=null) {
-			if (activeNote.existsWithCell()) {
-				int cellStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+			if (activeNote.existsWithCell() || activeNote.existsWithStructure()) {
 				
-				// attached to cell and time specified
+				int entityStartTime = Integer.MIN_VALUE;
+				int entityEndTime = Integer.MIN_VALUE;
+				
+				if (activeNote.existsWithCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				else {
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				
+				// attached to cell/structure and time is specified
 				if (activeNote.isTimeSpecified()) {
-					int cellEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
-					int noteStartTime = activeNote.getStartTime()-FRAME_OFFSET;
-					int noteEndTime = activeNote.getEndTime()-FRAME_OFFSET;
+					int noteStartTime = activeNote.getStartTime();
+					int noteEndTime = activeNote.getEndTime();
 					
 					// make sure times actually overlap
-					if (noteStartTime<=cellStartTime && cellStartTime<=noteEndTime)
-						time = cellStartTime;
-					else if (cellStartTime<=noteStartTime && noteStartTime<cellEndTime)
+					if (noteStartTime<=entityStartTime && entityStartTime<=noteEndTime)
+						time = entityStartTime;
+					else if (entityStartTime<=noteStartTime && noteStartTime<entityEndTime)
 						time = noteStartTime;
 				}
 				
-				// attached to cell and time not specified
+				// attached to cell/structure and time not specified
 				else
-					time = cellStartTime;
+					time = entityStartTime;
 			}
 				
 			else if (activeNote.isTimeSpecified()) {
