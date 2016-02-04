@@ -74,7 +74,7 @@ public class StoriesLoader {
 				
 				if (isStory(split)) {
 					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX], 
-							split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX]);
+							split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX], split[STORY_COLOR_URL_INDEX]);
 					stories.add(story);
 					storyCounter++;
 				}
@@ -142,12 +142,13 @@ public class StoriesLoader {
 		return false;
 	}
 	
-	private static final int NUMBER_OF_CSV_FIELDS = 14;
+	private static final int NUMBER_OF_CSV_FIELDS = 15;
 	
 	private static final int STORY_NAME_INDEX = 0,
 							STORY_DESCRIPTION_INDEX = 1,
 							STORY_AUTHOR_INDEX = 12,
-							STORY_DATE_INDEX = 13;
+							STORY_DATE_INDEX = 13,
+							STORY_COLOR_URL_INDEX = 14;
 	
 	private static final int NAME_INDEX = 0,
 							CONTENTS_INDEX = 1,

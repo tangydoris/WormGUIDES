@@ -1,7 +1,13 @@
 package wormguides;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+
 import wormguides.model.Rule;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -14,40 +20,73 @@ import javafx.util.Callback;
 
 public class DisplayLayer {
 	
-	private ObservableList<Rule> rulesList;
+	private ArrayList<Rule> internalRulesList;
+	private ObservableList<Rule> currentRulesList;
 	private HashMap<Rule, Button> buttonMap;
 	
-	public DisplayLayer() {
-		
+	public DisplayLayer(BooleanProperty useInternalRules) {
+		internalRulesList = new ArrayList<Rule>();
 		buttonMap = new HashMap<Rule, Button>();
 		
-		rulesList = FXCollections.observableArrayList();
-		rulesList.addListener(new ListChangeListener<Rule>() {
+		currentRulesList = FXCollections.observableArrayList();
+		currentRulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
 					if (!change.wasUpdated()) {
-						// added to list
+						// added to current list
 						for (Rule rule : change.getAddedSubList()) {
 							buttonMap.put(rule, rule.getDeleteButton());
 							
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(ActionEvent event) {
-									rulesList.remove(rule);
+									currentRulesList.remove(rule);
+									
+									Rule temp;
+									if (useInternalRules.get()) {
+										Iterator<Rule> iter = internalRulesList.iterator();
+										while (iter.hasNext()) {
+											temp = iter.next();
+											if (temp==rule)
+												iter.remove();
+										}
+									}
 									buttonMap.remove(rule);
 								}
 							});
+							
+							// if using default rules, copy changes to internal rules list
+							if (useInternalRules.get())
+								internalRulesList.add(rule);
 						}
 					}
 				}
 			}
 		});
-			
+		
+		useInternalRules.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				// TODO
+				// using internal rules now
+				// copy all internal rules to current list
+				if (newValue) {
+					currentRulesList.clear();
+					currentRulesList.addAll(internalRulesList);
+				}
+				// not using internal rules anymore
+				// copy all current rule changes back to internal list
+				else {
+					
+				}
+			}
+		});
 	}
 	
 	public ObservableList<Rule> getRulesList() {
-		return rulesList;
+		return currentRulesList;
 	}
 	
 	

@@ -39,9 +39,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import wormguides.controllers.StoryEditorController;
+import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
+import wormguides.loaders.URLLoader;
+import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
+import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AppFont;
@@ -77,10 +81,18 @@ public class StoriesLayer {
 	
 	private Comparator<Note> noteComparator;
 	
+	private ObservableList<Rule> currentRules;
+	private BooleanProperty useInternalRules;
+	private Window3DController window3DController;
 	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
-			IntegerProperty sceneTimeProperty, BooleanProperty cellClicked, LineageData data) {
+			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag) {
+		
 		parentStage = parent;
+		
+		window3DController = sceneController;
+		useInternalRules = useInternalRulesFlag;
+		currentRules = window3DController.getObservableColorRulesList();
 		
 		sceneElementsList = elementsList;
 		
@@ -96,7 +108,7 @@ public class StoriesLayer {
 			}
 		});
 		
-		timeProperty = sceneTimeProperty;
+		timeProperty = window3DController.getTimeProperty();
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		cellData = data;
 		
@@ -105,7 +117,7 @@ public class StoriesLayer {
 		activeStoryProperty = new SimpleStringProperty("");
 		
 		activeCellProperty = cellNameProperty;
-		cellClickedProperty = cellClicked;
+		cellClickedProperty = window3DController.getCellClicked();
 		
 		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
 		
@@ -143,18 +155,54 @@ public class StoriesLayer {
 	
 	public void setActiveStory(Story story) {
 		// disable previous active story
-		if (activeStory!=null)
+		// copy current rules changes back to story
+		if (activeStory!=null) {
 			activeStory.setActive(false);
+			ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+			// fix subclassing for rule and colorrule
+			for (Rule rule : currentRules) {
+				if (rule instanceof ColorRule)
+					rulesCopy.add((ColorRule) rule);
+			}
+			
+			activeStory.setColorURL(URLGenerator.generateIOS(rulesCopy, timeProperty.get(), 
+					window3DController.getRotationX(), window3DController.getRotationY(), 
+					window3DController.getRotationZ(), window3DController.getTranslationX(),
+					window3DController.getTranslationY(), window3DController.getScale(),
+					window3DController.getOthersVisibility()));
+		}
 		
 		setActiveNote(null);
 		
 		activeStory = story;
+		int startTime = timeProperty.get();
+		
 		if (activeStory!=null) {
 			activeStory.setActive(true);
 			activeStoryProperty.set(activeStory.getName());
+			
+			if (activeStory.getColorURL().isEmpty())
+				useInternalRules.set(true);
+			
+			else {
+				useInternalRules.set(false);
+				URLLoader.process(activeStory.getColorURL(), window3DController);
+			}
+			
+			
+			if (activeStory.hasNotes()) {
+				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
+				System.out.println("start time - "+startTime);
+				if (startTime<1)
+					startTime = 1;
+			}
 		}
-		else
+		else {
 			activeStoryProperty.set("");
+			useInternalRules.set(true);
+			URLLoader.process("", window3DController);
+		}
+		timeProperty.set(startTime);
 		
 		if (editController!=null)
 			editController.setActiveStory(activeStory);
@@ -246,6 +294,7 @@ public class StoriesLayer {
 				else {
 					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
 					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+					System.out.println("times - "+entityStartTime+", "+entityEndTime);
 				}
 				
 				// attached to cell/structure and time is specified

@@ -88,7 +88,9 @@ public abstract class Rule {
 		
 		hbox.setSpacing(3);
 		hbox.setPadding(new Insets(3));
-		hbox.setMaxWidth(290);
+		hbox.setPrefWidth(290);
+		hbox.setMinWidth(hbox.getPrefWidth());
+		hbox.setMaxWidth(hbox.getPrefWidth());
 		
 		label.setFont(AppFont.getFont());
 		label.setPrefHeight(UI_SIDE_LENGTH);

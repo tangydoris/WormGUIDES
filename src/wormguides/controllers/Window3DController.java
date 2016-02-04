@@ -60,7 +60,6 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -132,7 +131,7 @@ public class Window3DController {
 
 	// color rules stuff
 	private ColorHash colorHash;
-	private ObservableList<Rule> rulesList;
+	private ObservableList<Rule> currentRulesList;
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
 
@@ -181,7 +180,6 @@ public class Window3DController {
 	private ArrayList<String> labels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Text, Node> labelEntityMap;
-	
 	
 	private BooleanProperty bringUpInfoProperty;
 	
@@ -295,7 +293,7 @@ public class Window3DController {
 		
 		uniformSize = false;
 		
-		rulesList = FXCollections.observableArrayList();
+		currentRulesList = FXCollections.observableArrayList();
 		
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
@@ -910,7 +908,7 @@ public class Window3DController {
 						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 						
 						//iterate over rulesList
-						for (Rule rule: rulesList) {
+						for (Rule rule: currentRulesList) {
 							
 							if (rule instanceof MulticellularStructureRule) {
 								//check equivalence of shape rule to scene name
@@ -964,7 +962,7 @@ public class Window3DController {
  			// not in search mode
  			else {
  				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
- 				for (Rule rule : rulesList) {
+ 				for (Rule rule : currentRulesList) {
  					// just need to consult rule's active list
  					if (rule.appliesToCell(cellNames[i])) {
  						colors.add(Color.web(rule.getColor().toString()));
@@ -1263,7 +1261,7 @@ public class Window3DController {
 						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 						
 						//iterate over rulesList
-						for (Rule rule: rulesList) {
+						for (Rule rule: currentRulesList) {
 							
 							if (rule instanceof MulticellularStructureRule) {
 								//check equivalence of shape rule to scene name
@@ -1422,8 +1420,8 @@ public class Window3DController {
 		if (list == null)
 			return;
 		
-		rulesList = list;
-		rulesList.addListener(new ListChangeListener<Rule>() {
+		currentRulesList = list;
+		currentRulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
 			public void onChanged(
 					ListChangeListener.Change<? extends Rule> change) {
@@ -1473,7 +1471,7 @@ public class Window3DController {
 	
 	public ArrayList<ColorRule> getColorRulesList() {
 		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (Rule rule : rulesList) {
+		for (Rule rule : currentRulesList) {
 			if (rule instanceof ColorRule)
 				list.add((ColorRule)rule);
 		}
@@ -1482,13 +1480,13 @@ public class Window3DController {
 
 	
 	public ObservableList<Rule> getObservableColorRulesList() {
-		return rulesList;
+		return currentRulesList;
 	}
 
 	
 	public void setColorRulesList(ArrayList<ColorRule> list) {
-		rulesList.clear();
-		rulesList.setAll(list);
+		currentRulesList.clear();
+		currentRulesList.setAll(list);
 	}
 
 	
@@ -1506,17 +1504,22 @@ public class Window3DController {
 	
 	
 	public void setRotations(double rx, double ry, double rz) {
+		/*
 		rx = Math.toDegrees(rx);
 		ry = Math.toDegrees(ry);
 		rx = Math.toDegrees(rz);
+		*/
 		
-		rotateX.setAngle(rx+180);
+		//rotateX.setAngle(rx+180);
+		rotateX.setAngle(rx);
 		rotateY.setAngle(ry);
 		rotateZ.setAngle(rz);
 	}
 	
 
+	// TODO fix all rotations in url parsing/loading
 	public double getRotationX() {
+		/*
 		if (spheres[0]!=null) {
 			Transform transform = spheres[0].getLocalToSceneTransform();
 			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
@@ -1524,10 +1527,13 @@ public class Window3DController {
 		}
 		else
 			return 0;
+		*/
+		return rotateX.getAngle();
 	}
 
 	
 	public double getRotationY() {
+		/*
 		if (spheres[0]!=null) {
 			Transform transform = spheres[0].getLocalToSceneTransform();
 			double pitch = Math.atan2(-transform.getMzy(), transform.getMzz());
@@ -1535,10 +1541,13 @@ public class Window3DController {
 		}
 		else
 			return 0;
+		*/
+		return rotateY.getAngle();
 	}
 	
 	
 	public double getRotationZ() {
+		/*
 		if (spheres[0]!=null) {
 			Transform transform = spheres[0].getLocalToSceneTransform();
 			double yaw = Math.atan2(transform.getMzx(), Math.sqrt((transform.getMzy()*transform.getMzy()
@@ -1547,6 +1556,8 @@ public class Window3DController {
 		}
 		else
 			return 0;
+		*/
+		return rotateZ.getAngle();
 	}
 
 	

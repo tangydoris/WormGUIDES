@@ -1,29 +1,30 @@
-package wormguides;
+package wormguides.loaders;
 
 import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
+import wormguides.Search;
+import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.controllers.Window3DController;
 import wormguides.model.Rule;
 
 public class URLLoader {
 	
-	private Window3DController window3D;
-	private ObservableList<Rule> rulesList;
-	
-	public URLLoader(Window3DController window3D) {
-		this.window3D = window3D;
-		rulesList = window3D.getObservableColorRulesList();
-	}
-	
-	public void parseURL(String url) {
-		// TODO add error message
-		if (window3D==null)
+	public static void process(String url, Window3DController window3DController) {
+		if (window3DController==null)
 			return;
 		
 		if (!url.contains("testurlscript?/"))
 			return;
+		
+		// if no URL is given, revert to internal color rules
+		if (url.isEmpty()) {
+			return;
+		}
+		
+		ObservableList<Rule> rulesList = window3DController.getObservableColorRulesList();
 		
 		String[] args = url.split("/");
 		ArrayList<String> ruleArgs = new ArrayList<String>();
@@ -55,11 +56,11 @@ public class URLLoader {
 		}
 		
 		// process arguments
-		parseRules(ruleArgs);
-		parseViewArgs(viewArgs);
+		parseRules(ruleArgs, rulesList);
+		parseViewArgs(viewArgs, window3DController);
 	}
 	
-	private void parseRules(ArrayList<String> rules) {
+	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
 		rulesList.clear();
 		for (String rule : rules) {
 			ArrayList<String> types = new ArrayList<String>();
@@ -142,7 +143,7 @@ public class URLLoader {
 		}
 	}
 	
-	private boolean isGeneFormat(String name) {
+	private static boolean isGeneFormat(String name) {
 		if (name.indexOf("-") < 0)
 			return false;
 		
@@ -158,7 +159,7 @@ public class URLLoader {
 		return true;
 	}
 	
-	private void parseViewArgs(ArrayList<String> viewArgs) {
+	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController) {
 		// manipulate viewArgs arraylist so that rx ry and rz are grouped together
 		// to facilitate loading rotations in x and y
 		for (int i = 0; i < viewArgs.size(); i++) {
@@ -177,7 +178,7 @@ public class URLLoader {
 					double rx = Double.parseDouble(tokens[0].split("=")[1]);
 					double ry = Double.parseDouble(tokens[1].split("=")[1]);
 					double rz = Double.parseDouble(tokens[2].split("=")[1]);
-					window3D.setRotations(rx, ry, rz);
+					window3DController.setRotations(rx, ry, rz);
 				} catch (NumberFormatException nfe) {
 					System.out.println("error in parsing time variable");
 					nfe.printStackTrace();
@@ -189,7 +190,7 @@ public class URLLoader {
 			if (tokens.length!=0) {
 				switch (tokens[0]) {
 					case "time":	try {
-										window3D.setTime(Integer.parseInt(tokens[1]));
+										window3DController.setTime(Integer.parseInt(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing time variable");
 										nfe.printStackTrace();
@@ -197,7 +198,7 @@ public class URLLoader {
 									break;
 									
 					case "tX":		try {
-										window3D.setTranslationX(Double.parseDouble(tokens[1]));
+										window3DController.setTranslationX(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing translation variable");
 										nfe.printStackTrace();
@@ -205,7 +206,7 @@ public class URLLoader {
 									break;
 					
 					case "tY":		try {
-										window3D.setTranslationY(Double.parseDouble(tokens[1]));
+										window3DController.setTranslationY(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing translation variable");
 										nfe.printStackTrace();
@@ -213,7 +214,7 @@ public class URLLoader {
 									break;
 					
 					case "scale":	try {
-										window3D.setScale(Double.parseDouble(tokens[1]));
+										window3DController.setScale(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing scale variable");
 										nfe.printStackTrace();
@@ -221,7 +222,7 @@ public class URLLoader {
 									break;
 					
 					case "dim":		try {
-										window3D.setOthersVisibility(Double.parseDouble(tokens[1]));
+										window3DController.setOthersVisibility(Double.parseDouble(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing dim variable");
 										nfe.printStackTrace();

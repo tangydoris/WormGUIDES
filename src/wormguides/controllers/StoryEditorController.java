@@ -240,7 +240,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	}
 	
 	
-	private void setActiveNoteTagDisplay(Display display) {
+	private void setActiveNoteDisplay(Display display) {
 		if (activeNote!=null)
 			activeNote.setTagDisplay(display);
 	}
@@ -691,15 +691,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					switch ((Display) newValue.getUserData()) {
 					
 					case OVERLAY:
-									setActiveNoteTagDisplay(Display.OVERLAY);
+									setActiveNoteDisplay(Display.OVERLAY);
 									break;
 									
 					case SPRITE:
-									setActiveNoteTagDisplay(Display.SPRITE);
+									setActiveNoteDisplay(Display.SPRITE);
 									break;
 									
 					case BILLBOARD_FRONT:
-									setActiveNoteTagDisplay(Display.BILLBOARD_FRONT);
+									setActiveNoteDisplay(Display.BILLBOARD_FRONT);
 									break;
 									
 					default:
@@ -708,7 +708,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				}
 				
 				else
-					setActiveNoteTagDisplay(Display.BLANK);
+					setActiveNoteDisplay(Display.BLANK);
 			}
 		}
 	}
@@ -725,14 +725,20 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					case CELL:
 									setActiveNoteAttachmentType(Type.CELL);
 									setActiveNoteCellName(activeCellProperty.get());
+									setActiveNoteDisplay(Display.SPRITE);
+									updateDisplay();
 									break;
 									
 					case BLANK:
 									setActiveNoteAttachmentType(Type.BLANK);
+									setActiveNoteDisplay(Display.OVERLAY);
+									updateDisplay();
 									break;
 									
 					case STRUCTURE:
 									setActiveNoteAttachmentType(Type.STRUCTURE);
+									setActiveNoteDisplay(Display.SPRITE);
+									updateDisplay();
 									break;
 									
 					default:
@@ -751,7 +757,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	// ----- Begin button actions -----
 	@FXML protected void newStory() {
-		activeStory = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION);
+		Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
+		if (activeStory!=null)
+			story.setColorURL(activeStory.getColorURL());
+		activeStory = story;
 		setStoryCreated(true);
 	}
 	
