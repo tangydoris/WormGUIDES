@@ -363,7 +363,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private void updateTime() {
 		if (timeToggle!=null) {
-			System.out.println("updating time...");
 			setCurrentTimeLabel(timeProperty.get()+frameOffset);
 			
 			if (activeNote!=null) {
@@ -394,11 +393,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	
 	private void updateType() {
-		if (attachmentToggle!=null) {
-			resetToggle(attachmentToggle);
-			resetToggle(subStructureToggle);
-			structuresComboBox.getSelectionModel().clearSelection();
-			
+		if (attachmentToggle!=null) {			
 			if (activeNote!=null) {
 				switch (activeNote.getAttachmentType()) {
 				case CELL:
@@ -406,6 +401,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 								activeCellProperty.set(cellName);
 								setCellLabelName(cellName);
 								attachmentToggle.selectToggle(cellRadioBtn);
+								resetToggle(subStructureToggle);
 								break;
 				
 				case STRUCTURE:
@@ -418,6 +414,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									}
 								}
 								attachmentToggle.selectToggle(structureRadioBtn);
+								// TODO read substructure toggle enum from note (to be added)
 								break;
 								
 				case BLANK:		// fall to default case
@@ -425,8 +422,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				default:
 								globalRadioBtn.setSelected(true);
 								activeCellProperty.set(sceneActiveCellProperty.get());
+								resetToggle(subStructureToggle);
 								break;
 				}
+			}
+			
+			else {
+				resetToggle(attachmentToggle);
+				resetToggle(subStructureToggle);
+				structuresComboBox.getSelectionModel().clearSelection();
 			}
 		}
 	}
@@ -462,6 +466,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			if (activeNote!=null) {
 				
 				switch (activeNote.getTagDisplay()) {
+				case BLANK:		// fall to overlay case
+					
 				case OVERLAY:
 								infoPaneRadioBtn.setSelected(true);
 								break;
@@ -469,6 +475,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				case SPRITE:
 								locationRadioBtn.setSelected(true);
 								break;
+								
 				case BILLBOARD_FRONT:
 								billboardRadioBtn.setSelected(true);
 								break;
@@ -618,8 +625,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				switch ((Time)newValue.getUserData()) {
 								
 				case CURRENT:
-								// TODO
-								//System.out.println(timeProperty.get());
 								start = timeProperty.get();
 								end = start;
 								break;
@@ -631,8 +636,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									if (!endTimeField.getText().isEmpty())
 										end = Integer.parseInt(endTimeField.getText())-frameOffset;
 								} catch (NumberFormatException e) {
-									System.out.println("Invalid time - must be integer.");
-									//e.printStackTrace();
+									
 								}
 								break;
 								

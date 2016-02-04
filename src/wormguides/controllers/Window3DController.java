@@ -643,7 +643,7 @@ public class Window3DController {
 					}
 					else {
 						x += radius;
-						y += radius+5;
+						y += radius+10;
 					}
 				}
 				text.getTransforms().add(new Translate(x, y));
