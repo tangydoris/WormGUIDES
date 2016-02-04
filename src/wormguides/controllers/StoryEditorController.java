@@ -368,12 +368,19 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			if (activeNote!=null) {
 				int start = activeNote.getStartTime();
 				int end = activeNote.getEndTime();
+				//System.out.println(activeNote.getTagName()+" time - "+start+", "+end);
 				
-				if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE)
+				if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE) {
 					timeToggle.selectToggle(globalTimeRadioBtn);
+					startTimeField.setText("");
+					endTimeField.setText("");
+				}
 				
-				else if (start==end)
+				else if (start==end) {
 					timeToggle.selectToggle(currentTimeRadioBtn);
+					startTimeField.setText("");
+					endTimeField.setText("");
+				}
 				
 				else if (start<end) {
 					timeToggle.selectToggle(rangeTimeRadioBtn);
@@ -657,10 +664,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
-				try {
-					activeNote.setStartTime(Integer.parseInt(newValue)-frameOffset);
-				} catch (NumberFormatException e) {
-					
+				Toggle selected = timeToggle.getSelectedToggle();
+				if (selected!=null && selected.getUserData()==Time.RANGE) {
+					try {
+						activeNote.setStartTime(Integer.parseInt(newValue)-frameOffset);
+					} catch (NumberFormatException e) {
+						
+					}
 				}
 			}
 		}
@@ -672,10 +682,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
-				try {
-					activeNote.setEndTime(Integer.parseInt(newValue)-frameOffset);
-				} catch (NumberFormatException e) {
-					
+				Toggle selected = timeToggle.getSelectedToggle();
+				if (selected!=null && selected.getUserData()==Time.RANGE) {
+					try {
+						activeNote.setEndTime(Integer.parseInt(newValue)-frameOffset);
+					} catch (NumberFormatException e) {
+						
+					}
 				}
 			}
 		}

@@ -318,15 +318,13 @@ public class Note {
 	
 	
 	public void setStartAndEndTimes(int start, int end) {
-		if (start>=1 && end>=1 && start<=end) {
-			startTime = start;
-			endTime = end;
-			
-			if (elements!=null) {
-				for (SceneElement se : elements) {
-					se.setStartTime(startTime);
-					se.setEndTime(endTime);
-				}
+		startTime = start;
+		endTime = end;
+		
+		if (elements!=null) {
+			for (SceneElement se : elements) {
+				se.setStartTime(startTime);
+				se.setEndTime(endTime);
 			}
 		}
 	}

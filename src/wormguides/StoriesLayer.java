@@ -193,7 +193,6 @@ public class StoriesLayer {
 			
 			if (activeStory.hasNotes()) {
 				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
-				System.out.println("start time - "+startTime);
 				if (startTime<1)
 					startTime = 1;
 			}
@@ -295,7 +294,6 @@ public class StoriesLayer {
 				else {
 					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
 					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
-					System.out.println("times - "+entityStartTime+", "+entityEndTime);
 				}
 				
 				// attached to cell/structure and time is specified
