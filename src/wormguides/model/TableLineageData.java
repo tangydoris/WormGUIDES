@@ -97,13 +97,10 @@ public class TableLineageData implements LineageData{
 		name = name.trim();
 		int time = getFirstOccurrenceOf(name);
 		
-		if (time>-1) {
-			boolean exists = true;
+		if (time>=1) {
 			outer:
-				for (int i=time; i<timeFrames.size() && exists; i++) {
-					Frame frame = timeFrames.get(i);
-					
-					for (String cell : frame.getNames()) {
+				for (int i=time; i<timeFrames.size(); i++) {
+					for (String cell : timeFrames.get(i).getNames()) {
 						if (cell.equalsIgnoreCase(name))
 							continue outer;
 					}

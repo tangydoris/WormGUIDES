@@ -152,7 +152,7 @@ public class SceneElementsList {
 	
 	
 	public String[] getSceneElementNamesAtTime(int time) {
-		time++;
+		//time++;
 		
 		// Add lineage names of all structures at time
 		ArrayList<String> list = new ArrayList<String>();
@@ -169,7 +169,7 @@ public class SceneElementsList {
 
 	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		time++;
+		//time++;
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
 		for (int i = 0; i < elementsList.size(); i++) {
 			SceneElement se = elementsList.get(i);

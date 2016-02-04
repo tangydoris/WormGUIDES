@@ -16,11 +16,14 @@ import wormguides.model.Story;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
-import wormguides.model.Note.TimeStringFormatException;
 
 public class StoriesLoader {
 	
-	public static void load(String file, ObservableList<Story> stories) {
+	private static int frameOffset = 0;
+	
+	public static void load(String file, ObservableList<Story> stories, int offset) {
+		frameOffset = offset;
+		
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -89,8 +92,12 @@ public class StoriesLoader {
 						note.setImagingSource(split[IMG_SOURCE_INDEX]);
 						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
 						
-						note.setStartTime(split[START_TIME_INDEX]);
-						note.setEndTime(split[END_TIME_INDEX]);
+						String startTime = split[START_TIME_INDEX];
+						String endTime = split[END_TIME_INDEX];
+						if (!startTime.isEmpty() && !endTime.isEmpty()) {
+							note.setStartTime(Integer.parseInt(startTime)-frameOffset);
+							note.setEndTime(Integer.parseInt(endTime)-frameOffset);
+						}
 						
 						note.setComments(split[COMMENTS_INDEX]);
 						
@@ -107,7 +114,7 @@ public class StoriesLoader {
 					} catch (LocationStringFormatException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
-					} catch (TimeStringFormatException e) {
+					} catch (NumberFormatException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
 					}
@@ -134,8 +141,6 @@ public class StoriesLoader {
 		}
 		return false;
 	}
-	
-	
 	
 	private static final int NUMBER_OF_CSV_FIELDS = 14;
 	

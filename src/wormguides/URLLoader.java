@@ -189,7 +189,7 @@ public class URLLoader {
 			if (tokens.length!=0) {
 				switch (tokens[0]) {
 					case "time":	try {
-										window3D.setTime(Integer.parseInt(tokens[1])+1);
+										window3D.setTime(Integer.parseInt(tokens[1]));
 									} catch (NumberFormatException nfe) {
 										System.out.println("error in parsing time variable");
 										nfe.printStackTrace();

@@ -113,20 +113,20 @@ public class Story {
 	}
 	
 	
-	public ArrayList<Note> getNotesWithCell() {
+	public ArrayList<Note> getNotesWithEntity() {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note!=null && note.existsWithCell())
+			if (note!=null && note.attachedToCell())
 				list.add(note);
 		}
 		return list;
 	}
 	
 	
-	public ArrayList<Note> getNotesAtTime(int time) {
+	public ArrayList<Note> getPossibleNotesAtTime(int time) {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note.existsAtTime(time))
+			if (note.mayExistAtTime(time))
 				list.add(note);
 		}
 		return list;

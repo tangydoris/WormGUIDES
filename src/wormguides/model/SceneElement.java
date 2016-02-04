@@ -92,7 +92,7 @@ public class SceneElement {
 	
 	
 	public MeshView buildGeometry(int time) {
-		time++;
+		//time++;
 		// TODO OPTIMIZE THIS LATER
 		//GeometryLoader loader = new GeometryLoader();
 		
@@ -214,7 +214,7 @@ public class SceneElement {
 	
 	
 	public boolean existsAtTime(int time) {
-		time++;
+		//time++;
 		return startTime<=time && time<=endTime;
 	}
 	

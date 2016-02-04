@@ -3,6 +3,7 @@ package wormguides;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -106,13 +107,13 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = cellClicked;
 		
-		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
+		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
 			public int compare(Note o1, Note o2) {
-				Integer t1 = getEffectiveStartTime(o1, cellData);
-				Integer t2 = getEffectiveStartTime(o2, cellData);
+				Integer t1 = getEffectiveStartTime(o1);
+				Integer t2 = getEffectiveStartTime(o2);
 				if (t1.equals(t2))
 					return o1.getTagName().compareTo(o2.getTagName());
 				else
@@ -173,7 +174,7 @@ public class StoriesLayer {
 			activeNote.setActive(true);
 			
 			// set time property to be read by 3d window
-			timeProperty.set(getEffectiveStartTime(activeNote, cellData));
+			timeProperty.set(getEffectiveStartTime(activeNote));
 		}
 		
 		if (editController!=null)
@@ -181,16 +182,62 @@ public class StoriesLayer {
 	}
 	
 	
-	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
-		int time = 1;
+	// TODO
+	private Integer getEffectiveEndTime(Note activeNote) {
+		int time = Integer.MIN_VALUE;
 		
 		if (activeNote!=null) {
-			if (activeNote.existsWithCell() || activeNote.existsWithStructure()) {
+			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
 				
-				int entityStartTime = Integer.MIN_VALUE;
-				int entityEndTime = Integer.MIN_VALUE;
+				int entityStartTime;
+				int entityEndTime;
 				
-				if (activeNote.existsWithCell()) {
+				if (activeNote.attachedToCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				else {
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				
+				// attached to cell/structure and time is specified
+				if (activeNote.isTimeSpecified()) {
+					int noteStartTime = activeNote.getStartTime();
+					int noteEndTime = activeNote.getEndTime();
+					
+					// make sure times actually overlap
+					if (noteStartTime<=entityEndTime && entityEndTime<=noteEndTime)
+						time = entityEndTime;
+					else if (entityStartTime<=noteEndTime && noteEndTime<entityEndTime)
+						time = noteEndTime;
+				}
+				
+				// attached to cell/structure and time not specified
+				else
+					time = entityEndTime;
+			}
+				
+			else if (activeNote.isTimeSpecified()) {
+				time = activeNote.getEndTime();
+			}
+			
+		}
+		
+		return new Integer(time);
+	}
+	
+	
+	private Integer getEffectiveStartTime(Note activeNote) {
+		int time = Integer.MIN_VALUE;
+		
+		if (activeNote!=null) {
+			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
+				
+				int entityStartTime;
+				int entityEndTime;
+				
+				if (activeNote.attachedToCell()) {
 					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
 					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
 				}
@@ -243,22 +290,46 @@ public class StoriesLayer {
 	}
 	
 	
-	public ArrayList<Note> getNotesWithCell() {
+	public ArrayList<Note> getNotesWithEntity() {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		for (Story story : stories) {
 			if (story.isActive())
-				notes.addAll(story.getNotesWithCell());
+				notes.addAll(story.getNotesWithEntity());
 		}
 		return notes;
 	}
 	
 	
-	public ArrayList<Note> getActiveNotes(int time) {
+	/*
+	 * Returns array list of all active notes at input time
+	 * Includes notes attached to an entity if entity is present at input time
+	 */
+	public ArrayList<Note> getNotesAtTime(int time) {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		
 		for (Story story : stories) {
 			if (story.isActive())
-				notes.addAll(story.getNotesAtTime(time));
+				notes.addAll(story.getPossibleNotesAtTime(time));
+		}
+		
+		System.out.println("Getting notes at time "+time+":");
+		
+		Iterator<Note> iter = notes.iterator();
+		Note note;
+		while (iter.hasNext()) {
+			note = iter.next();
+			
+			// TODO
+			int effectiveStart = getEffectiveStartTime(note);
+			int effectiveEnd = getEffectiveEndTime(note);
+			System.out.println(note.toString());
+			System.out.println("effective times - "+effectiveStart+","
+					+effectiveEnd);
+			if (effectiveStart!=Integer.MIN_VALUE && effectiveEnd!=Integer.MIN_VALUE 
+					&& (time<effectiveStart || effectiveEnd<time)) {
+				System.out.println("removed");
+				iter.remove();
+			}
 		}
 		
 		return notes;

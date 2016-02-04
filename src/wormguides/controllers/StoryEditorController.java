@@ -31,7 +31,6 @@ import wormguides.StringListCellFactory;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
-import wormguides.model.Note.TimeStringFormatException;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
@@ -192,6 +191,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		initToggleData();
 		
 		updateType();
+		updateTime();
 		updateDisplay();
 		
 		timeToggle.selectedToggleProperty().addListener(new TimeToggleListener());
@@ -227,7 +227,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					setCellLabelName(newValue);
 			}
 		});
-		if (activeNote!=null && activeNote.existsWithCell())
+		if (activeNote!=null && activeNote.attachedToCell())
 			activeCellProperty.set(activeNote.getCellName());
 		else
 			activeCellProperty.set(sceneActiveCellProperty.get());
@@ -363,6 +363,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private void updateTime() {
 		if (timeToggle!=null) {
+			System.out.println("updating time...");
 			setCurrentTimeLabel(timeProperty.get()+frameOffset);
 			
 			if (activeNote!=null) {
@@ -618,7 +619,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 								
 				case CURRENT:
 								// TODO
-								System.out.println(timeProperty.get());
+								//System.out.println(timeProperty.get());
 								start = timeProperty.get();
 								end = start;
 								break;
@@ -653,9 +654,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
 				try {
-					activeNote.setStartTime(newValue);
-				} catch (TimeStringFormatException e) {
-					//System.out.println(e.toString());
+					activeNote.setStartTime(Integer.parseInt(newValue)-frameOffset);
+				} catch (NumberFormatException e) {
+					
 				}
 			}
 		}
@@ -668,9 +669,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
 				try {
-					activeNote.setEndTime(newValue);
-				} catch (TimeStringFormatException e) {
-					//System.out.println(e.toString());
+					activeNote.setEndTime(Integer.parseInt(newValue)-frameOffset);
+				} catch (NumberFormatException e) {
+					
 				}
 			}
 		}
@@ -701,6 +702,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									break;
 					}
 				}
+				
 				else
 					setActiveNoteTagDisplay(Display.BLANK);
 			}
@@ -734,6 +736,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					
 					}
 				}
+				
+				else
+					setActiveNoteAttachmentType(Type.BLANK);
 			}
 		}
 	}
