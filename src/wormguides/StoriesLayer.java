@@ -160,6 +160,7 @@ public class StoriesLayer {
 			activeStory.setActive(false);
 			ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
 			// fix subclassing for rule and colorrule
+			// TODO currently only supports rules for cells/cell bodies, not multicell structures
 			for (Rule rule : currentRules) {
 				if (rule instanceof ColorRule)
 					rulesCopy.add((ColorRule) rule);
