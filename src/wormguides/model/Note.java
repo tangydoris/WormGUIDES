@@ -476,7 +476,7 @@ public class Note {
 	}
 	
 	
-	public boolean hasCellNameError() {
+	public boolean hasEntityNameError() {
 		if (!tagDisplay.equals(Display.OVERLAY) && (attachedToCell() 
 				|| attachedToStructure())  && cellName.isEmpty())
 			return true;

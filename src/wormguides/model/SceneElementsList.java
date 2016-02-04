@@ -117,7 +117,7 @@ public class SceneElementsList {
 				time = element.getStartTime();
 		}
 
-		return time;
+		return time+1;
 	}
 	
 	
@@ -133,7 +133,7 @@ public class SceneElementsList {
 				time = element.getEndTime();
 		}
 
-		return time;
+		return time+1;
 	}
 	
 	

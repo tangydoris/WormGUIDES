@@ -174,7 +174,10 @@ public class StoriesLayer {
 			activeNote.setActive(true);
 			
 			// set time property to be read by 3d window
-			timeProperty.set(getEffectiveStartTime(activeNote));
+			int startTime = getEffectiveStartTime(activeNote);
+			if (startTime<1)
+				startTime=1;
+			timeProperty.set(startTime);
 		}
 		
 		if (editController!=null)
@@ -182,7 +185,6 @@ public class StoriesLayer {
 	}
 	
 	
-	// TODO
 	private Integer getEffectiveEndTime(Note activeNote) {
 		int time = Integer.MIN_VALUE;
 		
@@ -312,22 +314,15 @@ public class StoriesLayer {
 				notes.addAll(story.getPossibleNotesAtTime(time));
 		}
 		
-		System.out.println("Getting notes at time "+time+":");
-		
 		Iterator<Note> iter = notes.iterator();
 		Note note;
 		while (iter.hasNext()) {
 			note = iter.next();
 			
-			// TODO
 			int effectiveStart = getEffectiveStartTime(note);
 			int effectiveEnd = getEffectiveEndTime(note);
-			System.out.println(note.toString());
-			System.out.println("effective times - "+effectiveStart+","
-					+effectiveEnd);
 			if (effectiveStart!=Integer.MIN_VALUE && effectiveEnd!=Integer.MIN_VALUE 
 					&& (time<effectiveStart || effectiveEnd<time)) {
-				System.out.println("removed");
 				iter.remove();
 			}
 		}
@@ -716,7 +711,7 @@ public class StoriesLayer {
 		}	
 	}
 
-	private static final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
+	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
 	
 	private final int FRAME_OFFSET = 19;
 }

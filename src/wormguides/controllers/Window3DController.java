@@ -84,7 +84,7 @@ public class Window3DController {
 	
 	private Stage parentStage;
 
-	private LineageData data;
+	private LineageData cellData;
 
 	private SubScene subscene;
 	
@@ -192,14 +192,18 @@ public class Window3DController {
 		parentStage = parent;
 		
 		root = new Group();
-		this.data = data;
+		this.cellData = data;
 
 		time = new SimpleIntegerProperty(START_TIME);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 								Number oldValue, Number newValue) {
-				buildScene(time.get());
+				int t = newValue.intValue();
+				if (t<START_TIME)
+					t = START_TIME;
+				if (START_TIME<=t && t<=endTime)
+					buildScene(t);
 			}
 		});
 
@@ -532,7 +536,6 @@ public class Window3DController {
 	
 	
 	private void showContextMenu(String name, double sceneX, double sceneY) {
-		// TODO
 		if (contextMenuStage==null) {
 			contextMenuController = new ContextMenuController(bringUpInfoProperty);
 			
@@ -670,20 +673,20 @@ public class Window3DController {
 
 	// Builds subscene for a given timepoint
 	private void buildScene(int time) {
-		// Frame is indexed 1 less than the time requested
-		cellNames = data.getNames(time-1);
+		cellNames = cellData.getNames(time);
+		positions = cellData.getPositions(time);
+		diameters = cellData.getDiameters(time);
 		
-		if (sceneElementsList!=null)
-			meshNames = sceneElementsList.getSceneElementNamesAtTime(time-1);
-		
-		positions = data.getPositions(time-1);
-		diameters = data.getDiameters(time-1);
 		totalNuclei.set(cellNames.length);
+		
 		spheres = new Sphere[cellNames.length];
 		meshes = new MeshView[meshNames.length];
 		
 		// Start scene element list, find scene elements present at time, build and meshes
 		//empty meshes and scene element references from last rendering. Same for story elements
+		if (sceneElementsList!=null)
+			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
+		
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
 			currentSceneElements.clear();
@@ -733,8 +736,8 @@ public class Window3DController {
 		// End label stuff
 		
 		// Story stuff
-		// Notes are indexed starting from 1 (or 1+offset shown to user)
 		// TODO
+		// Notes are indexed starting from 1 (or 1+offset shown to user)
 		if (storiesLayer!=null) {			
 			currentNotes.clear();
 			
@@ -746,15 +749,19 @@ public class Window3DController {
 			
 			currentNotes = storiesLayer.getNotesAtTime(time);
 			
-			//System.out.println("Notes at time "+time+":");
 			for (Note note : currentNotes) {
-				//System.out.println(note.toString());
+				// Revert to overlay display if we have invalid display/attachment 
+				// type combination
+				if (note.hasLocationError() || note.hasEntityNameError())
+					note.setTagDisplay(Display.OVERLAY);
 				
+				// make mesh views for scene elements from note resources
 				if (note.hasSceneElements()) {
 					for (SceneElement se : note.getSceneElements()) {
 						MeshView mesh = se.buildGeometry(time);
 						mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
 						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+						// scale factor may have to change if not dealing with the Stanford Bunny
 						mesh.getTransforms().addAll(new Translate(
 							newOriginX+se.getX(),
 							newOriginY+se.getY(),
@@ -833,23 +840,31 @@ public class Window3DController {
 	private void addEntitiesToScene() {
 		//System.out.println(storiesList.toString());
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
-		ArrayList<Node> notes = new ArrayList<Node>();
-
-		refreshScene();
+		ArrayList<Text> notes = new ArrayList<Text>();
 		
-		// Must render everything that belongs to scene first before
-		// making the notes
-		addSpheresToList(entities);
- 		addMeshesToList(entities);
+		// add spheres
+		addCellGeometries(entities);
+		
+		// add scene element meshes (from notes and from scene elements list)
+ 		//entities.addAll(currentSceneElementMeshes);
+ 		addSceneElementGeometries(entities);
  		
+ 		// add notes
  		insertOverlayTitles();
  		addNoteGeometries(notes);
  		
- 		addLabelGeometries();
+ 		// add labels
+ 		for (String name : currentLabels) {
+			Text node = makeNoteSpriteText(name);
+			node.setWrappingWidth(node.getWrappingWidth()+20);
+			
+			if (spritesPane!=null && positionLabelSprite(name, node))
+				spritesPane.getChildren().add(node);
+		}
  		
- 		// render opaque entities first
  		if (!notes.isEmpty())
  			root.getChildren().addAll(notes);
+ 		
 		repositionSprites();
 		repositionNoteBillboardFronts();
  			
@@ -858,15 +873,122 @@ public class Window3DController {
 	}
 	
 	
-	private void addLabelGeometries() {
-		for (String name : currentLabels) {
-			Text node = makeNoteSpriteText(name);
-			node.setWrappingWidth(node.getWrappingWidth()+20);
-			
-			if (spritesPane!=null && positionLabelSprite(name, node))
-				spritesPane.getChildren().add(node);
-		}
+	// TODO
+	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
+		// add scene elements from note resources
+		for (Note note : currentNoteMeshMap.keySet())
+			list.add(currentNoteMeshMap.get(note));
 		
+		// Consult rules
+		if (!currentSceneElements.isEmpty()) {	
+			for (int i=0; i<currentSceneElements.size(); i++) {
+				SceneElement se = currentSceneElements.get(i);
+				MeshView mesh = currentSceneElementMeshes.get(i);
+				
+				// in search mode
+				if (inSearch) {
+	 				if (cellBodyTicked && searchedMeshes[i])
+	 					mesh.setMaterial(colorHash.getHighlightMaterial());
+	 				else 
+	 					mesh.setMaterial(colorHash.getTranslucentMaterial());
+	 			}
+				
+				else {
+					// in regular view mode
+					ArrayList<String> allNames = se.getAllCellNames();
+					String sceneName = se.getSceneName();
+					
+					// default white meshes
+					if (allNames.isEmpty()) {
+						mesh.setMaterial(new PhongMaterial(Color.WHITE));
+						mesh.setCullFace(CullFace.NONE);
+					}
+					
+					// If mesh has with name(s), then process rules (cell or shape)
+					// that apply to it
+					else {
+						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
+						
+						//iterate over rulesList
+						for (Rule rule: rulesList) {
+							
+							if (rule instanceof MulticellularStructureRule) {
+								//check equivalence of shape rule to scene name
+								if (((MulticellularStructureRule)rule).appliesTo(sceneName)) {
+									colors.add(Color.web(rule.getColor().toString()));
+								}
+							}
+							
+							else if(rule instanceof ColorRule) {
+								//iterate over cells and check if cells apply
+								for (String name: allNames) {
+									if(((ColorRule)rule).appliesToBody(name)) {
+										colors.add(rule.getColor());
+									}
+								}	
+							}
+						}
+						
+						// if any rules applied
+						if (!colors.isEmpty())
+							mesh.setMaterial(colorHash.getMaterial(colors));
+						else
+							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+					}
+				}
+				
+				list.add(mesh);
+			}
+		}
+	}
+	
+	
+	private void addCellGeometries(ArrayList<Shape3D> list) {
+		// Sphere stuff
+		for (int i = 0; i < cellNames.length; i ++) {
+			double radius;
+			if (!uniformSize)
+				radius = SIZE_SCALE*diameters[i]/2;
+			else
+				radius = SIZE_SCALE*UNIFORM_RADIUS;
+			Sphere sphere = new Sphere(radius);
+
+			Material material = new PhongMaterial();
+ 			// if in search, do highlighting
+ 			if (inSearch) {
+ 				if (cellNucleusTicked && searchedCells[i])
+					material = colorHash.getHighlightMaterial();
+ 				else
+					material = colorHash.getTranslucentMaterial();
+ 			}
+ 			// not in search mode
+ 			else {
+ 				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
+ 				for (Rule rule : rulesList) {
+ 					// just need to consult rule's active list
+ 					if (rule.appliesToCell(cellNames[i])) {
+ 						colors.add(Color.web(rule.getColor().toString()));
+ 					}
+ 				}
+ 				material = colorHash.getMaterial(colors);
+
+ 				if (colors.isEmpty())
+ 					material = colorHash.getOthersMaterial(othersOpacity.get());
+ 			}
+
+ 			sphere.setMaterial(material);
+
+ 			double x = positions[i][X_COR_INDEX]*X_SCALE;
+	        double y = positions[i][Y_COR_INDEX]*Y_SCALE;
+	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
+	        
+	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
+	        translateSphere(sphere, x, y, z);
+	        
+	        spheres[i] = sphere;
+	        list.add(sphere);
+		}
+		// End sphere stuff
 	}
 	
 	
@@ -894,48 +1016,122 @@ public class Window3DController {
 	// Inserts note geometries to scene
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
-	private void addNoteGeometries(ArrayList<Node> list) {		
+	private void addNoteGeometries(ArrayList<Text> list) {		
+		// TODO
 		for (Note note : currentNotes) {
-			// Revert to overlay display if we have invalid display/attachment 
-			// type combination
-			if (note.hasLocationError() || note.hasCellNameError())
-				note.setTagDisplay(Display.OVERLAY);
+			// map notes to their sphere/mesh view
+			Text text = makeNoteGraphic(note);
+			currentGraphicNoteMap.put(text, note);
+			// SPRITE
+			if (note.isSprite()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					spriteEntityMap.put(text, createLocationMarker(note.getX(), 
+							note.getY(), note.getZ()));
+				}
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i=0; i<cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
+							spriteEntityMap.put(text, spheres[i]);
+						}
+					}
+				}
+				// structure attachment
+				else if (note.attachedToStructure()) {
+					for (int i=0; i<currentSceneElements.size(); i++) {
+						if (currentSceneElements.get(i).getSceneName()
+								.equalsIgnoreCase(note.getCellName())) {
+							spriteEntityMap.put(text, currentSceneElementMeshes.get(i));
+						}
+					}
+				}
+			}
 			
-			Text node = makeNoteGraphic(note);
+			// BILLBOARD_FRONT
+			else if (note.isBillboardFront()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					billboardFrontEntityMap.put(text, createLocationMarker(note.getX(), 
+							note.getY(), note.getZ()));
+				}
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i=0; i<cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
+							billboardFrontEntityMap.put(text, spheres[i]);
+						}
+					}
+				}
+				// structure attachment
+				else if (note.attachedToStructure()) {
+					for (int i=0; i<currentSceneElements.size(); i++) {
+						if (currentSceneElements.get(i).getSceneName()
+								.equalsIgnoreCase(note.getCellName())) {
+							billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+						}
+					}
+				}
+			}
+			
+			// BILLBOARD
+			else if (note.isBillboard()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
+					text.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
+							newOriginY+note.getY(), newOriginZ+note.getZ()),
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+				}
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i=0; i<cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
+							double offset = 5;
+							if (!uniformSize)
+								offset = spheres[i].getRadius()+2;
+							
+							text.getTransforms().addAll(spheres[i].getTransforms());
+							text.getTransforms().addAll(new Translate(offset, offset),
+									new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+						}
+					}
+				}
+				// structure attachment
+				else if (note.attachedToStructure()) {
+					for (int i=0; i<currentSceneElements.size(); i++) {
+						if (currentSceneElements.get(i).getSceneName()
+								.equalsIgnoreCase(note.getCellName())) {
+							text.getTransforms().addAll(currentSceneElementMeshes.get(i)
+									.getTransforms());
+							double offset = 5;
+							text.getTransforms().addAll(new Translate(offset, offset),
+									new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+						}
+					}
+				}
+			}
+			
+			// add graphic to appropriate place (scene, overlay box, or on top of scene)
 			Display display = note.getTagDisplay();
-			
 			if (display!=null) {
 				switch (display) {
-					// Billboard: text transforms with scene entity
-					case BILLBOARD:
-								if (positionBillboard(note, node))
-									list.add(node);
+				case SPRITE:
+								spritesPane.getChildren().add(text);
 								break;
-					
-					// Billboard front: text transforms with scene entity
-					// but always faces the user
-					case BILLBOARD_FRONT:
-								if (positionBillboardFront(note, node))
-									list.add(node);
+				
+				case BILLBOARD_FRONT:	// fall to billboard case
+								
+				case BILLBOARD:
+								list.add(text);
 								break;
-					
-					// Sprite: text moves with whatever it is attached to and
-					// always faces user, does not transform with scene entity
-					case SPRITE:
-								if (spritesPane!=null && positionNoteSprite(note, node))
-									spritesPane.getChildren().add(node);
-								break;
-					
-					// Overlay: text in upper right corner (info pane)
-					case OVERLAY:	// fall to default case
-					
-					// Blank: not specified, treated as OVERLAY
-					case BLANK:		// fall to default case
-					
-					default:
-								// set overlay position relative to parent anchor pane
-								if (overlayVBox!=null)
-									overlayVBox.getChildren().add(node);
+								
+				case OVERLAY:	// fall to default case
+				
+				case BLANK:		// fall to default case
+				
+				default:
+								overlayVBox.getChildren().add(text);
 								break;
 				}
 			}
@@ -994,105 +1190,6 @@ public class Window3DController {
 	}
 	
 	
-	// Returns true if front-facing billboard is successfully positioned
-	// (whether it is to location or cell)
-	// false otherwise
-	private boolean positionBillboardFront(Note note, Text node) {
-		/*
-		if (note.attachedToLocation()) {
-			billboardFrontEntityMap.put(node, createLocationMarker(note.getX(), 
-					note.getY(), note.getZ()));
-			return true;
-		}
-		
-		else if (note.attachedToCell() && note.existsAtTime(time.get()-1, data)) {
-			for (int i=0; i<cellNames.length; i++) {
-				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
-					billboardFrontEntityMap.put(node, spheres[i]);
-					return true;
-				}
-			}
-		}
-		*/
-		
-		return false;
-	}
-	
-	
-	// Returns true if billboard is successfully positioned
-	// (whether it is to location or cell)
-	// false otherwise
-	private boolean positionBillboard(Note note, Node node) {
-		/*
-		if (note.attachedToLocation()) {
-			node.getTransforms().addAll(rotateX, rotateY, rotateZ);
-			node.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
-					newOriginY+note.getY(), newOriginZ+note.getZ()),
-					new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-			
-			return true;
-		}
-		
-		else if (note.attachedToCell() && note.existsAtTime(time.get()-1, data)) {
-			for (int i=0; i<cellNames.length; i++) {
-				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
-					double offset = 5;
-					if (!uniformSize)
-						offset = spheres[i].getRadius()+2;
-					
-					node.getTransforms().addAll(spheres[i].getTransforms());
-					node.getTransforms().addAll(new Translate(offset, offset),
-							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-					return true;
-				}
-			}
-		}
-		*/
-		
-		return false;
-	}
-	
-	
-	// Returns true if sprite is successfully positioned
-	// (whether it is to location or cell)
-	// false otherwise
-	// Input node is the note geometry
-	private boolean positionNoteSprite(Note note, Text node) {
-		/*
-		if (note.attachedToLocation()) {
-			// Z coordinate is ignored for sprites - they reside on top of the subscene
-			spriteEntityMap.put(node, createLocationMarker(note.getX(), 
-					note.getY(), note.getZ()));
-			return true;
-		}
-		
-		else if (note.attachedToCell() && note.existsAtTime(time.get()-1)) {
-			for (int i=0; i<cellNames.length; i++) {
-				if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
-					// TODO
-					System.out.println("inserted to sprite sphere map - "+node.getText()+", "
-							+ "@cell="+cellNames[i]);
-					spriteEntityMap.put(node, spheres[i]);
-					return true;
-				}
-			}
-		}
-		
-		else if (note.attachedToStructure() && note.existsAtTime(time.get()-1)) {
-			for (int i=0; i<currentSceneElements.size(); i++) {
-				if (currentSceneElements.get(i).getSceneName()
-						.equalsIgnoreCase(note.getCellName())) {
-					spriteEntityMap.put(node, currentSceneElementMeshes.get(i));
-					return true;
-				}
-			}
-		}
-		*/
-		
-		return false;
-	}
-	
-	
 	// Makes an anchor pane that contains the text to be shown
 	// if isOverlay is true, then the text is larger
 	private Text makeNoteGraphic(Note note) {
@@ -1105,17 +1202,14 @@ public class Window3DController {
 			switch (note.getTagDisplay()) {
 				case SPRITE:
 							node = makeNoteSpriteText(title);
-							currentGraphicNoteMap.put(node, note);
 							break;
 							
 				case BILLBOARD:
 							node = makeNoteBillboardText(title);
-							currentGraphicNoteMap.put(node, note);
 							break;
 							
 				case BILLBOARD_FRONT:
 							node = makeNoteBillboardText(title);
-							currentGraphicNoteMap.put(node, note);
 							break;
 							
 				case OVERLAY:	// fall to default case
@@ -1124,7 +1218,6 @@ public class Window3DController {
 				
 				default:
 							node = makeNoteOverlayText(title);
-							currentGraphicNoteMap.put(node, note);
 							break;
 							
 			}
@@ -1202,54 +1295,6 @@ public class Window3DController {
 		}
 	}
 	
-	
-	private void addSpheresToList(ArrayList<Shape3D> list) {
-		// for sphere rendering
-		for (int i = 0; i < cellNames.length; i ++) {
-			double radius;
-			if (!uniformSize)
-				radius = SIZE_SCALE*diameters[i]/2;
-			else
-				radius = SIZE_SCALE*UNIFORM_RADIUS;
-			Sphere sphere = new Sphere(radius);
-
-			Material material = new PhongMaterial();
- 			// if in search, do highlighting
- 			if (inSearch) {
- 				if (cellNucleusTicked && searchedCells[i])
-					material = colorHash.getHighlightMaterial();
- 				else
-					material = colorHash.getTranslucentMaterial();
- 			}
- 			// not in search mode
- 			else {
- 				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
- 				for (Rule rule : rulesList) {
- 					// just need to consult rule's active list
- 					if (rule.appliesToCell(cellNames[i])) {
- 						colors.add(Color.web(rule.getColor().toString()));
- 					}
- 				}
- 				material = colorHash.getMaterial(colors);
-
- 				if (colors.isEmpty())
- 					material = colorHash.getOthersMaterial(othersOpacity.get());
- 			}
-
- 			sphere.setMaterial(material);
-
- 			double x = positions[i][X_COR_INDEX]*X_SCALE;
-	        double y = positions[i][Y_COR_INDEX]*Y_SCALE;
-	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
-	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
-	        translateSphere(sphere, x, y, z);
-	        
-	        spheres[i] = sphere;
-	        
-	        list.add(spheres[i]);
-		}
-	}
-	
 
 	private void translateSphere(Node sphere, double x, double y, double z) {
 		Translate t = new Translate(x, y, z);
@@ -1280,7 +1325,7 @@ public class Window3DController {
 	
 	private void setNewOrigin() {
 		// Find average X Y positions of initial timepoint
-		Integer[][] positions = data.getPositions(START_TIME);
+		Integer[][] positions = cellData.getPositions(START_TIME);
 		int numCells = positions.length;
 		int sumX = 0;
 		int sumY = 0;
