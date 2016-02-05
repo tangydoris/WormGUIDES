@@ -29,6 +29,7 @@ import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AppFont;
 import wormguides.model.MulticellularStructureRule;
+import wormguides.model.PartsList;
 
 
 public class StructuresLayer {
@@ -210,9 +211,18 @@ public class StructuresLayer {
 				for (String cell : cells) {
 					//we'll use the first term
 					if (terms.length > 0) {
-						if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
-							appliesToCell = true;
-							break;
+						//check if search term is a functional name
+						String lineageName = PartsList.getLineageNameByFunctionalName((terms[0].toUpperCase()));
+						if (lineageName != null) {
+							if (cell.toLowerCase().startsWith(lineageName.toLowerCase())) {
+								appliesToCell = true;
+								break;
+							}
+						} else {
+							if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
+								appliesToCell = true;
+								break;
+							}
 						}
 					}
 				}
