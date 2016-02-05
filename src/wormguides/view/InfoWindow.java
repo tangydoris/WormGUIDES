@@ -3,6 +3,7 @@ package wormguides.view;
 
 import java.util.ArrayList;
 
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -65,6 +66,18 @@ public class InfoWindow {
 		tabPane.getTabs().add(tab);
 		tabPane.getSelectionModel().select(tab);
 		tabPane.setFocusTraversable(true);
+	}
+	
+	public void setCursorWait() {
+		infoWindowStage.getScene().setCursor(Cursor.WAIT);
+		scene.setCursor(Cursor.WAIT);
+		tabPane.getScene().setCursor(Cursor.WAIT);
+	}
+	
+	public void setCursorDefault() {
+		infoWindowStage.getScene().setCursor(Cursor.DEFAULT);
+		scene.setCursor(Cursor.DEFAULT);
+		tabPane.getScene().setCursor(Cursor.DEFAULT);
 	}
 
 }

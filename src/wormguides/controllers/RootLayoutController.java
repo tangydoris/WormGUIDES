@@ -14,6 +14,8 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -539,6 +541,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void addToInfoWindow(String name) {
+		service.restart();
 		
 		//GENERATE CELL TAB ON CLICK
 		if (name!=null && !name.isEmpty()) {
@@ -546,7 +549,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				return; //error check
 			}
 							
-			if (PartsList.containsLineageName(name)) { //in connectome --> terminal case (neuron)
+			if (PartsList.containsLineageName(name)) {
 				if (cellCases.containsTerminalCase(name)) {
 					
 					//show the tab
@@ -572,7 +575,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				}
 			}
 		}
-
 	}
 	
 	
@@ -987,5 +989,24 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 
 	private static final String JAR_NAME = "WormGUIDES.jar";
+	
+	private final Service service = new Service() {
+		@Override
+		protected Task createTask() {
+			return new Task<Void>() {
+				protected Void call() throws Exception {
+//					mainStage.getScene().setCursor(Cursor.WAIT);
+//					infoWindow.setCursorWait();
+//					window3D.setCursorWait();
+//					Thread.sleep(10000);
+//					mainStage.getScene().setCursor(Cursor.DEFAULT);
+//					infoWindow.setCursorDefault();
+//					window3D.setCursorDefault();
+					System.out.println("starting cursor thread...");
+					return null;
+				}
+			};
+		}
+	};
 	
 }

@@ -284,6 +284,12 @@ public class InfoWindowDOM {
 							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 									terminalCase.getCellName() + " on " + placeholder +
 									"</a>";
+							
+							//add wormbase link to end of gene expression section
+							if (placeholder.equals("wormbase")) {
+								String wormbaseSource = "<em>Source:</em> " + anchor;
+								geneExpressionDiv.addChild(new HTMLNode("p", "", "", wormbaseSource));
+							}
 						}
 					}
 				}	

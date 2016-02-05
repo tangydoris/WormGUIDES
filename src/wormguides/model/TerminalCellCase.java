@@ -262,10 +262,24 @@ public class TerminalCellCase {
 		
 		String cell = this.cellName;
 		//check for left, right, dorsal, or ventral suffix --> update cell
-		if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v') {
-			cell = cell.substring(0, cell.length()-1);
+		if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
+			//check if multiple suffixes
+			lastChar = cellName.charAt(cellName.length()-2);
+			lastChar = Character.toLowerCase(lastChar);
+			if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
+				cell = cell.substring(0, cell.length()-2);
+				System.out.println(cell);
+			} else {
+				cell = cell.substring(0, cell.length()-1);
+			}
 		} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
-			cell = cell.substring(0, cell.length()-1);
+			//check if double digit
+			if (Character.isDigit(cellName.length()-2)) {
+				cell = cell.substring(0, cell.length()-2);
+			} else {
+				cell = cell.substring(0, cell.length()-1);
+			}
+			
 		} else { //if no suffix, no homologues e.g. AVG, M
 			return homologues;
 		}
@@ -275,6 +289,7 @@ public class TerminalCellCase {
 		//search parts list for matching prefix terms
 		ArrayList<String> partsListHits = new ArrayList<String>();
 		for (String lineageName : PartsList.getLineageNames()) {
+			//GET BASE NAME FOR LINEAGE NAME AS DONE ABOVE WITH CELL NAME
 			lineageName = PartsList.getFunctionalNameByLineageName(lineageName);
 			if (lineageName.toLowerCase().startsWith(cell)) {
 				partsListHits.add(lineageName);
@@ -395,6 +410,10 @@ public class TerminalCellCase {
 				}
 			}
 		}
+		
+		//add the source
+		String source = "<em>Source:</em> <a href=\"#\" onclick=\"app.textpresso()\">" + this.cellName + " on Textpresso</a>";
+		references.add(source);
 		
 		links.add(URL);
 		return references;
