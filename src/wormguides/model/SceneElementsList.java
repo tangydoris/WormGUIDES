@@ -23,6 +23,7 @@ import java.util.jar.JarFile;
 public class SceneElementsList {
 	
 	public ArrayList<SceneElement> elementsList;
+	public HashMap<String, ArrayList<String>> nameCellsMap;
 	public HashMap<String, String> nameCommentsMap;
 	private JarFile jarFile;
 	private ArrayList<JarEntry> objEntries;
@@ -32,6 +33,7 @@ public class SceneElementsList {
 	public SceneElementsList() {
 		elementsList = new ArrayList<SceneElement>();
 		objEntries = new ArrayList<JarEntry>();
+		nameCellsMap = new HashMap<String, ArrayList<String>>();
 		nameCommentsMap = new HashMap<String, String>();
 		
 		buildListFromConfig();
@@ -94,6 +96,7 @@ public class SceneElementsList {
 				// add scene element to list
 				elementsList.add(se);
 				
+				addCells(se);
 				addComments(se);
 			}
 			
@@ -136,6 +139,11 @@ public class SceneElementsList {
 		return time+1;
 	}
 	
+	private void addCells(SceneElement element) {
+		if (element != null && element.isMulticellular()) {
+			nameCellsMap.put(element.getSceneName().toLowerCase(), element.getAllCellNames());
+		}
+	}
 	
 	private void addComments(SceneElement element) {
 		if (element!=null && element.isMulticellular())
@@ -234,6 +242,10 @@ public class SceneElementsList {
 	
 	public HashMap<String, String> getNameToCommentsMap() {
 		return nameCommentsMap;
+	}
+	
+	public HashMap<String, ArrayList<String>> getNameToCellsMap() {
+		return this.nameCellsMap;
 	}
 	
 	

@@ -241,10 +241,6 @@ public class TerminalCellCase {
 				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<"));
 				geneExpression.add(gene);
 			}
-			
-//			else {
-//				System.out.println("DIDN'T START: " + gene);
-//			}
 		}
 		
 		return geneExpression;
