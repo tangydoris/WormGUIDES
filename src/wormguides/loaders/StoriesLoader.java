@@ -2,6 +2,7 @@ package wormguides.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,11 +20,20 @@ import wormguides.model.Note.TagDisplayEnumException;
 
 public class StoriesLoader {
 	
-	private static int frameOffset = 0;
-	
-	public static void load(String file, ObservableList<Story> stories, int offset) {
-		frameOffset = offset;
+	public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
+		// TODO
+		if (file==null)
+			return;
 		
+		try {
+			InputStream stream = new FileInputStream(file);
+			processStream(file.getName(), stream, stories, offset);
+		} catch (FileNotFoundException e) {
+			System.out.println("The file '"+file.getName()+"' was not found in system.");
+		}
+	}
+	
+	public static void loadConfigFile(String file, ObservableList<Story> stories, int offset) {
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -34,20 +44,20 @@ public class StoriesLoader {
 				
 				if (entry.getName().equals("wormguides/model/story_file/"+file)) {
 					InputStream stream = jarFile.getInputStream(entry);
-					processStream(file, stream, stories);
+					processStream(file, stream, stories, offset);
 				}
 			}
 			
 			jarFile.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("The config file '" + file + "' wasn't found on the system.");
+			System.out.println("The config file '" + file + "' was not found in the system.");
 		} catch (IOException e) {
-			System.out.println("The config file '" + file + "' wasn't found on the system.");
+			System.out.println("The config file '" + file + "' was not found inn the system.");
 		}
 	}
 	
-	private static void processStream(String file, InputStream stream, ObservableList<Story> stories) {
-		int storyCounter = -1; //used for accessing the current story for adding scene elements
+	private static void processStream(String file, InputStream stream, ObservableList<Story> stories, int offset) {
+		int storyCounter = stories.size()-1; //used for accessing the current story for adding scene elements
 
 		try {
 			InputStreamReader streamReader = new InputStreamReader(stream);
@@ -95,8 +105,8 @@ public class StoriesLoader {
 						String startTime = split[START_TIME_INDEX];
 						String endTime = split[END_TIME_INDEX];
 						if (!startTime.isEmpty() && !endTime.isEmpty()) {
-							note.setStartTime(Integer.parseInt(startTime)-frameOffset);
-							note.setEndTime(Integer.parseInt(endTime)-frameOffset);
+							note.setStartTime(Integer.parseInt(startTime)-offset);
+							note.setEndTime(Integer.parseInt(endTime)-offset);
 						}
 						
 						note.setComments(split[COMMENTS_INDEX]);

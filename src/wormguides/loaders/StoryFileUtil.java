@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javafx.collections.ObservableList;
 import wormguides.model.Note;
 import wormguides.model.Story;
 
 public class StoryFileUtil {
 
-	public static Story loadFromCSVFile(File file, int offset) throws IOException{
-		
+	public static Story loadFromCSVFile(ObservableList<Story>stories, File file, int offset) throws IOException{
+		StoriesLoader.loadFromFile(file, stories, offset);
 		return null;
 	}
 	

@@ -123,7 +123,7 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = window3DController.getCellClicked();
 		
-		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
+		StoriesLoader.loadConfigFile(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -156,7 +156,7 @@ public class StoriesLayer {
 		File file = chooser.showOpenDialog(parentStage);
 		if (file!=null) {
 			 try {
-				 StoryFileUtil.loadFromCSVFile(file, FRAME_OFFSET);
+				 StoryFileUtil.loadFromCSVFile(stories, file, FRAME_OFFSET);
 			 } catch (IOException e) {
 				 System.out.println("error occurred while saving story");
 				 return;
