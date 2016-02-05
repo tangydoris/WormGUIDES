@@ -370,22 +370,71 @@ public class Search {
 							// this is because some cells have the same description and it 
 							// gives the first one found
 							//System.out.println("\nShowing found description names:");
-							for (int i=0; i<descriptions.size(); i++) {
-								String textLowerCase = descriptions.get(i).toLowerCase();
-								String[] keywords = searched.split(" ");
-								boolean found = true;
-								for (String keyword : keywords) {
-									if (textLowerCase.indexOf(keyword)<0) {
-										found = false;
-										break;
+				
+							//for searching with multiple terms, perform individual searches and return the intersection of the hits
+							ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+							String[] keywords = searched.split(" ");
+							for (String keyword : keywords) {
+								ArrayList<String> results = new ArrayList<String>();
+								for (int i=0; i<descriptions.size(); i++) {
+									String textLowerCase = descriptions.get(i).toLowerCase();
+
+									//look for match
+									if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+										//get cell name that corresponds to matching description
+										String cell = PartsList.getLineageNameByIndex(i);
+										
+										//only add new entries
+										if (!results.contains(cell)) {
+											results.add(cell);
+										}
 									}
 								}
 								
-								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
-									cells.add(PartsList.getLineageNameByIndex(i));
+								//add the results to the hits
+								hits.add(results);
+							}
+							
+							//find the intersection among the results --> using the first list to find matches
+							if (hits.size() > 0) {
+								ArrayList<String> results = hits.get(0);
+								for (int k = 0; k < results.size(); k++) {
+									String cell = results.get(k);
+									
+									//look for a match in rest of the hits
+									boolean intersection = true;
+									for (int i = 1; i < hits.size(); i++) {
+										if (!hits.get(i).contains(cell)) {
+											intersection = false;
+										}
+									}
+									
+									if (intersection && !cells.contains(cell)) {
+										cells.add(cell);
+									}
+								}
+								
 							}
 							
 							break;
+							
+
+//							for (int i=0; i<descriptions.size(); i++) {
+//								String textLowerCase = descriptions.get(i).toLowerCase();
+//								String[] keywords = searched.split(" ");
+//								boolean found = true;
+//								for (String keyword : keywords) {
+//									if (textLowerCase.indexOf(keyword)<0) {
+//										found = false;
+//										break;
+//									}
+//								}
+//								
+//								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
+//									cells.add(PartsList.getLineageNameByIndex(i));
+//							}
+//							
+//							break;
 						 
 			case GENE:		
 							if (isGeneFormat(getSearchedText())) {
