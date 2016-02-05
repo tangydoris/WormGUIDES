@@ -3,6 +3,11 @@ package wormguides.model;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/*
+ * All times known to data structures begin at 1
+ * Frames are indexed from 0
+ */
+
 public class TableLineageData implements LineageData{
 	
 	private ArrayList<Frame> timeFrames;
@@ -30,6 +35,7 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public String[] getNames(int time) {
+		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new String[1];
 		else {
@@ -39,6 +45,7 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public Integer[][] getPositions(int time) {
+		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new Integer[1][3];
 		else
@@ -47,6 +54,7 @@ public class TableLineageData implements LineageData{
 
 	@Override
 	public Integer[] getDiameters(int time) {
+		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new Integer[1];
 		else
@@ -97,13 +105,10 @@ public class TableLineageData implements LineageData{
 		name = name.trim();
 		int time = getFirstOccurrenceOf(name);
 		
-		if (time>-1) {
-			boolean exists = true;
+		if (time>=1) {
 			outer:
-				for (int i=time; i<timeFrames.size() && exists; i++) {
-					Frame frame = timeFrames.get(i);
-					
-					for (String cell : frame.getNames()) {
+				for (int i=time; i<timeFrames.size(); i++) {
+					for (String cell : timeFrames.get(i).getNames()) {
 						if (cell.equalsIgnoreCase(name))
 							continue outer;
 					}

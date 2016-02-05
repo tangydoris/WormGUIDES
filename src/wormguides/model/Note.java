@@ -76,6 +76,14 @@ public class Note {
 	}
 	
 	
+	public String getLocationString() {
+		if (x==Integer.MIN_VALUE || y==Integer.MIN_VALUE || z==Integer.MIN_VALUE)
+			return "";
+		
+		return x+" "+y+" "+z;
+	}
+	
+	
 	public BooleanProperty getActiveProperty() {
 		return activeProperty;
 	}
@@ -291,68 +299,40 @@ public class Note {
 			elements.add(se);
 		}
 	}
-	
-	
-	// Input should be the time (with +19 offset) that user sees in range 20-419
-	// Time internally stored as values in range 1-400
-	public void setStartTime(String time) throws TimeStringFormatException {
-		if (time!=null && !time.isEmpty()) {
-			try {
-				int t = Integer.parseInt(time.trim());
-				setStartTime(t-FRAME_OFFSET);
-			} catch (NumberFormatException e) {
-				throw new TimeStringFormatException();
-			}
-		}
-	}
-	
+
 	
 	public void setStartTime(int time) {
-		if (time>-1) {
-			startTime = time++;
+		if (time>=1) {
+			startTime = time;
 			
 			if (elements!=null) {
 				for (SceneElement se : elements)
-					se.setStartTime(startTime+1);
-			}
-		}
-	}
-	
-	
-	public void setEndTime(String time) throws TimeStringFormatException {
-		if (time!=null && !time.isEmpty()) {
-			try {
-				int t = Integer.parseInt(time.trim());
-				setEndTime(t-FRAME_OFFSET);
-			} catch (NumberFormatException e) {
-				throw new TimeStringFormatException();
+					se.setStartTime(startTime);
 			}
 		}
 	}
 	
 	
 	public void setEndTime(int time) {
-		if (time>-1) {
-			endTime = time++;
+		if (time>=1) {
+			endTime = time;
 			
 			if (elements!=null) {
 				for (SceneElement se : elements)
-					se.setEndTime(endTime+1);
+					se.setEndTime(endTime);
 			}
 		}
 	}
 	
 	
-	public void setStartAndEndTimes(int startTime, int endTime) {
-		if (-1<startTime && -1<endTime && startTime<=endTime) {
-			this.startTime = startTime++;
-			this.endTime = endTime++;
-			
-			if (elements!=null) {
-				for (SceneElement se : elements) {
-					se.setStartTime(this.startTime);
-					se.setEndTime(this.endTime+1);
-				}
+	public void setStartAndEndTimes(int start, int end) {
+		startTime = start;
+		endTime = end;
+		
+		if (elements!=null) {
+			for (SceneElement se : elements) {
+				se.setStartTime(startTime);
+				se.setEndTime(endTime);
 			}
 		}
 	}
@@ -455,7 +435,16 @@ public class Note {
 	
 	
 	public String toString() {
-		return tagName+" - '"+tagContents+"' from time "+startTime+" to "+endTime;
+		StringBuilder sb = new StringBuilder();
+		sb.append("Note[").append("@Name='").append(tagName).append("' ");
+		sb.append("@Type=").append(attachmentType).append(" ");
+		sb.append("@Display=").append(tagDisplay).append(" ");
+		sb.append("@Time=").append(startTime).append(", ").append(endTime).append(" ");
+		sb.append("@Location=").append(x).append(", ").append(y).append(", ").append(z).append(" ");
+		sb.append("@Cell='").append(cellName).append("' ");
+		sb.append("@Resource='").append(resourceLocation).append("']");
+		
+		return sb.toString();
 	}
 	
 	
@@ -493,35 +482,32 @@ public class Note {
 	}
 	
 	
-	public boolean hasCellNameError() {
-		if (!tagDisplay.equals(Display.OVERLAY) && attachmentType.equals(Type.CELL)  && cellName.isEmpty())
+	public boolean hasEntityNameError() {
+		if (!tagDisplay.equals(Display.OVERLAY) && (attachedToCell() 
+				|| attachedToStructure())  && cellName.isEmpty())
 			return true;
 		
 		return false;
 	}
 	
 	
-	/*
-	 * Returns true is note exists with multicell structure
-	 * False otherwise
-	 */
-	public boolean existsWithStructure() {
+	public boolean attachedToStructure() {
 		return attachmentType.equals(Type.STRUCTURE);
 	}
 	
 	
-	public boolean isValidStructureAttachment() {
-		return existsWithStructure() && isEntitySpecified();
-	}
-	
-	
-	public boolean existsWithCell() {
+	public boolean attachedToCell() {
 		return attachmentType.equals(Type.CELL);
 	}
 	
 	
-	public boolean isValidCellAttachment() {
-		return existsWithCell() && isEntitySpecified();
+	public boolean attachedToLocation() {
+		return attachmentType.equals(Type.LOCATION);
+	} 
+	
+	
+	public boolean attachedToGlobalEvent() {
+		return attachmentType.equals(Type.BLANK);
 	}
 	
 	
@@ -537,14 +523,13 @@ public class Note {
 	
 	// Returns true if note is visible at input time, or in sprite cell/celltime mode
 	// false otherwise
-	public boolean existsAtTime(int time) {
+	public boolean mayExistAtTime(int time) {
 		if (!isWithoutScope()) {
 			// If start and end times are not set
 			// then note exists at all times
 			if (!isTimeSpecified())
 				return true;
 			
-			time++;
 			if (startTime<=time && time<=endTime)
 				return true;
 		}
@@ -601,19 +586,19 @@ public class Note {
 			this.type = type;
 		}
 		
-		String getType() {
+		public String toString() {
 			return type;
 		}
 		
-		boolean equals(String type) {
+		public boolean equals(String type) {
 			return this.type.equalsIgnoreCase(type.trim());
 		}
 		
-		boolean equals(Type type) {
+		public boolean equals(Type type) {
 			return this==type;
 		}
 		
-		static String valuesToString() {
+		public static String valuesToString() {
 			StringBuilder sb = new StringBuilder();
 			int len = values().length;
 			Type[] values = values();
@@ -641,19 +626,19 @@ public class Note {
 			this.display = display;
 		}
 		
-		String getDisplay() {
+		public String toString() {
 			return display;
 		}
 		
-		boolean equals(String display) {
+		public boolean equals(String display) {
 			return this.display.equalsIgnoreCase(display.trim());
 		}
 		
-		boolean equals(Display display) {
+		public boolean equals(Display display) {
 			return this==display;
 		}
 		
-		static String valuesToString() {
+		public static String valuesToString() {
 			StringBuilder sb = new StringBuilder();
 			int len = values().length;
 			Display[] values = values();
@@ -688,13 +673,6 @@ public class Note {
 		public LocationStringFormatException() {
 			super("Invalid note location string format, must be 3 "
 					+ "integers separated by spaces.");
-		}
-	}
-	
-	
-	public class TimeStringFormatException extends Exception {
-		public TimeStringFormatException() {
-			super("Invalid note time string format, must be integer.");
 		}
 	}
 	

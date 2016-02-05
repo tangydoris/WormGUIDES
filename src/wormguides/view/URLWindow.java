@@ -184,15 +184,15 @@ public class URLWindow extends AnchorPane {
 	public void resetURLs() {
 		if (scene != null) {
 			ArrayList<ColorRule> list = scene.getColorRulesList();
-			iOSURL = URLGenerator.generateIOSURL(list, scene.getTime(), 
+			iOSURL = URLGenerator.generateIOS(list, scene.getTime(), 
 							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
 							scene.getTranslationX(), scene.getTranslationY(), 
 							scene.getScale(), scene.getOthersVisibility());
-			androidURL = URLGenerator.generateAndroidURL(list, scene.getTime(), 
+			androidURL = URLGenerator.generateAndroid(list, scene.getTime(), 
 							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
 							scene.getTranslationX(), scene.getTranslationY(), 
 							scene.getScale(), scene.getOthersVisibility());
-			webURL = URLGenerator.generateWebURL(list, scene.getTime(), 
+			webURL = URLGenerator.generateWeb(list, scene.getTime(), 
 							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
 							scene.getTranslationX(), scene.getTranslationY(), 
 							scene.getScale(), scene.getOthersVisibility());

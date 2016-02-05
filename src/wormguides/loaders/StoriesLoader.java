@@ -2,6 +2,7 @@ package wormguides.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,11 +17,23 @@ import wormguides.model.Story;
 import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
-import wormguides.model.Note.TimeStringFormatException;
 
 public class StoriesLoader {
 	
-	public static void load(String file, ObservableList<Story> stories) {
+	public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
+		// TODO
+		if (file==null)
+			return;
+		
+		try {
+			InputStream stream = new FileInputStream(file);
+			processStream(file.getName(), stream, stories, offset);
+		} catch (FileNotFoundException e) {
+			System.out.println("The file '"+file.getName()+"' was not found in system.");
+		}
+	}
+	
+	public static void loadConfigFile(String file, ObservableList<Story> stories, int offset) {
 		try {
 			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -31,20 +44,20 @@ public class StoriesLoader {
 				
 				if (entry.getName().equals("wormguides/model/story_file/"+file)) {
 					InputStream stream = jarFile.getInputStream(entry);
-					processStream(file, stream, stories);
+					processStream(file, stream, stories, offset);
 				}
 			}
 			
 			jarFile.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("The config file '" + file + "' wasn't found on the system.");
+			System.out.println("The config file '" + file + "' was not found in the system.");
 		} catch (IOException e) {
-			System.out.println("The config file '" + file + "' wasn't found on the system.");
+			System.out.println("The config file '" + file + "' was not found inn the system.");
 		}
 	}
 	
-	private static void processStream(String file, InputStream stream, ObservableList<Story> stories) {
-		int storyCounter = -1; //used for accessing the current story for adding scene elements
+	private static void processStream(String file, InputStream stream, ObservableList<Story> stories, int offset) {
+		int storyCounter = stories.size()-1; //used for accessing the current story for adding scene elements
 
 		try {
 			InputStreamReader streamReader = new InputStreamReader(stream);
@@ -71,7 +84,7 @@ public class StoriesLoader {
 				
 				if (isStory(split)) {
 					Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX], 
-							split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX]);
+							split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX], split[STORY_COLOR_URL_INDEX]);
 					stories.add(story);
 					storyCounter++;
 				}
@@ -89,8 +102,12 @@ public class StoriesLoader {
 						note.setImagingSource(split[IMG_SOURCE_INDEX]);
 						note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
 						
-						note.setStartTime(split[START_TIME_INDEX]);
-						note.setEndTime(split[END_TIME_INDEX]);
+						String startTime = split[START_TIME_INDEX];
+						String endTime = split[END_TIME_INDEX];
+						if (!startTime.isEmpty() && !endTime.isEmpty()) {
+							note.setStartTime(Integer.parseInt(startTime)-offset);
+							note.setEndTime(Integer.parseInt(endTime)-offset);
+						}
 						
 						note.setComments(split[COMMENTS_INDEX]);
 						
@@ -107,7 +124,7 @@ public class StoriesLoader {
 					} catch (LocationStringFormatException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
-					} catch (TimeStringFormatException e) {
+					} catch (NumberFormatException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
 					}
@@ -135,22 +152,21 @@ public class StoriesLoader {
 		return false;
 	}
 	
+	public static final int NUMBER_OF_CSV_FIELDS = 15;
 	
-	
-	private static final int NUMBER_OF_CSV_FIELDS = 14;
-	
-	private static final int STORY_NAME_INDEX = 0,
+	public static final int STORY_NAME_INDEX = 0,
 							STORY_DESCRIPTION_INDEX = 1,
 							STORY_AUTHOR_INDEX = 12,
-							STORY_DATE_INDEX = 13;
+							STORY_DATE_INDEX = 13,
+							STORY_COLOR_URL_INDEX = 14;
 	
-	private static final int NAME_INDEX = 0,
+	public static final int NAME_INDEX = 0,
 							CONTENTS_INDEX = 1,
 							DISPLAY_INDEX = 2,
 							TYPE_INDEX = 3,
 							LOCATION_INDEX = 4,
 							CELLNAME_INDEX = 5,
-							//MARKER_INDEX = 6,
+							MARKER_INDEX = 6,
 							IMG_SOURCE_INDEX = 7,
 							RESOURCE_LOCATION_INDEX = 8,
 							START_TIME_INDEX = 9,

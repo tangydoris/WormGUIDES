@@ -31,7 +31,6 @@ import wormguides.StringListCellFactory;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
-import wormguides.model.Note.TimeStringFormatException;
 import wormguides.model.Note.Type;
 import wormguides.model.Story;
 
@@ -192,6 +191,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		initToggleData();
 		
 		updateType();
+		updateTime();
 		updateDisplay();
 		
 		timeToggle.selectedToggleProperty().addListener(new TimeToggleListener());
@@ -227,7 +227,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					setCellLabelName(newValue);
 			}
 		});
-		if (activeNote!=null && activeNote.existsWithCell())
+		if (activeNote!=null && activeNote.attachedToCell())
 			activeCellProperty.set(activeNote.getCellName());
 		else
 			activeCellProperty.set(sceneActiveCellProperty.get());
@@ -240,7 +240,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	}
 	
 	
-	private void setActiveNoteTagDisplay(Display display) {
+	private void setActiveNoteDisplay(Display display) {
 		if (activeNote!=null)
 			activeNote.setTagDisplay(display);
 	}
@@ -368,12 +368,19 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			if (activeNote!=null) {
 				int start = activeNote.getStartTime();
 				int end = activeNote.getEndTime();
+				//System.out.println(activeNote.getTagName()+" time - "+start+", "+end);
 				
-				if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE)
+				if (start==Integer.MIN_VALUE || end==Integer.MIN_VALUE) {
 					timeToggle.selectToggle(globalTimeRadioBtn);
+					startTimeField.setText("");
+					endTimeField.setText("");
+				}
 				
-				else if (start==end)
+				else if (start==end) {
 					timeToggle.selectToggle(currentTimeRadioBtn);
+					startTimeField.setText("");
+					endTimeField.setText("");
+				}
 				
 				else if (start<end) {
 					timeToggle.selectToggle(rangeTimeRadioBtn);
@@ -393,11 +400,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	
 	private void updateType() {
-		if (attachmentToggle!=null) {
-			resetToggle(attachmentToggle);
-			resetToggle(subStructureToggle);
-			structuresComboBox.getSelectionModel().clearSelection();
-			
+		if (attachmentToggle!=null) {			
 			if (activeNote!=null) {
 				switch (activeNote.getAttachmentType()) {
 				case CELL:
@@ -405,6 +408,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 								activeCellProperty.set(cellName);
 								setCellLabelName(cellName);
 								attachmentToggle.selectToggle(cellRadioBtn);
+								resetToggle(subStructureToggle);
 								break;
 				
 				case STRUCTURE:
@@ -417,6 +421,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									}
 								}
 								attachmentToggle.selectToggle(structureRadioBtn);
+								// TODO read substructure toggle enum from note (to be added)
 								break;
 								
 				case BLANK:		// fall to default case
@@ -424,8 +429,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				default:
 								globalRadioBtn.setSelected(true);
 								activeCellProperty.set(sceneActiveCellProperty.get());
+								resetToggle(subStructureToggle);
 								break;
 				}
+			}
+			
+			else {
+				resetToggle(attachmentToggle);
+				resetToggle(subStructureToggle);
+				structuresComboBox.getSelectionModel().clearSelection();
 			}
 		}
 	}
@@ -461,6 +473,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			if (activeNote!=null) {
 				
 				switch (activeNote.getTagDisplay()) {
+				case BLANK:		// fall to overlay case
+					
 				case OVERLAY:
 								infoPaneRadioBtn.setSelected(true);
 								break;
@@ -468,6 +482,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				case SPRITE:
 								locationRadioBtn.setSelected(true);
 								break;
+								
 				case BILLBOARD_FRONT:
 								billboardRadioBtn.setSelected(true);
 								break;
@@ -617,8 +632,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 				switch ((Time)newValue.getUserData()) {
 								
 				case CURRENT:
-								// TODO
-								System.out.println(timeProperty.get());
 								start = timeProperty.get();
 								end = start;
 								break;
@@ -630,8 +643,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 									if (!endTimeField.getText().isEmpty())
 										end = Integer.parseInt(endTimeField.getText())-frameOffset;
 								} catch (NumberFormatException e) {
-									System.out.println("Invalid time - must be integer.");
-									//e.printStackTrace();
+									
 								}
 								break;
 								
@@ -652,10 +664,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
-				try {
-					activeNote.setStartTime(newValue);
-				} catch (TimeStringFormatException e) {
-					//System.out.println(e.toString());
+				Toggle selected = timeToggle.getSelectedToggle();
+				if (selected!=null && selected.getUserData()==Time.RANGE) {
+					try {
+						activeNote.setStartTime(Integer.parseInt(newValue)-frameOffset);
+					} catch (NumberFormatException e) {
+						
+					}
 				}
 			}
 		}
@@ -667,10 +682,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		public void changed(ObservableValue<? extends String> observable, 
 				String oldValue, String newValue) {
 			if (activeNote!=null) {
-				try {
-					activeNote.setEndTime(newValue);
-				} catch (TimeStringFormatException e) {
-					//System.out.println(e.toString());
+				Toggle selected = timeToggle.getSelectedToggle();
+				if (selected!=null && selected.getUserData()==Time.RANGE) {
+					try {
+						activeNote.setEndTime(Integer.parseInt(newValue)-frameOffset);
+					} catch (NumberFormatException e) {
+						
+					}
 				}
 			}
 		}
@@ -686,23 +704,24 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					switch ((Display) newValue.getUserData()) {
 					
 					case OVERLAY:
-									setActiveNoteTagDisplay(Display.OVERLAY);
+									setActiveNoteDisplay(Display.OVERLAY);
 									break;
 									
 					case SPRITE:
-									setActiveNoteTagDisplay(Display.SPRITE);
+									setActiveNoteDisplay(Display.SPRITE);
 									break;
 									
 					case BILLBOARD_FRONT:
-									setActiveNoteTagDisplay(Display.BILLBOARD_FRONT);
+									setActiveNoteDisplay(Display.BILLBOARD_FRONT);
 									break;
 									
 					default:
 									break;
 					}
 				}
+				
 				else
-					setActiveNoteTagDisplay(Display.BLANK);
+					setActiveNoteDisplay(Display.BLANK);
 			}
 		}
 	}
@@ -719,14 +738,20 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					case CELL:
 									setActiveNoteAttachmentType(Type.CELL);
 									setActiveNoteCellName(activeCellProperty.get());
+									setActiveNoteDisplay(Display.SPRITE);
+									updateDisplay();
 									break;
 									
 					case BLANK:
 									setActiveNoteAttachmentType(Type.BLANK);
+									setActiveNoteDisplay(Display.OVERLAY);
+									updateDisplay();
 									break;
 									
 					case STRUCTURE:
 									setActiveNoteAttachmentType(Type.STRUCTURE);
+									setActiveNoteDisplay(Display.SPRITE);
+									updateDisplay();
 									break;
 									
 					default:
@@ -734,6 +759,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 					
 					}
 				}
+				
+				else
+					setActiveNoteAttachmentType(Type.BLANK);
 			}
 		}
 	}
@@ -742,7 +770,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	// ----- Begin button actions -----
 	@FXML protected void newStory() {
-		activeStory = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION);
+		Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
+		if (activeStory!=null)
+			story.setColorURL(activeStory.getColorURL());
+		activeStory = story;
 		setStoryCreated(true);
 	}
 	

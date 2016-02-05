@@ -6,7 +6,7 @@ import wormguides.model.ColorRule;
 
 public class URLGenerator {
 	
-	public static String generateIOSURL(ArrayList<ColorRule> rules, int time, double rX, 
+	public static String generateIOS(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder("wormguides://wormguides/testurlscript?");
 		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
@@ -14,7 +14,7 @@ public class URLGenerator {
 		return builder.toString();
 	}
 	
-	public static String generateAndroidURL(ArrayList<ColorRule> rules, int time, double rX, 
+	public static String generateAndroid(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
 		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
@@ -22,7 +22,7 @@ public class URLGenerator {
 		return builder.toString();
 	}
 
-	public static String generateWebURL(ArrayList<ColorRule> rules, int time, double rX, 
+	public static String generateWeb(ArrayList<ColorRule> rules, int time, double rX, 
 							double rY, double rZ, double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
 		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));

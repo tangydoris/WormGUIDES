@@ -26,13 +26,14 @@ public class Story {
 	private BooleanProperty changedBooleanProperty;
 	private Comparator<Note> comparator;
 	
+	private String colorURL;
 	
-	public Story(String name, String description) {
-		this(name, description, "", "");
+	public Story(String name, String description, String url) {
+		this(name, description, "", "", url);
 	}
 	
 	
-	public Story(String name, String description, String author, String date) {
+	public Story(String name, String description, String author, String date, String url) {
 		this.name = name;
 		this.description = description;
 		
@@ -78,6 +79,18 @@ public class Story {
 				}
 			}
 		});
+		
+		colorURL = url;
+	}
+	
+	
+	public String getColorURL() {
+		return colorURL;
+	}
+	
+	
+	public void setColorURL(String url) {
+		colorURL = url;
 	}
 	
 	
@@ -113,20 +126,25 @@ public class Story {
 	}
 	
 	
-	public ArrayList<Note> getNotesWithCell() {
+	public ArrayList<Note> getNotesWithEntity() {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note!=null && note.existsWithCell())
+			if (note!=null && note.attachedToCell())
 				list.add(note);
 		}
 		return list;
 	}
 	
 	
-	public ArrayList<Note> getNotesAtTime(int time) {
+	public boolean hasNotes() {
+		return !notes.isEmpty();
+	}
+	
+	
+	public ArrayList<Note> getPossibleNotesAtTime(int time) {
 		ArrayList<Note> list = new ArrayList<Note>();
 		for (Note note : notes) {
-			if (note.existsAtTime(time))
+			if (note.mayExistAtTime(time))
 				list.add(note);
 		}
 		return list;

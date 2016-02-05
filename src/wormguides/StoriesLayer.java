@@ -1,8 +1,10 @@
 package wormguides;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -34,13 +36,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import wormguides.controllers.StoryEditorController;
+import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
+import wormguides.loaders.StoryFileUtil;
+import wormguides.loaders.URLLoader;
+import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
+import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AppFont;
@@ -76,10 +85,18 @@ public class StoriesLayer {
 	
 	private Comparator<Note> noteComparator;
 	
+	private ObservableList<Rule> currentRules;
+	private BooleanProperty useInternalRules;
+	private Window3DController window3DController;
 	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
-			IntegerProperty sceneTimeProperty, BooleanProperty cellClicked, LineageData data) {
+			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag) {
+		
 		parentStage = parent;
+		
+		window3DController = sceneController;
+		useInternalRules = useInternalRulesFlag;
+		currentRules = window3DController.getObservableColorRulesList();
 		
 		sceneElementsList = elementsList;
 		
@@ -95,7 +112,7 @@ public class StoriesLayer {
 			}
 		});
 		
-		timeProperty = sceneTimeProperty;
+		timeProperty = window3DController.getTimeProperty();
 		rebuildSceneFlag = new SimpleBooleanProperty(false);
 		cellData = data;
 		
@@ -104,15 +121,15 @@ public class StoriesLayer {
 		activeStoryProperty = new SimpleStringProperty("");
 		
 		activeCellProperty = cellNameProperty;
-		cellClickedProperty = cellClicked;
+		cellClickedProperty = window3DController.getCellClicked();
 		
-		StoriesLoader.load(STORY_CONFIG_FILE_NAME, stories);
+		StoriesLoader.loadConfigFile(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
 			public int compare(Note o1, Note o2) {
-				Integer t1 = getEffectiveStartTime(o1, cellData);
-				Integer t2 = getEffectiveStartTime(o2, cellData);
+				Integer t1 = getEffectiveStartTime(o1);
+				Integer t2 = getEffectiveStartTime(o2);
 				if (t1.equals(t2))
 					return o1.getTagName().compareTo(o2.getTagName());
 				else
@@ -124,6 +141,55 @@ public class StoriesLayer {
 			story.setComparator(noteComparator);
 			story.sortNotes();
 		}
+	}
+	
+	
+	/*
+	 * Loades story from file and sets it as active story
+	 */
+	public void loadStory() {
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Save Story");
+		chooser.setInitialFileName("WormGUIDES Story.csv");
+		chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+		 
+		File file = chooser.showOpenDialog(parentStage);
+		if (file!=null) {
+			 try {
+				 StoryFileUtil.loadFromCSVFile(stories, file, FRAME_OFFSET);
+			 } catch (IOException e) {
+				 System.out.println("error occurred while saving story");
+				 return;
+			 }
+		 }
+	}
+	
+	
+	/*
+	 * Saves active story to file
+	 */
+	public void saveActiveStory() {
+		 FileChooser chooser = new FileChooser();
+		 chooser.setTitle("Save Story");
+		 chooser.setInitialFileName("WormGUIDES Story.csv");
+		 chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+		 
+		 File file = chooser.showSaveDialog(parentStage);
+		 // if user clicks save
+		 if (file!=null) {
+			 try {
+				 if (activeStory!=null)
+					 StoryFileUtil.saveToCSVFile(activeStory, file, FRAME_OFFSET);
+				 else
+					 System.out.println("no active story to save");
+				 // TODO make error pop up
+			 } catch (IOException e) {
+				 // TODO make error pop up
+				 System.out.println("error occurred while saving story");
+				 return;
+			 }
+			 System.out.println("file saved");
+		 }
 	}
 	
 	
@@ -142,18 +208,66 @@ public class StoriesLayer {
 	
 	public void setActiveStory(Story story) {
 		// disable previous active story
-		if (activeStory!=null)
+		// copy current rules changes back to story
+		if (activeStory!=null) {
 			activeStory.setActive(false);
+			ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+			// fix subclassing for rule and colorrule
+			// TODO currently only supports rules for cells/cell bodies, not multicell structures
+			for (Rule rule : currentRules) {
+				if (rule instanceof ColorRule)
+					rulesCopy.add((ColorRule) rule);
+			}
+			
+			activeStory.setColorURL(URLGenerator.generateIOS(rulesCopy, timeProperty.get(), 
+					window3DController.getRotationX(), window3DController.getRotationY(), 
+					window3DController.getRotationZ(), window3DController.getTranslationX(),
+					window3DController.getTranslationY(), window3DController.getScale(),
+					window3DController.getOthersVisibility()));
+		}
 		
 		setActiveNote(null);
 		
 		activeStory = story;
+		int startTime = timeProperty.get();
+		
 		if (activeStory!=null) {
 			activeStory.setActive(true);
 			activeStoryProperty.set(activeStory.getName());
+			
+			if (activeStory.getColorURL().isEmpty())
+				useInternalRules.set(true);
+			
+			if (!activeStory.getColorURL().isEmpty()){
+				useInternalRules.set(false);
+				URLLoader.process(activeStory.getColorURL(), window3DController);
+			}
+			else {
+				useInternalRules.set(true);
+				ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+				for (Rule rule : currentRules) {
+					if (rule instanceof ColorRule)
+						rulesCopy.add((ColorRule) rule);
+				}
+				activeStory.setColorURL(URLGenerator.generateIOS(rulesCopy, timeProperty.get(), 
+						window3DController.getRotationX(), window3DController.getRotationY(), 
+						window3DController.getRotationZ(), window3DController.getTranslationX(),
+						window3DController.getTranslationY(), window3DController.getScale(),
+						window3DController.getOthersVisibility()));
+			}
+			
+			if (activeStory.hasNotes()) {
+				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
+				if (startTime<1)
+					startTime = 1;
+			}
 		}
-		else
+		else {
 			activeStoryProperty.set("");
+			useInternalRules.set(true);
+			URLLoader.process("", window3DController);
+		}
+		timeProperty.set(startTime);
 		
 		if (editController!=null)
 			editController.setActiveStory(activeStory);
@@ -173,7 +287,10 @@ public class StoriesLayer {
 			activeNote.setActive(true);
 			
 			// set time property to be read by 3d window
-			timeProperty.set(getEffectiveStartTime(activeNote, cellData));
+			int startTime = getEffectiveStartTime(activeNote);
+			if (startTime<1)
+				startTime=1;
+			timeProperty.set(startTime);
 		}
 		
 		if (editController!=null)
@@ -181,16 +298,61 @@ public class StoriesLayer {
 	}
 	
 	
-	private Integer getEffectiveStartTime(Note activeNote, LineageData cellData) {
-		int time = 1;
+	private Integer getEffectiveEndTime(Note activeNote) {
+		int time = Integer.MIN_VALUE;
 		
 		if (activeNote!=null) {
-			if (activeNote.existsWithCell() || activeNote.existsWithStructure()) {
+			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
 				
-				int entityStartTime = Integer.MIN_VALUE;
-				int entityEndTime = Integer.MIN_VALUE;
+				int entityStartTime;
+				int entityEndTime;
 				
-				if (activeNote.existsWithCell()) {
+				if (activeNote.attachedToCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				else {
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+				}
+				
+				// attached to cell/structure and time is specified
+				if (activeNote.isTimeSpecified()) {
+					int noteStartTime = activeNote.getStartTime();
+					int noteEndTime = activeNote.getEndTime();
+					
+					// make sure times actually overlap
+					if (noteStartTime<=entityEndTime && entityEndTime<=noteEndTime)
+						time = entityEndTime;
+					else if (entityStartTime<=noteEndTime && noteEndTime<entityEndTime)
+						time = noteEndTime;
+				}
+				
+				// attached to cell/structure and time not specified
+				else
+					time = entityEndTime;
+			}
+				
+			else if (activeNote.isTimeSpecified()) {
+				time = activeNote.getEndTime();
+			}
+			
+		}
+		
+		return new Integer(time);
+	}
+	
+	
+	private Integer getEffectiveStartTime(Note activeNote) {
+		int time = Integer.MIN_VALUE;
+		
+		if (activeNote!=null) {
+			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
+				
+				int entityStartTime;
+				int entityEndTime;
+				
+				if (activeNote.attachedToCell()) {
 					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
 					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
 				}
@@ -243,22 +405,39 @@ public class StoriesLayer {
 	}
 	
 	
-	public ArrayList<Note> getNotesWithCell() {
+	public ArrayList<Note> getNotesWithEntity() {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		for (Story story : stories) {
 			if (story.isActive())
-				notes.addAll(story.getNotesWithCell());
+				notes.addAll(story.getNotesWithEntity());
 		}
 		return notes;
 	}
 	
 	
-	public ArrayList<Note> getActiveNotes(int time) {
+	/*
+	 * Returns array list of all active notes at input time
+	 * Includes notes attached to an entity if entity is present at input time
+	 */
+	public ArrayList<Note> getNotesAtTime(int time) {
 		ArrayList<Note> notes = new ArrayList<Note>();
 		
 		for (Story story : stories) {
 			if (story.isActive())
-				notes.addAll(story.getNotesAtTime(time));
+				notes.addAll(story.getPossibleNotesAtTime(time));
+		}
+		
+		Iterator<Note> iter = notes.iterator();
+		Note note;
+		while (iter.hasNext()) {
+			note = iter.next();
+			
+			int effectiveStart = getEffectiveStartTime(note);
+			int effectiveEnd = getEffectiveEndTime(note);
+			if (effectiveStart!=Integer.MIN_VALUE && effectiveEnd!=Integer.MIN_VALUE 
+					&& (time<effectiveStart || effectiveEnd<time)) {
+				iter.remove();
+			}
 		}
 		
 		return notes;
@@ -645,7 +824,7 @@ public class StoriesLayer {
 		}	
 	}
 
-	private static final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
+	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
 	
 	private final int FRAME_OFFSET = 19;
 }

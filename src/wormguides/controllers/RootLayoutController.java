@@ -53,9 +53,9 @@ import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.StringListCellFactory;
 import wormguides.StructuresLayer;
-import wormguides.URLLoader;
 import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
+import wormguides.loaders.URLLoader;
 import wormguides.model.CellCases;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -95,7 +95,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private URLLoadWarningDialog warning;
 	
 	// 3D subscene stuff
-	private Window3DController window3D;
+	private Window3DController window3DController;
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
@@ -143,13 +143,14 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	// Cell selection
 	private StringProperty selectedName;
 	
-	// Layers tab
+	// Display Layer stuff
 	private DisplayLayer displayLayer;
+	private BooleanProperty useInternalRules;
 	@FXML private ListView<Rule> rulesListView;
 	@FXML private CheckBox uniformSizeCheckBox;
 	@FXML private Slider opacitySlider;
 	
-	//structures tab
+	// Structures tab
 	private StructuresLayer structuresLayer;
 	@FXML private TextField structuresSearchField;
 	@FXML private ListView<String> structuresSearchListView;
@@ -173,9 +174,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private ListView<Story> storiesListView;
 	@FXML private Button noteEditorBtn;
 	
-	// url stuff
-	private URLLoader urlLoader;
-	
 	//production information
 	ProductionInfo productionInfo;
 	
@@ -194,11 +192,14 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	// ----- Begin menu items and buttons listeners -----
 	@FXML public void menuLoadStory() {
-		// TODO
+		if (storiesLayer!=null) {
+			storiesLayer.loadStory();
+		}
 	}
 	
 	@FXML public void menuSaveStory() {
-		// TODO
+		if (storiesLayer!=null)
+			storiesLayer.saveActiveStory();
 	}
 	
 	@FXML public void menuCloseAction() {
@@ -235,7 +236,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			urlStage = new Stage();
 			
 			urlWindow = new URLWindow();
-			urlWindow.setScene(window3D);
+			urlWindow.setScene(window3DController);
 			urlWindow.getCloseButton().setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
@@ -268,16 +269,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 						Optional<ButtonType> result = warning.showAndWait();
 						if (result.get() == warning.getButtonTypeOkay()) {
 							urlLoadStage.hide();
-							if (urlLoader==null)
-								urlLoader = new URLLoader(window3D);
-							urlLoader.parseURL(urlLoadWindow.getInputURL());
+							URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
 						}
 					}
 					else {
 						urlLoadStage.hide();
-						if (urlLoader==null)
-							urlLoader = new URLLoader(window3D);
-						urlLoader.parseURL(urlLoadWindow.getInputURL());
+						URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
 					}
 				}
 			});
@@ -378,43 +375,43 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3D = new Window3DController(mainStage, modelAnchorPane, data);
-		subscene = window3D.getSubScene();
+		window3DController = new Window3DController(mainStage, modelAnchorPane, data);
+		subscene = window3DController.getSubScene();
 		
-		modelAnchorPane.setOnMouseClicked(window3D.getNoteClickHandler());
+		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
 		
-		backwardButton.setOnAction(window3D.getBackwardButtonListener());
-		forwardButton.setOnAction(window3D.getForwardButtonListener());
-		zoomOutButton.setOnAction(window3D.getZoomOutButtonListener());
-		zoomInButton.setOnAction(window3D.getZoomInButtonListener());
+		backwardButton.setOnAction(window3DController.getBackwardButtonListener());
+		forwardButton.setOnAction(window3DController.getForwardButtonListener());
+		zoomOutButton.setOnAction(window3DController.getZoomOutButtonListener());
+		zoomInButton.setOnAction(window3DController.getZoomInButtonListener());
 		
-		window3D.setSearchField(searchField);
+		window3DController.setSearchField(searchField);
 		
 		// slider has to listen to 3D window's opacity value
 		// 3d window's opacity value has to listen to opacity slider's value
-		opacitySlider.valueProperty().addListener(window3D.getOthersOpacityListener());
-		window3D.addListenerToOpacitySlider(opacitySlider);
+		opacitySlider.valueProperty().addListener(window3DController.getOthersOpacityListener());
+		window3DController.addListenerToOpacitySlider(opacitySlider);
 		
-		uniformSizeCheckBox.selectedProperty().addListener(window3D.getUniformSizeCheckBoxListener());
+		uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
 		
-		cellNucleusTick.selectedProperty().addListener(window3D.getCellNucleusTickListener());
-		cellBodyTick.selectedProperty().addListener(window3D.getCellBodyTickListener());
+		cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
 		
-		multiRadioBtn.selectedProperty().addListener(window3D.getMulticellModeListener());
+		multiRadioBtn.selectedProperty().addListener(window3DController.getMulticellModeListener());
 		
 		// for context menu
 		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
-		window3D.setBringUpInfoProperty(bringUpInfoProperty);
+		window3DController.setBringUpInfoProperty(bringUpInfoProperty);
 		// send to search
 	}
 	
 	private void setPropertiesFrom3DWindow() {
-		time = window3D.getTimeProperty();
-		window3D.getZoomProperty();
-		totalNuclei = window3D.getTotalNucleiProperty();
-		playingMovie = window3D.getPlayingMovieProperty();
-		selectedName = window3D.getSelectedName();
+		time = window3DController.getTimeProperty();
+		window3DController.getZoomProperty();
+		totalNuclei = window3DController.getTotalNucleiProperty();
+		playingMovie = window3DController.getPlayingMovieProperty();
+		selectedName = window3DController.getSelectedName();
 	}
 	
 	
@@ -430,7 +427,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
 				timeSlider.setValue(time.get());
-				if (time.get()>=window3D.getEndTime()-1) {
+				if (time.get()>=window3DController.getEndTime()-1) {
 					playButton.setGraphic(playIcon);
 					playingMovie.set(false);
 				}
@@ -441,8 +438,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, 
 					Number oldValue, Number newValue) {
-				if (newValue.intValue() != timeSlider.getValue() && window3D!=null)
-					window3D.setTime(newValue.intValue());
+				int newTime = newValue.intValue();
+				if (newTime!=timeSlider.getValue() && window3DController!=null)
+					window3DController.setTime(newTime);
 			}
 		});
 		
@@ -688,8 +686,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void setSlidersProperties() {
 		timeSlider.setMin(1);
-		timeSlider.setMax(window3D.getEndTime());
-		timeSlider.setValue(window3D.getStartTime());
+		timeSlider.setMax(window3DController.getEndTime());
+		timeSlider.setValue(window3DController.getStartTime());
 		
 		opacitySlider.setMin(0);
 		opacitySlider.setMax(100);
@@ -732,7 +730,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initDisplayLayer() {
-		displayLayer = new DisplayLayer();
+		useInternalRules = new SimpleBooleanProperty(true);
+		displayLayer = new DisplayLayer(useInternalRules);
 		
 		rulesListView.setItems(displayLayer.getRulesList());
 		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
@@ -871,9 +870,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void initStoriesLayer(LineageData data) {
-		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, window3D.getTimeProperty(), 
-				window3D.getCellClicked(), data);
-		window3D.setStoriesLayer(storiesLayer);
+		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, 
+				data, window3DController, useInternalRules);
+		window3DController.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
 		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
@@ -881,7 +880,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
-		storiesLayer.getRebuildSceneFlag().addListener(window3D.getRebuildFlagListener());
+		storiesLayer.getRebuildSceneFlag().addListener(window3DController.getRebuildFlagListener());
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
@@ -902,8 +901,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private void initSceneElementsList() {
 		elementsList = new SceneElementsList();
 		
-		if (window3D!=null)
-			window3D.setSceneElementsList(elementsList);
+		if (window3DController!=null)
+			window3DController.setSceneElementsList(elementsList);
 		
 		Search.setSceneElementsList(elementsList);
 	}
@@ -955,7 +954,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		ObservableList<Rule> list = displayLayer.getRulesList();
 		search.setRulesList(list);
-		window3D.setRulesList(list);
+		window3DController.setRulesList(list);
 		
 		initSceneElementsList();
 		
@@ -971,11 +970,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		// stories layer
 		initStoriesLayer(data);
 		
-		window3D.setSearchResultsList(search.getSearchResultsList());
+		window3DController.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
 		
-		window3D.setSearchResultsUpdateService(search.getResultsUpdateService());
-		window3D.setGeneResultsUpdated(search.getGeneResultsUpdated());
+		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
+		window3DController.setGeneResultsUpdated(search.getGeneResultsUpdated());
 		
 		search.addDefaultColorRules();
 		
