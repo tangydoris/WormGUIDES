@@ -76,6 +76,14 @@ public class Note {
 	}
 	
 	
+	public String getLocationString() {
+		if (x==Integer.MIN_VALUE || y==Integer.MIN_VALUE || z==Integer.MIN_VALUE)
+			return "";
+		
+		return x+" "+y+" "+z;
+	}
+	
+	
 	public BooleanProperty getActiveProperty() {
 		return activeProperty;
 	}
@@ -578,19 +586,19 @@ public class Note {
 			this.type = type;
 		}
 		
-		String getType() {
+		public String toString() {
 			return type;
 		}
 		
-		boolean equals(String type) {
+		public boolean equals(String type) {
 			return this.type.equalsIgnoreCase(type.trim());
 		}
 		
-		boolean equals(Type type) {
+		public boolean equals(Type type) {
 			return this==type;
 		}
 		
-		static String valuesToString() {
+		public static String valuesToString() {
 			StringBuilder sb = new StringBuilder();
 			int len = values().length;
 			Type[] values = values();
@@ -618,19 +626,19 @@ public class Note {
 			this.display = display;
 		}
 		
-		String getDisplay() {
+		public String toString() {
 			return display;
 		}
 		
-		boolean equals(String display) {
+		public boolean equals(String display) {
 			return this.display.equalsIgnoreCase(display.trim());
 		}
 		
-		boolean equals(Display display) {
+		public boolean equals(Display display) {
 			return this==display;
 		}
 		
-		static String valuesToString() {
+		public static String valuesToString() {
 			StringBuilder sb = new StringBuilder();
 			int len = values().length;
 			Display[] values = values();

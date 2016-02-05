@@ -1,5 +1,6 @@
 package wormguides;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,12 +36,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
+import wormguides.loaders.StoryFileUtil;
 import wormguides.loaders.URLLoader;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
@@ -140,6 +144,55 @@ public class StoriesLayer {
 	}
 	
 	
+	/*
+	 * Loades story from file and sets it as active story
+	 */
+	public void loadStory() {
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Save Story");
+		chooser.setInitialFileName("WormGUIDES Story.csv");
+		chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+		 
+		File file = chooser.showOpenDialog(parentStage);
+		if (file!=null) {
+			 try {
+				 StoryFileUtil.loadFromCSVFile(file, FRAME_OFFSET);
+			 } catch (IOException e) {
+				 System.out.println("error occurred while saving story");
+				 return;
+			 }
+		 }
+	}
+	
+	
+	/*
+	 * Saves active story to file
+	 */
+	public void saveActiveStory() {
+		 FileChooser chooser = new FileChooser();
+		 chooser.setTitle("Save Story");
+		 chooser.setInitialFileName("WormGUIDES Story.csv");
+		 chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+		 
+		 File file = chooser.showSaveDialog(parentStage);
+		 // if user clicks save
+		 if (file!=null) {
+			 try {
+				 if (activeStory!=null)
+					 StoryFileUtil.saveToCSVFile(activeStory, file, FRAME_OFFSET);
+				 else
+					 System.out.println("no active story to save");
+				 // TODO make error pop up
+			 } catch (IOException e) {
+				 // TODO make error pop up
+				 System.out.println("error occurred while saving story");
+				 return;
+			 }
+			 System.out.println("file saved");
+		 }
+	}
+	
+	
 	public StringProperty getActiveStoryProperty() {
 		return activeStoryProperty;
 	}
@@ -185,11 +238,23 @@ public class StoriesLayer {
 			if (activeStory.getColorURL().isEmpty())
 				useInternalRules.set(true);
 			
-			else {
+			if (!activeStory.getColorURL().isEmpty()){
 				useInternalRules.set(false);
 				URLLoader.process(activeStory.getColorURL(), window3DController);
 			}
-			
+			else {
+				useInternalRules.set(true);
+				ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+				for (Rule rule : currentRules) {
+					if (rule instanceof ColorRule)
+						rulesCopy.add((ColorRule) rule);
+				}
+				activeStory.setColorURL(URLGenerator.generateIOS(rulesCopy, timeProperty.get(), 
+						window3DController.getRotationX(), window3DController.getRotationY(), 
+						window3DController.getRotationZ(), window3DController.getTranslationX(),
+						window3DController.getTranslationY(), window3DController.getScale(),
+						window3DController.getOthersVisibility()));
+			}
 			
 			if (activeStory.hasNotes()) {
 				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
