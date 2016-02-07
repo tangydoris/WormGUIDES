@@ -678,5 +678,4 @@ public class Note {
 	
 	
 	private final String OBJ_EXT = ".obj";
-	private final int FRAME_OFFSET = 19;
 }
