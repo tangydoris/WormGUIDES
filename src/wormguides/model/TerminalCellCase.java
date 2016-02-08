@@ -264,7 +264,6 @@ public class TerminalCellCase {
 			lastChar = Character.toLowerCase(lastChar);
 			if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
 				cell = cell.substring(0, cell.length()-2);
-				System.out.println(cell);
 			} else {
 				cell = cell.substring(0, cell.length()-1);
 			}

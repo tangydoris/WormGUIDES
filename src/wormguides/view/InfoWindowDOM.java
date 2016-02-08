@@ -305,6 +305,7 @@ public class InfoWindowDOM {
 				linksUL.addChild(li);
 			}
 		}
+		linksUL.addChild(new HTMLNode("li", "", "", "<a href=\"#\" onclick=\"jsCallToJava()\">testing</a>"));
 		/*
 		 * TODO
 		 * cytoshow stub
@@ -420,6 +421,9 @@ public class InfoWindowDOM {
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
+		
+		
+		body.addChild(collapseFunctionButton.jsCallBackScript());
 		
 		//add head and body to html
 		html.addChild(head);

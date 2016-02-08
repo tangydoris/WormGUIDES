@@ -1896,12 +1896,8 @@ public class Window3DController {
 	}
 
 	
-	public void setCursorWait() {
-		parentStage.getScene().setCursor(Cursor.WAIT);
-	}
-	
-	public void setCursorDefault() {
-		parentStage.getScene().setCursor(Cursor.DEFAULT);
+	public Stage getStage() {
+		return this.parentStage;
 	}
 
 

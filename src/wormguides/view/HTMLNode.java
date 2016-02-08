@@ -306,6 +306,11 @@ public class HTMLNode {
 		
 		return new HTMLNode("script", script, true);
 	}
+	
+	public HTMLNode jsCallBackScript() {
+		String script = "function jsCallToJava() { app.callFromJavascript(\"testing\"); }";
+		return new HTMLNode("script", script, true);
+	}
 
 	public String getTag() {
 		if (this.tag != null) {
@@ -328,7 +333,7 @@ public class HTMLNode {
 		}
 
 		if (this.isButton()) {
-			System.out.println("BUTTON STYLE RETURN NOTHING");
+			System.out.println("BUTTON STYLE RETURNED NOTHING");
 		}
 		return "";
 	}

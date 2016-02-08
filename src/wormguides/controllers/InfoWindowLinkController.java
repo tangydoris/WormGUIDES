@@ -45,6 +45,10 @@ public class InfoWindowLinkController {
 		openLink("https://www.google.com/#q=");
 	}
 	
+	public void callFromJavascript(String msg) {
+		System.out.println("passed from js: " + msg);
+	}
+	
 	private void openLink(String host) throws IOException, URISyntaxException {
 		for (String link : links) {
 			if (link.startsWith(host)) {

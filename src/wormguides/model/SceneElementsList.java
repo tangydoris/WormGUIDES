@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -20,19 +21,21 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import wormguides.loaders.ProductionInfoLoader;
+
 public class SceneElementsList {
 	
 	public ArrayList<SceneElement> elementsList;
 	public HashMap<String, ArrayList<String>> nameCellsMap;
 	public HashMap<String, String> nameCommentsMap;
 	private JarFile jarFile;
-	private ArrayList<JarEntry> objEntries;
+	private ArrayList<File> objEntries;
 	
 	
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
 	public SceneElementsList() {
 		elementsList = new ArrayList<SceneElement>();
-		objEntries = new ArrayList<JarEntry>();
+		objEntries = new ArrayList<File>();
 		nameCellsMap = new HashMap<String, ArrayList<String>>();
 		nameCommentsMap = new HashMap<String, String>();
 		
@@ -41,24 +44,40 @@ public class SceneElementsList {
 	
 	
 	private void buildListFromConfig() {
+		
+		URL url = SceneElementsList.class.getResource("shapes_file/" + CELL_CONFIG_FILE_NAME);
+		
 		try {
-			jarFile = new JarFile(new File("WormGUIDES.jar"));
-			Enumeration<JarEntry> entries = jarFile.entries();
-			JarEntry entry;
-			
-			while (entries.hasMoreElements()) {
-				entry = entries.nextElement();
+//			jarFile = new JarFile(new File("WormGUIDES.jar"));
+//			Enumeration<JarEntry> entries = jarFile.entries();
+//			JarEntry entry;
+//			
+//			while (entries.hasMoreElements()) {
+//				entry = entries.nextElement();
 				
-				if (entry.getName().equals("wormguides/model/shapes_file/"+CELL_CONFIG_FILE_NAME)) {
-					InputStream stream = jarFile.getInputStream(entry);
-					processStreamString(stream);
-				}
-				else if (entry.getName().startsWith("wormguides/model/obj_file/"))
-					objEntries.add(entry);
-				
+//				if (entry.getName().equals("wormguides/model/shapes_file/"+CELL_CONFIG_FILE_NAME)) {
+			if (url != null) {
+				InputStream stream = url.openStream();
+				processStreamString(stream);
 			}
+//					InputStream stream = jarFile.getInputStream(entry);
+//					processStreamString(stream);
+//				}
 			
-			jarFile.close();
+			//add obj entries
+			URL url2 = SceneElementsList.class.getResource("objFile/");
+			if (url2 != null) {
+				File[] contents = new File(url2.getFile()).listFiles();
+				for (File file : contents) {
+					objEntries.add(file);
+				}
+			}
+//				else if (entry.getName().startsWith("wormguides/model/obj_file/"))
+//					objEntries.add(entry);
+				
+			//}
+			
+			//jarFile.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		} catch (IOException e) {

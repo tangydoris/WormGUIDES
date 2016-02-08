@@ -1,5 +1,6 @@
 package wormguides.controllers;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import wormguides.loaders.ProductionInfoLoader;

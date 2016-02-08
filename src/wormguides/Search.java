@@ -368,8 +368,9 @@ public class Search {
 			case DESCRIPTION:
 							// TODO some cells with the searched term are not showing up in results list
 							// this is because some cells have the same description and it 
-							// gives the first one found
-							//System.out.println("\nShowing found description names:");
+							// gives the first one found 
+				
+							// FIXED ^^ ???
 				
 							//for searching with multiple terms, perform individual searches and return the intersection of the hits
 							ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
@@ -390,7 +391,6 @@ public class Search {
 										}
 									}
 								}
-								
 								//add the results to the hits
 								hits.add(results);
 							}
@@ -413,12 +413,9 @@ public class Search {
 										cells.add(cell);
 									}
 								}
-								
 							}
 							
 							break;
-							
-
 //							for (int i=0; i<descriptions.size(); i++) {
 //								String textLowerCase = descriptions.get(i).toLowerCase();
 //								String[] keywords = searched.split(" ");
@@ -434,8 +431,7 @@ public class Search {
 //									cells.add(PartsList.getLineageNameByIndex(i));
 //							}
 //							
-//							break;
-						 
+//							break; 
 			case GENE:		
 							if (isGeneFormat(getSearchedText())) {
 								showLoadingService.restart();

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -18,10 +20,26 @@ public class AceTreeLoader {
 	
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 	
-	public static TableLineageData loadNucFiles(String jarPath) {
+	public static TableLineageData loadNucFiles() {
+		
+//		//find the JAR name
+//		String JarName = "";
+//		try {
+//			String pathToJar = ProductionInfoLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI().toString();
+//			
+//			//remove bin from path
+//			pathToJar = pathToJar.substring(0, pathToJar.indexOf("/bin/"));
+//			
+//			//take JAR name and add extension
+//			JarName = pathToJar.substring(pathToJar.lastIndexOf('/')+1) + ".jar";
+//		} catch (URISyntaxException e1) {
+//			// TODO Auto-generated catch block
+//			//e1.printStackTrace();
+//		}		
+		
 		TableLineageData tld = new TableLineageData(allCellNames);
 		try {
-			JarFile jarFile = new JarFile(new File(jarPath));
+			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
 			int time = 0;

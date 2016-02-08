@@ -55,10 +55,7 @@ public class InfoWindow {
 		webview.getEngine().loadContent(dom.DOMtoString());
 		webview.setContextMenuEnabled(false);
 		
-		
-		/*
-		 * TESTING LINK CONTROLLER
-		 */
+		//link controller
 		JSObject window = (JSObject) webview.getEngine().executeScript("window");
 		window.setMember("app", new InfoWindowLinkController(links));
 		
@@ -68,16 +65,8 @@ public class InfoWindow {
 		tabPane.setFocusTraversable(true);
 	}
 	
-	public void setCursorWait() {
-		infoWindowStage.getScene().setCursor(Cursor.WAIT);
-		scene.setCursor(Cursor.WAIT);
-		tabPane.getScene().setCursor(Cursor.WAIT);
-	}
-	
-	public void setCursorDefault() {
-		infoWindowStage.getScene().setCursor(Cursor.DEFAULT);
-		scene.setCursor(Cursor.DEFAULT);
-		tabPane.getScene().setCursor(Cursor.DEFAULT);
+	public Stage getStage() {
+		return this.infoWindowStage;
 	}
 
 }
