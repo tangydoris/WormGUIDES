@@ -19,6 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
+import wormguides.model.CellCases;
 import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageTree;
@@ -66,6 +67,9 @@ public class Search {
 	private static boolean postsynapticTicked;
 	private static boolean electricalTicked;
 	private static boolean neuromuscularTicked;
+	
+	//for cell cases searching
+	private static CellCases cellCases;
 
 		
 	static {
@@ -840,6 +844,19 @@ public class Search {
 		if (con != null) {
 			connectome = con;
 		}
+	}
+	
+	public static void setCellCases(CellCases cc) {
+		if (cc != null) {
+			cellCases = cc;
+		}
+	}
+	
+	public static boolean hasCellCase(String cellName) {
+		if (cellCases != null) {
+			return cellCases.hasCellCase(cellName);
+		}
+		return false;
 	}
 	
 	//connectome checkbox listeners

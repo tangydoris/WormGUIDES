@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import wormguides.Search;
+
 //http://java-buddy.blogspot.com/2012/05/communication-between-javafx-and.html
 
 /*
@@ -13,6 +15,11 @@ import java.util.ArrayList;
  * 
  * Because our anchors <a> cannot pass vars, we'll keep the links in
  * memory and have the anchor call the appropriate callback method
+ */
+
+
+/* TODO
+ * remove links --> pass link as string to openLink
  */
 public class InfoWindowLinkController {
 	ArrayList<String> links;
@@ -45,8 +52,22 @@ public class InfoWindowLinkController {
 		openLink("https://www.google.com/#q=");
 	}
 	
+	public void handleWiringPartnerClick(String cellName) {
+		if (!Search.hasCellCase(cellName)) {
+			
+		} else {
+			/*
+			 * TODO
+			 * focus the tab if it already exists
+			 */
+		}
+	}
+	
+	
+	/* trying to port this to all links instead of ^^^ method */
 	public void callFromJavascript(String msg) {
 		System.out.println("passed from js: " + msg);
+		System.out.println("TESTING");
 	}
 	
 	private void openLink(String host) throws IOException, URISyntaxException {

@@ -537,9 +537,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		});
 	}
 	
-	
 	private void addToInfoWindow(String name) {
-		service.restart();
+		//service.restart();
 		
 		//GENERATE CELL TAB ON CLICK
 		if (name!=null && !name.isEmpty()) {
@@ -574,7 +573,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			}
 		}
 	}
-	
 	
 	private void setSelectedEntityInfo(String name) {
 		if (name==null || name.isEmpty()) {
@@ -922,6 +920,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			initInfoWindow();
 		
 		cellCases = new CellCases(infoWindow);
+		Search.setCellCases(cellCases);
 	}
 	
 	private void initProductionInfo() {
@@ -987,22 +986,22 @@ public class RootLayoutController extends BorderPane implements Initializable{
         sizeInfoPane();
 	}
 	
-	private final Service service = new Service() {
-		@Override
-		protected Task createTask() {
-			return new Task<Void>() {
-				protected Void call() throws Exception {
-					mainStage.getScene().setCursor(Cursor.WAIT);
-					infoWindow.getStage().getScene().setCursor(Cursor.WAIT); //ONLY WORKS ON TOP CONTAINER --> NOT ON TABPANE
-					//window3DController.getStage().getScene().setCursor(Cursor.WAIT); DOESN'T WORK
-					Thread.sleep(5000);
-					mainStage.getScene().setCursor(Cursor.DEFAULT);
-					infoWindow.getStage().getScene().setCursor(Cursor.DEFAULT);
-					//window3DController.getStage().getScene().setCursor(Cursor.DEFAULT);
-					return null;
-				}
-			};
-		}
-	};
+//	private final Service service = new Service() {
+//		@Override
+//		protected Task createTask() {
+//			return new Task<Void>() {
+//				protected Void call() throws Exception {
+//					mainStage.getScene().setCursor(Cursor.WAIT);
+//					infoWindow.getStage().getScene().setCursor(Cursor.WAIT); //ONLY WORKS ON TOP CONTAINER --> NOT ON TABPANE
+//					//window3DController.getStage().getScene().setCursor(Cursor.WAIT); DOESN'T WORK
+//					Thread.sleep(5000);
+//					mainStage.getScene().setCursor(Cursor.DEFAULT);
+//					infoWindow.getStage().getScene().setCursor(Cursor.DEFAULT);
+//					//window3DController.getStage().getScene().setCursor(Cursor.DEFAULT);
+//					return null;
+//				}
+//			};
+//		}
+//	};
 	
 }

@@ -13,6 +13,8 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import wormguides.model.EmbryonicAnalogousCells;
+import wormguides.model.EmbryonicHomology;
 import wormguides.model.TableLineageData;
 
 // Loader class to read nuclei files
@@ -21,21 +23,7 @@ public class AceTreeLoader {
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 	
 	public static TableLineageData loadNucFiles() {
-		
-//		//find the JAR name
-//		String JarName = "";
-//		try {
-//			String pathToJar = ProductionInfoLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI().toString();
-//			
-//			//remove bin from path
-//			pathToJar = pathToJar.substring(0, pathToJar.indexOf("/bin/"));
-//			
-//			//take JAR name and add extension
-//			JarName = pathToJar.substring(pathToJar.lastIndexOf('/')+1) + ".jar";
-//		} catch (URISyntaxException e1) {
-//			// TODO Auto-generated catch block
-//			//e1.printStackTrace();
-//		}		
+
 		
 		TableLineageData tld = new TableLineageData(allCellNames);
 		try {

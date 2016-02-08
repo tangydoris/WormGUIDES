@@ -136,8 +136,24 @@ public class InfoWindowDOM {
 			Collections.sort(presynapticPartners);
 			
 			//remove brackets
-			String prePartners = presynapticPartners.toString();
-			prePartners = prePartners.substring(1, prePartners.length()-2);
+			//String prePartners = presynapticPartners.toString();
+			
+			//handleWiringPartnerClick(String cell)
+			//anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+			//terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+			//"</a>";
+			
+			//handleWiringPartnerClick
+			
+			ArrayList<String> presynapticPartnerAnchors = new ArrayList<String>();
+			for (String presynapticPartner : presynapticPartners) {
+//				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(\"" + presynapticPartner + "\")\">" 
+//						+ presynapticPartner + "</a>";
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ presynapticPartner + "</a>";
+				presynapticPartnerAnchors.add(anchor);
+			}
+			String prePartners = presynapticPartnerAnchors.toString().substring(1, presynapticPartnerAnchors.toString().length()-2);
 			
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em><br>" + prePartners);
 			wiringPartnersUL.addChild(li);
@@ -243,6 +259,16 @@ public class InfoWindowDOM {
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
+		
+			/*
+			 * TODO
+			 * 
+			 * anchor --> <a href="www...." onclick="JAVASCRIPTLINKHANDLER(THIS)">blah</a>
+			 * 
+			 * function JAVASCRIPTLINKHANDLER(ELEMENT) {
+			 * 		app.openLink(URL);
+			 * }
+			 */
 			
 			//begin after www.
 			int startIDX = link.indexOf("www.");
@@ -422,8 +448,10 @@ public class InfoWindowDOM {
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
-		
-		body.addChild(collapseFunctionButton.jsCallBackScript());
+		// testing JS callback
+		//body.addChild(collapseFunctionButton.jsCallBackScript());
+		//body.addChild(collapseFunctionButton.addJsCurrentLinkScript());
+		body.addChild(wiringPartnersDiv.addWiringPartnersClickScript());
 		
 		//add head and body to html
 		html.addChild(head);
