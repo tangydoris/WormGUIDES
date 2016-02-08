@@ -25,7 +25,6 @@ public class ColorHash {
 	// Used for 'others' opacity
 	private HashMap<Double, Material> opacityMaterialHash;
 	
-	
 	public ColorHash() {
 		materialHash = new HashMap<TreeSet<Color>, Material>();
 		opacityHash = new HashMap<Material, Double>();
@@ -147,7 +146,10 @@ public class ColorHash {
 	
 	
 	public double getMaterialOpacity(Material material) {
-		return opacityHash.get(material);
+		if (material!=null)
+			return opacityHash.get(material);
+		
+		return 0;
 	}
 	
 	

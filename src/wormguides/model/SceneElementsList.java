@@ -84,17 +84,21 @@ public class SceneElementsList {
 				while (st.hasMoreTokens()) {
 					cellNames.add(st.nextToken());
 				}
-						
-				SceneElement se = new SceneElement(//objEntries,
-						splits[0], cellNames,
-						splits[2], splits[3], splits[4],
-						Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
-						splits[7]);
 				
-				// add scene element to list
-				elementsList.add(se);
-				
-				addComments(se);
+				try {
+					SceneElement se = new SceneElement(//objEntries,
+							splits[0], cellNames,
+							splits[2], splits[3], splits[4],
+							Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
+							splits[7]);
+					
+					// add scene element to list
+					elementsList.add(se);
+					addComments(se);
+					
+				} catch (NumberFormatException e) {
+					System.out.println("error in reading scene element time for line "+line);
+				}
 			}
 			
 			reader.close();

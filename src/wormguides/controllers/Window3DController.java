@@ -588,18 +588,18 @@ public class Window3DController {
 	
 	
 	private void repositionNoteBillboardFronts() {
-		for (Node node : billboardFrontEntityMap.keySet()) {
-			Node s = billboardFrontEntityMap.get(node);
-			if (s!=null) {
-				Bounds b = s.getBoundsInParent();
+		for (Node billboard : billboardFrontEntityMap.keySet()) {
+			Node entity = billboardFrontEntityMap.get(billboard);
+			if (entity!=null) {
+				Bounds b = entity.getBoundsInParent();
 				
 				if (b!=null) {
-					node.getTransforms().clear();
+					billboard.getTransforms().clear();
 					double x = b.getMaxX();
 					double y = b.getMaxY();
 					double z = b.getMaxZ();
-					node.getTransforms().addAll(new Translate(x, y, z),
-								new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+					billboard.getTransforms().addAll(new Translate(x, y, z),
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 			}
 		}
@@ -757,15 +757,12 @@ public class Window3DController {
 				if (note.hasSceneElements()) {
 					for (SceneElement se : note.getSceneElements()) {
 						MeshView mesh = se.buildGeometry(time);
-						mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-						// scale factor may have to change if not dealing with the Stanford Bunny
-						mesh.getTransforms().addAll(new Translate(
-							newOriginX+se.getX(),
-							newOriginY+se.getY(),
-							newOriginZ+se.getZ()),
-							new Scale(150, -150, -150));
-						currentNoteMeshMap.put(note, mesh);
+						
+						if (mesh!=null) {
+							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
+							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+							currentNoteMeshMap.put(note, mesh);
+						}
 					}
 				}
 			}
@@ -836,7 +833,6 @@ public class Window3DController {
 
 	
 	private void addEntitiesToScene() {
-		//System.out.println(storiesList.toString());
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
 		ArrayList<Text> notes = new ArrayList<Text>();
 		
@@ -844,12 +840,11 @@ public class Window3DController {
 		addCellGeometries(entities);
 		
 		// add scene element meshes (from notes and from scene elements list)
- 		//entities.addAll(currentSceneElementMeshes);
  		addSceneElementGeometries(entities);
  		
  		// add notes
  		insertOverlayTitles();
- 		addNoteGeometries(notes);
+ 		addNoteGeometries(notes, entities);
  		
  		// add labels
  		for (String name : currentLabels) {
@@ -874,8 +869,11 @@ public class Window3DController {
 	// TODO
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
 		// add scene elements from note resources
-		for (Note note : currentNoteMeshMap.keySet())
+		for (Note note : currentNoteMeshMap.keySet()) {
+			//MeshView mesh = currentNoteMeshMap.get(note);
+			//mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
 			list.add(currentNoteMeshMap.get(note));
+		}
 		
 		// Consult rules
 		if (!currentSceneElements.isEmpty()) {	
@@ -975,13 +973,11 @@ public class Window3DController {
  			}
 
  			sphere.setMaterial(material);
-
- 			double x = positions[i][X_COR_INDEX]*X_SCALE;
-	        double y = positions[i][Y_COR_INDEX]*Y_SCALE;
-	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
 	        
-	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
-	        translateSphere(sphere, x, y, z);
+	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX,
+	        		new Translate(positions[i][X_COR_INDEX]*X_SCALE,
+	        				positions[i][Y_COR_INDEX]*Y_SCALE, 
+	        				positions[i][Z_COR_INDEX]*Z_SCALE));
 	        
 	        spheres[i] = sphere;
 	        list.add(sphere);
@@ -1014,7 +1010,7 @@ public class Window3DController {
 	// Inserts note geometries to scene
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
-	private void addNoteGeometries(ArrayList<Text> list) {		
+	private void addNoteGeometries(ArrayList<Text> list, ArrayList<Shape3D> entities) {		
 		// TODO
 		for (Note note : currentNotes) {
 			// map notes to their sphere/mesh view
@@ -1024,8 +1020,9 @@ public class Window3DController {
 			if (note.isSprite()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					spriteEntityMap.put(text, createLocationMarker(note.getX(), 
-							note.getY(), note.getZ()));
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					spriteEntityMap.put(text, marker);
+					entities.add(marker);
 				}
 				// cell attachment
 				else if (note.attachedToCell()) {
@@ -1050,8 +1047,9 @@ public class Window3DController {
 			else if (note.isBillboardFront()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					billboardFrontEntityMap.put(text, createLocationMarker(note.getX(), 
-							note.getY(), note.getZ()));
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					billboardFrontEntityMap.put(text, marker);
+					entities.add(marker);
 				}
 				// cell attachment
 				else if (note.attachedToCell()) {
@@ -1076,9 +1074,9 @@ public class Window3DController {
 			else if (note.isBillboard()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
-					text.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
-							newOriginY+note.getY(), newOriginZ+note.getZ()),
+					text.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					text.getTransforms().addAll(
+							new Translate(note.getX(), note.getY(), note.getZ()),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 				// cell attachment
@@ -1181,9 +1179,10 @@ public class Window3DController {
 	
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
-		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ,
-				new Translate(newOriginX+x, 
-						newOriginY+y, newOriginZ+z));
+		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX,
+				new Translate(x, y, z));
+		// make marker transparent
+		sphere.setMaterial(colorHash.getOthersMaterial(0));
 		return sphere;
 	}
 	
@@ -1222,12 +1221,6 @@ public class Window3DController {
 		}
 		return node;
 	}
-	
-	
-	private void translateSphere(Node sphere, double x, double y, double z) {
-		Translate t = new Translate(x, y, z);
-		sphere.getTransforms().add(t);
-	}
 
 	
 	private void buildCamera() {
@@ -1263,9 +1256,9 @@ public class Window3DController {
 			sumY += positions[i][Y_COR_INDEX];
 			sumZ += positions[i][Z_COR_INDEX];
 		}
-		this.newOriginX = (int) Math.round(X_SCALE*sumX/numCells);
-		this.newOriginY = (int) Math.round(Y_SCALE*sumY/numCells);
-		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
+		newOriginX = (int) Math.round(X_SCALE*sumX/numCells);
+		newOriginY = (int) Math.round(Y_SCALE*sumY/numCells);
+		newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 
 		// Set new origin to average X Y positions
 		xform.setTranslate(newOriginX, newOriginY, newOriginZ);

@@ -659,6 +659,7 @@ public class StoriesLayer {
 				@Override
 				public void handle(MouseEvent event) {
 					story.setActive(!story.isActive());
+					
 					if (story.isActive())
 						setActiveStory(story);
 					else
