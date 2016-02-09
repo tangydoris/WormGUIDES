@@ -390,12 +390,12 @@ public class Note {
 	
 	
 	public int getY() {
-		return x;
+		return y;
 	}
 	
 	
 	public int getZ() {
-		return x;
+		return z;
 	}
 	
 	

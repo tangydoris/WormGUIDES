@@ -267,13 +267,17 @@ public class StoriesLayer {
 			useInternalRules.set(true);
 			URLLoader.process("", window3DController);
 		}
-		timeProperty.set(startTime);
 		
 		if (editController!=null)
 			editController.setActiveStory(activeStory);
 		
-		rebuildSceneFlag.set(true);
-		rebuildSceneFlag.set(false);
+		if (timeProperty.get()!=startTime)
+			timeProperty.set(startTime);
+		
+		else {
+			rebuildSceneFlag.set(true);
+			rebuildSceneFlag.set(false);
+		}
 	}
 	
 	

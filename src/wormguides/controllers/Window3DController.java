@@ -165,7 +165,7 @@ public class Window3DController {
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
 	// Map of current note graphics to their note objects
-	private HashMap<Text, Note> currentGraphicNoteMap;
+	private HashMap<Node, Note> currentGraphicNoteMap;
 	// Map of current notes to their scene elements
 	private HashMap<Note, MeshView> currentNoteMeshMap;
 	
@@ -173,8 +173,8 @@ public class Window3DController {
 	private Pane spritesPane;
 	
 	// maps of sprite/billboard front notes attached to cell, or cell and time
-	private HashMap<Text, Node> spriteEntityMap;
-	private HashMap<Text, Node> billboardFrontEntityMap;
+	private HashMap<Node, VBox> entitySpriteMap;
+	private HashMap<Node, Node> billboardFrontEntityMap;
 	
 	// Label stuff
 	private ArrayList<String> labels;
@@ -200,8 +200,10 @@ public class Window3DController {
 				int t = newValue.intValue();
 				if (t<START_TIME)
 					t = START_TIME;
-				if (START_TIME<=t && t<=endTime)
+				if (START_TIME<=t && t<=endTime) {
+					//System.out.println("time change build scene...");
 					buildScene(t);
+				}
 			}
 		});
 
@@ -303,10 +305,10 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
-		currentGraphicNoteMap = new HashMap<Text, Note>();
+		currentGraphicNoteMap = new HashMap<Node, Note>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
-		spriteEntityMap = new HashMap<Text, Node>();
-		billboardFrontEntityMap = new HashMap<Text, Node>();
+		entitySpriteMap = new HashMap<Node, VBox>();
+		billboardFrontEntityMap = new HashMap<Node, Node>();
 		
 		labels = new ArrayList<String>();
 		currentLabels = new ArrayList<String>();
@@ -472,6 +474,7 @@ public class Window3DController {
 				else
 					labels.add(name);
 				
+				System.out.println("add label build scene...");
 				buildScene(time.get());
 			}
 
@@ -488,6 +491,9 @@ public class Window3DController {
 					selectedName.set(name);
 					found = true;
 					
+					// TODO
+					//System.out.println(node.getBoundsInParent().toString());
+					
 					if (event.getButton()==MouseButton.SECONDARY)
 						showContextMenu(name, event.getScreenX(), event.getScreenY());
 					
@@ -497,6 +503,7 @@ public class Window3DController {
 						else
 							labels.add(name);
 						
+						System.out.println("add label build scene...");
 						buildScene(time.get());
 					}
 					
@@ -608,10 +615,11 @@ public class Window3DController {
 	
 	// Reposition sprites by projecting the sphere's 3d coordinate 
 	// onto the front of the subscene
-	private void repositionSprites() {
-		for (Text text : spriteEntityMap.keySet()) {
-			alignTextWithEntity(text, spriteEntityMap.get(text), false);
+	private void repositionSprites() {		
+		for (Node entity : entitySpriteMap.keySet()) {
+			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
 		}
+		
 		for (Text text : labelEntityMap.keySet()) {
 			alignTextWithEntity(text, labelEntityMap.get(text), true);
 		}
@@ -620,31 +628,37 @@ public class Window3DController {
 	
 	// Input text is the note/label geometry
 	// Input entity is the cell/body/mesh that the text should align with
-	private void alignTextWithEntity(Text text, Node node, boolean isLabel) {
+	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
 		if (node!=null) {
 			Bounds b = node.getBoundsInParent();
 			
 			if (b!=null) {
-				text.getTransforms().clear();
-				Point2D p = CameraHelper.project(camera, 
-						new Point3D((b.getMaxX()+b.getMinX())/2, 
-								(b.getMaxY()+b.getMinY())/2, 
+				noteGraphic.getTransforms().clear();
+				Point2D p1 = CameraHelper.project(camera, 
+						new Point3D((b.getMinX()+b.getMaxX())/2, 
+								(b.getMinY()+b.getMaxY())/2, 
 								(b.getMaxZ()+b.getMinZ())/2));
-				double x = p.getX();
-				double y = p.getY();
+				double x = p1.getX();
+				double y = p1.getY();
 				
-				if (node instanceof Sphere) {
-					double radius = ((Sphere) node).getRadius();
-					if (isLabel) {
-						x += radius;
-						y -= (radius+5);
-					}
-					else {
-						x += radius;
-						y += radius+10;
-					}
+				double vOffset = b.getHeight()/2;
+				double hOffset = b.getWidth()/2;
+
+				if (isLabel) {
+					x += hOffset;
+					y -= vOffset+5;
 				}
-				text.getTransforms().add(new Translate(x, y));
+				else {
+					x += hOffset;
+					y += vOffset+5;
+				}
+				
+				noteGraphic.getTransforms().add(new Translate(x, y));
+				
+				if (noteGraphic instanceof VBox) {
+					System.out.println("entity: "+node.getBoundsInParent().toString());
+					System.out.println("note: "+noteGraphic.getBoundsInParent().toString());
+				}
 			}
 		}
 	}
@@ -742,7 +756,7 @@ public class Window3DController {
 			currentNoteMeshMap.clear();
 			currentGraphicNoteMap.clear();
 			
-			spriteEntityMap.clear();
+			entitySpriteMap.clear();
 			billboardFrontEntityMap.clear();
 			
 			currentNotes = storiesLayer.getNotesAtTime(time);
@@ -805,8 +819,10 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, 
 								Boolean oldValue, Boolean newValue) {
-				if (newValue)
+				if (newValue) {
+					//System.out.println("stories layer rebuilding scene...");
 					buildScene(time.get());
+				}
 			}
 		};
 	}
@@ -827,6 +843,10 @@ public class Window3DController {
 				Node node = iter.next();
 				if (node instanceof Text)
 					iter.remove();
+				else if (node instanceof VBox && node!=overlayVBox) {
+					System.out.println("removed: "+node.toString());
+					iter.remove();
+				}
 			}
 		}
 	}
@@ -834,7 +854,7 @@ public class Window3DController {
 	
 	private void addEntitiesToScene() {
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
-		ArrayList<Text> notes = new ArrayList<Text>();
+		ArrayList<Node> notes = new ArrayList<Node>();
 		
 		// add spheres
 		addCellGeometries(entities);
@@ -844,7 +864,7 @@ public class Window3DController {
  		
  		// add notes
  		insertOverlayTitles();
- 		addNoteGeometries(notes, entities);
+ 		addNoteGeometries(notes);
  		
  		// add labels
  		for (String name : currentLabels) {
@@ -866,7 +886,6 @@ public class Window3DController {
 	}
 	
 	
-	// TODO
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
 		// add scene elements from note resources
 		for (Note note : currentNoteMeshMap.keySet()) {
@@ -1003,6 +1022,7 @@ public class Window3DController {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 	
@@ -1010,34 +1030,71 @@ public class Window3DController {
 	// Inserts note geometries to scene
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
-	private void addNoteGeometries(ArrayList<Text> list, ArrayList<Shape3D> entities) {		
+	private void addNoteGeometries(ArrayList<Node> list) {		
 		// TODO
 		for (Note note : currentNotes) {
 			// map notes to their sphere/mesh view
-			Text text = makeNoteGraphic(note);
+			Node text = makeNoteGraphic(note);
 			currentGraphicNoteMap.put(text, note);
+			
 			// SPRITE
 			if (note.isSprite()) {
 				// location attachment
 				if (note.attachedToLocation()) {
+					VBox box = new VBox(3);
+					box.getChildren().add(text);
+					// add marker to scene
 					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
-					spriteEntityMap.put(text, marker);
-					entities.add(marker);
+					root.getChildren().add(marker);
+					entitySpriteMap.put(marker, box);
+					
+					if (spritesPane!=null)
+						spritesPane.getChildren().add(box);
 				}
+				
 				// cell attachment
 				else if (note.attachedToCell()) {
 					for (int i=0; i<cellNames.length; i++) {
 						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
-							spriteEntityMap.put(text, spheres[i]);
+							// if another note is already attached to the same sphere,
+							// create a vbox for note positioning
+							if (!entitySpriteMap.containsKey(spheres[i])) {
+								VBox box = new VBox(3);
+								box.getChildren().add(text);
+								entitySpriteMap.put(spheres[i], box);
+								
+								if (spritesPane!=null)
+									spritesPane.getChildren().add(box);
+							}
+							else {
+								entitySpriteMap.get(spheres[i]).getChildren().add(text);
+							}
+							
+							break;
 						}
 					}
 				}
+				
 				// structure attachment
 				else if (note.attachedToStructure()) {
 					for (int i=0; i<currentSceneElements.size(); i++) {
 						if (currentSceneElements.get(i).getSceneName()
 								.equalsIgnoreCase(note.getCellName())) {
-							spriteEntityMap.put(text, currentSceneElementMeshes.get(i));
+							MeshView mesh = currentSceneElementMeshes.get(i);
+							if (!entitySpriteMap.containsKey(mesh)) {
+								VBox box = new VBox(3);
+								box.getChildren().add(text);
+								entitySpriteMap.put(mesh, box);
+								
+								if (spritesPane!=null) {
+									spritesPane.getChildren().add(box);
+									System.out.println("added box for "+note.getTagName());
+								}
+							}
+							else {
+								entitySpriteMap.get(mesh).getChildren().add(text);
+								System.out.println("added to box "+note.getTagName());
+							}
 						}
 					}
 				}
@@ -1048,8 +1105,8 @@ public class Window3DController {
 				// location attachment
 				if (note.attachedToLocation()) {
 					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					root.getChildren().add(marker);
 					billboardFrontEntityMap.put(text, marker);
-					entities.add(marker);
 				}
 				// cell attachment
 				else if (note.attachedToCell()) {
@@ -1113,7 +1170,6 @@ public class Window3DController {
 			if (display!=null) {
 				switch (display) {
 				case SPRITE:
-								spritesPane.getChildren().add(text);
 								break;
 				
 				case BILLBOARD_FRONT:	// fall to billboard case
@@ -1177,12 +1233,15 @@ public class Window3DController {
 	}
 	
 	
+	// TODO
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
 		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX,
-				new Translate(x, y, z));
+				new Translate(x*X_SCALE, y*Y_SCALE, z*Z_SCALE));
+		System.out.println("marker: "+x+" "+y+" "+z);
 		// make marker transparent
 		sphere.setMaterial(colorHash.getOthersMaterial(0));
+		//sphere.setMaterial(colorHash.getHighlightMaterial());
 		return sphere;
 	}
 	
@@ -1349,20 +1408,25 @@ public class Window3DController {
 			public void onChanged(
 					ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
-					for (Rule rule : change.getAddedSubList()) {
-						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable,
-									Boolean oldValue, Boolean newValue) {
-								if (newValue)
-									buildScene(time.get());
-							}
-						});
+					if (!(change.getAddedSize()>0)) {
 						buildScene(time.get());
+						
+						for (Rule rule : change.getAddedSubList()) {
+							rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+								@Override
+								public void changed(ObservableValue<? extends Boolean> observable,
+										Boolean oldValue, Boolean newValue) {
+									if (newValue) {
+										buildScene(time.get());
+									}
+								}
+							});
+						}
 					}
 					
-					if (!change.getRemoved().isEmpty())
+					if (!change.getRemoved().isEmpty()) {
 						buildScene(time.get());
+					}
 				}
 			}
 		});
@@ -1548,11 +1612,9 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
-											Number oldValue, Number newValue) {
+					Number oldValue, Number newValue) {
 				othersOpacity.set(Math.round(newValue.doubleValue())/100d);
-
 				
-
 				buildScene(time.get());
 			}
 		};
