@@ -7,9 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.net.URL;
 
 import javafx.collections.ObservableList;
 import wormguides.model.Note;
@@ -34,21 +32,13 @@ public class StoriesLoader {
 	}
 	
 	public static void loadConfigFile(String file, ObservableList<Story> stories, int offset) {
+		URL url = StoriesLoader.class.getResource("../model/story_file/" + file);
+		
 		try {
-			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
-			Enumeration<JarEntry> entries = jarFile.entries();
-			JarEntry entry;
-			
-			while (entries.hasMoreElements()) {
-				entry = entries.nextElement();
-				
-				if (entry.getName().equals("wormguides/model/story_file/"+file)) {
-					InputStream stream = jarFile.getInputStream(entry);
-					processStream(file, stream, stories, offset);
-				}
+			if (url != null) {
+				InputStream stream = url.openStream();
+				processStream(file, stream, stories, offset);
 			}
-			
-			jarFile.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("The config file '" + file + "' was not found in the system.");
 		} catch (IOException e) {

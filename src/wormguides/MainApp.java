@@ -28,7 +28,7 @@ public class MainApp extends Application {
 	public void start(Stage primaryStage) {
 		System.out.println("start");
 		
-		ImageLoader.loadImages(JAR_NAME);
+		ImageLoader.loadImages();
 		
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("WormGUIDES");
@@ -85,7 +85,4 @@ public class MainApp extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
-	private static final String JAR_NAME = "WormGUIDES.jar";
-	
 }

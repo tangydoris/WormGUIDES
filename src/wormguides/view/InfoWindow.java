@@ -2,7 +2,6 @@ package wormguides.view;
 
 
 import java.util.ArrayList;
-
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -17,6 +16,7 @@ public class InfoWindow {
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	Scene scene;
+	
 	
 	/*
 	 * TODO
@@ -54,17 +54,22 @@ public class InfoWindow {
 		webview.getEngine().loadContent(dom.DOMtoString());
 		webview.setContextMenuEnabled(false);
 		
-		
-		/*
-		 * TESTING LINK CONTROLLER
-		 */
+		//link controller
 		JSObject window = (JSObject) webview.getEngine().executeScript("window");
 		window.setMember("app", new InfoWindowLinkController(links));
+		
+		//link handler
 		
 		Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(tab);
 		tabPane.getSelectionModel().select(tab);
 		tabPane.setFocusTraversable(true);
 	}
+	
+	public Stage getStage() {
+		return this.infoWindowStage;
+	}
+	
+	public static final String EVENT_TYPE_CLICK = "click";
 
 }

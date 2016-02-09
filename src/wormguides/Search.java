@@ -19,6 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
+import wormguides.model.CellCases;
 import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageTree;
@@ -66,6 +67,9 @@ public class Search {
 	private static boolean postsynapticTicked;
 	private static boolean electricalTicked;
 	private static boolean neuromuscularTicked;
+	
+	//for cell cases searching
+	private static CellCases cellCases;
 
 		
 	static {
@@ -368,25 +372,70 @@ public class Search {
 			case DESCRIPTION:
 							// TODO some cells with the searched term are not showing up in results list
 							// this is because some cells have the same description and it 
-							// gives the first one found
-							//System.out.println("\nShowing found description names:");
-							for (int i=0; i<descriptions.size(); i++) {
-								String textLowerCase = descriptions.get(i).toLowerCase();
-								String[] keywords = searched.split(" ");
-								boolean found = true;
-								for (String keyword : keywords) {
-									if (textLowerCase.indexOf(keyword)<0) {
-										found = false;
-										break;
+							// gives the first one found 
+				
+							// FIXED ^^ ???
+				
+							//for searching with multiple terms, perform individual searches and return the intersection of the hits
+							ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+							String[] keywords = searched.split(" ");
+							for (String keyword : keywords) {
+								ArrayList<String> results = new ArrayList<String>();
+								for (int i=0; i<descriptions.size(); i++) {
+									String textLowerCase = descriptions.get(i).toLowerCase();
+
+									//look for match
+									if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+										//get cell name that corresponds to matching description
+										String cell = PartsList.getLineageNameByIndex(i);
+										
+										//only add new entries
+										if (!results.contains(cell)) {
+											results.add(cell);
+										}
 									}
 								}
-								
-								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
-									cells.add(PartsList.getLineageNameByIndex(i));
+								//add the results to the hits
+								hits.add(results);
+							}
+							
+							//find the intersection among the results --> using the first list to find matches
+							if (hits.size() > 0) {
+								ArrayList<String> results = hits.get(0);
+								for (int k = 0; k < results.size(); k++) {
+									String cell = results.get(k);
+									
+									//look for a match in rest of the hits
+									boolean intersection = true;
+									for (int i = 1; i < hits.size(); i++) {
+										if (!hits.get(i).contains(cell)) {
+											intersection = false;
+										}
+									}
+									
+									if (intersection && !cells.contains(cell)) {
+										cells.add(cell);
+									}
+								}
 							}
 							
 							break;
-						 
+//							for (int i=0; i<descriptions.size(); i++) {
+//								String textLowerCase = descriptions.get(i).toLowerCase();
+//								String[] keywords = searched.split(" ");
+//								boolean found = true;
+//								for (String keyword : keywords) {
+//									if (textLowerCase.indexOf(keyword)<0) {
+//										found = false;
+//										break;
+//									}
+//								}
+//								
+//								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
+//									cells.add(PartsList.getLineageNameByIndex(i));
+//							}
+//							
+//							break; 
 			case GENE:		
 							if (isGeneFormat(getSearchedText())) {
 								showLoadingService.restart();
@@ -431,6 +480,7 @@ public class Search {
 		String nameLower = name.toLowerCase();
 		
 		boolean appliesToName = true;
+		boolean appliesToCell = false;
 		boolean appliesToComment = true;
 		
 		String[] terms = searched.trim().toLowerCase().split(" ");
@@ -439,6 +489,17 @@ public class Search {
 			if (!nameLower.contains(term)) {
 				appliesToName = false;
 				break;
+			}
+		}
+		
+		//search in cells
+		for (SceneElement se : sceneElementsList.elementsList) {
+			if (se.getSceneName().toLowerCase().equals(nameLower)) {
+				for (String cell : se.getAllCellNames()) {
+					if (cell.toLowerCase().contains(searched.toLowerCase())) {
+						appliesToCell = true;
+					}
+				}
 			}
 		}
 		
@@ -452,7 +513,7 @@ public class Search {
 			}
 		}
 		
-		return appliesToName || appliesToComment;
+		return appliesToName || appliesToCell || appliesToComment;
 	}
 	
 	
@@ -783,6 +844,19 @@ public class Search {
 		if (con != null) {
 			connectome = con;
 		}
+	}
+	
+	public static void setCellCases(CellCases cc) {
+		if (cc != null) {
+			cellCases = cc;
+		}
+	}
+	
+	public static boolean hasCellCase(String cellName) {
+		if (cellCases != null) {
+			return cellCases.hasCellCase(cellName);
+		}
+		return false;
 	}
 	
 	//connectome checkbox listeners

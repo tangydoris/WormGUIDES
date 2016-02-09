@@ -51,8 +51,7 @@ public class NonTerminalCellCase {
 	private String buildWORMBASELink() {
 		if (this.cellName == null) return "";
 		
-		String URL = "http://www.wormbase.org/db/get?name=" + 
-		this.cellName + ";class=Anatomy_term";
+		String URL = wormbaseURL + this.cellName + wormbaseURLEXT;
 		
 		try {
 			//URLConnection connection = new URL(URL).openConnection();			
@@ -88,4 +87,7 @@ public class NonTerminalCellCase {
 	public ArrayList<String> getCellShapeProductionInfo() {
 		return this.cellShapeProductionInfo;
 	}
+	
+	private final static String wormbaseURL = "http://www.wormbase.org/db/get?name=";
+	private final static String wormbaseURLEXT = ";class=Anatomy_term";
 }
