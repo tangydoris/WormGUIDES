@@ -513,17 +513,16 @@ public class Window3DController {
 			selectedName.set(name);
 			cellClicked.set(true);
 			
+			String normalizedName = normalizeName(name);
+			
 			if (event.getButton()==MouseButton.SECONDARY)
 				showContextMenu(name, event.getScreenX(), event.getScreenY());
-			
-			String funcName = PartsList.getFunctionalNameByLineageName(name);
-			if (funcName!=null)
-				name = funcName;
 			else if (event.getButton()==MouseButton.PRIMARY) {
 				if (labels.contains(name))
 					labels.remove(name);
-				else
+				else {
 					labels.add(name);
+				}
 				
 				buildScene();
 			}
@@ -781,21 +780,19 @@ public class Window3DController {
 		// Label stuff
 		labelEntityMap.clear();
 		currentLabels.clear();
-		for (String name : labels) {
-			// TODO make functional label appear
+		
+		for (String label : labels) {
 			for (String cell : cellNames) {
-				if (!currentLabels.contains(name) && cell.equalsIgnoreCase(name)) {
-					currentLabels.add(name);
+				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+					currentLabels.add(label);
 					break;
 				}
-				else if (PartsList.getFunctionalNameByLineageName(cell)!=null)
-					currentLabels.add(PartsList.getFunctionalNameByLineageName(cell));
 			}
 			
 			for (int i=0; i<currentSceneElements.size(); i++) {
-				if (!currentLabels.contains(name) 
-						&& name.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
-					currentLabels.add(name);
+				if (!currentLabels.contains(label) 
+						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
+					currentLabels.add(label);
 					break;
 				}
 			}
@@ -915,12 +912,23 @@ public class Window3DController {
  			addNoteGeometries(notes);
  		
  		// add labels
+ 		// TODO
  		for (String name : currentLabels) {
-			Text node = makeNoteSpriteText(name);
-			node.setWrappingWidth(node.getWrappingWidth()+20);
+ 			String funcName = PartsList.getFunctionalNameByLineageName(name);
+ 			Text text;
+ 			if (funcName!=null)
+ 				text = makeNoteSpriteText(funcName);
+ 			else
+ 				text = makeNoteSpriteText(name);
+ 			
+ 			if (text!=null) {
+ 				text.setWrappingWidth(text.getWrappingWidth()+30);
 			
-			if (spritesPane!=null && positionLabelSprite(name, node))
-				spritesPane.getChildren().add(node);
+				if (spritesPane!=null && positionLabelSprite(name, text)) {
+					spritesPane.getChildren().add(text);
+				}
+ 			}
+			
 		}
  		
  		if (!notes.isEmpty())
@@ -1055,8 +1063,13 @@ public class Window3DController {
 				public void handle(MouseEvent event) {
 					// make label appear
 					String name = cellNames[index];
-					if (!currentLabels.contains(name))
+					
+					if (!currentLabels.contains(name)) {
+						String funcName = PartsList.getFunctionalNameByLineageName(name);
+						if (funcName!=null)
+							name = funcName;
 						showTransientLabel(name, spheres[index]);
+					}
 				}
 	        });
 	        sphere.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -1076,10 +1089,16 @@ public class Window3DController {
 	private boolean positionLabelSprite(String name, Text text) {
 		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
-			if (cellNames[i].equalsIgnoreCase(name) && spheres[i]!=null) {
-				labelEntityMap.put(text, spheres[i]);
-				return true;
+			if (spheres[i]!=null) {
+				String cell = cellNames[i];
+				Sphere sphere = spheres[i];
+				
+				if (cell.equalsIgnoreCase(name)) {
+					labelEntityMap.put(text, sphere);
+					return true;
+				}
 			}
+			
 		}
 		
 		// mesh view label
