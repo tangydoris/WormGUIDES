@@ -101,7 +101,7 @@ public class StoriesLayer {
 		sceneElementsList = elementsList;
 		
 		stories = FXCollections.observableArrayList(
-				story -> new Observable[]{story.getChangedProperty()});
+				story -> new Observable[]{story.getChangedProperty(), story.getActiveProperty()});
 		stories.addListener(new ListChangeListener<Story>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
@@ -294,6 +294,7 @@ public class StoriesLayer {
 			int startTime = getEffectiveStartTime(activeNote);
 			if (startTime<1)
 				startTime=1;
+			
 			timeProperty.set(startTime);
 		}
 		

@@ -41,14 +41,6 @@ public class Story {
 		this.date = date;
 		
 		activeBooleanProperty = new SimpleBooleanProperty(false);
-		activeBooleanProperty.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable,
-					Boolean oldValue, Boolean newValue) {
-				changedBooleanProperty.set(true);
-			}
-		});
-		
 		changedBooleanProperty = new SimpleBooleanProperty(false);
 		changedBooleanProperty.addListener(new ChangeListener<Boolean>() {
 			@Override
