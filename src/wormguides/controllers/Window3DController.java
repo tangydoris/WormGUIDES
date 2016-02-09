@@ -103,6 +103,7 @@ public class Window3DController {
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private int endTime;
+	private int startTime;
 	private Sphere[] spheres;
 	private MeshView[] meshes;
 	private String[] cellNames;
@@ -181,27 +182,30 @@ public class Window3DController {
 	private ArrayList<String> labels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Text, Node> labelEntityMap;
+	private Text transientLabel; // shows up on hover
 	
 	private BooleanProperty bringUpInfoProperty;
 	
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DController(Stage parent, Pane parentPane, LineageData data) {
+	public Window3DController(Stage parent, Pane parentPane, LineageData data, int movieStartTime) {
 		parentStage = parent;
 		
 		root = new Group();
 		this.cellData = data;
+		
+		startTime = movieStartTime;
 
-		time = new SimpleIntegerProperty(START_TIME);
+		time = new SimpleIntegerProperty(startTime);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 								Number oldValue, Number newValue) {
 				int t = newValue.intValue();
-				if (t<START_TIME)
-					t = START_TIME;
-				if (START_TIME<=t && t<=endTime)
+				if (t<startTime)
+					t = startTime;
+				if (startTime<=t && t<=endTime)
 					buildScene();
 			}
 		});
@@ -326,6 +330,51 @@ public class Window3DController {
 		subscene.setOnMouseReleased(handler);
 		
 		setNotesPane(parentPane);
+		
+		// transient label on entity hover
+		transientLabel = new Text();
+		transientLabel.setFont(AppFont.getSpriteAndOverlayFont());
+		transientLabel.setFill(Color.web("#F0F0F0"));
+	}
+	
+	
+	/*
+	 * Insert transient label into sprites pane
+	 * name = name that appears on the label
+	 * x = x coordinate of where the label should appears on the sprites pane
+	 * y = y coordinate of where the label should appears on the sprites pane
+	 */
+	private void showTransientLabel(String name, Node entity) {
+		Bounds b = entity.getBoundsInParent();
+		
+		Point2D p = CameraHelper.project(camera, 
+				new Point3D((b.getMinX()+b.getMaxX())/2, 
+						(b.getMinY()+b.getMaxY())/2, 
+						(b.getMaxZ()+b.getMinZ())/2));
+		double x = p.getX();
+		double y = p.getY();
+		
+		double vOffset = b.getHeight()/2;
+		double hOffset = b.getWidth()/2;
+
+		x += hOffset;
+		y -= vOffset+5;
+		
+		if (spritesPane!=null) {
+			transientLabel.getTransforms().clear();
+			transientLabel.setText(name);
+			spritesPane.getChildren().add(transientLabel);
+			transientLabel.getTransforms().add(new Translate(x, y));
+		}
+	}
+	
+	
+	/*
+	 * Remove transient label from sprites pane
+	 */
+	private void removeTransientLabel() {
+		if (spritesPane!=null)
+			spritesPane.getChildren().remove(transientLabel);
 	}
 	
 	
@@ -631,12 +680,12 @@ public class Window3DController {
 			
 			if (b!=null) {
 				noteGraphic.getTransforms().clear();
-				Point2D p1 = CameraHelper.project(camera, 
+				Point2D p = CameraHelper.project(camera, 
 						new Point3D((b.getMinX()+b.getMaxX())/2, 
 								(b.getMinY()+b.getMaxY())/2, 
 								(b.getMaxZ()+b.getMinZ())/2));
-				double x = p1.getX();
-				double y = p1.getY();
+				double x = p.getX();
+				double y = p.getY();
 				
 				double vOffset = b.getHeight()/2;
 				double hOffset = b.getWidth()/2;
@@ -675,10 +724,12 @@ public class Window3DController {
 	}
 	
 
-	// Builds subscene for a given timepoint
+	/*
+	 *  Calls service to retrieve subscene data at current time point
+	 *  then render entities, notes, and labels
+	 */
 	private void buildScene() {
 		// Spool thread for actual rendering to subscene
-		// TODO
 		renderService.restart();
 	}
 	
@@ -752,7 +803,6 @@ public class Window3DController {
 		// End label stuff
 		
 		// Story stuff
-		// TODO
 		// Notes are indexed starting from 1 (or 1+offset shown to user)
 		if (storiesLayer!=null) {			
 			currentNotes.clear();
@@ -842,10 +892,8 @@ public class Window3DController {
 				Node node = iter.next();
 				if (node instanceof Text)
 					iter.remove();
-				else if (node instanceof VBox && node!=overlayVBox) {
-					System.out.println("removed: "+node.toString());
+				else if (node instanceof VBox && node!=overlayVBox)
 					iter.remove();
-				}
 			}
 		}
 	}
@@ -999,6 +1047,26 @@ public class Window3DController {
 	        				positions[i][Z_COR_INDEX]*Z_SCALE));
 	        
 	        spheres[i] = sphere;
+	        
+	        final int index = i;
+	        // TODO
+	        sphere.setOnMouseEntered(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					// make label appear
+					String name = cellNames[index];
+					if (!currentLabels.contains(name))
+						showTransientLabel(name, spheres[index]);
+				}
+	        });
+	        sphere.setOnMouseExited(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					// make label disappear
+					removeTransientLabel();
+				}
+	        });
+	        
 	        list.add(sphere);
 		}
 		// End sphere stuff
@@ -1297,7 +1365,7 @@ public class Window3DController {
 	
 	private void setNewOrigin() {
 		// Find average X Y positions of initial timepoint
-		Integer[][] positions = cellData.getPositions(START_TIME);
+		Integer[][] positions = cellData.getPositions(startTime);
 		int numCells = positions.length;
 		int sumX = 0;
 		int sumY = 0;
@@ -1475,7 +1543,7 @@ public class Window3DController {
 
 	
 	public void setTime(int t) {
-		if (START_TIME<=t && t<=endTime) {
+		if (startTime<=t && t<=endTime) {
 			time.set(t);
 			hideContextPopups();
 		}
@@ -1654,7 +1722,7 @@ public class Window3DController {
 
 	
 	public int getStartTime() {
-		return START_TIME;
+		return startTime;
 	}
 	
 
@@ -1885,8 +1953,6 @@ public class Window3DController {
 
     private final double CAMERA_NEAR_CLIP = 1,
 						CAMERA_FAR_CLIP = 2000;
-
-    private final int START_TIME = 1;
 
     private final int X_COR_INDEX = 0,
 					Y_COR_INDEX = 1,

@@ -13,7 +13,8 @@ import java.util.jar.JarFile;
 
 public class ProductionInfoLoader {
 
-	public ArrayList<ArrayList<String>> buildProductionInfo() {
+	public static ArrayList<ArrayList<String>> buildProductionInfo() {
+		
 		ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
 		ArrayList<String> cells = new ArrayList<String>();
 		ArrayList<String> imageSeries = new ArrayList<String>();
@@ -23,6 +24,8 @@ public class ProductionInfoLoader {
 		ArrayList<String> temporalResolutions = new ArrayList<String>();
 		ArrayList<String> segmentations = new ArrayList<String>();
 		ArrayList<String> cytoshowLinks = new ArrayList<String>();
+		ArrayList<String> movieStartTime = new ArrayList<String>();
+		
 		try {
 			JarFile jarFile = new JarFile(new File(JARname));
 			Enumeration<JarEntry> entries = jarFile.entries();
@@ -31,7 +34,7 @@ public class ProductionInfoLoader {
 			while (entries.hasMoreElements()) {
 				entry = entries.nextElement();
 				
-				if (entry.getName().equals(productionInfoFilePath)) {
+				if (entry.getName().equalsIgnoreCase(productionInfoFilePath)) {
 					
 					InputStream stream = jarFile.getInputStream(entry);
 					InputStreamReader streamReader = new InputStreamReader(stream);
@@ -56,7 +59,7 @@ public class ProductionInfoLoader {
 						
 						StringTokenizer tokenizer = new StringTokenizer(line, ",");
 						//check if valid line i.e. 4 tokens
-						if (tokenizer.countTokens() == 8) {
+						if (tokenizer.countTokens() == NUMBER_OF_FIELDS) {
 							cells.add(tokenizer.nextToken());
 							imageSeries.add(tokenizer.nextToken());
 							markers.add(tokenizer.nextToken());
@@ -65,6 +68,7 @@ public class ProductionInfoLoader {
 							temporalResolutions.add(tokenizer.nextToken());
 							segmentations.add(tokenizer.nextToken());
 							cytoshowLinks.add(tokenizer.nextToken());
+							movieStartTime.add(tokenizer.nextToken());
 						}
 					}
 				}
@@ -79,6 +83,7 @@ public class ProductionInfoLoader {
 			productionInfo.add(temporalResolutions);
 			productionInfo.add(segmentations);
 			productionInfo.add(cytoshowLinks);
+			productionInfo.add(movieStartTime);
 			
 			jarFile.close();
 			return productionInfo;
@@ -91,9 +96,10 @@ public class ProductionInfoLoader {
 	}
 	
 	//production info file location
+	private final static int NUMBER_OF_FIELDS = 9;
 	private final static String productionInfoFilePath = "wormguides/model/production_info_file/Production_Info.csv";
-	private static final String JARname = "WormGUIDES.jar";
-	private static final String productInfoLine = "Production Information,,,,,,,";
-	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link";
+	private final static String JARname = "WormGUIDES.jar";
+	private final static String productInfoLine = "Production Information,,,,,,,";
+	private final static String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link,Movie start time (min)";
 	
 }
