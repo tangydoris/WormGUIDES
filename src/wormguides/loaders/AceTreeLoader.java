@@ -18,10 +18,12 @@ public class AceTreeLoader {
 	
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 	
-	public static TableLineageData loadNucFiles(String jarPath) {
+	public static TableLineageData loadNucFiles() {
+
+		
 		TableLineageData tld = new TableLineageData(allCellNames);
 		try {
-			JarFile jarFile = new JarFile(new File(jarPath));
+			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
 
 			Enumeration<JarEntry> entries = jarFile.entries();
 			int time = 0;

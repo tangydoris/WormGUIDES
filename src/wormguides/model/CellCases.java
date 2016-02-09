@@ -72,7 +72,8 @@ public class CellCases {
 	public boolean containsTerminalCase(String cellName) {
 		if (terminalCases != null) {
 			for (TerminalCellCase tCase : terminalCases) {
-				if (tCase.getCellName().equals(cellName)) {
+				if (tCase.getCellName().equals(cellName) || 
+						tCase.getCellName().equals(PartsList.getFunctionalNameByLineageName(cellName))) {
 					return true;
 				}
 			}
@@ -84,13 +85,18 @@ public class CellCases {
 	public boolean containsNonTerminalCase(String cellName) {
 		if (nonTerminalCases != null) {
 			for (NonTerminalCellCase ntCase : nonTerminalCases) {
-				if (ntCase.getCellName().equals(cellName)) {
+				if (ntCase.getCellName().equals(cellName) || 
+						ntCase.getCellName().equals(PartsList.getLineageNameByFunctionalName(cellName))) {
 					return true;
 				}
 			}
 			return false;
 		}
 		return false;
+	}
+	
+	public boolean hasCellCase(String cellName) {
+		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName);
 	}
 	
 }

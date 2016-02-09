@@ -14,7 +14,7 @@ public class Connectome {
 	
 	public Connectome() {
 		connectome = new ArrayList<NeuronalSynapse>();
-		connectomeLoader = new ConnectomeLoader(connectomeFilePath);
+		connectomeLoader = new ConnectomeLoader();
 		
 		buildConnectome();
 	}

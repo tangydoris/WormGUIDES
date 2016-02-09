@@ -136,8 +136,24 @@ public class InfoWindowDOM {
 			Collections.sort(presynapticPartners);
 			
 			//remove brackets
-			String prePartners = presynapticPartners.toString();
-			prePartners = prePartners.substring(1, prePartners.length()-2);
+			//String prePartners = presynapticPartners.toString();
+			
+			//handleWiringPartnerClick(String cell)
+			//anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
+			//terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+			//"</a>";
+			
+			//handleWiringPartnerClick
+			
+			ArrayList<String> presynapticPartnerAnchors = new ArrayList<String>();
+			for (String presynapticPartner : presynapticPartners) {
+//				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(\"" + presynapticPartner + "\")\">" 
+//						+ presynapticPartner + "</a>";
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ presynapticPartner + "</a>";
+				presynapticPartnerAnchors.add(anchor);
+			}
+			String prePartners = presynapticPartnerAnchors.toString().substring(1, presynapticPartnerAnchors.toString().length()-2);
 			
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em><br>" + prePartners);
 			wiringPartnersUL.addChild(li);
@@ -243,6 +259,16 @@ public class InfoWindowDOM {
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
+		
+			/*
+			 * TODO
+			 * 
+			 * anchor --> <a href="www...." onclick="JAVASCRIPTLINKHANDLER(THIS)">blah</a>
+			 * 
+			 * function JAVASCRIPTLINKHANDLER(ELEMENT) {
+			 * 		app.openLink(URL);
+			 * }
+			 */
 			
 			//begin after www.
 			int startIDX = link.indexOf("www.");
@@ -272,7 +298,6 @@ public class InfoWindowDOM {
 								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
 										"</a>";
-								System.out.println(anchor + ", " + link);
 							} else {
 								String callbackMethod = "app.google()";
 								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
@@ -285,10 +310,20 @@ public class InfoWindowDOM {
 							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
 									terminalCase.getCellName() + " on " + placeholder +
 									"</a>";
+							
+							//add wormbase link to end of gene expression section
+							if (placeholder.equals("wormbase")) {
+								String wormbaseSource = "<em>Source:</em> " + anchor;
+								geneExpressionDiv.addChild(new HTMLNode("p", "", "", wormbaseSource));
+							}
 						}
 					}
 				}	
-			} 
+			} else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
+				anchor = "<a href=\"#\" onclick=\"app.wormwiring()\">" +
+						terminalCase.getCellName() + " on Wormwiring" +
+						"</a>";
+			}
 			
 			//make sure anchor has been built 
 			if (!anchor.equals(link)) {
@@ -296,6 +331,14 @@ public class InfoWindowDOM {
 				linksUL.addChild(li);
 			}
 		}
+		linksUL.addChild(new HTMLNode("li", "", "", "<a href=\"#\" onclick=\"jsCallToJava()\">testing</a>"));
+		/*
+		 * TODO
+		 * cytoshow stub
+		 */
+		HTMLNode liSTUB = new HTMLNode("li", "", "", "Cytoshow: [cytoshow link to this cell in EM data]");
+		linksUL.addChild(liSTUB);
+		
 		linksDiv.addChild(linksUL);
 		
 		//references
@@ -405,6 +448,11 @@ public class InfoWindowDOM {
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
+		// testing JS callback
+		//body.addChild(collapseFunctionButton.jsCallBackScript());
+		//body.addChild(collapseFunctionButton.addJsCurrentLinkScript());
+		body.addChild(wiringPartnersDiv.addWiringPartnersClickScript());
+		
 		//add head and body to html
 		html.addChild(head);
 		html.addChild(body);
@@ -459,7 +507,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> TerminalDescendants: </strong>");
+				"<strong> Terminal Descendants: </strong>");
 		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
 		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
 		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "height: 0px; visibility: hidden;");

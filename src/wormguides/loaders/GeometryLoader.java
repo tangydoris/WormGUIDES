@@ -1,15 +1,11 @@
 package wormguides.loaders;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 /*
@@ -29,67 +25,64 @@ public class GeometryLoader {
 	private static TriangleMesh mesh;
  
 	public static MeshView loadOBJ(String fileName) {
+		
+		//take path up until model
+		fileName = fileName.substring(fileName.indexOf("/model"));
+		fileName = ".." + fileName;
+		
+		URL url = ProductionInfoLoader.class.getResource(fileName);
+		
 		coords = new ArrayList<double[]>();
 		faces = new ArrayList<int[]>();
 		mesh = new TriangleMesh();
 		
 		try {
-			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
-			Enumeration<JarEntry> entries = jarFile.entries();
-			JarEntry entry;
-			
-			while (entries.hasMoreElements()) {
-				entry = entries.nextElement();
+			if (url != null) {
+				InputStream stream = url.openStream();
+				InputStreamReader streamReader = new InputStreamReader(stream);
+				BufferedReader reader = new BufferedReader(streamReader);
 				
-				if (entry.getName().startsWith(fileName)) {
-					InputStream stream = jarFile.getInputStream(entry);
-					InputStreamReader streamReader = new InputStreamReader(stream);
-					BufferedReader reader = new BufferedReader(streamReader);
-					
-					String line;
-					
-					while((line = reader.readLine()) != null) {
-						//make sure valid line
-						if (line.length() <= 1) break;
+				String line;
+				
+				while((line = reader.readLine()) != null) {
+					//make sure valid line
+					if (line.length() <= 1) break;
 
-						//process each line in the obj file
-						String lineType = line.substring(0, 2);
-						if (lineType.equals(vertexLine)) {
-							//process vertex lines
-							String v = line.substring(2);
-							double[] vertices = new double[3];
-							int counter = 0;
+					//process each line in the obj file
+					String lineType = line.substring(0, 2);
+					if (lineType.equals(vertexLine)) {
+						//process vertex lines
+						String v = line.substring(2);
+						double[] vertices = new double[3];
+						int counter = 0;
 
-							StringTokenizer tokenizer = new StringTokenizer(v);
-							while(tokenizer.hasMoreTokens()) {
-								vertices[counter++] = Double.parseDouble(tokenizer.nextToken());
-							}
-							//make sure good line
-							if (counter == 3) {
-								coords.add(vertices);
-							}
-						} else if (lineType.equals(faceLine)) {
-							//process face lines
-							String f = line.substring(2);
-							int[] faceCoords = new int[3];
-							int counter = 0;
+						StringTokenizer tokenizer = new StringTokenizer(v);
+						while(tokenizer.hasMoreTokens()) {
+							vertices[counter++] = Double.parseDouble(tokenizer.nextToken());
+						}
+						//make sure good line
+						if (counter == 3) {
+							coords.add(vertices);
+						}
+					} else if (lineType.equals(faceLine)) {
+						//process face lines
+						String f = line.substring(2);
+						int[] faceCoords = new int[3];
+						int counter = 0;
 
-							StringTokenizer tokenizer = new StringTokenizer(f);
-							while(tokenizer.hasMoreTokens()) {
-								faceCoords[counter++] = Integer.parseInt(tokenizer.nextToken());
-							}
+						StringTokenizer tokenizer = new StringTokenizer(f);
+						while(tokenizer.hasMoreTokens()) {
+							faceCoords[counter++] = Integer.parseInt(tokenizer.nextToken());
+						}
 
-							if (counter == 3) {
-								faces.add(faceCoords);
-							}
-						} else {} //ignore other cases
-					}
-					createMesh();
-					reader.close();
+						if (counter == 3) {
+							faces.add(faceCoords);
+						}
+					} else {} //ignore other cases
 				}
+				createMesh();
+				reader.close();
 			}
-			
-			jarFile.close();
 		} catch (IOException e1) {
 			System.out.println("The file " + fileName + " wasn't found on the system.");
 			return null;

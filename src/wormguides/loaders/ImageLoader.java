@@ -1,11 +1,8 @@
 package wormguides.loaders;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.net.URL;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,58 +14,88 @@ public class ImageLoader {
 	private static Image edit, eye, eyeInvert, close; 
 	private static Image copy;
 	private static ImageView paste;
-	private static JarFile jarFile;
 	
-	public static void loadImages(String jarPath) {
+	public static void loadImages() {
+		
+		
 		try {
-			jarFile = new JarFile(new File(jarPath));
-			Enumeration<JarEntry> entries = jarFile.entries();
-			JarEntry entry;
-			while (entries.hasMoreElements()){
-				entry = entries.nextElement();
-				if (entry.getName().startsWith(ENTRY_PREFIX)) {
-					processImage(entry);
-				}
-			}
-			jarFile.close();
-			
+				URL urlBack = ImageLoader.class.getResource(ENTRY_PREFIX + BACKWARD_PNG);
+				processImage(urlBack);
+				
+				URL urlFor = ImageLoader.class.getResource(ENTRY_PREFIX + FORWARD_PNG);
+				processImage(urlFor);
+				
+				URL urlClose = ImageLoader.class.getResource(ENTRY_PREFIX + CLOSE_PNG);
+				processImage(urlClose);
+				
+				URL urlCopy = ImageLoader.class.getResource(ENTRY_PREFIX + COPY_PNG);
+				processImage(urlCopy);
+				
+				URL urlEdit = ImageLoader.class.getResource(ENTRY_PREFIX + EDIT_PNG);
+				processImage(urlEdit);
+				
+				URL urlEye = ImageLoader.class.getResource(ENTRY_PREFIX + EYE_PNG);
+				processImage(urlEye);
+				
+				URL urlEyei = ImageLoader.class.getResource(ENTRY_PREFIX + EYE_INV_PNG);
+				processImage(urlEyei);
+				
+				URL urlMinus = ImageLoader.class.getResource(ENTRY_PREFIX + MINUS_PNG);
+				processImage(urlMinus);
+				
+				URL urlPaste = ImageLoader.class.getResource(ENTRY_PREFIX + PASTE_PNG);
+				processImage(urlPaste);
+				
+				URL urlPause = ImageLoader.class.getResource(ENTRY_PREFIX + PAUSE_PNG);
+				processImage(urlPause);
+				
+				URL urlPlay = ImageLoader.class.getResource(ENTRY_PREFIX + PLAY_PNG);
+				processImage(urlPlay);
+				
+				URL urlPlus = ImageLoader.class.getResource(ENTRY_PREFIX + PLUS_PNG);
+				processImage(urlPlus);
+				
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 	
-	public static void processImage(JarEntry entry) throws IOException {
-		InputStream input = jarFile.getInputStream(entry);
-		Image image = new Image(input);
-		switch (entry.getName()) {
-			case EDIT_PNG:		edit = image;
-								return;
-			case EYE_PNG:		eye = image;
-								return;
-			case EYE_INV_PNG:	eyeInvert = image;
-								return;
-			case CLOSE_PNG:		close = image;
-								return;
-			case COPY_PNG:		copy = image;
-								return;
-			
-		}
-		ImageView icon = new ImageView(image);
-		switch (entry.getName()) {
-			case BACKWARD_PNG:	backward = icon;
-								break;
-			case FORWARD_PNG:	forward = icon;
-								break;
-			case PLAY_PNG:		play = icon;
-								break;
-			case PAUSE_PNG:		pause = icon;
-								break;
-			case PLUS_PNG:		plus = icon;
-								return;
-			case MINUS_PNG: 	minus = icon;
-								return;
-			case PASTE_PNG:		paste = icon;
-								return;
+	public static void processImage(URL url) throws IOException {
+		if (url != null) {
+			InputStream input = url.openStream();
+			Image image = new Image(input);
+			String urlStr = url.getFile();
+			urlStr = urlStr.substring(urlStr.indexOf("wormguides"));
+			switch (urlStr) {
+				case PATH_FROM_ROOT + EDIT_PNG:		edit = image;
+									return;
+				case PATH_FROM_ROOT + EYE_PNG:		eye = image;
+									return;
+				case PATH_FROM_ROOT + EYE_INV_PNG:	eyeInvert = image;
+									return;
+				case PATH_FROM_ROOT + CLOSE_PNG:		close = image;
+									return;
+				case PATH_FROM_ROOT + COPY_PNG:		copy = image;
+									return;
+				
+			}
+			ImageView icon = new ImageView(image);
+			switch (urlStr) {
+				case PATH_FROM_ROOT + BACKWARD_PNG:	backward = icon;
+									break;
+				case PATH_FROM_ROOT + FORWARD_PNG:	forward = icon;
+									break;
+				case PATH_FROM_ROOT + PLAY_PNG:		play = icon;
+									break;
+				case PATH_FROM_ROOT + PAUSE_PNG:		pause = icon;
+									break;
+				case PATH_FROM_ROOT + PLUS_PNG:		plus = icon;
+									return;
+				case PATH_FROM_ROOT + MINUS_PNG: 	minus = icon;
+									return;
+				case PATH_FROM_ROOT + PASTE_PNG:		paste = icon;
+									return;
+			}
 		}
 	}
 
@@ -120,17 +147,18 @@ public class ImageLoader {
 		return paste;
 	}
 	
-	private static final String ENTRY_PREFIX = "wormguides/view/icons/",
-			BACKWARD_PNG = ENTRY_PREFIX+"backward.png",
-			FORWARD_PNG = ENTRY_PREFIX+"forward.png",
-			PAUSE_PNG = ENTRY_PREFIX+"pause.png",
-			PLAY_PNG = ENTRY_PREFIX+"play.png",
-			EDIT_PNG = ENTRY_PREFIX+"edit.png",
-			EYE_PNG = ENTRY_PREFIX+"eye.png",
-			EYE_INV_PNG = ENTRY_PREFIX+"eye-invert.png",
-			CLOSE_PNG = ENTRY_PREFIX+"close.png",
-			PLUS_PNG = ENTRY_PREFIX+"plus.png",
-			MINUS_PNG = ENTRY_PREFIX+"minus.png",
-			COPY_PNG = ENTRY_PREFIX+"copy.png",
-			PASTE_PNG = ENTRY_PREFIX+"paste.png";
+	private static final String ENTRY_PREFIX = "/wormguides/view/icons/",
+			PATH_FROM_ROOT = "wormguides/view/icons/",
+			BACKWARD_PNG = "backward.png",
+			FORWARD_PNG ="forward.png",
+			PAUSE_PNG = "pause.png",
+			PLAY_PNG = "play.png",
+			EDIT_PNG = "edit.png",
+			EYE_PNG = "eye.png",
+			EYE_INV_PNG = "eye-invert.png",
+			CLOSE_PNG = "close.png",
+			PLUS_PNG = "plus.png",
+			MINUS_PNG = "minus.png",
+			COPY_PNG = "copy.png",
+			PASTE_PNG = "paste.png";
 }

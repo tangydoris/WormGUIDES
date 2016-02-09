@@ -1982,6 +1982,9 @@ public class Window3DController {
 	}
 
 	
+	public Stage getStage() {
+		return this.parentStage;
+	}
 
 
 	private final String CS = ", ";

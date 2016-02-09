@@ -28,6 +28,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AppFont;
 import wormguides.model.MulticellularStructureRule;
+import wormguides.model.PartsList;
 
 
 public class StructuresLayer {
@@ -40,6 +41,7 @@ public class StructuresLayer {
 	private Color selectedColor;
 	private String searchText;
 	
+	private HashMap<String, ArrayList<String>> nameToCellsMap;
 	private HashMap<String, String> nameToCommentsMap;
 	private HashMap<String, StructureListCellGraphic> nameListCellMap;
 	
@@ -71,6 +73,7 @@ public class StructuresLayer {
 		});
 		
 		allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
+		nameToCellsMap = sceneElementsList.getNameToCellsMap();
 		nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 		
 		setSearchField(searchField);
@@ -192,12 +195,34 @@ public class StructuresLayer {
 				String nameLower = name.toLowerCase();
 				
 				boolean appliesToName = true;
+				boolean appliesToCell = false;
 				boolean appliesToComment = true;
 				
 				for (String term : terms) {
 					if (!nameLower.contains(term)) {
 						appliesToName = false;
 						break;
+					}
+				}
+				
+				//search in cells]
+				ArrayList<String> cells = nameToCellsMap.get(nameLower);
+				for (String cell : cells) {
+					//we'll use the first term
+					if (terms.length > 0) {
+						//check if search term is a functional name
+						String lineageName = PartsList.getLineageNameByFunctionalName((terms[0].toUpperCase()));
+						if (lineageName != null) {
+							if (cell.toLowerCase().startsWith(lineageName.toLowerCase())) {
+								appliesToCell = true;
+								break;
+							}
+						} else {
+							if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
+								appliesToCell = true;
+								break;
+							}
+						}
 					}
 				}
 				
@@ -211,11 +236,22 @@ public class StructuresLayer {
 					}
 				}
 				
-				if (appliesToName || appliesToComment)
+				if (appliesToName || appliesToCell || appliesToComment)
 					searchResultsList.add(name);
 			}
 		}
 	}
+	
+	//search in cells
+//			for (SceneElement se : sceneElementsList.elementsList) {
+//				if (se.getSceneName().toLowerCase().equals(nameLower)) {
+//					for (String cell : se.getAllCellNames()) {
+//						if (cell.toLowerCase().contains(searched.toLowerCase())) {
+//							appliesToCell = true;
+//						}
+//					}
+//				}
+//			}
 	
 	
 	public StringProperty getSelectedNameProperty() {
