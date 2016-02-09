@@ -49,7 +49,7 @@ public class ProductionInfoLoader {
 
 				StringTokenizer tokenizer = new StringTokenizer(line, ",");
 				//check if valid line i.e. 4 tokens
-				if (tokenizer.countTokens() == 8) {
+				if (tokenizer.countTokens() == NUMBER_OF_FIELDS) {
 					cells.add(tokenizer.nextToken());
 					imageSeries.add(tokenizer.nextToken());
 					markers.add(tokenizer.nextToken());

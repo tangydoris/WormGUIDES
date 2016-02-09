@@ -1117,6 +1117,19 @@ public class Window3DController {
 				
 				if (cell.equalsIgnoreCase(name)) {
 					labelEntityMap.put(text, sphere);
+					
+					// make labels clickable - removed from scene on click
+					// TODO
+					text.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							allLabels.remove(name);
+							currentLabels.remove(name);
+							if (spritesPane!=null) {
+								spritesPane.getChildren().remove(text);
+							}
+						}
+					});
 					return true;
 				}
 			}
