@@ -135,20 +135,8 @@ public class InfoWindowDOM {
 		if (presynapticPartners.size() > 0) {
 			Collections.sort(presynapticPartners);
 			
-			//remove brackets
-			//String prePartners = presynapticPartners.toString();
-			
-			//handleWiringPartnerClick(String cell)
-			//anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-			//terminalCase.getCellName() + " on Google (searching Wormatlas)" +
-			//"</a>";
-			
-			//handleWiringPartnerClick
-			
 			ArrayList<String> presynapticPartnerAnchors = new ArrayList<String>();
 			for (String presynapticPartner : presynapticPartners) {
-//				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(\"" + presynapticPartner + "\")\">" 
-//						+ presynapticPartner + "</a>";
 				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
 						+ presynapticPartner + "</a>";
 				presynapticPartnerAnchors.add(anchor);
@@ -558,17 +546,36 @@ public class InfoWindowDOM {
 				if (dotIDX > 0) {
 					placeholder = placeholder.substring(0, dotIDX);
 					
-					//make anchor tag
-					String callbackMethod = "app." + placeholder + "()";
-					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							nonTerminalCase.getCellName() + " on " + placeholder +
-							"</a>";
+					//check for google links
+					if (placeholder.equals("google")) {
+						//check if wormatlas specific search
+						if (link.contains("site:wormatlas.org")) {
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" +
+									"</a>";
+						} else {
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + 
+									" on Google</a>";
+						}
+					} else {
+						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName()
+						+ " on " + placeholder + "</a>";
+					}
 				}
 			}
 			HTMLNode li = new HTMLNode("li", "", "", anchor);
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
+		
+		
+		
+		
+		
+//		anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+//				"</a>";
+//	} else {
+//		anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+//				" on Google</a>";
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -627,6 +634,9 @@ public class InfoWindowDOM {
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
+		
+		//add link controller
+		body.addChild(body.addLinkHandlerScript());
 		
 		//add head and body to html
 		html.addChild(head);
