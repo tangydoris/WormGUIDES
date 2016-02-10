@@ -55,7 +55,8 @@ public class InfoWindowDOM {
 		//external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
-		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName);
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "    " + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		
 		//parts list descriptions
@@ -135,20 +136,8 @@ public class InfoWindowDOM {
 		if (presynapticPartners.size() > 0) {
 			Collections.sort(presynapticPartners);
 			
-			//remove brackets
-			//String prePartners = presynapticPartners.toString();
-			
-			//handleWiringPartnerClick(String cell)
-			//anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-			//terminalCase.getCellName() + " on Google (searching Wormatlas)" +
-			//"</a>";
-			
-			//handleWiringPartnerClick
-			
 			ArrayList<String> presynapticPartnerAnchors = new ArrayList<String>();
 			for (String presynapticPartner : presynapticPartners) {
-//				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(\"" + presynapticPartner + "\")\">" 
-//						+ presynapticPartner + "</a>";
 				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
 						+ presynapticPartner + "</a>";
 				presynapticPartnerAnchors.add(anchor);
@@ -160,28 +149,43 @@ public class InfoWindowDOM {
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			String postPartners = postsynapticPartners.toString();
 			
-			postPartners = postPartners.substring(1, postPartners.length()-2);
+			ArrayList<String> postsynapticPartnersAnchors = new ArrayList<String>();
+			for (String postsynapticPartner : postsynapticPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ postsynapticPartner + "</a>";
+				postsynapticPartnersAnchors.add(anchor);
+			}
 			
+			String postPartners = postsynapticPartnersAnchors.toString().substring(1, postsynapticPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
 			Collections.sort(electricalPartners);
 			
-			String electPartners = electricalPartners.toString();
-			electPartners = electPartners.substring(1, electPartners.length()-2);
+			ArrayList<String> electricalPartnersAnchors = new ArrayList<String>();
+			for (String electricalPartner : electricalPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ electricalPartner + "</a>";
+				electricalPartnersAnchors.add(anchor);
+			}
 			
+			String electPartners = electricalPartnersAnchors.toString().substring(1, electricalPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em><br>" + electPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
 			Collections.sort(neuromuscularPartners);
 			
-			String neuroPartners = neuromuscularPartners.toString();
-			neuroPartners = neuroPartners.substring(1, neuroPartners.length()-2);
+			ArrayList<String> neuromuscularPartnersAnchors = new ArrayList<String>();
+			for (String neuromuscularPartner : neuromuscularPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ neuromuscularPartner + "</a>";
+				neuromuscularPartnersAnchors.add(anchor);
+			}
 			
+			String neuroPartners = neuromuscularPartnersAnchors.toString().substring(1, neuromuscularPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em><br>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
@@ -259,25 +263,15 @@ public class InfoWindowDOM {
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
-		
-			/*
-			 * TODO
-			 * 
-			 * anchor --> <a href="www...." onclick="JAVASCRIPTLINKHANDLER(THIS)">blah</a>
-			 * 
-			 * function JAVASCRIPTLINKHANDLER(ELEMENT) {
-			 * 		app.openLink(URL);
-			 * }
-			 */
+
 			
 			//begin after www.
 			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
 				//check if textpresso link i.e. '-' before www
 				if (link.charAt(startIDX-1) == '-') {
-					String callbackMethod = "app.textpresso()";
-					anchor =  "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							terminalCase.getCellName() + " on Textpresso</a>";
+					anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+							" on Textpresso</a>";
 				} else {
 
 					//move past www.
@@ -294,22 +288,16 @@ public class InfoWindowDOM {
 						if (placeholder.equals("google")) {
 							//check if wormatlas specific search
 							if (link.contains("site:wormatlas.org")) {
-								String callbackMethod = "app.googleWormatlas()";
-								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + " on Google (searching Wormatlas)" +
 										"</a>";
 							} else {
-								String callbackMethod = "app.google()";
-								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-										terminalCase.getCellName() + " on Google" +
-										"</a>";
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+										" on Google</a>";
 							}
 						} else {
 							//make anchor tag
-							String callbackMethod = "app." + placeholder + "()";
-							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-									terminalCase.getCellName() + " on " + placeholder +
-									"</a>";
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+									" on " + placeholder + "</a>";
 							
 							//add wormbase link to end of gene expression section
 							if (placeholder.equals("wormbase")) {
@@ -320,9 +308,8 @@ public class InfoWindowDOM {
 					}
 				}	
 			} else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
-				anchor = "<a href=\"#\" onclick=\"app.wormwiring()\">" +
-						terminalCase.getCellName() + " on Wormwiring" +
-						"</a>";
+				anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+						" on Wormwiring</a>";
 			}
 			
 			//make sure anchor has been built 
@@ -331,7 +318,6 @@ public class InfoWindowDOM {
 				linksUL.addChild(li);
 			}
 		}
-		linksUL.addChild(new HTMLNode("li", "", "", "<a href=\"#\" onclick=\"jsCallToJava()\">testing</a>"));
 		/*
 		 * TODO
 		 * cytoshow stub
@@ -369,7 +355,7 @@ public class InfoWindowDOM {
 		HTMLNode productionInfoUL = new HTMLNode("ul");
 		
 		ArrayList<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
-		String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
+		String markerAndStrainNuc = "<em>Nuclear: </em><br>Strain and Marker name: ";
 		if (nuclearInfo.size() == 2) {
 			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
 					+ "Image Series: " + nuclearInfo.get(1);
@@ -378,7 +364,7 @@ public class InfoWindowDOM {
 		
 		boolean hasCellShapeData;
 		ArrayList<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
-		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
+		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Strain and Marker name: ";
 		if (cellShapeInfo.size() == 2) {
 			hasCellShapeData = true;
 			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
@@ -448,10 +434,10 @@ public class InfoWindowDOM {
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
-		// testing JS callback
-		//body.addChild(collapseFunctionButton.jsCallBackScript());
-		//body.addChild(collapseFunctionButton.addJsCurrentLinkScript());
-		body.addChild(wiringPartnersDiv.addWiringPartnersClickScript());
+		// link controller scripts
+		body.addChild(body.addLinkHandlerScript());
+		body.addChild(body.handleWiringPartnerClickScript());
+		body.addChild(body.viewInCellTheaterScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -562,18 +548,26 @@ public class InfoWindowDOM {
 				if (dotIDX > 0) {
 					placeholder = placeholder.substring(0, dotIDX);
 					
-					//make anchor tag
-					String callbackMethod = "app." + placeholder + "()";
-					anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							nonTerminalCase.getCellName() + " on " + placeholder +
-							"</a>";
+					//check for google links
+					if (placeholder.equals("google")) {
+						//check if wormatlas specific search
+						if (link.contains("site:wormatlas.org")) {
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" +
+									"</a>";
+						} else {
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + 
+									" on Google</a>";
+						}
+					} else {
+						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName()
+						+ " on " + placeholder + "</a>";
+					}
 				}
 			}
 			HTMLNode li = new HTMLNode("li", "", "", anchor);
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -633,6 +627,9 @@ public class InfoWindowDOM {
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
+		//add link controller
+		body.addChild(body.addLinkHandlerScript());
+		
 		//add head and body to html
 		html.addChild(head);
 		html.addChild(body);
@@ -657,7 +654,7 @@ public class InfoWindowDOM {
 	public void buildStyleNode() {
 		if (html == null) return;
 		
-		//start with rule for unorder list --> no bullets
+		//default style rules
 		String style = newLine + "ul {"
 				+ newLine + "list-style-type: none;"
 				+ newLine + "display: block;"

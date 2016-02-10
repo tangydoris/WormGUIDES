@@ -59,6 +59,7 @@ import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.ProductionInfo;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
@@ -927,6 +928,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initProductionInfo() {
 		productionInfo = new ProductionInfo();
+		Search.setProductionInfo(productionInfo);
 	}
 
 	@Override

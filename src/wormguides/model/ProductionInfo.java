@@ -1,8 +1,7 @@
-package wormguides.controllers;
+package wormguides.model;
 
 import java.util.ArrayList;
 import wormguides.loaders.ProductionInfoLoader;
-import wormguides.model.PartsList;
 
 public class ProductionInfo {
 	

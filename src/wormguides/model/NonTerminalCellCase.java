@@ -44,6 +44,8 @@ public class NonTerminalCellCase {
 		ArrayList<String> links = new ArrayList<String>();
 		
 		links.add(buildWORMBASELink());
+		links.add(addGoogleLink());
+		links.add(addGoogleWormatlasLink());
 		
 		return links;
 	}
@@ -62,6 +64,22 @@ public class NonTerminalCellCase {
 		}
 		
 		return URL;
+	}
+	
+	private String addGoogleLink() {
+		if (this.cellName != null) {
+			return googleURL + this.cellName + "+c.+elegans";
+		}
+		
+		return "";
+	}
+	
+	private String addGoogleWormatlasLink() {
+		if (this.cellName != null) {
+			return googleWormatlasURL + this.cellName;
+		}
+		
+		return "";
 	}
 	
 	public String getCellName() {
@@ -90,4 +108,6 @@ public class NonTerminalCellCase {
 	
 	private final static String wormbaseURL = "http://www.wormbase.org/db/get?name=";
 	private final static String wormbaseURLEXT = ";class=Anatomy_term";
+	private final static String googleURL = "https://www.google.com/#q=";
+	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
 }

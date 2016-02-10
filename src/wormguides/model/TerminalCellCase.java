@@ -416,7 +416,7 @@ public class TerminalCellCase {
 	
 	private String addGoogleLink() {
 		if (this.cellName != null) {
-			return googleURL + this.cellName;
+			return googleURL + this.cellName + "+c.+elegans";
 		}
 		
 		return "";

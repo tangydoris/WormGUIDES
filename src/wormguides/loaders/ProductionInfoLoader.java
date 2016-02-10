@@ -13,7 +13,7 @@ public class ProductionInfoLoader {
 
 	public static ArrayList<ArrayList<String>> buildProductionInfo() {
 
-		URL url = ProductionInfoLoader.class.getResource("../model/production_info_file/Production_Info.csv");
+		URL url = ProductionInfoLoader.class.getResource("/wormguides/model/production_info_file/Production_Info.csv");
 		ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
 		ArrayList<String> cells = new ArrayList<String>();
 		ArrayList<String> imageSeries = new ArrayList<String>();
@@ -48,7 +48,7 @@ public class ProductionInfoLoader {
 				if (line.length() <= 1) break;
 
 				StringTokenizer tokenizer = new StringTokenizer(line, ",");
-				//check if valid line i.e. 4 tokens
+				//check if valid line
 				if (tokenizer.countTokens() == NUMBER_OF_FIELDS) {
 					cells.add(tokenizer.nextToken());
 					imageSeries.add(tokenizer.nextToken());
@@ -73,7 +73,6 @@ public class ProductionInfoLoader {
 			productionInfo.add(cytoshowLinks);
 			productionInfo.add(movieStartTime);
 			
-			//jarFile.close();
 			return productionInfo;
 			
 		} catch (IOException e) {
@@ -87,8 +86,8 @@ public class ProductionInfoLoader {
 	private final static int NUMBER_OF_FIELDS = 9;
 	private final static String productionInfoFilePath = "wormguides/model/production_info_file/"
 			+ "Production_Info.csv";
-	private static final String productInfoLine = "Production Information,,,,,,,";
-	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,"
-			+ "Temporal Resolution,Segmentation,cytoshow link,Movie start time (min)";
+	private static final String productInfoLine = "Production Information,,,,,,,,,,,,,";
+	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,"
+			+ "Segmentation,cytoshow link,Movie start time (min),,,,,";
 	
 }
