@@ -160,35 +160,43 @@ public class InfoWindowDOM {
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			//String postPartners = postsynapticPartners.toString();
-			//postPartners = postPartners.substring(1, postPartners.length()-2);
 			
-			ArrayList<String> postsynapticPartnerAnchors = new ArrayList<String>();
+			ArrayList<String> postsynapticPartnersAnchors = new ArrayList<String>();
 			for (String postsynapticPartner : postsynapticPartners) {
 				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
 						+ postsynapticPartner + "</a>";
-				postsynapticPartnerAnchors.add(anchor);
+				postsynapticPartnersAnchors.add(anchor);
 			}
 			
-			String postPartners = postsynapticPartnerAnchors.toString().substring(1, postsynapticPartnerAnchors.toString().length()-2);
+			String postPartners = postsynapticPartnersAnchors.toString().substring(1, postsynapticPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
 			Collections.sort(electricalPartners);
 			
-			String electPartners = electricalPartners.toString();
-			electPartners = electPartners.substring(1, electPartners.length()-2);
+			ArrayList<String> electricalPartnersAnchors = new ArrayList<String>();
+			for (String electricalPartner : electricalPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ electricalPartner + "</a>";
+				electricalPartnersAnchors.add(anchor);
+			}
 			
+			String electPartners = electricalPartnersAnchors.toString().substring(1, electricalPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em><br>" + electPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
 			Collections.sort(neuromuscularPartners);
 			
-			String neuroPartners = neuromuscularPartners.toString();
-			neuroPartners = neuroPartners.substring(1, neuroPartners.length()-2);
+			ArrayList<String> neuromuscularPartnersAnchors = new ArrayList<String>();
+			for (String neuromuscularPartner : neuromuscularPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ neuromuscularPartner + "</a>";
+				neuromuscularPartnersAnchors.add(anchor);
+			}
 			
+			String neuroPartners = neuromuscularPartnersAnchors.toString().substring(1, neuromuscularPartnersAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em><br>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}

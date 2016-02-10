@@ -24,6 +24,7 @@ import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.ProductionInfo;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
@@ -70,6 +71,9 @@ public class Search {
 	
 	//for cell cases searching
 	private static CellCases cellCases;
+	
+	//for production info searching
+	private static ProductionInfo productionInfo;
 
 		
 	static {
@@ -534,8 +538,6 @@ public class Search {
 	/*
 	 * non terminal cell case will use this search to find the 
 	 * terminal descendants for a given cell
-	 * 
-	 * 
 	 */
 	public static ArrayList<String> getDescendantsList(String queryCell) {
 		ArrayList<String> descendants = new ArrayList<String>();
@@ -852,11 +854,64 @@ public class Search {
 		}
 	}
 	
+	public static void setProductionInfo(ProductionInfo pi) {
+		if (pi != null) {
+			productionInfo = pi;
+		}
+	}
+	
 	public static boolean hasCellCase(String cellName) {
 		if (cellCases != null) {
 			return cellCases.hasCellCase(cellName);
 		}
 		return false;
+	}
+	
+	/*
+	 * Method taken from RootLayoutController 
+	 * --> how can InfoWindowLinkController generate page without ptr to RootLayoutController
+	 */
+	public static void addToInfoWindow(String name) {
+		//service.restart();
+		
+		//update to lineage name if function
+		String lineage = PartsList.getLineageNameByFunctionalName(name);
+		if (lineage != null) {
+			name = lineage;
+		}
+		
+		//GENERATE CELL TAB ON CLICK
+		if (name!=null && !name.isEmpty()) {
+			if (cellCases == null || productionInfo == null)  {
+				return; //error check
+			}
+							
+			if (PartsList.containsLineageName(name)) {
+				if (cellCases.containsTerminalCase(name)) {
+					
+					//show the tab
+				} else {
+					//translate the name if necessary
+					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
+					//add a terminal case --> pass the wiring partners
+					cellCases.makeTerminalCase(tabTitle, 
+							connectome.querryConnectivity(name, true, false, false, false, false),
+							connectome.querryConnectivity(name, false, true, false, false, false),
+							connectome.querryConnectivity(name, false, false, true, false, false),
+							connectome.querryConnectivity(name, false, false, false, true, false),
+							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
+				}
+			} else { //not in connectome --> non terminal case
+				if (cellCases.containsNonTerminalCase(name)) {
+	
+					//show tab
+				} else {
+					//add a non terminal case
+					cellCases.makeNonTerminalCase(name, 
+							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
+				}
+			}
+		}
 	}
 	
 	//connectome checkbox listeners

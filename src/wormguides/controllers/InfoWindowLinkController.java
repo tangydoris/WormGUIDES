@@ -21,16 +21,15 @@ import wormguides.Search;
 public class InfoWindowLinkController {
 	
 	public void handleLink(String url) throws IOException, URISyntaxException {
-		System.out.println("Clicked: " + url);
 		if (Desktop.isDesktopSupported()) {
 			Desktop.getDesktop().browse(new URI(url));
 		}
 	}
 	
 	public void handleWiringPartnerClick(String cellName) {
-		System.out.println("Clicked partner: " + cellName);
 		if (!Search.hasCellCase(cellName)) {
-			
+			//generate a new cell case
+			Search.addToInfoWindow(cellName);
 		} else {
 			/*
 			 * TODO
