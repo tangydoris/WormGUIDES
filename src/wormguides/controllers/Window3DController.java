@@ -182,7 +182,7 @@ public class Window3DController {
 	private ArrayList<String> allLabels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Node, Text> entityLabelMap;
-	private Text transientLabel; // shows up on hover
+	private Text transientLabelText; // shows up on hover
 	
 	private BooleanProperty bringUpInfoProperty;
 	
@@ -340,11 +340,24 @@ public class Window3DController {
 	 */
 	private void showTransientLabel(String name, Node entity) {
 		Bounds b = entity.getBoundsInParent();
-		//System.out.println("transient - "+b.toString());
 		
 		if (b!=null) {
-			transientLabel = makeNoteSpriteText(name);
-			transientLabel.setFill(Color.web("#F0F0F0"));
+			transientLabelText = makeNoteSpriteText(name);
+			
+			transientLabelText.setWrappingWidth(-1);
+			transientLabelText.setFill(Color.web("#F0F0F0"));
+			transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					event.consume();
+				}
+			});
+			transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					event.consume();
+				}
+			});
 			
 			Point2D p = CameraHelper.project(camera, 
 					new Point3D((b.getMinX()+b.getMaxX())/2, 
@@ -360,10 +373,10 @@ public class Window3DController {
 			y -= vOffset+5;
 			
 			if (spritesPane!=null) {
-				transientLabel.setText(name);
-				transientLabel.getTransforms().add(new Translate(x, y));
+				transientLabelText.setText(name);
+				transientLabelText.getTransforms().add(new Translate(x, y));
 				
-				spritesPane.getChildren().add(transientLabel);
+				spritesPane.getChildren().add(transientLabelText);
 			}
 		}
 	}
@@ -374,7 +387,7 @@ public class Window3DController {
 	 */
 	private void removeTransientLabel() {
 		if (spritesPane!=null)
-			spritesPane.getChildren().remove(transientLabel);
+			spritesPane.getChildren().remove(transientLabelText);
 	}
 	
 	
@@ -926,21 +939,8 @@ public class Window3DController {
  		
  		// add labels
  		for (String name : currentLabels) {
- 			String funcName = PartsList.getFunctionalNameByLineageName(name);
- 			Text text;
- 			if (funcName!=null)
- 				text = makeNoteSpriteText(funcName);
- 			else
- 				text = makeNoteSpriteText(name);
- 			
- 			// TODO
- 			/*
- 			if (name.equalsIgnoreCase(selectedName.get()))
- 				text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
-			*/
- 			
- 			if (text!=null && spritesPane!=null)
- 				mapLabelSpriteToEntity(name, text);
+ 			if (spritesPane!=null)
+ 				insertLabelFor(name, getEntityWithName(name));
 		}
  		
  		if (!notes.isEmpty())
@@ -1119,7 +1119,7 @@ public class Window3DController {
 		// sphere label
 		for (int i=0; i<cellNames.length && entity==null; i++) {
 			if (spheres[i]!=null) {				
-				if (cellNames[i].equalsIgnoreCase(name)) {
+				if (cellNames[i].equals(name)) {
 					entity = spheres[i];
 				}
 			}
@@ -1141,10 +1141,8 @@ public class Window3DController {
 	
 	private void removeLabelFrom(Node entity) {
 		if (entity!=null) {
-			if (spritesPane!=null) {
-				Text text = entityLabelMap.get(entity);
-				spritesPane.getChildren().remove(text);
-			}
+			if (spritesPane!=null)
+				spritesPane.getChildren().remove(entityLabelMap.get(entity));
 			
 			entityLabelMap.remove(entity);
 		}
@@ -1159,9 +1157,6 @@ public class Window3DController {
 		else
 			text = makeNoteSpriteText(name);
 		
-		if (name.equalsIgnoreCase(selectedName.get()))
-			text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
-		
 		text.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -1175,9 +1170,13 @@ public class Window3DController {
 			}
 		});
 		
-		for (Node shape3D : entityLabelMap.keySet()) {
+		for (Node shape3D : entityLabelMap.keySet())
 			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
-		}
+		
+		if (name.equalsIgnoreCase(selectedName.get()))
+			text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+		
+		text.setWrappingWidth(-1);
 		
 		entityLabelMap.put(entity, text);
 		
@@ -1188,13 +1187,12 @@ public class Window3DController {
 	}
 	
 	
-	private boolean mapLabelSpriteToEntity(String name, Text text) {
+	private Shape3D getEntityWithName(String name) {
 		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
 			if (spheres[i]!=null) {				
 				if (cellNames[i].equalsIgnoreCase(name)) {
-					insertLabelFor(name, spheres[i]);
-					return true;
+					return spheres[i];
 				}
 			}
 			
@@ -1204,12 +1202,11 @@ public class Window3DController {
 		for (int i=0; i<currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i)!=null) {
-				insertLabelFor(name, currentSceneElementMeshes.get(i));
-				return true;
+				return currentSceneElementMeshes.get(i);
 			}
 		}
 		
-		return false;
+		return null;
 	}
 	
 	
