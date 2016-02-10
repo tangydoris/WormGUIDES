@@ -37,4 +37,8 @@ public class InfoWindowLinkController {
 			 */
 		}
 	}
+	
+	public void viewInCellTheater(String cellName) {
+		System.out.println(cellName);
+	}
 }

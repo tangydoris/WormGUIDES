@@ -162,6 +162,12 @@ public class Connectome {
 			}
 			return lineageNameResults;
 		}
+		
+		//check if queryCell in results, remove
+		if (searchResults.contains(queryCell.toUpperCase())) {
+			searchResults.remove(queryCell.toUpperCase());
+		}
+		
 		return searchResults;
 	}
 	

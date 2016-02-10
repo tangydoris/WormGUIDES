@@ -320,7 +320,15 @@ public class HTMLNode {
 				+ newLine + "}";
 		
 		
-	return new HTMLNode("script", script, true);
+		return new HTMLNode("script", script, true);
+	}
+	
+	public HTMLNode viewInCellTheaterScript() {
+		String script = "function viewInCellTheater(element) {"
+				+ newLine + "app.viewInCellTheater(element.name);"
+				+ newLine + "}";
+		
+		return new HTMLNode("script", script, true);
 	}
 
 	public String getTag() {

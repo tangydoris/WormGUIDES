@@ -55,7 +55,8 @@ public class InfoWindowDOM {
 		//external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
-		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName);
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "    " + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		
 		//parts list descriptions
@@ -436,6 +437,7 @@ public class InfoWindowDOM {
 		// link controller scripts
 		body.addChild(body.addLinkHandlerScript());
 		body.addChild(body.handleWiringPartnerClickScript());
+		body.addChild(body.viewInCellTheaterScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -566,16 +568,6 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-		
-		
-		
-		
-		
-//		anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + " on Google (searching Wormatlas)" +
-//				"</a>";
-//	} else {
-//		anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
-//				" on Google</a>";
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
