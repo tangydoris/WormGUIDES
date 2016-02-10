@@ -160,9 +160,15 @@ public class InfoWindowDOM {
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			String postPartners = postsynapticPartners.toString();
+			//String postPartners = postsynapticPartners.toString();
+			//postPartners = postPartners.substring(1, postPartners.length()-2);
 			
-			postPartners = postPartners.substring(1, postPartners.length()-2);
+			ArrayList<String> postsynapticPartnerAnchors = new ArrayList<String>();
+			for (String postsynapticPartner : postsynapticPartners) {
+				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
+						+ postsynapticPartner + "</a>";
+			}
+			postsynapticPartnerAnchors.add(anchor);
 			
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
@@ -430,8 +436,9 @@ public class InfoWindowDOM {
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
-		// link controller script
+		// link controller scripts
 		body.addChild(body.addLinkHandlerScript());
+		body.addChild(body.handleWiringPartnerClickScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -553,7 +560,6 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-
 		
 		//production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");

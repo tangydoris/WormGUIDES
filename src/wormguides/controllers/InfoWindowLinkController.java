@@ -28,6 +28,7 @@ public class InfoWindowLinkController {
 	}
 	
 	public void handleWiringPartnerClick(String cellName) {
+		System.out.println("Clicked partner: " + cellName);
 		if (!Search.hasCellCase(cellName)) {
 			
 		} else {
