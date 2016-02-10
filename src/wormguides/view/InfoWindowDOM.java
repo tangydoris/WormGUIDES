@@ -358,7 +358,7 @@ public class InfoWindowDOM {
 		HTMLNode productionInfoUL = new HTMLNode("ul");
 		
 		ArrayList<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
-		String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
+		String markerAndStrainNuc = "<em>Nuclear: </em><br>Strain and Marker name: ";
 		if (nuclearInfo.size() == 2) {
 			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
 					+ "Image Series: " + nuclearInfo.get(1);
@@ -367,7 +367,7 @@ public class InfoWindowDOM {
 		
 		boolean hasCellShapeData;
 		ArrayList<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
-		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
+		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Strain and Marker name: ";
 		if (cellShapeInfo.size() == 2) {
 			hasCellShapeData = true;
 			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
