@@ -519,20 +519,14 @@ public class Window3DController {
 				if (allLabels.contains(name)) {
 					allLabels.remove(name);
 					currentLabels.remove(name);
+					
 					removeLabelFor(name);
 				}
 				else {
 					allLabels.add(name);
 					currentLabels.add(name);
 					
-					Text text;
-					String funcName = PartsList.getFunctionalNameByLineageName(name);
-					if (funcName!=null)
-						text= makeNoteSpriteText(funcName);
-					else
-						text = makeNoteSpriteText(name);
-					
-					mapLabelSpriteToEntity(name, text);
+					insertLabelFor(name, node);
 				}
 			}
 
@@ -556,20 +550,14 @@ public class Window3DController {
 						if (allLabels.contains(name)) {
 							allLabels.remove(name);
 							currentLabels.remove(name);
+							
 							removeLabelFor(name);
 						}
 						else {
 							allLabels.add(name);
 							currentLabels.add(name);
 							
-							Text text;
-							String funcName = PartsList.getFunctionalNameByLineageName(name);
-							if (funcName!=null)
-								text= makeNoteSpriteText(funcName);
-							else
-								text = makeNoteSpriteText(name);
-							
-							mapLabelSpriteToEntity(name, text);
+							insertLabelFor(name, node);
 						}
 					}
 					
@@ -945,6 +933,12 @@ public class Window3DController {
  			else
  				text = makeNoteSpriteText(name);
  			
+ 			// TODO
+ 			/*
+ 			if (name.equalsIgnoreCase(selectedName.get()))
+ 				text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+			*/
+ 			
  			if (text!=null && spritesPane!=null)
  				mapLabelSpriteToEntity(name, text);
 		}
@@ -1151,6 +1145,7 @@ public class Window3DController {
 				Text text = entityLabelMap.get(entity);
 				spritesPane.getChildren().remove(text);
 			}
+			
 			entityLabelMap.remove(entity);
 		}
 	}
@@ -1164,6 +1159,9 @@ public class Window3DController {
 		else
 			text = makeNoteSpriteText(name);
 		
+		if (name.equalsIgnoreCase(selectedName.get()))
+			text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+		
 		text.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -1172,8 +1170,14 @@ public class Window3DController {
 				
 				if (spritesPane!=null)
 					spritesPane.getChildren().remove(text);
+				
+				entityLabelMap.remove(entity);
 			}
 		});
+		
+		for (Node shape3D : entityLabelMap.keySet()) {
+			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
+		}
 		
 		entityLabelMap.put(entity, text);
 		
@@ -1381,7 +1385,7 @@ public class Window3DController {
 	
 	private Text makeNoteOverlayText(String title) {
 		Text text = new Text(title);
-		text.setFill(Color.WHITE);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		if (overlayVBox!=null)
 			text.setWrappingWidth(overlayVBox.getWidth());
@@ -1405,7 +1409,7 @@ public class Window3DController {
 		text.setStrokeWidth(2);
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		text.setCacheHint(CacheHint.QUALITY);
-		text.setFill(Color.WHITE);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
 		return text;
 	}
 	
@@ -2035,6 +2039,9 @@ public class Window3DController {
 	private final String CS = ", ";
 
 	private final String FILL_COLOR_HEX = "#272727";
+	
+	private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66";
+	private final String SPRITE_COLOR_HEX = "#ffffff";
 
 	private final long WAIT_TIME_MILLI = 200;
 
