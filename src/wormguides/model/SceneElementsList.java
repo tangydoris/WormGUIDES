@@ -15,13 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import wormguides.loaders.ProductionInfoLoader;
 
 public class SceneElementsList {
 	
@@ -48,21 +44,10 @@ public class SceneElementsList {
 		URL url = SceneElementsList.class.getResource("shapes_file/" + CELL_CONFIG_FILE_NAME);
 		
 		try {
-//			jarFile = new JarFile(new File("WormGUIDES.jar"));
-//			Enumeration<JarEntry> entries = jarFile.entries();
-//			JarEntry entry;
-//			
-//			while (entries.hasMoreElements()) {
-//				entry = entries.nextElement();
-				
-//				if (entry.getName().equals("wormguides/model/shapes_file/"+CELL_CONFIG_FILE_NAME)) {
 			if (url != null) {
 				InputStream stream = url.openStream();
 				processStreamString(stream);
 			}
-//					InputStream stream = jarFile.getInputStream(entry);
-//					processStreamString(stream);
-//				}
 			
 			//add obj entries
 			URL url2 = SceneElementsList.class.getResource("objFile/");
@@ -72,12 +57,6 @@ public class SceneElementsList {
 					objEntries.add(file);
 				}
 			}
-//				else if (entry.getName().startsWith("wormguides/model/obj_file/"))
-//					objEntries.add(entry);
-				
-			//}
-			
-			//jarFile.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		} catch (IOException e) {
@@ -105,18 +84,21 @@ public class SceneElementsList {
 				while (st.hasMoreTokens()) {
 					cellNames.add(st.nextToken());
 				}
-						
-				SceneElement se = new SceneElement(//objEntries,
-						splits[0], cellNames,
-						splits[2], splits[3], splits[4],
-						Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
-						splits[7]);
 				
-				// add scene element to list
-				elementsList.add(se);
-				
-				addCells(se);
-				addComments(se);
+				try {
+					SceneElement se = new SceneElement(//objEntries,
+							splits[0], cellNames,
+							splits[2], splits[3], splits[4],
+							Integer.parseInt(splits[5]), Integer.parseInt(splits[6]),
+							splits[7]);
+					
+					// add scene element to list
+					elementsList.add(se);
+					addComments(se);
+					
+				} catch (NumberFormatException e) {
+					System.out.println("error in reading scene element time for line "+line);
+				}
 			}
 			
 			reader.close();
@@ -178,9 +160,7 @@ public class SceneElementsList {
 	}
 	
 	
-	public String[] getSceneElementNamesAtTime(int time) {
-		//time++;
-		
+	public String[] getSceneElementNamesAtTime(int time) {		
 		// Add lineage names of all structures at time
 		ArrayList<String> list = new ArrayList<String>();
 		for (SceneElement se : elementsList) {
@@ -196,7 +176,6 @@ public class SceneElementsList {
 
 	
 	public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-		//time++;
 		ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
 		for (int i = 0; i < elementsList.size(); i++) {
 			SceneElement se = elementsList.get(i);

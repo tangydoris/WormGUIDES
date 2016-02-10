@@ -10,11 +10,10 @@ import java.util.StringTokenizer;
 
 public class ProductionInfoLoader {
 
-	public ArrayList<ArrayList<String>> buildProductionInfo() {
-		
+
+	public static ArrayList<ArrayList<String>> buildProductionInfo() {
+
 		URL url = ProductionInfoLoader.class.getResource("../model/production_info_file/Production_Info.csv");
-		
-		
 		ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
 		ArrayList<String> cells = new ArrayList<String>();
 		ArrayList<String> imageSeries = new ArrayList<String>();
@@ -24,6 +23,8 @@ public class ProductionInfoLoader {
 		ArrayList<String> temporalResolutions = new ArrayList<String>();
 		ArrayList<String> segmentations = new ArrayList<String>();
 		ArrayList<String> cytoshowLinks = new ArrayList<String>();
+		ArrayList<String> movieStartTime = new ArrayList<String>();
+
 		try {	
 			InputStream stream = url.openStream();
 			InputStreamReader streamReader = new InputStreamReader(stream);
@@ -45,10 +46,10 @@ public class ProductionInfoLoader {
 						
 				//make sure valid line
 				if (line.length() <= 1) break;
-						
+
 				StringTokenizer tokenizer = new StringTokenizer(line, ",");
 				//check if valid line i.e. 4 tokens
-				if (tokenizer.countTokens() == 8) {
+				if (tokenizer.countTokens() == NUMBER_OF_FIELDS) {
 					cells.add(tokenizer.nextToken());
 					imageSeries.add(tokenizer.nextToken());
 					markers.add(tokenizer.nextToken());
@@ -57,6 +58,7 @@ public class ProductionInfoLoader {
 					temporalResolutions.add(tokenizer.nextToken());
 					segmentations.add(tokenizer.nextToken());
 					cytoshowLinks.add(tokenizer.nextToken());
+					movieStartTime.add(tokenizer.nextToken());
 				}
 			}
 			
@@ -69,6 +71,7 @@ public class ProductionInfoLoader {
 			productionInfo.add(temporalResolutions);
 			productionInfo.add(segmentations);
 			productionInfo.add(cytoshowLinks);
+			productionInfo.add(movieStartTime);
 			
 			//jarFile.close();
 			return productionInfo;
@@ -81,8 +84,11 @@ public class ProductionInfoLoader {
 	}
 	
 	//production info file location
-	private final static String productionInfoFilePath = "wormguides/model/production_info_file/Production_Info.csv";
+	private final static int NUMBER_OF_FIELDS = 9;
+	private final static String productionInfoFilePath = "wormguides/model/production_info_file/"
+			+ "Production_Info.csv";
 	private static final String productInfoLine = "Production Information,,,,,,,";
-	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link";
+	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,"
+			+ "Temporal Resolution,Segmentation,cytoshow link,Movie start time (min)";
 	
 }

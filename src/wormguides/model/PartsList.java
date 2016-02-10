@@ -70,7 +70,7 @@ public class PartsList {
 	public static String getFunctionalNameByLineageName(String name) {
 		//account for case insensitivity and translate lineage name
 		for (String lineageName : lineageNames) {
-			if (lineageName.toLowerCase().equals(name.toLowerCase())) {
+			if (lineageName.equalsIgnoreCase(name)) {
 				name = lineageName;
 				break;
 			}

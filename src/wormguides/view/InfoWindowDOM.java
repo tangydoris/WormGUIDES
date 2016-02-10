@@ -167,9 +167,10 @@ public class InfoWindowDOM {
 			for (String postsynapticPartner : postsynapticPartners) {
 				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
 						+ postsynapticPartner + "</a>";
+				postsynapticPartnerAnchors.add(anchor);
 			}
-			postsynapticPartnerAnchors.add(anchor);
 			
+			String postPartners = postsynapticPartnerAnchors.toString().substring(1, postsynapticPartnerAnchors.toString().length()-2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}

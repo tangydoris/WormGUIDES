@@ -9,9 +9,7 @@ public class ProductionInfo {
 	private ArrayList<ArrayList<String>> productionInfoData;
 	
 	public ProductionInfo() {
-		ProductionInfoLoader piLoader = new ProductionInfoLoader();
-		
-		this.productionInfoData = piLoader.buildProductionInfo();
+		productionInfoData = ProductionInfoLoader.buildProductionInfo();
 	}
 	
 	public ArrayList<String> getNuclearInfo() {
@@ -23,6 +21,25 @@ public class ProductionInfo {
 		}
 		
 		return nuclearInfo;
+	}
+	
+	public int getDefaultStartTime() {
+		return DEFAULT_START_TIME;
+	}
+	
+	public int getMovieTimeOffset() {
+		String input = productionInfoData.get(8).get(1);
+		
+		try {
+			int startTime = Integer.parseInt(input);
+			return startTime-DEFAULT_START_TIME;
+		} catch (NumberFormatException e) {
+			System.out.println("Input: '"+input+"'");
+			System.out.println("Invalid input for movie start time. Using default start time of "
+					+DEFAULT_START_TIME);
+		}
+		
+		return 0;
 	}
 	
 	public ArrayList<String> getCellShapeData(String queryCell) {
@@ -46,7 +63,8 @@ public class ProductionInfo {
 	}
 	
 	public ArrayList<ArrayList<String>> getProductionInfoData() {
-		return this.productionInfoData;
+		return productionInfoData;
 	}
 	
+	private final int DEFAULT_START_TIME = 1;
 }

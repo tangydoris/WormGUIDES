@@ -14,8 +14,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -157,12 +155,13 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private ListView<String> allStructuresListView;
 	@FXML private Button addStructureRuleBtn;
 	@FXML private ColorPicker structureRuleColorPicker;
-	// cell information
+	
+	// Cell information
 	@FXML private Text displayedName;
 	@FXML private Text moreInfoClickableText;
 	@FXML private Text displayedDescription;
 	
-	// story information
+	// Story information
 	@FXML private Text displayedStory;
 	@FXML private Text displayedStoryDescription;
 	
@@ -191,6 +190,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	// ----- Begin menu items and buttons listeners -----
+	// TODO
+	@FXML public void productionInfoAction() {
+		// productionInfo should already be initialized
+	}
+	
 	@FXML public void menuLoadStory() {
 		if (storiesLayer!=null) {
 			storiesLayer.loadStory();
@@ -297,13 +301,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	@FXML
 	public void openInfoWindow() {
-		if (infoWindow == null) {
-			
+		if (infoWindow==null) {
 			initInfoWindow();
-			initCellCases();
-			initProductionInfo();
+			
+			if (cellCases==null)
+				initCellCases();
 		}
-		
 		infoWindow.showWindow();
 	}
 	
@@ -375,7 +378,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
-		window3DController = new Window3DController(mainStage, modelAnchorPane, data);
+		window3DController = new Window3DController(mainStage, modelAnchorPane, 
+				data, productionInfo.getDefaultStartTime());
 		subscene = window3DController.getSubScene();
 		
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -634,14 +638,16 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	private void setLabels() {
+		int timeOffset = productionInfo.getMovieTimeOffset();
+		
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
-				timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
+				timeLabel.setText("~"+(time.get()+timeOffset)+" min p.f.c.");
 			}
 		});
-		timeLabel.setText("~"+(time.get()+19)+" min p.f.c.");
+		timeLabel.setText("~"+(time.get()+timeOffset)+" min p.f.c.");
 		timeLabel.toFront();
 		
 		totalNuclei.addListener(new ChangeListener<Number>() {
@@ -654,7 +660,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				totalNucleiLabel.setText(newValue.intValue()+suffix);
 			}
 		});
-		
 		totalNucleiLabel.setText(totalNuclei.get()+" Nuclei");
 		totalNucleiLabel.toFront();
 	}
@@ -869,7 +874,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initStoriesLayer(LineageData data) {
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, 
-				data, window3DController, useInternalRules);
+				data, window3DController, useInternalRules, productionInfo.getMovieTimeOffset());
 		window3DController.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
@@ -916,9 +921,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void initCellCases() {
-		if (infoWindow == null)
-			initInfoWindow();
-		
 		cellCases = new CellCases(infoWindow);
 		Search.setCellCases(cellCases);
 	}
@@ -943,6 +945,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	public void initializeWithLineageData(LineageData data) {
+		initProductionInfo();
+		
 		init3DWindow(data);
 		setPropertiesFrom3DWindow();
 		
@@ -959,9 +963,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		// connectome
 		initConnectome();
-		
-		//init cell cases
-		//initCellCases();
 		
 		// structures layer
 		initStructuresLayer();

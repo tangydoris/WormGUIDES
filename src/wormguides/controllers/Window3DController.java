@@ -74,6 +74,7 @@ import wormguides.model.LineageData;
 import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
+import wormguides.model.PartsList;
 import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
@@ -102,6 +103,7 @@ public class Window3DController {
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private int endTime;
+	private int startTime;
 	private Sphere[] spheres;
 	private MeshView[] meshes;
 	private String[] cellNames;
@@ -165,7 +167,7 @@ public class Window3DController {
 	// (any note that should be visible in a given frame)
 	private ArrayList<Note> currentNotes;
 	// Map of current note graphics to their note objects
-	private HashMap<Text, Note> currentGraphicNoteMap;
+	private HashMap<Node, Note> currentGraphicNoteMap;
 	// Map of current notes to their scene elements
 	private HashMap<Note, MeshView> currentNoteMeshMap;
 	
@@ -173,35 +175,44 @@ public class Window3DController {
 	private Pane spritesPane;
 	
 	// maps of sprite/billboard front notes attached to cell, or cell and time
-	private HashMap<Text, Node> spriteEntityMap;
-	private HashMap<Text, Node> billboardFrontEntityMap;
+	private HashMap<Node, VBox> entitySpriteMap;
+	private HashMap<Node, Node> billboardFrontEntityMap;
 	
 	// Label stuff
-	private ArrayList<String> labels;
+	private ArrayList<String> allLabels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Text, Node> labelEntityMap;
+	private Text transientLabel; // shows up on hover
+	/*
+	private EventHandler<MouseEvent> meshMouseEnterHandler;
+	private EventHandler<MouseEvent> meshMouseExitHandler;
+	private EventHandler<MouseEvent> sphereMouseEnterHandler;
+	private EventHandler<MouseEvent> sphereMouseExitHandler;
+	*/
 	
 	private BooleanProperty bringUpInfoProperty;
 	
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DController(Stage parent, Pane parentPane, LineageData data) {
+	public Window3DController(Stage parent, Pane parentPane, LineageData data, int movieStartTime) {
 		parentStage = parent;
 		
 		root = new Group();
 		this.cellData = data;
+		
+		startTime = movieStartTime;
 
-		time = new SimpleIntegerProperty(START_TIME);
+		time = new SimpleIntegerProperty(startTime);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
 								Number oldValue, Number newValue) {
 				int t = newValue.intValue();
-				if (t<START_TIME)
-					t = START_TIME;
-				if (START_TIME<=t && t<=endTime)
-					buildScene(t);
+				if (t<startTime)
+					t = startTime;
+				if (startTime<=t && t<=endTime)
+					buildScene();
 			}
 		});
 
@@ -303,12 +314,12 @@ public class Window3DController {
 		currentSceneElements = new ArrayList<SceneElement>();
 		
 		currentNotes = new ArrayList<Note>();
-		currentGraphicNoteMap = new HashMap<Text, Note>();
+		currentGraphicNoteMap = new HashMap<Node, Note>();
 		currentNoteMeshMap = new HashMap<Note, MeshView>();
-		spriteEntityMap = new HashMap<Text, Node>();
-		billboardFrontEntityMap = new HashMap<Text, Node>();
+		entitySpriteMap = new HashMap<Node, VBox>();
+		billboardFrontEntityMap = new HashMap<Node, Node>();
 		
-		labels = new ArrayList<String>();
+		allLabels = new ArrayList<String>();
 		currentLabels = new ArrayList<String>();
 		labelEntityMap = new HashMap<Text, Node>();
 		
@@ -328,6 +339,51 @@ public class Window3DController {
 	}
 	
 	
+	/*
+	 * Insert transient label into sprites pane
+	 * name = name that appears on the label
+	 * entity = entity that the label should show up on
+	 */
+	private void showTransientLabel(String name, Node entity) {
+		Bounds b = entity.getBoundsInParent();
+		//System.out.println("transient - "+b.toString());
+		
+		if (b!=null) {
+			transientLabel = makeNoteSpriteText(name);
+			transientLabel.setFill(Color.web("#F0F0F0"));
+			
+			Point2D p = CameraHelper.project(camera, 
+					new Point3D((b.getMinX()+b.getMaxX())/2, 
+							(b.getMinY()+b.getMaxY())/2, 
+							(b.getMaxZ()+b.getMinZ())/2));
+			double x = p.getX();
+			double y = p.getY();
+			
+			double vOffset = b.getHeight()/2;
+			double hOffset = b.getWidth()/2;
+	
+			x += hOffset;
+			y -= vOffset+5;
+			
+			if (spritesPane!=null) {
+				transientLabel.setText(name);
+				transientLabel.getTransforms().add(new Translate(x, y));
+				
+				spritesPane.getChildren().add(transientLabel);
+			}
+		}
+	}
+	
+	
+	/*
+	 * Remove transient label from sprites pane
+	 */
+	private void removeTransientLabel() {
+		if (spritesPane!=null)
+			spritesPane.getChildren().remove(transientLabel);
+	}
+	
+	
 	public void setBringUpInfoProperty(BooleanProperty bringUpInfoProperty) {
 		this.bringUpInfoProperty = bringUpInfoProperty;
 	}
@@ -343,7 +399,7 @@ public class Window3DController {
 	public void setStoriesLayer(StoriesLayer layer) {
 		if (layer!=null) {
 			storiesLayer = layer;
-			buildScene(time.get());
+			buildScene();
 		}
 	}
 	
@@ -459,20 +515,22 @@ public class Window3DController {
 		if (node instanceof Sphere) {			
 			Sphere picked = (Sphere) node;
 			selectedIndex.set(getPickedSphereIndex(picked));
-			String name = cellNames[selectedIndex.get()];
+			String name = normalizeName(cellNames[selectedIndex.get()]);
 			selectedName.set(name);
 			cellClicked.set(true);
 			
 			if (event.getButton()==MouseButton.SECONDARY)
 				showContextMenu(name, event.getScreenX(), event.getScreenY());
-			
 			else if (event.getButton()==MouseButton.PRIMARY) {
-				if (labels.contains(name))
-					labels.remove(name);
-				else
-					labels.add(name);
+				if (allLabels.contains(name)) {
+					allLabels.remove(name);
+				}
+				else {
+					allLabels.add(name);
+					// TODO
+				}
 				
-				buildScene(time.get());
+				buildScene();
 			}
 
 		}
@@ -492,12 +550,12 @@ public class Window3DController {
 						showContextMenu(name, event.getScreenX(), event.getScreenY());
 					
 					else if (event.getButton()==MouseButton.PRIMARY) {
-						if (labels.contains(name))
-							labels.remove(name);
+						if (allLabels.contains(name))
+							allLabels.remove(name);
 						else
-							labels.add(name);
+							allLabels.add(name);
 						
-						buildScene(time.get());
+						buildScene();
 					}
 					
 					break;
@@ -588,18 +646,18 @@ public class Window3DController {
 	
 	
 	private void repositionNoteBillboardFronts() {
-		for (Node node : billboardFrontEntityMap.keySet()) {
-			Node s = billboardFrontEntityMap.get(node);
-			if (s!=null) {
-				Bounds b = s.getBoundsInParent();
+		for (Node billboard : billboardFrontEntityMap.keySet()) {
+			Node entity = billboardFrontEntityMap.get(billboard);
+			if (entity!=null) {
+				Bounds b = entity.getBoundsInParent();
 				
 				if (b!=null) {
-					node.getTransforms().clear();
+					billboard.getTransforms().clear();
 					double x = b.getMaxX();
 					double y = b.getMaxY();
 					double z = b.getMaxZ();
-					node.getTransforms().addAll(new Translate(x, y, z),
-								new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+					billboard.getTransforms().addAll(new Translate(x, y, z),
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 			}
 		}
@@ -608,10 +666,11 @@ public class Window3DController {
 	
 	// Reposition sprites by projecting the sphere's 3d coordinate 
 	// onto the front of the subscene
-	private void repositionSprites() {
-		for (Text text : spriteEntityMap.keySet()) {
-			alignTextWithEntity(text, spriteEntityMap.get(text), false);
+	private void repositionSprites() {		
+		for (Node entity : entitySpriteMap.keySet()) {
+			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
 		}
+		
 		for (Text text : labelEntityMap.keySet()) {
 			alignTextWithEntity(text, labelEntityMap.get(text), true);
 		}
@@ -620,31 +679,33 @@ public class Window3DController {
 	
 	// Input text is the note/label geometry
 	// Input entity is the cell/body/mesh that the text should align with
-	private void alignTextWithEntity(Text text, Node node, boolean isLabel) {
+	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
 		if (node!=null) {
 			Bounds b = node.getBoundsInParent();
+			//System.out.println("static - "+b.toString());
 			
 			if (b!=null) {
-				text.getTransforms().clear();
+				noteGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, 
-						new Point3D((b.getMaxX()+b.getMinX())/2, 
-								(b.getMaxY()+b.getMinY())/2, 
+						new Point3D((b.getMinX()+b.getMaxX())/2, 
+								(b.getMinY()+b.getMaxY())/2, 
 								(b.getMaxZ()+b.getMinZ())/2));
 				double x = p.getX();
 				double y = p.getY();
 				
-				if (node instanceof Sphere) {
-					double radius = ((Sphere) node).getRadius();
-					if (isLabel) {
-						x += radius;
-						y -= (radius+5);
-					}
-					else {
-						x += radius;
-						y += radius+10;
-					}
+				double vOffset = b.getHeight()/2;
+				double hOffset = b.getWidth()/2;
+
+				if (isLabel) {
+					x += hOffset;
+					y -= vOffset+5;
 				}
-				text.getTransforms().add(new Translate(x, y));
+				else {
+					x += hOffset;
+					y += vOffset+5;
+				}
+				
+				noteGraphic.getTransforms().add(new Translate(x, y));
 			}
 		}
 	}
@@ -669,11 +730,22 @@ public class Window3DController {
 	}
 	
 
-	// Builds subscene for a given timepoint
-	private void buildScene(int time) {
-		cellNames = cellData.getNames(time);
-		positions = cellData.getPositions(time);
-		diameters = cellData.getDiameters(time);
+	/*
+	 *  Calls service to retrieve subscene data at current time point
+	 *  then render entities, notes, and labels
+	 */
+	private void buildScene() {
+		// Spool thread for actual rendering to subscene
+		renderService.restart();
+	}
+	
+	
+	private void getSceneData() {
+		final int requestedTime = time.get();
+		cellNames = cellData.getNames(requestedTime);
+		positions = cellData.getPositions(requestedTime);
+		diameters = cellData.getDiameters(requestedTime);
+		otherCells.clear();
 		
 		totalNuclei.set(cellNames.length);
 		
@@ -683,7 +755,7 @@ public class Window3DController {
 		// Start scene element list, find scene elements present at time, build and meshes
 		//empty meshes and scene element references from last rendering. Same for story elements
 		if (sceneElementsList!=null)
-			meshNames = sceneElementsList.getSceneElementNamesAtTime(time);
+			meshNames = sceneElementsList.getSceneElementNamesAtTime(requestedTime);
 		
 		if (!currentSceneElementMeshes.isEmpty()) {
 			currentSceneElementMeshes.clear();
@@ -691,11 +763,11 @@ public class Window3DController {
 		}
 		
 		if (sceneElementsList != null) {
-			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(time);
+			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
 			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 				//add meshes from each scene element
 				SceneElement se = sceneElementsAtTime.get(i);
-				MeshView mesh = se.buildGeometry(time-1);
+				MeshView mesh = se.buildGeometry(requestedTime-1);
 				
 				if (mesh != null) {
 					//null mesh when file not found thrown
@@ -715,18 +787,19 @@ public class Window3DController {
 		// Label stuff
 		labelEntityMap.clear();
 		currentLabels.clear();
-		for (String name : labels) {
+		
+		for (String label : allLabels) {
 			for (String cell : cellNames) {
-				if (!currentLabels.contains(name) && cell.equalsIgnoreCase(name)) {
-					currentLabels.add(name);
+				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+					currentLabels.add(label);
 					break;
 				}
 			}
 			
 			for (int i=0; i<currentSceneElements.size(); i++) {
-				if (!currentLabels.contains(name) 
-						&& name.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
-					currentLabels.add(name);
+				if (!currentLabels.contains(label) 
+						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
+					currentLabels.add(label);
 					break;
 				}
 			}
@@ -734,7 +807,6 @@ public class Window3DController {
 		// End label stuff
 		
 		// Story stuff
-		// TODO
 		// Notes are indexed starting from 1 (or 1+offset shown to user)
 		if (storiesLayer!=null) {			
 			currentNotes.clear();
@@ -742,10 +814,10 @@ public class Window3DController {
 			currentNoteMeshMap.clear();
 			currentGraphicNoteMap.clear();
 			
-			spriteEntityMap.clear();
+			entitySpriteMap.clear();
 			billboardFrontEntityMap.clear();
 			
-			currentNotes = storiesLayer.getNotesAtTime(time);
+			currentNotes = storiesLayer.getNotesAtTime(requestedTime);
 			
 			for (Note note : currentNotes) {
 				// Revert to overlay display if we have invalid display/attachment 
@@ -756,16 +828,13 @@ public class Window3DController {
 				// make mesh views for scene elements from note resources
 				if (note.hasSceneElements()) {
 					for (SceneElement se : note.getSceneElements()) {
-						MeshView mesh = se.buildGeometry(time);
-						mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-						// scale factor may have to change if not dealing with the Stanford Bunny
-						mesh.getTransforms().addAll(new Translate(
-							newOriginX+se.getX(),
-							newOriginY+se.getY(),
-							newOriginZ+se.getZ()),
-							new Scale(150, -150, -150));
-						currentNoteMeshMap.put(note, mesh);
+						MeshView mesh = se.buildGeometry(requestedTime);
+						
+						if (mesh!=null) {
+							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
+							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+							currentNoteMeshMap.put(note, mesh);
+						}
 					}
 				}
 			}
@@ -780,9 +849,6 @@ public class Window3DController {
 		else
 			consultSearchResultsList();
 		// End search stuff
-		
-		// Spool thread for actual rendering to subscene
-		renderService.restart();
 	}
 
 	
@@ -799,7 +865,7 @@ public class Window3DController {
 				localSearchResults.add(name);
 		}
 
-		buildScene(time.get());
+		buildScene();
 	}
 	
 	
@@ -809,7 +875,7 @@ public class Window3DController {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 								Boolean oldValue, Boolean newValue) {
 				if (newValue)
-					buildScene(time.get());
+					buildScene();
 			}
 		};
 	}
@@ -830,34 +896,43 @@ public class Window3DController {
 				Node node = iter.next();
 				if (node instanceof Text)
 					iter.remove();
+				else if (node instanceof VBox && node!=overlayVBox)
+					iter.remove();
 			}
 		}
 	}
 
 	
 	private void addEntitiesToScene() {
-		//System.out.println(storiesList.toString());
 		ArrayList<Shape3D> entities = new ArrayList<Shape3D>();
-		ArrayList<Text> notes = new ArrayList<Text>();
+		ArrayList<Node> notes = new ArrayList<Node>();
 		
 		// add spheres
 		addCellGeometries(entities);
 		
 		// add scene element meshes (from notes and from scene elements list)
- 		//entities.addAll(currentSceneElementMeshes);
  		addSceneElementGeometries(entities);
+ 		
+ 		Collections.sort(entities, opacityComparator);
+		root.getChildren().addAll(entities);
  		
  		// add notes
  		insertOverlayTitles();
- 		addNoteGeometries(notes);
+ 		if (!currentNotes.isEmpty())
+ 			addNoteGeometries(notes);
  		
  		// add labels
+ 		// TODO
  		for (String name : currentLabels) {
-			Text node = makeNoteSpriteText(name);
-			node.setWrappingWidth(node.getWrappingWidth()+20);
-			
-			if (spritesPane!=null && positionLabelSprite(name, node))
-				spritesPane.getChildren().add(node);
+ 			String funcName = PartsList.getFunctionalNameByLineageName(name);
+ 			Text text;
+ 			if (funcName!=null)
+ 				text = makeNoteSpriteText(funcName);
+ 			else
+ 				text = makeNoteSpriteText(name);
+ 			
+ 			if (text!=null && spritesPane!=null && mapLabelSpriteToEntity(name, text))
+				spritesPane.getChildren().add(text);
 		}
  		
  		if (!notes.isEmpty())
@@ -865,17 +940,16 @@ public class Window3DController {
  		
 		repositionSprites();
 		repositionNoteBillboardFronts();
- 			
-		Collections.sort(entities, opacityComparator);
-		root.getChildren().addAll(entities);
 	}
 	
 	
-	// TODO
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
 		// add scene elements from note resources
-		for (Note note : currentNoteMeshMap.keySet())
+		for (Note note : currentNoteMeshMap.keySet()) {
+			//MeshView mesh = currentNoteMeshMap.get(note);
+			//mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
 			list.add(currentNoteMeshMap.get(note));
+		}
 		
 		// Consult rules
 		if (!currentSceneElements.isEmpty()) {	
@@ -935,6 +1009,28 @@ public class Window3DController {
 					}
 				}
 				
+				mesh.setOnMouseEntered(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						// make label appear
+						String name = normalizeName(se.getSceneName());
+						
+						if (!currentLabels.contains(name)) {
+							String funcName = PartsList.getFunctionalNameByLineageName(name);
+							if (funcName!=null)
+								name = funcName;
+							showTransientLabel(name, mesh);
+						}
+					}
+				});
+				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						// make label disappear
+						removeTransientLabel();
+					}
+				});
+				
 				list.add(mesh);
 			}
 		}
@@ -975,28 +1071,69 @@ public class Window3DController {
  			}
 
  			sphere.setMaterial(material);
-
- 			double x = positions[i][X_COR_INDEX]*X_SCALE;
-	        double y = positions[i][Y_COR_INDEX]*Y_SCALE;
-	        double z = positions[i][Z_COR_INDEX]*Z_SCALE;
 	        
-	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
-	        translateSphere(sphere, x, y, z);
+	        sphere.getTransforms().addAll(rotateZ, rotateY, rotateX,
+	        		new Translate(positions[i][X_COR_INDEX]*X_SCALE,
+	        				positions[i][Y_COR_INDEX]*Y_SCALE, 
+	        				positions[i][Z_COR_INDEX]*Z_SCALE));
 	        
 	        spheres[i] = sphere;
+	        
+	        final int index = i;
+	        sphere.setOnMouseEntered(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					// make label appear
+					String name = cellNames[index];
+					
+					if (!currentLabels.contains(name)) {
+						String funcName = PartsList.getFunctionalNameByLineageName(name);
+						if (funcName!=null)
+							name = funcName;
+						showTransientLabel(name, spheres[index]);
+					}
+				}
+	        });
+	        sphere.setOnMouseExited(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					// make label disappear
+					removeTransientLabel();
+				}
+	        });
+	        
 	        list.add(sphere);
 		}
 		// End sphere stuff
 	}
 	
 	
-	private boolean positionLabelSprite(String name, Text text) {
+	private boolean mapLabelSpriteToEntity(String name, Text text) {
 		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
-			if (cellNames[i].equalsIgnoreCase(name) && spheres[i]!=null) {
-				labelEntityMap.put(text, spheres[i]);
-				return true;
+			if (spheres[i]!=null) {
+				String cell = cellNames[i];
+				Sphere sphere = spheres[i];
+				
+				if (cell.equalsIgnoreCase(name)) {
+					labelEntityMap.put(text, sphere);
+					
+					// make labels clickable - removed from scene on click
+					// TODO
+					text.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							allLabels.remove(name);
+							currentLabels.remove(name);
+							if (spritesPane!=null) {
+								spritesPane.getChildren().remove(text);
+							}
+						}
+					});
+					return true;
+				}
 			}
+			
 		}
 		
 		// mesh view label
@@ -1007,6 +1144,7 @@ public class Window3DController {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 	
@@ -1014,33 +1152,66 @@ public class Window3DController {
 	// Inserts note geometries to scene
 	// Input list is the list that billboards are added to which are added to the subscene
 	// Note overlays and sprites are added to the pane that contains the subscene
-	private void addNoteGeometries(ArrayList<Text> list) {		
-		// TODO
+	private void addNoteGeometries(ArrayList<Node> list) {
 		for (Note note : currentNotes) {
 			// map notes to their sphere/mesh view
-			Text text = makeNoteGraphic(note);
+			Node text = makeNoteGraphic(note);
 			currentGraphicNoteMap.put(text, note);
+			
 			// SPRITE
 			if (note.isSprite()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					spriteEntityMap.put(text, createLocationMarker(note.getX(), 
-							note.getY(), note.getZ()));
+					VBox box = new VBox(3);
+					box.getChildren().add(text);
+					// add marker to scene
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					root.getChildren().add(marker);
+					entitySpriteMap.put(marker, box);
+					
+					if (spritesPane!=null)
+						spritesPane.getChildren().add(box);
 				}
+				
 				// cell attachment
 				else if (note.attachedToCell()) {
 					for (int i=0; i<cellNames.length; i++) {
 						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i]!=null) {
-							spriteEntityMap.put(text, spheres[i]);
+							// if another note is already attached to the same sphere,
+							// create a vbox for note positioning
+							if (!entitySpriteMap.containsKey(spheres[i])) {
+								VBox box = new VBox(3);
+								box.getChildren().add(text);
+								entitySpriteMap.put(spheres[i], box);
+								
+								if (spritesPane!=null)
+									spritesPane.getChildren().add(box);
+							}
+							else {
+								entitySpriteMap.get(spheres[i]).getChildren().add(text);
+							}
+							
+							break;
 						}
 					}
 				}
+				
 				// structure attachment
 				else if (note.attachedToStructure()) {
 					for (int i=0; i<currentSceneElements.size(); i++) {
 						if (currentSceneElements.get(i).getSceneName()
 								.equalsIgnoreCase(note.getCellName())) {
-							spriteEntityMap.put(text, currentSceneElementMeshes.get(i));
+							MeshView mesh = currentSceneElementMeshes.get(i);
+							if (!entitySpriteMap.containsKey(mesh)) {
+								VBox box = new VBox(3);
+								box.getChildren().add(text);
+								entitySpriteMap.put(mesh, box);
+								
+								if (spritesPane!=null)
+									spritesPane.getChildren().add(box);
+							}
+							else
+								entitySpriteMap.get(mesh).getChildren().add(text);
 						}
 					}
 				}
@@ -1050,8 +1221,9 @@ public class Window3DController {
 			else if (note.isBillboardFront()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					billboardFrontEntityMap.put(text, createLocationMarker(note.getX(), 
-							note.getY(), note.getZ()));
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					root.getChildren().add(marker);
+					billboardFrontEntityMap.put(text, marker);
 				}
 				// cell attachment
 				else if (note.attachedToCell()) {
@@ -1076,9 +1248,9 @@ public class Window3DController {
 			else if (note.isBillboard()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
-					text.getTransforms().addAll(new Translate(newOriginX+note.getX(), 
-							newOriginY+note.getY(), newOriginZ+note.getZ()),
+					text.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					text.getTransforms().addAll(
+							new Translate(note.getX(), note.getY(), note.getZ()),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
 				// cell attachment
@@ -1115,7 +1287,6 @@ public class Window3DController {
 			if (display!=null) {
 				switch (display) {
 				case SPRITE:
-								spritesPane.getChildren().add(text);
 								break;
 				
 				case BILLBOARD_FRONT:	// fall to billboard case
@@ -1161,7 +1332,7 @@ public class Window3DController {
 	
 	private Text makeNoteSpriteText(String title) {
 		Text text = makeNoteOverlayText(title);
-		text.setWrappingWidth(130);
+		text.setWrappingWidth(160);
 		return text;
 	}
 	
@@ -1181,9 +1352,10 @@ public class Window3DController {
 	
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
-		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ,
-				new Translate(newOriginX+x, 
-						newOriginY+y, newOriginZ+z));
+		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX,
+				new Translate(x*X_SCALE, y*Y_SCALE, z*Z_SCALE));
+		// make marker transparent
+		sphere.setMaterial(colorHash.getOthersMaterial(0));
 		return sphere;
 	}
 	
@@ -1222,12 +1394,6 @@ public class Window3DController {
 		}
 		return node;
 	}
-	
-	
-	private void translateSphere(Node sphere, double x, double y, double z) {
-		Translate t = new Translate(x, y, z);
-		sphere.getTransforms().add(t);
-	}
 
 	
 	private void buildCamera() {
@@ -1253,7 +1419,7 @@ public class Window3DController {
 	
 	private void setNewOrigin() {
 		// Find average X Y positions of initial timepoint
-		Integer[][] positions = cellData.getPositions(START_TIME);
+		Integer[][] positions = cellData.getPositions(startTime);
 		int numCells = positions.length;
 		int sumX = 0;
 		int sumY = 0;
@@ -1263,9 +1429,9 @@ public class Window3DController {
 			sumY += positions[i][Y_COR_INDEX];
 			sumZ += positions[i][Z_COR_INDEX];
 		}
-		this.newOriginX = (int) Math.round(X_SCALE*sumX/numCells);
-		this.newOriginY = (int) Math.round(Y_SCALE*sumY/numCells);
-		this.newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
+		newOriginX = (int) Math.round(X_SCALE*sumX/numCells);
+		newOriginY = (int) Math.round(Y_SCALE*sumY/numCells);
+		newOriginZ = (int) Math.round(Z_SCALE*sumZ/numCells);
 
 		// Set new origin to average X Y positions
 		xform.setTranslate(newOriginX, newOriginY, newOriginZ);
@@ -1356,20 +1522,25 @@ public class Window3DController {
 			public void onChanged(
 					ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
-					for (Rule rule : change.getAddedSubList()) {
-						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable,
-									Boolean oldValue, Boolean newValue) {
-								if (newValue)
-									buildScene(time.get());
-							}
-						});
-						buildScene(time.get());
+					if (!(change.getAddedSize()>0)) {
+						buildScene();
+						
+						for (Rule rule : change.getAddedSubList()) {
+							rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+								@Override
+								public void changed(ObservableValue<? extends Boolean> observable,
+										Boolean oldValue, Boolean newValue) {
+									if (newValue) {
+										buildScene();
+									}
+								}
+							});
+						}
 					}
 					
-					if (!change.getRemoved().isEmpty())
-						buildScene(time.get());
+					if (!change.getRemoved().isEmpty()) {
+						buildScene();
+					}
 				}
 			}
 		});
@@ -1426,7 +1597,7 @@ public class Window3DController {
 
 	
 	public void setTime(int t) {
-		if (START_TIME<=t && t<=endTime) {
+		if (startTime<=t && t<=endTime) {
 			time.set(t);
 			hideContextPopups();
 		}
@@ -1555,12 +1726,10 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable,
-											Number oldValue, Number newValue) {
+					Number oldValue, Number newValue) {
 				othersOpacity.set(Math.round(newValue.doubleValue())/100d);
-
 				
-
-				buildScene(time.get());
+				buildScene();
 			}
 		};
 	}
@@ -1586,7 +1755,7 @@ public class Window3DController {
 										String oldValue, String newValue) {
 				if (newValue.isEmpty()) {
 					inSearch = false;
-					buildScene(time.get());
+					buildScene();
 				}
 				else
 					inSearch = true;
@@ -1607,7 +1776,7 @@ public class Window3DController {
 
 	
 	public int getStartTime() {
-		return START_TIME;
+		return startTime;
 	}
 	
 
@@ -1687,7 +1856,7 @@ public class Window3DController {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 									Boolean oldValue, Boolean newValue) {
 				uniformSize = newValue.booleanValue();
-				buildScene(time.get());
+				buildScene();
 			}
 		};
 	}
@@ -1702,8 +1871,8 @@ public class Window3DController {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
+							getSceneData();
 							refreshScene();
-							otherCells.clear();
 							addEntitiesToScene();
 						}
 					});
@@ -1761,7 +1930,7 @@ public class Window3DController {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellNucleusTicked = newValue;
-				buildScene(time.get());
+				buildScene();
 			}
 		};
 	}
@@ -1773,7 +1942,7 @@ public class Window3DController {
 			public void changed(ObservableValue<? extends Boolean> observable, 
 					Boolean oldValue, Boolean newValue) {
 				cellBodyTicked = newValue;
-				buildScene(time.get());
+				buildScene();
 			}
 		};
 	}
@@ -1841,8 +2010,6 @@ public class Window3DController {
 
     private final double CAMERA_NEAR_CLIP = 1,
 						CAMERA_FAR_CLIP = 2000;
-
-    private final int START_TIME = 1;
 
     private final int X_COR_INDEX = 0,
 					Y_COR_INDEX = 1,

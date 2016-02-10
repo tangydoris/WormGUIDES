@@ -5,16 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import wormguides.model.EmbryonicAnalogousCells;
-import wormguides.model.EmbryonicHomology;
 import wormguides.model.TableLineageData;
 
 // Loader class to read nuclei files

@@ -1,5 +1,7 @@
 package wormguides.model;
 import java.util.ArrayList;
+import java.util.Iterator;
+
 import javafx.scene.shape.MeshView;
 import wormguides.loaders.GeometryLoader;
 
@@ -40,16 +42,17 @@ public class SceneElement {
 		
 		// make sure there is proper capitalization in cell names
 		// specificially "Ab" instead of "AB"
-		ArrayList<String> namesToRemove = new ArrayList<String>();
-		for (String name : cellNames) {
-			if (name.startsWith("Ab"))
-				namesToRemove.add(name);
+		ArrayList<String> editedNames = new ArrayList<String>();
+		Iterator<String> iter = cellNames.iterator();
+		String name;
+		while (iter.hasNext()) {
+			name = iter.next();
+			if (name.startsWith("Ab")) {
+				iter.remove();
+				editedNames.add("AB"+name.substring(2));
+			}
 		}
-		for (String name : namesToRemove) {
-			cellNames.remove(name);
-			name = "AB"+name.substring(2);
-			cellNames.add(name);
-		}
+		cellNames.addAll(editedNames);
 	}
 	
 	

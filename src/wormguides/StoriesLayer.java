@@ -65,6 +65,8 @@ public class StoriesLayer {
 
 	private ObservableList<Story> stories;
 	
+	private int timeOffset;
+	
 	private double width;
 	private Stage editStage;
 	
@@ -90,7 +92,8 @@ public class StoriesLayer {
 	private Window3DController window3DController;
 	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
-			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag) {
+			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag,
+			int movieTimeOffset) {
 		
 		parentStage = parent;
 		
@@ -100,8 +103,10 @@ public class StoriesLayer {
 		
 		sceneElementsList = elementsList;
 		
+		timeOffset = movieTimeOffset;
+		
 		stories = FXCollections.observableArrayList(
-				story -> new Observable[]{story.getChangedProperty()});
+				story -> new Observable[]{story.getChangedProperty(), story.getActiveProperty()});
 		stories.addListener(new ListChangeListener<Story>() {
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Story> c) {
@@ -123,7 +128,7 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = window3DController.getCellClicked();
 		
-		StoriesLoader.loadConfigFile(STORY_CONFIG_FILE_NAME, stories, FRAME_OFFSET);
+		StoriesLoader.loadConfigFile(STORY_CONFIG_FILE_NAME, stories, timeOffset);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -156,7 +161,7 @@ public class StoriesLayer {
 		File file = chooser.showOpenDialog(parentStage);
 		if (file!=null) {
 			 try {
-				 StoryFileUtil.loadFromCSVFile(stories, file, FRAME_OFFSET);
+				 StoryFileUtil.loadFromCSVFile(stories, file, timeOffset);
 			 } catch (IOException e) {
 				 System.out.println("error occurred while saving story");
 				 return;
@@ -179,7 +184,7 @@ public class StoriesLayer {
 		 if (file!=null) {
 			 try {
 				 if (activeStory!=null)
-					 StoryFileUtil.saveToCSVFile(activeStory, file, FRAME_OFFSET);
+					 StoryFileUtil.saveToCSVFile(activeStory, file, timeOffset);
 				 else
 					 System.out.println("no active story to save");
 				 // TODO make error pop up
@@ -267,13 +272,17 @@ public class StoriesLayer {
 			useInternalRules.set(true);
 			URLLoader.process("", window3DController);
 		}
-		timeProperty.set(startTime);
 		
 		if (editController!=null)
 			editController.setActiveStory(activeStory);
 		
-		rebuildSceneFlag.set(true);
-		rebuildSceneFlag.set(false);
+		if (timeProperty.get()!=startTime)
+			timeProperty.set(startTime);
+		
+		else {
+			rebuildSceneFlag.set(true);
+			rebuildSceneFlag.set(false);
+		}
 	}
 	
 	
@@ -290,6 +299,7 @@ public class StoriesLayer {
 			int startTime = getEffectiveStartTime(activeNote);
 			if (startTime<1)
 				startTime=1;
+			
 			timeProperty.set(startTime);
 		}
 		
@@ -487,7 +497,7 @@ public class StoriesLayer {
 			@Override
 			public void handle(ActionEvent event) {
 				if (editStage==null) {
-					editController = new StoryEditorController(FRAME_OFFSET, cellData, 
+					editController = new StoryEditorController(timeOffset, cellData, 
 							sceneElementsList.getAllMulticellSceneNames(),
 							activeCellProperty, cellClickedProperty, timeProperty);
 					
@@ -659,6 +669,7 @@ public class StoriesLayer {
 				@Override
 				public void handle(MouseEvent event) {
 					story.setActive(!story.isActive());
+					
 					if (story.isActive())
 						setActiveStory(story);
 					else
@@ -825,6 +836,4 @@ public class StoriesLayer {
 	}
 
 	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
-	
-	private final int FRAME_OFFSET = 19;
 }
