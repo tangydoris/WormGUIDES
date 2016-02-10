@@ -181,14 +181,8 @@ public class Window3DController {
 	// Label stuff
 	private ArrayList<String> allLabels;
 	private ArrayList<String> currentLabels;
-	private HashMap<Text, Node> labelEntityMap;
+	private HashMap<Node, Text> entityLabelMap;
 	private Text transientLabel; // shows up on hover
-	/*
-	private EventHandler<MouseEvent> meshMouseEnterHandler;
-	private EventHandler<MouseEvent> meshMouseExitHandler;
-	private EventHandler<MouseEvent> sphereMouseEnterHandler;
-	private EventHandler<MouseEvent> sphereMouseExitHandler;
-	*/
 	
 	private BooleanProperty bringUpInfoProperty;
 	
@@ -321,7 +315,7 @@ public class Window3DController {
 		
 		allLabels = new ArrayList<String>();
 		currentLabels = new ArrayList<String>();
-		labelEntityMap = new HashMap<Text, Node>();
+		entityLabelMap = new HashMap<Node, Text>();
 		
 		EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 			@Override
@@ -524,13 +518,22 @@ public class Window3DController {
 			else if (event.getButton()==MouseButton.PRIMARY) {
 				if (allLabels.contains(name)) {
 					allLabels.remove(name);
+					currentLabels.remove(name);
+					removeLabelFor(name);
 				}
 				else {
 					allLabels.add(name);
-					// TODO
+					currentLabels.add(name);
+					
+					Text text;
+					String funcName = PartsList.getFunctionalNameByLineageName(name);
+					if (funcName!=null)
+						text= makeNoteSpriteText(funcName);
+					else
+						text = makeNoteSpriteText(name);
+					
+					mapLabelSpriteToEntity(name, text);
 				}
-				
-				buildScene();
 			}
 
 		}
@@ -550,12 +553,24 @@ public class Window3DController {
 						showContextMenu(name, event.getScreenX(), event.getScreenY());
 					
 					else if (event.getButton()==MouseButton.PRIMARY) {
-						if (allLabels.contains(name))
+						if (allLabels.contains(name)) {
 							allLabels.remove(name);
-						else
+							currentLabels.remove(name);
+							removeLabelFor(name);
+						}
+						else {
 							allLabels.add(name);
-						
-						buildScene();
+							currentLabels.add(name);
+							
+							Text text;
+							String funcName = PartsList.getFunctionalNameByLineageName(name);
+							if (funcName!=null)
+								text= makeNoteSpriteText(funcName);
+							else
+								text = makeNoteSpriteText(name);
+							
+							mapLabelSpriteToEntity(name, text);
+						}
 					}
 					
 					break;
@@ -671,8 +686,8 @@ public class Window3DController {
 			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
 		}
 		
-		for (Text text : labelEntityMap.keySet()) {
-			alignTextWithEntity(text, labelEntityMap.get(text), true);
+		for (Node entity : entityLabelMap.keySet()) {
+			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
 		}
 	}
 	
@@ -785,7 +800,7 @@ public class Window3DController {
 		
 		
 		// Label stuff
-		labelEntityMap.clear();
+		entityLabelMap.clear();
 		currentLabels.clear();
 		
 		for (String label : allLabels) {
@@ -922,7 +937,6 @@ public class Window3DController {
  			addNoteGeometries(notes);
  		
  		// add labels
- 		// TODO
  		for (String name : currentLabels) {
  			String funcName = PartsList.getFunctionalNameByLineageName(name);
  			Text text;
@@ -931,8 +945,8 @@ public class Window3DController {
  			else
  				text = makeNoteSpriteText(name);
  			
- 			if (text!=null && spritesPane!=null && mapLabelSpriteToEntity(name, text))
-				spritesPane.getChildren().add(text);
+ 			if (text!=null && spritesPane!=null)
+ 				mapLabelSpriteToEntity(name, text);
 		}
  		
  		if (!notes.isEmpty())
@@ -946,8 +960,6 @@ public class Window3DController {
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
 		// add scene elements from note resources
 		for (Note note : currentNoteMeshMap.keySet()) {
-			//MeshView mesh = currentNoteMeshMap.get(note);
-			//mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
 			list.add(currentNoteMeshMap.get(note));
 		}
 		
@@ -1108,28 +1120,76 @@ public class Window3DController {
 	}
 	
 	
+	private void removeLabelFor(String name) {
+		Node entity = null;
+		// sphere label
+		for (int i=0; i<cellNames.length && entity==null; i++) {
+			if (spheres[i]!=null) {				
+				if (cellNames[i].equalsIgnoreCase(name)) {
+					entity = spheres[i];
+				}
+			}
+		}
+		
+		// mesh view label
+		for (int i=0; i<currentSceneElements.size() && entity==null; i++) {
+			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+					&& currentSceneElementMeshes.get(i)!=null) {
+				entity = currentSceneElementMeshes.get(i);
+			}
+		}
+		
+		if (entity!=null) {
+			removeLabelFrom(entity);
+		}
+	}
+	
+	
+	private void removeLabelFrom(Node entity) {
+		if (entity!=null) {
+			if (spritesPane!=null) {
+				Text text = entityLabelMap.get(entity);
+				spritesPane.getChildren().remove(text);
+			}
+			entityLabelMap.remove(entity);
+		}
+	}
+	
+	
+	private void insertLabelFor(String name, Node entity) {		
+		String funcName = PartsList.getFunctionalNameByLineageName(name);
+		Text text;
+		if (funcName!=null)
+			text = makeNoteSpriteText(funcName);
+		else
+			text = makeNoteSpriteText(name);
+		
+		text.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				allLabels.remove(name);
+				currentLabels.remove(name);
+				
+				if (spritesPane!=null)
+					spritesPane.getChildren().remove(text);
+			}
+		});
+		
+		entityLabelMap.put(entity, text);
+		
+		if (spritesPane!=null) {
+			spritesPane.getChildren().add(text);
+			alignTextWithEntity(text, entity, true);
+		}
+	}
+	
+	
 	private boolean mapLabelSpriteToEntity(String name, Text text) {
 		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
-			if (spheres[i]!=null) {
-				String cell = cellNames[i];
-				Sphere sphere = spheres[i];
-				
-				if (cell.equalsIgnoreCase(name)) {
-					labelEntityMap.put(text, sphere);
-					
-					// make labels clickable - removed from scene on click
-					// TODO
-					text.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent event) {
-							allLabels.remove(name);
-							currentLabels.remove(name);
-							if (spritesPane!=null) {
-								spritesPane.getChildren().remove(text);
-							}
-						}
-					});
+			if (spheres[i]!=null) {				
+				if (cellNames[i].equalsIgnoreCase(name)) {
+					insertLabelFor(name, spheres[i]);
 					return true;
 				}
 			}
@@ -1140,7 +1200,7 @@ public class Window3DController {
 		for (int i=0; i<currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i)!=null) {
-				labelEntityMap.put(text, currentSceneElementMeshes.get(i));
+				insertLabelFor(name, currentSceneElementMeshes.get(i));
 				return true;
 			}
 		}
@@ -1617,47 +1677,19 @@ public class Window3DController {
 		rotateZ.setAngle(rz);
 	}
 	
-
-	// TODO fix all rotations in url parsing/loading
+	
 	public double getRotationX() {
-		/*
-		if (spheres[0]!=null) {
-			Transform transform = spheres[0].getLocalToSceneTransform();
-			double roll = Math.atan2(-transform.getMyx(), transform.getMxx());
-			return roll;  
-		}
-		else
-			return 0;
-		*/
+
 		return rotateX.getAngle();
 	}
 
 	
 	public double getRotationY() {
-		/*
-		if (spheres[0]!=null) {
-			Transform transform = spheres[0].getLocalToSceneTransform();
-			double pitch = Math.atan2(-transform.getMzy(), transform.getMzz());
-			return pitch;
-		}
-		else
-			return 0;
-		*/
 		return rotateY.getAngle();
 	}
 	
 	
 	public double getRotationZ() {
-		/*
-		if (spheres[0]!=null) {
-			Transform transform = spheres[0].getLocalToSceneTransform();
-			double yaw = Math.atan2(transform.getMzx(), Math.sqrt((transform.getMzy()*transform.getMzy()
-														+(transform.getMzz()*transform.getMzz()))));
-			return yaw;
-		}
-		else
-			return 0;
-		*/
 		return rotateZ.getAngle();
 	}
 
