@@ -259,25 +259,15 @@ public class InfoWindowDOM {
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
 			String anchor = link; //replaced with anchor if valid link
-		
-			/*
-			 * TODO
-			 * 
-			 * anchor --> <a href="www...." onclick="JAVASCRIPTLINKHANDLER(THIS)">blah</a>
-			 * 
-			 * function JAVASCRIPTLINKHANDLER(ELEMENT) {
-			 * 		app.openLink(URL);
-			 * }
-			 */
+
 			
 			//begin after www.
 			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
 				//check if textpresso link i.e. '-' before www
 				if (link.charAt(startIDX-1) == '-') {
-					String callbackMethod = "app.textpresso()";
-					anchor =  "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-							terminalCase.getCellName() + " on Textpresso</a>";
+					anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+							" on Textpresso</a>";
 				} else {
 
 					//move past www.
@@ -294,22 +284,16 @@ public class InfoWindowDOM {
 						if (placeholder.equals("google")) {
 							//check if wormatlas specific search
 							if (link.contains("site:wormatlas.org")) {
-								String callbackMethod = "app.googleWormatlas()";
-								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-										terminalCase.getCellName() + " on Google (searching Wormatlas)" +
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + " on Google (searching Wormatlas)" +
 										"</a>";
 							} else {
-								String callbackMethod = "app.google()";
-								anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-										terminalCase.getCellName() + " on Google" +
-										"</a>";
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+										" on Google</a>";
 							}
 						} else {
 							//make anchor tag
-							String callbackMethod = "app." + placeholder + "()";
-							anchor = "<a href=\"#\" onclick=\"" + callbackMethod + "\">" +
-									terminalCase.getCellName() + " on " + placeholder +
-									"</a>";
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+									" on " + placeholder + "</a>";
 							
 							//add wormbase link to end of gene expression section
 							if (placeholder.equals("wormbase")) {
@@ -320,9 +304,8 @@ public class InfoWindowDOM {
 					}
 				}	
 			} else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
-				anchor = "<a href=\"#\" onclick=\"app.wormwiring()\">" +
-						terminalCase.getCellName() + " on Wormwiring" +
-						"</a>";
+				anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
+						" on Wormwiring</a>";
 			}
 			
 			//make sure anchor has been built 
@@ -331,7 +314,6 @@ public class InfoWindowDOM {
 				linksUL.addChild(li);
 			}
 		}
-		linksUL.addChild(new HTMLNode("li", "", "", "<a href=\"#\" onclick=\"jsCallToJava()\">testing</a>"));
 		/*
 		 * TODO
 		 * cytoshow stub
@@ -448,10 +430,8 @@ public class InfoWindowDOM {
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 		
-		// testing JS callback
-		//body.addChild(collapseFunctionButton.jsCallBackScript());
-		//body.addChild(collapseFunctionButton.addJsCurrentLinkScript());
-		body.addChild(wiringPartnersDiv.addWiringPartnersClickScript());
+		// link controller script
+		body.addChild(body.addLinkHandlerScript());
 		
 		//add head and body to html
 		html.addChild(head);
@@ -657,7 +637,7 @@ public class InfoWindowDOM {
 	public void buildStyleNode() {
 		if (html == null) return;
 		
-		//start with rule for unorder list --> no bullets
+		//default style rules
 		String style = newLine + "ul {"
 				+ newLine + "list-style-type: none;"
 				+ newLine + "display: block;"

@@ -16,6 +16,7 @@ public class InfoWindow {
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	Scene scene;
+	InfoWindowLinkController linkController;
 	
 	
 	/*
@@ -40,6 +41,8 @@ public class InfoWindow {
 		infoWindowStage.setWidth(700);
 		
 		infoWindowStage.setResizable(true);
+		
+		linkController = new InfoWindowLinkController();
 	}
 	
 	public void showWindow() {
@@ -56,7 +59,7 @@ public class InfoWindow {
 		
 		//link controller
 		JSObject window = (JSObject) webview.getEngine().executeScript("window");
-		window.setMember("app", new InfoWindowLinkController(links));
+		window.setMember("app", linkController);
 		
 		//link handler
 		

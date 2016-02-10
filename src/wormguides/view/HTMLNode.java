@@ -304,39 +304,14 @@ public class HTMLNode {
 		return new HTMLNode("script", script, true);
 	}
 	
-	public HTMLNode addWiringPartnersClickScript() {
-		//onclick="app.handleWiringPartnerClick("AVAR")">AVAR</a>
-		String script = "function handleWiringPartnerClick(element) {"
-				+ newLine + "app.handleWiringPartnerClick(element.innerHTML);"
-				+ newLine + "}";
-		
-		return new HTMLNode("script", script, true);
-		
-	}
+
 	
-	/*
-	 * TODO
-	 * 
-	 */
-	public HTMLNode addJsCurrentLinkScript() {
-		String script = "var currentLink = \"placeholder\";"
-						+ newLine + "function setCurrentLink(element) {"
-						+ newLine + "app.callFromJavaScript(\"hello\");"
-						+ newLine + "}"
-						+ newLine + "var allLinks = document.getElementsByTagName(\"A\");"
-						+ newLine + "var i = 0;"
-						+ newLine + "app.callFromJavascript(i);"
-						+ newLine + newLine + "for (; i < allLinks.length; i++) {"
-						+ newLine + "allLinks[i].addEventListener(\"click\", setCurrentLink, false);"
-						+ newLine + "}"
-						;
+	public HTMLNode addLinkHandlerScript() {
+		String script = "function handleLink(element) {"
+				+ newLine + "app.handleLink(element.name);"
+				+ newLine + "}";	
+		return new HTMLNode("script", script, true);
 		
-		return new HTMLNode("script", script, true);
-	}
-	
-	public HTMLNode jsCallBackScript() {
-		String script = "function jsCallToJava() { app.callFromJavascript(\"testing\"); }";
-		return new HTMLNode("script", script, true);
 	}
 
 	public String getTag() {
