@@ -66,6 +66,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import wormguides.ColorComparator;
 import wormguides.MainApp;
+import wormguides.Search;
+import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
@@ -541,7 +544,7 @@ public class Window3DController {
 			cellClicked.set(true);
 			
 			if (event.getButton()==MouseButton.SECONDARY)
-				showContextMenu(name, event.getScreenX(), event.getScreenY());
+				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL);
 			else if (event.getButton()==MouseButton.PRIMARY) {
 				if (allLabels.contains(name)) {
 					allLabels.remove(name);
@@ -572,8 +575,12 @@ public class Window3DController {
 					else selectedName.set(name);
 					found = true;
 					
-					if (event.getButton()==MouseButton.SECONDARY)
-						showContextMenu(name, event.getScreenX(), event.getScreenY());
+					if (event.getButton()==MouseButton.SECONDARY) {
+						if (sceneElementsList.isMulticellStructureName(name))
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR);
+						else
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
+					}
 					
 					else if (event.getButton()==MouseButton.PRIMARY) {
 						if (allLabels.contains(name)) {
@@ -623,9 +630,9 @@ public class Window3DController {
 	}
 	
 	
-	private void showContextMenu(String name, double sceneX, double sceneY) {
+	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
 		if (contextMenuStage==null) {
-			contextMenuController = new ContextMenuController(bringUpInfoProperty);
+			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty);
 			
 			contextMenuStage = new Stage();
 			contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -648,15 +655,6 @@ public class Window3DController {
 	            					"-fx-faint-focus-color: transparent;");
 	            }
 				
-				contextMenuController.setSearchButtonListener(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						if (searchField!=null)
-							searchField.setText(contextMenuController.getName());
-						contextMenuStage.hide();
-					}
-				});
-				
 			} catch (IOException e) {
 				System.out.println("error in initializing context menu for "+name+".");
 				e.printStackTrace();
@@ -664,8 +662,24 @@ public class Window3DController {
 		}
 		
 		contextMenuController.setName(name);
+		contextMenuController.setSearchOption(option);
+		
+		contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Rule rule = Search.addColorRule(SearchType.SYSTEMATIC, name, 
+						Color.WHITE, option);
+				rule.showEditStage(parentStage);
+				
+				contextMenuStage.hide();
+				
+				// TODO bring rule edit to front
+			}
+		});
+		
 		contextMenuStage.setX(sceneX);
 		contextMenuStage.setY(sceneY);
+		
 		contextMenuStage.show();
 	}
 
@@ -1633,7 +1647,6 @@ public class Window3DController {
 			AnchorPane.setRightAnchor(overlayVBox, 5.0);
 			
 			spritesPane.getChildren().add(overlayVBox);
-			System.out.println(overlayVBox.getBoundsInParent().toString());
 		}
 	}
 	

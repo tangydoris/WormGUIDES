@@ -253,25 +253,26 @@ public class Search {
 	}
 	
 	
-	public static void addColorRule(SearchType type, String searched, Color color, 
+	public static Rule addColorRule(SearchType type, String searched, Color color, 
 			SearchOption...options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 		for (SearchOption option : options)
 			optionsArray.add(option);
-		addColorRule(type, searched, color, optionsArray);
+		return addColorRule(type, searched, color, optionsArray);
 	}
 	
 	
-	public static void addColorRule(SearchType type, String searched, Color color, 
+	public static Rule addColorRule(SearchType type, String searched, Color color, 
 			ArrayList<SearchOption> options) {
 		SearchType tempType = Search.type;
 		Search.type = type;
-		addColorRule(searched, color, options);
+		Rule rule = addColorRule(searched, color, options);
 		Search.type = tempType;
+		return rule;
 	}
 	
 	
-	private static void addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
+	private static Rule addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
 		// default search options is cell and descendant
 		if (options==null)
 			options = new ArrayList<SearchOption>();
@@ -329,6 +330,8 @@ public class Search {
 		
 		rulesList.add(rule);
 		searchResultsList.clear();
+		
+		return rule;
 	}
 	
 	

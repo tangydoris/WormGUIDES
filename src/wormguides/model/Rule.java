@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -71,7 +72,8 @@ public abstract class Rule {
 	private RuleEditorController editController;
 	private SubmitHandler handler;
 	
-	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean structureRule) {
+	public Rule(String searched, Color color, ArrayList<SearchOption> options, 
+			boolean structureRule) {
 		setSearchedText(searched);
 		setColor(color);
 		
@@ -98,8 +100,11 @@ public abstract class Rule {
 		label.setMinHeight(UI_SIDE_LENGTH);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		label.setFont(AppFont.getFont());
-		HBox.setHgrow(label, Priority.ALWAYS);
+		//HBox.setHgrow(label, Priority.ALWAYS);
 		resetLabel();
+		
+		Region r = new Region();
+		HBox.setHgrow(r, Priority.ALWAYS);
 		
 		colorRectangle.setHeight(UI_SIDE_LENGTH);
 		colorRectangle.setWidth(UI_SIDE_LENGTH);
@@ -116,49 +121,7 @@ public abstract class Rule {
 		editBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (editStage==null) {
-					editController = new RuleEditorController();
-					
-					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/layouts/RuleEditorLayout.fxml"));
-					
-					loader.setController(editController);
-					loader.setRoot(editController);
-					
-					try {
-						editStage = new Stage();
-						editStage.setScene(new Scene((AnchorPane) loader.load()));
-						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
-			            	node.setStyle("-fx-focus-color: -fx-outer-border; "
-			            					+"-fx-faint-focus-color: transparent;");
-			            }
-						
-						editStage.setTitle("Edit Rule");
-						editStage.initModality(Modality.NONE);
-						editStage.setResizable(false);
-						
-						editController.setHeading(text);
-						editController.setSubmitHandler(handler);
-						editController.setColor(color);
-						editController.setCellTicked(isCellSelected());
-						editController.setCellBodyTicked(isCellBodySelected());
-						editController.setAncestorsTicked(isAncestorSelected());
-						editController.setDescendantsTicked(isDescendantSelected());
-						
-						if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
-							editController.disableDescendantOption();
-						else if (isStructureRule)
-							editController.disableOptionsForStructureRule();
-						
-					} catch (IOException e) {
-						System.out.println("error in instantiating rule editor - input/output exception");
-						e.printStackTrace();
-					} catch (NullPointerException npe) {
-						System.out.println("error in instantiating rule editor - null pointer exception");
-						npe.printStackTrace();
-					}
-				}
-				editStage.show();
+				showEditStage(null);
 			}
 		});
 		
@@ -199,8 +162,7 @@ public abstract class Rule {
 		toolTip.setFont(AppFont.getFont());
 		label.setTooltip(toolTip);
 		
-		//HBox.setHgrow(region, Priority.ALWAYS);
-		hbox.getChildren().addAll(label, colorRectangle, editBtn, 
+		hbox.getChildren().addAll(label, r, colorRectangle, editBtn, 
 									visibleBtn, deleteBtn);
 		
 		ruleChanged = new SimpleBooleanProperty(false);
@@ -215,6 +177,61 @@ public abstract class Rule {
 		});
 		
 		visible = true;
+	}
+	
+	
+	public void showEditStage(Stage stage) {
+		if (editStage==null)
+			initEditStage(stage);
+		
+		editStage.show();
+	}
+	
+	
+	private void initEditStage(Stage stage) {
+		editController = new RuleEditorController();
+		
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(MainApp.class.getResource("view/layouts/RuleEditorLayout.fxml"));
+		
+		loader.setController(editController);
+		loader.setRoot(editController);
+		
+		try {
+			editStage = new Stage();
+			editStage.setScene(new Scene((AnchorPane) loader.load()));
+			for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
+            	node.setStyle("-fx-focus-color: -fx-outer-border; "
+            					+"-fx-faint-focus-color: transparent;");
+            }
+			
+			editStage.setTitle("Edit Rule");
+			if (stage!=null)
+				editStage.initOwner(stage);
+			editStage.initModality(Modality.NONE);
+			
+			editStage.setResizable(false);
+			
+			editController.setHeading(text);
+			editController.setSubmitHandler(handler);
+			editController.setColor(color);
+			editController.setCellTicked(isCellSelected());
+			editController.setCellBodyTicked(isCellBodySelected());
+			editController.setAncestorsTicked(isAncestorSelected());
+			editController.setDescendantsTicked(isDescendantSelected());
+			
+			if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
+				editController.disableDescendantOption();
+			else if (isStructureRule)
+				editController.disableOptionsForStructureRule();
+			
+		} catch (IOException e) {
+			System.out.println("error in instantiating rule editor - input/output exception");
+			e.printStackTrace();
+		} catch (NullPointerException npe) {
+			System.out.println("error in instantiating rule editor - null pointer exception");
+			npe.printStackTrace();
+		}
 	}
 	
 	

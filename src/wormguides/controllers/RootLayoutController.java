@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -117,6 +118,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Tab colorAndDisplayTab;
 	@FXML private TabPane colorAndDisplayTabPane;
 	@FXML private Tab cellsTab;
+	@FXML private Tab displayTab;
+	@FXML private Tab storiesTab;
 	
 	// Cells tab
 	private Search search;
@@ -739,6 +742,18 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		rulesListView.setItems(displayLayer.getRulesList());
 		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
+		
+		displayLayer.getRulesList().addListener(new ListChangeListener<Rule>() {
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends Rule> c) {
+				while (c.next()) {
+					if (c.wasAdded()) {
+						mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+						colorAndDisplayTabPane.getSelectionModel().select(displayTab);
+					}
+				}
+			}
+		});
 	}
 	
 	
@@ -809,6 +824,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		assert (colorAndDisplayTab != null);
 		assert (colorAndDisplayTabPane != null);
 		assert (cellsTab != null);
+		assert (displayTab != null);
+		assert (storiesTab != null);
 		
 		assert (searchField != null);
 		assert (searchResultsListView != null);
@@ -943,6 +960,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		initDisplayLayer();
 		
 		initializeWithLineageData(data);
+		
+		mainTabPane.getSelectionModel().select(storiesTab);
 	}
 	
 	
