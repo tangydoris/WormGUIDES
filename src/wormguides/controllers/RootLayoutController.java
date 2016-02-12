@@ -956,6 +956,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
+		Search.setLineageData(data);
 		
 		ObservableList<Rule> list = displayLayer.getRulesList();
 		search.setRulesList(list);

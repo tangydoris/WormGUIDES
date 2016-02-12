@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import wormguides.Search;
+import wormguides.model.PartsList;
 
 /*
  * Callback class for our HTML page for a terminal cell case to open link in default browser
@@ -39,6 +40,11 @@ public class InfoWindowLinkController {
 	}
 	
 	public void viewInCellTheater(String cellName) {
-		System.out.println(cellName);
+		if (PartsList.getLineageNameByFunctionalName(cellName) != null) {
+			System.out.println(Search.getFirstOccurenceOf(PartsList.getLineageNameByFunctionalName(cellName)));
+		} else {
+			System.out.println(Search.getFirstOccurenceOf(cellName));
+		}
+		
 	}
 }
