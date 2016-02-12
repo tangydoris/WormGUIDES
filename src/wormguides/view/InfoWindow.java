@@ -2,6 +2,8 @@ package wormguides.view;
 
 
 import java.util.ArrayList;
+
+import javafx.beans.property.IntegerProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -19,7 +21,8 @@ public class InfoWindow {
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	Scene scene;
-	Window3DController window3D; //update scenes on links
+	Stage window3DStage; //update scenes on links
+	IntegerProperty time;
 	InfoWindowLinkController linkController;
 	
 	
@@ -29,7 +32,7 @@ public class InfoWindow {
 	 * if tab is closed --> remove case from cell cases i.e. internal memory
 	 */
 	
-	public InfoWindow(Window3DController window3D) {
+	public InfoWindow(Stage window3DStage, IntegerProperty time) {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Info Window");
 		
@@ -47,8 +50,9 @@ public class InfoWindow {
 		
 		infoWindowStage.setResizable(true);
 		
-		this.window3D = window3D;
-		linkController = new InfoWindowLinkController(this.window3D);
+		this.window3DStage = window3DStage;
+		this.time = time;
+		linkController = new InfoWindowLinkController(this.window3DStage, this.time);
 		
 	}
 	

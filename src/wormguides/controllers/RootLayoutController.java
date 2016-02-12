@@ -936,7 +936,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initInfoWindow() {
 		if (window3DController!=null) {
-			infoWindow = new InfoWindow(window3DController);
+			infoWindow = new InfoWindow(window3DController.getStage(), window3DController.getTimeProperty());
 		}
 	}
 	

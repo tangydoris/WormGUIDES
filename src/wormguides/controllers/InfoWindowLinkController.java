@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.stage.Stage;
 import wormguides.Search;
 import wormguides.model.PartsList;
 
@@ -20,10 +22,12 @@ import wormguides.model.PartsList;
  * remove links --> pass link as string to openLink
  */
 public class InfoWindowLinkController {
-	Window3DController window3DController;
+	Stage window3DStage; //update scenes on links
+	IntegerProperty time;
 	
-	public InfoWindowLinkController(Window3DController window3DController) {
-		this.window3DController = window3DController;
+	public InfoWindowLinkController(Stage window3DStage, IntegerProperty time) {
+		this.window3DStage = window3DStage;
+		this.time = time;
 	}
 	
 	public void handleLink(String url) throws IOException, URISyntaxException {
@@ -57,17 +61,15 @@ public class InfoWindowLinkController {
 			endTime = Search.getLastOccurenceOf(cellName);
 		}
 		
-		if(window3DController.getTime() >= startTime && window3DController.getTime() <= endTime) {
+		if(time.get() >= startTime && time.get() <= endTime) {
 			//highlight the clicked cell
-			System.out.println(startTime + " - " + endTime);
-			window3DController.insertLabelFor(cellName);
+			//window3DController.insertLabelFor(cellName);
 		} else {
-			System.out.println(startTime + " - " + endTime);
-			window3DController.setTime(startTime);
-			window3DController.insertLabelFor(cellName);
+			time.set(startTime);
+			//window3DController.insertLabelFor(cellName);
 			//highlight clicked cell
 		}
 		
-		window3DController.getStage().requestFocus();
+		window3DStage.requestFocus();
 	}
 }
