@@ -66,6 +66,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import wormguides.ColorComparator;
 import wormguides.MainApp;
+import wormguides.Search;
+import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.ColorHash;
@@ -182,18 +185,22 @@ public class Window3DController {
 	private ArrayList<String> allLabels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Node, Text> entityLabelMap;
-	private Text transientLabel; // shows up on hover
+	private Text transientLabelText; // shows up on hover
+	
+	private EventHandler<MouseEvent> clickableMouseEnteredHandler;
+	private EventHandler<MouseEvent> clickableMouseExitedHandler;
 	
 	private BooleanProperty bringUpInfoProperty;
 	
 	private SubsceneSizeListener subsceneSizeListener;
 
 	
-	public Window3DController(Stage parent, Pane parentPane, LineageData data, int movieStartTime) {
+	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
+			int movieStartTime) {
 		parentStage = parent;
 		
 		root = new Group();
-		this.cellData = data;
+		this.cellData = data;		
 		
 		startTime = movieStartTime;
 
@@ -330,6 +337,19 @@ public class Window3DController {
 		subscene.setOnMouseReleased(handler);
 		
 		setNotesPane(parentPane);
+		
+		clickableMouseEnteredHandler = new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				spritesPane.setCursor(Cursor.HAND);
+			}
+		};
+		clickableMouseExitedHandler = new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				spritesPane.setCursor(Cursor.DEFAULT);
+			}
+		};
 	}
 	
 	
@@ -340,11 +360,24 @@ public class Window3DController {
 	 */
 	private void showTransientLabel(String name, Node entity) {
 		Bounds b = entity.getBoundsInParent();
-		//System.out.println("transient - "+b.toString());
 		
 		if (b!=null) {
-			transientLabel = makeNoteSpriteText(name);
-			transientLabel.setFill(Color.web("#F0F0F0"));
+			transientLabelText = makeNoteSpriteText(name);
+			
+			transientLabelText.setWrappingWidth(-1);
+			transientLabelText.setFill(Color.web("#F0F0F0"));
+			transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					event.consume();
+				}
+			});
+			transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					event.consume();
+				}
+			});
 			
 			Point2D p = CameraHelper.project(camera, 
 					new Point3D((b.getMinX()+b.getMaxX())/2, 
@@ -359,12 +392,10 @@ public class Window3DController {
 			x += hOffset;
 			y -= vOffset+5;
 			
-			if (spritesPane!=null) {
-				transientLabel.setText(name);
-				transientLabel.getTransforms().add(new Translate(x, y));
-				
-				spritesPane.getChildren().add(transientLabel);
-			}
+			transientLabelText.setText(name);
+			transientLabelText.getTransforms().add(new Translate(x, y));
+			
+			spritesPane.getChildren().add(transientLabelText);
 		}
 	}
 	
@@ -373,8 +404,7 @@ public class Window3DController {
 	 * Remove transient label from sprites pane
 	 */
 	private void removeTransientLabel() {
-		if (spritesPane!=null)
-			spritesPane.getChildren().remove(transientLabel);
+		spritesPane.getChildren().remove(transientLabelText);
 	}
 	
 	
@@ -455,8 +485,7 @@ public class Window3DController {
 	private void handleMouseDragged(MouseEvent event) {
 		hideContextPopups();
 		
-		if (spritesPane!=null)
-			spritesPane.setCursor(Cursor.CLOSED_HAND);
+		spritesPane.setCursor(Cursor.CLOSED_HAND);
 
 		mouseOldX = mousePosX;
         mouseOldY = mousePosY;
@@ -495,12 +524,13 @@ public class Window3DController {
 	
 	
 	private void handleMouseReleasedOrEntered() {
-		if (spritesPane!=null)
-			spritesPane.setCursor(Cursor.HAND);
+		spritesPane.setCursor(Cursor.DEFAULT);
 	}
 	
 	
 	private void handleMouseClicked(MouseEvent event) {
+		spritesPane.setCursor(Cursor.HAND);
+		
 		hideContextPopups();
 		
 		Node node = event.getPickResult().getIntersectedNode();
@@ -514,25 +544,19 @@ public class Window3DController {
 			cellClicked.set(true);
 			
 			if (event.getButton()==MouseButton.SECONDARY)
-				showContextMenu(name, event.getScreenX(), event.getScreenY());
+				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL);
 			else if (event.getButton()==MouseButton.PRIMARY) {
 				if (allLabels.contains(name)) {
 					allLabels.remove(name);
 					currentLabels.remove(name);
+					
 					removeLabelFor(name);
 				}
 				else {
 					allLabels.add(name);
 					currentLabels.add(name);
 					
-					Text text;
-					String funcName = PartsList.getFunctionalNameByLineageName(name);
-					if (funcName!=null)
-						text= makeNoteSpriteText(funcName);
-					else
-						text = makeNoteSpriteText(name);
-					
-					mapLabelSpriteToEntity(name, text);
+					insertLabelFor(name, node);
 				}
 			}
 
@@ -546,30 +570,30 @@ public class Window3DController {
 				if (curr.equals(node)) {
 					SceneElement clickedSceneElement = currentSceneElements.get(i);
 					String name = normalizeName(clickedSceneElement.getSceneName());
-					selectedName.set(name);
+					if (name.startsWith("Ab"))
+						selectedName.set(name.replace("Ab", "AB"));
+					else selectedName.set(name);
 					found = true;
 					
-					if (event.getButton()==MouseButton.SECONDARY)
-						showContextMenu(name, event.getScreenX(), event.getScreenY());
+					if (event.getButton()==MouseButton.SECONDARY) {
+						if (sceneElementsList.isMulticellStructureName(name))
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR);
+						else
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
+					}
 					
 					else if (event.getButton()==MouseButton.PRIMARY) {
 						if (allLabels.contains(name)) {
 							allLabels.remove(name);
 							currentLabels.remove(name);
+							
 							removeLabelFor(name);
 						}
 						else {
 							allLabels.add(name);
 							currentLabels.add(name);
 							
-							Text text;
-							String funcName = PartsList.getFunctionalNameByLineageName(name);
-							if (funcName!=null)
-								text= makeNoteSpriteText(funcName);
-							else
-								text = makeNoteSpriteText(name);
-							
-							mapLabelSpriteToEntity(name, text);
+							insertLabelFor(name, node);
 						}
 					}
 					
@@ -606,9 +630,9 @@ public class Window3DController {
 	}
 	
 	
-	private void showContextMenu(String name, double sceneX, double sceneY) {
+	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
 		if (contextMenuStage==null) {
-			contextMenuController = new ContextMenuController(bringUpInfoProperty);
+			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty);
 			
 			contextMenuStage = new Stage();
 			contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -631,15 +655,6 @@ public class Window3DController {
 	            					"-fx-faint-focus-color: transparent;");
 	            }
 				
-				contextMenuController.setSearchButtonListener(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						if (searchField!=null)
-							searchField.setText(contextMenuController.getName());
-						contextMenuStage.hide();
-					}
-				});
-				
 			} catch (IOException e) {
 				System.out.println("error in initializing context menu for "+name+".");
 				e.printStackTrace();
@@ -647,8 +662,24 @@ public class Window3DController {
 		}
 		
 		contextMenuController.setName(name);
+		contextMenuController.setSearchOption(option);
+		
+		contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Rule rule = Search.addColorRule(SearchType.SYSTEMATIC, name, 
+						Color.WHITE, option);
+				rule.showEditStage(parentStage);
+				
+				contextMenuStage.hide();
+				
+				// TODO bring rule edit to front
+			}
+		});
+		
 		contextMenuStage.setX(sceneX);
 		contextMenuStage.setY(sceneY);
+		
 		contextMenuStage.show();
 	}
 
@@ -669,7 +700,7 @@ public class Window3DController {
 				if (b!=null) {
 					billboard.getTransforms().clear();
 					double x = b.getMaxX();
-					double y = b.getMaxY();
+					double y = b.getMaxY()+b.getHeight()/2;
 					double z = b.getMaxZ();
 					billboard.getTransforms().addAll(new Translate(x, y, z),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
@@ -713,7 +744,7 @@ public class Window3DController {
 
 				if (isLabel) {
 					x += hOffset;
-					y -= vOffset+5;
+					y -= (vOffset+5);
 				}
 				else {
 					x += hOffset;
@@ -902,18 +933,15 @@ public class Window3DController {
 		root.getChildren().add(xform);
 		
 		// clear note sprites and overlays
-		if (overlayVBox!=null)
-			overlayVBox.getChildren().clear();
+		overlayVBox.getChildren().clear();
 		
-		if (spritesPane!=null) {
-			Iterator<Node> iter = spritesPane.getChildren().iterator();
-			while (iter.hasNext()) {
-				Node node = iter.next();
-				if (node instanceof Text)
-					iter.remove();
-				else if (node instanceof VBox && node!=overlayVBox)
-					iter.remove();
-			}
+		Iterator<Node> iter = spritesPane.getChildren().iterator();
+		while (iter.hasNext()) {
+			Node node = iter.next();
+			if (node instanceof Text)
+				iter.remove();
+			else if (node instanceof VBox && node!=overlayVBox)
+				iter.remove();
 		}
 	}
 
@@ -937,17 +965,8 @@ public class Window3DController {
  			addNoteGeometries(notes);
  		
  		// add labels
- 		for (String name : currentLabels) {
- 			String funcName = PartsList.getFunctionalNameByLineageName(name);
- 			Text text;
- 			if (funcName!=null)
- 				text = makeNoteSpriteText(funcName);
- 			else
- 				text = makeNoteSpriteText(name);
- 			
- 			if (text!=null && spritesPane!=null)
- 				mapLabelSpriteToEntity(name, text);
-		}
+ 		for (String name : currentLabels)
+			insertLabelFor(name, getEntityWithName(name));
  		
  		if (!notes.isEmpty())
  			root.getChildren().addAll(notes);
@@ -1024,6 +1043,8 @@ public class Window3DController {
 				mesh.setOnMouseEntered(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
+						spritesPane.setCursor(Cursor.HAND);
+						
 						// make label appear
 						String name = normalizeName(se.getSceneName());
 						
@@ -1038,6 +1059,8 @@ public class Window3DController {
 				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
+						spritesPane.setCursor(Cursor.DEFAULT);
+						
 						// make label disappear
 						removeTransientLabel();
 					}
@@ -1095,6 +1118,8 @@ public class Window3DController {
 	        sphere.setOnMouseEntered(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
+					spritesPane.setCursor(Cursor.HAND);
+					
 					// make label appear
 					String name = cellNames[index];
 					
@@ -1109,6 +1134,8 @@ public class Window3DController {
 	        sphere.setOnMouseExited(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
+					spritesPane.setCursor(Cursor.DEFAULT);
+					
 					// make label disappear
 					removeTransientLabel();
 				}
@@ -1125,7 +1152,7 @@ public class Window3DController {
 		// sphere label
 		for (int i=0; i<cellNames.length && entity==null; i++) {
 			if (spheres[i]!=null) {				
-				if (cellNames[i].equalsIgnoreCase(name)) {
+				if (cellNames[i].equals(name)) {
 					entity = spheres[i];
 				}
 			}
@@ -1147,10 +1174,7 @@ public class Window3DController {
 	
 	private void removeLabelFrom(Node entity) {
 		if (entity!=null) {
-			if (spritesPane!=null) {
-				Text text = entityLabelMap.get(entity);
-				spritesPane.getChildren().remove(text);
-			}
+			spritesPane.getChildren().remove(entityLabelMap.get(entity));
 			entityLabelMap.remove(entity);
 		}
 	}
@@ -1169,28 +1193,34 @@ public class Window3DController {
 			public void handle(MouseEvent event) {
 				allLabels.remove(name);
 				currentLabels.remove(name);
+
+				spritesPane.getChildren().remove(text);
 				
-				if (spritesPane!=null)
-					spritesPane.getChildren().remove(text);
+				entityLabelMap.remove(entity);
 			}
 		});
 		
+		for (Node shape3D : entityLabelMap.keySet())
+			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
+		
+		if (name.equalsIgnoreCase(selectedName.get()))
+			text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+		
+		text.setWrappingWidth(-1);
+		
 		entityLabelMap.put(entity, text);
 		
-		if (spritesPane!=null) {
-			spritesPane.getChildren().add(text);
-			alignTextWithEntity(text, entity, true);
-		}
+		spritesPane.getChildren().add(text);
+		alignTextWithEntity(text, entity, true);
 	}
 	
 	
-	private boolean mapLabelSpriteToEntity(String name, Text text) {
+	private Shape3D getEntityWithName(String name) {
 		// sphere label
 		for (int i=0; i<cellNames.length; i++) {
 			if (spheres[i]!=null) {				
 				if (cellNames[i].equalsIgnoreCase(name)) {
-					insertLabelFor(name, spheres[i]);
-					return true;
+					return spheres[i];
 				}
 			}
 			
@@ -1200,12 +1230,11 @@ public class Window3DController {
 		for (int i=0; i<currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i)!=null) {
-				insertLabelFor(name, currentSceneElementMeshes.get(i));
-				return true;
+				return currentSceneElementMeshes.get(i);
 			}
 		}
 		
-		return false;
+		return null;
 	}
 	
 	
@@ -1218,6 +1247,9 @@ public class Window3DController {
 			Node text = makeNoteGraphic(note);
 			currentGraphicNoteMap.put(text, note);
 			
+			text.setOnMouseEntered(clickableMouseEnteredHandler);
+			text.setOnMouseExited(clickableMouseExitedHandler);
+			
 			// SPRITE
 			if (note.isSprite()) {
 				// location attachment
@@ -1229,8 +1261,7 @@ public class Window3DController {
 					root.getChildren().add(marker);
 					entitySpriteMap.put(marker, box);
 					
-					if (spritesPane!=null)
-						spritesPane.getChildren().add(box);
+					spritesPane.getChildren().add(box);
 				}
 				
 				// cell attachment
@@ -1243,9 +1274,7 @@ public class Window3DController {
 								VBox box = new VBox(3);
 								box.getChildren().add(text);
 								entitySpriteMap.put(spheres[i], box);
-								
-								if (spritesPane!=null)
-									spritesPane.getChildren().add(box);
+								spritesPane.getChildren().add(box);
 							}
 							else {
 								entitySpriteMap.get(spheres[i]).getChildren().add(text);
@@ -1266,9 +1295,7 @@ public class Window3DController {
 								VBox box = new VBox(3);
 								box.getChildren().add(text);
 								entitySpriteMap.put(mesh, box);
-								
-								if (spritesPane!=null)
-									spritesPane.getChildren().add(box);
+								spritesPane.getChildren().add(box);
 							}
 							else
 								entitySpriteMap.get(mesh).getChildren().add(text);
@@ -1370,7 +1397,7 @@ public class Window3DController {
 	
 	private void insertOverlayTitles() {
 		if (storiesLayer!=null) {
-			if (storiesLayer.getActiveStory()!=null && overlayVBox!=null) {
+			if (storiesLayer.getActiveStory()!=null) {
 				Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
 				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
 				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
@@ -1381,10 +1408,9 @@ public class Window3DController {
 	
 	private Text makeNoteOverlayText(String title) {
 		Text text = new Text(title);
-		text.setFill(Color.WHITE);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
 		text.setFontSmoothingType(FontSmoothingType.LCD);
-		if (overlayVBox!=null)
-			text.setWrappingWidth(overlayVBox.getWidth());
+		text.setWrappingWidth(overlayVBox.getWidth());
 		text.setFont(AppFont.getSpriteAndOverlayFont());
 		return text;
 	}
@@ -1405,7 +1431,7 @@ public class Window3DController {
 		text.setStrokeWidth(2);
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		text.setCacheHint(CacheHint.QUALITY);
-		text.setFill(Color.WHITE);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
 		return text;
 	}
 	
@@ -1608,13 +1634,15 @@ public class Window3DController {
 	
 	
 	// Sets transparent anchor pane overlay for sprite notes display
-	public void setNotesPane(Pane parentPane) {
+	public void setNotesPane(AnchorPane parentPane) {
 		if (parentPane!=null) {
 			spritesPane = parentPane;
 			
 			overlayVBox = new VBox(5);
 			overlayVBox.setPrefWidth(170);
 			overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
+			overlayVBox.setMinWidth(overlayVBox.getPrefWidth());
+			
 			AnchorPane.setTopAnchor(overlayVBox, 5.0);
 			AnchorPane.setRightAnchor(overlayVBox, 5.0);
 			
@@ -2035,6 +2063,9 @@ public class Window3DController {
 	private final String CS = ", ";
 
 	private final String FILL_COLOR_HEX = "#272727";
+	
+	private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66";
+	private final String SPRITE_COLOR_HEX = "#ffffff";
 
 	private final long WAIT_TIME_MILLI = 200;
 

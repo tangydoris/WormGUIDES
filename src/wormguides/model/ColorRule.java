@@ -7,7 +7,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import javafx.scene.paint.Color;
 
-public class ColorRule extends Rule{
+public class ColorRule extends Rule {
 	
 	
 	private SearchType type;

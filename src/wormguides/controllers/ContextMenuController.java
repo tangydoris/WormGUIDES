@@ -11,21 +11,34 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import wormguides.SearchOption;
 
 public class ContextMenuController extends AnchorPane implements Initializable{
 	
 	@FXML private Text nameText;
-	@FXML private Button search;
+	@FXML private Button color;
+	
+	private SearchOption searchOption;
+	private Stage parentStage;
 	
 	private BooleanProperty bringUpInfoProperty;
 	
-	public ContextMenuController(BooleanProperty bringUpInfoProperty) {
+	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty) {
 		super();
+		
 		this.bringUpInfoProperty = bringUpInfoProperty;
+		parentStage = stage;
+		
+		searchOption = SearchOption.CELL;
 	}
 	
-	public void setSearchButtonListener(EventHandler<ActionEvent> handler) {
-		search.setOnAction(handler);
+	public void setColorButtonListener(EventHandler<ActionEvent> handler) {
+		color.setOnAction(handler);
+	}
+	
+	public void setSearchOption(SearchOption option) {
+		searchOption = option;
 	}
 	
 	public String getName() {
