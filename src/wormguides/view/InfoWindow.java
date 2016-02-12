@@ -12,13 +12,16 @@ import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
+import wormguides.controllers.Window3DController;
 
 public class InfoWindow {
 	
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	Scene scene;
+	Window3DController window3D; //update scenes on links
 	InfoWindowLinkController linkController;
+	
 	
 	
 	/*
@@ -26,7 +29,7 @@ public class InfoWindow {
 	 * if tab is closed --> remove case from cell cases i.e. internal memory
 	 */
 	
-	public InfoWindow() {
+	public InfoWindow(Window3DController window3D) {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Info Window");
 		
@@ -44,7 +47,9 @@ public class InfoWindow {
 		
 		infoWindowStage.setResizable(true);
 		
-		linkController = new InfoWindowLinkController();
+		this.window3D = window3D;
+		linkController = new InfoWindowLinkController(this.window3D);
+		
 	}
 	
 	public void showWindow() {

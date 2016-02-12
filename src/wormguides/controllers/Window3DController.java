@@ -193,7 +193,6 @@ public class Window3DController {
 	private BooleanProperty bringUpInfoProperty;
 	
 	private SubsceneSizeListener subsceneSizeListener;
-
 	
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
 			int movieStartTime) {
@@ -1179,8 +1178,21 @@ public class Window3DController {
 		}
 	}
 	
+	public void insertLabelFor(String name) {
+		for (int i = 0; i < cellNames.length; i++) {
+			if (cellNames[i].toLowerCase().equals(name.toLowerCase())) {
+				insertLabelFor(name, spheres[i]);
+			}
+		}
+		for (int i = 0; i < meshNames.length; i++) {
+			if (meshNames[i].toLowerCase().equals(name.toLowerCase())) {
+				insertLabelFor(name, meshes[i]);
+			}
+		}
+	}
 	
-	private void insertLabelFor(String name, Node entity) {		
+	
+	private void insertLabelFor(String name, Node entity) {
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
 		Text text;
 		if (funcName!=null)
@@ -1203,7 +1215,7 @@ public class Window3DController {
 		for (Node shape3D : entityLabelMap.keySet())
 			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
 		
-		if (name.equalsIgnoreCase(selectedName.get()))
+		//if (name.equalsIgnoreCase(selectedName.get())) --> got rid of this to make "View in 3D" work --> any problems?
 			text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
 		
 		text.setWrappingWidth(-1);
@@ -1838,7 +1850,6 @@ public class Window3DController {
 	public int getStartTime() {
 		return startTime;
 	}
-	
 
 	public EventHandler<ActionEvent> getZoomInButtonListener() {
 		return new EventHandler<ActionEvent>() {

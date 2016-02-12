@@ -857,6 +857,14 @@ public class Search {
 		return -1;
 	}
 	
+	public static int getLastOccurenceOf(String name) {
+		if (lineageData != null) {
+			return lineageData.getLastOccurrenceOf(name);
+		}
+		
+		return -1;
+	}
+	
 	public static void setConnectome(Connectome con) {
 		if (con != null) {
 			connectome = con;

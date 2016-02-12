@@ -935,7 +935,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void initInfoWindow() {
-		infoWindow = new InfoWindow();
+		if (window3DController!=null) {
+			infoWindow = new InfoWindow(window3DController);
+		}
 	}
 	
 	private void initCellCases() {
