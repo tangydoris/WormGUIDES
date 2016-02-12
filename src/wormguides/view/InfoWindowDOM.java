@@ -56,7 +56,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
-		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "    " + viewInCellTheaterLink);
+		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		
 		//parts list descriptions
@@ -284,6 +284,9 @@ public class InfoWindowDOM {
 					if (dotIDX > 0) {
 						placeholder = placeholder.substring(0, dotIDX);
 						
+						//capitalize first letter of placeholder
+						placeholder = Character.toUpperCase(placeholder.charAt(0)) + placeholder.substring(1);
+						
 						//check for google links
 						if (placeholder.equals("google")) {
 							//check if wormatlas specific search
@@ -300,7 +303,7 @@ public class InfoWindowDOM {
 									" on " + placeholder + "</a>";
 							
 							//add wormbase link to end of gene expression section
-							if (placeholder.equals("wormbase")) {
+							if (placeholder.equals("Wormbase")) {
 								String wormbaseSource = "<em>Source:</em> " + anchor;
 								geneExpressionDiv.addChild(new HTMLNode("p", "", "", wormbaseSource));
 							}
@@ -461,7 +464,8 @@ public class InfoWindowDOM {
 		//cell name
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
 		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
-		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo);
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		
 		//homologues
@@ -629,6 +633,7 @@ public class InfoWindowDOM {
 		
 		//add link controller
 		body.addChild(body.addLinkHandlerScript());
+		body.addChild(body.viewInCellTheaterScript());
 		
 		//add head and body to html
 		html.addChild(head);
