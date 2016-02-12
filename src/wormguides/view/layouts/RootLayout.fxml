@@ -34,7 +34,7 @@
                         <MenuItem disable="true" mnemonicParsing="false" onAction="#productionInfoAction" text="Experimental Data" />
                     </items>
                   </Menu>
-                  <MenuItem disable="true" mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
+                  <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
