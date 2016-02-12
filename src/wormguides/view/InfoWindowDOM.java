@@ -351,7 +351,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Production Information: </strong>");
+				"<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
@@ -578,7 +578,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Production Information: </strong>");
+				"<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");

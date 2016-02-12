@@ -26,7 +26,7 @@
             <Menu mnemonicParsing="false" text="View">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#viewTreeAction" text="Lineage tree" />
-                  <Menu mnemonicParsing="false" text="Primary Documents">
+                  <Menu mnemonicParsing="false" text="Primary Data">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#viewCellShapesIndex" text="Cell Shapes Index" />
                         <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
