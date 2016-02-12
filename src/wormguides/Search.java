@@ -867,6 +867,16 @@ public class Search {
 		return false;
 	}
 	
+	
+	/*
+	 * WHERE ELSE CAN WE PUT THIS --> ONLY PLACE TO REFERENCE CELL CASES IN STATIC WAY
+	 */
+	public static void removeCellCase(String cellName) {
+		if (cellCases != null && cellName != null) {
+			cellCases.removeCellCase(cellName);
+		}
+	}
+	
 	/*
 	 * Method taken from RootLayoutController 
 	 * --> how can InfoWindowLinkController generate page without ptr to RootLayoutController

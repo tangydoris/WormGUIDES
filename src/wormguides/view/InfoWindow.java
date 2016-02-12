@@ -2,6 +2,7 @@ package wormguides.view;
 
 
 import java.util.ArrayList;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -9,6 +10,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
+import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
 
 public class InfoWindow {
@@ -64,8 +66,19 @@ public class InfoWindow {
 		//link handler
 		
 		Tab tab = new Tab(dom.getName(), webview);
-		tabPane.getTabs().add(tab);
-		tabPane.getSelectionModel().select(tab);
+		tabPane.getTabs().add(0, tab); //prepend the tab
+		tabPane.getSelectionModel().select(tab); //show the new tab
+		
+		//close tab event handler
+		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+		tab.setOnClosed(new EventHandler<javafx.event.Event>() {
+			public void handle(javafx.event.Event e) {
+				Tab t = (Tab) e.getSource();
+				String cellName = t.getText();
+				Search.removeCellCase(cellName);
+			}
+		});
+		
 		tabPane.setFocusTraversable(true);
 	}
 	

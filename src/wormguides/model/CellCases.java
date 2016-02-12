@@ -99,4 +99,24 @@ public class CellCases {
 		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName);
 	}
 	
+	public void removeCellCase(String cellName) {
+		if (containsTerminalCase(cellName)) {
+			for (int i = 0; i < terminalCases.size(); i++) {
+				if (terminalCases.get(i).getCellName().toLowerCase().equals(cellName.toLowerCase())) {
+					terminalCases.remove(i);
+					return;
+				}
+			}
+		}
+		
+		if (containsNonTerminalCase(cellName)) {
+			for (int i = 0; i < nonTerminalCases.size(); i++) {
+				if (nonTerminalCases.get(i).getCellName().toLowerCase().equals(cellName.toLowerCase())) {
+					nonTerminalCases.remove(i);
+					return;
+				}
+			}
+		}
+	}
+	
 }
