@@ -22,6 +22,7 @@ import javafx.scene.paint.Color;
 import wormguides.model.CellCases;
 import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
+import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
@@ -74,6 +75,9 @@ public class Search {
 	
 	//for production info searching
 	private static ProductionInfo productionInfo;
+	
+	//for lineage searching
+	private static LineageData lineageData;
 
 		
 	static {
@@ -846,6 +850,22 @@ public class Search {
 		return false;
 	}
 	
+	public static int getFirstOccurenceOf(String name) {
+		if (lineageData != null) {
+			return lineageData.getFirstOccurrenceOf(name);
+		}
+		
+		return -1;
+	}
+	
+	public static int getLastOccurenceOf(String name) {
+		if (lineageData != null) {
+			return lineageData.getLastOccurrenceOf(name);
+		}
+		
+		return -1;
+	}
+	
 	public static void setConnectome(Connectome con) {
 		if (con != null) {
 			connectome = con;
@@ -864,11 +884,27 @@ public class Search {
 		}
 	}
 	
+	public static void setLineageData(LineageData ld) {
+		if (ld != null) {
+			lineageData = ld;
+		}
+	}
+	
 	public static boolean hasCellCase(String cellName) {
 		if (cellCases != null) {
 			return cellCases.hasCellCase(cellName);
 		}
 		return false;
+	}
+	
+	
+	/*
+	 * WHERE ELSE CAN WE PUT THIS --> ONLY PLACE TO REFERENCE CELL CASES IN STATIC WAY
+	 */
+	public static void removeCellCase(String cellName) {
+		if (cellCases != null && cellName != null) {
+			cellCases.removeCellCase(cellName);
+		}
 	}
 	
 	/*

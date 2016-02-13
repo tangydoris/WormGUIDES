@@ -9,6 +9,9 @@ import javafx.collections.ObservableList;
 import wormguides.model.Note;
 import wormguides.model.Story;
 
+/*
+ * Used for loading/saving stories
+ */
 public class StoryFileUtil {
 
 	public static Story loadFromCSVFile(ObservableList<Story>stories, File file, int offset) throws IOException{

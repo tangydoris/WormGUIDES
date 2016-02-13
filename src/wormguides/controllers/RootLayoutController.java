@@ -935,7 +935,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void initInfoWindow() {
-		infoWindow = new InfoWindow();
+		if (window3DController!=null) {
+			infoWindow = new InfoWindow(window3DController.getStage(), 
+					window3DController.getTimeProperty(), window3DController.getSelectedName());
+		}
 	}
 	
 	private void initCellCases() {
@@ -975,6 +978,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		initSearch();
 		Search.setActiveLineageNames(data.getAllCellNames());
+		Search.setLineageData(data);
 		
 		ObservableList<Rule> list = displayLayer.getRulesList();
 		search.setRulesList(list);
