@@ -771,7 +771,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private void initToggleGroup() {
 		typeToggleGroup = new ToggleGroup();
 		sysRadioBtn.setToggleGroup(typeToggleGroup);
-		sysRadioBtn.setUserData(SearchType.SYSTEMATIC);
+		sysRadioBtn.setUserData(SearchType.LINEAGE);
 		funRadioBtn.setToggleGroup(typeToggleGroup);
 		funRadioBtn.setUserData(SearchType.FUNCTIONAL);
 		desRadioBtn.setToggleGroup(typeToggleGroup);

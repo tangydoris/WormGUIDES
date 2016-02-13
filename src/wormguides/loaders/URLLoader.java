@@ -117,7 +117,7 @@ public class URLLoader {
 				String name = sb.substring(0, sb.indexOf("+"));
 				
 				if (types.contains("-s"))
-					Search.addColorRule(SearchType.SYSTEMATIC, name, Color.web(colorString), options);
+					Search.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
 				
 				if (types.contains("-n"))
 					Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
@@ -130,7 +130,7 @@ public class URLLoader {
 				
 				// if no type present, default is systematic
 				if (noTypeSpecified) {
-					SearchType type = SearchType.SYSTEMATIC;
+					SearchType type = SearchType.LINEAGE;
 					if (isGeneFormat(name))
 						type = SearchType.GENE;
 					Search.addColorRule(type, name, Color.web(colorString), options);

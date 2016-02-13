@@ -81,7 +81,7 @@ public class Search {
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
 		
-		type = SearchType.SYSTEMATIC;
+		type = SearchType.LINEAGE;
 		
 		selectedColor = Color.WHITE;
 		
@@ -281,7 +281,7 @@ public class Search {
 		searched = searched.toLowerCase();
 		searched = searched.trim();
 		switch (type) {
-			case SYSTEMATIC:
+			case LINEAGE:
 							label = LineageTree.getCaseSensitiveName(searched);
 							if (label.isEmpty())
 								label = searched;
@@ -323,7 +323,8 @@ public class Search {
 		else if (type == SearchType.CONNECTOME) { 
 			cells = getCellsList(searched);
 			rule.setCells(cells);
-		} else {
+		} 
+		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
 		}
@@ -362,7 +363,7 @@ public class Search {
 		ArrayList<String> cells = new ArrayList<String> ();
 		searched = searched.toLowerCase();
 		switch (type) {
-			case SYSTEMATIC:
+			case LINEAGE:
 							for (String name : activeLineageNames) {
 								if (name.toLowerCase().equals(searched))
 									cells.add(name);

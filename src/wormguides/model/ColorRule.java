@@ -19,7 +19,7 @@ public class ColorRule extends Rule {
 	
 	
 	public ColorRule(String searched, Color color, SearchOption...options) {
-		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)), SearchType.SYSTEMATIC);
+		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)), SearchType.LINEAGE);
 	}
 	
 	

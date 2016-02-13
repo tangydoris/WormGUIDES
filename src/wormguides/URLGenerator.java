@@ -51,7 +51,7 @@ public class URLGenerator {
 			
 			// search types
 			switch (rule.getSearchType()) {
-				case SYSTEMATIC :	builder.append("-s");
+				case LINEAGE :	builder.append("-s");
 									break;
 				case DESCRIPTION :	builder.append("-d");
 									break;

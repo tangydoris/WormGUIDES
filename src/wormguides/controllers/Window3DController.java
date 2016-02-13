@@ -667,7 +667,7 @@ public class Window3DController {
 		contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Rule rule = Search.addColorRule(SearchType.SYSTEMATIC, name, 
+				Rule rule = Search.addColorRule(SearchType.LINEAGE, name, 
 						Color.WHITE, option);
 				rule.showEditStage(parentStage);
 				
@@ -1608,7 +1608,7 @@ public class Window3DController {
 			public void onChanged(
 					ListChangeListener.Change<? extends Rule> change) {
 				while (change.next()) {
-					if (!(change.getAddedSize()>0)) {
+					if (change.getAddedSize()>0) {
 						buildScene();
 						
 						for (Rule rule : change.getAddedSubList()) {
