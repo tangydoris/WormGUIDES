@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
+import javafx.stage.Stage;
 import wormguides.Search;
+import wormguides.model.PartsList;
 
 /*
  * Callback class for our HTML page for a terminal cell case to open link in default browser
@@ -19,6 +23,15 @@ import wormguides.Search;
  * remove links --> pass link as string to openLink
  */
 public class InfoWindowLinkController {
+	private Stage parentStage; //update scenes on links
+	private IntegerProperty time;
+	private StringProperty activeCellProperty;
+	
+	public InfoWindowLinkController(Stage stage, IntegerProperty timeProperty, StringProperty cellNameProperty) {
+		parentStage = stage;
+		time = timeProperty;
+		activeCellProperty = cellNameProperty;
+	}
 	
 	public void handleLink(String url) throws IOException, URISyntaxException {
 		if (Desktop.isDesktopSupported()) {
@@ -39,6 +52,26 @@ public class InfoWindowLinkController {
 	}
 	
 	public void viewInCellTheater(String cellName) {
-		System.out.println(cellName);
+		int startTime;
+		int endTime;
+		
+		String linName = PartsList.getLineageNameByFunctionalName(cellName);
+		if (linName != null)
+			cellName = linName;
+
+		startTime = Search.getFirstOccurenceOf(cellName);
+		endTime = Search.getLastOccurenceOf(cellName);
+		
+		if(time.get() >= startTime && time.get() <= endTime) {
+			//highlight the clicked cell
+			//window3DController.insertLabelFor(cellName);
+		} 
+		else {
+			time.set(startTime);
+			//window3DController.insertLabelFor(cellName);
+			//highlight clicked cell
+		}
+		
+		parentStage.requestFocus();
 	}
 }

@@ -16,10 +16,12 @@ import wormguides.model.Note.AttachmentTypeEnumException;
 import wormguides.model.Note.LocationStringFormatException;
 import wormguides.model.Note.TagDisplayEnumException;
 
+/*
+ * Used to load stories from the internal stories config file
+ */
 public class StoriesLoader {
 	
 	public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
-		// TODO
 		if (file==null)
 			return;
 		
