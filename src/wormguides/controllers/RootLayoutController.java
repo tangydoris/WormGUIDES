@@ -178,7 +178,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Button noteEditorBtn;
 	
 	//production information
-	ProductionInfo productionInfo;
+	private ProductionInfo productionInfo;
 	
 	
 	// info window Stuff
@@ -546,8 +546,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	private void addToInfoWindow(String name) {
-		//service.restart();
-		
 		//GENERATE CELL TAB ON CLICK
 		if (name!=null && !name.isEmpty()) {
 			if (cellCases == null)  {
@@ -937,7 +935,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private void initInfoWindow() {
 		if (window3DController!=null) {
 			infoWindow = new InfoWindow(window3DController.getStage(), 
-					window3DController.getTimeProperty(), window3DController.getSelectedName());
+					window3DController.getTimeProperty(), 
+					window3DController.getSelectedNameLabeled());
 		}
 	}
 	

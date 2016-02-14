@@ -23,14 +23,15 @@ import wormguides.model.PartsList;
  * remove links --> pass link as string to openLink
  */
 public class InfoWindowLinkController {
+	
 	private Stage parentStage; //update scenes on links
 	private IntegerProperty time;
-	private StringProperty activeCellProperty;
+	private StringProperty labeledCellProperty;
 	
 	public InfoWindowLinkController(Stage stage, IntegerProperty timeProperty, StringProperty cellNameProperty) {
 		parentStage = stage;
 		time = timeProperty;
-		activeCellProperty = cellNameProperty;
+		labeledCellProperty = cellNameProperty;
 	}
 	
 	public void handleLink(String url) throws IOException, URISyntaxException {
@@ -62,15 +63,10 @@ public class InfoWindowLinkController {
 		startTime = Search.getFirstOccurenceOf(cellName);
 		endTime = Search.getLastOccurenceOf(cellName);
 		
-		if(time.get() >= startTime && time.get() <= endTime) {
-			//highlight the clicked cell
-			//window3DController.insertLabelFor(cellName);
-		} 
-		else {
+		if(time.get()<startTime || time.get()>endTime)
 			time.set(startTime);
-			//window3DController.insertLabelFor(cellName);
-			//highlight clicked cell
-		}
+
+		labeledCellProperty.set(cellName);
 		
 		parentStage.requestFocus();
 	}

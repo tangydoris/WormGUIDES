@@ -125,6 +125,7 @@ public class Window3DController {
     // subscene click cell selection stuff
     private IntegerProperty selectedIndex;
     private StringProperty selectedName;
+    private StringProperty selectedNameLabeled;
     private Stage contextMenuStage;
     private ContextMenuController contextMenuController;
     private BooleanProperty cellClicked;
@@ -236,6 +237,21 @@ public class Window3DController {
                 if (selected != -1)
                     selectedIndex.set(selected);
             }
+        });
+        selectedNameLabeled = new SimpleStringProperty("");
+        selectedNameLabeled.addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, 
+					String oldValue, String newValue) {
+				if (!newValue.isEmpty()) {
+					selectedName.set(newValue);
+					if (!allLabels.contains(newValue)) {
+						allLabels.add(newValue);
+						currentLabels.add(newValue);
+					}
+					insertLabelFor(newValue, getEntityWithName(newValue));
+				}
+			}
         });
         
         cellClicked = new SimpleBooleanProperty(false);
@@ -439,6 +455,11 @@ public class Window3DController {
     
     public IntegerProperty getSelectedIndex() {
         return selectedIndex;
+    }
+    
+    
+    public StringProperty getSelectedNameLabeled() {
+    	return selectedNameLabeled;
     }
 
     
@@ -1145,23 +1166,7 @@ public class Window3DController {
     
     
     private void removeLabelFor(String name) {
-        Node entity = null;
-        // sphere label
-        for (int i=0; i<cellNames.length && entity==null; i++) {
-            if (spheres[i]!=null) {             
-                if (cellNames[i].equals(name)) {
-                    entity = spheres[i];
-                }
-            }
-        }
-        
-        // mesh view label
-        for (int i=0; i<currentSceneElements.size() && entity==null; i++) {
-            if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-                    && currentSceneElementMeshes.get(i)!=null) {
-                entity = currentSceneElementMeshes.get(i);
-            }
-        }
+        Node entity = getEntityWithName(name);
         
         if (entity!=null) {
             removeLabelFrom(entity);
@@ -1190,16 +1195,15 @@ public class Window3DController {
                 allLabels.remove(name);
                 currentLabels.remove(name);
 
-                spritesPane.getChildren().remove(text);
-                
-                entityLabelMap.remove(entity);
+                removeLabelFor(name);
             }
         });
         
         for (Node shape3D : entityLabelMap.keySet())
             entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
         
-            text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+        if (name.equals(selectedName.get()))
+        	text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
         
         text.setWrappingWidth(-1);
         

@@ -20,10 +20,10 @@ public class InfoWindow {
 	
 	private Stage infoWindowStage;
 	private TabPane tabPane;
-	Scene scene;
-	Stage window3DStage; //update scenes on links
-	IntegerProperty time;
-	InfoWindowLinkController linkController;
+	private Scene scene;
+	private Stage window3DStage; //update scenes on links
+	private IntegerProperty time;
+	private InfoWindowLinkController linkController;
 	
 	
 	
