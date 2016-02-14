@@ -281,7 +281,7 @@
                                                                   <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                                   <HBox maxWidth="1.7976931348623157E308">
                                                                      <children>
-                                                                        <ListView fx:id="searchResultsListView" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="180.0" HBox.hgrow="ALWAYS" />
+                                                                        <ListView fx:id="searchResultsListView" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="150.0" HBox.hgrow="ALWAYS" />
                                                                      </children>
                                                                   </HBox>
                                                                   <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />

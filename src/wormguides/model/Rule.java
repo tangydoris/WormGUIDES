@@ -418,6 +418,11 @@ public abstract class Rule {
 	}
 	
 	
+	public void setChanged(boolean changed) {
+		ruleChanged.set(changed);
+	}
+	
+	
 	private class SubmitHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
@@ -428,7 +433,6 @@ public abstract class Rule {
 				resetLabel();
 				toolTip.setText(toStringFull());
 				ruleChanged.set(true);
-				ruleChanged.set(false);
 			}
 		}
 	}

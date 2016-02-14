@@ -1607,7 +1607,7 @@ public class Window3DController {
             public void onChanged(
                     ListChangeListener.Change<? extends Rule> change) {
                 while (change.next()) {
-                    if (!(change.getAddedSize()>0)) {
+                    if (change.getAddedSize()>0) {
                         buildScene();
                         
                         for (Rule rule : change.getAddedSubList()) {
@@ -1615,9 +1615,10 @@ public class Window3DController {
                                 @Override
                                 public void changed(ObservableValue<? extends Boolean> observable,
                                         Boolean oldValue, Boolean newValue) {
-                                    if (newValue) {
+                                    if (newValue)
                                         buildScene();
-                                    }
+                                    
+                                    rule.setChanged(false);
                                 }
                             });
                         }
