@@ -24,7 +24,6 @@ public class SceneElementsList {
 	public ArrayList<SceneElement> elementsList;
 	public HashMap<String, ArrayList<String>> nameCellsMap;
 	public HashMap<String, String> nameCommentsMap;
-	private JarFile jarFile;
 	private ArrayList<File> objEntries;
 	
 	
@@ -41,12 +40,13 @@ public class SceneElementsList {
 	
 	private void buildListFromConfig() {
 		
-		URL url = SceneElementsList.class.getResource("shapes_file/" + CELL_CONFIG_FILE_NAME);
+		URL url = SceneElementsList.class.getResource("/wormguides/model/shapes_file/" + CELL_CONFIG_FILE_NAME);
 		
 		try {
 			if (url != null) {
 				InputStream stream = url.openStream();
 				processStreamString(stream);
+				processCells();
 			}
 			
 			//add obj entries
@@ -63,8 +63,7 @@ public class SceneElementsList {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		}
 	}
-	
-	
+
 	private void processStreamString(InputStream stream) {
 		InputStreamReader streamReader = new InputStreamReader(stream);
 		BufferedReader reader = new BufferedReader(streamReader);
@@ -106,6 +105,54 @@ public class SceneElementsList {
 			System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
 			return;
 		}
+	}
+	
+	/*
+	 * the start of our recursive algorithm to unpack entries 
+	 * in cell names which reference other scene elements' cell list
+	 */
+	private void processCells() {
+		if (elementsList == null) return;
+		
+		for (SceneElement se : elementsList) {
+			ArrayList<String> cells = se.getAllCellNames();
+			for (int i = 0; i < cells.size(); i++) {
+				if (cells.get(i).startsWith(asterisk)) {
+					se.setNewCellNames(unpackCells(cells));
+				}
+			}
+		}
+		
+		for (SceneElement se : elementsList) {
+			System.out.println(se.getAllCellNames().toString());
+		}
+	}
+	
+	private ArrayList<String> unpackCells(ArrayList<String> cells) {
+		ArrayList<String> unpackedCells = new ArrayList<String>();
+		
+		for (int i = 0; i < cells.size(); i++) {
+			String cell = cells.get(i);
+			//if cell starts with asterisk, recurse. else, add cel
+			if (cell.startsWith(asterisk)) {
+				for (int j = 0; j < elementsList.size(); j++) {
+					SceneElement se = elementsList.get(j);
+					
+					//find the matching resource location
+					if (se.getResourceLocation().endsWith(cell.substring(1))) {
+						//recursively unpack matching location's cell list
+						unpackedCells.addAll(unpackCells(se.getAllCellNames()));
+					}
+				}
+			} else {
+				//only add cell name entry if not already added
+				if (!unpackedCells.contains(cell)) {
+					unpackedCells.add(cell);
+				}
+			}
+		}
+		
+		return unpackedCells;
 	}
 	
 	
@@ -247,5 +294,6 @@ public class SceneElementsList {
 	}
 	
 	
-	private final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
+	private final static String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
+	private final static String asterisk = "*";
 }
