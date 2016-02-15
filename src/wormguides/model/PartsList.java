@@ -23,7 +23,7 @@ public class PartsList {
 		
 		try {
 			
-			URL url = PartsList.class.getResource("partslist.txt");
+			URL url = PartsList.class.getResource("/wormguides/model/partslist.txt");
 			InputStream input = url.openStream();
 			InputStreamReader isr = new InputStreamReader(input);
 			BufferedReader br = new BufferedReader(isr);

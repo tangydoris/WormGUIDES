@@ -89,6 +89,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private Stage connectomeStage;
 	private Stage partsListStage;
 	private Stage cellShapesIndexStage;
+	private Stage cellDeathsStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -340,6 +341,26 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		cellShapesIndexStage.show();
 	}
 	
+	@FXML
+	public void viewCellDeaths() {
+		if (cellDeathsStage == null) {
+			cellDeathsStage = new Stage();
+			cellDeathsStage.setTitle("Cell Deaths");
+			
+			WebView cellDeathsWebView = new WebView();
+			cellDeathsWebView.getEngine().loadContent(CellDeaths.getCellDeathsDOMAsString());
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(cellDeathsWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			cellDeathsStage.setScene(scene);
+			cellDeathsStage.setResizable(false);
+		}
+		cellDeathsStage.show();
+	}
+	
 	@FXML public void viewPartsList() {
 		if (partsListStage == null) {
 			partsListStage = new Stage();
@@ -347,7 +368,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			
 			/*
 			 * TODO
-			 * change partslist html to dom paradigm
+			 * change partslist html to dom paradigm (see cell deaths)
 			 */
 			
 			//build webview scene to render parts list

@@ -6,12 +6,25 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
+
 public class CellDeaths {
 	private static ArrayList<String> cellDeaths;
+	private static InfoWindowDOM dom;
 	private final static String CellDeathsFile = "/wormguides/model/cell_deaths/CellDeaths.csv";
 	
 	static {
 		cellDeaths = new ArrayList<String>();
+		
+		//build the dom
+		dom = new InfoWindowDOM();
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+				
+		HTMLNode deathsDiv = new HTMLNode("div");
+		HTMLNode deathsUL = new HTMLNode("ul");
+		
 		try {
 			URL url = PartsList.class.getResource(CellDeathsFile);
 			
@@ -21,14 +34,36 @@ public class CellDeaths {
 					
 			String line;
 			while ((line = br.readLine()) != null) {
+				//add death to UL
+				deathsUL.addChild(new HTMLNode("li", "", "", line));
+				
+				//add to internal memory
 				cellDeaths.add(line.toLowerCase());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
+		deathsDiv.addChild(deathsUL);
+		body.addChild(deathsDiv);
+		
+		dom.getHTML().addChild(head);
+		dom.getHTML().addChild(body);
+		dom.buildStyleNode();
 	}
 	
 	public static boolean containsCell(String cell) {
-		return cellDeaths.contains(cell.toLowerCase());
+		if (cellDeaths != null) {
+			return cellDeaths.contains(cell.toLowerCase());
+		}
+		return false;
+	}
+	
+	public static String getCellDeathsDOMAsString() {
+		if (dom != null) {
+			return dom.DOMtoString();
+		}
+		return "";
 	}
 }
