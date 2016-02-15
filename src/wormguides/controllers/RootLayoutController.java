@@ -60,6 +60,7 @@ import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
 import wormguides.model.PartsList;
+import wormguides.model.CellDeaths;
 import wormguides.model.ProductionInfo;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
@@ -344,6 +345,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			partsListStage = new Stage();
 			partsListStage.setTitle("Parts List");	
 			
+			/*
+			 * TODO
+			 * change partslist html to dom paradigm
+			 */
+			
 			//build webview scene to render parts list
 			WebView partsListWebView = new WebView();
 			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsHTMLTable());
@@ -611,6 +617,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			if (functionalName!=null) {
 				displayedName.setText("Active Cell: "+name+" ("+functionalName+")");
 				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+			} else if (CellDeaths.containsCell(name)) {
+				displayedName.setText("Active Cell: "+name);
+				displayedDescription.setText("Cell Death");
 			}
 		}
 	}
@@ -757,6 +766,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initPartsList() {
 		new PartsList();
+	}
+	
+	private void initCellDeaths() {
+		new CellDeaths();
 	}
 	
 	
@@ -953,6 +966,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
+		initCellDeaths();
 		LineageData data = AceTreeLoader.loadNucFiles();
 		initLineageTree(data.getAllCellNames());
 		
