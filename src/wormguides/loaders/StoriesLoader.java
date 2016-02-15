@@ -27,28 +27,28 @@ public class StoriesLoader {
 		
 		try {
 			InputStream stream = new FileInputStream(file);
-			processStream(file.getName(), stream, stories, offset);
+			processStream(stream, stories, offset);
 		} catch (FileNotFoundException e) {
 			System.out.println("The file '"+file.getName()+"' was not found in system.");
 		}
 	}
 	
-	public static void loadConfigFile(String file, ObservableList<Story> stories, int offset) {
-		URL url = StoriesLoader.class.getResource("../model/story_file/" + file);
+	public static void loadConfigFile(ObservableList<Story> stories, int offset) {
+		URL url = StoriesLoader.class.getResource(StoryListConfig);
 		
 		try {
 			if (url != null) {
 				InputStream stream = url.openStream();
-				processStream(file, stream, stories, offset);
+				processStream(stream, stories, offset);
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("The config file '" + file + "' was not found in the system.");
+			System.out.println("The config file '" + StoryListConfig + "' was not found in the system.");
 		} catch (IOException e) {
-			System.out.println("The config file '" + file + "' was not found inn the system.");
+			System.out.println("The config file '" + StoryListConfig + "' was not found inn the system.");
 		}
 	}
 	
-	private static void processStream(String file, InputStream stream, ObservableList<Story> stories, int offset) {
+	private static void processStream(InputStream stream, ObservableList<Story> stories, int offset) {
 		int storyCounter = stories.size()-1; //used for accessing the current story for adding scene elements
 
 		try {
@@ -126,11 +126,11 @@ public class StoriesLoader {
 			reader.close();
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("Unable to process file '" + file + "'.");
+			System.out.println("Unable to process file '" + StoryListConfig + "'.");
 		} catch (NumberFormatException e) {
-			System.out.println("Number Format Error in file '" + file + "'.");
+			System.out.println("Number Format Error in file '" + StoryListConfig + "'.");
 		} catch (IOException e) {
-			System.out.println("The config file '" + file + "' wasn't found on the system.");
+			System.out.println("The config file '" + StoryListConfig + "' wasn't found on the system.");
 		}
 	}
 	
@@ -164,4 +164,6 @@ public class StoriesLoader {
 							START_TIME_INDEX = 9,
 							END_TIME_INDEX = 10,
 							COMMENTS_INDEX = 11;
+	
+	private static final String StoryListConfig = "/wormguides/model/story_file/StoryListConfig.csv";
 }

@@ -128,7 +128,7 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = window3DController.getCellClicked();
 		
-		StoriesLoader.loadConfigFile(STORY_CONFIG_FILE_NAME, stories, timeOffset);
+		StoriesLoader.loadConfigFile(stories, timeOffset);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -834,6 +834,4 @@ public class StoriesLayer {
 			}
 		}	
 	}
-
-	private final String STORY_CONFIG_FILE_NAME = "StoryListConfig.csv";
 }
