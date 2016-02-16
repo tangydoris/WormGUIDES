@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.jar.JarFile;
 
 public class SceneElementsList {
 	

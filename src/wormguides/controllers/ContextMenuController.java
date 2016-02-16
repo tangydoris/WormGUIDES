@@ -12,9 +12,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import wormguides.SearchOption;
+import wormguides.model.CellCases;
 
-public class ContextMenuController extends AnchorPane implements Initializable{
+public class ContextMenuController extends AnchorPane implements Initializable {
 	
 	@FXML private Text nameText;
 	@FXML private Button color;
@@ -22,26 +22,26 @@ public class ContextMenuController extends AnchorPane implements Initializable{
 	@FXML private Button wiredTo;
 	@FXML private Button colorNeighbors;
 	
-	private SearchOption searchOption;
+	private CellCases cellCases;
+	
 	private Stage parentStage;
 	
 	private BooleanProperty bringUpInfoProperty;
 	
-	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty) {
+	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCases cases) {
 		super();
 		
 		this.bringUpInfoProperty = bringUpInfoProperty;
 		parentStage = stage;
-		
-		searchOption = SearchOption.CELL;
+		cellCases = cases;
+	}
+	
+	public void setExpressesButtonListener(EventHandler<ActionEvent> handler) {
+		expresses.setOnAction(handler);
 	}
 	
 	public void setColorButtonListener(EventHandler<ActionEvent> handler) {
 		color.setOnAction(handler);
-	}
-	
-	public void setSearchOption(SearchOption option) {
-		searchOption = option;
 	}
 	
 	public String getName() {

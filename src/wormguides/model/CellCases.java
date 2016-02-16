@@ -21,10 +21,14 @@ public class CellCases {
 	
 	private InfoWindow infoWindow;
 	
-	public CellCases(InfoWindow infoWindow) {
+	public CellCases(InfoWindow window) {
 		terminalCases = new ArrayList<TerminalCellCase>();
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
-		this.infoWindow = infoWindow;
+		infoWindow = window;
+	}
+	
+	public void setInfoWindow(InfoWindow window) {
+		infoWindow = window;
 	}
 	
 	public void makeTerminalCase(String cellName, 
@@ -46,7 +50,8 @@ public class CellCases {
 			InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
 			
 			//add dom(tab) to InfoWindow
-			infoWindow.addTab(tcDOM, terminalCase.getLinks());
+			if (infoWindow!=null)
+				infoWindow.addTab(tcDOM, terminalCase.getLinks());
 		}
 	}
 	

@@ -21,10 +21,9 @@ public class InfoWindow {
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	private Scene scene;
-	private Stage window3DStage; //update scenes on links
+	private Stage parentStage; //update scenes on links
 	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
-	
 	
 	
 	/*
@@ -51,10 +50,9 @@ public class InfoWindow {
 		
 		infoWindowStage.setResizable(true);
 		
-		window3DStage = stage;
+		parentStage = stage;
 		time = timeProperty;
-		linkController = new InfoWindowLinkController(window3DStage, time, cellNameProperty);
-		
+		linkController = new InfoWindowLinkController(parentStage, time, cellNameProperty);
 	}
 	
 	public void showWindow() {

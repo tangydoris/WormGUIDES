@@ -71,6 +71,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
+import wormguides.model.CellCases;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
@@ -128,6 +129,7 @@ public class Window3DController {
     private StringProperty selectedNameLabeled;
     private Stage contextMenuStage;
     private ContextMenuController contextMenuController;
+    private CellCases cellCases;
     private BooleanProperty cellClicked;
 
     // searched highlighting stuff
@@ -196,7 +198,7 @@ public class Window3DController {
     private SubsceneSizeListener subsceneSizeListener;
     
     public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
-            int movieStartTime) {
+            int movieStartTime, CellCases cases) {
         parentStage = parent;
         
         root = new Group();
@@ -365,6 +367,8 @@ public class Window3DController {
                 spritesPane.setCursor(Cursor.DEFAULT);
             }
         };
+        
+        cellCases = cases;
     }
     
     
@@ -650,7 +654,7 @@ public class Window3DController {
     
     private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
         if (contextMenuStage==null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty);
+            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases);
             
             contextMenuStage = new Stage();
             contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -680,7 +684,6 @@ public class Window3DController {
         }
         
         contextMenuController.setName(name);
-        contextMenuController.setSearchOption(option);
         
         contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
             @Override
@@ -691,6 +694,14 @@ public class Window3DController {
                 
                 contextMenuStage.hide();
             }
+        });
+        
+        contextMenuController.setExpressesButtonListener(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
         });
         
         contextMenuStage.setX(sceneX);
