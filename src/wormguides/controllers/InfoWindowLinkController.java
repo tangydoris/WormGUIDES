@@ -12,15 +12,8 @@ import wormguides.Search;
 import wormguides.model.PartsList;
 
 /*
- * Callback class for our HTML page for a terminal cell case to open link in default browser
+ * Callback class for our HTML page for a terminal cell case to open links in default browser
  * 
- * Because our anchors <a> cannot pass vars, we'll keep the links in
- * memory and have the anchor call the appropriate callback method
- */
-
-
-/* TODO
- * remove links --> pass link as string to openLink
  */
 public class InfoWindowLinkController {
 	
@@ -41,15 +34,18 @@ public class InfoWindowLinkController {
 	}
 	
 	public void handleWiringPartnerClick(String cellName) {
-		if (!Search.hasCellCase(cellName)) {
-			//generate a new cell case
-			Search.addToInfoWindow(cellName);
-		} else {
-			/*
-			 * TODO
-			 * focus the tab if it already exists
-			 */
-		}
+		//until page generation is faster, just view wiring partner in 3D
+		viewInCellTheater(cellName);
+		
+//		if (!Search.hasCellCase(cellName)) {
+//			//generate a new cell case
+//			Search.addToInfoWindow(cellName);
+//		} else {
+//			/*
+//			 * TODO
+//			 * focus the tab if it already exists
+//			 */
+//		}
 	}
 	
 	public void viewInCellTheater(String cellName) {

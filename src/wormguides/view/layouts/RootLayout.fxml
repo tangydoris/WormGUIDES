@@ -31,6 +31,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#viewCellShapesIndex" text="Cell Shapes Index" />
                         <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
                         <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
+                        <MenuItem mnemonicParsing="false" onAction="#viewCellDeaths" text="Cell Deaths" />
                         <MenuItem disable="true" mnemonicParsing="false" onAction="#productionInfoAction" text="Experimental Data" />
                     </items>
                   </Menu>

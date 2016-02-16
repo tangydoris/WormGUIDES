@@ -12,10 +12,10 @@ public class InfoWindowDOM {
 	private HTMLNode html;
 	private String name;
 
-	//other dom uses: connectome, parts list, cell shapes index
+	//other future dom uses: connectome, parts list, cell shapes index
 	
 	/*
-	 * TODO
+	 * TODO - when necessary
 	 * getNode(String ID)
 	 * removeNode(String ID)
 	 * addChildToNode(String parentID, HTMLNode child) -- need this?
@@ -27,7 +27,6 @@ public class InfoWindowDOM {
 		this.name = "CELL TITLE";
 	}
 	
-	//pass the cell name as a string which will be the name at the top of the tab
 	public InfoWindowDOM(HTMLNode html) {
 		if (!html.getTag().equals("html")) {
 			this.html = new HTMLNode("html");
@@ -48,10 +47,7 @@ public class InfoWindowDOM {
 		HTMLNode head = new HTMLNode("head");
 		
 		HTMLNode body = new HTMLNode("body");
-		
-		
-		
-		
+
 		//external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
@@ -726,6 +722,10 @@ public class InfoWindowDOM {
 	 return (newLine + "#" + node.getID() + " {"
 				+ newLine + node.getStyle()
 				+ newLine + "}");
+	}
+	
+	public HTMLNode getHTML() {
+		return this.html;
 	}
 	
 	public String getName() {
