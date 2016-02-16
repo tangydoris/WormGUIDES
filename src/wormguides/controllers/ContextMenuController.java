@@ -18,6 +18,9 @@ public class ContextMenuController extends AnchorPane implements Initializable{
 	
 	@FXML private Text nameText;
 	@FXML private Button color;
+	@FXML private Button expresses;
+	@FXML private Button wiredTo;
+	@FXML private Button colorNeighbors;
 	
 	private SearchOption searchOption;
 	private Stage parentStage;
@@ -48,10 +51,6 @@ public class ContextMenuController extends AnchorPane implements Initializable{
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		assertFXMLNodes();
-	}
-	
-	@FXML public void showNeightborsAction() {
-		// TODO
 	}
 	
 	@FXML public void showInfoAction() {

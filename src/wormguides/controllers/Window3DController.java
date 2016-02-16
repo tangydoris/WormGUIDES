@@ -590,9 +590,7 @@ public class Window3DController {
                 if (curr.equals(node)) {
                     SceneElement clickedSceneElement = currentSceneElements.get(i);
                     String name = normalizeName(clickedSceneElement.getSceneName());
-                    if (name.startsWith("Ab"))
-                        selectedName.set(name.replace("Ab", "AB"));
-                    else selectedName.set(name);
+                    selectedName.set(name);
                     found = true;
                     
                     if (event.getButton()==MouseButton.SECONDARY) {
@@ -1168,9 +1166,8 @@ public class Window3DController {
     private void removeLabelFor(String name) {
         Node entity = getEntityWithName(name);
         
-        if (entity!=null) {
+        if (entity!=null)
             removeLabelFrom(entity);
-        }
     }
     
     
@@ -1192,6 +1189,7 @@ public class Window3DController {
         text.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+            	System.out.println("removing - "+name);
                 allLabels.remove(name);
                 currentLabels.remove(name);
 
@@ -1218,7 +1216,7 @@ public class Window3DController {
         // sphere label
         for (int i=0; i<cellNames.length; i++) {
             if (spheres[i]!=null) {             
-                if (cellNames[i].equalsIgnoreCase(name)) {
+                if (cellNames[i].equals(name)) {
                     return spheres[i];
                 }
             }
