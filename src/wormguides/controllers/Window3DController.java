@@ -1189,7 +1189,6 @@ public class Window3DController {
         text.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-            	System.out.println("removing - "+name);
                 allLabels.remove(name);
                 currentLabels.remove(name);
 

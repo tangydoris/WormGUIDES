@@ -592,6 +592,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
+		if (name.startsWith("Ab"))
+			name = "AB"+name.substring(2);
 		displayedName.setText("Active Cell: "+name);
 		moreInfoClickableText.setVisible(true);
 		displayedDescription.setText("");
