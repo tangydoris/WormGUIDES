@@ -472,7 +472,7 @@ public class Search {
 //								if (PartsList.containsLineageName(searched)) {
 //									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
 //								}
-								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
+								cells.addAll(connectome.queryConnectivity(searched, presynapticTicked,
 										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
 							}
 							break;
@@ -935,10 +935,10 @@ public class Search {
 					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
 					//add a terminal case --> pass the wiring partners
 					cellCases.makeTerminalCase(tabTitle, 
-							connectome.querryConnectivity(name, true, false, false, false, false),
-							connectome.querryConnectivity(name, false, true, false, false, false),
-							connectome.querryConnectivity(name, false, false, true, false, false),
-							connectome.querryConnectivity(name, false, false, false, true, false),
+							connectome.queryConnectivity(name, true, false, false, false, false),
+							connectome.queryConnectivity(name, false, true, false, false, false),
+							connectome.queryConnectivity(name, false, false, true, false, false),
+							connectome.queryConnectivity(name, false, false, false, true, false),
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { //not in connectome --> non terminal case

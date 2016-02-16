@@ -74,11 +74,13 @@ import wormguides.Xform;
 import wormguides.model.CellCases;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
+import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
+import wormguides.model.ProductionInfo;
 import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
@@ -193,18 +195,23 @@ public class Window3DController {
     private EventHandler<MouseEvent> clickableMouseEnteredHandler;
     private EventHandler<MouseEvent> clickableMouseExitedHandler;
     
+    private ProductionInfo productionInfo;
+    private Connectome connectome;
+    
     private BooleanProperty bringUpInfoProperty;
     
     private SubsceneSizeListener subsceneSizeListener;
     
     public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
-            int movieStartTime, CellCases cases) {
+            CellCases cases, ProductionInfo info, Connectome connectome) {
         parentStage = parent;
         
         root = new Group();
-        this.cellData = data;       
+        cellData = data;       
+        productionInfo = info;
+        this.connectome = connectome;
         
-        startTime = movieStartTime;
+        startTime = productionInfo.getDefaultStartTime();
 
         time = new SimpleIntegerProperty(startTime);
         time.addListener(new ChangeListener<Number>() {
@@ -654,7 +661,7 @@ public class Window3DController {
     
     private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
         if (contextMenuStage==null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases);
+            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases, productionInfo, connectome);
             
             contextMenuStage = new Stage();
             contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -683,7 +690,15 @@ public class Window3DController {
             }
         }
         
-        contextMenuController.setName(name);
+        String funcName = PartsList.getFunctionalNameByLineageName(name);
+        if (funcName==null) {
+        	contextMenuController.setName(name);
+        	contextMenuController.setDisableTerminalCaseFunctions(true);
+        }
+        else {
+        	contextMenuController.setName(funcName);
+        	contextMenuController.setDisableTerminalCaseFunctions(false);
+        }
         
         contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
             @Override
@@ -696,6 +711,7 @@ public class Window3DController {
             }
         });
         
+        /*
         contextMenuController.setExpressesButtonListener(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -703,6 +719,7 @@ public class Window3DController {
 				
 			}
         });
+        */
         
         contextMenuStage.setX(sceneX);
         contextMenuStage.setY(sceneY);

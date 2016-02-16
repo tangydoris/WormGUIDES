@@ -16,6 +16,7 @@ import wormguides.view.InfoWindowDOM;
  * 
  */
 public class CellCases {
+	
 	private ArrayList<TerminalCellCase> terminalCases;
 	private ArrayList<NonTerminalCellCase> nonTerminalCases;
 	
@@ -53,6 +54,18 @@ public class CellCases {
 			if (infoWindow!=null)
 				infoWindow.addTab(tcDOM, terminalCase.getLinks());
 		}
+	}
+	
+	public TerminalCellCase getTerminalCellCase(String cellName) {
+		if (!containsTerminalCase(cellName))
+			return null;
+		
+		for (TerminalCellCase cellCase : terminalCases) {
+			if (cellCase.getCellName().equalsIgnoreCase(cellName))
+				return cellCase;
+		}
+		
+		return null;
 	}
 	
 	public void makeNonTerminalCase(String cellName, 

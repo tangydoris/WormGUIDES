@@ -414,9 +414,13 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	public void init3DWindow(LineageData data) {
 		if (cellCases==null)
 			initCellCases();
+		if (productionInfo==null)
+			initProductionInfo();
+		if (connectome==null)
+			initConnectome();
 		
 		window3DController = new Window3DController(mainStage, modelAnchorPane, 
-				data, productionInfo.getDefaultStartTime(), cellCases);
+				data, cellCases, productionInfo, connectome);
 		subscene = window3DController.getSubScene();
 		
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -748,8 +752,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void onChanged(ListChangeListener.Change<? extends Rule> c) {
 				while (c.next()) {
-					if (c.wasAdded() && mainTabPane.getSelectionModel().getSelectedItem()!=storiesTab) {
-						mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+					if (c.wasAdded()) {
+						//mainTabPane.getSelectionModel().select(colorAndDisplayTab);
 						colorAndDisplayTabPane.getSelectionModel().select(displayTab);
 					}
 				}

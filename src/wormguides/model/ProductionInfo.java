@@ -27,7 +27,7 @@ public class ProductionInfo {
 	}
 	
 	public int getMovieTimeOffset() {
-		String input = productionInfoData.get(8).get(1);
+		String input = productionInfoData.get(8).get(0);
 		
 		try {
 			int startTime = Integer.parseInt(input);

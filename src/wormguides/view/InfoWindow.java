@@ -40,7 +40,8 @@ public class InfoWindow {
 	private String nameToQuery;
 	private Service<Void> addNameService;
 	private Service<Void> showLoadingService;
-	private int count;
+	
+	private int count; // to show loading in progress
 	
 	/*
 	 * TODO
@@ -130,8 +131,8 @@ public class InfoWindow {
 						final String queryName = nameToQuery;
 						
 						if (queryName!=null && !queryName.isEmpty()) {
-							if (cellCases == null)  {
-								System.out.println("null cellCases");
+							if (cellCases==null)  {
+								System.out.println("null cell cases");
 								return null; //error check
 							}
 							
@@ -144,10 +145,10 @@ public class InfoWindow {
 									String tabTitle = connectome.checkQueryCell(queryName).toUpperCase();
 									//add a terminal case --> pass the wiring partners
 									cellCases.makeTerminalCase(tabTitle, 
-											connectome.querryConnectivity(queryName, true, false, false, false, false),
-											connectome.querryConnectivity(queryName, false, true, false, false, false),
-											connectome.querryConnectivity(queryName, false, false, true, false, false),
-											connectome.querryConnectivity(queryName, false, false, false, true, false),
+											connectome.queryConnectivity(queryName, true, false, false, false, false),
+											connectome.queryConnectivity(queryName, false, true, false, false, false),
+											connectome.queryConnectivity(queryName, false, false, true, false, false),
+											connectome.queryConnectivity(queryName, false, false, false, true, false),
 											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(queryName));
 								}
 							} else { //not in connectome --> non terminal case
@@ -245,5 +246,4 @@ public class InfoWindow {
 	
 	public static final String EVENT_TYPE_CLICK = "click";
 	private static final long WAIT_TIME_MILLI = 750;
-
 }

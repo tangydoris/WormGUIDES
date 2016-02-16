@@ -7,6 +7,7 @@ import wormguides.ConnectomeToHTML;
 import wormguides.loaders.ConnectomeLoader;
 
 public class Connectome {
+	
 	private ArrayList<NeuronalSynapse> connectome;
 	private ConnectomeLoader connectomeLoader;
 	
@@ -79,7 +80,7 @@ public class Connectome {
 	 * Search function which takes cell and filters results based on filter toggles
 	 * filter toggles = 4 Synapse Types
 	 */
-	public ArrayList<String> querryConnectivity(String queryCell,
+	public ArrayList<String> queryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
 			boolean electricalTicked, boolean neuromuscularTicked, boolean getLineage) {
 		
@@ -190,7 +191,7 @@ public class Connectome {
 		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
 		
 		String queryCell = "AIZL";
-		querryConnectivity(queryCell, true, true, true, true, true);
+		queryConnectivity(queryCell, true, true, true, true, true);
 	}
 	
 	//static vars

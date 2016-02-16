@@ -588,19 +588,19 @@ public class TerminalCellCase {
 	}
 	
 	public ArrayList<String> getExpressesWORMBASE() {
-		return this.geneExpression;
+		return geneExpression;
 	}
 	
 	public ArrayList<ArrayList<String>> getHomologues() {
-		return this.homologues;
+		return homologues;
 	}
 	
 	public ArrayList<String> getReferences() {
-		return this.references;
+		return references;
 	}
 	
 	public ArrayList<String> getLinks() {
-		return this.links;
+		return links;
 	}
 	
 	public ArrayList<String> getNuclearProductionInfo() {
