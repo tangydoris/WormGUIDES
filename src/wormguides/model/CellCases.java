@@ -70,7 +70,8 @@ public class CellCases {
 			InfoWindowDOM ntcDOM = new InfoWindowDOM(nonTerminalCase);
 			
 			//add dom(tab) to InfoWindow
-			infoWindow.addTab(ntcDOM, nonTerminalCase.getLinks());
+			if (infoWindow!=null)
+				infoWindow.addTab(ntcDOM, nonTerminalCase.getLinks());
 		}
 	}
 	

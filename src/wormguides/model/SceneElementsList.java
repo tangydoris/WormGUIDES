@@ -121,10 +121,6 @@ public class SceneElementsList {
 				}
 			}
 		}
-		
-		for (SceneElement se : elementsList) {
-			System.out.println(se.getAllCellNames().toString());
-		}
 	}
 	
 	private ArrayList<String> unpackCells(ArrayList<String> cells) {
