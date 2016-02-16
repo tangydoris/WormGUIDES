@@ -33,8 +33,16 @@ public class NonTerminalCellCase {
 		
 		//add each descendant as terminal descendant object
 		for (String descendant : descendantsList) {
+			String partsListDescription = PartsList.getDescriptionByLineageName(descendant);
+			if (partsListDescription == null) {
+				if (CellDeaths.containsCell(descendant)) {
+					partsListDescription = "Cell Death";
+				} else {
+					partsListDescription = "";
+				}
+			}
 			terminalDescendants.add
-						(new TerminalDescendant(descendant, PartsList.getDescriptionByLineageName(descendant)));
+						(new TerminalDescendant(descendant, partsListDescription));
 		}
 		
 		return terminalDescendants;

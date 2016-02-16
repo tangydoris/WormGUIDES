@@ -139,6 +139,11 @@ public class SceneElement {
 			endTime = time;
 	}
 	
+	public void setNewCellNames(ArrayList<String> cells) {
+		this.cellNames.clear();
+		this.cellNames = cells;
+	}
+	
 	
 	public int getX() {
 		return x;
