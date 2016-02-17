@@ -82,7 +82,12 @@ public class Connectome {
 	 */
 	public ArrayList<String> queryConnectivity(String queryCell,
 			boolean presynapticTicked, boolean postsynapticTicked,
-			boolean electricalTicked, boolean neuromuscularTicked, boolean getLineage) {
+			boolean electricalTicked, boolean neuromuscularTicked, 
+			boolean getLineage) {
+		
+		// query only works for lineage names
+		if (PartsList.containsFunctionalName(queryCell))
+			queryCell = PartsList.getLineageNameByFunctionalName(queryCell);
 		
 		queryCell = checkQueryCell(queryCell);
 		

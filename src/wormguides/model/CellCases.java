@@ -43,16 +43,17 @@ public class CellCases {
 		addTerminalCase(tCase);
 	}
 	
+	
 	private void addTerminalCase(TerminalCellCase terminalCase) {
 		if (terminalCases != null) {
 			terminalCases.add(terminalCase);
 			
-			//create dom(tab)
-			InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
-			
-			//add dom(tab) to InfoWindow
-			if (infoWindow!=null)
+			if (infoWindow!=null) {
+				//create dom(tab)
+				InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
+				//add dom(tab) to InfoWindow
 				infoWindow.addTab(tcDOM, terminalCase.getLinks());
+			}
 		}
 	}
 	

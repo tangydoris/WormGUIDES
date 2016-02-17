@@ -61,7 +61,6 @@ public abstract class Rule {
 	
 	private HBox hbox = new HBox();
 	private Label label = new Label();
-	//private Region region = new Region();
 	private Rectangle colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
 	private Button editBtn = new Button();
 	private Button visibleBtn = new Button();
@@ -100,7 +99,6 @@ public abstract class Rule {
 		label.setMinHeight(UI_SIDE_LENGTH);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		label.setFont(AppFont.getFont());
-		//HBox.setHgrow(label, Priority.ALWAYS);
 		resetLabel();
 		
 		Region r = new Region();
@@ -184,6 +182,7 @@ public abstract class Rule {
 		if (editStage==null)
 			initEditStage(stage);
 		
+		editController.setHeading(label.getText());
 		editStage.show();
 	}
 	
@@ -200,17 +199,18 @@ public abstract class Rule {
 		try {
 			editStage = new Stage();
 			editStage.setScene(new Scene((AnchorPane) loader.load()));
+			
+			/*
 			for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
             	node.setStyle("-fx-focus-color: -fx-outer-border; "
             					+"-fx-faint-focus-color: transparent;");
             }
+			*/
 			
 			editStage.setTitle("Edit Rule");
 			if (stage!=null)
 				editStage.initOwner(stage);
 			editStage.initModality(Modality.NONE);
-			
-			editStage.setResizable(false);
 			
 			editController.setHeading(text);
 			editController.setSubmitHandler(handler);
@@ -222,6 +222,7 @@ public abstract class Rule {
 			
 			if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
 				editController.disableDescendantOption();
+			
 			else if (isStructureRule)
 				editController.disableOptionsForStructureRule();
 			
@@ -253,6 +254,12 @@ public abstract class Rule {
 	
 	private void setColorButton(Color color) {
 		colorRectangle.setFill(color);
+	}
+	
+	
+	public void setText(String title) {
+		text = title;
+		resetLabel();
 	}
 	
 	

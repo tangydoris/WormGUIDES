@@ -153,7 +153,7 @@ public class InfoWindow {
 								}
 							} else { //not in connectome --> non terminal case
 								if (cellCases.containsNonTerminalCase(queryName)) {
-					
+									
 									//show tab
 								} else {
 									//add a non terminal case
@@ -206,6 +206,25 @@ public class InfoWindow {
 			infoWindowStage.toFront();
 		}
 	}
+	
+	private void goToTabWithName(String name) {
+		if (containsTab(name)) {
+			for (Tab tab : tabPane.getTabs()) {
+				if (tab.getText().equalsIgnoreCase(name)) {
+					tabPane.getSelectionModel().select(tab);
+					break;
+				}
+			}
+		}
+	}
+	
+	private boolean containsTab(String name) {
+		for (Tab tab : tabPane.getTabs()) {
+			if (tab.getText().equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
+	}
 
 	public void addTab(InfoWindowDOM dom, ArrayList<String> links) {
 		Platform.runLater(new Runnable() {
@@ -220,7 +239,6 @@ public class InfoWindow {
 				window.setMember("app", linkController);
 				
 				//link handler
-				
 				Tab tab = new Tab(dom.getName(), webview);
 				tabPane.getTabs().add(0, tab); //prepend the tab
 				tabPane.getSelectionModel().select(tab); //show the new tab
@@ -241,9 +259,9 @@ public class InfoWindow {
 	}
 	
 	public Stage getStage() {
-		return this.infoWindowStage;
+		return infoWindowStage;
 	}
 	
-	public static final String EVENT_TYPE_CLICK = "click";
-	private static final long WAIT_TIME_MILLI = 750;
+	public final String EVENT_TYPE_CLICK = "click";
+	private final long WAIT_TIME_MILLI = 750;
 }

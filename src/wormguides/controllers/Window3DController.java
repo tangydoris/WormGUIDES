@@ -693,11 +693,11 @@ public class Window3DController {
         String funcName = PartsList.getFunctionalNameByLineageName(name);
         if (funcName==null) {
         	contextMenuController.setName(name);
-        	contextMenuController.setDisableTerminalCaseFunctions(true);
+        	contextMenuController.removeTerminalCaseFunctions(true);
         }
         else {
         	contextMenuController.setName(funcName);
-        	contextMenuController.setDisableTerminalCaseFunctions(false);
+        	contextMenuController.removeTerminalCaseFunctions(false);
         }
         
         contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
