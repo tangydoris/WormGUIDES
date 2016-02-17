@@ -872,17 +872,21 @@ public class Search {
 	}
 	
 	public static int getFirstOccurenceOf(String name) {
-		if (lineageData != null) {
+		if (lineageData!=null && lineageData.isCellName(name))
 			return lineageData.getFirstOccurrenceOf(name);
-		}
+		
+		else if (sceneElementsList!=null && sceneElementsList.isSceneElementName(name))
+			return sceneElementsList.getFirstOccurrenceOf(name);
 		
 		return -1;
 	}
 	
 	public static int getLastOccurenceOf(String name) {
-		if (lineageData != null) {
+		if (lineageData!=null && lineageData.isCellName(name))
 			return lineageData.getLastOccurrenceOf(name);
-		}
+		
+		else if (sceneElementsList!=null && sceneElementsList.isSceneElementName(name))
+			return sceneElementsList.getLastOccurrenceOf(name);
 		
 		return -1;
 	}

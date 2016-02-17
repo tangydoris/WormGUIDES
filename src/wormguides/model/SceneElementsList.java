@@ -37,6 +37,15 @@ public class SceneElementsList {
 	}
 	
 	
+	public boolean isSceneElementName(String name) {
+		for (SceneElement se : elementsList) {
+			if (se.getSceneName().equalsIgnoreCase(name))
+				return true;
+		}
+		return false;
+	}
+	
+	
 	private void buildListFromConfig() {
 		
 		URL url = SceneElementsList.class.getResource("/wormguides/model/shapes_file/" + CELL_CONFIG_FILE_NAME);

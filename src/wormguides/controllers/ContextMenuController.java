@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -199,6 +200,14 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		return nameText.getText();
 	}
 	
+	public void setWiredToButtonListener(EventHandler<MouseEvent> handler) {
+		wiredTo.setOnMouseClicked(handler);
+	}
+	
+	public void setExpressesButtonListener(EventHandler<MouseEvent> handler) {
+		expresses.setOnMouseClicked(handler);
+	}
+	
 	public void removeTerminalCaseFunctions(boolean remove) {
 		if (remove && mainVBox.getChildren().contains(expressesHBox) 
 				&& mainVBox.getChildren().contains(wiredToHBox))
@@ -281,8 +290,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				}
 				
 				expressesMenu.getItems().clear();
-				
-				resetLoadingMenuItem();
 				expressesMenu.getItems().addAll(expressesTitle, loadingMenuItem);
 				expressesMenu.show(expresses, Side.RIGHT, 0, 0);
 				
@@ -293,7 +300,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		wiredTo.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// TODO Auto-generated method stub
 				if (wiredToMenu==null) {
 					wiredToMenu = new ContextMenu();
 					wiredToMenu.setMaxHeight(MAX_MENU_HEIGHT);
@@ -303,7 +309,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					wiredToMenu.setOnHidden(new EventHandler<WindowEvent>() {
 						@Override
 						public void handle(WindowEvent event) {
-							resetLoadingMenuItem();
 							wiredToQueryService.cancel();
 						}
 					});
@@ -338,11 +343,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 							wiredToMenu.getItems().remove(loadingMenuItem);
 							ArrayList<ArrayList<String>> results = wiredToQueryService.getValue();
 							if (results!=null) {
-								/*
-								for (ArrayList<String> array : results)
-									System.out.println(array.toString());
-								*/
-								
 								wiredToMenu.getItems().addAll(colorAll, preSyn, postSyn, electr, neuro);
 								
 								colorAll.setOnAction(new EventHandler<ActionEvent>() {
@@ -351,28 +351,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 										Rule rule = Search.addGiantConnectomeColorRule(cellName, 
 												DEFAULT_COLOR, true, true, true, true);
 										rule.showEditStage(parentStage);
-										/*
-										if (!results.get(PRE_SYN_INDEX).isEmpty()) {
-											Rule rule = Search.addGiantConnectomeColorRule(cellName, 
-													DEFAULT_COLOR, true, true, true, true);
-											rule.showEditStage(parentStage);
-										}
-										if (!results.get(POST_SYN_INDEX).isEmpty()) {
-											Rule rule = Search.addGiantConnectomeColorRule(cellName, 
-													DEFAULT_COLOR, false, true, false, false);
-											rule.showEditStage(parentStage);
-										}
-										if (!results.get(ELECTR_INDEX).isEmpty()) {
-											Rule rule = Search.addGiantConnectomeColorRule(cellName,
-													DEFAULT_COLOR, false, false, true, false);
-											rule.showEditStage(parentStage);
-										}
-										if (!results.get(NEURO_INDEX).isEmpty()) {
-											Rule rule = Search.addGiantConnectomeColorRule(cellName, 
-													DEFAULT_COLOR, false, false, false, true);
-											rule.showEditStage(parentStage);
-										}
-										*/
 									}
 								});
 								
@@ -391,9 +369,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				postSyn.getItems().clear();
 				electr.getItems().clear();
 				neuro.getItems().clear();
-				
-				resetLoadingMenuItem();
-				wiredToMenu.getItems().add(loadingMenuItem);
 				
 				wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
 				

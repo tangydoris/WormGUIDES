@@ -59,6 +59,11 @@ public class InfoWindowLinkController {
 		startTime = Search.getFirstOccurenceOf(cellName);
 		endTime = Search.getLastOccurenceOf(cellName);
 		
+		if (startTime<=0)
+			startTime = 1;
+		if (endTime<=0)
+			endTime = 1;
+		
 		if(time.get()<startTime || time.get()>endTime)
 			time.set(startTime);
 

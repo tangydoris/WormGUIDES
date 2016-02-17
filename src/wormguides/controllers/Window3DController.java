@@ -684,6 +684,8 @@ public class Window3DController {
                                     "-fx-faint-focus-color: transparent;");
                 }
                 
+                
+                
             } catch (IOException e) {
                 System.out.println("error in initializing context menu for "+name+".");
                 e.printStackTrace();
@@ -880,7 +882,7 @@ public class Window3DController {
         
         for (String label : allLabels) {
             for (String cell : cellNames) {
-                if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+                if (!currentLabels.contains(label) && cell.equals(label)) {
                     currentLabels.add(label);
                     break;
                 }

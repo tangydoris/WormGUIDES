@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -72,12 +71,7 @@ public class RuleEditorController extends AnchorPane implements Initializable{
 	
 	
 	public void setHeading(String name) {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				heading.setText(name);
-			}
-		});
+		heading.setText(name);
 	}
 	
 	

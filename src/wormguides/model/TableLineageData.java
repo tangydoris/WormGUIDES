@@ -8,7 +8,7 @@ import java.util.Comparator;
  * Frames are indexed from 0
  */
 
-public class TableLineageData implements LineageData{
+public class TableLineageData implements LineageData {
 	
 	private ArrayList<Frame> timeFrames;
 	private ArrayList<String> allCellNames;

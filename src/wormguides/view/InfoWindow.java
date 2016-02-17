@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -245,8 +246,8 @@ public class InfoWindow {
 				
 				//close tab event handler
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-				tab.setOnClosed(new EventHandler<javafx.event.Event>() {
-					public void handle(javafx.event.Event e) {
+				tab.setOnClosed(new EventHandler<Event>() {
+					public void handle(Event e) {
 						Tab t = (Tab) e.getSource();
 						String cellName = t.getText();
 						Search.removeCellCase(cellName);
