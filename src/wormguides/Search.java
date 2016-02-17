@@ -128,6 +128,13 @@ public class Search {
 		
 		geneSearchService = WormBaseQuery.getSearchService();
 		if (geneSearchService != null) {
+			geneSearchService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					showLoadingService.cancel();
+					searchResultsList.clear();
+				}
+			});
 			geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				@Override
 				public void handle(WorkerStateEvent event) {
@@ -155,7 +162,67 @@ public class Search {
 		geneSearchQueue = new LinkedList<String>();
 		count = 0;	
 		geneResultsUpdated = new SimpleBooleanProperty(false);
+	}
+	
+	
+	public static Rule addGiantConnectomeColorRule(String funcName, Color color, 
+			boolean isPresynaptic, boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
 		
+		StringBuilder sb = new StringBuilder("'");
+		sb.append(funcName).append("' Connectome");
+		
+		ArrayList<String> types = new ArrayList<String>();
+		if (isPresynaptic)
+			types.add("presynaptic");
+		if (isPostsynaptic)
+			types.add("postsynaptic");
+		if (isElectrical)
+			types.add("electrical");
+		if (isNeuromuscular)
+			types.add("neuromuscular");
+		if (!types.isEmpty()) {
+			sb.append(" - ");
+
+			for (int i=0; i<types.size(); i++) {
+				sb.append(types.get(i));
+				
+				if (i!=types.size()-1)
+					sb.append(", ");					
+			}
+		}
+		
+		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
+		options.add(SearchOption.CELL);
+		ColorRule tempRule = new ColorRule(sb.toString(), color);
+		tempRule.setCells(connectome.queryConnectivity(PartsList.getLineageNameByFunctionalName(funcName), 
+				isPresynaptic, isPostsynaptic, isElectrical, isNeuromuscular, true));
+		tempRule.setText(sb.toString());
+		
+		rulesList.add(tempRule);
+		return tempRule;
+	}
+	
+	
+	public static Rule addConnectomeColorRule(String searched, Color color, boolean isPresynaptic, 
+			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
+		boolean tempPresyn = presynapticTicked;
+		boolean tempPostsyn = postsynapticTicked;
+		boolean tempElectr = electricalTicked;
+		boolean tempNeuro = neuromuscularTicked;
+		
+		presynapticTicked = isPresynaptic;
+		postsynapticTicked = isPostsynaptic;
+		electricalTicked = isElectrical;
+		neuromuscularTicked = isNeuromuscular;
+		
+		Rule rule = addColorRule(SearchType.CONNECTOME, searched, color, SearchOption.CELL);
+		
+		presynapticTicked = tempPresyn;
+		postsynapticTicked = tempPostsyn;
+		electricalTicked = tempElectr;
+		neuromuscularTicked = tempNeuro;
+		
+		return rule;
 	}
 	
 	
@@ -292,7 +359,7 @@ public class Search {
 							break;
 							
 			case FUNCTIONAL:
-							label = "'"+searched+"' Functional Name";
+							label = "'"+searched+"' Functional";
 							break;
 							
 			case DESCRIPTION:
@@ -320,14 +387,10 @@ public class Search {
 		ColorRule rule = new ColorRule(label, color, options, type);
 		
 		ArrayList<String> cells;
-		if (type==SearchType.GENE) {
+		
+		if (type==SearchType.GENE)
 			WormBaseQuery.doSearch(searched);
-		} 
-		//separate case for name translation purposes (see setConnectomeRuleCells())
-		else if (type == SearchType.CONNECTOME) { 
-			cells = getCellsList(searched);
-			rule.setCells(cells);
-		} 
+
 		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
@@ -338,29 +401,6 @@ public class Search {
 		
 		return rule;
 	}
-	
-	
-	/*
-	 * Method which returns the cells which pertain to a connectome rule
-	 * If a systematic name is searched in the connectome e.g. ABa, the query is translated to a functional name prior to adding cells
-	 * If a functional name is searched in the connectome e.g. ASAL, no translation is done
-	 */
-	// TODO Look into this
-//	private static ArrayList<String> setConnectomeRuleCells(String searched) {
-//		ArrayList<String> cells = new ArrayList<String>();
-//		
-//		//if a systematic name is searched, translate to functional before searching connectome
-//		if (PartsList.containsLineageName(searched)) {
-//			searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
-//		}
-//		searched = searched.toLowerCase();
-//		for (String name : functionalNames) {
-//			if (name.toLowerCase().startsWith(searched)) {
-//				cells.add(PartsList.getLineageNameByFunctionalName(name));
-//			}
-//		}
-//		return cells;
-//	}
 	
 	
 	private static ArrayList<String> getCellsList(String searched) {
@@ -432,22 +472,7 @@ public class Search {
 							}
 							
 							break;
-//							for (int i=0; i<descriptions.size(); i++) {
-//								String textLowerCase = descriptions.get(i).toLowerCase();
-//								String[] keywords = searched.split(" ");
-//								boolean found = true;
-//								for (String keyword : keywords) {
-//									if (textLowerCase.indexOf(keyword)<0) {
-//										found = false;
-//										break;
-//									}
-//								}
-//								
-//								if (found && !cells.contains(PartsList.getLineageNameByIndex(i)))
-//									cells.add(PartsList.getLineageNameByIndex(i));
-//							}
-//							
-//							break; 
+
 			case GENE:		
 							if (isGeneFormat(getSearchedText())) {
 								showLoadingService.restart();
@@ -468,11 +493,7 @@ public class Search {
 							
 			case CONNECTOME:
 							if (connectome != null) {
-//								//if a systematic name is searched, translate to functional before searching connectome
-//								if (PartsList.containsLineageName(searched)) {
-//									searched = PartsList.getFunctionalNameByLineageName(searched).toLowerCase();
-//								}
-								cells.addAll(connectome.querryConnectivity(searched, presynapticTicked,
+								cells.addAll(connectome.queryConnectivity(searched, presynapticTicked,
 										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
 							}
 							break;
@@ -935,10 +956,10 @@ public class Search {
 					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
 					//add a terminal case --> pass the wiring partners
 					cellCases.makeTerminalCase(tabTitle, 
-							connectome.querryConnectivity(name, true, false, false, false, false),
-							connectome.querryConnectivity(name, false, true, false, false, false),
-							connectome.querryConnectivity(name, false, false, true, false, false),
-							connectome.querryConnectivity(name, false, false, false, true, false),
+							connectome.queryConnectivity(name, true, false, false, false, false),
+							connectome.queryConnectivity(name, false, true, false, false, false),
+							connectome.queryConnectivity(name, false, false, true, false, false),
+							connectome.queryConnectivity(name, false, false, false, true, false),
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { //not in connectome --> non terminal case

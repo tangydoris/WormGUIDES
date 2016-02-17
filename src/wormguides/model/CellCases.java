@@ -16,15 +16,20 @@ import wormguides.view.InfoWindowDOM;
  * 
  */
 public class CellCases {
+	
 	private ArrayList<TerminalCellCase> terminalCases;
 	private ArrayList<NonTerminalCellCase> nonTerminalCases;
 	
 	private InfoWindow infoWindow;
 	
-	public CellCases(InfoWindow infoWindow) {
+	public CellCases(InfoWindow window) {
 		terminalCases = new ArrayList<TerminalCellCase>();
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
-		this.infoWindow = infoWindow;
+		infoWindow = window;
+	}
+	
+	public void setInfoWindow(InfoWindow window) {
+		infoWindow = window;
 	}
 	
 	public void makeTerminalCase(String cellName, 
@@ -38,16 +43,30 @@ public class CellCases {
 		addTerminalCase(tCase);
 	}
 	
+	
 	private void addTerminalCase(TerminalCellCase terminalCase) {
 		if (terminalCases != null) {
 			terminalCases.add(terminalCase);
 			
-			//create dom(tab)
-			InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
-			
-			//add dom(tab) to InfoWindow
-			infoWindow.addTab(tcDOM, terminalCase.getLinks());
+			if (infoWindow!=null) {
+				//create dom(tab)
+				InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
+				//add dom(tab) to InfoWindow
+				infoWindow.addTab(tcDOM, terminalCase.getLinks());
+			}
 		}
+	}
+	
+	public TerminalCellCase getTerminalCellCase(String cellName) {
+		if (!containsTerminalCase(cellName))
+			return null;
+		
+		for (TerminalCellCase cellCase : terminalCases) {
+			if (cellCase.getCellName().equalsIgnoreCase(cellName))
+				return cellCase;
+		}
+		
+		return null;
 	}
 	
 	public void makeNonTerminalCase(String cellName, 
@@ -65,7 +84,8 @@ public class CellCases {
 			InfoWindowDOM ntcDOM = new InfoWindowDOM(nonTerminalCase);
 			
 			//add dom(tab) to InfoWindow
-			infoWindow.addTab(ntcDOM, nonTerminalCase.getLinks());
+			if (infoWindow!=null)
+				infoWindow.addTab(ntcDOM, nonTerminalCase.getLinks());
 		}
 	}
 	

@@ -244,9 +244,10 @@ public class TerminalCellCase {
 	private ArrayList<String> setExpressionsFromWORMBASE() {
 		ArrayList<String> geneExpression = new ArrayList<String>();
 		
-		if (this.cellName == null) return geneExpression;
+		if (cellName == null)
+			return geneExpression;
 
-		String URL = wormbaseURL + this.cellName + wormbaseEXT;
+		String URL = wormbaseURL + cellName + wormbaseEXT;
 		
 		String content = "";
 		URLConnection connection = null;
@@ -257,10 +258,11 @@ public class TerminalCellCase {
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
 			scanner.close();
+			
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
-			System.out.println(this.cellName + " page not found on Wormbase");
+			System.out.println(cellName + " page not found on Wormbase");
 			return geneExpression;
 		}
 		
@@ -588,19 +590,19 @@ public class TerminalCellCase {
 	}
 	
 	public ArrayList<String> getExpressesWORMBASE() {
-		return this.geneExpression;
+		return geneExpression;
 	}
 	
 	public ArrayList<ArrayList<String>> getHomologues() {
-		return this.homologues;
+		return homologues;
 	}
 	
 	public ArrayList<String> getReferences() {
-		return this.references;
+		return references;
 	}
 	
 	public ArrayList<String> getLinks() {
-		return this.links;
+		return links;
 	}
 	
 	public ArrayList<String> getNuclearProductionInfo() {

@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -312,7 +311,10 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			
 			if (cellCases==null)
 				initCellCases();
+			else
+				cellCases.setInfoWindow(infoWindow);
 		}
+		
 		infoWindow.showWindow();
 	}
 	
@@ -409,8 +411,15 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	
 	public void init3DWindow(LineageData data) {
+		if (cellCases==null)
+			initCellCases();
+		if (productionInfo==null)
+			initProductionInfo();
+		if (connectome==null)
+			initConnectome();
+		
 		window3DController = new Window3DController(mainStage, modelAnchorPane, 
-				data, productionInfo.getDefaultStartTime());
+				data, cellCases, productionInfo, connectome);
 		subscene = window3DController.getSubScene();
 		
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -542,7 +551,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			@Override
 			public void handle(MouseEvent event) {
 				openInfoWindow();
-				addToInfoWindow(selectedName.get());
+				infoWindow.addName(selectedName.get());
 			}
 		});
 		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
@@ -565,46 +574,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 					Boolean oldValue, Boolean newValue) {
 				if (newValue) {
 					openInfoWindow();
-					addToInfoWindow(selectedName.get());
+					infoWindow.addName(selectedName.get());
 					bringUpInfoProperty.set(false);
 				}
 			}
 		});
-	}
-	
-	private void addToInfoWindow(String name) {
-		//GENERATE CELL TAB ON CLICK
-		if (name!=null && !name.isEmpty()) {
-			if (cellCases == null)  {
-				return; //error check
-			}
-							
-			if (PartsList.containsLineageName(name)) {
-				if (cellCases.containsTerminalCase(name)) {
-					
-					//show the tab
-				} else {
-					//translate the name if necessary
-					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
-					//add a terminal case --> pass the wiring partners
-					cellCases.makeTerminalCase(tabTitle, 
-							connectome.querryConnectivity(name, true, false, false, false, false),
-							connectome.querryConnectivity(name, false, true, false, false, false),
-							connectome.querryConnectivity(name, false, false, true, false, false),
-							connectome.querryConnectivity(name, false, false, false, true, false),
-							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
-				}
-			} else { //not in connectome --> non terminal case
-				if (cellCases.containsNonTerminalCase(name)) {
-	
-					//show tab
-				} else {
-					//add a non terminal case
-					cellCases.makeNonTerminalCase(name, 
-							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
-				}
-			}
-		}
 	}
 	
 	private void setSelectedEntityInfo(String name) {
@@ -619,6 +593,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
+		if (name.startsWith("Ab"))
+			name = "AB"+name.substring(2);
 		displayedName.setText("Active Cell: "+name);
 		moreInfoClickableText.setVisible(true);
 		displayedDescription.setText("");
@@ -770,18 +746,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		rulesListView.setItems(displayLayer.getRulesList());
 		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
-		
-		displayLayer.getRulesList().addListener(new ListChangeListener<Rule>() {
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends Rule> c) {
-				while (c.next()) {
-					if (c.wasAdded()) {
-						mainTabPane.getSelectionModel().select(colorAndDisplayTab);
-						colorAndDisplayTabPane.getSelectionModel().select(displayTab);
-					}
-				}
-			}
-		});
 	}
 	
 	
@@ -968,9 +932,17 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initInfoWindow() {
 		if (window3DController!=null) {
+			
+			if (connectome==null)
+				initConnectome();
+			if (productionInfo==null)
+				initProductionInfo();
+			if (cellCases==null)
+				initCellCases();
+			
 			infoWindow = new InfoWindow(window3DController.getStage(), 
-					window3DController.getTimeProperty(), 
-					window3DController.getSelectedNameLabeled());
+					window3DController.getTimeProperty(), window3DController.getSelectedNameLabeled(),
+					cellCases, productionInfo, connectome);
 		}
 	}
 	

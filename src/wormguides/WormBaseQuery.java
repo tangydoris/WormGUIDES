@@ -36,8 +36,6 @@ public class WormBaseQuery{
 						final String searchText = searched.trim();
 						searched = searchText;
 						
-						//System.out.println("starting gene search for "+searchText);
-						
 						// try to get result if previously searched
 						if (resultsHash.containsKey(searched))
 							return resultsHash.get(searched);
@@ -46,7 +44,7 @@ public class WormBaseQuery{
 						ArrayList<String> out = new ArrayList<String>();
 						
 						BufferedReader pageStream = openUrl("http://www.wormbase.org/db/get?name="
-																		+searchText+";class=gene");
+								+searchText+";class=gene");
 						if (pageStream != null) {
 							String firstQueryLine = "";
 							String restString = "";
@@ -63,13 +61,13 @@ public class WormBaseQuery{
 							}
 							
 							BufferedReader restPageStream = openUrl("http://www.wormbase.org"
-																				+ restString);
+									+ restString);
 							String wbGeneLine = "";
 							try {
 								while ((wbGeneLine = restPageStream.readLine()) != null) {
 									
 									Pattern p = Pattern.compile("class=\"anatomy_term-link\""
-																	+" title=\"\">(\\S+)</a>");
+											+" title=\"\">(\\S+)</a>");
 									Matcher m = p.matcher(wbGeneLine);
 									
 									while (m.find()) {
@@ -78,9 +76,10 @@ public class WormBaseQuery{
 											out.add(name);
 									}
 								}
+								
 								pageStream.close();
 								restPageStream.close();
-								//System.out.println("finished gene search for "+searched);
+								
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -107,6 +106,7 @@ public class WormBaseQuery{
 	
 	private static BufferedReader openUrl(String target) {
 		HttpURLConnection connection = null;
+		
 		try{
 			URL url = new URL(target);
 			connection = (HttpURLConnection) url.openConnection();
@@ -117,6 +117,7 @@ public class WormBaseQuery{
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 			
 			return rd;
+			
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    return null;
@@ -124,6 +125,7 @@ public class WormBaseQuery{
 	}
 	
 	public static void doSearch(String text) {
+		System.out.println("searching "+text);
 		searched = text;
 		searchService.restart();
 	}

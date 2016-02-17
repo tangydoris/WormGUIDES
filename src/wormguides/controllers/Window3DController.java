@@ -71,13 +71,16 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
+import wormguides.model.CellCases;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
+import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
+import wormguides.model.ProductionInfo;
 import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
@@ -128,6 +131,7 @@ public class Window3DController {
     private StringProperty selectedNameLabeled;
     private Stage contextMenuStage;
     private ContextMenuController contextMenuController;
+    private CellCases cellCases;
     private BooleanProperty cellClicked;
 
     // searched highlighting stuff
@@ -191,18 +195,23 @@ public class Window3DController {
     private EventHandler<MouseEvent> clickableMouseEnteredHandler;
     private EventHandler<MouseEvent> clickableMouseExitedHandler;
     
+    private ProductionInfo productionInfo;
+    private Connectome connectome;
+    
     private BooleanProperty bringUpInfoProperty;
     
     private SubsceneSizeListener subsceneSizeListener;
     
     public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
-            int movieStartTime) {
+            CellCases cases, ProductionInfo info, Connectome connectome) {
         parentStage = parent;
         
         root = new Group();
-        this.cellData = data;       
+        cellData = data;       
+        productionInfo = info;
+        this.connectome = connectome;
         
-        startTime = movieStartTime;
+        startTime = productionInfo.getDefaultStartTime();
 
         time = new SimpleIntegerProperty(startTime);
         time.addListener(new ChangeListener<Number>() {
@@ -365,6 +374,8 @@ public class Window3DController {
                 spritesPane.setCursor(Cursor.DEFAULT);
             }
         };
+        
+        cellCases = cases;
     }
     
     
@@ -590,9 +601,7 @@ public class Window3DController {
                 if (curr.equals(node)) {
                     SceneElement clickedSceneElement = currentSceneElements.get(i);
                     String name = normalizeName(clickedSceneElement.getSceneName());
-                    if (name.startsWith("Ab"))
-                        selectedName.set(name.replace("Ab", "AB"));
-                    else selectedName.set(name);
+                    selectedName.set(name);
                     found = true;
                     
                     if (event.getButton()==MouseButton.SECONDARY) {
@@ -652,7 +661,7 @@ public class Window3DController {
     
     private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
         if (contextMenuStage==null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty);
+            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases, productionInfo, connectome);
             
             contextMenuStage = new Stage();
             contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -681,8 +690,15 @@ public class Window3DController {
             }
         }
         
-        contextMenuController.setName(name);
-        contextMenuController.setSearchOption(option);
+        String funcName = PartsList.getFunctionalNameByLineageName(name);
+        if (funcName==null) {
+        	contextMenuController.setName(name);
+        	contextMenuController.removeTerminalCaseFunctions(true);
+        }
+        else {
+        	contextMenuController.setName(funcName);
+        	contextMenuController.removeTerminalCaseFunctions(false);
+        }
         
         contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
             @Override
@@ -694,6 +710,16 @@ public class Window3DController {
                 contextMenuStage.hide();
             }
         });
+        
+        /*
+        contextMenuController.setExpressesButtonListener(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+        });
+        */
         
         contextMenuStage.setX(sceneX);
         contextMenuStage.setY(sceneY);
@@ -1168,9 +1194,8 @@ public class Window3DController {
     private void removeLabelFor(String name) {
         Node entity = getEntityWithName(name);
         
-        if (entity!=null) {
+        if (entity!=null)
             removeLabelFrom(entity);
-        }
     }
     
     
@@ -1218,7 +1243,7 @@ public class Window3DController {
         // sphere label
         for (int i=0; i<cellNames.length; i++) {
             if (spheres[i]!=null) {             
-                if (cellNames[i].equalsIgnoreCase(name)) {
+                if (cellNames[i].equals(name)) {
                     return spheres[i];
                 }
             }
