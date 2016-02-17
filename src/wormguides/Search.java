@@ -378,6 +378,9 @@ public class Search {
 			case MULTICELL:
 							label = "'"+searched+"' Multicellular Structure";
 							break;
+			case NEIGHBOR:
+							label = "'"+searched+"' Neighbors";
+							break;
 							
 			default:
 							label = searched;
@@ -497,6 +500,8 @@ public class Search {
 										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
 							}
 							break;
+			case NEIGHBOR:
+							cells = getNeighbors(searched);
 		}
 		return cells;
 	}
@@ -630,6 +635,86 @@ public class Search {
 		return ancestors;
 	}
 	
+	/*
+	 * neighbor search mode:
+	 * given cell:
+	 * - find time range of cell
+	 * 		- for each time point
+	 *			- find its nearest neighbor and compute d = distance to neighbor
+	 *       		- d = root((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2)
+	 * 			- multiple d by 1.5
+	 *     		- for position in positionsAtTime
+	 *     			- compute d1 = distance from query cell position to position
+	 *     			- if d1 is <= d
+	 *     				- if cell is not in results
+	 *     					- add cell
+	 * - highlight results over lifetime of cell
+	 */
+	public static ArrayList<String> getNeighbors(String cellName) {
+		ArrayList<String> results = new ArrayList<String>();
+		
+		if (cellName == null || !lineageData.isCellName(cellName)) return results;
+		
+		//get time range for cell
+		int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
+		int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
+		
+		for (int i = firstOccurence; i <= lastOccurence; i++) {
+			String[] names = lineageData.getNames(i);
+			Integer[][] positions = lineageData.getPositions(i);
+			
+			//find the coordinates of the query cell
+			int queryIDX = -1;
+			int x = -1;
+			int y = -1;
+			int z = -1;
+			for (int j = 0; j < names.length; j++) {
+				if (names[j].toLowerCase().equals(cellName.toLowerCase())) {
+					queryIDX = j;
+					x = positions[j][0];
+					y = positions[j][1];
+					z = positions[j][2];
+				}
+			}
+			
+			//find nearest neighbor
+			if (x != -1 && y != -1 && z != -1) {
+				//int nearestNeighborIDX = -1; --> debugging
+				double distance = Double.MAX_VALUE;
+				for (int k = 0; k < positions.length; k++) {
+					if (k != queryIDX) {
+						double distanceFromQuery = distance(x, positions[k][0], y, positions[k][1], z, positions[k][2]);
+						if (distanceFromQuery < distance) {
+							distance = distanceFromQuery;
+							//nearestNeighborIDX = k; --> debugging
+						}
+					}
+				}
+				
+				//multiple distance by 1.5
+				if (distance != Double.MAX_VALUE) {
+					distance *= 1.5;
+				}
+				
+				//find all cells within d*1.5 range
+				for (int n = 0; n < positions.length; n++) {
+					//compute distance from each cell to query cell
+					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
+						//only add new entries
+						if (!results.contains(names[n])) {
+							results.add(names[n]);
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	private static double distance(int x1, int x2, int y1, int y2, int z1, int z2) {
+		return Math.sqrt(Math.pow((x2-x1), 2) + Math.pow((y2-y1), 2) + Math.pow((z2-z1), 2));
+	}
 	
 	public EventHandler<ActionEvent> getAddButtonListener() {
 		return new EventHandler<ActionEvent>() {

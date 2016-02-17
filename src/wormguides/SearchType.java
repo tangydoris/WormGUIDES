@@ -13,7 +13,8 @@ public enum SearchType {
 	 * SearchOption.MULTICELLULAR is used to distinguish multicell structures from cell bodies
 	 * when meshes in the 3D window query the rules
 	 */
-	MULTICELL ("Multicellular Structure");
+	MULTICELL ("Multicellular Structure"),
+	NEIGHBOR ("Neighbor");
 	
 	
 	private String description;

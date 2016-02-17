@@ -196,6 +196,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		color.setOnAction(handler);
 	}
 	
+	public void setColorNeighborsButtonListener(EventHandler<ActionEvent> handler) {
+		colorNeighbors.setOnAction(handler);
+	}
+	
 	public String getName() {
 		return nameText.getText();
 	}
