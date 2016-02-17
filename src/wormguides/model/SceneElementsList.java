@@ -8,7 +8,6 @@ package wormguides.model;
  */
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +22,13 @@ public class SceneElementsList {
 	public ArrayList<SceneElement> elementsList;
 	public HashMap<String, ArrayList<String>> nameCellsMap;
 	public HashMap<String, String> nameCommentsMap;
-	private ArrayList<File> objEntries;
+	//private ArrayList<File> objEntries;
 	
 	
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
 	public SceneElementsList() {
 		elementsList = new ArrayList<SceneElement>();
-		objEntries = new ArrayList<File>();
+		//objEntries = new ArrayList<File>();
 		nameCellsMap = new HashMap<String, ArrayList<String>>();
 		nameCommentsMap = new HashMap<String, String>();
 		
@@ -57,15 +56,20 @@ public class SceneElementsList {
 				processCells();
 			}
 			
+			
+			/*
+			 * when/how is this used? --> can't open folders using getResource
+			 */
+			
 			//add obj entries
-			URL url2 = SceneElementsList.class.getResource("objFile/");
-			if (url2 != null) {
-				File[] contents = new File(url2.getFile()).listFiles();
-				for (File file : contents) {
-					objEntries.add(file);
-				}
-			}
-		} catch (FileNotFoundException e) {
+//			URL objFilesDir = SceneElementsList.class.getResource("wormguides/model/obj_files/");
+//			if (objFilesDir != null) {
+//				File[] contents = new File(objFilesDir.toURI()).listFiles();
+//				for (File file : contents) {
+//					objEntries.add(file);
+//				}
+//			}
+ 		} catch (FileNotFoundException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		} catch (IOException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");

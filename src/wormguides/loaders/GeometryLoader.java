@@ -25,12 +25,15 @@ public class GeometryLoader {
 	private static TriangleMesh mesh;
  
 	public static MeshView loadOBJ(String fileName) {
-		
+		/*
+		 * can't use '..' in getResouce --> instead use complete relative path from root directory. has to start with '/'
+		 */
 		//take path up until model
-		fileName = fileName.substring(fileName.indexOf("/model"));
-		fileName = ".." + fileName;
+//		fileName = fileName.substring(fileName.indexOf("/model"));
+//		fileName = ".." + fileName;
 		
-		URL url = ProductionInfoLoader.class.getResource(fileName);
+		//append /
+		URL url = ProductionInfoLoader.class.getResource("/" + fileName);
 		
 		coords = new ArrayList<double[]>();
 		faces = new ArrayList<int[]>();
