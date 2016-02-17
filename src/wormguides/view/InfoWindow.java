@@ -75,7 +75,11 @@ public class InfoWindow {
 		
 		//link handler
 		
-		Tab tab = new Tab(dom.getName(), webview);
+		
+		
+		DraggableTab tab = new DraggableTab(dom.getName());
+		tab.setContent(webview);
+		//Tab tab = new Tab(dom.getName(), webview);
 		tabPane.getTabs().add(0, tab); //prepend the tab
 		tabPane.getSelectionModel().select(tab); //show the new tab
 		
