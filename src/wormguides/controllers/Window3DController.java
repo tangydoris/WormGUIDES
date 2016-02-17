@@ -662,7 +662,8 @@ public class Window3DController {
     
     private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
         if (contextMenuStage==null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases, productionInfo, connectome);
+            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, 
+            		cellCases, productionInfo, connectome);
             
             contextMenuStage = new Stage();
             contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -685,7 +686,16 @@ public class Window3DController {
                                     "-fx-faint-focus-color: transparent;");
                 }
                 
+                EventHandler<MouseEvent> closeContextMenuHandler = new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						contextMenuStage.hide();
+					}
+                };
                 
+                contextMenuController.setInfoButtonListener(closeContextMenuHandler);
+                contextMenuController.setExpressesButtonListener(closeContextMenuHandler);
+                contextMenuController.setWiredToButtonListener(closeContextMenuHandler);
                 
             } catch (IOException e) {
                 System.out.println("error in initializing context menu for "+name+".");
@@ -703,9 +713,9 @@ public class Window3DController {
         	contextMenuController.removeTerminalCaseFunctions(false);
         }
         
-        contextMenuController.setColorButtonListener(new EventHandler<ActionEvent>() {
+        contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
             @Override
-            public void handle(ActionEvent event) {
+            public void handle(MouseEvent event) {
                 Rule rule = Search.addColorRule(SearchType.LINEAGE, name, 
                         Color.WHITE, option);
                 rule.showEditStage(parentStage);
@@ -714,9 +724,9 @@ public class Window3DController {
             }
         });
         
-        contextMenuController.setColorNeighborsButtonListener(new EventHandler<ActionEvent>() {
+        contextMenuController.setColorNeighborsButtonListener(new EventHandler<MouseEvent>() {
         	@Override
-        	public void handle(ActionEvent event) {
+        	public void handle(MouseEvent event) {
         		//call distance Search method
         		Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name,
         				Color.WHITE, option);

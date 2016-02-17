@@ -199,8 +199,6 @@ public abstract class Rule {
 		try {
 			editStage = new Stage();
 			editStage.setScene(new Scene((AnchorPane) loader.load()));
-			editStage.setWidth(250);
-			editStage.setHeight(380);
 			
 			for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
             	node.setStyle("-fx-focus-color: -fx-outer-border; "

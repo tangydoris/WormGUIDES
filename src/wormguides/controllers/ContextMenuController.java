@@ -42,6 +42,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	@FXML private HBox wiredToHBox;
 	
 	@FXML private Text nameText;
+	@FXML private Button info;
 	@FXML private Button color;
 	@FXML private Button expresses;
 	@FXML private Button wiredTo;
@@ -192,16 +193,16 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		};
 	}
 	
-	public void setColorButtonListener(EventHandler<ActionEvent> handler) {
-		color.setOnAction(handler);
+	public void setInfoButtonListener(EventHandler<MouseEvent> handler) {
+		info.setOnMouseClicked(handler);
 	}
 	
-	public void setColorNeighborsButtonListener(EventHandler<ActionEvent> handler) {
-		colorNeighbors.setOnAction(handler);
+	public void setColorButtonListener(EventHandler<MouseEvent> handler) {
+		color.setOnMouseClicked(handler);
 	}
 	
-	public String getName() {
-		return nameText.getText();
+	public void setColorNeighborsButtonListener(EventHandler<MouseEvent> handler) {
+		colorNeighbors.setOnMouseClicked(handler);
 	}
 	
 	public void setWiredToButtonListener(EventHandler<MouseEvent> handler) {
@@ -210,6 +211,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	
 	public void setExpressesButtonListener(EventHandler<MouseEvent> handler) {
 		expresses.setOnMouseClicked(handler);
+	}
+	
+	public String getName() {
+		return nameText.getText();
 	}
 	
 	public void removeTerminalCaseFunctions(boolean remove) {

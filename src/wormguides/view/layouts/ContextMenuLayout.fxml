@@ -28,7 +28,7 @@
             <HBox>
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#showInfoAction" text="Show Info">
+                  <Button fx:id="info" mnemonicParsing="false" onAction="#showInfoAction" text="Show Info">
                      <font>
                         <Font size="14.0" />
                      </font>
