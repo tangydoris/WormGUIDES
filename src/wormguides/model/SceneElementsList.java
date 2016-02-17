@@ -17,20 +17,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.jar.JarFile;
 
 public class SceneElementsList {
 	
 	public ArrayList<SceneElement> elementsList;
 	public HashMap<String, ArrayList<String>> nameCellsMap;
 	public HashMap<String, String> nameCommentsMap;
-	private ArrayList<File> objEntries;
+	//private ArrayList<File> objEntries;
 	
 	
 	//this will eventually be constructed using a .txt file that contains the Scene Element information for the embryo
 	public SceneElementsList() {
 		elementsList = new ArrayList<SceneElement>();
-		objEntries = new ArrayList<File>();
+		//objEntries = new ArrayList<File>();
 		nameCellsMap = new HashMap<String, ArrayList<String>>();
 		nameCommentsMap = new HashMap<String, String>();
 		
@@ -49,15 +48,20 @@ public class SceneElementsList {
 				processCells();
 			}
 			
+			
+			/*
+			 * when/how is this used? --> can't open folders using getResource
+			 */
+			
 			//add obj entries
-			URL url2 = SceneElementsList.class.getResource("objFile/");
-			if (url2 != null) {
-				File[] contents = new File(url2.getFile()).listFiles();
-				for (File file : contents) {
-					objEntries.add(file);
-				}
-			}
-		} catch (FileNotFoundException e) {
+//			URL objFilesDir = SceneElementsList.class.getResource("wormguides/model/obj_files/");
+//			if (objFilesDir != null) {
+//				File[] contents = new File(objFilesDir.toURI()).listFiles();
+//				for (File file : contents) {
+//					objEntries.add(file);
+//				}
+//			}
+ 		} catch (FileNotFoundException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
 		} catch (IOException e) {
 			System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
@@ -121,10 +125,6 @@ public class SceneElementsList {
 					se.setNewCellNames(unpackCells(cells));
 				}
 			}
-		}
-		
-		for (SceneElement se : elementsList) {
-			System.out.println(se.getAllCellNames().toString());
 		}
 	}
 	

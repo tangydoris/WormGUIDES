@@ -996,7 +996,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		initToggleGroup();
 		initDisplayLayer();
 		
-		initializeWithLineageData(data);
+			initializeWithLineageData(data);
 		
 		mainTabPane.getSelectionModel().select(storiesTab);
 	}
