@@ -95,6 +95,7 @@ public class Window3DController {
     private SubScene subscene;
     
     private TextField searchField;
+
     
     // transformation stuff
     private Group root;
@@ -138,7 +139,7 @@ public class Window3DController {
     private boolean inSearch;
     private ObservableList<String> searchResultsList;
     private ArrayList<String> localSearchResults;
-
+    
     // color rules stuff
     private ColorHash colorHash;
     private ObservableList<Rule> currentRulesList;
@@ -709,6 +710,17 @@ public class Window3DController {
                 
                 contextMenuStage.hide();
             }
+        });
+        
+        contextMenuController.setColorNeighborsButtonListener(new EventHandler<ActionEvent>() {
+        	@Override
+        	public void handle(ActionEvent event) {
+        		//call distance Search method
+        		Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name,
+        				Color.WHITE, option);
+        		rule.showEditStage(parentStage);
+        		contextMenuStage.hide();
+        	}
         });
         
         /*
