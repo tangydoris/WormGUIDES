@@ -268,7 +268,15 @@ public class SceneElement {
 	
 	
 	public String toString() {
-		return sceneName+": "+resourceLocation;
+		StringBuilder sb = new StringBuilder("SceneElement[");
+		sb.append("@scenename=").append(sceneName);
+		sb.append("; @startTime=").append(startTime);
+		sb.append("; @endTime=").append(endTime);
+		sb.append("; @cells=").append(cellNames.toString());
+		sb.append("; @resourceLocation=").append(resourceLocation);
+		sb.append("; @comments=").append(comments);
+		sb.append("]");
+		return sb.toString();
 	}
 	
 	private final String OBJ_EXT = ".obj";

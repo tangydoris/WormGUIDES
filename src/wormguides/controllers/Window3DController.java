@@ -877,6 +877,7 @@ public class Window3DController {
         }
         
         if (sceneElementsList != null) {
+        	//System.out.println("scene elements at time "+requestedTime);
             sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
             for (int i = 0; i < sceneElementsAtTime.size(); i++) {
                 //add meshes from each scene element
@@ -892,6 +893,7 @@ public class Window3DController {
                     
                     //add scene element to rendered scene element reference for on click responsiveness
                     currentSceneElements.add(se);
+                    //System.out.println(se.toString());
                 }
             }   
         }
