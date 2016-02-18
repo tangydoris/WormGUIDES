@@ -117,9 +117,9 @@ public class StructuresLayer {
 						searchResultsList.clear();
 					
 					else {
-						searchAndUpdateResults(newValue.toLowerCase());
-						deselectAllStructures();
 						setSelectedStructure("");
+						deselectAllStructures();
+						searchAndUpdateResults(newValue.toLowerCase());
 					}
 				}
 			});
@@ -205,22 +205,24 @@ public class StructuresLayer {
 					}
 				}
 				
-				//search in cells]
+				//search in cells
 				ArrayList<String> cells = nameToCellsMap.get(nameLower);
-				for (String cell : cells) {
-					//we'll use the first term
-					if (terms.length > 0) {
-						//check if search term is a functional name
-						String lineageName = PartsList.getLineageNameByFunctionalName((terms[0].toUpperCase()));
-						if (lineageName != null) {
-							if (cell.toLowerCase().startsWith(lineageName.toLowerCase())) {
-								appliesToCell = true;
-								break;
-							}
-						} else {
-							if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
-								appliesToCell = true;
-								break;
+				if (cells!=null) {
+					for (String cell : cells) {
+						//we'll use the first term
+						if (terms.length > 0) {
+							//check if search term is a functional name
+							String lineageName = PartsList.getLineageNameByFunctionalName((terms[0].toUpperCase()));
+							if (lineageName != null) {
+								if (cell.toLowerCase().startsWith(lineageName.toLowerCase())) {
+									appliesToCell = true;
+									break;
+								}
+							} else {
+								if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
+									appliesToCell = true;
+									break;
+								}
 							}
 						}
 					}
