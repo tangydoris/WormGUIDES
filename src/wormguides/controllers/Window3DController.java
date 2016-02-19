@@ -217,6 +217,8 @@ public class Window3DController {
     //still screen capture counter and label
     private final static String imgName = "WormGUIDES_time_";
     
+    private BooleanProperty update3D;
+    
     public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
             CellCases cases, ProductionInfo info, Connectome connectome) {
         parentStage = parent;
@@ -404,6 +406,21 @@ public class Window3DController {
         orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
         orientationIndicator.setMaterial(material);
       //  root.getChildren().add(orientationIndicator);
+        
+       initializeUpdate3D();
+    }
+    
+    private void initializeUpdate3D() {
+    	update3D = new SimpleBooleanProperty(false);
+    	
+    	update3D.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) { //i.e. out of focus, now refresh the scene
+					buildScene();
+				}
+			}
+		});
     }
     
     
@@ -477,11 +494,19 @@ public class Window3DController {
     public void setStoriesLayer(StoriesLayer layer) {
         if (layer!=null) {
             storiesLayer = layer;
+            if (update3D != null) {
+            	initializeUpdate3D();
+            }
+            storiesLayer.setUpdate3DProperty(update3D);
+            
             buildScene();
         }
     }
     
-
+    public BooleanProperty getUpdate3DProperty() {
+    	return this.update3D;
+    }
+    
     public IntegerProperty getTimeProperty() {
         return time;
     }
@@ -2008,6 +2033,15 @@ public class Window3DController {
                     if (t>=1 && t<getEndTime()-1)
                         time.set(t+1);
                 }
+            }
+        };
+    }
+    
+    public EventHandler<ActionEvent> getUpdate3DListener() {
+    	return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+               
             }
         };
     }

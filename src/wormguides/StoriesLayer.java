@@ -91,6 +91,8 @@ public class StoriesLayer {
 	private BooleanProperty useInternalRules;
 	private Window3DController window3DController;
 	
+	private BooleanProperty update3D;
+	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
 			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag,
 			int movieTimeOffset) {
@@ -307,6 +309,10 @@ public class StoriesLayer {
 			editController.setActiveNote(activeNote);
 	}
 	
+	public void setUpdate3DProperty(BooleanProperty update3D) {
+		this.update3D = update3D;
+	}
+	
 	
 	private Integer getEffectiveEndTime(Note activeNote) {
 		int time = Integer.MIN_VALUE;
@@ -499,7 +505,9 @@ public class StoriesLayer {
 				if (editStage==null) {
 					editController = new StoryEditorController(timeOffset, cellData, 
 							sceneElementsList.getAllMulticellSceneNames(),
-							activeCellProperty, cellClickedProperty, timeProperty);
+							activeCellProperty, cellClickedProperty, timeProperty, update3D);
+					
+					editController.setUpdate3DProperty(update3D);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
