@@ -1,5 +1,7 @@
 package wormguides.controllers;
 
+import java.awt.image.RenderedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +9,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
 
 import com.sun.javafx.scene.CameraHelper;
 
@@ -27,6 +31,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -41,9 +46,11 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -53,6 +60,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.CullFace;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
@@ -193,6 +201,9 @@ public class Window3DController {
     private HashMap<Node, Text> entityLabelMap;
     private Text transientLabelText; // shows up on hover
     
+    //orientation indicator
+    private Cylinder orientationIndicator;
+    
     private EventHandler<MouseEvent> clickableMouseEnteredHandler;
     private EventHandler<MouseEvent> clickableMouseExitedHandler;
     
@@ -202,6 +213,9 @@ public class Window3DController {
     private BooleanProperty bringUpInfoProperty;
     
     private SubsceneSizeListener subsceneSizeListener;
+    
+    //still screen capture counter and label
+    private final static String imgName = "WormGUIDES_time_";
     
     public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, 
             CellCases cases, ProductionInfo info, Connectome connectome) {
@@ -377,6 +391,19 @@ public class Window3DController {
         };
         
         cellCases = cases;
+        
+        //set up the orientation indicator in bottom right corner
+        double radius = 5.0;
+        double height = 15.0;
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseColor(Color.RED);
+        orientationIndicator = new Cylinder(radius, height);
+//        orientationIndicator.setTranslateX(newOriginX);
+//        orientationIndicator.setTranslateY(newOriginY);
+//        orientationIndicator.setTranslateZ(newOriginZ);
+        orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
+        orientationIndicator.setMaterial(material);
+      //  root.getChildren().add(orientationIndicator);
     }
     
     
@@ -551,6 +578,10 @@ public class Window3DController {
             
             repositionSprites();
             repositionNoteBillboardFronts();
+            
+
+            
+            stillscreenCapture();
         }
     }
     
@@ -1013,6 +1044,8 @@ public class Window3DController {
             else if (node instanceof VBox && node!=overlayVBox)
                 iter.remove();
         }
+        
+       // root.getChildren().add(orientationIndicator);
     }
 
     
@@ -1632,6 +1665,26 @@ public class Window3DController {
                     searchedMeshes[i] = false;
             }
         }
+    }
+    
+    /*
+     * When called, a snapshot of the screen is saved
+     */
+    public void stillscreenCapture() {
+    	WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+    	
+    	/* 
+    	 * write the image to a file
+    	 */
+    	try {
+    		String imageFileName = imgName + time.get() + ".png";
+    		File file = new File(imageFileName);
+    		RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+    		ImageIO.write(renderedImage, "png", file);
+    		System.out.println("Saved image " + imageFileName + " to WormGUIDES directory");
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
     }
 
     

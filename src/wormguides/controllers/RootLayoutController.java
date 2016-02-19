@@ -211,6 +211,12 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			storiesLayer.saveActiveStory();
 	}
 	
+	@FXML public void menuSaveImageAction() {
+		if (window3DController != null) {
+			window3DController.stillscreenCapture();
+		}
+	}
+	
 	@FXML public void menuCloseAction() {
 		System.out.println("exiting...");
 		System.exit(0);

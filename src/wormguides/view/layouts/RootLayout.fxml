@@ -19,7 +19,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveStory" text="Save Active Story" />
                   <MenuItem mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
                   <MenuItem disable="true" mnemonicParsing="false" text="Save Movie" />
-                  <MenuItem disable="true" mnemonicParsing="false" text="Save Image" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuSaveImageAction" text="Save Image" />
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>
