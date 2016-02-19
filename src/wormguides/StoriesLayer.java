@@ -297,12 +297,16 @@ public class StoriesLayer {
 		if (activeNote!=null) {
 			activeNote.setActive(true);
 			
-			// set time property to be read by 3d window
-			int startTime = getEffectiveStartTime(activeNote);
-			if (startTime<1)
-				startTime=1;
 			
-			timeProperty.set(startTime);
+			/* TODO
+			 * IS THIS NECESSARY? removing this line fixes the bug where every "New Note" click jumps to the start
+			 */
+			// set time property to be read by 3d window --> 
+//			int startTime = getEffectiveStartTime(activeNote);
+//			if (startTime<1)
+//				startTime=1;
+//			
+//			timeProperty.set(startTime);
 		}
 		
 		if (editController!=null)
