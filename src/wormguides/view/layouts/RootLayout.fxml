@@ -64,7 +64,7 @@
                            <children>
                               <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <children>
-                                    <Label text="Stories:">
+                                    <Label text="Stories: User created shareable annotations">
                                        <font>
                                           <Font size="14.0" />
                                        </font>

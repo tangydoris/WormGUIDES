@@ -759,8 +759,8 @@ public class Window3DController {
                 };
                 
                 contextMenuController.setInfoButtonListener(closeContextMenuHandler);
-                contextMenuController.setExpressesButtonListener(closeContextMenuHandler);
-                contextMenuController.setWiredToButtonListener(closeContextMenuHandler);
+                //contextMenuController.setExpressesButtonListener(closeContextMenuHandler);
+                //contextMenuController.setWiredToButtonListener(closeContextMenuHandler);
                 
             } catch (IOException e) {
                 System.out.println("error in initializing context menu for "+name+".");
@@ -771,11 +771,11 @@ public class Window3DController {
         String funcName = PartsList.getFunctionalNameByLineageName(name);
         if (funcName==null) {
         	contextMenuController.setName(name);
-        	contextMenuController.removeTerminalCaseFunctions(true);
+        	contextMenuController.disableTerminalCaseFunctions(true);
         }
         else {
         	contextMenuController.setName(funcName);
-        	contextMenuController.removeTerminalCaseFunctions(false);
+        	contextMenuController.disableTerminalCaseFunctions(false);
         }
         
         contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
