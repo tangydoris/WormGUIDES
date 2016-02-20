@@ -66,9 +66,14 @@ public class InfoWindowLinkController {
 		
 		if(time.get()<startTime || time.get()>endTime)
 			time.set(startTime);
-
-		labeledCellProperty.set(cellName);
+		
+		resetLabeledCellProperty(cellName);
 		
 		parentStage.requestFocus();
+	}
+	
+	private void resetLabeledCellProperty(String cellName) {
+		labeledCellProperty.set("");
+		labeledCellProperty.set(cellName);
 	}
 }

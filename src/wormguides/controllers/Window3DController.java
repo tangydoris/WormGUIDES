@@ -271,10 +271,12 @@ public class Window3DController {
 					String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
 					selectedName.set(newValue);
+					
 					if (!allLabels.contains(newValue)) {
 						allLabels.add(newValue);
-						currentLabels.add(newValue);
+			    		currentLabels.add(newValue);
 					}
+					
 					insertLabelFor(newValue, getEntityWithName(newValue));
 				}
 			}
@@ -424,50 +426,65 @@ public class Window3DController {
     }
     
     
+    public ColorHash getColorHash() {
+    	return colorHash;
+    }
+    
+    
     /*
      * Insert transient label into sprites pane
      * name = name that appears on the label
      * entity = entity that the label should show up on
      */
     private void showTransientLabel(String name, Node entity) {
-        Bounds b = entity.getBoundsInParent();
-        
-        if (b!=null) {
-            transientLabelText = makeNoteSpriteText(name);
-            
-            transientLabelText.setWrappingWidth(-1);
-            transientLabelText.setFill(Color.web("#F0F0F0"));
-            transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    event.consume();
-                }
-            });
-            transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    event.consume();
-                }
-            });
-            
-            Point2D p = CameraHelper.project(camera, 
-                    new Point3D((b.getMinX()+b.getMaxX())/2, 
-                            (b.getMinY()+b.getMaxY())/2, 
-                            (b.getMaxZ()+b.getMinZ())/2));
-            double x = p.getX();
-            double y = p.getY();
-            
-            double vOffset = b.getHeight()/2;
-            double hOffset = b.getWidth()/2;
-    
-            x += hOffset;
-            y -= vOffset+5;
-            
-            transientLabelText.setText(name);
-            transientLabelText.getTransforms().add(new Translate(x, y));
-            
-            spritesPane.getChildren().add(transientLabelText);
-        }
+    	boolean labelDrawn = false;
+    	
+    	if (currentLabels.contains(name))
+			labelDrawn = true;
+    	
+    	if (!labelDrawn) {
+	        Bounds b = entity.getBoundsInParent();
+	        
+	        if (b!=null) {
+	        	String funcName = PartsList.getFunctionalNameByLineageName(name);
+	        	if (funcName!=null)
+	        		name = funcName;
+	        	
+	            transientLabelText = makeNoteSpriteText(name);
+	            
+	            transientLabelText.setWrappingWidth(-1);
+	            transientLabelText.setFill(Color.web("#F0F0F0"));
+	            transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+	                @Override
+	                public void handle(MouseEvent event) {
+	                    event.consume();
+	                }
+	            });
+	            transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	                @Override
+	                public void handle(MouseEvent event) {
+	                    event.consume();
+	                }
+	            });
+	            
+	            Point2D p = CameraHelper.project(camera, 
+	                    new Point3D((b.getMinX()+b.getMaxX())/2, 
+	                            (b.getMinY()+b.getMaxY())/2, 
+	                            (b.getMaxZ()+b.getMinZ())/2));
+	            double x = p.getX();
+	            double y = p.getY();
+	            
+	            double vOffset = b.getHeight()/2;
+	            double hOffset = b.getWidth()/2;
+	    
+	            x += hOffset;
+	            y -= vOffset+5;
+	            
+	            transientLabelText.getTransforms().add(new Translate(x, y));
+	            
+	            spritesPane.getChildren().add(transientLabelText);
+	        }
+    	}
     }
     
     
@@ -604,8 +621,6 @@ public class Window3DController {
             repositionSprites();
             repositionNoteBillboardFronts();
             
-
-            
             stillscreenCapture();
         }
     }
@@ -634,17 +649,15 @@ public class Window3DController {
             if (event.getButton()==MouseButton.SECONDARY)
                 showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL);
             else if (event.getButton()==MouseButton.PRIMARY) {
-                if (allLabels.contains(name)) {
-                    allLabels.remove(name);
-                    currentLabels.remove(name);
-                    
+                if (allLabels.contains(name))
                     removeLabelFor(name);
-                }
+                
                 else {
-                    allLabels.add(name);
-                    currentLabels.add(name);
-                    
-                    insertLabelFor(name, node);
+                	if (!allLabels.contains(name)) {
+                		allLabels.add(name);
+                		currentLabels.add(name);
+                		insertLabelFor(name, getEntityWithName(name));
+                	}
                 }
             }
 
@@ -669,17 +682,13 @@ public class Window3DController {
                     }
                     
                     else if (event.getButton()==MouseButton.PRIMARY) {
-                        if (allLabels.contains(name)) {
-                            allLabels.remove(name);
-                            currentLabels.remove(name);
-                            
+                        if (allLabels.contains(name))
                             removeLabelFor(name);
-                        }
+ 
                         else {
-                            allLabels.add(name);
-                            currentLabels.add(name);
-                            
-                            insertLabelFor(name, node);
+                    		allLabels.add(name);
+                    		currentLabels.add(name);
+                    		insertLabelFor(name, node);
                         }
                     }
                     
@@ -790,16 +799,6 @@ public class Window3DController {
         		contextMenuStage.hide();
         	}
         });
-        
-        /*
-        contextMenuController.setExpressesButtonListener(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				// TODO Auto-generated method stub
-				
-			}
-        });
-        */
         
         contextMenuStage.setX(sceneX);
         contextMenuStage.setY(sceneY);
@@ -962,7 +961,7 @@ public class Window3DController {
         
         for (String label : allLabels) {
             for (String cell : cellNames) {
-                if (!currentLabels.contains(label) && cell.equals(label)) {
+                if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
                     currentLabels.add(label);
                     break;
                 }
@@ -1176,12 +1175,8 @@ public class Window3DController {
                         // make label appear
                         String name = normalizeName(se.getSceneName());
                         
-                        if (!currentLabels.contains(name)) {
-                            String funcName = PartsList.getFunctionalNameByLineageName(name);
-                            if (funcName!=null)
-                                name = funcName;
+                        if (!currentLabels.contains(name.toLowerCase()))
                             showTransientLabel(name, mesh);
-                        }
                     }
                 });
                 mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -1251,11 +1246,9 @@ public class Window3DController {
                     // make label appear
                     String name = cellNames[index];
                     
-                    if (!currentLabels.contains(name)) {
-                        String funcName = PartsList.getFunctionalNameByLineageName(name);
-                        if (funcName!=null)
-                            name = funcName;
-                        showTransientLabel(name, spheres[index]);
+                    if (!currentLabels.contains(name.toLowerCase())) {
+                        // get cell body version of sphere, if there is one
+                        showTransientLabel(name, getEntityWithName(name));
                     }
                 }
             });
@@ -1276,6 +1269,9 @@ public class Window3DController {
     
     
     private void removeLabelFor(String name) {
+    	allLabels.remove(name);
+        currentLabels.remove(name);
+        
         Node entity = getEntityWithName(name);
         
         if (entity!=null)
@@ -1291,28 +1287,34 @@ public class Window3DController {
     }
     
     private void insertLabelFor(String name, Node entity) {
-        String funcName = PartsList.getFunctionalNameByLineageName(name);
+    	// if label is already in scene, make all labels white
+    	// and highlight that one
+    	Text label = entityLabelMap.get(entity);
+    	if (label!=null) {
+    		for (Node shape : entityLabelMap.keySet())
+    			entityLabelMap.get(shape).setFill(Color.web(SPRITE_COLOR_HEX));
+    		
+    		label.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+    		return;
+    	}
+
+		String funcName = PartsList.getFunctionalNameByLineageName(name);
         Text text;
         if (funcName!=null)
             text = makeNoteSpriteText(funcName);
         else
             text = makeNoteSpriteText(name);
         
+        final String tempName = name;
         text.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                allLabels.remove(name);
-                currentLabels.remove(name);
-
-                removeLabelFor(name);
+                removeLabelFor(tempName);
             }
         });
         
         for (Node shape3D : entityLabelMap.keySet())
             entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
-        
-        if (name.equals(selectedName.get()))
-        	text.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
         
         text.setWrappingWidth(-1);
         
@@ -1320,25 +1322,40 @@ public class Window3DController {
         
         spritesPane.getChildren().add(text);
         alignTextWithEntity(text, entity, true);
+    	
+    	
+    	// highlight newest label
+    	if (name.equalsIgnoreCase(selectedName.get())) {
+    		text = entityLabelMap.get(entity);
+    		if (text!=null)
+    			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+    		else
+    			System.out.println("cannot get Text from entityLabelMap");
+    	}
     }
     
     
+    /*
+     * Returns the scene 3D entity with input name
+     * Pririty is given to meshes (if a mesh and a cell have the same name,
+     * the mesh is returned)
+     */
     private Shape3D getEntityWithName(String name) {
+    	// give priority to meshes
+    	// mesh view label
+        for (int i=0; i<currentSceneElements.size(); i++) {
+            if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+                    && currentSceneElementMeshes.get(i)!=null) {
+                return currentSceneElementMeshes.get(i);
+            }
+        }
+        
         // sphere label
         for (int i=0; i<cellNames.length; i++) {
             if (spheres[i]!=null) {             
                 if (cellNames[i].equals(name)) {
                     return spheres[i];
                 }
-            }
-            
-        }
-        
-        // mesh view label
-        for (int i=0; i<currentSceneElements.size(); i++) {
-            if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-                    && currentSceneElementMeshes.get(i)!=null) {
-                return currentSceneElementMeshes.get(i);
             }
         }
         
