@@ -132,6 +132,11 @@ public class StoriesLayer {
 		
 		StoriesLoader.loadConfigFile(stories, timeOffset);
 		
+		Story defaultStory = new Story("Blank Story", 
+				"This is a blank story. Create notes and set custom color rules!", "");
+		stories.add(defaultStory);
+		setActiveStory(defaultStory);
+		
 		noteComparator = new Comparator<Note>() {
 			@Override
 			public int compare(Note o1, Note o2) {
