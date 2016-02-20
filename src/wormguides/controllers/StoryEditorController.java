@@ -98,11 +98,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML private TextArea contentArea;
 	private Note activeNote;
 	
+	private BooleanProperty update3D;
+	
 	// Input nameProperty is the string property that changes with clicking
 	// on an entity in the 3d window
 	public StoryEditorController(int timeOffset, LineageData data, ArrayList<String> multiCellStructuresList, 
 			StringProperty nameProperty, BooleanProperty cellClickedProperty, 
-			IntegerProperty sceneTimeProperty) {
+			IntegerProperty sceneTimeProperty, BooleanProperty update3D) {
 		
 		super();
 		
@@ -156,6 +158,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		structureComboItems = FXCollections.observableArrayList();
 		structureComboItems.addAll(multiCellStructuresList);
 		//structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
+		
+		this.update3D = update3D;
 	}
 	
 	
@@ -179,6 +183,17 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		// text fields
 		updateNoteFields();
 		titleField.textProperty().addListener(new TitleFieldListener());
+		titleField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+				if (newPropertyValue) { //i.e. out of focus, now refresh the scene
+					update3D.set(false);
+				} else {
+					update3D.set(true);
+				}
+			}
+		});
+		
 		contentArea.textProperty().addListener(new ContentAreaListener());
 		
 		updateStoryFields();
@@ -253,6 +268,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			if (type.equals(Type.CELL) && !activeCellProperty.get().isEmpty())
 				activeNote.setCellName(activeCellProperty.get());
 		}
+	}
+	
+	public void setUpdate3DProperty(BooleanProperty update3D) {
+		this.update3D = update3D;
 	}
 	
 	
@@ -607,7 +626,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			}
 		}
 	}
-	
 	
 	private class ContentAreaListener implements ChangeListener<String> {
 		@Override

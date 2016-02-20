@@ -91,6 +91,8 @@ public class StoriesLayer {
 	private BooleanProperty useInternalRules;
 	private Window3DController window3DController;
 	
+	private BooleanProperty update3D;
+	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
 			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag,
 			int movieTimeOffset) {
@@ -295,16 +297,24 @@ public class StoriesLayer {
 		if (activeNote!=null) {
 			activeNote.setActive(true);
 			
-			// set time property to be read by 3d window
-			int startTime = getEffectiveStartTime(activeNote);
-			if (startTime<1)
-				startTime=1;
 			
-			timeProperty.set(startTime);
+			/* TODO
+			 * IS THIS NECESSARY? removing this line fixes the bug where every "New Note" click jumps to the start
+			 */
+			// set time property to be read by 3d window --> 
+//			int startTime = getEffectiveStartTime(activeNote);
+//			if (startTime<1)
+//				startTime=1;
+//			
+//			timeProperty.set(startTime);
 		}
 		
 		if (editController!=null)
 			editController.setActiveNote(activeNote);
+	}
+	
+	public void setUpdate3DProperty(BooleanProperty update3D) {
+		this.update3D = update3D;
 	}
 	
 	
@@ -499,7 +509,9 @@ public class StoriesLayer {
 				if (editStage==null) {
 					editController = new StoryEditorController(timeOffset, cellData, 
 							sceneElementsList.getAllMulticellSceneNames(),
-							activeCellProperty, cellClickedProperty, timeProperty);
+							activeCellProperty, cellClickedProperty, timeProperty, update3D);
+					
+					editController.setUpdate3DProperty(update3D);
 					
 					editController.setActiveNote(activeNote);
 					editController.setActiveStory(activeStory);
