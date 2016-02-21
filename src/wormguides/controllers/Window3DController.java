@@ -417,7 +417,8 @@ public class Window3DController {
     	
     	update3D.addListener(new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldPropertyValue, Boolean newPropertyValue) {
+			public void changed(ObservableValue<? extends Boolean> arg0, 
+					Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (newPropertyValue) { //i.e. out of focus, now refresh the scene
 					buildScene();
 				}
@@ -453,7 +454,7 @@ public class Window3DController {
 	            transientLabelText = makeNoteSpriteText(name);
 	            
 	            transientLabelText.setWrappingWidth(-1);
-	            transientLabelText.setFill(Color.web("#F0F0F0"));
+	            transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
 	            transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
 	                @Override
 	                public void handle(MouseEvent event) {
@@ -2218,20 +2219,21 @@ public class Window3DController {
 
     private final String FILL_COLOR_HEX = "#272727";
     
-    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66";
-    private final String SPRITE_COLOR_HEX = "#ffffff";
+    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66",
+    					SPRITE_COLOR_HEX = "#ffffff",
+    					TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
 
     private final long WAIT_TIME_MILLI = 200;
-
+    
     private final double CAMERA_INITIAL_DISTANCE = -220;
-
+    
     private final double CAMERA_NEAR_CLIP = 1,
                         CAMERA_FAR_CLIP = 2000;
-
+    
     private final int X_COR_INDEX = 0,
                     Y_COR_INDEX = 1,
                     Z_COR_INDEX = 2;
-
+    
     private final double Z_SCALE = 5,
                         X_SCALE = 1,
                         Y_SCALE = 1;

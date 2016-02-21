@@ -903,6 +903,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, 
 				lineageData, window3DController, useInternalRules, 
 				productionInfo.getMovieTimeOffset(), newStory);
+		
 		window3DController.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
