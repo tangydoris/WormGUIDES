@@ -912,7 +912,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
-		storiesLayer.getRebuildSceneFlag().addListener(window3DController.getRebuildFlagListener());
+		window3DController.addListenerToRebuildSceneFlag(storiesLayer.getRebuildSceneFlag());
+		
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 

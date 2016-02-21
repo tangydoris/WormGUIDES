@@ -412,6 +412,7 @@ public class Window3DController {
        initializeUpdate3D();
     }
     
+    
     private void initializeUpdate3D() {
     	update3D = new SimpleBooleanProperty(false);
     	
@@ -421,9 +422,22 @@ public class Window3DController {
 					Boolean oldPropertyValue, Boolean newPropertyValue) {
 				if (newPropertyValue) { //i.e. out of focus, now refresh the scene
 					buildScene();
+					update3D.set(false);
 				}
 			}
 		});
+    }
+    
+    
+    public void addListenerToRebuildSceneFlag(BooleanProperty flag) {
+    	flag.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, 
+					Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					buildScene();
+			}
+    	});
     }
     
     
@@ -1041,16 +1055,19 @@ public class Window3DController {
     }
     
     
+    /*
     public ChangeListener<Boolean> getRebuildFlagListener() {
         return new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, 
                                 Boolean oldValue, Boolean newValue) {
-                if (newValue)
+                if (newValue) {
                     buildScene();
+                }
             }
         };
     }
+    */
 
     
     private void refreshScene() {

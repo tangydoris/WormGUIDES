@@ -41,6 +41,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
@@ -298,9 +299,8 @@ public class StoriesLayer {
 		
 		if (timeProperty.get()!=startTime)
 			timeProperty.set(startTime);
-		
 		else {
-			rebuildSceneFlag.set(true);
+			rebuildSceneFlag.set(true); // TODO is this buggy?? (doris)
 			rebuildSceneFlag.set(false);
 		}
 	}
@@ -315,16 +315,14 @@ public class StoriesLayer {
 		if (activeNote!=null) {
 			activeNote.setActive(true);
 			
-			
-			/* TODO
-			 * IS THIS NECESSARY? removing this line fixes the bug where every "New Note" click jumps to the start
-			 */
-			// set time property to be read by 3d window --> 
-//			int startTime = getEffectiveStartTime(activeNote);
-//			if (startTime<1)
-//				startTime=1;
-//			
-//			timeProperty.set(startTime);
+			// set time property to be read by 3d window
+			if (!activeNote.getTagName().equals("New Note")) {
+				int startTime = getEffectiveStartTime(activeNote);
+				if (startTime<1)
+					startTime=1;
+				
+				timeProperty.set(startTime);
+			}
 		}
 		
 		if (editController!=null)
@@ -559,6 +557,14 @@ public class StoriesLayer {
 				editStage.initModality(Modality.NONE);
 				editStage.setResizable(true);
 				
+				editStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+					@Override
+					public void handle(WindowEvent event) {
+						rebuildSceneFlag.set(true);
+						rebuildSceneFlag.set(false);
+					}
+				});
+				
 				editController.getNoteCreatedProperty().addListener(new ChangeListener<Boolean>() {
 					@Override
 					public void changed(ObservableValue<? extends Boolean> observable, 
@@ -568,6 +574,9 @@ public class StoriesLayer {
 							editController.setNoteCreated(false);
 							activeStory.addNote(newNote);
 							setActiveNote(newNote);
+							
+							rebuildSceneFlag.set(true);
+							rebuildSceneFlag.set(false);
 						}
 					}
 				});
