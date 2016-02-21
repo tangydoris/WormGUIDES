@@ -25,6 +25,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
@@ -95,9 +96,19 @@ public class StoriesLayer {
 	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
 			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag,
-			int movieTimeOffset) {
+			int movieTimeOffset, Button newStoryButton) {
 		
 		parentStage = parent;
+		
+		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
+				stories.add(story);
+				setActiveStory(story);
+				setActiveNote(null);
+			}
+		});
 		
 		window3DController = sceneController;
 		useInternalRules = useInternalRulesFlag;
@@ -537,21 +548,6 @@ public class StoriesLayer {
 						editStage.initModality(Modality.NONE);
 						editStage.setResizable(true);
 						
-						editController.getStoryCreatedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable, 
-									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									Story newStory = editController.getActiveStory();
-									stories.add(newStory);
-									setActiveStory(newStory);
-									setActiveNote(null);
-									
-									editController.setStoryCreated(false);
-								}
-							}
-						});
-						
 						editController.getNoteCreatedProperty().addListener(new ChangeListener<Boolean>() {
 							@Override
 							public void changed(ObservableValue<? extends Boolean> observable, 
@@ -851,4 +847,7 @@ public class StoriesLayer {
 			}
 		}	
 	}
+	
+	private final String NEW_STORY_TITLE = "New Story";
+	private final String NEW_STORY_DESCRIPTION = "New story description here";
 }

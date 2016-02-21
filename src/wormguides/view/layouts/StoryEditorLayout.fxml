@@ -15,18 +15,6 @@
                <children>
                   <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button maxWidth="1.7976931348623157E308" minWidth="89.0" mnemonicParsing="false" onAction="#newStory" text="New Story">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <tooltip>
-                              <Tooltip text="Create a new story">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Tooltip>
-                           </tooltip>
-                        </Button>
                         <HBox spacing="5.0">
                            <children>
                               <Label maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" text="Author:">

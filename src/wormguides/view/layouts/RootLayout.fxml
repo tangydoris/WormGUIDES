@@ -73,6 +73,12 @@
                                     <HBox>
                                        <children>
                                           <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                          <Button fx:id="newStory" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="New Story">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Button>
+                                          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                           <Button fx:id="noteEditorBtn" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" text="Edit Selected Story">
                                              <font>
                                                 <Font size="14.0" />

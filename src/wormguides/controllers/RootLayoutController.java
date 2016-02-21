@@ -163,17 +163,16 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Text moreInfoClickableText;
 	@FXML private Text displayedDescription;
 	
-	// Story information
-	@FXML private Text displayedStory;
-	@FXML private Text displayedStoryDescription;
-	
 	// scene elements stuff
 	private SceneElementsList elementsList;
 	
-	// story stuff
+	// Story stuff
+	@FXML private Text displayedStory;
+	@FXML private Text displayedStoryDescription;
 	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
 	@FXML private Button noteEditorBtn;
+	@FXML private Button newStory;
 	
 	//production information
 	private ProductionInfo productionInfo;
@@ -877,6 +876,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		assert (storiesListView != null);
 		assert (noteEditorBtn != null);
+		assert (newStory != null);
 	}
 	
 	private void initStructuresLayer() {
@@ -901,7 +901,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	
 	private void initStoriesLayer() {
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, 
-				lineageData, window3DController, useInternalRules, productionInfo.getMovieTimeOffset());
+				lineageData, window3DController, useInternalRules, 
+				productionInfo.getMovieTimeOffset(), newStory);
 		window3DController.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
