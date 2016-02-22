@@ -674,6 +674,7 @@ public class Search {
 					x = positions[j][0];
 					y = positions[j][1];
 					z = positions[j][2];
+					//System.out.println(x + ", " + y + ", " + z);
 				}
 			}
 			
