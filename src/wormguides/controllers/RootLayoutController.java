@@ -92,6 +92,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private Stage partsListStage;
 	private Stage cellShapesIndexStage;
 	private Stage cellDeathsStage;
+	private Stage productionInfoStage;
 	
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -201,9 +202,28 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	RotationController rotationController;
 	
 	// ----- Begin menu items and buttons listeners -----
-	// TODO
 	@FXML public void productionInfoAction() {
-		// productionInfo should already be initialized
+		if (productionInfoStage == null) {
+			productionInfoStage = new Stage();
+			productionInfoStage.setTitle("Experimental Data");
+			
+			if (productionInfo == null) {
+				initProductionInfo();
+			}
+			
+			WebView productionInfoWebView = new WebView();
+			productionInfoWebView.getEngine().loadContent(productionInfo.getProductionInfoDOM().DOMtoString());
+			productionInfoWebView.setContextMenuEnabled(false);
+			
+			VBox root = new VBox();
+			root.getChildren().addAll(productionInfoWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+			
+			productionInfoStage.setScene(scene);
+			productionInfoStage.setResizable(false);
+		}
+		productionInfoStage.show();
 	}
 	
 	@FXML public void menuLoadStory() {
