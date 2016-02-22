@@ -32,12 +32,12 @@ public class CellCases {
 		infoWindow = window;
 	}
 	
-	public void makeTerminalCase(String cellName, 
+	public void makeTerminalCase(String lineageName, String cellName, 
 			ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
 			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners, 
 			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
 		
-		TerminalCellCase tCase = new TerminalCellCase(cellName, presynapticPartners, postsynapticPartners,
+		TerminalCellCase tCase = new TerminalCellCase(lineageName, cellName, presynapticPartners, postsynapticPartners,
 				electricalPartners, neuromuscularPartners, nuclearProductionInfo, cellShapeProductionInfo);
 		
 		addTerminalCase(tCase);

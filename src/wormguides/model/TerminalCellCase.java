@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class TerminalCellCase {
 	
 	private String cellName;
+	private String lineageName;
 	private String externalInfo;
 	private String partsListDescription;
 	private String imageURL;
@@ -26,7 +27,7 @@ public class TerminalCellCase {
 	private ArrayList<String> nuclearProductionInfo;
 	private ArrayList<String> cellShapeProductionInfo;
 	
-	public TerminalCellCase(String cellName, ArrayList<String> presynapticPartners, 
+	public TerminalCellCase(String lineageName, String cellName, ArrayList<String> presynapticPartners, 
 			ArrayList<String> postsynapticPartners,ArrayList<String> electricalPartners, 
 			ArrayList<String> neuromuscularPartners, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {

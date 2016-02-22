@@ -61,7 +61,7 @@
             <HBox fx:id="expressesHBox" layoutX="15.0" layoutY="118.0">
                <children>
                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="expresses" mnemonicParsing="false" text="Expresses">
+                  <Button fx:id="expresses" mnemonicParsing="false" text="Gene Expression">
                      <font>
                         <Font size="14.0" />
                      </font>

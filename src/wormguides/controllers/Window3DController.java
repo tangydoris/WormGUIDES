@@ -805,14 +805,13 @@ public class Window3DController {
 		if (contextMenuStage == null)
 			initContextMenuStage();
 
+		contextMenuController.setName(name);
+		
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
-		if (funcName == null) {
-			contextMenuController.setName(name);
+		if (funcName == null)
 			contextMenuController.disableTerminalCaseFunctions(true);
-		} else {
-			contextMenuController.setName(funcName);
+		else
 			contextMenuController.disableTerminalCaseFunctions(false);
-		}
 
 		contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 			@Override
@@ -1160,6 +1159,7 @@ public class Window3DController {
 
 		// add notes
 		insertOverlayTitles();
+		
 		if (!currentNotes.isEmpty())
 			addNoteGeometries(notes);
 
@@ -1581,10 +1581,15 @@ public class Window3DController {
 
 	private void insertOverlayTitles() {
 		if (storiesLayer != null) {
+			Text infoPaneTitle = makeNoteOverlayText("Story Title:");
+			
 			if (storiesLayer.getActiveStory() != null) {
-				Text infoPaneTitle = makeNoteOverlayText("Info Pane:");
 				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
 				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+			}
+			else {
+				Text noStoryTitle = makeNoteOverlayText("none");
+				overlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
 			}
 		}
 	}

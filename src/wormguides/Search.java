@@ -35,76 +35,75 @@ public class Search {
 	private static ArrayList<String> activeLineageNames;
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> descriptions;
-	
+
 	private static ObservableList<String> searchResultsList;
 	private static Comparator<String> nameComparator;
 	private static String searchedText;
 	private BooleanProperty clearSearchFieldProperty;
-	
+
 	private static SearchType type;
-	
+
 	private static boolean cellNucleusTicked;
 	private static boolean cellBodyTicked;
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	private static ObservableList<Rule> rulesList;
 	private static Color selectedColor;
-	
+
 	private final static Service<Void> resultsUpdateService;
 	private final static Service<ArrayList<String>> geneSearchService;
-	
+
 	private static BooleanProperty geneResultsUpdated;
-	
+
 	private final static Service<Void> showLoadingService;
 	// count used to display ellipsis when gene search is running
 	private static int count;
 	private static LinkedList<String> geneSearchQueue;
-	
-	//used for adding shape rules
+
+	// used for adding shape rules
 	private static SceneElementsList sceneElementsList;
-	
-	//for connectome searching
+
+	// for connectome searching
 	private static Connectome connectome;
 	private static boolean presynapticTicked;
 	private static boolean postsynapticTicked;
 	private static boolean electricalTicked;
 	private static boolean neuromuscularTicked;
-	
-	//for cell cases searching
+
+	// for cell cases searching
 	private static CellCases cellCases;
-	
-	//for production info searching
+
+	// for production info searching
 	private static ProductionInfo productionInfo;
-	
-	//for lineage searching
+
+	// for lineage searching
 	private static LineageData lineageData;
 
-		
 	static {
 		activeLineageNames = new ArrayList<String>();
 		functionalNames = PartsList.getFunctionalNames();
 		descriptions = PartsList.getDescriptions();
-		
+
 		type = SearchType.LINEAGE;
-		
+
 		selectedColor = Color.WHITE;
-		
+
 		searchResultsList = FXCollections.observableArrayList();
 		nameComparator = new CellNameComparator();
 		searchedText = "";
-		
+
 		// cell nucleus search type default to true
 		cellNucleusTicked = true;
 		cellBodyTicked = false;
 		ancestorTicked = false;
-		descendantTicked = false;	
-		
-		//connectome synapse types all unchecked at init
+		descendantTicked = false;
+
+		// connectome synapse types all unchecked at init
 		presynapticTicked = false;
 		postsynapticTicked = false;
 		electricalTicked = false;
 		neuromuscularTicked = false;
-		
+
 		resultsUpdateService = new Service<Void>() {
 			@Override
 			protected final Task<Void> createTask() {
@@ -123,9 +122,9 @@ public class Search {
 				return task;
 			}
 		};
-		
+
 		showLoadingService = new ShowLoadingService();
-		
+
 		geneSearchService = WormBaseQuery.getSearchService();
 		if (geneSearchService != null) {
 			geneSearchService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
@@ -141,36 +140,35 @@ public class Search {
 					showLoadingService.cancel();
 					searchResultsList.clear();
 					updateGeneResults();
-					
+
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
 					for (Rule rule : rulesList) {
 						if (rule instanceof ColorRule) {
-							if (rule.getSearchedText().contains("'"+searched+"'")) {
+							if (rule.getSearchedText().contains("'" + searched + "'")) {
 								rule.setCells(geneSearchService.getValue());
 							}
 						}
 					}
 					geneResultsUpdated.set(!geneResultsUpdated.get());
-					
+
 					if (!geneSearchQueue.isEmpty())
 						WormBaseQuery.doSearch(geneSearchQueue.pop());
 				}
 			});
 		}
-		
+
 		geneSearchQueue = new LinkedList<String>();
-		count = 0;	
+		count = 0;
 		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
-	
-	
-	public static Rule addGiantConnectomeColorRule(String funcName, Color color, 
-			boolean isPresynaptic, boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
-		
+
+	public static Rule addGiantConnectomeColorRule(String funcName, Color color, boolean isPresynaptic,
+			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
+
 		StringBuilder sb = new StringBuilder("'");
 		sb.append(funcName).append("' Connectome");
-		
+
 		ArrayList<String> types = new ArrayList<String>();
 		if (isPresynaptic)
 			types.add("presynaptic");
@@ -183,61 +181,58 @@ public class Search {
 		if (!types.isEmpty()) {
 			sb.append(" - ");
 
-			for (int i=0; i<types.size(); i++) {
+			for (int i = 0; i < types.size(); i++) {
 				sb.append(types.get(i));
-				
-				if (i!=types.size()-1)
-					sb.append(", ");					
+
+				if (i != types.size() - 1)
+					sb.append(", ");
 			}
 		}
-		
+
 		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 		options.add(SearchOption.CELL);
 		ColorRule tempRule = new ColorRule(sb.toString(), color);
-		tempRule.setCells(connectome.queryConnectivity(PartsList.getLineageNameByFunctionalName(funcName), 
+		tempRule.setCells(connectome.queryConnectivity(PartsList.getLineageNameByFunctionalName(funcName),
 				isPresynaptic, isPostsynaptic, isElectrical, isNeuromuscular, true));
 		tempRule.setText(sb.toString());
-		
+
 		rulesList.add(tempRule);
 		return tempRule;
 	}
-	
-	
-	public static Rule addConnectomeColorRule(String searched, Color color, boolean isPresynaptic, 
+
+	public static Rule addConnectomeColorRule(String searched, Color color, boolean isPresynaptic,
 			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
 		boolean tempPresyn = presynapticTicked;
 		boolean tempPostsyn = postsynapticTicked;
 		boolean tempElectr = electricalTicked;
 		boolean tempNeuro = neuromuscularTicked;
-		
+
 		presynapticTicked = isPresynaptic;
 		postsynapticTicked = isPostsynaptic;
 		electricalTicked = isElectrical;
 		neuromuscularTicked = isNeuromuscular;
-		
+
 		Rule rule = addColorRule(SearchType.CONNECTOME, searched, color, SearchOption.CELL);
-		
+
 		presynapticTicked = tempPresyn;
 		postsynapticTicked = tempPostsyn;
 		electricalTicked = tempElectr;
 		neuromuscularTicked = tempNeuro;
-		
+
 		return rule;
 	}
-	
-	
+
 	public static void setActiveLineageNames(ArrayList<String> names) {
 		activeLineageNames = names;
 	}
-	
-	
+
 	private static void updateGeneResults() {
 		ArrayList<String> results = geneSearchService.getValue();
 		ArrayList<String> cellsForListView = new ArrayList<String>();
-		
-		if (results==null || results.isEmpty())
+
+		if (results == null || results.isEmpty())
 			return;
-		
+
 		cellsForListView.addAll(results);
 		if (ancestorTicked) {
 			ArrayList<String> ancestors = getAncestorsList(results);
@@ -253,40 +248,34 @@ public class Search {
 					cellsForListView.add(name);
 			}
 		}
-		
+
 		searchResultsList.sort(nameComparator);
 		appendFunctionalToLineageNames(cellsForListView);
 		geneResultsUpdated.set(!geneResultsUpdated.get());
 	}
-	
+
 	private static void appendFunctionalToLineageNames(ArrayList<String> list) {
 		searchResultsList.clear();
 		for (String result : list) {
-			if (PartsList.getFunctionalNameByLineageName(result)!=null)
-				result += " ("
-						+ PartsList.getFunctionalNameByLineageName(result)
-						+ ")";
+			if (PartsList.getFunctionalNameByLineageName(result) != null)
+				result += " (" + PartsList.getFunctionalNameByLineageName(result) + ")";
 			searchResultsList.add(result);
 		}
 	}
-	
-	
+
 	public static boolean isLineageName(String name) {
 		return activeLineageNames.contains(name);
 	}
-	
-	
+
 	private static String getSearchedText() {
 		final String searched = searchedText;
 		return searched;
 	}
-	
-	
+
 	public void setRulesList(ObservableList<Rule> list) {
 		rulesList = list;
 	}
-	
-	
+
 	public boolean containsColorRule(ColorRule other) {
 		for (Rule rule : rulesList) {
 			if (rule instanceof ColorRule) {
@@ -296,241 +285,244 @@ public class Search {
 		}
 		return false;
 	}
-	
-	
+
 	public EventHandler<ActionEvent> getColorPickerListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				selectedColor = ((ColorPicker)event.getSource()).getValue();
+				selectedColor = ((ColorPicker) event.getSource()).getValue();
 			}
 		};
 	}
-	
-	
+
 	public void addDefaultColorRules() {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd",  Color.web("0xb30a95"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELL);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL);
 	}
-	
-	
+
 	public void clearRules() {
 		rulesList.clear();
 	}
-	
-	
-	public static Rule addColorRule(SearchType type, String searched, Color color, 
-			SearchOption...options) {
+
+	public static Rule addColorRule(SearchType type, String searched, Color color, SearchOption... options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
 		for (SearchOption option : options)
 			optionsArray.add(option);
 		return addColorRule(type, searched, color, optionsArray);
 	}
-	
-	
-	public static Rule addColorRule(SearchType type, String searched, Color color, 
-			ArrayList<SearchOption> options) {
+
+	public static Rule addColorRule(SearchType type, String searched, Color color, ArrayList<SearchOption> options) {
 		SearchType tempType = Search.type;
 		Search.type = type;
 		Rule rule = addColorRule(searched, color, options);
 		Search.type = tempType;
 		return rule;
 	}
-	
-	
+
 	private static Rule addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
 		// default search options is cell and descendant
-		if (options==null)
+		if (options == null)
 			options = new ArrayList<SearchOption>();
-		
+
 		String label = "";
 		searched = searched.toLowerCase();
 		searched = searched.trim();
 		switch (type) {
-			case LINEAGE:
-							label = LineageTree.getCaseSensitiveName(searched);
-							if (label.isEmpty())
-								label = searched;
-							break;
-							
-			case FUNCTIONAL:
-							label = "'"+searched+"' Functional";
-							break;
-							
-			case DESCRIPTION:
-							label = "'"+searched+"' \"PartsList\" Description";
-							break;
-							
-			case GENE:		
-							geneSearchQueue.add(searched);
-							label = "'"+searched+"' Gene";
-							break;
-							
-			case CONNECTOME:
-							label = "'"+searched+"' Connectome";
-							break;
-							
-			case MULTICELL:
-							label = "'"+searched+"' Multicellular Structure";
-							break;
-			case NEIGHBOR:
-							label = "'"+searched+"' Neighbors";
-							break;
-							
-			default:
-							label = searched;
-							break;
+		case LINEAGE:
+			label = LineageTree.getCaseSensitiveName(searched);
+			if (label.isEmpty())
+				label = searched;
+			break;
+
+		case FUNCTIONAL:
+			label = "'" + searched + "' Functional";
+			break;
+
+		case DESCRIPTION:
+			label = "'" + searched + "' \"PartsList\" Description";
+			break;
+
+		case GENE:
+			geneSearchQueue.add(searched);
+			label = "'" + searched + "' Gene";
+			break;
+
+		case CONNECTOME:
+			label = "'" + searched + "' Connectome";
+			break;
+
+		case MULTICELL:
+			label = "'" + searched + "' Multicellular Structure";
+			break;
+		case NEIGHBOR:
+			label = "'" + searched + "' Neighbors";
+			break;
+
+		default:
+			label = searched;
+			break;
 		}
-		
+
 		ColorRule rule = new ColorRule(label, color, options, type);
-		
+
 		ArrayList<String> cells;
-		
-		if (type==SearchType.GENE)
+
+		if (type == SearchType.GENE)
 			WormBaseQuery.doSearch(searched);
 
 		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
 		}
-		
+
 		rulesList.add(rule);
 		searchResultsList.clear();
-		
+
 		return rule;
 	}
-	
-	
+
 	private static ArrayList<String> getCellsList(String searched) {
-		ArrayList<String> cells = new ArrayList<String> ();
+		ArrayList<String> cells = new ArrayList<String>();
 		searched = searched.toLowerCase();
+		
 		switch (type) {
-			case LINEAGE:
-							for (String name : activeLineageNames) {
-								if (name.toLowerCase().equals(searched))
-									cells.add(name);
-							}
-							break;
-						
-			case FUNCTIONAL:
-							for (String name : functionalNames) {
-								if (name.toLowerCase().startsWith(searched))
-									cells.add(PartsList.getLineageNameByFunctionalName(name));
-							}
-							break;
-						
-			case DESCRIPTION:
-							// TODO some cells with the searched term are not showing up in results list
-							// this is because some cells have the same description and it 
-							// gives the first one found 
-				
-							// FIXED ^^ ???
-				
-							//for searching with multiple terms, perform individual searches and return the intersection of the hits
-							ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
-							String[] keywords = searched.split(" ");
-							for (String keyword : keywords) {
-								ArrayList<String> results = new ArrayList<String>();
-								for (int i=0; i<descriptions.size(); i++) {
-									String textLowerCase = descriptions.get(i).toLowerCase();
+		case LINEAGE:
+			for (String name : activeLineageNames) {
+				if (name.toLowerCase().equals(searched))
+					cells.add(name);
+			}
+			break;
 
-									//look for match
-									if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
-										//get cell name that corresponds to matching description
-										String cell = PartsList.getLineageNameByIndex(i);
-										
-										//only add new entries
-										if (!results.contains(cell)) {
-											results.add(cell);
-										}
-									}
-								}
-								//add the results to the hits
-								hits.add(results);
-							}
-							
-							//find the intersection among the results --> using the first list to find matches
-							if (hits.size() > 0) {
-								ArrayList<String> results = hits.get(0);
-								for (int k = 0; k < results.size(); k++) {
-									String cell = results.get(k);
-									
-									//look for a match in rest of the hits
-									boolean intersection = true;
-									for (int i = 1; i < hits.size(); i++) {
-										if (!hits.get(i).contains(cell)) {
-											intersection = false;
-										}
-									}
-									
-									if (intersection && !cells.contains(cell)) {
-										cells.add(cell);
-									}
-								}
-							}
-							
-							break;
+		case FUNCTIONAL:
+			String name;
+			for (int i=0; i<functionalNames.size(); i++) {
+				name = functionalNames.get(i);
+				if (name.toLowerCase().startsWith(searched))
+					cells.add(PartsList.getLineageNameByIndex(i));
+			}
+			/*
+			for (String name : functionalNames) {
+				if (name.toLowerCase().startsWith(searched))
+					cells.add(PartsList.getLineageNameByFunctionalName(name));
+			}
+			*/
+			break;
 
-			case GENE:		
-							if (isGeneFormat(getSearchedText())) {
-								showLoadingService.restart();
-								WormBaseQuery.doSearch(getSearchedText());
-							}
-							break;
-							
-			case MULTICELL:	
-							if (sceneElementsList != null) {
-								for (SceneElement se : sceneElementsList.getList()) {
-									if (se.isMulticellular()) {
-										if (isNameSearched(se.getSceneName(), searched))
-											cells.addAll(se.getAllCellNames());
-									}
-								}
-							}
-							break;
-							
-			case CONNECTOME:
-							if (connectome != null) {
-								cells.addAll(connectome.queryConnectivity(searched, presynapticTicked,
-										postsynapticTicked, electricalTicked, neuromuscularTicked, true));
-							}
-							break;
-			case NEIGHBOR:
-							cells = getNeighbors(searched);
+		case DESCRIPTION:
+			// TODO some cells with the searched term are not showing up in
+			// results list
+			// this is because some cells have the same description and it
+			// gives the first one found
+
+			// FIXED ^^ ???
+
+			// for searching with multiple terms, perform individual searches
+			// and return the intersection of the hits
+			ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+			String[] keywords = searched.split(" ");
+			for (String keyword : keywords) {
+				ArrayList<String> results = new ArrayList<String>();
+				for (int i = 0; i < descriptions.size(); i++) {
+					String textLowerCase = descriptions.get(i).toLowerCase();
+
+					// look for match
+					if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+						// get cell name that corresponds to matching
+						// description
+						String cell = PartsList.getLineageNameByIndex(i);
+
+						// only add new entries
+						if (!results.contains(cell)) {
+							results.add(cell);
+						}
+					}
+				}
+				// add the results to the hits
+				hits.add(results);
+			}
+
+			// find the intersection among the results --> using the first list
+			// to find matches
+			if (hits.size() > 0) {
+				ArrayList<String> results = hits.get(0);
+				for (int k = 0; k < results.size(); k++) {
+					String cell = results.get(k);
+
+					// look for a match in rest of the hits
+					boolean intersection = true;
+					for (int i = 1; i < hits.size(); i++) {
+						if (!hits.get(i).contains(cell)) {
+							intersection = false;
+						}
+					}
+
+					if (intersection && !cells.contains(cell)) {
+						cells.add(cell);
+					}
+				}
+			}
+
+			break;
+
+		case GENE:
+			if (isGeneFormat(getSearchedText())) {
+				showLoadingService.restart();
+				WormBaseQuery.doSearch(getSearchedText());
+			}
+			break;
+
+		case MULTICELL:
+			if (sceneElementsList != null) {
+				for (SceneElement se : sceneElementsList.getList()) {
+					if (se.isMulticellular()) {
+						if (isNameSearched(se.getSceneName(), searched))
+							cells.addAll(se.getAllCellNames());
+					}
+				}
+			}
+			break;
+
+		case CONNECTOME:
+			if (connectome != null) {
+				cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
+						electricalTicked, neuromuscularTicked, true));
+			}
+			break;
+		case NEIGHBOR:
+			cells = getNeighbors(searched);
 		}
 		return cells;
 	}
-	
-	
+
 	// Tests if name contains all parts of a search string
 	// returns true if it does, false otherwise
 	// TODO extend functionality to search comments
 	private static boolean isNameSearched(String name, String searched) {
-		if (name==null || searched==null)
+		if (name == null || searched == null)
 			return false;
-		
+
 		// search in structure scene names
 		String nameLower = name.toLowerCase();
-		
+
 		boolean appliesToName = true;
 		boolean appliesToCell = false;
 		boolean appliesToComment = true;
-		
+
 		String[] terms = searched.trim().toLowerCase().split(" ");
-		
+
 		for (String term : terms) {
 			if (!nameLower.contains(term)) {
 				appliesToName = false;
 				break;
 			}
 		}
-		
-		//search in cells
+
+		// search in cells
 		for (SceneElement se : sceneElementsList.elementsList) {
 			if (se.getSceneName().toLowerCase().equals(nameLower)) {
 				for (String cell : se.getAllCellNames()) {
@@ -540,7 +532,7 @@ public class Search {
 				}
 			}
 		}
-		
+
 		// search in comments if name does not already apply
 		String comment = sceneElementsList.nameCommentsMap.get(nameLower);
 		String commentLower = comment.toLowerCase();
@@ -550,17 +542,16 @@ public class Search {
 				break;
 			}
 		}
-		
+
 		return appliesToName || appliesToCell || appliesToComment;
 	}
-	
-	
+
 	// Returns true if name is a gene name, false otherwise
 	// (some string, -, some number)
 	private static boolean isGeneFormat(String name) {
-		if (name.indexOf("-")!=-1) {
+		if (name.indexOf("-") != -1) {
 			try {
-				Integer.parseInt(name.substring(name.indexOf("-")+1));
+				Integer.parseInt(name.substring(name.indexOf("-") + 1));
 				return true;
 			} catch (NumberFormatException e) {
 				// Don't do anything if the suffix is not a number
@@ -568,37 +559,37 @@ public class Search {
 		}
 		return false;
 	}
-	
+
 	/*
-	 * non terminal cell case will use this search to find the 
-	 * terminal descendants for a given cell
+	 * non terminal cell case will use this search to find the terminal
+	 * descendants for a given cell
 	 */
 	public static ArrayList<String> getDescendantsList(String queryCell) {
 		ArrayList<String> descendants = new ArrayList<String>();
 		if (queryCell != null) {
 			for (String name : PartsList.getLineageNames()) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, queryCell)) {
-					
+
 					/*
 					 * 
 					 */
-					
-					
+
 					descendants.add(name);
-				}	
+				}
 			}
 		}
 		return descendants;
 	}
-	
+
 	// Generates a list of descendants of all cells in input
 	private static ArrayList<String> getDescendantsList(ArrayList<String> cells) {
 		ArrayList<String> descendants = new ArrayList<String>();
-		
-		if (cells==null)
+
+		if (cells == null)
 			return descendants;
-		
-		// Special cases for 'ab' and 'p0' because the input list of cells would be empty
+
+		// Special cases for 'ab' and 'p0' because the input list of cells would
+		// be empty
 		String searched = searchedText.toLowerCase();
 		if (searched.equals("ab") || searched.equals("p0")) {
 			for (String name : activeLineageNames) {
@@ -606,64 +597,57 @@ public class Search {
 					descendants.add(name);
 			}
 		}
-		
+
 		for (String cell : cells) {
 			for (String name : activeLineageNames) {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, cell))
 					descendants.add(name);
 			}
 		}
-		
+
 		return descendants;
 	}
-	
-	
+
 	// generates a list of ancestors of all cells in input
 	private static ArrayList<String> getAncestorsList(ArrayList<String> cells) {
 		ArrayList<String> ancestors = new ArrayList<String>();
-		
-		if (cells==null)
+
+		if (cells == null)
 			return ancestors;
-		
+
 		for (String cell : cells) {
 			for (String name : activeLineageNames) {
 				if (!ancestors.contains(name) && LineageTree.isAncestor(name, cell))
 					ancestors.add(name);
 			}
 		}
-		
+
 		return ancestors;
 	}
-	
+
 	/*
-	 * neighbor search mode:
-	 * given cell:
-	 * - find time range of cell
-	 * 		- for each time point
-	 *			- find its nearest neighbor and compute d = distance to neighbor
-	 *       		- d = root((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2)
-	 * 			- multiple d by 1.5
-	 *     		- for position in positionsAtTime
-	 *     			- compute d1 = distance from query cell position to position
-	 *     			- if d1 is <= d
-	 *     				- if cell is not in results
-	 *     					- add cell
-	 * - highlight results over lifetime of cell
+	 * neighbor search mode: given cell: - find time range of cell - for each
+	 * time point - find its nearest neighbor and compute d = distance to
+	 * neighbor - d = root((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2) - multiple d by
+	 * 1.5 - for position in positionsAtTime - compute d1 = distance from query
+	 * cell position to position - if d1 is <= d - if cell is not in results -
+	 * add cell - highlight results over lifetime of cell
 	 */
 	public static ArrayList<String> getNeighbors(String cellName) {
 		ArrayList<String> results = new ArrayList<String>();
-		
-		if (cellName == null || !lineageData.isCellName(cellName)) return results;
-		
-		//get time range for cell
+
+		if (cellName == null || !lineageData.isCellName(cellName))
+			return results;
+
+		// get time range for cell
 		int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
 		int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
-		
+
 		for (int i = firstOccurence; i <= lastOccurence; i++) {
 			String[] names = lineageData.getNames(i);
 			Integer[][] positions = lineageData.getPositions(i);
-			
-			//find the coordinates of the query cell
+
+			// find the coordinates of the query cell
 			int queryIDX = -1;
 			int x = -1;
 			int y = -1;
@@ -676,31 +660,31 @@ public class Search {
 					z = positions[j][2];
 				}
 			}
-			
-			//find nearest neighbor
+
+			// find nearest neighbor
 			if (x != -1 && y != -1 && z != -1) {
-				//int nearestNeighborIDX = -1; --> debugging
+				// int nearestNeighborIDX = -1; --> debugging
 				double distance = Double.MAX_VALUE;
 				for (int k = 0; k < positions.length; k++) {
 					if (k != queryIDX) {
 						double distanceFromQuery = distance(x, positions[k][0], y, positions[k][1], z, positions[k][2]);
 						if (distanceFromQuery < distance) {
 							distance = distanceFromQuery;
-							//nearestNeighborIDX = k; --> debugging
+							// nearestNeighborIDX = k; --> debugging
 						}
 					}
 				}
-				
-				//multiple distance by 1.5
+
+				// multiple distance by 1.5
 				if (distance != Double.MAX_VALUE) {
 					distance *= 1.5;
 				}
-				
-				//find all cells within d*1.5 range
+
+				// find all cells within d*1.5 range
 				for (int n = 0; n < positions.length; n++) {
-					//compute distance from each cell to query cell
+					// compute distance from each cell to query cell
 					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
-						//only add new entries
+						// only add new entries
 						if (!results.contains(names[n])) {
 							results.add(names[n]);
 						}
@@ -708,14 +692,14 @@ public class Search {
 				}
 			}
 		}
-		
+
 		return results;
 	}
-	
+
 	private static double distance(int x1, int x2, int y1, int y2, int z1, int z2) {
-		return Math.sqrt(Math.pow((x2-x1), 2) + Math.pow((y2-y1), 2) + Math.pow((z2-z1), 2));
+		return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
 	}
-	
+
 	public EventHandler<ActionEvent> getAddButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -723,7 +707,7 @@ public class Search {
 				// do not add new ColorRule if search has no matches
 				if (searchResultsList.isEmpty())
 					return;
-				
+
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 				if (cellNucleusTicked)
 					options.add(SearchOption.CELL);
@@ -733,102 +717,87 @@ public class Search {
 					options.add(SearchOption.ANCESTOR);
 				if (descendantTicked)
 					options.add(SearchOption.DESCENDANT);
-				
+
 				addColorRule(getSearchedText(), selectedColor, options);
-				
+
 				searchResultsList.clear();
-				
+
 				if (clearSearchFieldProperty != null)
 					clearSearchFieldProperty.set(true);
 			}
 		};
 	}
-	
-	
+
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				cellNucleusTicked = newValue;
 			}
 		};
 	}
-	
-	
+
 	public ChangeListener<Boolean> getCellBodyTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				cellBodyTicked = newValue;
 			}
 		};
 	}
-	
-	
+
 	public ChangeListener<Boolean> getAncestorTickListner() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				ancestorTicked = newValue;
-				if (type==SearchType.GENE)
+				if (type == SearchType.GENE)
 					updateGeneResults();
 				else
 					resultsUpdateService.restart();
 			}
 		};
 	}
-	
-	
+
 	public ChangeListener<Boolean> getDescendantTickListner() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				descendantTicked = newValue;
-				if (type==SearchType.GENE)
+				if (type == SearchType.GENE)
 					updateGeneResults();
 				else
 					resultsUpdateService.restart();
 			}
 		};
 	}
-	
-	
+
 	public void setClearSearchFieldProperty(BooleanProperty property) {
 		clearSearchFieldProperty = property;
 	}
-	
-	
+
 	public ChangeListener<Toggle> getTypeToggleListener() {
 		return new ChangeListener<Toggle>() {
 			@Override
-			public void changed(ObservableValue<? extends Toggle> observable, 
-					Toggle oldValue, Toggle newValue) {
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
 				type = (SearchType) newValue.getUserData();
 				resultsUpdateService.restart();
 			}
 		};
 	}
-	
-	
+
 	public BooleanProperty getGeneResultsUpdated() {
 		return geneResultsUpdated;
 	}
-	
-	
+
 	public ObservableList<String> getSearchResultsList() {
 		return searchResultsList;
 	}
-	
-	
+
 	public ChangeListener<String> getTextFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable,
-											String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				searchedText = newValue.toLowerCase();
 				if (searchedText.isEmpty())
 					searchResultsList.clear();
@@ -837,17 +806,16 @@ public class Search {
 			}
 		};
 	}
-	
-	
+
 	private static void refreshSearchResultsList(String newValue) {
 		String searched = newValue.toLowerCase();
 		if (!searched.isEmpty()) {
 			ArrayList<String> cells;
 			cells = getCellsList(searched);
-			
-			if (cells==null)
+
+			if (cells == null)
 				return;
-			
+
 			ArrayList<String> cellsForListView = new ArrayList<String>();
 			cellsForListView.addAll(cells);
 
@@ -870,27 +838,23 @@ public class Search {
 			appendFunctionalToLineageNames(cellsForListView);
 		}
 	}
-	
-	
+
 	public Service<Void> getResultsUpdateService() {
 		return resultsUpdateService;
 	}
-	
-	
+
 	private static int getCountFinal(int count) {
 		final int out = count;
 		return out;
 	}
-	
-	
+
 	private static final class CellNameComparator implements Comparator<String> {
 		@Override
 		public int compare(String s1, String s2) {
 			return s1.compareTo(s2);
 		}
 	}
-	
-	
+
 	private static final class ShowLoadingService extends Service<Void> {
 		@Override
 		protected final Task<Void> createTask() {
@@ -907,17 +871,22 @@ public class Search {
 							public void run() {
 								searchResultsList.clear();
 								String loading = "Fetching data from WormBase";
-								int num = getCountFinal(count)%modulus;
+								int num = getCountFinal(count) % modulus;
 								switch (num) {
-									case 1:		loading+=".";
-												break;
-									case 2:		loading+="..";
-												break;
-									case 3:		loading+="...";
-												break;
-									case 4:		loading+="....";
-												break;
-									default:	break;
+								case 1:
+									loading += ".";
+									break;
+								case 2:
+									loading += "..";
+									break;
+								case 3:
+									loading += "...";
+									break;
+								case 4:
+									loading += "....";
+									break;
+								default:
+									break;
 								}
 								searchResultsList.add(loading);
 							}
@@ -925,8 +894,8 @@ public class Search {
 						try {
 							Thread.sleep(WAIT_TIME_MILLI);
 							count++;
-							if (count<0)
-								count=0;
+							if (count < 0)
+								count = 0;
 						} catch (InterruptedException ie) {
 							break;
 						}
@@ -936,179 +905,172 @@ public class Search {
 			};
 		}
 	}
-	
-	
+
 	public static void setSceneElementsList(SceneElementsList list) {
-		if (list!=null)
+		if (list != null)
 			sceneElementsList = list;
 	}
-	
-	
+
 	public static String getStructureComment(String name) {
 		return sceneElementsList.getCommentByName(name);
 	}
-	
-	
+
 	public static boolean isStructureWithComment(String name) {
-		if (sceneElementsList!=null && (sceneElementsList.isMulticellStructureName(name)))
+		if (sceneElementsList != null && (sceneElementsList.isMulticellStructureName(name)))
 			return true;
-		
+
 		return false;
 	}
-	
+
 	public static int getFirstOccurenceOf(String name) {
-		if (lineageData!=null && lineageData.isCellName(name))
+		if (lineageData != null && lineageData.isCellName(name))
 			return lineageData.getFirstOccurrenceOf(name);
-		
-		else if (sceneElementsList!=null && sceneElementsList.isSceneElementName(name))
+
+		else if (sceneElementsList != null && sceneElementsList.isSceneElementName(name))
 			return sceneElementsList.getFirstOccurrenceOf(name);
-		
+
 		return -1;
 	}
-	
+
 	public static int getLastOccurenceOf(String name) {
-		if (lineageData!=null && lineageData.isCellName(name))
+		if (lineageData != null && lineageData.isCellName(name))
 			return lineageData.getLastOccurrenceOf(name);
-		
-		else if (sceneElementsList!=null && sceneElementsList.isSceneElementName(name))
+
+		else if (sceneElementsList != null && sceneElementsList.isSceneElementName(name))
 			return sceneElementsList.getLastOccurrenceOf(name);
-		
+
 		return -1;
 	}
-	
+
 	public static void setConnectome(Connectome con) {
 		if (con != null) {
 			connectome = con;
 		}
 	}
-	
+
 	public static void setCellCases(CellCases cc) {
 		if (cc != null) {
 			cellCases = cc;
 		}
 	}
-	
+
 	public static void setProductionInfo(ProductionInfo pi) {
 		if (pi != null) {
 			productionInfo = pi;
 		}
 	}
-	
+
 	public static void setLineageData(LineageData ld) {
 		if (ld != null) {
 			lineageData = ld;
 		}
 	}
-	
+
 	public static boolean hasCellCase(String cellName) {
 		if (cellCases != null) {
 			return cellCases.hasCellCase(cellName);
 		}
 		return false;
 	}
-	
-	
+
 	/*
-	 * WHERE ELSE CAN WE PUT THIS --> ONLY PLACE TO REFERENCE CELL CASES IN STATIC WAY
+	 * WHERE ELSE CAN WE PUT THIS --> ONLY PLACE TO REFERENCE CELL CASES IN
+	 * STATIC WAY
 	 */
 	public static void removeCellCase(String cellName) {
 		if (cellCases != null && cellName != null) {
 			cellCases.removeCellCase(cellName);
 		}
 	}
-	
+
 	/*
-	 * Method taken from RootLayoutController 
-	 * --> how can InfoWindowLinkController generate page without ptr to RootLayoutController
+	 * Method taken from RootLayoutController --> how can
+	 * InfoWindowLinkController generate page without ptr to
+	 * RootLayoutController
 	 */
 	public static void addToInfoWindow(String name) {
-		//service.restart();
-		
-		//update to lineage name if function
+		// service.restart();
+
+		// update to lineage name if function
 		String lineage = PartsList.getLineageNameByFunctionalName(name);
 		if (lineage != null) {
 			name = lineage;
 		}
-		
-		//GENERATE CELL TAB ON CLICK
-		if (name!=null && !name.isEmpty()) {
-			if (cellCases == null || productionInfo == null)  {
-				return; //error check
+
+		// GENERATE CELL TAB ON CLICK
+		if (name != null && !name.isEmpty()) {
+			if (cellCases == null || productionInfo == null) {
+				return; // error check
 			}
-							
+
 			if (PartsList.containsLineageName(name)) {
 				if (cellCases.containsTerminalCase(name)) {
-					
-					//show the tab
+
+					// show the tab
 				} else {
-					//translate the name if necessary
-					String tabTitle = connectome.checkQueryCell(name).toUpperCase();
-					//add a terminal case --> pass the wiring partners
-					cellCases.makeTerminalCase(tabTitle, 
-							connectome.queryConnectivity(name, true, false, false, false, false),
-							connectome.queryConnectivity(name, false, true, false, false, false),
-							connectome.queryConnectivity(name, false, false, true, false, false),
-							connectome.queryConnectivity(name, false, false, false, true, false),
+					// translate the name if necessary
+					String searchName = connectome.checkQueryCell(name).toUpperCase();
+					// add a terminal case --> pass the wiring partners
+					cellCases.makeTerminalCase(name, searchName,
+							connectome.queryConnectivity(searchName, true, false, false, false, false),
+							connectome.queryConnectivity(searchName, false, true, false, false, false),
+							connectome.queryConnectivity(searchName, false, false, true, false, false),
+							connectome.queryConnectivity(searchName, false, false, false, true, false),
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
-			} else { //not in connectome --> non terminal case
+			} else { // not in connectome --> non terminal case
 				if (cellCases.containsNonTerminalCase(name)) {
-	
-					//show tab
+
+					// show tab
 				} else {
-					//add a non terminal case
-					cellCases.makeNonTerminalCase(name, 
-							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
+					// add a non terminal case
+					cellCases.makeNonTerminalCase(name, productionInfo.getNuclearInfo(),
+							productionInfo.getCellShapeData(name));
 				}
 			}
 		}
 	}
-	
-	//connectome checkbox listeners
+
+	// connectome checkbox listeners
 	public ChangeListener<Boolean> getPresynapticTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				presynapticTicked = newValue;
 				resultsUpdateService.restart();
 			}
 		};
 	}
-	
+
 	public ChangeListener<Boolean> getPostsynapticTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				postsynapticTicked = newValue;
 				resultsUpdateService.restart();
 			}
 		};
 	}
-	
+
 	public ChangeListener<Boolean> getElectricalTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				electricalTicked = newValue;
 				resultsUpdateService.restart();
 			}
 		};
 	}
-	
+
 	public ChangeListener<Boolean> getNeuromuscularTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				neuromuscularTicked = newValue;
 				resultsUpdateService.restart();
 			}
 		};
 	}
-
 
 	private static final long WAIT_TIME_MILLI = 750;
 }

@@ -31,6 +31,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.model.CellCases;
 import wormguides.model.Connectome;
+import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
 import wormguides.model.Rule;
 import wormguides.model.TerminalCellCase;
@@ -61,7 +62,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private int count; // to show loading in progress
 
-	private String cellName;
+	private String cellName; // lineage name of cell
 	private ContextMenu expressesMenu;
 	private MenuItem expressesTitle;
 	private MenuItem loadingMenuItem;
@@ -153,13 +154,17 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 								System.out.println("null cell cases");
 								return null; // error check
 							}
-
-							if (!cellCases.containsTerminalCase(cellName)) {
-								cellCases.makeTerminalCase(cellName,
-										connectome.queryConnectivity(cellName, true, false, false, false, false),
-										connectome.queryConnectivity(cellName, false, true, false, false, false),
-										connectome.queryConnectivity(cellName, false, false, true, false, false),
-										connectome.queryConnectivity(cellName, false, false, false, true, false),
+							
+							String funcName = PartsList.getFunctionalNameByLineageName(cellName);
+							String searchName = cellName;
+							if (funcName!=null)
+								searchName = funcName;
+							if (!cellCases.containsTerminalCase(searchName)) {
+								cellCases.makeTerminalCase(cellName, searchName,
+										connectome.queryConnectivity(searchName, true, false, false, false, false),
+										connectome.queryConnectivity(searchName, false, true, false, false, false),
+										connectome.queryConnectivity(searchName, false, false, true, false, false),
+										connectome.queryConnectivity(searchName, false, false, false, true, false),
 										productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(cellName));
 							}
 							return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
@@ -237,7 +242,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	}
 
 	public String getName() {
-		return nameText.getText();
+		return cellName;
 	}
 
 	public void disableTerminalCaseFunctions(boolean disable) {
@@ -454,14 +459,22 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		}
 	}
 
+	/*
+	 * Input name should be a lineage name
+	 */
 	public void setName(String name) {
 		name = name.trim();
 
 		if (name.startsWith("Ab"))
 			name = "AB" + name.substring(2);
 
-		nameText.setText(name);
 		cellName = name;
+		
+		String funcName = PartsList.getFunctionalNameByLineageName(name);
+		if (funcName!=null)
+			name = name+" ("+funcName+")";
+		
+		nameText.setText(name);
 	}
 
 	private final long WAIT_TIME_MILLI = 750;
