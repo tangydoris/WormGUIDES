@@ -23,6 +23,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -50,7 +51,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 
 public class SulstonTreePane extends ScrollPane {
-	
+
 	private LineageData data;
 	private HashMap<String, Integer> nameXUseMap;
 	private HashMap<String, Integer> nameYStartUseMap;
@@ -58,51 +59,54 @@ public class SulstonTreePane extends ScrollPane {
 	private TreeItem<String> lineageTreeRoot;
 
 	private ColorHash colorHash;
-	
-	private int maxX = 0; // global to class to keep track of current x layout position
+
+	private int maxX = 0; // global to class to keep track of current x layout
+							// position
 	private ObservableList<Rule> rules;
 	private Pane mainPane;
 	private Group zoomGroup;
-	
+
 	// Node content;
 	private Scale scaleTransform;
 	private Line timeIndicator;
 	private int ttduration = 0;
 	private IntegerProperty time;
 
-	private int xsc = 5;// =XScale minimal spacing between branches, inter branch gap
-				// seems to be some multiple of this?
+	private int xsc = 5;// =XScale minimal spacing between branches, inter
+						// branch gap
+	// seems to be some multiple of this?
 
 	private int iXmax = 20; // left margin
 	private int iYmin = 20;
-	
+
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
-	
+	private StringProperty selectedNameLabeled;
+
 	private Stage ownStage;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent event) {
 			String sourceName = ((Node) event.getSource()).getId();
-			
+
 			// right click
-			if (event.getButton()==MouseButton.SECONDARY
-					|| (event.getButton()==MouseButton.PRIMARY
-						&& (event.isControlDown() || event.isMetaDown()))) {
-				// TODO
+			if (event.getButton() == MouseButton.SECONDARY
+					|| (event.getButton() == MouseButton.PRIMARY && (event.isControlDown() || event.isMetaDown()))) {
 				showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
 			}
-			
+
 			// left click
-			else if (event.getButton()==MouseButton.PRIMARY) {
+			else if (event.getButton() == MouseButton.PRIMARY) {
 				contextMenuStage.hide();
+
+				resetSelectedNameLabeled(sourceName);
 				
 				if (hiddenNodes.contains(sourceName))
 					hiddenNodes.remove(sourceName);
 				else
 					hiddenNodes.add(sourceName);
-				
+
 				updateDrawing();
 			}
 		}
@@ -112,13 +116,13 @@ public class SulstonTreePane extends ScrollPane {
 
 	}
 
-	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot, 
+	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot,
 			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, 
-			ContextMenuController controller) {
+			ContextMenuController controller, StringProperty selectedNameLabeled) {
 		super();
-		
+
 		this.ownStage = ownStage;
-		
+
 		this.time = time;
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -126,7 +130,7 @@ public class SulstonTreePane extends ScrollPane {
 				repositionTimeLine();
 			}
 		});
-		
+
 		this.hiddenNodes = new TreeSet<String>();
 		// start with founders visible
 		hiddenNodes.add("ABala");
@@ -157,12 +161,12 @@ public class SulstonTreePane extends ScrollPane {
 				while (change.next()) {
 					if (change.getAddedSize() > 0) {
 						updateColoring();
-						
+
 						for (Rule rule : change.getAddedSubList()) {
 							rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 								@Override
-								public void changed(ObservableValue<? extends Boolean> observable, 
-										Boolean oldValue, Boolean newValue) {
+								public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+										Boolean newValue) {
 									if (newValue)
 										updateColoring();
 								}
@@ -191,7 +195,7 @@ public class SulstonTreePane extends ScrollPane {
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
-		
+
 		canvas.setVisible(true);
 
 		this.getChildren().add(contentGroup);
@@ -215,7 +219,7 @@ public class SulstonTreePane extends ScrollPane {
 
 		contentGroup.getChildren().add(tp);
 		contentGroup.getChildren().add(tm);
-		
+
 		tm.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -223,7 +227,7 @@ public class SulstonTreePane extends ScrollPane {
 				scaleTransform.setY(scaleTransform.getY() * .75);
 			}
 		});
-		
+
 		tp.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -231,20 +235,27 @@ public class SulstonTreePane extends ScrollPane {
 				scaleTransform.setY(scaleTransform.getY() * 1.3333);
 			}
 		});
-		
+
 		Pane yetanotherlevel = new Pane();
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
 		bindLocation(tm, (ScrollPane) this, yetanotherlevel);
 		bindLocation(tp, (ScrollPane) this, yetanotherlevel);
-		
+
 		contextMenuController = controller;
 		contextMenuStage = contextMenuController.getOwnStage();
+		
+		this.selectedNameLabeled = selectedNameLabeled;
 	}
 	
+	private void resetSelectedNameLabeled(String name) {
+		selectedNameLabeled.set("");
+		selectedNameLabeled.set(name);
+	}
+
 	private void showContextMenu(String name, double sceneX, double sceneY) {
-		if (contextMenuStage!=null) {
+		if (contextMenuStage != null) {
 			String funcName = PartsList.getFunctionalNameByLineageName(name);
 
 			if (funcName == null) {
@@ -254,7 +265,7 @@ public class SulstonTreePane extends ScrollPane {
 				contextMenuController.setName(funcName);
 				contextMenuController.disableTerminalCaseFunctions(false);
 			}
-			
+
 			contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
@@ -274,7 +285,7 @@ public class SulstonTreePane extends ScrollPane {
 					contextMenuStage.hide();
 				}
 			});
-			
+
 			contextMenuStage.setX(sceneX);
 			contextMenuStage.setY(sceneY);
 			contextMenuStage.show();

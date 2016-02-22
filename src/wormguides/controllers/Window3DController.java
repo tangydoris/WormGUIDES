@@ -224,7 +224,7 @@ public class Window3DController {
 	private BooleanProperty update3D;
 
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCases cases,
-			ProductionInfo info, Connectome connectome) {
+			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
 
 		root = new Group();
@@ -271,14 +271,34 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					selectedName.set(newValue);
-
-					if (!allLabels.contains(newValue)) {
-						allLabels.add(newValue);
-						currentLabels.add(newValue);
-					}
-
-					insertLabelFor(newValue, getEntityWithName(newValue));
+					// value passed may be a functional name
+					// use lineage names instead
+					String lineageName = PartsList.getLineageNameByFunctionalName(newValue);
+					if (lineageName==null)
+						lineageName = newValue;
+					
+					selectedName.set(lineageName);
+					
+					if (!allLabels.contains(lineageName))
+						allLabels.add(lineageName);
+					
+					// go to labeled name
+					int startTime;
+					int endTime;
+					
+					startTime = Search.getFirstOccurenceOf(lineageName);
+					endTime = Search.getLastOccurenceOf(lineageName);
+					
+					if (startTime<=0)
+						startTime = 1;
+					if (endTime<=0)
+						endTime = 1;
+					
+					if(time.get()<startTime || time.get()>endTime)
+						time.set(startTime);
+					
+					else
+						insertLabelFor(lineageName, getEntityWithName(lineageName));
 				}
 			}
 		});
@@ -409,6 +429,8 @@ public class Window3DController {
 		// root.getChildren().add(orientationIndicator);
 		xform.getChildren().add(createOrientationIndicator());
 
+		this.bringUpInfoProperty = bringUpInfoProperty;
+		
 		initializeUpdate3D();
 	}
 
@@ -569,10 +591,6 @@ public class Window3DController {
 	 */
 	private void removeTransientLabel() {
 		spritesPane.getChildren().remove(transientLabelText);
-	}
-
-	public void setBringUpInfoProperty(BooleanProperty bringUpInfoProperty) {
-		this.bringUpInfoProperty = bringUpInfoProperty;
 	}
 
 	// Called by RootLayoutController to set the loaded SceneElementsList
@@ -866,14 +884,14 @@ public class Window3DController {
 	private void createSubScene(Double width, Double height) {
 		subscene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
 		subscene.setFill(Color.web(FILL_COLOR_HEX));
-		
+
 		buildCamera();
 	}
 
 	public ContextMenuController getContextMenuController() {
 		if (contextMenuStage == null)
 			initContextMenuStage();
-		
+
 		return contextMenuController;
 	}
 
@@ -1864,7 +1882,6 @@ public class Window3DController {
 	}
 
 	public double getRotationX() {
-
 		return rotateX.getAngle();
 	}
 

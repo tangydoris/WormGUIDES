@@ -48,8 +48,8 @@ public class InfoWindow {
 	 * if tab is closed --> remove case from cell cases i.e. internal memory
 	 */
 	
-	public InfoWindow(Stage stage, IntegerProperty timeProperty, 
-			StringProperty cellNameProperty, CellCases cases, ProductionInfo info, Connectome connectome) {
+	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCases cases, 
+			ProductionInfo info, Connectome connectome) {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Info Window");
 		
@@ -72,8 +72,7 @@ public class InfoWindow {
 		infoWindowStage.setResizable(true);
 		
 		parentStage = stage;
-		time = timeProperty;
-		linkController = new InfoWindowLinkController(parentStage, time, cellNameProperty);
+		linkController = new InfoWindowLinkController(parentStage, cellNameProperty);
 		
 		count = 0;
 		showLoadingService = new Service<Void>() {

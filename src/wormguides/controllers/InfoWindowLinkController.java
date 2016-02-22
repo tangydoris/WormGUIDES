@@ -5,11 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
-import wormguides.Search;
-import wormguides.model.PartsList;
 
 /*
  * Callback class for our HTML page for a terminal cell case to open links in default browser
@@ -18,12 +15,10 @@ import wormguides.model.PartsList;
 public class InfoWindowLinkController {
 	
 	private Stage parentStage; //update scenes on links
-	private IntegerProperty time;
 	private StringProperty labeledCellProperty;
 	
-	public InfoWindowLinkController(Stage stage, IntegerProperty timeProperty, StringProperty cellNameProperty) {
+	public InfoWindowLinkController(Stage stage, StringProperty cellNameProperty) {
 		parentStage = stage;
-		time = timeProperty;
 		labeledCellProperty = cellNameProperty;
 	}
 	
@@ -49,24 +44,6 @@ public class InfoWindowLinkController {
 	}
 	
 	public void viewInCellTheater(String cellName) {
-		int startTime;
-		int endTime;
-		
-		String linName = PartsList.getLineageNameByFunctionalName(cellName);
-		if (linName != null)
-			cellName = linName;
-
-		startTime = Search.getFirstOccurenceOf(cellName);
-		endTime = Search.getLastOccurenceOf(cellName);
-		
-		if (startTime<=0)
-			startTime = 1;
-		if (endTime<=0)
-			endTime = 1;
-		
-		if(time.get()<startTime || time.get()>endTime)
-			time.set(startTime);
-		
 		resetLabeledCellProperty(cellName);
 		
 		parentStage.requestFocus();
