@@ -1,5 +1,6 @@
 package wormguides.controllers;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
@@ -46,6 +48,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.CellShapesIndexToHTML;
 import wormguides.DisplayLayer;
+import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
@@ -89,6 +92,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Stage partsListStage;
 	private Stage cellShapesIndexStage;
 	private Stage cellDeathsStage;
+	private Stage productionInfoStage;
 
 	// URL generation/loading
 	private URLWindow urlWindow;
@@ -232,11 +236,34 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private TreeItem<String> lineageTreeRoot;
 	private LineageData lineageData;
 
+	// rotation controller
+	private Stage rotationControllerStage;
+	RotationController rotationController;
+
 	// ----- Begin menu items and buttons listeners -----
-	// TODO
 	@FXML
 	public void productionInfoAction() {
-		// productionInfo should already be initialized
+		if (productionInfoStage == null) {
+			productionInfoStage = new Stage();
+			productionInfoStage.setTitle("Experimental Data");
+
+			if (productionInfo == null) {
+				initProductionInfo();
+			}
+
+			WebView productionInfoWebView = new WebView();
+			productionInfoWebView.getEngine().loadContent(productionInfo.getProductionInfoDOM().DOMtoString());
+			productionInfoWebView.setContextMenuEnabled(false);
+
+			VBox root = new VBox();
+			root.getChildren().addAll(productionInfoWebView);
+			Scene scene = new Scene(new Group());
+			scene.setRoot(root);
+
+			productionInfoStage.setScene(scene);
+			productionInfoStage.setResizable(false);
+		}
+		productionInfoStage.show();
 	}
 
 	@FXML
@@ -474,6 +501,41 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		connectomeStage.show();
 	}
 	// ----- End menu items and buttons listeners -----
+
+	@FXML
+	public void openRotationController() {
+		if (rotationControllerStage == null) {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/layouts/RotationControllerLayout.fxml"));
+
+			if (rotationController == null) {
+				rotationController = new RotationController(window3DController.getRotateXAngleProperty(),
+						window3DController.getRotateYAngleProperty(), window3DController.getRotateZAngleProperty());
+			}
+
+			rotationControllerStage = new Stage();
+
+			loader.setController(rotationController);
+			// loader.setRoot(rotationController); --> what does this line do in
+			// StoriesLayer?
+
+			try {
+				rotationControllerStage.setScene(new Scene((AnchorPane) loader.load()));
+
+				rotationControllerStage.setTitle("Rotation Controller");
+				rotationControllerStage.initOwner(mainStage);
+				rotationControllerStage.initModality(Modality.NONE);
+				rotationControllerStage.setResizable(true);
+
+			} catch (IOException e) {
+				System.out.println("error in initializing note editor.");
+				e.printStackTrace();
+			}
+		}
+
+		rotationControllerStage.show(); // null ptr e
+		rotationControllerStage.toFront();
+	}
 
 	public void init3DWindow(LineageData data) {
 		if (cellCases == null)

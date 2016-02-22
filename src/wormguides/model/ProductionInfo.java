@@ -2,6 +2,8 @@ package wormguides.model;
 
 import java.util.ArrayList;
 import wormguides.loaders.ProductionInfoLoader;
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
 
 public class ProductionInfo {
 	
@@ -63,6 +65,62 @@ public class ProductionInfo {
 	
 	public ArrayList<ArrayList<String>> getProductionInfoData() {
 		return productionInfoData;
+	}
+	
+	public InfoWindowDOM getProductionInfoDOM() {
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+		
+		HTMLNode productionInfoDiv = new HTMLNode("div");
+		HTMLNode productionInfoTable = new HTMLNode("table");
+		
+		//title row
+		HTMLNode trH = new HTMLNode("tr");
+		HTMLNode th1 = new HTMLNode("th", "", "", "Cells");
+		HTMLNode th2 = new HTMLNode("th", "", "", "Image Series");
+		HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
+		HTMLNode th4 = new HTMLNode("th", "", "", "Strain");
+		HTMLNode th5 = new HTMLNode("th", "", "", "Compressed Embryo?");
+		HTMLNode th6 = new HTMLNode("th", "", "", "Temporal Resolution");
+		HTMLNode th7 = new HTMLNode("th", "", "", "Segmentation");
+		HTMLNode th8 = new HTMLNode("th", "", "", "Cytoshow Link");
+		HTMLNode th9 = new HTMLNode("th", "", "", "Movie Start Time (min)");
+		trH.addChild(th1);
+		trH.addChild(th2);
+		trH.addChild(th3);
+		trH.addChild(th4);
+		trH.addChild(th5);
+		trH.addChild(th6);
+		trH.addChild(th7);
+		trH.addChild(th8);
+		trH.addChild(th9);
+		
+		productionInfoTable.addChild(trH);
+		
+		int rows = productionInfoData.get(0).size();
+		for (int i = 0; i < rows; i++) {
+			HTMLNode tr = new HTMLNode("tr");
+			for (int k = 0; k < productionInfoData.size(); k++) {
+				String data = productionInfoData.get(k).get(i);
+				HTMLNode td = new HTMLNode("td", "", "", data);
+				tr.addChild(td);
+			}
+			productionInfoTable.addChild(tr);
+		}
+		
+		
+		productionInfoDiv.addChild(productionInfoTable);
+		
+		body.addChild(productionInfoDiv);
+		
+		html.addChild(head);
+		html.addChild(body);
+		
+		InfoWindowDOM productionInfoDOM = new InfoWindowDOM(html);
+		productionInfoDOM.buildStyleNode();
+		
+		return productionInfoDOM;
 	}
 	
 	private final int DEFAULT_START_TIME = 1;

@@ -24,7 +24,6 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM() {
 		this.html = new HTMLNode("html");
-		this.name = "CELL TITLE";
 	}
 	
 	public InfoWindowDOM(HTMLNode html) {
@@ -33,8 +32,6 @@ public class InfoWindowDOM {
 		} else {
 			this.html = html;
 		}
-
-		this.name = "CELL TITLE";
 	}
 	
 	/*
@@ -667,6 +664,10 @@ public class InfoWindowDOM {
 				+ newLine + newLine + "div {"
 				+ newLine + "width: 100%;"
 				+ newLine + "overflow: hidden;"
+				+ newLine + "}"
+				+ newLine + "table, th, td {"
+				+ newLine + "border: 1px solid black;"
+				+ newLine + "border-collapse: collapse;"
 				+ newLine + "}" + newLine;
 		HTMLNode head = null; //saved to add style node as child of head
 		if (html.hasChildren()) {
