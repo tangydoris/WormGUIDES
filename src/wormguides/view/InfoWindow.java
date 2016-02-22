@@ -131,16 +131,16 @@ public class InfoWindow {
 					@Override
 					protected Void call() throws Exception {
 						// GENERATE CELL TAB ON CLICK
-						final String queryName = nameToQuery;
+						final String lineageName = nameToQuery;
 
-						if (queryName != null && !queryName.isEmpty()) {
+						if (lineageName != null && !lineageName.isEmpty()) {
 							if (cellCases == null) {
 								System.out.println("null cell cases");
 								return null; // error check
 							}
 
-							if (PartsList.containsLineageName(queryName)) {
-								if (cellCases.containsTerminalCase(queryName)) {
+							if (PartsList.containsLineageName(lineageName)) {
+								if (cellCases.containsTerminalCase(lineageName)) {
 
 									// show the tab
 								} else {
@@ -149,23 +149,23 @@ public class InfoWindow {
 									//String tabTitle = queryName;
 									// add a terminal case --> pass the wiring
 									// partners
-									String searchName = connectome.checkQueryCell(queryName).toUpperCase();
-									cellCases.makeTerminalCase(queryName, searchName,
-											connectome.queryConnectivity(searchName, true, false, false, false, false),
-											connectome.queryConnectivity(searchName, false, true, false, false, false),
-											connectome.queryConnectivity(searchName, false, false, true, false, false),
-											connectome.queryConnectivity(searchName, false, false, false, true, false),
+									String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
+									cellCases.makeTerminalCase(lineageName, funcName,
+											connectome.queryConnectivity(funcName, true, false, false, false, false),
+											connectome.queryConnectivity(funcName, false, true, false, false, false),
+											connectome.queryConnectivity(funcName, false, false, true, false, false),
+											connectome.queryConnectivity(funcName, false, false, false, true, false),
 											productionInfo.getNuclearInfo(),
-											productionInfo.getCellShapeData(searchName));
+											productionInfo.getCellShapeData(funcName));
 								}
 							} else { // not in connectome --> non terminal case
-								if (cellCases.containsNonTerminalCase(queryName)) {
+								if (cellCases.containsNonTerminalCase(lineageName)) {
 
 									// show tab
 								} else {
 									// add a non terminal case
-									cellCases.makeNonTerminalCase(queryName, productionInfo.getNuclearInfo(),
-											productionInfo.getCellShapeData(queryName));
+									cellCases.makeNonTerminalCase(lineageName, productionInfo.getNuclearInfo(),
+											productionInfo.getCellShapeData(lineageName));
 								}
 							}
 						}

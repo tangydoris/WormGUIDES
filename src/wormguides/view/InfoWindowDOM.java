@@ -48,7 +48,7 @@ public class InfoWindowDOM {
 		//external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
-		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		
@@ -457,7 +457,7 @@ public class InfoWindowDOM {
 		//cell name
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
 		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
-		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getCellName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 		

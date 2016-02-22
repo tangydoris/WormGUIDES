@@ -16,84 +16,84 @@ import wormguides.view.InfoWindowDOM;
  * 
  */
 public class CellCases {
-	
+
 	private ArrayList<TerminalCellCase> terminalCases;
 	private ArrayList<NonTerminalCellCase> nonTerminalCases;
-	
+
 	private InfoWindow infoWindow;
-	
+
 	public CellCases(InfoWindow window) {
 		terminalCases = new ArrayList<TerminalCellCase>();
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
 		infoWindow = window;
 	}
-	
+
 	public void setInfoWindow(InfoWindow window) {
 		infoWindow = window;
 	}
-	
-	public void makeTerminalCase(String lineageName, String cellName, 
-			ArrayList<String> presynapticPartners, ArrayList<String> postsynapticPartners,
-			ArrayList<String> electricalPartners, ArrayList<String> neuromuscularPartners, 
-			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
-		
+
+	public void makeTerminalCase(String lineageName, String cellName, ArrayList<String> presynapticPartners,
+			ArrayList<String> postsynapticPartners, ArrayList<String> electricalPartners,
+			ArrayList<String> neuromuscularPartners, ArrayList<String> nuclearProductionInfo,
+			ArrayList<String> cellShapeProductionInfo) {
+
 		TerminalCellCase tCase = new TerminalCellCase(lineageName, cellName, presynapticPartners, postsynapticPartners,
 				electricalPartners, neuromuscularPartners, nuclearProductionInfo, cellShapeProductionInfo);
-		
+
 		addTerminalCase(tCase);
 	}
-	
-	
+
 	private void addTerminalCase(TerminalCellCase terminalCase) {
 		if (terminalCases != null) {
 			terminalCases.add(terminalCase);
-			
-			if (infoWindow!=null) {
-				//create dom(tab)
+
+			if (infoWindow != null) {
+				// create dom(tab)
 				InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
-				//add dom(tab) to InfoWindow
+				// add dom(tab) to InfoWindow
 				infoWindow.addTab(tcDOM, terminalCase.getLinks());
 			}
 		}
 	}
-	
+
 	public TerminalCellCase getTerminalCellCase(String cellName) {
 		if (!containsTerminalCase(cellName))
 			return null;
-		
+
 		for (TerminalCellCase cellCase : terminalCases) {
 			if (cellCase.getCellName().equalsIgnoreCase(cellName))
 				return cellCase;
 		}
-		
+
 		return null;
 	}
-	
-	public void makeNonTerminalCase(String cellName, 
-			ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
-		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo);
-		
+
+	public void makeNonTerminalCase(String cellName, ArrayList<String> nuclearProductionInfo,
+			ArrayList<String> cellShapeProductionInfo) {
+		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo,
+				cellShapeProductionInfo);
+
 		addNonTerminalCase(ntCase);
 	}
-	
+
 	private void addNonTerminalCase(NonTerminalCellCase nonTerminalCase) {
 		if (nonTerminalCases != null) {
 			nonTerminalCases.add(nonTerminalCase);
-			
-			//create dom(tab)
+
+			// create dom(tab)
 			InfoWindowDOM ntcDOM = new InfoWindowDOM(nonTerminalCase);
-			
-			//add dom(tab) to InfoWindow
-			if (infoWindow!=null)
+
+			// add dom(tab) to InfoWindow
+			if (infoWindow != null)
 				infoWindow.addTab(ntcDOM, nonTerminalCase.getLinks());
 		}
 	}
-	
+
 	public boolean containsTerminalCase(String cellName) {
 		if (terminalCases != null) {
 			for (TerminalCellCase tCase : terminalCases) {
-				if (tCase.getCellName().equals(cellName) || 
-						tCase.getCellName().equals(PartsList.getFunctionalNameByLineageName(cellName))) {
+				if (tCase.getCellName().equals(cellName)
+						|| tCase.getCellName().equals(PartsList.getFunctionalNameByLineageName(cellName))) {
 					return true;
 				}
 			}
@@ -101,12 +101,12 @@ public class CellCases {
 		}
 		return false;
 	}
-	
+
 	public boolean containsNonTerminalCase(String cellName) {
 		if (nonTerminalCases != null) {
 			for (NonTerminalCellCase ntCase : nonTerminalCases) {
-				if (ntCase.getCellName().equals(cellName) || 
-						ntCase.getCellName().equals(PartsList.getLineageNameByFunctionalName(cellName))) {
+				if (ntCase.getCellName().equals(cellName)
+						|| ntCase.getCellName().equals(PartsList.getLineageNameByFunctionalName(cellName))) {
 					return true;
 				}
 			}
@@ -114,11 +114,11 @@ public class CellCases {
 		}
 		return false;
 	}
-	
+
 	public boolean hasCellCase(String cellName) {
 		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName);
 	}
-	
+
 	public void removeCellCase(String cellName) {
 		if (containsTerminalCase(cellName)) {
 			for (int i = 0; i < terminalCases.size(); i++) {
@@ -128,7 +128,7 @@ public class CellCases {
 				}
 			}
 		}
-		
+
 		if (containsNonTerminalCase(cellName)) {
 			for (int i = 0; i < nonTerminalCases.size(); i++) {
 				if (nonTerminalCases.get(i).getCellName().toLowerCase().equals(cellName.toLowerCase())) {
@@ -138,5 +138,5 @@ public class CellCases {
 			}
 		}
 	}
-	
+
 }

@@ -1010,13 +1010,13 @@ public class Search {
 					// show the tab
 				} else {
 					// translate the name if necessary
-					String searchName = connectome.checkQueryCell(name).toUpperCase();
+					String funcName = connectome.checkQueryCell(name).toUpperCase();
 					// add a terminal case --> pass the wiring partners
-					cellCases.makeTerminalCase(name, searchName,
-							connectome.queryConnectivity(searchName, true, false, false, false, false),
-							connectome.queryConnectivity(searchName, false, true, false, false, false),
-							connectome.queryConnectivity(searchName, false, false, true, false, false),
-							connectome.queryConnectivity(searchName, false, false, false, true, false),
+					cellCases.makeTerminalCase(name, funcName,
+							connectome.queryConnectivity(funcName, true, false, false, false, false),
+							connectome.queryConnectivity(funcName, false, true, false, false, false),
+							connectome.queryConnectivity(funcName, false, false, true, false, false),
+							connectome.queryConnectivity(funcName, false, false, false, true, false),
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { // not in connectome --> non terminal case

@@ -304,8 +304,7 @@ public class Window3DController {
 					if(time.get()<startTime || time.get()>endTime)
 						time.set(startTime);
 					
-					else
-						insertLabelFor(lineageName, getEntityWithName(lineageName));
+					insertLabelFor(lineageName, getEntityWithName(lineageName));
 				}
 			}
 		});

@@ -34,13 +34,15 @@ public class TerminalCellCase {
 		
 		this.links = new ArrayList<String>();
 		
+		this.lineageName = lineageName;
+		
 		this.cellName = cellName;
 		this.externalInfo = this.cellName;
 		if (PartsList.getLineageNameByFunctionalName(cellName) != null) {
-			this.externalInfo += " (" + PartsList.getLineageNameByFunctionalName(cellName) + ")";
+			this.externalInfo += " (" + lineageName + ")";
 		}
 		
-		this.partsListDescription = PartsList.getDescriptionByFunctionalName(cellName);
+		this.partsListDescription = PartsList.getDescriptionByLineageName(lineageName);
 		
 		if (Character.isDigit(cellName.charAt(cellName.length() - 1))){
 			this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT;
@@ -74,7 +76,10 @@ public class TerminalCellCase {
 		 * cytoshow stub
 		 */
 		links.add("Cytoshow: [cytoshow link to this cell in EM data]");
-
+	}
+	
+	public String getLineageName() {
+		return lineageName;
 	}
 	
 	private String setFunctionFromWORMATLAS() {
