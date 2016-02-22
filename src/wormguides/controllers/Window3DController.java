@@ -203,6 +203,10 @@ public class Window3DController {
     
     //orientation indicator
     private Cylinder orientationIndicator;
+    private Rotate indicatorRotation;//this is the time varying component of rotation
+   	//private Group orientationIndicator;//this isn't needed globally really
+   	private double [] keyValuesRotate={0,45,100,100,145};
+   	private double [] keyFramesRotate={1,20,320,340,400}; //start 
     
     private EventHandler<MouseEvent> clickableMouseEnteredHandler;
     private EventHandler<MouseEvent> clickableMouseExitedHandler;
@@ -402,15 +406,78 @@ public class Window3DController {
         PhongMaterial material = new PhongMaterial();
         material.setDiffuseColor(Color.RED);
         orientationIndicator = new Cylinder(radius, height);
-//        orientationIndicator.setTranslateX(newOriginX);
-//        orientationIndicator.setTranslateY(newOriginY);
-//        orientationIndicator.setTranslateZ(newOriginZ);
+        //orientationIndicator.setTranslateX(newOriginX);
+        //orientationIndicator.setTranslateY(newOriginY);
+        //orientationIndicator.setTranslateZ(newOriginZ);
         orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
         orientationIndicator.setMaterial(material);
-      //  root.getChildren().add(orientationIndicator);
+        //root.getChildren().add(orientationIndicator);
+        xform.getChildren().add(createOrientationIndicator());
         
-       initializeUpdate3D();
+        initializeUpdate3D();
     }
+    
+    private Group createOrientationIndicator(){
+    	indicatorRotation=new Rotate();
+       //top level group
+    	//had rotation to make it match main rotation
+    	Group orientationIndicator=new Group();
+    	//has rotation to make it match biological orientation
+        Group middleTransformGroup= new Group();
+        
+    	//set up the orientation indicator in bottom right corner
+        Text t= makeNoteBillboardText("P     A");
+        t.setTranslateX(-10);
+        middleTransformGroup.getChildren().add(t);
+      
+        t= makeNoteBillboardText("D     V");
+        t.setTranslateX(-42);
+        t.setTranslateY(32);
+        t.setRotate(90);
+        middleTransformGroup.getChildren().add(t);
+     
+        t= makeNoteBillboardText("L    R");
+        t.setTranslateX(5);
+        t.setTranslateZ(10);
+        t.getTransforms().add(new Rotate(90,new Point3D(0,1,0)));
+        middleTransformGroup.getChildren().add(t);
+        
+        middleTransformGroup.getTransforms().add(new Rotate(-30,0,0));// rotation to match lateral orientation in image
+       // middleTransformGroup.getTransforms().add(new Scale(.5,.50,.5));
+        middleTransformGroup.getTransforms().add(new Scale(3,3,3));
+        //xy relocates z shrinks aparent by moving away from camera? improves resolution?
+        orientationIndicator.getTransforms().add(new Translate(300,200,800));
+        orientationIndicator.getTransforms().add(new Translate(-newOriginX,-newOriginY,-newOriginZ));
+        orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
+        orientationIndicator.getTransforms().add(new Translate(newOriginX,newOriginY,newOriginZ));        
+        orientationIndicator.getChildren().add(middleTransformGroup);
+        middleTransformGroup.getTransforms().add(indicatorRotation);
+        return orientationIndicator;
+    }
+   
+
+	private double computeInterpolatedValue(int timevalue, double[] keyFrames, double[] keyValues) {
+		 if(timevalue<=keyFrames[0])
+	    	 return keyValues[0];
+		  
+	     if(timevalue>=keyFrames[keyFrames.length-1])
+	    	 return keyValues[keyValues.length-1];
+	     
+	     int i;
+	     for ( i=0;i<keyFrames.length;i++){
+	    	 if(keyFrames[i]==timevalue)
+	    		 return(keyValues[i]);
+	    	 
+	    	 if (keyFrames[i]>timevalue)
+	    		 break;
+	     }
+	     
+	     //interpolate btw values at i and i-1
+	     double alpha=((timevalue-keyFrames[i-1])/(keyFrames[i]-keyFrames[i-1]));
+	     double value= keyValues[i]*alpha+keyValues[i-1]*(1-alpha);
+	     //System.out.println("alpha "+alpha+keyValues[i-1]+" "+keyValues[i]+" value "+value);
+	     return value;
+	}
     
     
     private void initializeUpdate3D() {
@@ -636,7 +703,7 @@ public class Window3DController {
             repositionSprites();
             repositionNoteBillboardFronts();
             
-            stillscreenCapture();
+            //stillscreenCapture();
         }
     }
     
@@ -1087,7 +1154,11 @@ public class Window3DController {
                 iter.remove();
         }
         
-       // root.getChildren().add(orientationIndicator);
+        //root.getChildren().add(orientationIndicator);
+        double newrotate = computeInterpolatedValue(time.get(), keyFramesRotate, keyValuesRotate);
+        indicatorRotation.setAngle(-newrotate);
+        //System.out.println(time.get()+" rotation is "+newrotate);
+        indicatorRotation.setAxis(new Point3D(1, 0, 0));
     }
 
     

@@ -17,6 +17,7 @@ import java.lang.Math;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -35,6 +36,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.TreeItem;
@@ -54,9 +56,17 @@ public class SulstonTreePane extends ScrollPane {
 	Group zoomGroup;
 	//Node content;
 	Scale scaleTransform;
-
+	Line timeIndicator;
 	int ttduration=0;
+	IntegerProperty time;
+	
+	
+	int xsc=5;//=XScale minimal spacing between branches, inter branch gap seems to be some multiple of this?
 
+	int iXmax=20; //left margin 
+	int iYmin=20;
+	
+	
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent event) {
@@ -77,40 +87,97 @@ public class SulstonTreePane extends ScrollPane {
 
 
 
-	public SulstonTreePane(LineageData data, TreeItem<String> lineageTreeRoot, ObservableList<Rule> rules, ColorHash colorHash) {
+	public SulstonTreePane(LineageData data, TreeItem<String> lineageTreeRoot, 
+			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time) {
 		super();
+		this.time=time;
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable,
+								Number oldValue, Number newValue) {
+				repositionTimeLine();
+			}
+		});
 		this.hiddenNodes=new TreeSet<String>();
+		//start with founders visible
+		hiddenNodes.add("ABala");
+		hiddenNodes.add("ABalp");
+		hiddenNodes.add("ABara");
+		hiddenNodes.add("ABarp");
+		hiddenNodes.add("ABpla");
+		hiddenNodes.add("ABplp");
+		hiddenNodes.add("ABpra");
+		hiddenNodes.add("ABprp");
+
+		hiddenNodes.add("MSa");
+		hiddenNodes.add("MSp");
+		hiddenNodes.add("Ea");
+		hiddenNodes.add("Ep");
+		hiddenNodes.add("Ca");
+		hiddenNodes.add("Cp");
+		hiddenNodes.add("D");
+		hiddenNodes.add("P4");
+		
 		this.rules=rules;
 		this.colorHash=colorHash;
 		this.lineageTreeRoot=lineageTreeRoot;
 
-		rules.addListener(new ListChangeListener<Rule>() {
-			@Override
-			public void onChanged(
-					ListChangeListener.Change<? extends Rule> change) {
-
-				while (change.next()) {
-					for (Rule rule : change.getAddedSubList()) {
-						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable,
-									Boolean oldValue, Boolean newValue) {
-								if (newValue)
-									updateColoring();
-								//buildScene(time.get());
-							}
-						});
-						updateColoring();
-						//buildScene(time.get());
-					}
-
-					for (Rule rule : change.getRemoved()) {
-						updateColoring();
-						//buildScene(time.get());
-					}
-				}
-			}
-		});
+//		rules.addListener(new ListChangeListener<Rule>() {
+//			@Override
+//			public void onChanged(
+//					ListChangeListener.Change<? extends Rule> change) {
+//
+//				while (change.next()) {
+//					for (Rule rule : change.getAddedSubList()) {
+//						rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+//							@Override
+//							public void changed(ObservableValue<? extends Boolean> observable,
+//									Boolean oldValue, Boolean newValue) {
+//								if (newValue)
+//									updateColoring();
+//								//buildScene(time.get());
+//							}
+//						});
+//						updateColoring();
+//						//buildScene(time.get());
+//					}
+//
+//					for (Rule rule : change.getRemoved()) {
+//						updateColoring();
+//						//buildScene(time.get());
+//					}
+//				}
+//			}
+//		});
+	      rules.addListener(new ListChangeListener<Rule>() {
+	            @Override
+	            public void onChanged(
+	                    ListChangeListener.Change<? extends Rule> change) {
+	                while (change.next()) {
+	                    if (change.getAddedSize()>0) {
+	                    	updateColoring();
+	                        
+	                        for (Rule rule : change.getAddedSubList()) {
+	                            rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+	                                @Override
+	                                public void changed(ObservableValue<? extends Boolean> observable,
+	                                        Boolean oldValue, Boolean newValue) {
+	                                    if (newValue)
+	                                    	updateColoring();
+	                                    
+	                                    rule.setChanged(false);
+	                                }
+	                            });
+	                        }
+	                    }
+	                    
+	                    if (!change.getRemoved().isEmpty()) {
+	                    	updateColoring();
+	                    }
+	                }
+	            }
+	        });
+	    
 
 
 		nameXUseMap= new HashMap<String, Integer>();
@@ -130,7 +197,7 @@ public class SulstonTreePane extends ScrollPane {
 
 		//canvas.getTransforms().add(scaleTransform);
 
-		System.out.println("in right constructor");
+		//System.out.println("in right constructor");
 		//canvas.setStyle("-fx-background-color: white;");
 		// Circle circle = new Circle(50,Color.BLUE);
 		//circle.relocate(20, 20);
@@ -149,14 +216,14 @@ public class SulstonTreePane extends ScrollPane {
 		this.setPannable(true);
 		//   this.getChildren().add(sp);
 
-		addLines(lineageTreeRoot,canvas);
-		// canvas.setPrefSize(maxX,400);
+		int x=addLines(lineageTreeRoot,canvas);
+		this.setPrefSize(300,300);
 
 		//   this.setPrefSize(maxX,400);
 
 		//add controls for zoom
 		Text tp=new Text(15,20,"+");
-		Text tm=new Text(30,20,"-");
+		Text tm=new Text(40,25,"-");
 		tp.setFont(new Font(25));
 		tm.setFont(new Font(35));
 
@@ -181,11 +248,17 @@ public class SulstonTreePane extends ScrollPane {
 		//		  this.setContent(contentGroup);
 		this.setContent(yetanotherlevel);
 
-		bindLocation(tm, (ScrollPane)this, yetanotherlevel);
-		bindLocation(tp, (ScrollPane)this, yetanotherlevel);
-
+		bindLocation(tm,(ScrollPane)this,yetanotherlevel);
+		bindLocation(tp,(ScrollPane)this,yetanotherlevel);
+	
 	}
 
+	private void repositionTimeLine(){
+		timeIndicator.setEndY(iYmin+time.getValue());
+		timeIndicator.setStartY(iYmin+time.getValue());
+		//System.out.println("adjusting time line");
+	}
+	
 	private void bindLocation(Text n,ScrollPane s, Pane scontent){
 		n.layoutYProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
@@ -242,16 +315,16 @@ public class SulstonTreePane extends ScrollPane {
 
 	private void updateDrawing(){
 		//clear drawing
-		System.out.println("update drawing");
+		//System.out.println("update drawing");
 		mainPane.getChildren().clear();
 		maxX=0;
 		//update drawing
-		addLines(lineageTreeRoot, mainPane);
+		addLines(lineageTreeRoot,mainPane);
 	}
 
 
 
-	public void updateColoring() {
+	public void updateColoring(){
 		//iterate over all drawn lines and recompute their color
 		ObservableList<Node> contentnodes= mainPane.getChildren();
 		Paint newcolors=null;
@@ -272,15 +345,26 @@ public class SulstonTreePane extends ScrollPane {
 				//Material getMaterial(TreeSet<Color> colorSet) {
 			}
 		}
+
 	}
 
-	private void addLines(TreeItem<String> lineageTreeRoot, Pane mainPane){
-		int something = recursiveDraw(mainPane, 400, 10, 10, lineageTreeRoot, 10);
+	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane){
+		//System.out.println("before recursivedraw "+maxX);
+		
+		int x=recursiveDraw(mainPane,400,10,10,lineageTreeRoot,10);
+		//add time indicator
+		int timevalue=time.getValue();
+		timeIndicator=new Line(0,iYmin+timevalue,maxX+iXmax*2,iYmin+timevalue);
+		timeIndicator.setStroke(new Color(.5,.5,.5,.5));
+		//System.out.println("after recursivedraw placing timelineat "+maxX+" "+timevalue);
+		mainPane.getChildren().add(timeIndicator);
+		drawTimeTicks();
+		return x;
 	}
 
-	// abortive attempt to paint lines with stripes by recovering the material used in striping shapes
-	// retrieval and coloring works but I think the texture needs to be rotated and so am holding off on figuring this out
+	//retrieves material for use as texture on lines
 	private  Paint PaintThatApplyToCell(String cellname) {
+		if(!(cellname==null)){
 		//TreeSet<Color> colors = new TreeSet<Color>();
 		TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 		//iterate over rulesList
@@ -292,7 +376,7 @@ public class SulstonTreePane extends ScrollPane {
 
 			else if(rule instanceof ColorRule) {
 				//iterate over cells and check if cells apply
-				if(((ColorRule)rule).appliesToBody(cellname)) {
+				if(((ColorRule)rule).appliesToCell(cellname)) {
 					colors.add(rule.getColor());
 				}
 
@@ -307,6 +391,7 @@ public class SulstonTreePane extends ScrollPane {
 				ImagePattern ip=new ImagePattern(i,0,0,21,21,false);
 
 				return ip;}
+		}
 		}
 		return null; //colors;
 	}
@@ -333,12 +418,28 @@ public class SulstonTreePane extends ScrollPane {
 		return null; //colors;
 	}
 
+	private void drawTimeTicks(){
+		for (int i=0;i<=400;i=i+100){
+			Line l=new Line(0,i,5,i);
+			Text number=new Text(Integer.toString(i));
+			number.setFont(new Font(6));
+			number.setX(7);
+			number.setY(i);
+			mainPane.getChildren().add(number);
+			mainPane.getChildren().add(l);
+		}
+		
+		for (int i=25;i<=400;i=i+25){
+			Line l=new Line(0,i,3,i);
+			mainPane.getChildren().add(l);
+		}
+			
+	}
 
 	//recursively draws each cell in Tree 
 	//not sure what rootstart is
 	// note returns the midpoint of the sublineage just drawn
 	private int recursiveDraw(Pane mainPane, int h, int x, int ystart, TreeItem<String> cell, int rootStart) {
-		// iCellsDrawn.add(c);
 
 		boolean done = false;
 		String cellName=cell.getValue();
@@ -348,20 +449,9 @@ public class SulstonTreePane extends ScrollPane {
 
 		int startTime = data.getFirstOccurrenceOf(cellName);
 		int lastTime = data.getLastOccurrenceOf(cellName);
-		//        if (c.iEndTime > lateTime) {
-		//           done = true;
-		//          lastTime = lateTime;
-		//     }  
-		//   dubious hard coded constants i dont understand
-		//double ysc=1;
-		int xsc=5;//=XScale minimal spacing between branches, inter branch gap seems to be some multiple of this?
-		//int iTimeIndex=1;
-		int iXmax=20; //left margin 
-		int iYmin=20;
-
+		if(startTime<1) startTime=1;
 		int length = (int)((lastTime - startTime));
-		//if (length<1) length=5;
-
+		
 		int yStartUse = (int)((startTime+iYmin)) ;
 		nameYStartUseMap.put(cellName, new Integer(yStartUse));
 
@@ -370,25 +460,20 @@ public class SulstonTreePane extends ScrollPane {
 		//Color lcolor=ColorsThatApplyToCell(cellName);
 		Paint lcolor=PaintThatApplyToCell(cellName);
 
-
 		if (cell.isLeaf() || done) {
 			if (x < iXmax) x = iXmax + xsc;
 			//terminal case line drawn
 			maxX=Math.max(x,maxX);
-
-
 			Line lcell=new Line(x,yStartUse,x,yStartUse+length);
-			// if (!lcolors.isEmpty())
 			if(!(lcolor==null))
 				lcell.setStroke(lcolor); //first for now
 			Tooltip t = new Tooltip(cellName);
 			hackTooltipStartTiming(t,ttduration);
 			Tooltip.install(lcell, t);
-
 			lcell.setId(cellName);
 			lcell.setOnMousePressed(handler);
 			if(done){ //this is a collapsed node not a terminal cell
-				System.out.println("done rendering");
+				//System.out.println("done rendering");
 				Circle circle = new Circle(2,Color.BLACK);
 				circle.relocate(x-2, yStartUse+length-2);
 				t = new Tooltip("Expand "+cellName);
@@ -399,13 +484,16 @@ public class SulstonTreePane extends ScrollPane {
 				circle.setOnMousePressed(handler);
 			}
 			mainPane.getChildren().add(lcell);
-			if (x > iXmax) iXmax = x;
+			int offsetx=2;
+			int offsety=3;
+			Text cellnametext=new Text(x-offsetx,yStartUse+length+offsety,cellName);
+			cellnametext.getTransforms().add(new Rotate(90,x-offsetx,yStartUse+length+offsety));
+			cellnametext.setFont(new Font(5));
+			
+			//cellnametext.setRotationAxis(new Point3D(x,yStartUse+length,0));
+			mainPane.getChildren().add(cellnametext);
+			//if (x > iXmax) iXmax = x;
 			nameXUseMap.put(cellName, new Integer(x));
-			//c.xUse = x;
-
-			//fillInHash(c, cHash);
-			//g.fillOval(c.xUse-2, c.yStartUse-2, 4, 4);
-
 			return x;
 		} else {
 
@@ -431,7 +519,9 @@ public class SulstonTreePane extends ScrollPane {
 				Line lcell=new Line(leftXUse.intValue(),leftYUse.intValue(),rightXUse.intValue(),leftYUse.intValue());
 				if(!(lcolor==null))
 					lcell.setStroke(lcolor); //first for now
-				lcell.setId(cLeft.getValue()+cRite.getValue()); //name division lines with child names
+				//lcell.setId(cLeft.getValue()+cRite.getValue()); //name division lines with child names
+				
+				lcell.setId(cellName);//set division line to parent id to aid recoloring
 				mainPane.getChildren().add(lcell);
 				x = (x1 + x2)/2;
 				length=leftYUse.intValue()-yStartUse;
@@ -473,7 +563,7 @@ public class SulstonTreePane extends ScrollPane {
 
 
 
-	/* public final int
+	/* public final static int
      NAME = 4
     ,TIME = 0
     ,PLANE = 3
