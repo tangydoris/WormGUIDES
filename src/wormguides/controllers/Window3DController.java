@@ -68,6 +68,7 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.TransformChangedEvent;
 import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -222,6 +223,10 @@ public class Window3DController {
 	private final static String imgName = "WormGUIDES_time_";
 
 	private BooleanProperty update3D;
+	
+	private DoubleProperty rotateXAngle;
+	private DoubleProperty rotateYAngle;
+	private DoubleProperty rotateZAngle;
 
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCases cases,
 			ProductionInfo info, Connectome connectome) {
@@ -344,6 +349,27 @@ public class Window3DController {
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
+		
+		//initialize
+		rotateXAngle = new SimpleDoubleProperty(1);
+		rotateYAngle = new SimpleDoubleProperty(1);
+		rotateZAngle = new SimpleDoubleProperty(1);
+		
+		//set intial values
+		rotateXAngle.set(rotateX.getAngle());
+		rotateYAngle.set(rotateY.getAngle());
+		rotateZAngle.set(rotateZ.getAngle());
+		
+		//add listener for control from rotationcontroller
+		rotateXAngle.addListener(getRotateXAngleListener());
+		rotateYAngle.addListener(getRotateYAngleListener());
+		rotateZAngle.addListener(getRotateZAngleListener());
+		
+		
+		//set listeners to update doubleproperties ^^
+		rotateX.setOnTransformChanged(getRotateXChangeHandler());
+		rotateY.setOnTransformChanged(getRotateYChangeHandler());
+		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
 
 		uniformSize = false;
 
@@ -1916,6 +1942,72 @@ public class Window3DController {
 
 	public void setOthersVisibility(double dim) {
 		othersOpacity.set(dim);
+	}
+	
+	private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+		return new EventHandler<TransformChangedEvent>() {
+			@Override
+			public void handle(TransformChangedEvent arg0) {
+				rotateXAngle.set(rotateX.getAngle());
+			}
+		};	
+	}
+	
+	private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
+		return new EventHandler<TransformChangedEvent>() {
+			@Override
+			public void handle(TransformChangedEvent arg0) {
+				rotateYAngle.set(rotateY.getAngle());
+			}
+		};	
+	}
+	
+	private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
+		return new EventHandler<TransformChangedEvent>() {
+			@Override
+			public void handle(TransformChangedEvent arg0) {
+				rotateZAngle.set(rotateZ.getAngle());
+			}
+		};	
+	}
+	
+	private ChangeListener<Number> getRotateXAngleListener() {
+		return new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				rotateX.setAngle(rotateXAngle.get());
+			}
+		};
+	}
+	
+	private ChangeListener<Number> getRotateYAngleListener() {
+		return new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				rotateY.setAngle(rotateYAngle.get());
+			}
+		};
+	}
+	
+	private ChangeListener<Number> getRotateZAngleListener() {
+		return new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				rotateZ.setAngle(rotateZAngle.get());
+			}
+		};
+	}
+	
+	public DoubleProperty getRotateXAngleProperty() {
+		return this.rotateXAngle;
+	}
+	
+	public DoubleProperty getRotateYAngleProperty() {
+		return this.rotateYAngle;
+	}
+	
+	public DoubleProperty getRotateZAngleProperty() {
+		return this.rotateZAngle;
 	}
 
 	public SubScene getSubScene() {

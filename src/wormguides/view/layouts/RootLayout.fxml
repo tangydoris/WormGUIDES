@@ -32,10 +32,11 @@
                         <MenuItem mnemonicParsing="false" onAction="#viewPartsList" text="Parts List" />
                         <MenuItem mnemonicParsing="false" onAction="#viewConnectome" text="Connectome" />
                         <MenuItem mnemonicParsing="false" onAction="#viewCellDeaths" text="Cell Deaths" />
-                        <MenuItem disable="true" mnemonicParsing="false" onAction="#productionInfoAction" text="Experimental Data" />
+                        <MenuItem mnemonicParsing="false" onAction="#productionInfoAction" text="Experimental Data" />
                     </items>
                   </Menu>
                   <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
+                  <MenuItem mnemonicParsing="false" onAction="#openRotationController" text="Rotation Control" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
