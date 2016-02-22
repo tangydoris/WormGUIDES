@@ -228,7 +228,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	}
 	
 	public void disableTerminalCaseFunctions(boolean disable) {
-		expresses.setDisable(disable);
+		wiredTo.setDisable(disable);
 	}
 
 	@Override
