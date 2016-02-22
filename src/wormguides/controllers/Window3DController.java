@@ -70,6 +70,8 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.TransformChangedEvent;
 import javafx.scene.transform.Translate;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -710,8 +712,6 @@ public class Window3DController {
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
-
-			// stillscreenCapture();
 		}
 	}
 
@@ -1766,17 +1766,31 @@ public class Window3DController {
 	 * When called, a snapshot of the screen is saved
 	 */
 	public void stillscreenCapture() {
+		/*
+		 * TODO
+		 * Open file save chooser
+		 */
+		
+		Stage fileChooserStage = new Stage();
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(
+				new ExtensionFilter("PNG File", "*.png"));
+		
+		
 		WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
 		/*
 		 * write the image to a file
 		 */
 		try {
-			String imageFileName = imgName + time.get() + ".png";
-			File file = new File(imageFileName);
-			RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-			ImageIO.write(renderedImage, "png", file);
-			System.out.println("Saved image " + imageFileName + " to WormGUIDES directory");
+			File file = fileChooser.showSaveDialog(fileChooserStage);
+			
+			if (file != null) {
+				RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+				ImageIO.write(renderedImage, "png", file);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
