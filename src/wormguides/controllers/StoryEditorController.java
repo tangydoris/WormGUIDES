@@ -350,16 +350,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	}
 	
 	
-	public void setStoryCreated(boolean created) {
-		storyCreated.set(created);
-	}
-	
-	
-	public BooleanProperty getStoryCreatedProperty() {
-		return storyCreated;
-	}
-	
-	
 	public void setNoteCreated(boolean created) {
 		noteCreated.set(created);
 	}
@@ -787,15 +777,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	
 	// ----- Begin button actions -----
-	@FXML protected void newStory() {
-		Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
-		if (activeStory!=null)
-			story.setColorURL(activeStory.getColorURL());
-		activeStory = story;
-		setStoryCreated(true);
-	}
-	
-	
 	@FXML protected void newNote() {
 		if (activeStory!=null) {
 			setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
@@ -807,8 +788,5 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	
 	private final String NEW_NOTE_TITLE = "New Note";
 	private final String NEW_NOTE_CONTENTS = "New note contents here";
-	
-	private final String NEW_STORY_TITLE = "New Story";
-	private final String NEW_STORY_DESCRIPTION = "New story description here";
 	
 }

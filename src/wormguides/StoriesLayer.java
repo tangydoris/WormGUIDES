@@ -25,6 +25,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
@@ -40,6 +41,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
@@ -95,9 +97,21 @@ public class StoriesLayer {
 	
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, 
 			LineageData data, Window3DController sceneController, BooleanProperty useInternalRulesFlag,
-			int movieTimeOffset) {
+			int movieTimeOffset, Button newStoryButton) {
 		
 		parentStage = parent;
+		
+		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
+				stories.add(story);
+				setActiveStory(story);
+				setActiveNote(null);
+				
+				bringUpEditor();
+			}
+		});
 		
 		window3DController = sceneController;
 		useInternalRules = useInternalRulesFlag;
@@ -131,6 +145,11 @@ public class StoriesLayer {
 		cellClickedProperty = window3DController.getCellClicked();
 		
 		StoriesLoader.loadConfigFile(stories, timeOffset);
+		
+		Story defaultStory = new Story("Blank Story", 
+				"This is a blank story. Create notes and set custom color rules!", "");
+		stories.add(defaultStory);
+		setActiveStory(defaultStory);
 		
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -280,9 +299,8 @@ public class StoriesLayer {
 		
 		if (timeProperty.get()!=startTime)
 			timeProperty.set(startTime);
-		
 		else {
-			rebuildSceneFlag.set(true);
+			rebuildSceneFlag.set(true); // TODO is this buggy?? (doris)
 			rebuildSceneFlag.set(false);
 		}
 	}
@@ -297,16 +315,14 @@ public class StoriesLayer {
 		if (activeNote!=null) {
 			activeNote.setActive(true);
 			
-			
-			/* TODO
-			 * IS THIS NECESSARY? removing this line fixes the bug where every "New Note" click jumps to the start
-			 */
-			// set time property to be read by 3d window --> 
-//			int startTime = getEffectiveStartTime(activeNote);
-//			if (startTime<1)
-//				startTime=1;
-//			
-//			timeProperty.set(startTime);
+			// set time property to be read by 3d window
+			if (!activeNote.getTagName().equals("New Note")) {
+				int startTime = getEffectiveStartTime(activeNote);
+				if (startTime<1)
+					startTime=1;
+				
+				timeProperty.set(startTime);
+			}
 		}
 		
 		if (editController!=null)
@@ -447,16 +463,18 @@ public class StoriesLayer {
 				notes.addAll(story.getPossibleNotesAtTime(time));
 		}
 		
-		Iterator<Note> iter = notes.iterator();
-		Note note;
-		while (iter.hasNext()) {
-			note = iter.next();
-			
-			int effectiveStart = getEffectiveStartTime(note);
-			int effectiveEnd = getEffectiveEndTime(note);
-			if (effectiveStart!=Integer.MIN_VALUE && effectiveEnd!=Integer.MIN_VALUE 
-					&& (time<effectiveStart || effectiveEnd<time)) {
-				iter.remove();
+		if (!notes.isEmpty()) {
+			Iterator<Note> iter = notes.iterator();
+			Note note;
+			while (iter.hasNext()) {
+				note = iter.next();
+				
+				int effectiveStart = getEffectiveStartTime(note);
+				int effectiveEnd = getEffectiveEndTime(note);
+				if (effectiveStart!=Integer.MIN_VALUE && effectiveEnd!=Integer.MIN_VALUE 
+						&& (time<effectiveStart || effectiveEnd<time)) {
+					iter.remove();
+				}
 			}
 		}
 		
@@ -506,85 +524,86 @@ public class StoriesLayer {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (editStage==null) {
-					editController = new StoryEditorController(timeOffset, cellData, 
-							sceneElementsList.getAllMulticellSceneNames(),
-							activeCellProperty, cellClickedProperty, timeProperty, update3D);
-					
-					editController.setUpdate3DProperty(update3D);
-					
-					editController.setActiveNote(activeNote);
-					editController.setActiveStory(activeStory);
-					
-					editStage = new Stage();
-					
-					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
-					
-					loader.setController(editController);
-					loader.setRoot(editController);
-					
-					try {
-						editStage.setScene(new Scene((AnchorPane) loader.load()));
-						
-						editStage.setTitle("Story/Note Editor");
-						editStage.initOwner(parentStage);
-						editStage.initModality(Modality.NONE);
-						editStage.setResizable(true);
-						
-						editController.getStoryCreatedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable, 
-									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									Story newStory = editController.getActiveStory();
-									stories.add(newStory);
-									setActiveStory(newStory);
-									setActiveNote(null);
-									
-									editController.setStoryCreated(false);
-								}
-							}
-						});
-						
-						editController.getNoteCreatedProperty().addListener(new ChangeListener<Boolean>() {
-							@Override
-							public void changed(ObservableValue<? extends Boolean> observable, 
-									Boolean oldValue, Boolean newValue) {
-								if (newValue) {
-									Note newNote = editController.getActiveNote();
-									editController.setNoteCreated(false);
-									activeStory.addNote(newNote);
-									setActiveNote(newNote);
-								}
-							}
-						});
-						
-						editController.addDeleteButtonListener(new EventHandler<ActionEvent>() {
-							@Override
-							public void handle(ActionEvent event) {
-								if (activeNote!=null)
-									activeStory.removeNote(activeNote);
-								
-								setActiveNote(null);
-							}
-						});
-						
-						for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
-			            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
-			            					"-fx-faint-focus-color: transparent;");
-			            }
-						
-					} catch (IOException e) {
-						System.out.println("error in initializing note editor.");
-						e.printStackTrace();
-					}
-				}
-				
-				editStage.show();
-				editStage.toFront();
+				bringUpEditor();
 			}
 		};
+	}
+	
+	
+	private void bringUpEditor() {
+		if (editStage==null) {
+			editController = new StoryEditorController(timeOffset, cellData, 
+					sceneElementsList.getAllMulticellSceneNames(),
+					activeCellProperty, cellClickedProperty, timeProperty, update3D);
+			
+			editController.setUpdate3DProperty(update3D);
+			
+			editController.setActiveNote(activeNote);
+			editController.setActiveStory(activeStory);
+			
+			editStage = new Stage();
+			
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
+			
+			loader.setController(editController);
+			loader.setRoot(editController);
+			
+			try {
+				editStage.setScene(new Scene((AnchorPane) loader.load()));
+				
+				editStage.setTitle("Story/Note Editor");
+				editStage.initOwner(parentStage);
+				editStage.initModality(Modality.NONE);
+				editStage.setResizable(true);
+				
+				editStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+					@Override
+					public void handle(WindowEvent event) {
+						rebuildSceneFlag.set(true);
+						rebuildSceneFlag.set(false);
+					}
+				});
+				
+				editController.getNoteCreatedProperty().addListener(new ChangeListener<Boolean>() {
+					@Override
+					public void changed(ObservableValue<? extends Boolean> observable, 
+							Boolean oldValue, Boolean newValue) {
+						if (newValue) {
+							Note newNote = editController.getActiveNote();
+							editController.setNoteCreated(false);
+							activeStory.addNote(newNote);
+							setActiveNote(newNote);
+							
+							rebuildSceneFlag.set(true);
+							rebuildSceneFlag.set(false);
+						}
+					}
+				});
+				
+				editController.addDeleteButtonListener(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						if (activeNote!=null)
+							activeStory.removeNote(activeNote);
+						
+						setActiveNote(null);
+					}
+				});
+				
+				for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
+	            	node.setStyle("-fx-focus-color: -fx-outer-border; "+
+	            					"-fx-faint-focus-color: transparent;");
+	            }
+				
+			} catch (IOException e) {
+				System.out.println("error in initializing note editor.");
+				e.printStackTrace();
+			}
+		}
+		
+		editStage.show();
+		editStage.toFront();
 	}
 	
 	
@@ -846,4 +865,7 @@ public class StoriesLayer {
 			}
 		}	
 	}
+	
+	private final String NEW_STORY_TITLE = "New Story";
+	private final String NEW_STORY_DESCRIPTION = "New story description here";
 }

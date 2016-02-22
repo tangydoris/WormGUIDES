@@ -37,6 +37,8 @@ import wormguides.model.TerminalCellCase;
 
 public class ContextMenuController extends AnchorPane implements Initializable {
 	
+	private Stage ownStage;
+	
 	@FXML private VBox mainVBox;
 	@FXML private HBox expressesHBox;
 	@FXML private HBox wiredToHBox;
@@ -193,6 +195,14 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		};
 	}
 	
+	public void setOwnStage(Stage stage) {
+		ownStage = stage;
+	}
+	
+	public Stage getOwnStage() {
+		return ownStage;
+	}
+	
 	public void setInfoButtonListener(EventHandler<MouseEvent> handler) {
 		info.setOnMouseClicked(handler);
 	}
@@ -217,13 +227,8 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		return nameText.getText();
 	}
 	
-	public void removeTerminalCaseFunctions(boolean remove) {
-		if (remove && mainVBox.getChildren().contains(expressesHBox) 
-				&& mainVBox.getChildren().contains(wiredToHBox))
-			mainVBox.getChildren().removeAll(expressesHBox, wiredToHBox);
-		else if (!remove && !mainVBox.getChildren().contains(expressesHBox)
-				&& !mainVBox.getChildren().contains(wiredToHBox))
-			mainVBox.getChildren().addAll(expressesHBox, wiredToHBox);
+	public void disableTerminalCaseFunctions(boolean disable) {
+		wiredTo.setDisable(disable);
 	}
 
 	@Override
@@ -260,6 +265,12 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					expressesQueryService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
 						@Override
 						public void handle(WorkerStateEvent event) {
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									expressesMenu.getItems().addAll(loadingMenuItem);
+								}
+							});
 							loadingService.restart();
 						}
 					});
@@ -276,7 +287,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 						@Override
 						public void handle(WorkerStateEvent event) {
 							loadingService.cancel();
-							expressesMenu.getItems().remove(loadingMenuItem);
+							resetLoadingMenuItem();
 							ArrayList<String> results = expressesQueryService.getValue();
 							if (results!=null) {
 								for (String result : results) {
@@ -299,7 +310,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				}
 				
 				expressesMenu.getItems().clear();
-				expressesMenu.getItems().addAll(expressesTitle, loadingMenuItem);
+				expressesMenu.getItems().addAll(expressesTitle);
 				expressesMenu.show(expresses, Side.RIGHT, 0, 0);
 				
 				expressesQueryService.restart();
@@ -330,30 +341,12 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					electr = new Menu("Electrical");
 					neuro = new Menu("Neuromuscular");
 					
-					wiredToQueryService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							loadingService.restart();
-						}
-					});
-					
-					wiredToQueryService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							loadingService.cancel();
-							resetLoadingMenuItem();
-						}
-					});
-					
 					wiredToQueryService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 						@Override
 						public void handle(WorkerStateEvent event) {
-							loadingService.cancel();
-							wiredToMenu.getItems().remove(loadingMenuItem);
 							ArrayList<ArrayList<String>> results = wiredToQueryService.getValue();
+							
 							if (results!=null) {
-								wiredToMenu.getItems().addAll(colorAll, preSyn, postSyn, electr, neuro);
-								
 								colorAll.setOnAction(new EventHandler<ActionEvent>() {
 									@Override
 									public void handle(ActionEvent event) {
@@ -368,18 +361,19 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 								populateWiredToMenu(results.get(ELECTR_INDEX), electr, false, false, true, false);
 								populateWiredToMenu(results.get(NEURO_INDEX), neuro, false, false, false, true);
 							}
+							
+							else {
+								wiredToMenu.getItems().clear();
+								wiredToMenu.getItems().add(new MenuItem("None"));
+							}
+							
+							wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
 						}
 					});
 				}
 				
 				wiredToMenu.getItems().clear();
-				
-				preSyn.getItems().clear();
-				postSyn.getItems().clear();
-				electr.getItems().clear();
-				neuro.getItems().clear();
-				
-				wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
+				wiredToMenu.getItems().addAll(colorAll, preSyn, postSyn, electr, neuro);
 				
 				wiredToQueryService.restart();
 			}
@@ -405,9 +399,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	
 	private void populateWiredToMenu(ArrayList<String> results, Menu menu, boolean isPresynaptic, 
 			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
+		menu.getItems().clear();
+		
 		if (results.isEmpty()) {
-			MenuItem none = new MenuItem("None");
-			menu.getItems().add(none);
+			menu.getItems().add(new MenuItem("None"));
 			return;
 		}
 		

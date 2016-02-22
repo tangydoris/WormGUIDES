@@ -65,8 +65,8 @@ public class Note {
 		sceneExpandedProperty = new SimpleBooleanProperty(false);
 		activeProperty = new SimpleBooleanProperty(false);
 		
+		setTagDisplay(Display.OVERLAY);
 		setAttachmentType(Type.BLANK);
-		setTagDisplay(Display.BLANK);
 	}
 	
 	public Note(Story parent, String tagName, String tagContents) {

@@ -437,7 +437,9 @@ public abstract class Rule {
 				setOptions(editController.getOptions());
 				resetLabel();
 				toolTip.setText(toStringFull());
+				
 				ruleChanged.set(true);
+				ruleChanged.set(false);
 			}
 		}
 	}

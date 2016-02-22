@@ -66,7 +66,7 @@ import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.InfoWindow;
-import wormguides.view.TreePane;
+import wormguides.view.SulstonTreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
@@ -140,9 +140,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private Connectome connectome;
 	@FXML private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
 	
-	// Lineage tree
-	private TreeItem<String> lineageTreeRoot;
-	
 	// Cell selection
 	private StringProperty selectedName;
 	
@@ -166,17 +163,16 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML private Text moreInfoClickableText;
 	@FXML private Text displayedDescription;
 	
-	// Story information
-	@FXML private Text displayedStory;
-	@FXML private Text displayedStoryDescription;
-	
 	// scene elements stuff
 	private SceneElementsList elementsList;
 	
-	// story stuff
+	// Story stuff
+	@FXML private Text displayedStory;
+	@FXML private Text displayedStoryDescription;
 	private StoriesLayer storiesLayer;
 	@FXML private ListView<Story> storiesListView;
 	@FXML private Button noteEditorBtn;
+	@FXML private Button newStory;
 	
 	//production information
 	private ProductionInfo productionInfo;
@@ -193,6 +189,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
 	
+	// Lineage tree
+	private TreeItem<String> lineageTreeRoot;
+	private LineageData lineageData;
 	
 	// ----- Begin menu items and buttons listeners -----
 	// TODO
@@ -239,7 +238,16 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	@FXML public void viewTreeAction() {
 		if (treeStage==null) {
 			treeStage = new Stage();
-			treeStage.setScene(new Scene(new TreePane(lineageTreeRoot)));
+			//SulstonTreePane treepane=new SulstonTreePane(lineageData,lineageTreeRoot,list,window3D.getColorHash());
+			//ScrollPane sp=new ScrollPane();
+			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot, 
+					displayLayer.getRulesList(), window3DController.getColorHash(), 
+					window3DController.getTimeProperty(), window3DController.getContextMenuController());
+			
+			//sp.setContent(treepane);
+			//sp.setPannable(true);
+			treeStage.setScene(new Scene(sp));
+					//treeStage.setScene(new Scene(new SulstonTreePane(lineageData,lineageTreeRoot)));
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
 		}
@@ -581,6 +589,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 				if (newValue) {
 					openInfoWindow();
 					infoWindow.addName(selectedName.get());
+					infoWindow.showWindow();
 					bringUpInfoProperty.set(false);
 				}
 			}
@@ -599,8 +608,6 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			name = name.substring(0, name.indexOf("("));
 		name = name.trim();
 		
-		if (name.startsWith("Ab"))
-			name = "AB"+name.substring(2);
 		displayedName.setText("Active Cell: "+name);
 		moreInfoClickableText.setVisible(true);
 		displayedDescription.setText("");
@@ -870,6 +877,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		assert (storiesListView != null);
 		assert (noteEditorBtn != null);
+		assert (newStory != null);
 	}
 	
 	private void initStructuresLayer() {
@@ -892,9 +900,11 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	}
 	
 	
-	private void initStoriesLayer(LineageData data) {
+	private void initStoriesLayer() {
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, 
-				data, window3DController, useInternalRules, productionInfo.getMovieTimeOffset());
+				lineageData, window3DController, useInternalRules, 
+				productionInfo.getMovieTimeOffset(), newStory);
+		
 		window3DController.setStoriesLayer(storiesLayer);
 		
 		storiesListView.setItems(storiesLayer.getStories());
@@ -903,7 +913,8 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		
 		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 		
-		storiesLayer.getRebuildSceneFlag().addListener(window3DController.getRebuildFlagListener());
+		window3DController.addListenerToRebuildSceneFlag(storiesLayer.getRebuildSceneFlag());
+		
 		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, 
@@ -966,31 +977,31 @@ public class RootLayoutController extends BorderPane implements Initializable{
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
 		initCellDeaths();
-		LineageData data = AceTreeLoader.loadNucFiles();
-		initLineageTree(data.getAllCellNames());
+		lineageData = AceTreeLoader.loadNucFiles();
+		initLineageTree(lineageData.getAllCellNames());
 		
 		assertFXMLNodes();
 		
 		initToggleGroup();
 		initDisplayLayer();
 		
-			initializeWithLineageData(data);
+		initializeWithLineageData();
 		
 		mainTabPane.getSelectionModel().select(storiesTab);
 	}
 	
 	
-	public void initializeWithLineageData(LineageData data) {
+	public void initializeWithLineageData() {
 		initProductionInfo();
 		
-		init3DWindow(data);
+		init3DWindow(lineageData);
 		setPropertiesFrom3DWindow();
 		
 		setSlidersProperties();
 		
 		initSearch();
-		Search.setActiveLineageNames(data.getAllCellNames());
-		Search.setLineageData(data);
+		Search.setActiveLineageNames(lineageData.getAllCellNames());
+		Search.setLineageData(lineageData);
 		
 		ObservableList<Rule> list = displayLayer.getRulesList();
 		search.setRulesList(list);
@@ -1005,7 +1016,7 @@ public class RootLayoutController extends BorderPane implements Initializable{
 		initStructuresLayer();
 		
 		// stories layer
-		initStoriesLayer(data);
+		initStoriesLayer();
 		
 		window3DController.setSearchResultsList(search.getSearchResultsList());
 		searchResultsListView.setItems(search.getSearchResultsList());
