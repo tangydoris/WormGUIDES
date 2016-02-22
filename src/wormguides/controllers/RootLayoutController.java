@@ -240,9 +240,9 @@ public class RootLayoutController extends BorderPane implements Initializable{
 			treeStage = new Stage();
 			//SulstonTreePane treepane=new SulstonTreePane(lineageData,lineageTreeRoot,list,window3D.getColorHash());
 			//ScrollPane sp=new ScrollPane();
-			SulstonTreePane sp = new SulstonTreePane(lineageData, lineageTreeRoot, 
+			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot, 
 					displayLayer.getRulesList(), window3DController.getColorHash(), 
-					window3DController.getTimeProperty());
+					window3DController.getTimeProperty(), window3DController.getContextMenuController());
 			
 			//sp.setContent(treepane);
 			//sp.setPannable(true);

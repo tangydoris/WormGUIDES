@@ -37,6 +37,8 @@ import wormguides.model.TerminalCellCase;
 
 public class ContextMenuController extends AnchorPane implements Initializable {
 	
+	private Stage ownStage;
+	
 	@FXML private VBox mainVBox;
 	@FXML private HBox expressesHBox;
 	@FXML private HBox wiredToHBox;
@@ -191,6 +193,14 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				return task;
 			}
 		};
+	}
+	
+	public void setOwnStage(Stage stage) {
+		ownStage = stage;
+	}
+	
+	public Stage getOwnStage() {
+		return ownStage;
 	}
 	
 	public void setInfoButtonListener(EventHandler<MouseEvent> handler) {
