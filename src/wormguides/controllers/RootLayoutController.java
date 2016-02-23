@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -327,7 +328,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
 		}
+		
 		treeStage.show();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				((Stage) treeStage.getScene().getWindow()).toFront();
+			}
+		});
 	}
 
 	@FXML
@@ -1113,26 +1121,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeInfoPane();
 		
 		window3DController.setTime(window3DController.getEndTime());
+		
+		viewTreeAction();
 	}
-
-	// private final Service service = new Service() {
-	// @Override
-	// protected Task createTask() {
-	// return new Task<Void>() {
-	// protected Void call() throws Exception {
-	// mainStage.getScene().setCursor(Cursor.WAIT);
-	// infoWindow.getStage().getScene().setCursor(Cursor.WAIT); //ONLY WORKS ON
-	// TOP CONTAINER --> NOT ON TABPANE
-	// //window3DController.getStage().getScene().setCursor(Cursor.WAIT);
-	// DOESN'T WORK
-	// Thread.sleep(5000);
-	// mainStage.getScene().setCursor(Cursor.DEFAULT);
-	// infoWindow.getStage().getScene().setCursor(Cursor.DEFAULT);
-	// //window3DController.getStage().getScene().setCursor(Cursor.DEFAULT);
-	// return null;
-	// }
-	// };
-	// }
-	// };
-
 }
