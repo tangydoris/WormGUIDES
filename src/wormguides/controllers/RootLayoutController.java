@@ -1111,6 +1111,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		sizeSubscene();
 		sizeInfoPane();
+		
+		window3DController.setTime(window3DController.getEndTime());
 	}
 
 	// private final Service service = new Service() {

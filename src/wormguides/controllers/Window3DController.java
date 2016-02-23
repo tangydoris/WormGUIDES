@@ -321,7 +321,7 @@ public class Window3DController {
 		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
 
-		endTime = data.getTotalTimePoints();
+		endTime = data.getTotalTimePoints()-1;
 
 		createSubScene(parentPane.widthProperty().get(), parentPane.heightProperty().get());
 		parentPane.getChildren().add(subscene);
@@ -354,7 +354,7 @@ public class Window3DController {
 
 		renderService = new RenderService();
 
-		zoom = new SimpleDoubleProperty(2.5);
+		zoom = new SimpleDoubleProperty(INITIAL_ZOOM);
 		zoom.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -1342,8 +1342,7 @@ public class Window3DController {
 
 			sphere.setMaterial(material);
 
-			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, 
-					new Translate(positions[i][X_COR_INDEX] * X_SCALE,
+			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(positions[i][X_COR_INDEX] * X_SCALE,
 					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
 
 			spheres[i] = sphere;
@@ -2343,5 +2342,6 @@ public class Window3DController {
 
 	private final double SIZE_SCALE = 1;
 	private final double UNIFORM_RADIUS = 4;
+	private final double INITIAL_ZOOM = 1.5;
 
 }
