@@ -14,12 +14,12 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Share Scene" />
-                  <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load Shared Scene" />
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveStory" text="Save Active Story" />
                   <MenuItem mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
                   <MenuItem disable="true" mnemonicParsing="false" text="Save Movie" />
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveImageAction" text="Save Image" />
+                  <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Share Scene" />
+                  <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load Shared Scene" />
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>

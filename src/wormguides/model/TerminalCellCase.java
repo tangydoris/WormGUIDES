@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class TerminalCellCase {
 	
-	private String cellName;
+	private String funcName;
 	private String lineageName;
 	private String externalInfo;
 	private String partsListDescription;
@@ -36,8 +36,8 @@ public class TerminalCellCase {
 		
 		this.lineageName = lineageName;
 		
-		this.cellName = cellName;
-		this.externalInfo = this.cellName;
+		this.funcName = cellName;
+		this.externalInfo = this.funcName;
 		if (PartsList.getLineageNameByFunctionalName(cellName) != null) {
 			this.externalInfo += " (" + lineageName + ")";
 		}
@@ -83,7 +83,7 @@ public class TerminalCellCase {
 	}
 	
 	private String setFunctionFromWORMATLAS() {
-		if (this.cellName == null) return "";
+		if (this.funcName == null) return "";
 		
 		String content = "";
 		URLConnection connection = null;
@@ -100,7 +100,7 @@ public class TerminalCellCase {
 		 * if no R/L, leave as is
 		 * e.g. AVG
 		 */
-		String cell = this.cellName;
+		String cell = this.funcName;
 		Character lastChar = cell.charAt(cell.length()-1);
 		lastChar = Character.toLowerCase(lastChar);
 		if (lastChar == 'r' || lastChar == 'l') {
@@ -235,7 +235,7 @@ public class TerminalCellCase {
 	private ArrayList<String> setAnatomy() {
 		ArrayList<String> anatomy = new ArrayList<String>();
 		
-		if (this.cellName == null) return anatomy;
+		if (this.funcName == null) return anatomy;
 		
 		
 		/*
@@ -250,10 +250,10 @@ public class TerminalCellCase {
 	private ArrayList<String> setExpressionsFromWORMBASE() {
 		ArrayList<String> geneExpression = new ArrayList<String>();
 		
-		if (cellName == null)
+		if (funcName == null)
 			return geneExpression;
 
-		String URL = wormbaseURL + cellName + wormbaseEXT;
+		String URL = wormbaseURL + funcName + wormbaseEXT;
 		
 		String content = "";
 		URLConnection connection = null;
@@ -268,7 +268,7 @@ public class TerminalCellCase {
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
-			System.out.println(cellName + " page not found on Wormbase");
+			System.out.println(funcName + " page not found on Wormbase");
 			return geneExpression;
 		}
 		
@@ -295,7 +295,7 @@ public class TerminalCellCase {
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
-			System.out.println(this.cellName + " page not found on Wormbase (second URL)");
+			System.out.println(this.funcName + " page not found on Wormbase (second URL)");
 			
 			//remove the link
 			for (int i = 0; i < links.size(); i++) {
@@ -325,16 +325,16 @@ public class TerminalCellCase {
 		ArrayList<String> leftRightHomologues = new ArrayList<String>();
 		ArrayList<String> additionalSymmetries = new ArrayList<String>();
 		
-		if (this.cellName == null) return homologues;
+		if (this.funcName == null) return homologues;
 		
-		char lastChar = cellName.charAt(cellName.length()-1);
+		char lastChar = funcName.charAt(funcName.length()-1);
 		lastChar = Character.toLowerCase(lastChar);
 		
-		String cell = this.cellName;
+		String cell = this.funcName;
 		//check for left, right, dorsal, or ventral suffix --> update cell
 		if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
 			//check if multiple suffixes
-			lastChar = cellName.charAt(cellName.length()-2);
+			lastChar = funcName.charAt(funcName.length()-2);
 			lastChar = Character.toLowerCase(lastChar);
 			if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
 				cell = cell.substring(0, cell.length()-2);
@@ -343,7 +343,7 @@ public class TerminalCellCase {
 			}
 		} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
 			//check if double digit
-			if (Character.isDigit(cellName.length()-2)) {
+			if (Character.isDigit(funcName.length()-2)) {
 				cell = cell.substring(0, cell.length()-2);
 			} else {
 				cell = cell.substring(0, cell.length()-1);
@@ -390,7 +390,7 @@ public class TerminalCellCase {
 		ArrayList<String> references = new ArrayList<String>();
 		
 		//open connection with the textpresso page
-		String URL = textpressoURL + this.cellName + textpressoURLEXT;
+		String URL = textpressoURL + this.funcName + textpressoURLEXT;
 				
 		String content = "";
 		URLConnection connection = null;
@@ -404,7 +404,7 @@ public class TerminalCellCase {
 		} catch (Exception e) {
 			//e.printStackTrace();
 			//a page wasn't found on wormatlas
-			System.out.println(this.cellName + " page not found on Textpresso");
+			System.out.println(this.funcName + " page not found on Textpresso");
 			return geneExpression;
 		}
 		
@@ -491,36 +491,36 @@ public class TerminalCellCase {
 	}
 	
 	private String addGoogleLink() {
-		if (this.cellName != null) {
-			return googleURL + this.cellName + "+c.+elegans";
+		if (this.funcName != null) {
+			return googleURL + this.funcName + "+c.+elegans";
 		}
 		
 		return "";
 	}
 	
 	private String addGoogleWormatlasLink() {
-		if (this.cellName != null) {
-			return googleWormatlasURL + this.cellName;
+		if (this.funcName != null) {
+			return googleWormatlasURL + this.funcName;
 		}
 		
 		return "";
 	}
 	
 	private String addWormWiringLink() {
-		if (this.cellName != null) {
-			String cell = this.cellName;
+		if (this.funcName != null) {
+			String cell = this.funcName;
 			//check if N2U, n2y or n930 image series 
 //			boolean N2U = true;
 //			boolean N2Y = false;
 //			boolean N930 = false;
 			
 			//need to zero pad in link generation
-			char lastChar = cellName.charAt(cellName.length()-1);
+			char lastChar = funcName.charAt(funcName.length()-1);
 			if (Character.isDigit(lastChar)) {
-				for (int i = 0; i < cellName.length(); i++) {
-					if (Character.isDigit(cellName.charAt(i))) {
+				for (int i = 0; i < funcName.length(); i++) {
+					if (Character.isDigit(funcName.charAt(i))) {
 						if (i != 0) { //error check
-							cell = cellName.substring(0, i) + "0" + cellName.substring(i);
+							cell = funcName.substring(0, i) + "0" + funcName.substring(i);
 						}
 					}
 				}
@@ -541,8 +541,8 @@ public class TerminalCellCase {
 	}
 
 	public String getCellName() {
-		if (this.cellName != null) {
-			return this.cellName;
+		if (this.funcName != null) {
+			return this.funcName;
 		}
 		return "";
 	}

@@ -312,23 +312,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void viewTreeAction() {
 		if (treeStage == null) {
 			treeStage = new Stage();
-			// SulstonTreePane treepane=new
-			// SulstonTreePane(lineageData,lineageTreeRoot,list,window3D.getColorHash());
-			// ScrollPane sp=new ScrollPane();
 			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
 					displayLayer.getRulesList(), window3DController.getColorHash(),
 					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
 					window3DController.getSelectedNameLabeled());
 
-			// sp.setContent(treepane);
-			// sp.setPannable(true);
 			treeStage.setScene(new Scene(sp));
-			// treeStage.setScene(new Scene(new
-			// SulstonTreePane(lineageData,lineageTreeRoot)));
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
 		}
-		
+
 		treeStage.show();
 		Platform.runLater(new Runnable() {
 			@Override
@@ -1017,7 +1010,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				}
 			}
 		});
-		displayedStory.setText("ActiveStory: "+storiesLayer.getActiveStory().getName());
+		displayedStory.setText("ActiveStory: " + storiesLayer.getActiveStory().getName());
 		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 	}
 
@@ -1119,9 +1112,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		sizeSubscene();
 		sizeInfoPane();
-		
+
 		window3DController.setTime(window3DController.getEndTime());
-		
+
 		viewTreeAction();
 	}
 }

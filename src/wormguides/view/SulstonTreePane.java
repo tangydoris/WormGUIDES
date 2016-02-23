@@ -359,7 +359,6 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	public void updateColoring() {
-		System.out.println("updating color");
 		// iterate over all drawn lines and recompute their color
 		ObservableList<Node> contentnodes = mainPane.getChildren();
 		Paint newcolors = null;

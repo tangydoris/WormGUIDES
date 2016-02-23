@@ -9,6 +9,7 @@ public class NonTerminalCellCase {
 	private String embryonicHomology;
 	private ArrayList<TerminalDescendant> terminalDescendants;
 	private ArrayList<String> links;
+	private ArrayList<String> geneExpression;
 	ArrayList<String> nuclearProductionInfo;
 	ArrayList<String> cellShapeProductionInfo;
 
