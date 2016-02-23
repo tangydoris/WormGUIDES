@@ -15,14 +15,14 @@ import wormguides.view.InfoWindowDOM;
  * 		- Model representation of InfoWindow TabPane
  * 
  */
-public class CellCases {
+public class CellCasesLists {
 
 	private ArrayList<TerminalCellCase> terminalCases;
 	private ArrayList<NonTerminalCellCase> nonTerminalCases;
 
 	private InfoWindow infoWindow;
 
-	public CellCases(InfoWindow window) {
+	public CellCasesLists(InfoWindow window) {
 		terminalCases = new ArrayList<TerminalCellCase>();
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
 		infoWindow = window;

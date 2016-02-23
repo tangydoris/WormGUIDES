@@ -29,7 +29,7 @@ import javafx.stage.WindowEvent;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
-import wormguides.model.CellCases;
+import wormguides.model.CellCasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
@@ -74,7 +74,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	private Menu preSyn, postSyn, electr, neuro;
 	private Service<ArrayList<ArrayList<String>>> wiredToQueryService;
 
-	private CellCases cellCases;
+	private CellCasesLists cellCases;
 	private ProductionInfo productionInfo;
 	private Connectome connectome;
 
@@ -82,7 +82,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private BooleanProperty bringUpInfoProperty;
 
-	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCases cases, ProductionInfo info,
+	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCasesLists cases, ProductionInfo info,
 			Connectome connectome) {
 		super();
 

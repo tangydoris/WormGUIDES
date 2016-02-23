@@ -10,8 +10,8 @@ public class NonTerminalCellCase {
 	private ArrayList<TerminalDescendant> terminalDescendants;
 	private ArrayList<String> links;
 	private ArrayList<String> geneExpression;
-	ArrayList<String> nuclearProductionInfo;
-	ArrayList<String> cellShapeProductionInfo;
+	private ArrayList<String> nuclearProductionInfo;
+	private ArrayList<String> cellShapeProductionInfo;
 
 	public NonTerminalCellCase(String cellName, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {

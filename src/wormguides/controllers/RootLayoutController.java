@@ -58,7 +58,7 @@ import wormguides.StructuresLayer;
 import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
-import wormguides.model.CellCases;
+import wormguides.model.CellCasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -223,7 +223,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private ProductionInfo productionInfo;
 
 	// info window Stuff
-	private CellCases cellCases;
+	private CellCasesLists cellCases;
 	private InfoWindow infoWindow;
 	private BooleanProperty bringUpInfoProperty;
 
@@ -1044,7 +1044,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initCellCases() {
-		cellCases = new CellCases(infoWindow);
+		cellCases = new CellCasesLists(infoWindow);
 		Search.setCellCases(cellCases);
 	}
 

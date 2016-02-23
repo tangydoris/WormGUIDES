@@ -32,6 +32,7 @@ public class TerminalCellCase {
 			ArrayList<String> neuromuscularPartners, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {
 		
+		// TODO bildlinks method
 		this.links = new ArrayList<String>();
 		
 		this.lineageName = lineageName;

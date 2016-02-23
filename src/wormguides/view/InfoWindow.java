@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
-import wormguides.model.CellCases;
+import wormguides.model.CellCasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
@@ -32,7 +32,7 @@ public class InfoWindow {
 	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
 
-	private CellCases cellCases;
+	private CellCasesLists cellCases;
 	private ProductionInfo productionInfo;
 	private Connectome connectome;
 
@@ -47,7 +47,7 @@ public class InfoWindow {
 	 * memory
 	 */
 
-	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCases cases, ProductionInfo info,
+	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCasesLists cases, ProductionInfo info,
 			Connectome connectome) {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Cell Info Window");

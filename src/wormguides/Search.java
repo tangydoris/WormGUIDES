@@ -19,7 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
-import wormguides.model.CellCases;
+import wormguides.model.CellCasesLists;
 import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -71,7 +71,7 @@ public class Search {
 	private static boolean neuromuscularTicked;
 
 	// for cell cases searching
-	private static CellCases cellCases;
+	private static CellCasesLists cellCases;
 
 	// for production info searching
 	private static ProductionInfo productionInfo;
@@ -947,7 +947,7 @@ public class Search {
 		}
 	}
 
-	public static void setCellCases(CellCases cc) {
+	public static void setCellCases(CellCasesLists cc) {
 		if (cc != null) {
 			cellCases = cc;
 		}

@@ -120,7 +120,7 @@ public class SceneElementsList {
 
 	private ArrayList<String> unpackCells(ArrayList<String> cells) {
 		ArrayList<String> unpackedCells = new ArrayList<String>();
-
+		
 		for (int i = 0; i < cells.size(); i++) {
 			String cell = cells.get(i);
 			// if cell starts with asterisk, recurse. else, add cel

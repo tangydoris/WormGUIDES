@@ -82,7 +82,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
-import wormguides.model.CellCases;
+import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
@@ -142,7 +142,7 @@ public class Window3DController {
 	private StringProperty selectedNameLabeled;
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
-	private CellCases cellCases;
+	private CellCasesLists cellCases;
 	private BooleanProperty cellClicked;
 
 	// searched highlighting stuff
@@ -230,7 +230,7 @@ public class Window3DController {
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
 
-	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCases cases,
+	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
 
