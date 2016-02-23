@@ -140,7 +140,7 @@ public abstract class Rule {
 					visibleBtn.setGraphic(eyeIcon);
 				else
 					visibleBtn.setGraphic(eyeInvertIcon);
-				
+
 				ruleChanged.set(true);
 				ruleChanged.set(false);
 			}
@@ -320,7 +320,7 @@ public abstract class Rule {
 
 	// TODO
 	public String toString() {
-		return text+" - visible: "+isVisible();
+		return text + " - visible: " + isVisible();
 	}
 
 	public boolean equals(ColorRule other) {
@@ -385,7 +385,7 @@ public abstract class Rule {
 
 		return false;
 	}
-	
+
 	public boolean isVisible() {
 		return visible;
 	}

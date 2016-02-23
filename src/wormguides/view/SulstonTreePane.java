@@ -376,7 +376,7 @@ public class SulstonTreePane extends ScrollPane {
 							currline.setStroke(lnewcolors);
 						else
 							currline.setStroke(Color.BLACK);
-						
+
 						if (currline != null && currline.getId() != null) {
 							if (currline.getId().equals("time"))
 								currline.setStroke(Color.BLACK);// first for now

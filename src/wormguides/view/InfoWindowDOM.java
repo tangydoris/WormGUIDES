@@ -12,20 +12,18 @@ public class InfoWindowDOM {
 	private HTMLNode html;
 	private String name;
 
-	//other future dom uses: connectome, parts list, cell shapes index
-	
+	// other future dom uses: connectome, parts list, cell shapes index
+
 	/*
-	 * TODO - when necessary
-	 * getNode(String ID)
-	 * removeNode(String ID)
-	 * addChildToNode(String parentID, HTMLNode child) -- need this?
-	 * add title tag to head
+	 * TODO - when necessary getNode(String ID) removeNode(String ID)
+	 * addChildToNode(String parentID, HTMLNode child) -- need this? add title
+	 * tag to head
 	 * 
 	 */
 	public InfoWindowDOM() {
 		this.html = new HTMLNode("html");
 	}
-	
+
 	public InfoWindowDOM(HTMLNode html) {
 		if (!html.getTag().equals("html")) {
 			this.html = new HTMLNode("html");
@@ -33,45 +31,44 @@ public class InfoWindowDOM {
 			this.html = html;
 		}
 	}
-	
+
 	/*
 	 * TERMINAL CELL CASE
 	 */
 	public InfoWindowDOM(TerminalCellCase terminalCase) {
 		this.html = new HTMLNode("html");
 		this.name = terminalCase.getCellName();
-	
+
 		HTMLNode head = new HTMLNode("head");
-		
+
 		HTMLNode body = new HTMLNode("body");
 
-		//external info
+		// external info
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
-		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName()
+				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
-		
-		//parts list descriptions
+
+		// parts list descriptions
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
 		String partsListDescription = terminalCase.getPartsListDescription();
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
-		
-		
-		//image
+
+		// image
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
-		String imagetext=terminalCase.getImageURL();
+		String imagetext = terminalCase.getImageURL();
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		imgDiv.addChild(img);
-	
-		
-		//wormatlas function
+
+		// wormatlas function
 		HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
 		HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Wormatlas Function: </strong>");
+		HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Wormatlas Function: </strong>");
 		functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
 		functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
 		HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
@@ -82,8 +79,8 @@ public class InfoWindowDOM {
 			HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
 			functionWORMATLASDiv.addChild(functionWORMATLASP);
 		}
-		
-		//anatomy
+
+		// anatomy
 		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
 		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
@@ -98,23 +95,23 @@ public class InfoWindowDOM {
 			anatomyUL.addChild(li);
 		}
 		anatomyDiv.addChild(anatomyUL);
-		
-		//wiring
+
+		// wiring
 		HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
-		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse", "wiringPartnersCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode wiringPartnersTitle = new HTMLNode("p", "wiringPartnersTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Wiring Partners: </strong>");
+		HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse",
+				"wiringPartnersCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+		HTMLNode wiringPartnersTitle = new HTMLNode("p", "wiringPartnersTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Wiring Partners: </strong>");
 		wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
 		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
-		//view in wiring diagram
+		// view in wiring diagram
 		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
 		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network: </em>");
 		HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
 		viewWDDiv.addChild(viewWDP);
 		viewWDDiv.addChild(viewWDImg);
-		//wiring partners UL
+		// wiring partners UL
 		HTMLNode wiringPartnersUL = new HTMLNode("ul");
 		ArrayList<String> presynapticPartners = terminalCase.getPresynapticPartners();
 		ArrayList<String> postsynapticPartners = terminalCase.getPresynapticPartners();
@@ -122,90 +119,99 @@ public class InfoWindowDOM {
 		ArrayList<String> neuromuscularPartners = terminalCase.getNeuromuscularPartners();
 		if (presynapticPartners.size() > 0) {
 			Collections.sort(presynapticPartners);
-			
+
 			ArrayList<String> presynapticPartnerAnchors = new ArrayList<String>();
 			for (String presynapticPartner : presynapticPartners) {
-				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
-						+ presynapticPartner + "</a>";
+				String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + presynapticPartner
+						+ "</a>";
 				presynapticPartnerAnchors.add(anchor);
 			}
-			String prePartners = presynapticPartnerAnchors.toString().substring(1, presynapticPartnerAnchors.toString().length()-2);
-			
+			String prePartners = presynapticPartnerAnchors.toString().substring(1,
+					presynapticPartnerAnchors.toString().length() - 2);
+
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Presynaptic to: </em><br>" + prePartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (postsynapticPartners.size() > 0) {
 			Collections.sort(postsynapticPartners);
-			
+
 			ArrayList<String> postsynapticPartnersAnchors = new ArrayList<String>();
 			for (String postsynapticPartner : postsynapticPartners) {
-				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
-						+ postsynapticPartner + "</a>";
+				String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + postsynapticPartner
+						+ "</a>";
 				postsynapticPartnersAnchors.add(anchor);
 			}
-			
-			String postPartners = postsynapticPartnersAnchors.toString().substring(1, postsynapticPartnersAnchors.toString().length()-2);
+
+			String postPartners = postsynapticPartnersAnchors.toString().substring(1,
+					postsynapticPartnersAnchors.toString().length() - 2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Postsynaptic to: </em><br>" + postPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (electricalPartners.size() > 0) {
 			Collections.sort(electricalPartners);
-			
+
 			ArrayList<String> electricalPartnersAnchors = new ArrayList<String>();
 			for (String electricalPartner : electricalPartners) {
-				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
-						+ electricalPartner + "</a>";
+				String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + electricalPartner
+						+ "</a>";
 				electricalPartnersAnchors.add(anchor);
 			}
-			
-			String electPartners = electricalPartnersAnchors.toString().substring(1, electricalPartnersAnchors.toString().length()-2);
+
+			String electPartners = electricalPartnersAnchors.toString().substring(1,
+					electricalPartnersAnchors.toString().length() - 2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Electrical to: </em><br>" + electPartners);
 			wiringPartnersUL.addChild(li);
 		}
 		if (neuromuscularPartners.size() > 0) {
 			Collections.sort(neuromuscularPartners);
-			
+
 			ArrayList<String> neuromuscularPartnersAnchors = new ArrayList<String>();
 			for (String neuromuscularPartner : neuromuscularPartners) {
-				String anchor =  "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" 
-						+ neuromuscularPartner + "</a>";
+				String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + neuromuscularPartner
+						+ "</a>";
 				neuromuscularPartnersAnchors.add(anchor);
 			}
-			
-			String neuroPartners = neuromuscularPartnersAnchors.toString().substring(1, neuromuscularPartnersAnchors.toString().length()-2);
+
+			String neuroPartners = neuromuscularPartnersAnchors.toString().substring(1,
+					neuromuscularPartnersAnchors.toString().length() - 2);
 			HTMLNode li = new HTMLNode("li", "", "", "<em>Neuromusclar to: </em><br>" + neuroPartners);
 			wiringPartnersUL.addChild(li);
 		}
-		
-		boolean isneuronpage=(presynapticPartners.size() > 0||electricalPartners.size()>0||neuromuscularPartners.size() > 0||postsynapticPartners.size() > 0);
-		// only add this section if it's a neuron (i.e. it appears in wiring diagram) -AS
-		if(isneuronpage){
+
+		boolean isneuronpage = (presynapticPartners.size() > 0 || electricalPartners.size() > 0
+				|| neuromuscularPartners.size() > 0 || postsynapticPartners.size() > 0);
+		// only add this section if it's a neuron (i.e. it appears in wiring
+		// diagram) -AS
+		if (isneuronpage) {
 			wiringPartnersDiv.addChild(wiringPartnersUL);
-			wiringPartnersDiv.addChild(viewWDDiv); //reversed order of these elements -AS
+			wiringPartnersDiv.addChild(viewWDDiv); // reversed order of these
+													// elements -AS
 		}
-		
-		//expresses
+
+		// expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
-		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse", "geneExpressionCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Gene Expression: </strong>");
+		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse",
+				"geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Gene Expression: </strong>");
 		geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
 		geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
 		HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
 		ArrayList<String> expresses = terminalCase.getExpressesWORMBASE();
 		Collections.sort(expresses);
 		String geneExpressionStr = expresses.toString();
-		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length()-1); //remove surrounding brackets
+		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
+																							// surrounding
+																							// brackets
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
-		
-		//homologues
+
+		// homologues
 		ArrayList<ArrayList<String>> terminalHomologues = terminalCase.getHomologues();
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
@@ -213,7 +219,7 @@ public class InfoWindowDOM {
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left;");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLIHeaeder = new HTMLNode("li", "", "", "<strong>L/R</strong>");
-		lrUL.addChild(lrLIHeaeder); //header
+		lrUL.addChild(lrLIHeaeder); // header
 		if (terminalHomologues.size() > 0) {
 			for (String leftRightHomologue : terminalHomologues.get(0)) {
 				HTMLNode lrLI = new HTMLNode("li", "", "", leftRightHomologue);
@@ -221,8 +227,7 @@ public class InfoWindowDOM {
 			}
 		}
 		homologuesLeftRightListDiv.addChild(lrUL);
-		
-		
+
 		HTMLNode homologuesAdditionalSymmDiv = new HTMLNode("div", "homologuesOther", "width: 50%; float: left;");
 		HTMLNode additionalSymmUL = new HTMLNode("ul");
 		HTMLNode additionaSymmLIHeader = new HTMLNode("li", "", "", "<strong>Additional Symmetries</strong>");
@@ -234,11 +239,11 @@ public class InfoWindowDOM {
 			}
 		}
 		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
-		
+
 		homologuesDiv.addChild(homologuesLeftRightListDiv);
 		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
-		
-		//links
+
+		// links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
@@ -249,75 +254,74 @@ public class InfoWindowDOM {
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : terminalCase.getLinks()) {
-			String anchor = link; //replaced with anchor if valid link
+			String anchor = link; // replaced with anchor if valid link
 
-			
-			//begin after www.
+			// begin after www.
 			int startIDX = link.indexOf("www.");
 			if (startIDX > 0) {
-				//check if textpresso link i.e. '-' before www
-				if (link.charAt(startIDX-1) == '-') {
-					anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
-							" on Textpresso</a>";
+				// check if textpresso link i.e. '-' before www
+				if (link.charAt(startIDX - 1) == '-') {
+					anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+							+ terminalCase.getCellName() + " on Textpresso</a>";
 				} else {
 
-					//move past www.
+					// move past www.
 					startIDX += 4;
-					
+
 					String placeholder = link.substring(startIDX);
-					
-					//find end of site name using '.'
+
+					// find end of site name using '.'
 					int dotIDX = placeholder.indexOf(".");
 					if (dotIDX > 0) {
 						placeholder = placeholder.substring(0, dotIDX);
-						
-						//capitalize first letter of placeholder
+
+						// capitalize first letter of placeholder
 						placeholder = Character.toUpperCase(placeholder.charAt(0)) + placeholder.substring(1);
-						
-						//check for google links
+
+						// check for google links
 						if (placeholder.equals("google")) {
-							//check if wormatlas specific search
+							// check if wormatlas specific search
 							if (link.contains("site:wormatlas.org")) {
-								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + " on Google (searching Wormatlas)" +
-										"</a>";
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ terminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
 							} else {
-								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
-										" on Google</a>";
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ terminalCase.getCellName() + " on Google</a>";
 							}
 						} else {
-							//make anchor tag
-							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
-									" on " + placeholder + "</a>";
-							
-							//add wormbase link to end of gene expression section
+							// make anchor tag
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+									+ terminalCase.getCellName() + " on " + placeholder + "</a>";
+
+							// add wormbase link to end of gene expression
+							// section
 							if (placeholder.equals("Wormbase")) {
 								String wormbaseSource = "<em>Source:</em> " + anchor;
 								geneExpressionDiv.addChild(new HTMLNode("p", "", "", wormbaseSource));
 							}
 						}
 					}
-				}	
+				}
 			} else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
-				anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + terminalCase.getCellName() + 
-						" on Wormwiring</a>";
+				anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+						+ terminalCase.getCellName() + " on Wormwiring</a>";
 			}
-			
-			//make sure anchor has been built 
+
+			// make sure anchor has been built
 			if (!anchor.equals(link)) {
 				HTMLNode li = new HTMLNode("li", "", "", anchor);
 				linksUL.addChild(li);
 			}
 		}
 		/*
-		 * TODO
-		 * cytoshow stub
+		 * TODO cytoshow stub
 		 */
 		HTMLNode liSTUB = new HTMLNode("li", "", "", "Cytoshow: [cytoshow link to this cell in EM data]");
 		linksUL.addChild(liSTUB);
-		
+
 		linksDiv.addChild(linksUL);
-		
-		//references
+
+		// references
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
@@ -332,39 +336,38 @@ public class InfoWindowDOM {
 			referencesUL.addChild(li);
 		}
 		referencesTEXTPRESSODiv.addChild(referencesUL);
-		
-		//production info
+
+		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
-		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
-		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Primary Data: </strong>");
+		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
+				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		
+
 		ArrayList<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
 		String markerAndStrainNuc = "<em>Nuclear: </em><br>Strain and Marker name: ";
 		if (nuclearInfo.size() == 2) {
-			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
-					+ "Image Series: " + nuclearInfo.get(1);
+			markerAndStrainNuc += nuclearInfo.get(0) + "<br>" + "Image Series: " + nuclearInfo.get(1);
 		}
 		HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
-		
+
 		boolean hasCellShapeData;
 		ArrayList<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
 		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Strain and Marker name: ";
 		if (cellShapeInfo.size() == 2) {
 			hasCellShapeData = true;
-			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
-					+ "Image Series: " + cellShapeInfo.get(1);
+			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>" + "Image Series: " + cellShapeInfo.get(1);
 		} else {
 			hasCellShapeData = false;
 		}
 		HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
-		
-		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
+
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "",
+				"<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		if (hasCellShapeData) {
 			productionInfoUL.addChild(cellShapeLI);
@@ -372,15 +375,27 @@ public class InfoWindowDOM {
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
 
-		
-		if(isneuronpage){
-			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); //will contain external info and parts list description. float left for img on right
-		
+		if (isneuronpage) {
+			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); // will
+																														// contain
+																														// external
+																														// info
+																														// and
+																														// parts
+																														// list
+																														// description.
+																														// float
+																														// left
+																														// for
+																														// img
+																														// on
+																														// right
+
 			topContainerDiv.addChild(cellNameDiv);
 			topContainerDiv.addChild(partsListDescrDiv);
-			//add divs to body
+			// add divs to body
 			body.addChild(topContainerDiv);
-			System.out.println("image text not null - "+imagetext);
+			System.out.println("image text not null - " + imagetext);
 			body.addChild(imgDiv);
 			if (functionFound) {
 				body.addChild(functionWORMATLASTopContainerDiv);
@@ -390,17 +405,16 @@ public class InfoWindowDOM {
 			body.addChild(cellNameDiv);
 			body.addChild(partsListDescrDiv);
 		}
-			
 
 		body.addChild(anatomyTopContainerDiv);
 		body.addChild(anatomyDiv);
-		
-		//only add this section if its contents exist
-		if(isneuronpage){			
+
+		// only add this section if its contents exist
+		if (isneuronpage) {
 			body.addChild(wiringPartnersTopContainerDiv);
 			body.addChild(wiringPartnersDiv);
 		}
-		
+
 		body.addChild(geneExpressionTopContainerDiv);
 		body.addChild(geneExpressionDiv);
 		body.addChild(homologuesTopContainerDiv);
@@ -411,8 +425,8 @@ public class InfoWindowDOM {
 		body.addChild(referencesTEXTPRESSODiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
-		
-		//add collapse scripts to body
+
+		// add collapse scripts to body
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
 		body.addChild(collapseAnatomyButton.makeCollapseButtonScript());
 		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
@@ -421,43 +435,44 @@ public class InfoWindowDOM {
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
-		
+
 		// link controller scripts
 		body.addChild(body.addLinkHandlerScript());
 		body.addChild(body.handleWiringPartnerClickScript());
 		body.addChild(body.viewInCellTheaterScript());
-		
-		//add head and body to html
+
+		// add head and body to html
 		html.addChild(head);
 		html.addChild(body);
-		
-		//add style node
-		buildStyleNode();	
+
+		// add style node
+		buildStyleNode();
 	}
-	
+
 	/*
 	 * NON TERMINAL CELL CASE
 	 */
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
 		this.name = nonTerminalCase.getCellName();
-	
+
 		HTMLNode head = new HTMLNode("head");
 
 		HTMLNode body = new HTMLNode("body");
-		
-		//cell name
+
+		// cell name
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
 		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
-		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName() + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName()
+				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
-		
-		//homologues
+
+		// homologues
 		HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
 		HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle",  "width: 95%; margin-top: 2%; float: left;",
+		HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> Homologues: </strong>");
 		homologuesTopContainerDiv.addChild(collapseHomologuesButton);
 		homologuesTopContainerDiv.addChild(homologuesTitle);
@@ -465,7 +480,11 @@ public class InfoWindowDOM {
 		HTMLNode homologuesLeftRightListDiv = new HTMLNode("div", "homologuesLR", "width: 50%; float: left");
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
-		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getEmbryonicHomology()); //is this the left/right option?
+		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getEmbryonicHomology()); // is
+																								// this
+																								// the
+																								// left/right
+																								// option?
 		lrUL.addChild(lrLI);
 		lrUL.addChild(lrLI2);
 		homologuesLeftRightListDiv.addChild(lrUL);
@@ -476,45 +495,50 @@ public class InfoWindowDOM {
 		homologuesAdditionalSymmDiv.addChild(additionalSymmUL);
 		homologuesDiv.addChild(homologuesLeftRightListDiv);
 		homologuesDiv.addChild(homologuesAdditionalSymmDiv);
-		
-		//terminal descendants
+
+		// terminal descendants
 		HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
-		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse", "terminalDescendantsCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
-		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Terminal Descendants: </strong>");
+		HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse",
+				"terminalDescendantsCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+				true);
+		HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Terminal Descendants: </strong>");
 		terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
 		terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
-		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants", "height: 0px; visibility: hidden;");
+		HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants",
+				"height: 0px; visibility: hidden;");
 		HTMLNode terminalDescendantsUL = new HTMLNode("ul");
 		for (TerminalDescendant terminalDescendant : nonTerminalCase.getTerminalDescendants()) {
 			String descendant = "";
 			String functionalName = PartsList.getFunctionalNameByLineageName(terminalDescendant.getCellName());
-			
+
 			if (functionalName != null) {
-				descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName() + ")</strong>";
+				descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName()
+						+ ")</strong>";
 			} else {
 				descendant = "<strong>" + terminalDescendant.getCellName() + "</strong>";
 			}
-			
+
 			String partsListEntry = terminalDescendant.getPartsListEntry();
 			if (!partsListEntry.equals("N/A")) {
 				descendant += (", " + partsListEntry);
 			}
-			
+
 			HTMLNode li = new HTMLNode("li", "", "", descendant);
 			terminalDescendantsUL.addChild(li);
 		}
 		terminalDescendantsDiv.addChild(terminalDescendantsUL);
-		
+
 		// description for non terminal cell
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
-		int terminalnum = nonTerminalCase.getTerminalDescendants().size();//# of terminals
+		int terminalnum = nonTerminalCase.getTerminalDescendants().size();// #
+																			// of
+																			// terminals
 		String partsListDescription = "Embryonic progenitor cell that generates " + terminalnum + " cells at hatching.";
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
-		
-		//links
+
+		// links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
@@ -525,31 +549,31 @@ public class InfoWindowDOM {
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : nonTerminalCase.getLinks()) {
-			String anchor = link; //replaced with anchor if valid link
-			
-			//begin after www.
-			int startIDX = link.indexOf("www.")+4;
+			String anchor = link; // replaced with anchor if valid link
+
+			// begin after www.
+			int startIDX = link.indexOf("www.") + 4;
 			if (startIDX > 0) {
 				String placeholder = link.substring(startIDX);
-				
-				//find end of site name using '.'
+
+				// find end of site name using '.'
 				int dotIDX = placeholder.indexOf(".");
 				if (dotIDX > 0) {
 					placeholder = placeholder.substring(0, dotIDX);
-					
-					//check for google links
+
+					// check for google links
 					if (placeholder.equals("google")) {
-						//check if wormatlas specific search
+						// check if wormatlas specific search
 						if (link.contains("site:wormatlas.org")) {
-							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" +
-									"</a>";
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+									+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
 						} else {
-							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName() + 
-									" on Google</a>";
+							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+									+ nonTerminalCase.getCellName() + " on Google</a>";
 						}
 					} else {
-						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">" + nonTerminalCase.getCellName()
-						+ " on " + placeholder + "</a>";
+						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+								+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
 					}
 				}
 			}
@@ -557,133 +581,123 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-		
-		//production info
+
+		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
-		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse", "productionInfoCollapseButton", 
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
-		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",  "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Primary Data: </strong>");
+		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
+				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
 		productionInfoTopContainerDiv.addChild(productionInfoTitle);
 		HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
 		HTMLNode productionInfoUL = new HTMLNode("ul");
-		
+
 		ArrayList<String> nuclearInfo = nonTerminalCase.getNuclearProductionInfo();
 		String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
 		if (nuclearInfo.size() == 2) {
-			markerAndStrainNuc += nuclearInfo.get(0) + "<br>"
-					+ "Image Series: " + nuclearInfo.get(1);
+			markerAndStrainNuc += nuclearInfo.get(0) + "<br>" + "Image Series: " + nuclearInfo.get(1);
 		}
 		HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
-				
+
 		boolean hasCellShapeData;
 		ArrayList<String> cellShapeInfo = nonTerminalCase.getCellShapeProductionInfo();
 		String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
 		if (cellShapeInfo.size() == 2) {
 			hasCellShapeData = true;
-			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>"
-					+ "Image Series: " + cellShapeInfo.get(1);
+			markerAndStrainCellShape += cellShapeInfo.get(0) + "<br>" + "Image Series: " + cellShapeInfo.get(1);
 		} else {
 			hasCellShapeData = false;
 		}
 		HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
-				
-		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "", "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
+
+		HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "",
+				"<em>Additional Embryos: </em><br>[other equivalent data sets info]");
 		productionInfoUL.addChild(nuclearLI);
 		if (hasCellShapeData) {
 			productionInfoUL.addChild(cellShapeLI);
 		}
 		productionInfoUL.addChild(additionalEmbryosLI);
 		productionInfoDiv.addChild(productionInfoUL);
-		
-		//add divs to body
+
+		// add divs to body
 		body.addChild(cellNameDiv);
-		body.addChild( partsListDescrDiv); //added non terminal description -AS
+		body.addChild(partsListDescrDiv); // added non terminal description -AS
 		body.addChild(homologuesTopContainerDiv);
 		body.addChild(homologuesDiv);
-		//body.addChild(embryonicHomologyDiv);
+		// body.addChild(embryonicHomologyDiv);
 		body.addChild(terminalDescendantsTopContainerDiv);
 		body.addChild(terminalDescendantsDiv);
 		body.addChild(linksTopContainerDiv);
 		body.addChild(linksDiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
-		
-		//add collapse scripts to body
+
+		// add collapse scripts to body
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
-		
-		//add link controller
+
+		// add link controller
 		body.addChild(body.addLinkHandlerScript());
 		body.addChild(body.viewInCellTheaterScript());
-		
-		//add head and body to html
+
+		// add head and body to html
 		html.addChild(head);
 		html.addChild(body);
-				
-		//add style node
+
+		// add style node
 		buildStyleNode();
 	}
-	
+
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
-		
-//		String str = domAsString += html.formatNode();
-//		System.out.println(str);
-//		return str;
+
+		// String str = domAsString += html.formatNode();
+		// System.out.println(str);
+		// return str;
 		return domAsString += html.formatNode();
-		
+
 	}
-	
+
 	/*
 	 * iterates through the DOM and builds the style tag add to the head node
 	 */
 	public void buildStyleNode() {
-		if (html == null) return;
-		
-		//default style rules
-		String style = newLine + "ul {"
-				+ newLine + "list-style-type: none;"
-				+ newLine + "display: block;"
-				+ newLine + "width: 100%;"
-				+ newLine + "}"
-				+ newLine + newLine + "li {"
-				+ newLine + "margin-bottom: 2%;"
-				+ newLine + "}"
-				+ newLine + newLine + "div {"
-				+ newLine + "width: 100%;"
-				+ newLine + "overflow: hidden;"
-				+ newLine + "}"
-				+ newLine + "table, th, td {"
-				+ newLine + "border: 1px solid black;"
-				+ newLine + "border-collapse: collapse;"
-				+ newLine + "}" + newLine;
-		HTMLNode head = null; //saved to add style node as child of head
+		if (html == null)
+			return;
+
+		// default style rules
+		String style = newLine + "ul {" + newLine + "list-style-type: none;" + newLine + "display: block;" + newLine
+				+ "width: 100%;" + newLine + "}" + newLine + newLine + "li {" + newLine + "margin-bottom: 2%;" + newLine
+				+ "}" + newLine + newLine + "div {" + newLine + "width: 100%;" + newLine + "overflow: hidden;" + newLine
+				+ "}" + newLine + "table, th, td {" + newLine + "border: 1px solid black;" + newLine
+				+ "border-collapse: collapse;" + newLine + "}" + newLine;
+		HTMLNode head = null; // saved to add style node as child of head
 		if (html.hasChildren()) {
 			for (HTMLNode node : html.getChildren()) {
-				if (node.getTag().equals("head")) { //save head
+				if (node.getTag().equals("head")) { // save head
 					head = node;
-				} else if (node.getTag().equals("body")) { //get style
-						style += findStyleInSubTree(node);
+				} else if (node.getTag().equals("body")) { // get style
+					style += findStyleInSubTree(node);
 				}
-					
+
 			}
 		}
 		addStyleNodeToHead(head, style);
 	}
-	
+
 	private void addStyleNodeToHead(HTMLNode head, String style) {
 		if (head != null) {
 			head.addChild(new HTMLNode(style, "text/css"));
 		}
 	}
-	
+
 	/*
-	 * called by buildStyleNode to scan the body node and extract style attributes from children
-	 * - only called if node is body tag and if body has children
+	 * called by buildStyleNode to scan the body node and extract style
+	 * attributes from children - only called if node is body tag and if body
+	 * has children
 	 */
 	private String findStyleInSubTree(HTMLNode node) {
 		String style = "";
@@ -692,14 +706,14 @@ public class InfoWindowDOM {
 				if (n.hasID() && !n.getStyle().equals("")) {
 					style += styleAsStr(n);
 				}
-					
+
 				if (n.hasChildren()) {
 					for (HTMLNode n1 : n.getChildren()) {
 						style += findStyleInSubTree(n1);
 					}
 				}
 			}
-			
+
 			if (node.hasID() && !node.getStyle().equals("")) {
 				style += styleAsStr(node);
 			}
@@ -710,23 +724,23 @@ public class InfoWindowDOM {
 		}
 		return style;
 	}
-	
+
 	private String styleAsStr(HTMLNode node) {
-	 return (newLine + "#" + node.getID() + " {"
-				+ newLine + node.getStyle()
-				+ newLine + "}");
+		return (newLine + "#" + node.getID() + " {" + newLine + node.getStyle() + newLine + "}");
 	}
-	
+
 	public HTMLNode getHTML() {
 		return this.html;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
 
 	private final static String doctypeTag = "<!DOCTYPE html>";
 	private final static String newLine = "\n";
-//	private final static String meta_charset = "<meta charset=\"utf-8\">";
-//	private final static String meta_httpequiv_content = "<meta http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong Bao\">";
+	// private final static String meta_charset = "<meta charset=\"utf-8\">";
+	// private final static String meta_httpequiv_content = "<meta
+	// http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong
+	// Bao\">";
 }

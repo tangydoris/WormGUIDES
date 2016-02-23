@@ -154,10 +154,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 								System.out.println("null cell cases");
 								return null; // error check
 							}
-							
+
 							String funcName = PartsList.getFunctionalNameByLineageName(cellName);
 							String searchName = cellName;
-							if (funcName!=null)
+							if (funcName != null)
 								searchName = funcName;
 							if (!cellCases.containsTerminalCase(searchName)) {
 								cellCases.makeTerminalCase(cellName, searchName,
@@ -469,11 +469,11 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 			name = "AB" + name.substring(2);
 
 		cellName = name;
-		
+
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
-		if (funcName!=null)
-			name = name+" ("+funcName+")";
-		
+		if (funcName != null)
+			name = name + " (" + funcName + ")";
+
 		nameText.setText(name);
 	}
 

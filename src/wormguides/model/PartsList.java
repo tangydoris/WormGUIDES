@@ -54,7 +54,7 @@ public class PartsList {
 			if (funcName.equalsIgnoreCase(name))
 				return true;
 		}
-		
+
 		return false;
 	}
 

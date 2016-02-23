@@ -13,57 +13,61 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.converter.NumberStringConverter;
 
-public class RotationController extends AnchorPane implements Initializable{
-	@FXML private Slider xRotationSlider;
-	@FXML private Slider yRotationSlider;
-	@FXML private Slider zRotationSlider;
-	
-	@FXML private TextField rotateXAngleField;
-	@FXML private TextField rotateYAngleField;
-	@FXML private TextField rotateZAngleField;
-	
+public class RotationController extends AnchorPane implements Initializable {
+	@FXML
+	private Slider xRotationSlider;
+	@FXML
+	private Slider yRotationSlider;
+	@FXML
+	private Slider zRotationSlider;
+
+	@FXML
+	private TextField rotateXAngleField;
+	@FXML
+	private TextField rotateYAngleField;
+	@FXML
+	private TextField rotateZAngleField;
+
 	private DoubleProperty xRotationAngle;
 	private DoubleProperty yRotationAngle;
 	private DoubleProperty zRotationAngle;
-	
-	public RotationController(DoubleProperty xRotationAngle,
-			DoubleProperty yRotationAngle, DoubleProperty zRotationAngle) {
+
+	public RotationController(DoubleProperty xRotationAngle, DoubleProperty yRotationAngle,
+			DoubleProperty zRotationAngle) {
 		super();
-		
+
 		this.xRotationAngle = xRotationAngle;
 		this.yRotationAngle = yRotationAngle;
 		this.zRotationAngle = zRotationAngle;
 	}
-	
 
-	
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {	
+	public void initialize(URL location, ResourceBundle resources) {
 		assertFXMLNodes();
-		
+
 		xRotationAngle.addListener(getXRotationListener());
 		yRotationAngle.addListener(getYRotationListener());
 		zRotationAngle.addListener(getZRotationListener());
-		
+
 		rotateXAngleField.textProperty().addListener(getRotateXAngleFieldListener());
 		rotateYAngleField.textProperty().addListener(getRotateYAngleFieldListener());
 		rotateZAngleField.textProperty().addListener(getRotateZAngleFieldListener());
 
-		//set initial values
+		// set initial values
 		xRotationSlider.setValue(xRotationAngle.get());
 		yRotationSlider.setValue(yRotationAngle.get());
 		zRotationSlider.setValue(zRotationAngle.get());
-		
+
 		rotateXAngleField.textProperty().bindBidirectional(xRotationAngle, new NumberStringConverter());
 		rotateYAngleField.textProperty().bindBidirectional(yRotationAngle, new NumberStringConverter());
 		rotateZAngleField.textProperty().bindBidirectional(zRotationAngle, new NumberStringConverter());
-		
+
 		xRotationSlider.valueProperty().addListener(getXRotationSliderListener());
 		yRotationSlider.valueProperty().addListener(getYRotationSliderListener());
 		zRotationSlider.valueProperty().addListener(getZRotationSliderListener());
-		
+
 	}
-	
+
 	private ChangeListener<Number> getXRotationListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -72,7 +76,7 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	private ChangeListener<Number> getYRotationListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -81,7 +85,7 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	private ChangeListener<Number> getZRotationListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -90,7 +94,7 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	public ChangeListener<Number> getXRotationSliderListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -99,7 +103,7 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	public ChangeListener<Number> getYRotationSliderListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -108,7 +112,7 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	public ChangeListener<Number> getZRotationSliderListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -117,73 +121,70 @@ public class RotationController extends AnchorPane implements Initializable{
 			}
 		};
 	}
-	
+
 	private ChangeListener<String> getRotateXAngleFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-					String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					//check if within -360 to +360 range
+					// check if within -360 to +360 range
 					try {
 						double rotateXAngleVal = Double.parseDouble(newValue);
-						
+
 						if (rotateXAngleVal > -360. && rotateXAngleVal < 360.) {
 							xRotationAngle.set(rotateXAngleVal);
 						}
 					} catch (NumberFormatException e) {
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 				}
 			}
 		};
 	}
-	
+
 	private ChangeListener<String> getRotateYAngleFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-					String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					//check if within -360 to +360 range
+					// check if within -360 to +360 range
 					try {
 						double rotateYAngleVal = Double.parseDouble(newValue);
-						
+
 						if (rotateYAngleVal > -360. && rotateYAngleVal < 360.) {
 							yRotationAngle.set(rotateYAngleVal);
 						}
 					} catch (NumberFormatException e) {
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 				}
 			}
 		};
 	}
-	
+
 	private ChangeListener<String> getRotateZAngleFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> observable, 
-					String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					//check if within -360 to +360 range
+					// check if within -360 to +360 range
 					try {
 						double rotateZAngleVal = Double.parseDouble(newValue);
-						
+
 						if (rotateZAngleVal > -360. && rotateZAngleVal < 360.) {
 							zRotationAngle.set(rotateZAngleVal);
 						}
 					} catch (NumberFormatException e) {
-						//e.printStackTrace();
+						// e.printStackTrace();
 					}
 				}
 			}
 		};
 	}
-	
+
 	private void assertFXMLNodes() {
-		assert (xRotationSlider != null);
-		assert (yRotationSlider != null);
-		assert (zRotationSlider != null);
+		assert(xRotationSlider != null);
+		assert(yRotationSlider != null);
+		assert(zRotationSlider != null);
 	}
 }

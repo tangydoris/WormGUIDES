@@ -321,7 +321,7 @@ public class Window3DController {
 		totalNuclei = new SimpleIntegerProperty();
 		totalNuclei.set(0);
 
-		endTime = data.getTotalTimePoints()-1;
+		endTime = data.getTotalTimePoints() - 1;
 
 		createSubScene(parentPane.widthProperty().get(), parentPane.heightProperty().get());
 		parentPane.getChildren().add(subscene);

@@ -70,8 +70,7 @@ public class CellCases {
 
 	public void makeNonTerminalCase(String cellName, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {
-		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo,
-				cellShapeProductionInfo);
+		NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo);
 
 		addNonTerminalCase(ntCase);
 	}
