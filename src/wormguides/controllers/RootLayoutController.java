@@ -345,7 +345,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			});
 
 			urlStage.setScene(new Scene(urlWindow));
-			urlStage.setTitle("URLs");
+			urlStage.setTitle("Share Scene");
 			urlStage.setResizable(false);
 			urlStage.initModality(Modality.NONE);
 		}
@@ -386,7 +386,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			});
 
 			urlLoadStage.setScene(new Scene(urlLoadWindow));
-			urlLoadStage.setTitle("Load URL");
+			urlLoadStage.setTitle("Load Scene");
 			urlLoadStage.setResizable(false);
 			urlLoadStage.initModality(Modality.NONE);
 		}

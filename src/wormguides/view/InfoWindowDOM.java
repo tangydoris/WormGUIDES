@@ -109,12 +109,6 @@ public class InfoWindowDOM {
 		wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
 		//view in wiring diagram
-//		HTMLNode viewWDTopContainerDiv = new HTMLNode("div", "viewWDTopContainer", "");
-//		HTMLNode collapseViewWDButton = new HTMLNode("button", "viewWDCollapse", "viewWDCollapseButton",  "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "-", true);
-//		HTMLNode viewWDTitle = new HTMLNode("p", "viewWDTitle", "width: 95%; float: left;",
-//				"<strong> View in Wiring Diagram Network: </strong>");
-//		viewWDTopContainerDiv.addChild(collapseViewWDButton);
-//		viewWDTopContainerDiv.addChild(viewWDTitle);
 		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
 		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network: </em>");
 		HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
@@ -406,8 +400,7 @@ public class InfoWindowDOM {
 			body.addChild(wiringPartnersTopContainerDiv);
 			body.addChild(wiringPartnersDiv);
 		}
-//		body.addChild(viewWDTopContainerDiv);
-//		body.addChild(viewWDDiv);
+		
 		body.addChild(geneExpressionTopContainerDiv);
 		body.addChild(geneExpressionDiv);
 		body.addChild(homologuesTopContainerDiv);
@@ -423,7 +416,6 @@ public class InfoWindowDOM {
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
 		body.addChild(collapseAnatomyButton.makeCollapseButtonScript());
 		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
-//		body.addChild(collapseViewWDButton.makeCollapseButtonScript());
 		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());

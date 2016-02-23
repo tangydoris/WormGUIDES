@@ -10,13 +10,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import wormguides.URLGenerator;
 import wormguides.controllers.Window3DController;
@@ -24,130 +22,60 @@ import wormguides.loaders.ImageLoader;
 import wormguides.model.ColorRule;
 
 public class URLWindow extends AnchorPane {
-	
-	Window3DController scene;
-	
-	private Label iOSLabel;
-	private Label androidLabel;
-	private Label webLabel;
-	
-	private TextField iOSField;
-	private TextField androidField;
-	private TextField webField;
-	
-	private String iOSURL;
-	private String androidURL;
-	private String webURL;
-	
+
+	private Window3DController scene;
+
+	private TextField urlField;
+
+	private String urlString;
+
 	private Button resetBtn;
 	private Button closeBtn;
-	
+
 	private Clipboard cb;
-	
+
 	public URLWindow() {
 		super();
 		setPrefWidth(430);
-		
+
 		cb = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Tooltip tooltip = new Tooltip("copy");
-		
+
 		VBox vBox = new VBox();
-		vBox.setSpacing(5);
-		AnchorPane.setTopAnchor(vBox, 15.0);
-		AnchorPane.setLeftAnchor(vBox, 15.0);
-		AnchorPane.setRightAnchor(vBox, 15.0);
-		AnchorPane.setBottomAnchor(vBox, 20.0);
+		vBox.setSpacing(10);
+		AnchorPane.setTopAnchor(vBox, 10.0);
+		AnchorPane.setLeftAnchor(vBox, 10.0);
+		AnchorPane.setRightAnchor(vBox, 10.0);
+		AnchorPane.setBottomAnchor(vBox, 10.0);
 		getChildren().add(vBox);
-		
-		iOSLabel = new Label("iOS:");
-		iOSLabel.setFont(AppFont.getFont());
-		iOSLabel.setPrefHeight(23);
-		androidLabel = new Label("Android:");
-		androidLabel.setFont(AppFont.getFont());
-		androidLabel.setPrefHeight(23);
-		webLabel = new Label("Web browser:");
-		webLabel.setFont(AppFont.getFont());
-		webLabel.setPrefHeight(23);
-		
-		HBox iOSHBox = new HBox(10);
-		iOSField = new TextField();
-		iOSField.setFont(AppFont.getFont());
-		iOSField.setEditable(false);
-		iOSField.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;");
-		HBox.setHgrow(iOSField, Priority.ALWAYS);
-		Button iOSCopyBtn = new Button();
-		iOSCopyBtn.setTooltip(tooltip);
-		iOSCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
-							"-fx-faint-focus-color: transparent;");
-		iOSCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
-		iOSCopyBtn.prefWidthProperty().bind(iOSCopyBtn.heightProperty());
-		iOSCopyBtn.minWidthProperty().bind(iOSCopyBtn.heightProperty());
-		iOSCopyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		iOSCopyBtn.setGraphic(ImageLoader.getCopyIcon());
-		iOSCopyBtn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				StringSelection ss = new StringSelection(iOSField.getText());
-				cb.setContents(ss, null);
-			}
-		});
-		iOSHBox.getChildren().addAll(iOSField, iOSCopyBtn);
-		
+
 		HBox androidHBox = new HBox(10);
-		androidField = new TextField();
-		androidField.setFont(AppFont.getFont());
-		androidField.setEditable(false);
-		androidField.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;");
-		HBox.setHgrow(androidField, Priority.ALWAYS);
+		urlField = new TextField();
+		urlField.setFont(AppFont.getFont());
+		urlField.setPrefHeight(28);
+		urlField.setEditable(false);
+		urlField.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		HBox.setHgrow(urlField, Priority.ALWAYS);
 		Button androidCopyBtn = new Button();
+		androidCopyBtn.setPrefSize(28, 28);
+		androidCopyBtn.setMinSize(28, 28);
+		androidCopyBtn.setMaxSize(28, 28);
 		androidCopyBtn.setTooltip(tooltip);
-		androidCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
-								"-fx-faint-focus-color: transparent;");
-		androidCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
-		androidCopyBtn.prefWidthProperty().bind(iOSCopyBtn.heightProperty());
-		androidCopyBtn.minWidthProperty().bind(iOSCopyBtn.heightProperty());
+		androidCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
 		androidCopyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		androidCopyBtn.setGraphic(ImageLoader.getCopyIcon());
 		androidCopyBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				StringSelection ss = new StringSelection(androidField.getText());
+				StringSelection ss = new StringSelection(urlField.getText());
 				cb.setContents(ss, null);
 			}
 		});
-		androidHBox.getChildren().addAll(androidField, androidCopyBtn);
-		
-		HBox webHBox = new HBox(10);
-		webField = new TextField();
-		webField.setFont(AppFont.getFont());
-		webField.setEditable(false);
-		webField.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;"); 
-		HBox.setHgrow(webField, Priority.ALWAYS);
-		Button webCopyBtn = new Button();
-		webCopyBtn.setTooltip(tooltip);
-		webCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
-							"-fx-faint-focus-color: transparent;");
-		webCopyBtn.maxWidthProperty().bind(iOSCopyBtn.heightProperty());
-		webCopyBtn.prefWidthProperty().bind(iOSCopyBtn.heightProperty());
-		webCopyBtn.minWidthProperty().bind(iOSCopyBtn.heightProperty());
-		webCopyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		webCopyBtn.setGraphic(ImageLoader.getCopyIcon());
-		webCopyBtn.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				StringSelection ss = new StringSelection(webField.getText());
-				cb.setContents(ss, null);
-			}
-		});
-		webHBox.getChildren().addAll(webField, webCopyBtn);
-		
+		androidHBox.getChildren().addAll(urlField, androidCopyBtn);
+
 		resetBtn = new Button("Generate");
 		resetBtn.setPrefWidth(100);
-		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;");
+		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
 		resetBtn.setFont(AppFont.getFont());
 		resetBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -155,54 +83,34 @@ public class URLWindow extends AnchorPane {
 				resetURLs();
 			}
 		});
-		
+
 		closeBtn = new Button("Close");
 		closeBtn.setPrefWidth(100);
-		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; "+
-						"-fx-faint-focus-color: transparent;");
+		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
 		closeBtn.setFont(AppFont.getFont());
 		HBox hBox = new HBox();
 		hBox.setSpacing(20);
 		hBox.setAlignment(Pos.CENTER);
 		hBox.getChildren().addAll(resetBtn, closeBtn);
-		
-		Region r1 = new Region();
-		r1.setPrefHeight(0);
-		
-		Region r = new Region();
-		r.setPrefHeight(5);
-		
-		vBox.getChildren().addAll(iOSLabel, iOSHBox, androidLabel, androidHBox, 
-												webLabel, webHBox, r, hBox);
+
+		vBox.getChildren().addAll(androidHBox, hBox);
 	}
-	
-	
+
 	public void setScene(Window3DController window3D) {
 		this.scene = window3D;
 	}
-	
+
 	public void resetURLs() {
 		if (scene != null) {
 			ArrayList<ColorRule> list = scene.getColorRulesList();
-			iOSURL = URLGenerator.generateIOS(list, scene.getTime(), 
-							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
-							scene.getTranslationX(), scene.getTranslationY(), 
-							scene.getScale(), scene.getOthersVisibility());
-			androidURL = URLGenerator.generateAndroid(list, scene.getTime(), 
-							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
-							scene.getTranslationX(), scene.getTranslationY(), 
-							scene.getScale(), scene.getOthersVisibility());
-			webURL = URLGenerator.generateWeb(list, scene.getTime(), 
-							scene.getRotationX(), scene.getRotationY(), scene.getRotationZ(), 
-							scene.getTranslationX(), scene.getTranslationY(), 
-							scene.getScale(), scene.getOthersVisibility());
-			
-			iOSField.setText(iOSURL);
-			androidField.setText(androidURL);
-			webField.setText(webURL);
+			urlString = URLGenerator.generateAndroid(list, scene.getTime(), scene.getRotationX(), scene.getRotationY(),
+					scene.getRotationZ(), scene.getTranslationX(), scene.getTranslationY(), scene.getScale(),
+					scene.getOthersVisibility());
+
+			urlField.setText(urlString);
 		}
 	}
-	
+
 	public Button getCloseButton() {
 		return closeBtn;
 	}
