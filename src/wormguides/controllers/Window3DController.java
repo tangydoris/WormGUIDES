@@ -225,7 +225,7 @@ public class Window3DController {
 	private final static String imgName = "WormGUIDES_time_";
 
 	private BooleanProperty update3D;
-	
+
 	private DoubleProperty rotateXAngle;
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
@@ -281,30 +281,35 @@ public class Window3DController {
 					// value passed may be a functional name
 					// use lineage names instead
 					String lineageName = PartsList.getLineageNameByFunctionalName(newValue);
-					if (lineageName==null)
+					if (lineageName == null)
 						lineageName = newValue;
-					
+
 					selectedName.set(lineageName);
-					
+
 					if (!allLabels.contains(lineageName))
 						allLabels.add(lineageName);
 					
+					Shape3D entity = getEntityWithName(lineageName);
+
 					// go to labeled name
 					int startTime;
 					int endTime;
-					
+
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
-					
-					if (startTime<=0)
+
+					if (startTime <= 0)
 						startTime = 1;
-					if (endTime<=0)
+					if (endTime <= 0)
 						endTime = 1;
 					
-					if(time.get()<startTime || time.get()>endTime)
+					if (time.get() < startTime || time.get() > endTime)
 						time.set(startTime);
 					
-					insertLabelFor(lineageName, getEntityWithName(lineageName));
+					else
+						insertLabelFor(lineageName, entity);
+					
+					highlightActiveCellLabel(entity);
 				}
 			}
 		});
@@ -370,24 +375,23 @@ public class Window3DController {
 		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
 		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
 		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
-		
-		//initialize
+
+		// initialize
 		rotateXAngle = new SimpleDoubleProperty(1);
 		rotateYAngle = new SimpleDoubleProperty(1);
 		rotateZAngle = new SimpleDoubleProperty(1);
-		
-		//set intial values
+
+		// set intial values
 		rotateXAngle.set(rotateX.getAngle());
 		rotateYAngle.set(rotateY.getAngle());
 		rotateZAngle.set(rotateZ.getAngle());
-		
-		//add listener for control from rotationcontroller
+
+		// add listener for control from rotationcontroller
 		rotateXAngle.addListener(getRotateXAngleListener());
 		rotateYAngle.addListener(getRotateYAngleListener());
 		rotateZAngle.addListener(getRotateZAngleListener());
-		
-		
-		//set listeners to update doubleproperties ^^
+
+		// set listeners to update doubleproperties ^^
 		rotateX.setOnTransformChanged(getRotateXChangeHandler());
 		rotateY.setOnTransformChanged(getRotateYChangeHandler());
 		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
@@ -457,7 +461,7 @@ public class Window3DController {
 		xform.getChildren().add(createOrientationIndicator());
 
 		this.bringUpInfoProperty = bringUpInfoProperty;
-		
+
 		initializeUpdate3D();
 	}
 
@@ -761,7 +765,10 @@ public class Window3DController {
 					if (!allLabels.contains(name)) {
 						allLabels.add(name);
 						currentLabels.add(name);
-						insertLabelFor(name, getEntityWithName(name));
+						
+						Shape3D entity = getEntityWithName(name);
+						insertLabelFor(name, entity);
+						highlightActiveCellLabel(entity);
 					}
 				}
 			}
@@ -794,6 +801,8 @@ public class Window3DController {
 							allLabels.add(name);
 							currentLabels.add(name);
 							insertLabelFor(name, node);
+							
+							highlightActiveCellLabel((Shape3D) node);
 						}
 					}
 
@@ -831,7 +840,7 @@ public class Window3DController {
 			initContextMenuStage();
 
 		contextMenuController.setName(name);
-		
+
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
 		if (funcName == null)
 			contextMenuController.disableTerminalCaseFunctions(true);
@@ -1184,14 +1193,21 @@ public class Window3DController {
 
 		// add notes
 		insertOverlayTitles();
-		
+
 		if (!currentNotes.isEmpty())
 			addNoteGeometries(notes);
 
 		// add labels
-		for (String name : currentLabels)
+		Shape3D activeEntity = null;
+		for (String name : currentLabels) {
 			insertLabelFor(name, getEntityWithName(name));
-
+			
+			if (name.equalsIgnoreCase(selectedName.get()))
+				activeEntity = getEntityWithName(name);
+		}
+		if (activeEntity!=null)
+			highlightActiveCellLabel(activeEntity);
+		
 		if (!notes.isEmpty())
 			root.getChildren().addAll(notes);
 
@@ -1405,24 +1421,20 @@ public class Window3DController {
 			}
 		});
 
-		for (Node shape3D : entityLabelMap.keySet())
-			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
-
 		text.setWrappingWidth(-1);
 
 		entityLabelMap.put(entity, text);
 
 		spritesPane.getChildren().add(text);
 		alignTextWithEntity(text, entity, true);
-
-		// highlight newest label
-		if (name.equalsIgnoreCase(selectedName.get())) {
-			text = entityLabelMap.get(entity);
-			if (text != null)
-				entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
-			else
-				System.out.println("cannot get Text from entityLabelMap");
-		}
+	}
+	
+	private void highlightActiveCellLabel(Shape3D entity) {
+		for (Node shape3D : entityLabelMap.keySet())
+			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
+		
+		if (entity!=null && entityLabelMap.get(entity)!=null)
+			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
 	}
 
 	/*
@@ -1607,12 +1619,11 @@ public class Window3DController {
 	private void insertOverlayTitles() {
 		if (storiesLayer != null) {
 			Text infoPaneTitle = makeNoteOverlayText("Story Title:");
-			
+
 			if (storiesLayer.getActiveStory() != null) {
 				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
 				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
-			}
-			else {
+			} else {
 				Text noStoryTitle = makeNoteOverlayText("none");
 				overlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
 			}
@@ -1789,18 +1800,15 @@ public class Window3DController {
 	 */
 	public void stillscreenCapture() {
 		/*
-		 * TODO
-		 * Open file save chooser
+		 * TODO Open file save chooser
 		 */
-		
+
 		Stage fileChooserStage = new Stage();
-		
+
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Choose Save Location");
-		fileChooser.getExtensionFilters().add(
-				new ExtensionFilter("PNG File", "*.png"));
-		
-		
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
+
 		WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
 		/*
@@ -1808,7 +1816,7 @@ public class Window3DController {
 		 */
 		try {
 			File file = fileChooser.showSaveDialog(fileChooserStage);
-			
+
 			if (file != null) {
 				RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
 				ImageIO.write(renderedImage, "png", file);
@@ -1978,34 +1986,34 @@ public class Window3DController {
 	public void setOthersVisibility(double dim) {
 		othersOpacity.set(dim);
 	}
-	
+
 	private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
 		return new EventHandler<TransformChangedEvent>() {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateXAngle.set(rotateX.getAngle());
 			}
-		};	
+		};
 	}
-	
+
 	private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
 		return new EventHandler<TransformChangedEvent>() {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateYAngle.set(rotateY.getAngle());
 			}
-		};	
+		};
 	}
-	
+
 	private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
 		return new EventHandler<TransformChangedEvent>() {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateZAngle.set(rotateZ.getAngle());
 			}
-		};	
+		};
 	}
-	
+
 	private ChangeListener<Number> getRotateXAngleListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -2014,7 +2022,7 @@ public class Window3DController {
 			}
 		};
 	}
-	
+
 	private ChangeListener<Number> getRotateYAngleListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -2023,7 +2031,7 @@ public class Window3DController {
 			}
 		};
 	}
-	
+
 	private ChangeListener<Number> getRotateZAngleListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -2032,15 +2040,15 @@ public class Window3DController {
 			}
 		};
 	}
-	
+
 	public DoubleProperty getRotateXAngleProperty() {
 		return this.rotateXAngle;
 	}
-	
+
 	public DoubleProperty getRotateYAngleProperty() {
 		return this.rotateYAngle;
 	}
-	
+
 	public DoubleProperty getRotateZAngleProperty() {
 		return this.rotateZAngle;
 	}
