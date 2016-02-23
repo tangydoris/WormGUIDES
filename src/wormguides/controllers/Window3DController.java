@@ -288,7 +288,7 @@ public class Window3DController {
 
 					if (!allLabels.contains(lineageName))
 						allLabels.add(lineageName);
-					
+
 					Shape3D entity = getEntityWithName(lineageName);
 
 					// go to labeled name
@@ -302,13 +302,13 @@ public class Window3DController {
 						startTime = 1;
 					if (endTime <= 0)
 						endTime = 1;
-					
+
 					if (time.get() < startTime || time.get() > endTime)
 						time.set(startTime);
-					
+
 					else
 						insertLabelFor(lineageName, entity);
-					
+
 					highlightActiveCellLabel(entity);
 				}
 			}
@@ -457,7 +457,7 @@ public class Window3DController {
 		// orientationIndicator.setTranslateZ(newOriginZ);
 		orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
 		orientationIndicator.setMaterial(material);
-		// root.getChildren().add(orientationIndicator);
+
 		xform.getChildren().add(createOrientationIndicator());
 
 		this.bringUpInfoProperty = bringUpInfoProperty;
@@ -501,7 +501,7 @@ public class Window3DController {
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 		// xy relocates z shrinks aparent by moving away from camera? improves
 		// resolution?
-		orientationIndicator.getTransforms().add(new Translate(300, 200, 800));
+		orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
 		orientationIndicator.getTransforms().add(new Translate(-newOriginX, -newOriginY, -newOriginZ));
 		orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
 		orientationIndicator.getTransforms().add(new Translate(newOriginX, newOriginY, newOriginZ));
@@ -765,7 +765,7 @@ public class Window3DController {
 					if (!allLabels.contains(name)) {
 						allLabels.add(name);
 						currentLabels.add(name);
-						
+
 						Shape3D entity = getEntityWithName(name);
 						insertLabelFor(name, entity);
 						highlightActiveCellLabel(entity);
@@ -801,7 +801,7 @@ public class Window3DController {
 							allLabels.add(name);
 							currentLabels.add(name);
 							insertLabelFor(name, node);
-							
+
 							highlightActiveCellLabel((Shape3D) node);
 						}
 					}
@@ -1201,13 +1201,13 @@ public class Window3DController {
 		Shape3D activeEntity = null;
 		for (String name : currentLabels) {
 			insertLabelFor(name, getEntityWithName(name));
-			
+
 			if (name.equalsIgnoreCase(selectedName.get()))
 				activeEntity = getEntityWithName(name);
 		}
-		if (activeEntity!=null)
+		if (activeEntity != null)
 			highlightActiveCellLabel(activeEntity);
-		
+
 		if (!notes.isEmpty())
 			root.getChildren().addAll(notes);
 
@@ -1342,7 +1342,8 @@ public class Window3DController {
 
 			sphere.setMaterial(material);
 
-			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(positions[i][X_COR_INDEX] * X_SCALE,
+			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, 
+					new Translate(positions[i][X_COR_INDEX] * X_SCALE,
 					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
 
 			spheres[i] = sphere;
@@ -1428,12 +1429,12 @@ public class Window3DController {
 		spritesPane.getChildren().add(text);
 		alignTextWithEntity(text, entity, true);
 	}
-	
+
 	private void highlightActiveCellLabel(Shape3D entity) {
 		for (Node shape3D : entityLabelMap.keySet())
 			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
-		
-		if (entity!=null && entityLabelMap.get(entity)!=null)
+
+		if (entity != null && entityLabelMap.get(entity) != null)
 			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
 	}
 

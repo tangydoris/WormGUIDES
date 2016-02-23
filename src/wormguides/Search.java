@@ -124,8 +124,8 @@ public class Search {
 		};
 
 		showLoadingService = new ShowLoadingService();
-
 		geneSearchService = WormBaseQuery.getSearchService();
+
 		if (geneSearchService != null) {
 			geneSearchService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 				@Override
@@ -303,6 +303,14 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELL);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL);
+
+		// highlights 2/23/16 structures
+		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xdbdd15"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "siavl", Color.web("0x50b428"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "sibdr", Color.web("0xc95aa9"), SearchOption.CELLBODY);
 	}
 
 	public void clearRules() {
@@ -389,7 +397,7 @@ public class Search {
 	private static ArrayList<String> getCellsList(String searched) {
 		ArrayList<String> cells = new ArrayList<String>();
 		searched = searched.toLowerCase();
-		
+
 		switch (type) {
 		case LINEAGE:
 			for (String name : activeLineageNames) {
@@ -400,17 +408,16 @@ public class Search {
 
 		case FUNCTIONAL:
 			String name;
-			for (int i=0; i<functionalNames.size(); i++) {
+			for (int i = 0; i < functionalNames.size(); i++) {
 				name = functionalNames.get(i);
 				if (name.toLowerCase().startsWith(searched))
 					cells.add(PartsList.getLineageNameByIndex(i));
 			}
 			/*
-			for (String name : functionalNames) {
-				if (name.toLowerCase().startsWith(searched))
-					cells.add(PartsList.getLineageNameByFunctionalName(name));
-			}
-			*/
+			 * for (String name : functionalNames) { if
+			 * (name.toLowerCase().startsWith(searched))
+			 * cells.add(PartsList.getLineageNameByFunctionalName(name)); }
+			 */
 			break;
 
 		case DESCRIPTION:
@@ -480,8 +487,12 @@ public class Search {
 			if (sceneElementsList != null) {
 				for (SceneElement se : sceneElementsList.getList()) {
 					if (se.isMulticellular()) {
-						if (isNameSearched(se.getSceneName(), searched))
-							cells.addAll(se.getAllCellNames());
+						if (isNameSearched(se.getSceneName(), searched)) {
+							for (String cellName : se.getAllCellNames()) {
+								if (!cells.contains(cellName))
+									cells.add(cellName);
+							}
+						}
 					}
 				}
 			}
@@ -501,7 +512,6 @@ public class Search {
 
 	// Tests if name contains all parts of a search string
 	// returns true if it does, false otherwise
-	// TODO extend functionality to search comments
 	private static boolean isNameSearched(String name, String searched) {
 		if (name == null || searched == null)
 			return false;
@@ -510,7 +520,6 @@ public class Search {
 		String nameLower = name.toLowerCase();
 
 		boolean appliesToName = true;
-		boolean appliesToCell = false;
 		boolean appliesToComment = true;
 
 		String[] terms = searched.trim().toLowerCase().split(" ");
@@ -519,17 +528,6 @@ public class Search {
 			if (!nameLower.contains(term)) {
 				appliesToName = false;
 				break;
-			}
-		}
-
-		// search in cells
-		for (SceneElement se : sceneElementsList.elementsList) {
-			if (se.getSceneName().toLowerCase().equals(nameLower)) {
-				for (String cell : se.getAllCellNames()) {
-					if (cell.toLowerCase().contains(searched.toLowerCase())) {
-						appliesToCell = true;
-					}
-				}
 			}
 		}
 
@@ -543,7 +541,7 @@ public class Search {
 			}
 		}
 
-		return appliesToName || appliesToCell || appliesToComment;
+		return appliesToName || appliesToComment;
 	}
 
 	// Returns true if name is a gene name, false otherwise
@@ -658,7 +656,7 @@ public class Search {
 					x = positions[j][0];
 					y = positions[j][1];
 					z = positions[j][2];
-					//System.out.println(x + ", " + y + ", " + z);
+					// System.out.println(x + ", " + y + ", " + z);
 				}
 			}
 
