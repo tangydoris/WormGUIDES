@@ -50,7 +50,7 @@ public class InfoWindow {
 	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCases cases, ProductionInfo info,
 			Connectome connectome) {
 		infoWindowStage = new Stage();
-		infoWindowStage.setTitle("Info Window");
+		infoWindowStage.setTitle("Cell Info Window");
 
 		cellCases = cases;
 		productionInfo = info;
@@ -145,8 +145,9 @@ public class InfoWindow {
 									// show the tab
 								} else {
 									// translate the name if necessary
-									//String tabTitle = connectome.checkQueryCell(queryName).toUpperCase();
-									//String tabTitle = queryName;
+									// String tabTitle =
+									// connectome.checkQueryCell(queryName).toUpperCase();
+									// String tabTitle = queryName;
 									// add a terminal case --> pass the wiring
 									// partners
 									String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
@@ -155,8 +156,7 @@ public class InfoWindow {
 											connectome.queryConnectivity(funcName, false, true, false, false, false),
 											connectome.queryConnectivity(funcName, false, false, true, false, false),
 											connectome.queryConnectivity(funcName, false, false, false, true, false),
-											productionInfo.getNuclearInfo(),
-											productionInfo.getCellShapeData(funcName));
+											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(funcName));
 								}
 							} else { // not in connectome --> non terminal case
 								if (cellCases.containsNonTerminalCase(lineageName)) {
@@ -188,15 +188,18 @@ public class InfoWindow {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
-				infoWindowStage.setTitle("Info Window");
-				showWindow();
 			}
 		});
 		addNameService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
-				infoWindowStage.setTitle("Info Window");
+			}
+		});
+		showLoadingService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				infoWindowStage.setTitle("Cell Info Window");
 				showWindow();
 			}
 		});

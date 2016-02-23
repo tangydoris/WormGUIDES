@@ -21,6 +21,7 @@ import java.lang.Math;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
@@ -174,9 +175,8 @@ public class SulstonTreePane extends ScrollPane {
 						}
 					}
 
-					if (!change.getRemoved().isEmpty()) {
+					if (change.wasRemoved())
 						updateColoring();
-					}
 				}
 			}
 		});
@@ -359,32 +359,36 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	public void updateColoring() {
+		System.out.println("updating color");
 		// iterate over all drawn lines and recompute their color
 		ObservableList<Node> contentnodes = mainPane.getChildren();
 		Paint newcolors = null;
 		for (Node currentnode : contentnodes) {
-			if (Line.class.isInstance(currentnode)) {
+			if (currentnode instanceof Line) {
 				Line currline = (Line) currentnode;
-				// Color newcolors=ColorsThatApplyToCell(currentnode.getId());
-				Paint lnewcolors = PaintThatApplyToCell(currentnode.getId());
+				Paint lnewcolors = paintThatAppliesToCell(currentnode.getId());
 
 				// note this is relying on using last color to set colors for
 				// division lines that return null because are tagged with both
-				if (!(lnewcolors == null))
-					currline.setStroke(lnewcolors);
-				else if (!(currline == null || currline.getId().equals("time")))
-					currline.setStroke(Color.BLACK);// first for now
-				// else if (!(newcolors==null))
-				// currline.setStroke(newcolors);
-				// hash method
-				// Material getMaterial(TreeSet<Color> colorSet) {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						if (lnewcolors != null)
+							currline.setStroke(lnewcolors);
+						else
+							currline.setStroke(Color.BLACK);
+						
+						if (currline != null && currline.getId() != null) {
+							if (currline.getId().equals("time"))
+								currline.setStroke(Color.BLACK);// first for now
+						}
+					}
+				});
 			}
 		}
 	}
 
 	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
-		// System.out.println("before recursivedraw "+maxX);
-
 		int x = recursiveDraw(mainPane, 400, 10, 10, lineageTreeRoot, 10);
 		// add time indicator
 		int timevalue = time.getValue();
@@ -399,38 +403,37 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	// retrieves material for use as texture on lines
-	private Paint PaintThatApplyToCell(String cellname) {
-		if (!(cellname == null)) {
-			// TreeSet<Color> colors = new TreeSet<Color>();
+	private Paint paintThatAppliesToCell(String cellname) {
+		if (cellname != null) {
 			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 			// iterate over rulesList
 			for (Rule rule : rules) {
-
 				if (rule instanceof MulticellularStructureRule) {
 					// nothing
 				}
 
 				else if (rule instanceof ColorRule) {
-					// iterate over cells and check if cells apply
 					if (((ColorRule) rule).appliesToCell(cellname)) {
+						System.out.println(rule.toString());
 						colors.add(rule.getColor());
 					}
-
 				}
 			}
+
 			// translate color list to material from material cache
-			if (!(colors.isEmpty())) {
+			if (!colors.isEmpty()) {
 				PhongMaterial m = (PhongMaterial) colorHash.getMaterial(colors);
 				Image i = m.getDiffuseMap();
 
-				if (!(i == null)) {
+				if (i != null) {
 					ImagePattern ip = new ImagePattern(i, 0, 0, 21, 21, false);
-
+					System.out.println("returning for - " + cellname + ": " + ip.toString());
 					return ip;
 				}
 			}
 		}
-		return null; // colors;
+
+		return null;
 	}
 
 	private Color ColorsThatApplyToCell(String cellname) {
@@ -477,7 +480,6 @@ public class SulstonTreePane extends ScrollPane {
 	// not sure what rootstart is
 	// note returns the midpoint of the sublineage just drawn
 	private int recursiveDraw(Pane mainPane, int h, int x, int ystart, TreeItem<String> cell, int rootStart) {
-
 		boolean done = false;
 		String cellName = cell.getValue();
 
@@ -494,9 +496,7 @@ public class SulstonTreePane extends ScrollPane {
 		nameYStartUseMap.put(cellName, new Integer(yStartUse));
 
 		// compute color
-		// TreeSet<Color> lcolors=
-		// Color lcolor=ColorsThatApplyToCell(cellName);
-		Paint lcolor = PaintThatApplyToCell(cellName);
+		Paint lcolor = paintThatAppliesToCell(cellName);
 
 		if (cell.isLeaf() || done) {
 			if (x < iXmax)
@@ -504,7 +504,7 @@ public class SulstonTreePane extends ScrollPane {
 			// terminal case line drawn
 			maxX = Math.max(x, maxX);
 			Line lcell = new Line(x, yStartUse, x, yStartUse + length);
-			if (!(lcolor == null))
+			if (lcolor != null)
 				lcell.setStroke(lcolor); // first for now
 			Tooltip t = new Tooltip(cellName);
 			hackTooltipStartTiming(t, ttduration);

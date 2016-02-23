@@ -135,15 +135,13 @@ public abstract class Rule {
 		visibleBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				ruleChanged.set(true);
-
-				if (visible)
-					visibleBtn.setGraphic(eyeInvertIcon);
-				else
-					visibleBtn.setGraphic(eyeIcon);
-
 				visible = !visible;
-
+				if (visible)
+					visibleBtn.setGraphic(eyeIcon);
+				else
+					visibleBtn.setGraphic(eyeInvertIcon);
+				
+				ruleChanged.set(true);
 				ruleChanged.set(false);
 			}
 		});
@@ -180,6 +178,8 @@ public abstract class Rule {
 
 		editController.setHeading(label.getText());
 		editStage.show();
+
+		((Stage) editStage.getScene().getWindow()).toFront();
 	}
 
 	private void initEditStage(Stage stage) {
@@ -318,8 +318,9 @@ public abstract class Rule {
 		return ruleChanged;
 	}
 
+	// TODO
 	public String toString() {
-		return text;
+		return text+" - visible: "+isVisible();
 	}
 
 	public boolean equals(ColorRule other) {
@@ -350,7 +351,6 @@ public abstract class Rule {
 			return false;
 
 		if (cells != null) {
-
 			if (options.contains(SearchOption.CELLBODY) && cells.contains(name))
 				return true;
 
@@ -365,6 +365,7 @@ public abstract class Rule {
 		return false;
 	}
 
+	// @param name : lineage name of cell
 	public boolean appliesToCell(String name) {
 		if (!visible)
 			return false;
@@ -384,7 +385,7 @@ public abstract class Rule {
 
 		return false;
 	}
-
+	
 	public boolean isVisible() {
 		return visible;
 	}
