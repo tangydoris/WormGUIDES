@@ -251,6 +251,7 @@ public class InfoWindow {
 				// link handler
 				DraggableTab tab = new DraggableTab(dom.getName());
 				tab.setContent(webview);
+				tab.setId(dom.getName());
 				// Tab tab = new Tab(dom.getName(), webview);
 				tabPane.getTabs().add(0, tab); // prepend the tab
 				tabPane.getSelectionModel().select(tab); // show the new tab
@@ -259,8 +260,9 @@ public class InfoWindow {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 				tab.setOnClosed(new EventHandler<Event>() {
 					public void handle(Event e) {
+						System.out.println("tab closed");
 						Tab t = (Tab) e.getSource();
-						String cellName = t.getText();
+						String cellName = t.getId();
 						Search.removeCellCase(cellName);
 					}
 				});
