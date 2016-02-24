@@ -260,7 +260,6 @@ public class InfoWindow {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 				tab.setOnClosed(new EventHandler<Event>() {
 					public void handle(Event e) {
-						System.out.println("tab closed");
 						Tab t = (Tab) e.getSource();
 						String cellName = t.getId();
 						Search.removeCellCase(cellName);
