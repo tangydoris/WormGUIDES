@@ -1794,6 +1794,10 @@ public class Window3DController {
 			}
 		}
 	}
+	
+	public void captureMovie() {
+		
+	}
 
 	/*
 	 * When called, a snapshot of the screen is saved
