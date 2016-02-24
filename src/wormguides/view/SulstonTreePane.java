@@ -85,6 +85,8 @@ public class SulstonTreePane extends ScrollPane {
 	private StringProperty selectedNameLabeled;
 
 	private Stage ownStage;
+	
+	private Pane canvas;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 		@Override
@@ -123,6 +125,24 @@ public class SulstonTreePane extends ScrollPane {
 		super();
 
 		this.ownStage = ownStage;
+		
+		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth, Number newStageWidth) {
+				if (canvas != null) {
+					canvas.setPrefWidth(newStageWidth.doubleValue());;
+				}
+			}
+		});
+		
+		ownStage.heightProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageHeight, Number newStageHeight) {
+				if (canvas != null) {
+					canvas.setPrefHeight(newStageHeight.doubleValue());;
+				}
+			}
+		});
 
 		this.time = time;
 		time.addListener(new ChangeListener<Number>() {
@@ -184,7 +204,8 @@ public class SulstonTreePane extends ScrollPane {
 		nameXUseMap = new HashMap<String, Integer>();
 		nameYStartUseMap = new HashMap<String, Integer>();
 
-		Pane canvas = new Pane();
+		canvas = new Pane();
+		canvas.setStyle("-fx-background-color: #e1e1ea;");
 		this.data = data;
 		mainPane = canvas;
 
@@ -195,7 +216,7 @@ public class SulstonTreePane extends ScrollPane {
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
-
+		
 		canvas.setVisible(true);
 
 		this.getChildren().add(contentGroup);
@@ -237,6 +258,7 @@ public class SulstonTreePane extends ScrollPane {
 		});
 
 		Pane yetanotherlevel = new Pane();
+		yetanotherlevel.setStyle("-fx-background-color: #e1e1ea;");
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
@@ -372,14 +394,15 @@ public class SulstonTreePane extends ScrollPane {
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-						if (lnewcolors != null)
+						if (lnewcolors != null){
 							currline.setStroke(lnewcolors);
-						else
-							currline.setStroke(Color.BLACK);
-
-						if (currline != null && currline.getId() != null) {
-							if (currline.getId().equals("time"))
-								currline.setStroke(Color.BLACK);// first for now
+						}
+						else{
+							if (currline != null && currline.getId() != null){
+								if (!currline.getId().equals("time")){
+									currline.setStroke(Color.BLACK);
+								}
+							}
 						}
 					}
 				});

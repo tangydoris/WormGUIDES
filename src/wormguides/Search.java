@@ -163,11 +163,14 @@ public class Search {
 		geneResultsUpdated = new SimpleBooleanProperty(false);
 	}
 
-	public static Rule addGiantConnectomeColorRule(String funcName, Color color, boolean isPresynaptic,
+	/*
+	 * Context menu controller always uses lineageName
+	 */
+	public static Rule addGiantConnectomeColorRule(String cellName, Color color, boolean isPresynaptic,
 			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
 
 		StringBuilder sb = new StringBuilder("'");
-		sb.append(funcName).append("' Connectome");
+		sb.append(cellName).append("' Connectome");
 
 		ArrayList<String> types = new ArrayList<String>();
 		if (isPresynaptic)
@@ -192,7 +195,7 @@ public class Search {
 		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 		options.add(SearchOption.CELL);
 		ColorRule tempRule = new ColorRule(sb.toString(), color);
-		tempRule.setCells(connectome.queryConnectivity(PartsList.getLineageNameByFunctionalName(funcName),
+		tempRule.setCells(connectome.queryConnectivity(cellName,
 				isPresynaptic, isPostsynaptic, isElectrical, isNeuromuscular, true));
 		tempRule.setText(sb.toString());
 

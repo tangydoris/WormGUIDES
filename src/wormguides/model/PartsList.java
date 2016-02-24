@@ -40,6 +40,7 @@ public class PartsList {
 	}
 
 	public static boolean containsLineageName(String name) {
+		//if (name == null) return false;
 		// case insensitive search
 		for (String lineageName : lineageNames) {
 			if (lineageName.toLowerCase().equals(name.toLowerCase())) {

@@ -524,7 +524,12 @@ public class StoriesLayer {
 			loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
 
 			loader.setController(editController);
+
+			//loader.setRoot(editController);
+			
+
 			loader.setRoot(editController);
+
 
 			try {
 				editStage.setScene(new Scene((AnchorPane) loader.load()));
