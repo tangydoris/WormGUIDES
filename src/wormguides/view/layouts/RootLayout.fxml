@@ -14,12 +14,12 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Generate URL" />
-                  <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load URL" />
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveStory" text="Save Active Story" />
                   <MenuItem mnemonicParsing="false" onAction="#menuLoadStory" text="Load Story" />
                   <MenuItem disable="true" mnemonicParsing="false" text="Save Movie" />
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveImageAction" text="Save Image" />
+                  <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Share Scene" />
+                  <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load Shared Scene" />
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>
@@ -35,7 +35,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#productionInfoAction" text="Experimental Data" />
                     </items>
                   </Menu>
-                  <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Info Window" />
+                  <MenuItem mnemonicParsing="false" onAction="#openInfoWindow" text="Cell Info Window" />
                   <MenuItem mnemonicParsing="false" onAction="#openRotationController" text="Rotation Control" />
               </items>
             </Menu>
@@ -295,7 +295,7 @@
                                                                   <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                                   <HBox VBox.vgrow="NEVER">
                                                                      <children>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Add to Display:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Color Applies To:">
                                                                            <font>
                                                                               <Font size="14.0" />
                                                                            </font>

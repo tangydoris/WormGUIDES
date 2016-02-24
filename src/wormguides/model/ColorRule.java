@@ -8,28 +8,24 @@ import wormguides.SearchType;
 import javafx.scene.paint.Color;
 
 public class ColorRule extends Rule {
-	
-	
+
 	private SearchType type;
-	
-	
+
 	public ColorRule(String searched, Color color) {
-		this(searched, color, new SearchOption[] {SearchOption.CELL, SearchOption.DESCENDANT});
+		this(searched, color, new SearchOption[] { SearchOption.CELL, SearchOption.DESCENDANT });
 	}
-	
-	
-	public ColorRule(String searched, Color color, SearchOption...options) {
+
+	public ColorRule(String searched, Color color, SearchOption... options) {
 		this(searched, color, new ArrayList<SearchOption>(Arrays.asList(options)), SearchType.LINEAGE);
 	}
-	
-	
+
 	public ColorRule(String searched, Color color, ArrayList<SearchOption> options, SearchType type) {
-		super (searched, color, options, false);
+		super(searched, color, options, false);
 		this.type = type;
 	}
 
 	public SearchType getSearchType() {
 		return type;
 	}
-	
+
 }

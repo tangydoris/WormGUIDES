@@ -21,8 +21,10 @@ import java.lang.Math;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -50,7 +52,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 
 public class SulstonTreePane extends ScrollPane {
-	
+
 	private LineageData data;
 	private HashMap<String, Integer> nameXUseMap;
 	private HashMap<String, Integer> nameYStartUseMap;
@@ -58,51 +60,54 @@ public class SulstonTreePane extends ScrollPane {
 	private TreeItem<String> lineageTreeRoot;
 
 	private ColorHash colorHash;
-	
-	private int maxX = 0; // global to class to keep track of current x layout position
+
+	private int maxX = 0; // global to class to keep track of current x layout
+							// position
 	private ObservableList<Rule> rules;
 	private Pane mainPane;
 	private Group zoomGroup;
-	
+
 	// Node content;
 	private Scale scaleTransform;
 	private Line timeIndicator;
 	private int ttduration = 0;
 	private IntegerProperty time;
 
-	private int xsc = 5;// =XScale minimal spacing between branches, inter branch gap
-				// seems to be some multiple of this?
+	private int xsc = 5;// =XScale minimal spacing between branches, inter
+						// branch gap
+	// seems to be some multiple of this?
 
 	private int iXmax = 20; // left margin
 	private int iYmin = 20;
-	
+
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
-	
+	private StringProperty selectedNameLabeled;
+
 	private Stage ownStage;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent event) {
 			String sourceName = ((Node) event.getSource()).getId();
-			
+
 			// right click
-			if (event.getButton()==MouseButton.SECONDARY
-					|| (event.getButton()==MouseButton.PRIMARY
-						&& (event.isControlDown() || event.isMetaDown()))) {
-				// TODO
+			if (event.getButton() == MouseButton.SECONDARY
+					|| (event.getButton() == MouseButton.PRIMARY && (event.isControlDown() || event.isMetaDown()))) {
 				showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
 			}
-			
+
 			// left click
-			else if (event.getButton()==MouseButton.PRIMARY) {
+			else if (event.getButton() == MouseButton.PRIMARY) {
 				contextMenuStage.hide();
-				
+
+				resetSelectedNameLabeled(sourceName);
+
 				if (hiddenNodes.contains(sourceName))
 					hiddenNodes.remove(sourceName);
 				else
 					hiddenNodes.add(sourceName);
-				
+
 				updateDrawing();
 			}
 		}
@@ -112,13 +117,13 @@ public class SulstonTreePane extends ScrollPane {
 
 	}
 
-	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot, 
-			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, 
-			ContextMenuController controller) {
+	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot,
+			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, ContextMenuController controller,
+			StringProperty selectedNameLabeled) {
 		super();
-		
+
 		this.ownStage = ownStage;
-		
+
 		this.time = time;
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -126,7 +131,7 @@ public class SulstonTreePane extends ScrollPane {
 				repositionTimeLine();
 			}
 		});
-		
+
 		this.hiddenNodes = new TreeSet<String>();
 		// start with founders visible
 		hiddenNodes.add("ABala");
@@ -157,12 +162,12 @@ public class SulstonTreePane extends ScrollPane {
 				while (change.next()) {
 					if (change.getAddedSize() > 0) {
 						updateColoring();
-						
+
 						for (Rule rule : change.getAddedSubList()) {
 							rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
 								@Override
-								public void changed(ObservableValue<? extends Boolean> observable, 
-										Boolean oldValue, Boolean newValue) {
+								public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+										Boolean newValue) {
 									if (newValue)
 										updateColoring();
 								}
@@ -170,9 +175,8 @@ public class SulstonTreePane extends ScrollPane {
 						}
 					}
 
-					if (!change.getRemoved().isEmpty()) {
+					if (change.wasRemoved())
 						updateColoring();
-					}
 				}
 			}
 		});
@@ -191,7 +195,7 @@ public class SulstonTreePane extends ScrollPane {
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
-		
+
 		canvas.setVisible(true);
 
 		this.getChildren().add(contentGroup);
@@ -215,7 +219,7 @@ public class SulstonTreePane extends ScrollPane {
 
 		contentGroup.getChildren().add(tp);
 		contentGroup.getChildren().add(tm);
-		
+
 		tm.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -223,7 +227,7 @@ public class SulstonTreePane extends ScrollPane {
 				scaleTransform.setY(scaleTransform.getY() * .75);
 			}
 		});
-		
+
 		tp.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -231,30 +235,37 @@ public class SulstonTreePane extends ScrollPane {
 				scaleTransform.setY(scaleTransform.getY() * 1.3333);
 			}
 		});
-		
+
 		Pane yetanotherlevel = new Pane();
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
 		bindLocation(tm, (ScrollPane) this, yetanotherlevel);
 		bindLocation(tp, (ScrollPane) this, yetanotherlevel);
-		
+
 		contextMenuController = controller;
 		contextMenuStage = contextMenuController.getOwnStage();
+
+		this.selectedNameLabeled = selectedNameLabeled;
 	}
-	
+
+	private void resetSelectedNameLabeled(String name) {
+		selectedNameLabeled.set("");
+		selectedNameLabeled.set(name);
+	}
+
 	private void showContextMenu(String name, double sceneX, double sceneY) {
-		if (contextMenuStage!=null) {
+		if (contextMenuStage != null) {
+			contextMenuController.setName(name);
+
 			String funcName = PartsList.getFunctionalNameByLineageName(name);
 
-			if (funcName == null) {
-				contextMenuController.setName(name);
+			if (funcName == null)
+
 				contextMenuController.disableTerminalCaseFunctions(true);
-			} else {
-				contextMenuController.setName(funcName);
+			else
 				contextMenuController.disableTerminalCaseFunctions(false);
-			}
-			
+
 			contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
@@ -274,10 +285,11 @@ public class SulstonTreePane extends ScrollPane {
 					contextMenuStage.hide();
 				}
 			});
-			
+
 			contextMenuStage.setX(sceneX);
 			contextMenuStage.setY(sceneY);
 			contextMenuStage.show();
+
 			((Stage) contextMenuStage.getScene().getWindow()).toFront();
 		}
 	}
@@ -351,34 +363,37 @@ public class SulstonTreePane extends ScrollPane {
 		ObservableList<Node> contentnodes = mainPane.getChildren();
 		Paint newcolors = null;
 		for (Node currentnode : contentnodes) {
-			if (Line.class.isInstance(currentnode)) {
+			if (currentnode instanceof Line) {
 				Line currline = (Line) currentnode;
-				// Color newcolors=ColorsThatApplyToCell(currentnode.getId());
-				Paint lnewcolors = PaintThatApplyToCell(currentnode.getId());
+				Paint lnewcolors = paintThatAppliesToCell(currentnode.getId());
 
 				// note this is relying on using last color to set colors for
 				// division lines that return null because are tagged with both
-				if (!(lnewcolors == null))
-					currline.setStroke(lnewcolors);
-				else
-					currline.setStroke(Color.BLACK);// first for now
-				// else if (!(newcolors==null))
-				// currline.setStroke(newcolors);
-				// hash method
-				// Material getMaterial(TreeSet<Color> colorSet) {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						if (lnewcolors != null)
+							currline.setStroke(lnewcolors);
+						else
+							currline.setStroke(Color.BLACK);
+
+						if (currline != null && currline.getId() != null) {
+							if (currline.getId().equals("time"))
+								currline.setStroke(Color.BLACK);// first for now
+						}
+					}
+				});
 			}
 		}
-
 	}
 
 	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
-		// System.out.println("before recursivedraw "+maxX);
-
 		int x = recursiveDraw(mainPane, 400, 10, 10, lineageTreeRoot, 10);
 		// add time indicator
 		int timevalue = time.getValue();
 		timeIndicator = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
+		timeIndicator.setId("time");
 		// System.out.println("after recursivedraw placing timelineat "+maxX+"
 		// "+timevalue);
 		mainPane.getChildren().add(timeIndicator);
@@ -387,38 +402,37 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	// retrieves material for use as texture on lines
-	private Paint PaintThatApplyToCell(String cellname) {
-		if (!(cellname == null)) {
-			// TreeSet<Color> colors = new TreeSet<Color>();
+	private Paint paintThatAppliesToCell(String cellname) {
+		if (cellname != null) {
 			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
 			// iterate over rulesList
 			for (Rule rule : rules) {
-
 				if (rule instanceof MulticellularStructureRule) {
 					// nothing
 				}
 
 				else if (rule instanceof ColorRule) {
-					// iterate over cells and check if cells apply
 					if (((ColorRule) rule).appliesToCell(cellname)) {
+						System.out.println(rule.toString());
 						colors.add(rule.getColor());
 					}
-
 				}
 			}
+
 			// translate color list to material from material cache
-			if (!(colors.isEmpty())) {
+			if (!colors.isEmpty()) {
 				PhongMaterial m = (PhongMaterial) colorHash.getMaterial(colors);
 				Image i = m.getDiffuseMap();
 
-				if (!(i == null)) {
+				if (i != null) {
 					ImagePattern ip = new ImagePattern(i, 0, 0, 21, 21, false);
-
+					System.out.println("returning for - " + cellname + ": " + ip.toString());
 					return ip;
 				}
 			}
 		}
-		return null; // colors;
+
+		return null;
 	}
 
 	private Color ColorsThatApplyToCell(String cellname) {
@@ -465,7 +479,6 @@ public class SulstonTreePane extends ScrollPane {
 	// not sure what rootstart is
 	// note returns the midpoint of the sublineage just drawn
 	private int recursiveDraw(Pane mainPane, int h, int x, int ystart, TreeItem<String> cell, int rootStart) {
-
 		boolean done = false;
 		String cellName = cell.getValue();
 
@@ -482,9 +495,7 @@ public class SulstonTreePane extends ScrollPane {
 		nameYStartUseMap.put(cellName, new Integer(yStartUse));
 
 		// compute color
-		// TreeSet<Color> lcolors=
-		// Color lcolor=ColorsThatApplyToCell(cellName);
-		Paint lcolor = PaintThatApplyToCell(cellName);
+		Paint lcolor = paintThatAppliesToCell(cellName);
 
 		if (cell.isLeaf() || done) {
 			if (x < iXmax)
@@ -492,7 +503,7 @@ public class SulstonTreePane extends ScrollPane {
 			// terminal case line drawn
 			maxX = Math.max(x, maxX);
 			Line lcell = new Line(x, yStartUse, x, yStartUse + length);
-			if (!(lcolor == null))
+			if (lcolor != null)
 				lcell.setStroke(lcolor); // first for now
 			Tooltip t = new Tooltip(cellName);
 			hackTooltipStartTiming(t, ttduration);
@@ -513,7 +524,11 @@ public class SulstonTreePane extends ScrollPane {
 			mainPane.getChildren().add(lcell);
 			int offsetx = 2;
 			int offsety = 3;
-			Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellName);
+			String cellnametextstring = cellName;
+			String terminalname = PartsList.getFunctionalNameByLineageName(cellName);
+			if (!(terminalname == null))
+				cellnametextstring = cellnametextstring + " ; " + terminalname;
+			Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellnametextstring);
 			cellnametext.getTransforms().add(new Rotate(90, x - offsetx, yStartUse + length + offsety));
 			cellnametext.setFont(new Font(5));
 

@@ -19,15 +19,15 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
 public class DisplayLayer {
-	
+
 	private ArrayList<Rule> internalRulesList;
 	private ObservableList<Rule> currentRulesList;
 	private HashMap<Rule, Button> buttonMap;
-	
+
 	public DisplayLayer(BooleanProperty useInternalRules) {
 		internalRulesList = new ArrayList<Rule>();
 		buttonMap = new HashMap<Rule, Button>();
-		
+
 		currentRulesList = FXCollections.observableArrayList();
 		currentRulesList.addListener(new ListChangeListener<Rule>() {
 			@Override
@@ -37,26 +37,27 @@ public class DisplayLayer {
 						// added to current list
 						for (Rule rule : change.getAddedSubList()) {
 							buttonMap.put(rule, rule.getDeleteButton());
-							
+
 							rule.getDeleteButton().setOnAction(new EventHandler<ActionEvent>() {
 								@Override
 								public void handle(ActionEvent event) {
 									currentRulesList.remove(rule);
-									
+
 									Rule temp;
 									if (useInternalRules.get()) {
 										Iterator<Rule> iter = internalRulesList.iterator();
 										while (iter.hasNext()) {
 											temp = iter.next();
-											if (temp==rule)
+											if (temp == rule)
 												iter.remove();
 										}
 									}
 									buttonMap.remove(rule);
 								}
 							});
-							
-							// if using default rules, copy changes to internal rules list
+
+							// if using default rules, copy changes to internal
+							// rules list
 							if (useInternalRules.get())
 								internalRulesList.add(rule);
 						}
@@ -64,11 +65,10 @@ public class DisplayLayer {
 				}
 			}
 		});
-		
+
 		useInternalRules.addListener(new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, 
-					Boolean oldValue, Boolean newValue) {
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				// TODO
 				// using internal rules now
 				// copy all internal rules to current list
@@ -79,17 +79,16 @@ public class DisplayLayer {
 				// not using internal rules anymore
 				// copy all current rule changes back to internal list
 				else {
-					
+
 				}
 			}
 		});
 	}
-	
+
 	public ObservableList<Rule> getRulesList() {
 		return currentRulesList;
 	}
-	
-	
+
 	/*
 	 * Renderer for rules in ListView's in Layers tab
 	 */
@@ -97,21 +96,20 @@ public class DisplayLayer {
 		return new Callback<ListView<Rule>, ListCell<Rule>>() {
 			@Override
 			public ListCell<Rule> call(ListView<Rule> param) {
-				ListCell<Rule> cell = new ListCell<Rule>(){
-	                @Override
-	                protected void updateItem(Rule item, boolean empty) {
-	                    super.updateItem(item, empty);
-	                    if (item != null) 
-	                    	setGraphic(item.getGraphic());
-	                	else
-	                		setGraphic(null);
-	                    setPickOnBounds(false);
-	            	}
-	        	};
-	        	return cell;
+				ListCell<Rule> cell = new ListCell<Rule>() {
+					@Override
+					protected void updateItem(Rule item, boolean empty) {
+						super.updateItem(item, empty);
+						if (item != null)
+							setGraphic(item.getGraphic());
+						else
+							setGraphic(null);
+						setPickOnBounds(false);
+					}
+				};
+				return cell;
 			}
 		};
 	}
 
-	
 }

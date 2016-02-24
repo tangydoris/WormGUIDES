@@ -10,27 +10,25 @@ import java.util.ArrayList;
 import wormguides.PartsListToHTML;
 
 public class PartsList {
-	
+
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> lineageNames;
 	private static ArrayList<String> descriptions;
-	
-	
+
 	static {
 		functionalNames = new ArrayList<String>();
 		lineageNames = new ArrayList<String>();
 		descriptions = new ArrayList<String>();
-		
+
 		try {
-			
 			URL url = PartsList.class.getResource("/wormguides/model/partslist.txt");
 			InputStream input = url.openStream();
 			InputStreamReader isr = new InputStreamReader(input);
 			BufferedReader br = new BufferedReader(isr);
-					
+
 			String line;
 			while ((line = br.readLine()) != null) {
-						
+
 				String[] lineArray = line.split("\t");
 				functionalNames.add(lineArray[0]);
 				lineageNames.add(lineArray[1]);
@@ -40,10 +38,9 @@ public class PartsList {
 			ioe.printStackTrace();
 		}
 	}
-	
-	
+
 	public static boolean containsLineageName(String name) {
-		//case insensitive search
+		// case insensitive search
 		for (String lineageName : lineageNames) {
 			if (lineageName.toLowerCase().equals(name.toLowerCase())) {
 				return true;
@@ -51,13 +48,16 @@ public class PartsList {
 		}
 		return false;
 	}
-	
-	
+
 	public static boolean containsFunctionalName(String name) {
-		return functionalNames.contains(name);
+		for (String funcName : functionalNames) {
+			if (funcName.equalsIgnoreCase(name))
+				return true;
+		}
+
+		return false;
 	}
-	
-	
+
 	public static String getFunctionalNameByIndex(int i) {
 		try {
 			return functionalNames.get(i);
@@ -65,10 +65,9 @@ public class PartsList {
 			return null;
 		}
 	}
-	
-	
+
 	public static String getFunctionalNameByLineageName(String name) {
-		//account for case insensitivity and translate lineage name
+		// account for case insensitivity and translate lineage name
 		for (String lineageName : lineageNames) {
 			if (lineageName.equalsIgnoreCase(name)) {
 				name = lineageName;
@@ -77,8 +76,7 @@ public class PartsList {
 		}
 		return getFunctionalNameByIndex(lineageNames.indexOf(name));
 	}
-	
-	
+
 	public static String getLineageNameByIndex(int i) {
 		try {
 			return lineageNames.get(i);
@@ -86,13 +84,17 @@ public class PartsList {
 			return null;
 		}
 	}
-	
-	
-	public static String getLineageNameByFunctionalName(String functionalName) {
-		return getLineageNameByIndex(functionalNames.indexOf(functionalName));
+
+	public static String getLineageNameByFunctionalName(String name) {
+		for (String funcName : functionalNames) {
+			if (funcName.equalsIgnoreCase(name)) {
+				name = funcName;
+				break;
+			}
+		}
+		return getLineageNameByIndex(functionalNames.indexOf(name));
 	}
-	
-	
+
 	public static String getDescriptionByIndex(int i) {
 		try {
 			return descriptions.get(i);
@@ -100,32 +102,27 @@ public class PartsList {
 			return null;
 		}
 	}
-	
-	
+
 	public static String getDescriptionByLineageName(String lineageName) {
 		return getDescriptionByIndex(lineageNames.indexOf(lineageName));
 	}
-	
-	
+
 	public static String getDescriptionByFunctionalName(String functionalName) {
 		return getDescriptionByIndex(functionalNames.indexOf(functionalName));
 	}
-	
-	
+
 	public static ArrayList<String> getLineageNames() {
 		return lineageNames;
 	}
-	
-	
+
 	public static ArrayList<String> getFunctionalNames() {
 		return functionalNames;
 	}
-	
-	
+
 	public static ArrayList<String> getDescriptions() {
 		return descriptions;
 	}
-	
+
 	public static String getPartsListAsHTMLTable() {
 		PartsListToHTML plToHTML = new PartsListToHTML();
 		return plToHTML.buildPartsListAsHTML();

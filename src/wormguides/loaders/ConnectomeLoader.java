@@ -26,25 +26,28 @@ public class ConnectomeLoader {
 
 				String line;
 
-				while((line = reader.readLine()) != null) {
-					//check if header line
+				while ((line = reader.readLine()) != null) {
+					// check if header line
 					if (line.equals(headerLine)) {
 						line = reader.readLine();
-						if (line == null) break;
+						if (line == null)
+							break;
 					}
-					//make sure valid line
-					if (line.length() <= 1) break;
+					// make sure valid line
+					if (line.length() <= 1)
+						break;
 
 					StringTokenizer tokenizer = new StringTokenizer(line, ",");
-					//check if valid line i.e. 4 tokenss
-					if (tokenizer.countTokens() == 4) {							
-						//gather data for a neuronal synapse: cell_1, cell_2, SynapseType, number of synapses
+					// check if valid line i.e. 4 tokenss
+					if (tokenizer.countTokens() == 4) {
+						// gather data for a neuronal synapse: cell_1, cell_2,
+						// SynapseType, number of synapses
 						String cell_1 = tokenizer.nextToken();
 						String cell_2 = tokenizer.nextToken();
 						String synapseTypeStr = tokenizer.nextToken();
 						String numberOfSynapsesStr = tokenizer.nextToken();
 
-						//remove padding 0s from cell names
+						// remove padding 0s from cell names
 						if (cell_1.contains("0")) {
 							cell_1 = removeZeroPad(cell_1);
 						}
@@ -53,7 +56,7 @@ public class ConnectomeLoader {
 							cell_2 = removeZeroPad(cell_2);
 						}
 
-						//unchecked --> number format exception unhandled
+						// unchecked --> number format exception unhandled
 						Integer numberOfSynapses = Integer.parseInt(numberOfSynapsesStr);
 
 						SynapseType synapseType;
@@ -66,7 +69,7 @@ public class ConnectomeLoader {
 						} else if (synapseTypeStr.equals(r_postsynapticV1)) {
 							synapseType = SynapseType.R_POSTSYNAPTIC;
 							synapseType.setMonadic();
-						} else if (synapseTypeStr.equals(r_postsynapticV2)) { 
+						} else if (synapseTypeStr.equals(r_postsynapticV2)) {
 							synapseType = SynapseType.R_POSTSYNAPTIC;
 							synapseType.setPoyadic();
 						} else if (synapseTypeStr.equals(ej_electrical)) {
@@ -74,20 +77,21 @@ public class ConnectomeLoader {
 						} else if (synapseTypeStr.equals(nmj_neuromuscular)) {
 							synapseType = SynapseType.NMJ_NEUROMUSCULAR;
 						} else {
-							//System.out.println("Unknown synapse type: " + synapseType);
+							// System.out.println("Unknown synapse type: " +
+							// synapseType);
 							synapseType = null;
 						}
 
-						if (cell_1.length() != 0 && cell_2.length() != 0
-								&& synapseType != null && numberOfSynapsesStr.length() >= 0) {
-							NeuronalSynapse neuronalSynapse = 
-									new NeuronalSynapse(cell_1, cell_2, synapseType, numberOfSynapses);
+						if (cell_1.length() != 0 && cell_2.length() != 0 && synapseType != null
+								&& numberOfSynapsesStr.length() >= 0) {
+							NeuronalSynapse neuronalSynapse = new NeuronalSynapse(cell_1, cell_2, synapseType,
+									numberOfSynapses);
 							connectome.add(neuronalSynapse);
 						}
 					}
 				}
 			}
-			
+
 			return connectome;
 
 		} catch (IOException e) {
@@ -100,7 +104,7 @@ public class ConnectomeLoader {
 	private String removeZeroPad(String cell) {
 		if (cell.contains("0")) {
 			int zeroIDX = cell.indexOf("0");
-			cell = cell.substring(0, zeroIDX) + cell.substring(zeroIDX+1);
+			cell = cell.substring(0, zeroIDX) + cell.substring(zeroIDX + 1);
 		}
 
 		return cell;

@@ -10,7 +10,6 @@ import java.util.StringTokenizer;
 
 public class ProductionInfoLoader {
 
-
 	public static ArrayList<ArrayList<String>> buildProductionInfo() {
 
 		URL url = ProductionInfoLoader.class.getResource("/wormguides/model/production_info_file/Production_Info.csv");
@@ -25,30 +24,32 @@ public class ProductionInfoLoader {
 		ArrayList<String> cytoshowLinks = new ArrayList<String>();
 		ArrayList<String> movieStartTime = new ArrayList<String>();
 
-		try {	
+		try {
 			InputStream stream = url.openStream();
 			InputStreamReader streamReader = new InputStreamReader(stream);
 			BufferedReader reader = new BufferedReader(streamReader);
-					
+
 			String line;
-					
-			while((line = reader.readLine()) != null) {
-				//skip product info line and header line
+
+			while ((line = reader.readLine()) != null) {
+				// skip product info line and header line
 				if (line.equals(productInfoLine)) {
 					line = reader.readLine();
-							
+
 					if (line.equals(headerLine)) {
 						line = reader.readLine();
 					}
-							
-					if (line == null) break;
+
+					if (line == null)
+						break;
 				}
-						
-				//make sure valid line
-				if (line.length() <= 1) break;
+
+				// make sure valid line
+				if (line.length() <= 1)
+					break;
 
 				StringTokenizer tokenizer = new StringTokenizer(line, ",");
-				//check if valid line
+				// check if valid line
 				if (tokenizer.countTokens() == NUMBER_OF_FIELDS) {
 					cells.add(tokenizer.nextToken());
 					imageSeries.add(tokenizer.nextToken());
@@ -61,8 +62,8 @@ public class ProductionInfoLoader {
 					movieStartTime.add(tokenizer.nextToken());
 				}
 			}
-			
-			//add array lists
+
+			// add array lists
 			productionInfo.add(cells);
 			productionInfo.add(imageSeries);
 			productionInfo.add(markers);
@@ -72,22 +73,22 @@ public class ProductionInfoLoader {
 			productionInfo.add(segmentations);
 			productionInfo.add(cytoshowLinks);
 			productionInfo.add(movieStartTime);
-			
+
 			return productionInfo;
-			
+
 		} catch (IOException e) {
 			System.out.println("The production info file " + productionInfoFilePath + " wasn't found on the system.");
 		}
-		
+
 		return productionInfo;
 	}
-	
-	//production info file location
+
+	// production info file location
 	private final static int NUMBER_OF_FIELDS = 9;
 	private final static String productionInfoFilePath = "wormguides/model/production_info_file/"
 			+ "Production_Info.csv";
 	private static final String productInfoLine = "Production Information,,,,,,,,,,,,,";
 	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,"
 			+ "Segmentation,cytoshow link,Movie start time (min),,,,,";
-	
+
 }
