@@ -579,6 +579,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Toggles the BooleanProperty bringUpInfoProperty so that the cell info
 	 * window is displayed. ContextMenuController listens for changes in this
 	 * toggle.
+	 * @return void
 	 */
 	@FXML
 	public void showInfoAction() {
