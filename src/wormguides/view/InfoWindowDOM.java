@@ -537,6 +537,25 @@ public class InfoWindowDOM {
 		String partsListDescription = "Embryonic progenitor cell that generates " + terminalnum + " cells at hatching.";
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
+		
+		// expresses
+		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
+		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse",
+				"geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+		HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle",
+				"width: 95%; margin-top: 2%; float: left;", "<strong> Gene Expression: </strong>");
+		geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
+		geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
+		HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
+		ArrayList<String> expresses = nonTerminalCase.getExpressesWORMBASE();
+		Collections.sort(expresses);
+		String geneExpressionStr = expresses.toString();
+		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
+																									// surrounding
+																									// brackets
+		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
+		geneExpressionDiv.addChild(geneExpression);
+
 
 		// links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
@@ -581,6 +600,22 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
+				
+		// references
+		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
+		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
+						"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
+						"<strong> References: </strong>");
+		referencesTopContainerDiv.addChild(collapseReferencesButton);
+		referencesTopContainerDiv.addChild(referencesTitle);
+		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "references", "height: 0px; visibility: hidden;");
+		HTMLNode referencesUL = new HTMLNode("ul");
+		for (String reference : nonTerminalCase.getReferences()) {
+			HTMLNode li = new HTMLNode("li", "", "", reference);
+			referencesUL.addChild(li);
+		}
+		referencesTEXTPRESSODiv.addChild(referencesUL);
 
 		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -625,18 +660,24 @@ public class InfoWindowDOM {
 		body.addChild(partsListDescrDiv); // added non terminal description -AS
 		body.addChild(homologuesTopContainerDiv);
 		body.addChild(homologuesDiv);
+		body.addChild(geneExpressionTopContainerDiv);
+		body.addChild(geneExpressionDiv);
 		// body.addChild(embryonicHomologyDiv);
 		body.addChild(terminalDescendantsTopContainerDiv);
 		body.addChild(terminalDescendantsDiv);
 		body.addChild(linksTopContainerDiv);
 		body.addChild(linksDiv);
+		body.addChild(referencesTopContainerDiv);
+		body.addChild(referencesTEXTPRESSODiv);
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 
 		// add collapse scripts to body
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
+		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
+		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 
 		// add link controller

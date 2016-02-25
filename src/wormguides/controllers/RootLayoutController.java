@@ -29,6 +29,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
@@ -240,6 +241,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	// rotation controller
 	private Stage rotationControllerStage;
 	RotationController rotationController;
+	
+	//movie capture
+	@FXML
+	private MenuItem captureVideoMenuItem;
+	@FXML
+	private MenuItem stopCaptureVideoMenuItem;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -534,8 +541,22 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			}
 		}
 
-		rotationControllerStage.show(); // null ptr e
+		rotationControllerStage.show();
 		rotationControllerStage.toFront();
+	}
+	
+	@FXML
+	public void captureVideo() {
+		System.out.println("capturing video");
+		captureVideoMenuItem.setDisable(true);
+		stopCaptureVideoMenuItem.setDisable(false);
+	}
+	
+	@FXML
+	public void stopCaptureAndSave() {
+		System.out.println("stopping capture...saving...");
+		captureVideoMenuItem.setDisable(false);
+		stopCaptureVideoMenuItem.setDisable(true);
 	}
 
 	public void init3DWindow(LineageData data) {
