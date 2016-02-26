@@ -36,6 +36,12 @@ import wormguides.model.ProductionInfo;
 import wormguides.model.Rule;
 import wormguides.model.TerminalCellCase;
 
+/**
+ * ContextMenuController is the controller class for the context menu that shows
+ * up on right click on a 3D entity. The menu can be accessed via the 3D
+ * subscene or the sulston tree.
+ */
+
 public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private Stage ownStage;
@@ -82,8 +88,25 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private BooleanProperty bringUpInfoProperty;
 
-	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCasesLists cases, ProductionInfo info,
-			Connectome connectome) {
+	/**
+	 * Constructur for ContextMenuController
+	 * 
+	 * @param stage
+	 *            the parent stage (or popup window) that the context menu lives
+	 *            in, used for rule editing window popups
+	 * @param bringUpInfoProperty
+	 *            when set to true, RootLayoutController brings up the cell info
+	 *            window
+	 * @param cases
+	 *            list of cell cases (terminal and non-terminal) that are
+	 *            currently in the program
+	 * @param info
+	 *            production information about WormGUIDES
+	 * @param connectome
+	 *            connectome object that has information about cell connectome
+	 */
+	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCasesLists cases,
+			ProductionInfo info, Connectome connectome) {
 		super();
 
 		this.bringUpInfoProperty = bringUpInfoProperty;
@@ -213,42 +236,120 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		};
 	}
 
+	/**
+	 * Sets the stage to which this popup menu belongs.
+	 * 
+	 * @param stage
+	 *            the stage to which this popup menu belongs. This is different
+	 *            from the parent's stage that owns this stage
+	 * @return void
+	 */
 	public void setOwnStage(Stage stage) {
 		ownStage = stage;
 	}
 
+	/**
+	 * Returns the stage that the popup context menu lives in
+	 * 
+	 * @return Stage the stage that the menu lives in (its own stage)
+	 */
 	public Stage getOwnStage() {
 		return ownStage;
 	}
 
+	/**
+	 * Sets the listener for the 'more info' button click in the menu. Called by
+	 * Window3DController
+	 * 
+	 * @param handler
+	 *            the handler (provided by Window3DController) that handles the
+	 *            'more info' button click action
+	 */
 	public void setInfoButtonListener(EventHandler<MouseEvent> handler) {
 		info.setOnMouseClicked(handler);
 	}
 
+	/**
+	 * Sets te listener for the 'color this cell' button click in the menu.
+	 * Called by Window3DController and SulstonTreePane since they handle the
+	 * click differently. A different mouse click listener is set depending on
+	 * where the menu pops up (whether in the 3D subscene or the sulston tree)
+	 * 
+	 * @param handler
+	 *            the handler (provided by Window3DController or
+	 *            SulstonTreePane) that handles the 'color this cell' button
+	 *            click action
+	 */
 	public void setColorButtonListener(EventHandler<MouseEvent> handler) {
 		color.setOnMouseClicked(handler);
 	}
 
+	/**
+	 * Sets te listener for the 'color neighbors' button click in the menu.
+	 * Called by Window3DController and SulstonTreePane since they handle the
+	 * click differently. A different mouse click listener is set depending on
+	 * where the menu pops up (whether in the 3D subscene or the sulston tree)
+	 * 
+	 * @param handler
+	 *            the handler (provided by Window3DController or
+	 *            SulstonTreePane) that handles the 'color neighbors' button
+	 *            click action
+	 */
 	public void setColorNeighborsButtonListener(EventHandler<MouseEvent> handler) {
 		colorNeighbors.setOnMouseClicked(handler);
 	}
 
+	/**
+	 * Sets the listener for the 'wired to' button click in the menu. Called by
+	 * Window3DController
+	 * 
+	 * @param handler
+	 *            the handler (provided by Window3DController) that handles the
+	 *            'wired to' button click action
+	 */
 	public void setWiredToButtonListener(EventHandler<MouseEvent> handler) {
 		wiredTo.setOnMouseClicked(handler);
 	}
 
+	/**
+	 * Sets the listener for the 'gene expressions' button click in the menu.
+	 * Called by Window3DController
+	 * 
+	 * @param handler
+	 *            the handler (provided by Window3DController) that handles the
+	 *            'gene expressions' button click action
+	 */
 	public void setExpressesButtonListener(EventHandler<MouseEvent> handler) {
 		expresses.setOnMouseClicked(handler);
 	}
 
+	/**
+	 * Returns the cell name of the context menu (also its title). This name is
+	 * either the lineage name or the functional name (if the cell is a terminal
+	 * cell)
+	 * 
+	 * @return cell name (title of the context menu)
+	 */
 	public String getName() {
 		return cellName;
 	}
 
+	/**
+	 * Disables/enables the 'wired to' button depending on whether the cell is
+	 * terminal or non-terminal.
+	 * 
+	 * @param disable
+	 *            if true, 'wired to' button is disabled, otherwise, the button
+	 *            is enabled
+	 */
 	public void disableTerminalCaseFunctions(boolean disable) {
 		wiredTo.setDisable(disable);
 	}
 
+	/**
+	 * Initializer for the loading of ContextMenuLayout.fxml. Sets 'wired to'
+	 * and 'gene expression' button actions.
+	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		loadingMenuItem = new MenuItem("Loading");
@@ -398,6 +499,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		});
 	}
 
+	/**
+	 * Removes the MenuItem that shows that gene expression web querying is in
+	 * progress.
+	 */
 	private void resetLoadingMenuItem() {
 		if (loadingMenuItem != null) {
 			Platform.runLater(new Runnable() {
@@ -415,6 +520,25 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		}
 	}
 
+	/**
+	 * Populates the input menu with MenuItems for each of the wired-to results.
+	 * 
+	 * @param results
+	 *            Results from either a pre-synaptic, post-synaptic, electrical,
+	 *            or neuromuscular query to the connectome
+	 * @param menu
+	 *            The pre-synaptic, post-synaptic, eletrical, or neuromuscular
+	 *            menu that should be populated with these results
+	 * @param isPresynaptic
+	 *            if true, a pre-synaptic query to the connectome was issued
+	 * @param isPostsynaptic
+	 *            if true, a pose-synaptic query to the connectome was issued
+	 * @param isElectrical
+	 *            if true, an electrical query to the connectome was issued
+	 * @param isNeuromuscular
+	 *            if true, a neuromuscular query to the connectome was issued
+	 * @return void
+	 */
 	private void populateWiredToMenu(ArrayList<String> results, Menu menu, boolean isPresynaptic,
 			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
 		menu.getItems().clear();
@@ -451,6 +575,12 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		}
 	}
 
+	/**
+	 * Toggles the BooleanProperty bringUpInfoProperty so that the cell info
+	 * window is displayed. ContextMenuController listens for changes in this
+	 * toggle.
+	 * @return void
+	 */
 	@FXML
 	public void showInfoAction() {
 		if (bringUpInfoProperty != null) {
@@ -459,8 +589,11 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		}
 	}
 
-	/*
-	 * Input name should be a lineage name
+	/**
+	 * Sets the linage name (cell/cellbody scope) of the context menu
+	 * 
+	 * @param name
+	 *            lineage name of cell/cell body that the context menu is for
 	 */
 	public void setName(String name) {
 		name = name.trim();
@@ -477,8 +610,10 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		nameText.setText(name);
 	}
 
+	/**Wait time in miliseconds between showing a different number of periods after 'loading'*/
 	private final long WAIT_TIME_MILLI = 750;
 	private final double MAX_MENU_HEIGHT = 200;
 	private final int PRE_SYN_INDEX = 0, POST_SYN_INDEX = 1, ELECTR_INDEX = 2, NEURO_INDEX = 3;
+	/**Default color of the rules that are created by the context menu*/
 	private final Color DEFAULT_COLOR = Color.WHITE;
 }
