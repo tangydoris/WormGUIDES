@@ -1,18 +1,28 @@
 package wormguides.controllers;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
 import com.sun.javafx.scene.CameraHelper;
+
+//import sim.util.media.MovieEncoder;
+
+import javax.media.*;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -76,12 +86,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import wormguides.ColorComparator;
+import wormguides.JavaPicture;
+import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
+import wormguides.loaders.ConnectomeLoader;
 import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
@@ -221,8 +234,15 @@ public class Window3DController {
 
 	private SubsceneSizeListener subsceneSizeListener;
 
-	// still screen capture counter and label
+	// still screen capture counter and label and movie capture
 	private final static String imgName = "WormGUIDES_time_";
+	private BooleanProperty captureVideo;
+	private Vector<File> movieFiles;
+	Vector<JavaPicture> javaPictures;
+	private int count;
+	private String movieName;
+	private String moviePath;
+	private File frameDir; 
 
 	private BooleanProperty update3D;
 
@@ -445,6 +465,11 @@ public class Window3DController {
 		};
 
 		cellCases = cases;
+		
+		
+		movieFiles = new Vector<File>();
+		javaPictures = new Vector<JavaPicture>();
+		count = -1;
 
 		// set up the orientation indicator in bottom right corner
 		double radius = 5.0;
@@ -1795,7 +1820,106 @@ public class Window3DController {
 		}
 	}
 	
-	public void captureMovie() {
+	public void captureImagesForMovie() {
+		
+		movieFiles.clear();
+		count = -1;
+		
+		Stage fileChooserStage = new Stage();
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+		
+		File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
+		
+		if (fakeFile == null) {
+			System.out.println("null file");
+			return;
+		}
+		
+		//save the name from the file chooser for later MOV file
+		movieName = fakeFile.getName();
+		moviePath = fakeFile.getAbsolutePath();
+		
+		//make a temp directory for the frames at the given save location
+		String path = fakeFile.getAbsolutePath();
+		if (path.lastIndexOf("/") < 0) {
+			path = path.substring(0, path.lastIndexOf("\\")+1) + "tempFrameDir";
+		} else {
+			path = path.substring(0, path.lastIndexOf("/")+1) + "tempFrameDir";
+		}
+		
+		frameDir = new File(path);
+		
+		try {
+			frameDir.mkdir();
+		} catch (SecurityException se) {}
+		
+		String frameDirPath = frameDir.getAbsolutePath() + "/";
+	
+		time.addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				if (captureVideo != null) {
+					if (captureVideo.get()) {
+						
+						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+
+						try {
+							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
+
+							if (file != null) {
+								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+								ImageIO.write(renderedImage, "JPEG", file);
+								movieFiles.addElement(file);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		});
+	}
+	
+	public void convertImagesToMovie() {
+		
+		//make our files into JavaPicture
+		javaPictures.clear();
+		
+		for (File movieFile : movieFiles) {
+			JavaPicture jp = new JavaPicture();
+			
+			jp.loadImage(movieFile);
+			
+			javaPictures.addElement(jp);
+		}
+		
+		if (javaPictures.size() > 0) {
+			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int)subscene.getWidth(),
+					(int) subscene.getHeight(), 5, movieName, javaPictures);
+			
+			//move the movie to the originally specified location
+			File movJustMade = new File(movieName);
+			movJustMade.renameTo(new File(moviePath));
+			
+			//remove the .movtemp.jpg file
+			File movtempjpg = new File(".movtemp.jpg");
+			if (movtempjpg != null) {
+				movtempjpg.delete();
+			}
+		}
+		
+		//remove all of the images in the frame directory
+		if (frameDir != null && frameDir.isDirectory()) {
+			File[] frames = frameDir.listFiles();
+			for (File frame : frames) {
+				frame.delete();
+			}
+			
+			frameDir.delete();
+		}
 		
 	}
 
@@ -1935,6 +2059,10 @@ public class Window3DController {
 		rotateX.setAngle(rx);
 		rotateY.setAngle(ry);
 		rotateZ.setAngle(rz);
+	}
+	
+	public void setCaptureVideo(BooleanProperty captureVideo) {
+		this.captureVideo = captureVideo;
 	}
 
 	public double getRotationX() {

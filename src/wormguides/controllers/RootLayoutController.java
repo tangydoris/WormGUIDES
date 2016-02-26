@@ -247,6 +247,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private MenuItem captureVideoMenuItem;
 	@FXML
 	private MenuItem stopCaptureVideoMenuItem;
+	private BooleanProperty captureVideo;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -547,16 +548,27 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	
 	@FXML
 	public void captureVideo() {
-		System.out.println("capturing video");
 		captureVideoMenuItem.setDisable(true);
 		stopCaptureVideoMenuItem.setDisable(false);
+		captureVideo.set(true);
+		
+		//start the image capture
+		if (window3DController != null) {
+			window3DController.captureImagesForMovie();
+		}
 	}
 	
 	@FXML
 	public void stopCaptureAndSave() {
-		System.out.println("stopping capture...saving...");
 		captureVideoMenuItem.setDisable(false);
 		stopCaptureVideoMenuItem.setDisable(true);
+		captureVideo.set(false);
+		
+		//convert captured images to movie
+		if (window3DController != null) {
+			window3DController.convertImagesToMovie();
+		}
+		
 	}
 
 	public void init3DWindow(LineageData data) {
@@ -1137,5 +1149,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setTime(window3DController.getEndTime());
 
 		viewTreeAction();
+		
+		captureVideo = new SimpleBooleanProperty(false);
+		if (window3DController != null) {
+			window3DController.setCaptureVideo(captureVideo);
+		}
 	}
 }
