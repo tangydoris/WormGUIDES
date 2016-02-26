@@ -66,17 +66,10 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		MediaLocator oml;
 
 		if ((oml = createMediaLocator(outputURL)) == null) {
-			System.err.println("Cannot build media locator from: " + outputURL);
-			System.exit(0);
+			System.out.println("Cannot build media locator from: " + outputURL);
+		} else {
+			doIt(width, height, frameRate, inputFiles, oml);
 		}
-
-		//JpegImagesToMovie imageToMovie = new JpegImagesToMovie();
-		//imageToMovie.
-
-
-		doIt(width, height, frameRate, inputFiles, oml);
-
-		//	System.exit(0);
 	}
 
 	public boolean doItPath(int width, int height, int frameRate, Vector inFiles, String outputURL) {
@@ -90,8 +83,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		MediaLocator oml;
 
 		if ((oml = createMediaLocator("file:" + outputURL)) == null) {
-			//System.err.println("Cannot build media locator from: " + outputURL);
-			System.exit(0);
+			System.out.println("Cannot build media locator from: " + outputURL);
+			return false;
 		}
 
 		boolean success = doIt(width, height, frameRate, inFiles, oml);

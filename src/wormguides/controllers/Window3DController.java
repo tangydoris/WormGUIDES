@@ -4,6 +4,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -90,6 +94,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
+import wormguides.loaders.ConnectomeLoader;
 import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;
@@ -235,6 +240,9 @@ public class Window3DController {
 	private Vector<File> movieFiles;
 	Vector<JavaPicture> javaPictures;
 	private int count;
+	private String movieName;
+	private String moviePath;
+	private File frameDir; 
 
 	private BooleanProperty update3D;
 
@@ -1816,6 +1824,39 @@ public class Window3DController {
 		
 		movieFiles.clear();
 		count = -1;
+		
+		Stage fileChooserStage = new Stage();
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+		
+		File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
+		
+		if (fakeFile == null) {
+			System.out.println("null file");
+			return;
+		}
+		
+		//save the name from the file chooser for later MOV file
+		movieName = fakeFile.getName();
+		moviePath = fakeFile.getAbsolutePath();
+		
+		//make a temp directory for the frames at the given save location
+		String path = fakeFile.getAbsolutePath();
+		if (path.lastIndexOf("/") < 0) {
+			path = path.substring(0, path.lastIndexOf("\\")+1) + "tempFrameDir";
+		} else {
+			path = path.substring(0, path.lastIndexOf("/")+1) + "tempFrameDir";
+		}
+		
+		frameDir = new File(path);
+		
+		try {
+			frameDir.mkdir();
+		} catch (SecurityException se) {}
+		
+		String frameDirPath = frameDir.getAbsolutePath() + "/";
 	
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -1826,7 +1867,7 @@ public class Window3DController {
 						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
 						try {
-							File file = new File("movieTest" + count++ + ".JPEG");
+							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
 
 							if (file != null) {
 								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
@@ -1857,8 +1898,29 @@ public class Window3DController {
 		
 		if (javaPictures.size() > 0) {
 			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int)subscene.getWidth(),
-					(int) subscene.getHeight(), 5, "Movie.mov", javaPictures);
+					(int) subscene.getHeight(), 5, movieName, javaPictures);
+			
+			//move the movie to the originally specified location
+			File movJustMade = new File(movieName);
+			movJustMade.renameTo(new File(moviePath));
+			
+			//remove the .movtemp.jpg file
+			File movtempjpg = new File(".movtemp.jpg");
+			if (movtempjpg != null) {
+				movtempjpg.delete();
+			}
 		}
+		
+		//remove all of the images in the frame directory
+		if (frameDir != null && frameDir.isDirectory()) {
+			File[] frames = frameDir.listFiles();
+			for (File frame : frames) {
+				frame.delete();
+			}
+			
+			frameDir.delete();
+		}
+		
 	}
 
 	/*
