@@ -449,6 +449,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void viewCellDeaths() {
 		if (cellDeathsStage == null) {
 			cellDeathsStage = new Stage();
+			cellDeathsStage.setWidth(400.);
 			cellDeathsStage.setTitle("Cell Deaths");
 
 			WebView cellDeathsWebView = new WebView();
@@ -477,7 +478,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			// build webview scene to render parts list
 			WebView partsListWebView = new WebView();
-			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsHTMLTable());
+			partsListWebView.getEngine().loadContent(PartsList.partsListDOM().DOMtoString());
 
 			VBox root = new VBox();
 			root.getChildren().addAll(partsListWebView);

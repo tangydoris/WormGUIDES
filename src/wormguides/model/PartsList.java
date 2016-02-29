@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-
-import wormguides.PartsListToHTML;
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
 
 public class PartsList {
 
@@ -123,10 +123,41 @@ public class PartsList {
 	public static ArrayList<String> getDescriptions() {
 		return descriptions;
 	}
-
-	public static String getPartsListAsHTMLTable() {
-		PartsListToHTML plToHTML = new PartsListToHTML();
-		return plToHTML.buildPartsListAsHTML();
+	
+	public static InfoWindowDOM partsListDOM() {
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+		
+		HTMLNode partsListTableDiv = new HTMLNode("div");
+		HTMLNode partsListTable = new HTMLNode("table");
+		
+		for (int i = 0; i < functionalNames.size(); i++) {
+			HTMLNode tr = new HTMLNode("tr");
+			
+			tr.addChild(new HTMLNode("td", "", "", functionalNames.get(i)));
+			
+			if (lineageNames.get(i) != null) {
+				tr.addChild(new HTMLNode("td", "", "", lineageNames.get(i)));
+			}
+			
+			if (descriptions.get(i) != null) {
+				tr.addChild(new HTMLNode("td", "", "", descriptions.get(i)));
+			}
+			
+			partsListTable.addChild(tr);
+		}
+		
+		partsListTableDiv.addChild(partsListTable);
+		body.addChild(partsListTableDiv);
+		
+		html.addChild(head);
+		html.addChild(body);
+		
+		InfoWindowDOM dom = new InfoWindowDOM(html);
+		dom.buildStyleNode();
+		
+		return dom;
 	}
 
 }

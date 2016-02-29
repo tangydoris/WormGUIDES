@@ -1,10 +1,7 @@
 package wormguides.model;
 
 import java.util.ArrayList;
-//import java.util.Collections;
 import java.util.Collections;
-import wormguides.HTMLGenerator;
-import wormguides.HTMLGenerator.HTMLTags;
 import wormguides.loaders.ConnectomeLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;

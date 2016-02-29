@@ -23,7 +23,7 @@ public class CellDeaths {
 		HTMLNode body = new HTMLNode("body");
 
 		HTMLNode deathsDiv = new HTMLNode("div");
-		HTMLNode deathsUL = new HTMLNode("ul");
+		HTMLNode deathsTable = new HTMLNode("table");
 
 		try {
 			URL url = PartsList.class.getResource(CellDeathsFile);
@@ -34,8 +34,10 @@ public class CellDeaths {
 
 			String line;
 			while ((line = br.readLine()) != null) {
-				// add death to UL
-				deathsUL.addChild(new HTMLNode("li", "", "", line));
+				// add death to table
+				HTMLNode tr = new HTMLNode("tr");
+				tr.addChild(new HTMLNode("td", "", "", line));
+				deathsTable.addChild(tr);
 
 				// add to internal memory
 				cellDeaths.add(line.toLowerCase());
@@ -44,7 +46,7 @@ public class CellDeaths {
 			e.printStackTrace();
 		}
 
-		deathsDiv.addChild(deathsUL);
+		deathsDiv.addChild(deathsTable);
 		body.addChild(deathsDiv);
 
 		dom.getHTML().addChild(head);
