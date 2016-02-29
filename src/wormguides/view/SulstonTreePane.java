@@ -69,7 +69,8 @@ public class SulstonTreePane extends ScrollPane {
 
 	// Node content;
 	private Scale scaleTransform;
-	private Line timeIndicator;
+	private Line timeIndicatorBar;
+	private Text timeIndicator;
 	private int ttduration = 0;
 	private IntegerProperty time;
 
@@ -87,6 +88,8 @@ public class SulstonTreePane extends ScrollPane {
 	private Stage ownStage;
 	
 	private Pane canvas;
+	
+	private final static int timeOffsetX = 17;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 		@Override
@@ -317,8 +320,10 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	private void repositionTimeLine() {
-		timeIndicator.setEndY(iYmin + time.getValue());
-		timeIndicator.setStartY(iYmin + time.getValue());
+		timeIndicatorBar.setEndY(iYmin + time.getValue());
+		timeIndicatorBar.setStartY(iYmin + time.getValue());
+		timeIndicator.setY(iYmin + time.getValue());
+		timeIndicator.setText(Integer.toString(time.get()));
 		// System.out.println("adjusting time line");
 	}
 
@@ -412,13 +417,20 @@ public class SulstonTreePane extends ScrollPane {
 
 	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
 		int x = recursiveDraw(mainPane, 400, 10, 10, lineageTreeRoot, 10);
-		// add time indicator
+		// add time indicator bar
 		int timevalue = time.getValue();
-		timeIndicator = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
+		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
+		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
+		timeIndicatorBar.setId("time");
+		
+		//add time indicator
+		timeIndicator = new Text(timeOffsetX, iYmin + timevalue, Integer.toString(time.get()));
+		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
-		timeIndicator.setId("time");
+		timeIndicator.setId("timeValue");
 		// System.out.println("after recursivedraw placing timelineat "+maxX+"
 		// "+timevalue);
+		mainPane.getChildren().add(timeIndicatorBar);
 		mainPane.getChildren().add(timeIndicator);
 		drawTimeTicks();
 		return x;
