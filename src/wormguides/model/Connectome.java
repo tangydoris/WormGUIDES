@@ -2,16 +2,17 @@ package wormguides.model;
 
 import java.util.ArrayList;
 //import java.util.Collections;
-
-import wormguides.ConnectomeToHTML;
+import java.util.Collections;
+import wormguides.HTMLGenerator;
+import wormguides.HTMLGenerator.HTMLTags;
 import wormguides.loaders.ConnectomeLoader;
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
 
 public class Connectome {
 
 	private ArrayList<NeuronalSynapse> connectome;
 	private ConnectomeLoader connectomeLoader;
-
-	// terminal cell case
 
 	public Connectome() {
 		connectome = new ArrayList<NeuronalSynapse>();
@@ -175,12 +176,187 @@ public class Connectome {
 		return searchResults;
 	}
 
-	public String connectomeAsHTML() {
-		if (connectome != null) {
-			ConnectomeToHTML connectomeToHTML = new ConnectomeToHTML(this);
-			return connectomeToHTML.buildConnectomeAsHTML();
+	public InfoWindowDOM connectomeDOM() {
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+
+		HTMLNode connectomeTablesDiv = new HTMLNode("div");
+
+		// add formatted wiring partners for each cell in connectome
+
+		// collect all unique cells
+		ArrayList<String> cells = new ArrayList<String>();
+		for (NeuronalSynapse ns : connectome) {
+			String cell_1 = ns.getCell1();
+			String cell_2 = ns.getCell2();
+
+			// add unique entries to list
+			if (!cells.contains(cell_1)) {
+				cells.add(cell_1);
+			}
+
+			if (!cells.contains(cell_2)) {
+				cells.add(cell_2);
+			}
 		}
-		return "";
+
+		// alphabetize the connectome cells
+		Collections.sort(cells);
+
+		// add tables of wiring partners for each unique entry
+		for (String cell : cells) {
+			connectomeTablesDiv.addChild(queryWiringPartnersAsHTMLTable(cell));
+			connectomeTablesDiv.addChild(new HTMLNode("br"));
+			connectomeTablesDiv.addChild(new HTMLNode("br"));
+		}
+		
+		body.addChild(connectomeTablesDiv);
+		html.addChild(head);
+		html.addChild(body);
+		
+		InfoWindowDOM dom = new InfoWindowDOM(html);
+		dom.buildStyleNode();
+		
+		return dom;
+	}
+
+	public HTMLNode queryWiringPartnersAsHTMLTable(String queryCell) {
+		/*
+		 * FORMAT Cell Name presynaptic: cellname (numconnections), cellname
+		 * (numconnections) postsynaptic: ...
+		 */
+
+		ArrayList<String> presynapticPartners = new ArrayList<String>();
+		ArrayList<String> postsynapticPartners = new ArrayList<String>();
+		ArrayList<String> electricalPartners = new ArrayList<String>();
+		ArrayList<String> neuromuscularPartners = new ArrayList<String>();
+
+		// get wiring partners
+		for (NeuronalSynapse ns : connectome) {
+			String cell_1 = ns.getCell1();
+			String cell_2 = ns.getCell2();
+
+			if (queryCell.equals(cell_1)) {
+				// add cell_2 as a wiring partner
+
+				// extract number of synapses
+				int numberOfSynapses = ns.numberOfSynapses();
+
+				// extract synapse type
+				String synapseTypeDescription = ns.getSynapseType().getDescription();
+
+				// format wiring partner with cell_2
+				String wiringPartner = cell_2 + formatNumberOfSynapses(Integer.toString(numberOfSynapses));
+
+				if (synapseTypeDescription.equals(s_presynapticDescription)) {
+					presynapticPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(r_postsynapticDescription)) {
+					postsynapticPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(ej_electricalDescription)) {
+					electricalPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(nmj_neuromuscularDescrpition)) {
+					neuromuscularPartners.add(wiringPartner);
+				}
+
+			} else if (queryCell.equals(cell_2)) {
+				// add cell_1 as a wiring partner
+
+				// extract number of synapses
+				int numberOfSynapses = ns.numberOfSynapses();
+
+				// extract synapse type
+				String synapseTypeDescription = ns.getSynapseType().getDescription();
+
+				// format wiring partner with cell_1
+				String wiringPartner = cell_1 + formatNumberOfSynapses(Integer.toString(numberOfSynapses));
+
+				if (synapseTypeDescription.equals(s_presynapticDescription)) {
+					presynapticPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(r_postsynapticDescription)) {
+					postsynapticPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(ej_electricalDescription)) {
+					electricalPartners.add(wiringPartner);
+				} else if (synapseTypeDescription.equals(nmj_neuromuscularDescrpition)) {
+					neuromuscularPartners.add(wiringPartner);
+				}
+			}
+		}
+
+		HTMLNode table = new HTMLNode("table");
+		HTMLNode trH = new HTMLNode("th");
+		HTMLNode th = new HTMLNode("th", "", "", "<strong>Cell:</strong>" + queryCell.toUpperCase());
+
+		trH.addChild(th);
+		table.addChild(trH);
+
+		HTMLNode trPre;
+		HTMLNode trPost;
+		HTMLNode trNeuro;
+		HTMLNode trElec;
+
+		Collections.sort(presynapticPartners); // alphabetize
+		if (presynapticPartners.size() > 0) {
+			trPre = new HTMLNode("tr");
+
+			HTMLNode tdPreTitle = new HTMLNode("td", "", "", presynapticPartnersTitle);
+			HTMLNode tdPre = new HTMLNode("td", "td", "td",
+					presynapticPartners.toString().substring(1, presynapticPartners.toString().length() - 1));
+
+			trPre.addChild(tdPreTitle);
+			trPre.addChild(tdPre);
+
+			table.addChild(trPre);
+		}
+
+		Collections.sort(postsynapticPartners); // alphabetize
+		if (postsynapticPartners.size() > 0) {
+			trPost = new HTMLNode("tr");
+
+			HTMLNode tdPostTitle = new HTMLNode("td", "", "", postsynapticPartnersTitle);
+			HTMLNode tdPost = new HTMLNode("td", "td", "td",
+					postsynapticPartners.toString().substring(1, postsynapticPartners.toString().length() - 1));
+
+			trPost.addChild(tdPostTitle);
+			trPost.addChild(tdPost);
+
+			table.addChild(trPost);
+		}
+
+		Collections.sort(electricalPartners); // alphabetize
+		if (electricalPartners.size() > 0) {
+			trElec = new HTMLNode("tr");
+
+			HTMLNode tdElecTitle = new HTMLNode("td", "", "", electricalPartnersTitle);
+			HTMLNode tdElec = new HTMLNode("td", "td", "td",
+					electricalPartners.toString().substring(1, electricalPartners.toString().length() - 1));
+
+			trElec.addChild(tdElecTitle);
+			trElec.addChild(tdElec);
+
+			table.addChild(trElec);
+		}
+
+		Collections.sort(neuromuscularPartners); // alphabetize
+		if (neuromuscularPartners.size() > 0) {
+			trNeuro = new HTMLNode("tr");
+
+			HTMLNode tdNeuroTitle = new HTMLNode("td", "", "", neuromusclarPartnersTitle);
+			HTMLNode tdNeuro = new HTMLNode("td", "td", "td",
+					neuromuscularPartners.toString().substring(1, neuromuscularPartners.toString().length() - 1));
+
+			trNeuro.addChild(tdNeuroTitle);
+			trNeuro.addChild(tdNeuro);
+
+			table.addChild(trNeuro);
+		}
+
+		return table;
+
+	}
+
+	private String formatNumberOfSynapses(String numberOfSynapses) {
+		return "(" + numberOfSynapses + ")";
 	}
 
 	public void debug() {
@@ -200,11 +376,16 @@ public class Connectome {
 	// static vars
 
 	// connectome config file location
-	private final static String connectomeFilePath = "src/wormguides/model/connectome_file/NeuronConnect.csv";
+	//private final static String connectomeFilePath = "src/wormguides/model/connectome_file/NeuronConnect.csv";
 
 	// synapse types as strings for search logic
 	private final static String s_presynapticDescription = "S presynaptic";
 	private final static String r_postsynapticDescription = "R postsynaptic";
 	private final static String ej_electricalDescription = "EJ electrical";
 	private final static String nmj_neuromuscularDescrpition = "Nmj neuromuscular";
+
+	private final String presynapticPartnersTitle = "Presynaptic: ";
+	private final String postsynapticPartnersTitle = "Postsynaptic: ";
+	private final String electricalPartnersTitle = "Electrical: ";
+	private final String neuromusclarPartnersTitle = "Neuromusclar: ";
 }

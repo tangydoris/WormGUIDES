@@ -498,7 +498,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			// build webview scene to render html
 			WebView connectomeHTML = new WebView();
-			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
+			connectomeHTML.getEngine().loadContent(connectome.connectomeDOM().DOMtoString());
 
 			VBox root = new VBox();
 			root.getChildren().addAll(connectomeHTML);
