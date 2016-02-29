@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import wormguides.view.HTMLNode;
+import wormguides.view.InfoWindowDOM;
+
 public class SceneElementsList {
 
 	public ArrayList<SceneElement> elementsList;
@@ -263,6 +266,58 @@ public class SceneElementsList {
 
 	public HashMap<String, ArrayList<String>> getNameToCellsMap() {
 		return this.nameCellsMap;
+	}
+	
+	public InfoWindowDOM sceneElementsListDOM() {
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
+		
+		//add nodes to html
+		html.addChild(head);
+		html.addChild(body);
+		
+		HTMLNode sceneElementsListDiv = new HTMLNode("div");
+		HTMLNode sceneElementsListTable = new HTMLNode("table");
+		
+		// title row
+		HTMLNode trH = new HTMLNode("tr");
+		HTMLNode th1 = new HTMLNode("th", "", "", "Scene Name");
+		HTMLNode th2 = new HTMLNode("th", "", "", "Cell Names");
+		HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
+		HTMLNode th4 = new HTMLNode("th", "", "", "Start Time");
+		HTMLNode th5 = new HTMLNode("th", "", "", "End Time");
+		HTMLNode th6 = new HTMLNode("th", "", "", "Comments");
+
+		trH.addChild(th1);
+		trH.addChild(th2);
+		trH.addChild(th3);
+		trH.addChild(th4);
+		trH.addChild(th5);
+		trH.addChild(th6);
+
+		
+		sceneElementsListTable.addChild(trH);
+		
+		for (SceneElement se : elementsList) {
+			HTMLNode tr = new HTMLNode("tr");
+			tr.addChild(new HTMLNode("td", "", "", se.getSceneName()));
+			tr.addChild(new HTMLNode("td", "", "", se.getAllCellNames().toString()));
+			tr.addChild(new HTMLNode("td", "", "", se.getMarkerName()));
+			tr.addChild(new HTMLNode("td", "", "", Integer.toString(se.getStartTime())));
+			tr.addChild(new HTMLNode("td", "", "", Integer.toString(se.getEndTime())));
+			tr.addChild(new HTMLNode("td", "", "", se.getComments()));
+			sceneElementsListTable.addChild(tr);
+		}
+		
+		sceneElementsListDiv.addChild(sceneElementsListTable);
+		
+		body.addChild(sceneElementsListDiv);
+				
+		InfoWindowDOM dom = new InfoWindowDOM(html);
+		dom.buildStyleNode();
+		
+		return dom;
 	}
 
 	private final static String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
