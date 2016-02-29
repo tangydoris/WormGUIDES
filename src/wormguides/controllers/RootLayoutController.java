@@ -48,7 +48,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import wormguides.CellShapesIndexToHTML;
 import wormguides.DisplayLayer;
 import wormguides.MainApp;
 import wormguides.Search;
@@ -427,11 +426,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			cellShapesIndexStage = new Stage();
 			cellShapesIndexStage.setTitle("Cell Shapes Index");
 
-			CellShapesIndexToHTML cellShapesToHTML = new CellShapesIndexToHTML(elementsList);
+			if (elementsList == null) {
+				initSceneElementsList();
+			}
 
 			// webview to render cell shapes list i.e. elementsList
 			WebView cellShapesIndexWebView = new WebView();
-			cellShapesIndexWebView.getEngine().loadContent(cellShapesToHTML.buildCellShapesIndexAsHTML());
+			cellShapesIndexWebView.getEngine().loadContent(elementsList.sceneElementsListDOM().DOMtoString());
 
 			VBox root = new VBox();
 			root.getChildren().addAll(cellShapesIndexWebView);
