@@ -2,15 +2,11 @@ package wormguides;
 
 import java.awt.*;
 import java.awt.MediaTracker;
-import java.awt.event.*;
 import com.sun.image.codec.jpeg.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.geom.GeneralPath;
 import java.io.*;
 import javax.swing.*; 
 import javax.imageio.*;
-import java.net.URL;
 
 public class JavaPicture{
     
@@ -23,7 +19,7 @@ public class JavaPicture{
     /** 
      * Constructor
      */
-    public void JavaPicture(){
+    public JavaPicture(){
         //No picture, no values
     }
     
@@ -63,7 +59,7 @@ public class JavaPicture{
 				System.err.println(ie);
 			}
 			
-			bimg = new BufferedImage(image.getWidth(null), image.getHeight(null), bimg.TYPE_INT_RGB);
+			bimg = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
 			Graphics g = bimg.getGraphics();
 			g.drawImage(image, 0, 0, null);
 
@@ -96,7 +92,7 @@ public class JavaPicture{
             shower.getContentPane().add(new JLabel(imgIcon));
             shower.setResizable(false);
             shower.pack();
-            shower.show();
+            shower.setVisible(true);
         }
     }
 

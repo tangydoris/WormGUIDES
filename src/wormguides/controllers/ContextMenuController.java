@@ -579,6 +579,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Toggles the BooleanProperty bringUpInfoProperty so that the cell info
 	 * window is displayed. ContextMenuController listens for changes in this
 	 * toggle.
+	 * 
 	 * @return void
 	 */
 	@FXML
@@ -610,10 +611,13 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		nameText.setText(name);
 	}
 
-	/**Wait time in miliseconds between showing a different number of periods after 'loading'*/
+	/**
+	 * Wait time in miliseconds between showing a different number of periods
+	 * after 'loading'
+	 */
 	private final long WAIT_TIME_MILLI = 750;
 	private final double MAX_MENU_HEIGHT = 200;
 	private final int PRE_SYN_INDEX = 0, POST_SYN_INDEX = 1, ELECTR_INDEX = 2, NEURO_INDEX = 3;
-	/**Default color of the rules that are created by the context menu*/
+	/** Default color of the rules that are created by the context menu */
 	private final Color DEFAULT_COLOR = Color.WHITE;
 }
