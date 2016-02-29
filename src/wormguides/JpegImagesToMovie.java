@@ -35,8 +35,6 @@ import wormguides.JavaPicture;
 import java.io.*;
 import java.util.*;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-
 import javax.media.*;
 import javax.media.control.*;
 import javax.media.protocol.*;
@@ -51,7 +49,7 @@ import javax.media.format.JPEGFormat;
  */
 public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 
-	public JpegImagesToMovie(int width, int height, int frameRate, String outputURL, Vector inputFiles) {
+	public JpegImagesToMovie(int width, int height, int frameRate, String outputURL, Vector<JavaPicture> inputFiles) {
 		if (width < 0 || height < 0 || frameRate < 1 || outputURL == null || inputFiles.size() == 0) {
 			prUsage();
 		}
@@ -72,7 +70,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		}
 	}
 
-	public boolean doItPath(int width, int height, int frameRate, Vector inFiles, String outputURL) {
+	public boolean doItPath(int width, int height, int frameRate, Vector<JavaPicture> inFiles, String outputURL) {
 		// Check for output file extension.
 		if (!outputURL.endsWith(".mov") && !outputURL.endsWith(".mov")) {
 			//System.err.println("The output file extension should end with a .mov extension");
@@ -95,7 +93,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 
 
 
-	public boolean doIt(int width, int height, int frameRate, Vector inFiles, MediaLocator outML) {
+	public boolean doIt(int width, int height, int frameRate, Vector<JavaPicture> inFiles, MediaLocator outML) {
 		ImageDataSource ids = new ImageDataSource(width, height, frameRate, inFiles);
 
 		Processor p;
@@ -113,7 +111,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		// Put the Processor into configured state so we can set
 		// some processing options on the processor.
 		p.configure();
-		if (!waitForState(p, p.Configured)) {
+		if (!waitForState(p, Processor.Configured)) {
 			//System.err.println("Failed to configure the processor.");
 			p.close();
 			p.deallocate();
@@ -142,7 +140,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		// We are done with programming the processor.  Let's just
 		// realize it.
 		p.realize();
-		if (!waitForState(p, p.Realized)) {
+		if (!waitForState(p, Controller.Realized)) {
 			//System.err.println("Failed to realize the processor.");
 			p.close();
 			p.deallocate();
@@ -306,6 +304,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 	/**
 	 * Create a media locator from the given string.
 	 */
+	@SuppressWarnings("unused")
 	static MediaLocator createMediaLocator(String url) {
 
 		MediaLocator ml;
@@ -321,7 +320,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 			if ((ml = new MediaLocator(file)) != null)
 				return ml;
 		}
-
+		
 		return null;
 	}
 
@@ -341,7 +340,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 
 		ImageSourceStream streams[];
 
-		ImageDataSource(int width, int height, int frameRate, Vector images) {
+		ImageDataSource(int width, int height, int frameRate, Vector<JavaPicture> images) {
 			streams = new ImageSourceStream[1];
 			streams[0] = new ImageSourceStream(width, height, frameRate, images);
 		}
@@ -404,14 +403,14 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 	 */
 	class ImageSourceStream implements PullBufferStream {
 
-		Vector images;
+		Vector<JavaPicture> images;
 		int width, height;
 		VideoFormat format;
 
 		int nextImage = 0;	// index of the next image to be read.
 		boolean ended = false;
 
-		public ImageSourceStream(int width, int height, int frameRate, Vector images) {
+		public ImageSourceStream(int width, int height, int frameRate, Vector<JavaPicture> images) {
 			this.width = width;
 			this.height = height;
 			this.images = images;
@@ -487,7 +486,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 			buf.setOffset(0);
 			buf.setLength((int)raFile.length());
 			buf.setFormat(format);
-			buf.setFlags(buf.getFlags() | buf.FLAG_KEY_FRAME);
+			buf.setFlags(buf.getFlags() | Buffer.FLAG_KEY_FRAME);
 
 			// Close the random access file.
 			raFile.close();

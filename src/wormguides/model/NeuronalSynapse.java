@@ -1,5 +1,11 @@
 package wormguides.model;
 
+/**
+ * A class which defines a synapse between two cells
+ * 
+ * @author katzmanb
+ *
+ */
 public class NeuronalSynapse {
 
 	// cell_1 and _2 are functional names

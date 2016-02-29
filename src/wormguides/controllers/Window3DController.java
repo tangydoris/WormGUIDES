@@ -1,13 +1,8 @@
 package wormguides.controllers;
 
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,8 +16,6 @@ import javax.imageio.ImageIO;
 import com.sun.javafx.scene.CameraHelper;
 
 //import sim.util.media.MovieEncoder;
-
-import javax.media.*;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -94,7 +87,6 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
-import wormguides.loaders.ConnectomeLoader;
 import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.ColorRule;

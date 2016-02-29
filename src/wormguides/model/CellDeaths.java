@@ -9,6 +9,12 @@ import java.util.ArrayList;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
+/**
+ * The list of cell deaths represented in internal memory and a DOM for external window viewing
+ * 
+ * @author katzmanb
+ *
+ */
 public class CellDeaths {
 	private static ArrayList<String> cellDeaths;
 	private static InfoWindowDOM dom;

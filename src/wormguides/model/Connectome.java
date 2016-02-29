@@ -6,6 +6,13 @@ import wormguides.loaders.ConnectomeLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
+/**
+ * The underlying model of the all neuronal connections
+ * Holds a list of NeuronalSynapses which define two terminal cells which are wired
+ * 
+ * @author katzmanb
+ *
+ */
 public class Connectome {
 
 	private ArrayList<NeuronalSynapse> connectome;
@@ -50,8 +57,11 @@ public class Connectome {
 		return connectedCells;
 	}
 
-	/*
-	 * provides name translation from systematic to functional
+	/**
+	 * Provides name translation from systematic to functional
+	 * 
+	 * @param queryCell the cell to be checked
+	 * @return the resultant translated or untranslated cell name
 	 */
 	public String checkQueryCell(String queryCell) {
 		if (PartsList.containsLineageName(queryCell)) {
@@ -61,6 +71,11 @@ public class Connectome {
 		return queryCell;
 	}
 
+	/**
+	 * 
+	 * @param queryCell the cell to query in the connectome
+	 * @return boolean corresponding to whether the query is in the connectome or not
+	 */
 	public boolean containsCell(String queryCell) {
 		queryCell = checkQueryCell(queryCell);
 
@@ -73,9 +88,17 @@ public class Connectome {
 		return false;
 	}
 
-	/*
+	/**
 	 * Search function which takes cell and filters results based on filter
 	 * toggles filter toggles = 4 Synapse Types
+	 * 
+	 * @param queryCell the cell to be searched for
+	 * @param presynapticTicked
+	 * @param postsynapticTicked
+	 * @param electricalTicked
+	 * @param neuromuscularTicked
+	 * @param getLineage denotes whether to return the partners are lineage names or functional names
+	 * @return the list of connections to the query cell
 	 */
 	public ArrayList<String> queryConnectivity(String queryCell, boolean presynapticTicked, boolean postsynapticTicked,
 			boolean electricalTicked, boolean neuromuscularTicked, boolean getLineage) {
@@ -173,6 +196,11 @@ public class Connectome {
 		return searchResults;
 	}
 
+	/**
+	 * Builds the connectome as a DOM to be displayed in an external popup window
+	 * 
+	 * @return the DOM of the connectome
+	 */
 	public InfoWindowDOM connectomeDOM() {
 		HTMLNode html = new HTMLNode("html");
 		HTMLNode head = new HTMLNode("head");
@@ -218,6 +246,12 @@ public class Connectome {
 		return dom;
 	}
 
+	/**
+	 * Generates a table of synaptic partners for a given cell
+	 * 
+	 * @param queryCell the cell for which the table is generated
+	 * @return the table HTML node for the DOM
+	 */
 	public HTMLNode queryWiringPartnersAsHTMLTable(String queryCell) {
 		/*
 		 * FORMAT Cell Name presynaptic: cellname (numconnections), cellname
@@ -356,19 +390,19 @@ public class Connectome {
 		return "(" + numberOfSynapses + ")";
 	}
 
-	public void debug() {
-		System.out.println("Connectome size: " + connectome.size());
-
-		ArrayList<String> allConnectomeCellNames = getAllConnectomeCellNames();
-		System.out.println("All connectome cells size: " + allConnectomeCellNames.size());
-
-		String centralCell = "ADAL";
-		ArrayList<String> connectedCells = getConnectedCells(centralCell);
-		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
-
-		String queryCell = "AIZL";
-		queryConnectivity(queryCell, true, true, true, true, true);
-	}
+//	public void debug() {
+//		System.out.println("Connectome size: " + connectome.size());
+//
+//		ArrayList<String> allConnectomeCellNames = getAllConnectomeCellNames();
+//		System.out.println("All connectome cells size: " + allConnectomeCellNames.size());
+//
+//		String centralCell = "ADAL";
+//		ArrayList<String> connectedCells = getConnectedCells(centralCell);
+//		System.out.println("Connected cells to '" + centralCell + "' size: " + connectedCells.size());
+//
+//		String queryCell = "AIZL";
+//		queryConnectivity(queryCell, true, true, true, true, true);
+//	}
 
 	// static vars
 

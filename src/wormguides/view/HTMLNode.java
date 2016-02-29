@@ -2,6 +2,12 @@ package wormguides.view;
 
 import java.util.ArrayList;
 
+/**
+ * Nodes for the DOM tree
+ * 
+ * @author katzmanb
+ *
+ */
 public class HTMLNode {
 	private String tag;
 	private String ID;
@@ -27,7 +33,11 @@ public class HTMLNode {
 
 	private ArrayList<HTMLNode> children;
 
-	// container node with no ID - e.g. head, body, ul
+	/**
+	 * container node with no ID - e.g. head, body, ul
+	 * 
+	 * @param tag the type of node
+	 */
 	public HTMLNode(String tag) {
 		this.tag = tag;
 
@@ -48,7 +58,13 @@ public class HTMLNode {
 		this.children = new ArrayList<HTMLNode>();
 	}
 
-	// container node with ID - e.g. <div>
+	/**
+	 * Container node with ID - e.g. <div>
+	 * 
+	 * @param tag the type of node
+	 * @param ID the ID corresponding to this node
+	 * @param style the style associated with this nodes
+	 */
 	public HTMLNode(String tag, String ID, String style) {
 		this.tag = tag;
 		this.ID = ID;
@@ -69,7 +85,14 @@ public class HTMLNode {
 		this.children = new ArrayList<HTMLNode>();
 	}
 
-	// inner node - e.g. <p>
+	/**
+	 * inner node - e.g. <p>
+	 * 
+	 * @param tag the type of node
+	 * @param ID the ID corresponding to this node
+	 * @param style the style associated with this node
+	 * @param innerHTML the text inside the tags
+	 */
 	public HTMLNode(String tag, String ID, String style, String innerHTML) {
 		this.tag = tag;
 		this.ID = ID;
@@ -89,7 +112,12 @@ public class HTMLNode {
 		children = null;
 	}
 
-	// img node
+	/**
+	 * inner node - e.g. <p>
+	 * 
+	 * @param imgSrc the URL of the image
+	 * @param isImage the flag that this is an image (true)
+	 */
 	public HTMLNode(String imgSrc, boolean isImage) {
 		this.tag = "img";
 		this.imgSrc = imgSrc;
@@ -107,7 +135,12 @@ public class HTMLNode {
 		this.children = null;
 	}
 
-	// style node
+	/**
+	 * The style node
+	 * 
+	 * @param style the formatted string of style for the DOM
+	 * @param type - usually set to text/css
+	 */
 	public HTMLNode(String style, String type) {
 		this.tag = "style";
 		this.innerHTML = style;
@@ -130,7 +163,16 @@ public class HTMLNode {
 		this.children = null;
 	}
 
-	// button node
+	/**
+	 * A button node for collapsing sections
+	 * 
+	 * @param tag the type of node
+	 * @param onclick the function to call onclick
+	 * @param ID the ID associated with this node
+	 * @param style the style associated with this node
+	 * @param buttonText the text to go inside of the button
+	 * @param button the flag indentifying this as a button (true)
+	 */
 	public HTMLNode(String tag, String onclick, String ID, String style, String buttonText, boolean button) {
 		this.tag = tag;
 		this.onclick = onclick;
@@ -150,7 +192,13 @@ public class HTMLNode {
 		this.children = null;
 	}
 
-	// script
+	/**
+	 * A javascript node
+	 * 
+	 * @param tag the type of node
+	 * @param script the js function/script
+	 * @param isScript the flag identifying this as a script (true)
+	 */
 	public HTMLNode(String tag, String script, boolean isScript) {
 		this.tag = tag;
 		this.script = script;
@@ -166,7 +214,7 @@ public class HTMLNode {
 		this.children = null;
 
 	}
-
+	
 	public void addChild(HTMLNode child) {
 		if (children == null)
 			return;
@@ -184,6 +232,12 @@ public class HTMLNode {
 	 * TODO - add remove child method
 	 */
 
+	/**
+	 * Formats a given node and its children into a string
+	 * 
+	 * @param node the node to be formatted
+	 * @return
+	 */
 	private String formatNode(HTMLNode node) {
 		/*
 		 * TODO - container without ID --> <head> - container with ID --> div -
@@ -242,6 +296,11 @@ public class HTMLNode {
 		return nodeStr;
 	}
 
+	/**
+	 * Makes a script node to collapse a section on click of a button
+	 * 
+	 * @return the script node with the collapsing function
+	 */
 	public HTMLNode makeCollapseButtonScript() {
 		if (!this.isButton())
 			return null;
@@ -275,6 +334,11 @@ public class HTMLNode {
 		return new HTMLNode("script", script, true);
 	}
 
+	/**
+	 * Collapse function specific for homologues because it's made of two ULs
+	 * 
+	 * @return the script node with the collapsing function
+	 */
 	public HTMLNode makeHomologuesCollapseButtonScript() {
 		if (!this.isButton())
 			return null;
@@ -300,12 +364,21 @@ public class HTMLNode {
 		return new HTMLNode("script", script, true);
 	}
 
+	/**
+	 * The script that handles callbacks to Java when a link is clicked --> allows WormGUIDES to target external browser
+	 * 
+	 * @return the script node with the callback function
+	 */
 	public HTMLNode addLinkHandlerScript() {
 		String script = "function handleLink(element) {" + newLine + "app.handleLink(element.name);" + newLine + "}";
 		return new HTMLNode("script", script, true);
 
 	}
 
+	/**
+	 * 
+	 * @return the script node with the callback to Java for generating a new tab on click
+	 */
 	public HTMLNode handleWiringPartnerClickScript() {
 		String script = "function handleWiringPartnerClick(element) {" + newLine
 				+ "app.handleWiringPartnerClick(element.innerHTML);" + newLine + "}";
@@ -313,6 +386,10 @@ public class HTMLNode {
 		return new HTMLNode("script", script, true);
 	}
 
+	/**
+	 * 
+	 * @return the script node with the callback to Java for viewing a clicked cell in the cell theater
+	 */
 	public HTMLNode viewInCellTheaterScript() {
 		String script = "function viewInCellTheater(element) {" + newLine + "app.viewInCellTheater(element.name);"
 				+ newLine + "}";

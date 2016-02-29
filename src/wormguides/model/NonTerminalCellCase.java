@@ -7,6 +7,12 @@ import java.util.Scanner;
 
 import wormguides.Search;
 
+/**
+ * A non terminal cell object which contains the information for the Information Window feature
+ * 
+ * @author katzmanb
+ *
+ */
 public class NonTerminalCellCase {
 
 	private String cellName;
@@ -18,6 +24,12 @@ public class NonTerminalCellCase {
 	private ArrayList<String> nuclearProductionInfo;
 	private ArrayList<String> cellShapeProductionInfo;
 
+	/**
+	 * 
+	 * @param cellName
+	 * @param nuclearProductionInfo the production information under Nuclear
+	 * @param cellShapeProductionInfo the production information under Cell Shape
+	 */
 	public NonTerminalCellCase(String cellName, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {
 		this.cellName = cellName; // use this for identifier and external
@@ -40,6 +52,11 @@ public class NonTerminalCellCase {
 		return cellName;
 	}
 
+	/**
+	 * Finds the terminal descendants of the cell using the parts list
+	 * 
+	 * @return the list of terminal descendants
+	 */
 	private ArrayList<TerminalDescendant> buildTerminalDescendants() {
 		ArrayList<TerminalDescendant> terminalDescendants = new ArrayList<TerminalDescendant>();
 
@@ -61,6 +78,10 @@ public class NonTerminalCellCase {
 		return terminalDescendants;
 	}
 	
+	/**
+	 * 
+	 * @return the list of gene expressions from the wormbase page corresponding to this cell
+	 */
 	private ArrayList<String> setExpressionsFromWORMBASE() {
 		ArrayList<String> geneExpression = new ArrayList<String>();
 		
@@ -134,6 +155,11 @@ public class NonTerminalCellCase {
 		return geneExpression;
 	}
 	
+	/**
+	 * Finds the number of matches and documents for this cell on texpresso, and the first page of results
+	 *  
+	 * @return the number of matches, documents, and first page of results
+	 */
 	private ArrayList<String> setReferences() {
 		ArrayList<String> references = new ArrayList<String>();
 		
