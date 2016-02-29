@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry excluding="wormguides/model/connectome_file/" kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/katzmanb/Desktop/jmf-2_1_1e-alljava/JMF-2.1.1e/lib/jmf.jar"/>
+	<classpathentry kind="lib" path="C:/Users/katzmanb/Desktop/WormGUIDES/jmf.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
