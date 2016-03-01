@@ -1,8 +1,6 @@
 package wormguides.view;
 
-import java.util.ArrayList;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -23,13 +21,20 @@ import wormguides.model.Connectome;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
 
+/**
+ * The top level container for the list of Info Window cell cases pages. This holds the tabpane of cases
+ * 
+ * @author katzmanb
+ *
+ */
+
 public class InfoWindow {
 
 	private Stage infoWindowStage;
 	private TabPane tabPane;
 	private Scene scene;
 	private Stage parentStage; // update scenes on links
-	private IntegerProperty time;
+//	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
 
 	private CellCasesLists cellCases;
@@ -40,12 +45,7 @@ public class InfoWindow {
 	private Service<Void> addNameService;
 	private Service<Void> showLoadingService;
 
-	private int count; // to show loading in progress
-
-	/*
-	 * TODO if tab is closed --> remove case from cell cases i.e. internal
-	 * memory
-	 */
+	private int count; //to show loading in progress
 
 	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCasesLists cases, ProductionInfo info,
 			Connectome connectome) {
@@ -217,26 +217,31 @@ public class InfoWindow {
 		}
 	}
 
-	private void goToTabWithName(String name) {
-		if (containsTab(name)) {
-			for (Tab tab : tabPane.getTabs()) {
-				if (tab.getText().equalsIgnoreCase(name)) {
-					tabPane.getSelectionModel().select(tab);
-					break;
-				}
-			}
-		}
-	}
+//	private void goToTabWithName(String name) {
+//		if (containsTab(name)) {
+//			for (Tab tab : tabPane.getTabs()) {
+//				if (tab.getText().equalsIgnoreCase(name)) {
+//					tabPane.getSelectionModel().select(tab);
+//					break;
+//				}
+//			}
+//		}
+//	}
+//
+//	private boolean containsTab(String name) {
+//		for (Tab tab : tabPane.getTabs()) {
+//			if (tab.getText().equalsIgnoreCase(name))
+//				return true;
+//		}
+//		return false;
+//	}
 
-	private boolean containsTab(String name) {
-		for (Tab tab : tabPane.getTabs()) {
-			if (tab.getText().equalsIgnoreCase(name))
-				return true;
-		}
-		return false;
-	}
-
-	public void addTab(InfoWindowDOM dom, ArrayList<String> links) {
+	/**
+	 * Adds a tab to the window in a separate thread
+	 * 
+	 * @param dom the dom to be added as a tab
+	 */
+	public void addTab(InfoWindowDOM dom) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {

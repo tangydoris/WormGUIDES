@@ -5,6 +5,12 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * A terminal cell object which contains the information for the Information Window feature
+ * 
+ * @author katzmanb
+ *
+ */
 public class TerminalCellCase {
 	
 	private String funcName;
@@ -27,12 +33,23 @@ public class TerminalCellCase {
 	private ArrayList<String> nuclearProductionInfo;
 	private ArrayList<String> cellShapeProductionInfo;
 	
+	/**
+	 * 
+	 * @param lineageName 
+	 * @param cellName functional name
+	 * @param presynapticPartners
+	 * @param postsynapticPartners
+	 * @param electricalPartners
+	 * @param neuromuscularPartners
+	 * @param nuclearProductionInfo information from the production file under Nuclear
+	 * @param cellShapeProductionInfo information from the production file under Cell Shape
+	 */
 	public TerminalCellCase(String lineageName, String cellName, ArrayList<String> presynapticPartners, 
 			ArrayList<String> postsynapticPartners,ArrayList<String> electricalPartners, 
 			ArrayList<String> neuromuscularPartners, ArrayList<String> nuclearProductionInfo,
 			ArrayList<String> cellShapeProductionInfo) {
 		
-		// TODO bildlinks method
+		// TODO buildlinks method
 		this.links = new ArrayList<String>();
 		
 		this.lineageName = lineageName;
@@ -83,6 +100,11 @@ public class TerminalCellCase {
 		return lineageName;
 	}
 	
+	/**
+	 * Finds the wormatlas page corresponding to this cell and parses its html for the 'Function' section, which it then pulls
+	 * 
+	 * @return the "Function" section of html from wormatlas.org
+	 */
 	private String setFunctionFromWORMATLAS() {
 		if (this.funcName == null) return "";
 		
@@ -156,6 +178,12 @@ public class TerminalCellCase {
 		return findFunctionInHTML(content, URL);
 	}
 	
+	/**
+	 * 
+	 * @param content the full html page from wormatlas
+	 * @param URL the full url for the page to add to to this cell case's external link
+	 * @return the 'Function' section from the wormatlas page
+	 */
 	private String findFunctionInHTML(String content, String URL) {
 		//parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));
@@ -248,6 +276,10 @@ public class TerminalCellCase {
 		return anatomy;
 	}
 	
+	/**
+	 * 
+	 * @return the list of gene expressions from the wormbase page corresponding to this cell
+	 */
 	private ArrayList<String> setExpressionsFromWORMBASE() {
 		ArrayList<String> geneExpression = new ArrayList<String>();
 		
@@ -321,6 +353,11 @@ public class TerminalCellCase {
 		return geneExpression;
 	}
 	
+	/**
+	 * Searches the parts list lineage names and finds matching prefixes to the query cell
+	 * 
+	 * @return the list of homologues for this cell
+	 */
 	private ArrayList<ArrayList<String>> setHomologues() {
 		ArrayList<ArrayList<String>> homologues = new ArrayList<ArrayList<String>>();
 		ArrayList<String> leftRightHomologues = new ArrayList<String>();
@@ -387,6 +424,11 @@ public class TerminalCellCase {
 		return homologues;
 	}
 	
+	/**
+	 * Finds the number of matches and documents for this cell on texpresso, and the first page of results
+	 *  
+	 * @return the number of matches, documents, and first page of results
+	 */
 	private ArrayList<String> setReferences() {
 		ArrayList<String> references = new ArrayList<String>();
 		

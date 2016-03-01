@@ -1,7 +1,10 @@
 package wormguides.model;
 
-/*
- *class which holds a cell name and parts list entry for each terminal descendant (neuron)
+/**
+ * class which holds a cell name and parts list entry for each terminal descendant (neuron)
+ * 
+ * @author katzmanb
+ *
  */
 public class TerminalDescendant {
 	private String cellName;
