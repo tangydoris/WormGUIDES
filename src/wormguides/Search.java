@@ -195,8 +195,8 @@ public class Search {
 		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 		options.add(SearchOption.CELL);
 		ColorRule tempRule = new ColorRule(sb.toString(), color);
-		tempRule.setCells(connectome.queryConnectivity(cellName,
-				isPresynaptic, isPostsynaptic, isElectrical, isNeuromuscular, true));
+		tempRule.setCells(connectome.queryConnectivity(cellName, isPresynaptic, isPostsynaptic, isElectrical,
+				isNeuromuscular, true));
 		tempRule.setText(sb.toString());
 
 		rulesList.add(tempRule);
@@ -370,6 +370,7 @@ public class Search {
 		case MULTICELL:
 			label = "'" + searched + "' Multicellular Structure";
 			break;
+
 		case NEIGHBOR:
 			label = "'" + searched + "' Neighbors";
 			break;

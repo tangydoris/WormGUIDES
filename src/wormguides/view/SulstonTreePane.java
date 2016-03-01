@@ -472,10 +472,8 @@ public class SulstonTreePane extends ScrollPane {
 				}
 
 				else if (rule instanceof ColorRule) {
-					if (((ColorRule) rule).appliesToCell(cellname)) {
-						System.out.println(rule.toString());
+					if (((ColorRule) rule).appliesToCell(cellname))
 						colors.add(rule.getColor());
-					}
 				}
 			}
 
@@ -486,7 +484,6 @@ public class SulstonTreePane extends ScrollPane {
 
 				if (i != null) {
 					ImagePattern ip = new ImagePattern(i, 0, 0, 21, 21, false);
-					System.out.println("returning for - " + cellname + ": " + ip.toString());
 					return ip;
 				}
 			}

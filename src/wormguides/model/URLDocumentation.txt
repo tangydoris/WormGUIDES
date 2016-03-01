@@ -1,6 +1,10 @@
 Note:	The Android and web URLs are currently equivalent.
 Note:	URLs are generated using the UTF8 values.
 
+Rule Type:
+MulticellularStructureRule	->	"-m" (added later to support rules added from the 'Structures' tab)
+ColorRule					->	not specified (original API)
+
 Search Type:
 Description	-> "-d"
 Systematic 	-> "-s"

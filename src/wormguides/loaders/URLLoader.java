@@ -7,12 +7,13 @@ import javafx.scene.paint.Color;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
+import wormguides.StructuresLayer;
 import wormguides.controllers.Window3DController;
 import wormguides.model.Rule;
 
 public class URLLoader {
 
-	public static void process(String url, Window3DController window3DController) {
+	public static void process(String url, Window3DController window3DController, StructuresLayer structuresLayer) {
 		if (window3DController == null)
 			return;
 
@@ -55,18 +56,25 @@ public class URLLoader {
 		}
 
 		// process arguments
-		parseRules(ruleArgs, rulesList);
+		parseRules(ruleArgs, rulesList, structuresLayer);
 		parseViewArgs(viewArgs, window3DController);
 	}
 
-	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
+	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList,
+			StructuresLayer structuresLayer) {
 		rulesList.clear();
 		for (String rule : rules) {
 			ArrayList<String> types = new ArrayList<String>();
 			StringBuilder sb = new StringBuilder(rule);
 			boolean noTypeSpecified = true;
+			boolean isMulticellStructureRule = false;
 
 			try {
+				// ColorRule or StructureRule?
+				if (sb.indexOf("-m") > -1)
+					isMulticellStructureRule = true;
+
+				// parse other args
 				if (sb.indexOf("-s") > -1) {
 					noTypeSpecified = false;
 					types.add("-s");
@@ -115,25 +123,30 @@ public class URLLoader {
 				// extract name from what's left of rule
 				String name = sb.substring(0, sb.indexOf("+"));
 
-				if (types.contains("-s"))
-					Search.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
+				// add regular ColorRule
+				if (!isMulticellStructureRule) {
+					if (types.contains("-s"))
+						Search.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
 
-				if (types.contains("-n"))
-					Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+					if (types.contains("-n"))
+						Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
 
-				if (types.contains("-d"))
-					Search.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+					if (types.contains("-d"))
+						Search.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
 
-				if (types.contains("-g"))
-					Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
-
-				// if no type present, default is systematic
-				if (noTypeSpecified) {
-					SearchType type = SearchType.LINEAGE;
-					if (isGeneFormat(name))
-						type = SearchType.GENE;
-					Search.addColorRule(type, name, Color.web(colorString), options);
+					if (types.contains("-g"))
+						Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+					// if no type present, default is systematic
+					if (noTypeSpecified) {
+						SearchType type = SearchType.LINEAGE;
+						if (isGeneFormat(name))
+							type = SearchType.GENE;
+						Search.addColorRule(type, name, Color.web(colorString), options);
+					}
+				} else { // add StructureRule
+					structuresLayer.addStructureRule(name, Color.web(colorString));
 				}
+
 			} catch (StringIndexOutOfBoundsException e) {
 				System.out.println("invalid color rule format");
 				e.printStackTrace();

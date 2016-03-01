@@ -64,6 +64,8 @@ public class StoriesLayer {
 	private Stage parentStage;
 
 	private SceneElementsList sceneElementsList;
+	
+	private StructuresLayer structuresLayer;
 
 	private ObservableList<Story> stories;
 
@@ -97,9 +99,11 @@ public class StoriesLayer {
 
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
 			Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
-			Button newStoryButton) {
+			Button newStoryButton, StructuresLayer structuresLayer) {
 
 		parentStage = parent;
+		
+		this.structuresLayer = structuresLayer;
 
 		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -262,7 +266,7 @@ public class StoriesLayer {
 
 			if (!activeStory.getColorURL().isEmpty()) {
 				useInternalRules.set(false);
-				URLLoader.process(activeStory.getColorURL(), window3DController);
+				URLLoader.process(activeStory.getColorURL(), window3DController, structuresLayer);
 			} else {
 				useInternalRules.set(true);
 				ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
@@ -285,7 +289,7 @@ public class StoriesLayer {
 		} else {
 			activeStoryProperty.set("");
 			useInternalRules.set(true);
-			URLLoader.process("", window3DController);
+			URLLoader.process("", window3DController, structuresLayer);
 		}
 
 		if (editController != null)

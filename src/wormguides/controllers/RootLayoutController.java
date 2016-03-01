@@ -379,11 +379,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 						Optional<ButtonType> result = warning.showAndWait();
 						if (result.get() == warning.getButtonTypeOkay()) {
 							urlLoadStage.hide();
-							URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+							URLLoader.process(urlLoadWindow.getInputURL(), window3DController, structuresLayer);
 						}
 					} else {
 						urlLoadStage.hide();
-						URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+						URLLoader.process(urlLoadWindow.getInputURL(), window3DController, structuresLayer);
 					}
 				}
 			});
@@ -1017,8 +1017,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initStoriesLayer() {
+		if (structuresLayer == null)
+			initStructuresLayer();
+
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, structuresLayer);
 
 		window3DController.setStoriesLayer(storiesLayer);
 
