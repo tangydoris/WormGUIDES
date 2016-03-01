@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 public class ImageLoader {
 
 	private static ImageView forward, backward, play, pause;
-	private static ImageView plus, minus;
+	private static Image plus, minus;
 	private static Image edit, eye, eyeInvert, close;
 	private static Image copy;
 	private static ImageView paste;
@@ -81,7 +81,12 @@ public class ImageLoader {
 			case PATH_FROM_ROOT + COPY_PNG:
 				copy = image;
 				return;
-
+			case PATH_FROM_ROOT + PLUS_PNG:
+				plus = image;
+				return;
+			case PATH_FROM_ROOT + MINUS_PNG:
+				minus = image;
+				return;
 			}
 			ImageView icon = new ImageView(image);
 			switch (urlStr) {
@@ -97,12 +102,6 @@ public class ImageLoader {
 			case PATH_FROM_ROOT + PAUSE_PNG:
 				pause = icon;
 				break;
-			case PATH_FROM_ROOT + PLUS_PNG:
-				plus = icon;
-				return;
-			case PATH_FROM_ROOT + MINUS_PNG:
-				minus = icon;
-				return;
 			case PATH_FROM_ROOT + PASTE_PNG:
 				paste = icon;
 				return;
@@ -126,11 +125,11 @@ public class ImageLoader {
 		return pause;
 	}
 
-	public static ImageView getPlusIcon() {
+	public static Image getPlusIcon() {
 		return plus;
 	}
 
-	public static ImageView getMinusIcon() {
+	public static Image getMinusIcon() {
 		return minus;
 	}
 
