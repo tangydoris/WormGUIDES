@@ -6,15 +6,15 @@ MulticellularStructureRule	->	"-m" (added later to support rules added from the 
 ColorRule					->	not specified (original API)
 
 Search Type:
-Description	-> "-d"
-Systematic 	-> "-s"
-Functional 	-> "-n"
-Gene		-> "-g"
+Description	->	"-d"
+Systematic 	->	"-s"
+Functional 	->	"-n"
+Gene		->	"-g"
 
-Systematic, Proper		-> -s-n
-Description, Proper		-> -d-n
-Description, Systematic	-> -d-s
-All						-> -d-s-n
+Systematic, Proper		->	-s-n
+Description, Proper		->	-d-n
+Description, Systematic	->	-d-s
+All						->	-d-s-n
 
 Note:	The documentation says that "-g" corresponds to gene search, but iOS only registers a text as
 		a gene search if there are no modifiers.
@@ -23,14 +23,17 @@ Note:	Currently on the desktop version, we toggle each search type by itself. Mu
 
 
 Modifier:
-Cell		-> "$"
-Descendant	-> "<" (%3E in UTF8)
-Ancestor	-> ">" (%3C in UTF8)
+Cell		->	"$"
+Descendant	->	"<" (%3E in UTF8)
+Ancestor	->	">" (%3C in UTF8)
+Cell Body	->	"#" (added later to color cell bodies)
 
-Cell, Descendant		-> "<$" (%3E$)
-Cell, Ancestor			-> "$>" ($%3C)
-Descendant, Ancestor	-> "<>" (%3E%3C)
-All						-> "<$>" (%3E$%3C)
+Ex.
+Cell, Descendant		->	"<$" (%3E$)
+Cell, Ancestor			->	"$>" ($%3C)
+Cell Body, Ancestor		->	"#>" (#%3C)
+Descendant, Ancestor	->	"<>" (%3E%3C)
+All						->	"<$#>" (%3E$%3C)
 
 Note:	The "$" is not used in the Android version. There is ambiguity in whether or not the cell
 		modifier is implicitly selected.

@@ -106,18 +106,33 @@ public class URLLoader {
 				if (sb.indexOf("%3C") > -1) {
 					options.add(SearchOption.ANCESTOR);
 					int i = sb.indexOf("%3C");
-					sb.replace(i, i + 3, "");
+					sb.replace(i, i+3, "");
+				}
+				if (sb.indexOf(">") > -1) {
+					options.add(SearchOption.ANCESTOR);
+					int i = sb.indexOf(">");
+					sb.replace(i, i+1, "");
 				}
 				if (sb.indexOf("$") > -1) {
 					options.add(SearchOption.CELL);
 					options.add(SearchOption.CELLBODY);
 					int i = sb.indexOf("$");
-					sb.replace(i, i + 1, "");
+					sb.replace(i, i+1, "");
 				}
-				if (rule.contains("%3E")) {
+				if (rule.indexOf("%3E") > -1) {
 					options.add(SearchOption.DESCENDANT);
 					int i = sb.indexOf("%3E");
-					sb.replace(i, i + 3, "");
+					sb.replace(i, i+3, "");
+				}
+				if (sb.indexOf("<") > -1) {
+					options.add(SearchOption.DESCENDANT);
+					int i = sb.indexOf("<");
+					sb.replace(i, i+1, "");
+				}
+				if (sb.indexOf("#") > -1) {
+					options.add(SearchOption.CELLBODY);
+					int i = sb.indexOf("#");
+					sb.replace(i, i+1, "");
 				}
 
 				// extract name from what's left of rule
