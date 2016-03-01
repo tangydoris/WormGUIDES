@@ -93,10 +93,10 @@ public class SulstonTreePane extends ScrollPane {
 	private Stage ownStage;
 
 	private Pane canvas;
-
-	private final static int timeOffsetX = 17;
+	private final static int timeOffsetX = 20; // 17?
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
+
 		@Override
 		public void handle(MouseEvent event) {
 			String sourceName = ((Node) event.getSource()).getId();
@@ -121,6 +121,7 @@ public class SulstonTreePane extends ScrollPane {
 				updateDrawing();
 			}
 		}
+
 	};
 
 	public SulstonTreePane() {
@@ -347,7 +348,8 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setEndY(iYmin + time.getValue());
 		timeIndicatorBar.setStartY(iYmin + time.getValue());
 		timeIndicator.setY(iYmin + time.getValue());
-		timeIndicator.setText(Integer.toString(time.get()));
+
+		timeIndicator.setText(Integer.toString(time.get() + 20));
 		// System.out.println("adjusting time line");
 	}
 
@@ -445,9 +447,9 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
 		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicatorBar.setId("time");
-
-		// add time indicator
-		timeIndicator = new Text(timeOffsetX, iYmin + timevalue, Integer.toString(time.get()));
+		
+		//add time indicator
+		timeIndicator = new Text(timeOffsetX, iYmin + timevalue, Integer.toString(time.get()+20));
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");

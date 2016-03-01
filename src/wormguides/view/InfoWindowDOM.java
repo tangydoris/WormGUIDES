@@ -8,6 +8,12 @@ import wormguides.model.PartsList;
 import wormguides.model.TerminalCellCase;
 import wormguides.model.TerminalDescendant;
 
+/**
+ * The document object model for WormGUIDES external information windows
+ * 
+ * @author katzmanb
+ *
+ */
 public class InfoWindowDOM {
 	private HTMLNode html;
 	private String name;
@@ -32,8 +38,10 @@ public class InfoWindowDOM {
 		}
 	}
 
-	/*
-	 * TERMINAL CELL CASE
+	/**
+	 * A DOM for a terminal cell case
+	 * 
+	 * @param terminalCase
 	 */
 	public InfoWindowDOM(TerminalCellCase terminalCase) {
 		this.html = new HTMLNode("html");
@@ -279,7 +287,7 @@ public class InfoWindowDOM {
 						placeholder = Character.toUpperCase(placeholder.charAt(0)) + placeholder.substring(1);
 
 						// check for google links
-						if (placeholder.equals("google")) {
+						if (placeholder.equals("Google")) {
 							// check if wormatlas specific search
 							if (link.contains("site:wormatlas.org")) {
 								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
@@ -449,8 +457,10 @@ public class InfoWindowDOM {
 		buildStyleNode();
 	}
 
-	/*
-	 * NON TERMINAL CELL CASE
+	/**
+	 * A DOM for a non terminal cell case
+	 * 
+	 * @param nonTerminalCase
 	 */
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
@@ -692,6 +702,10 @@ public class InfoWindowDOM {
 		buildStyleNode();
 	}
 
+	/**
+	 * 
+	 * @return the dom as a string to be set to the content of a WebView
+	 */
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
 
@@ -702,8 +716,10 @@ public class InfoWindowDOM {
 
 	}
 
-	/*
-	 * iterates through the DOM and builds the style tag add to the head node
+	/**
+	 * Iterates through the DOM and builds the style tag add to the head node
+	 * 
+	 * Nodes with style are classified by their having an ID or not
 	 */
 	public void buildStyleNode() {
 		if (html == null)
@@ -729,16 +745,25 @@ public class InfoWindowDOM {
 		addStyleNodeToHead(head, style);
 	}
 
+	/**
+	 * Adds the compiled style string to a style node in the head node
+	 * 
+	 * @param head
+	 * @param style
+	 */
 	private void addStyleNodeToHead(HTMLNode head, String style) {
 		if (head != null) {
 			head.addChild(new HTMLNode(style, "text/css"));
 		}
 	}
 
-	/*
+	/**
 	 * called by buildStyleNode to scan the body node and extract style
 	 * attributes from children - only called if node is body tag and if body
 	 * has children
+	 * 
+	 * @param node the body node in which to search for nodes with style
+	 * @return all of the styles formatted as a string to go into a node in the head
 	 */
 	private String findStyleInSubTree(HTMLNode node) {
 		String style = "";
@@ -766,6 +791,12 @@ public class InfoWindowDOM {
 		return style;
 	}
 
+	/**
+	 * Formats a style attribute for a specific node
+	 * 
+	 * @param node the node to build a style attribute for
+	 * @return a string representation of the style for the style node
+	 */
 	private String styleAsStr(HTMLNode node) {
 		return (newLine + "#" + node.getID() + " {" + newLine + node.getStyle() + newLine + "}");
 	}

@@ -450,6 +450,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void viewCellDeaths() {
 		if (cellDeathsStage == null) {
 			cellDeathsStage = new Stage();
+			cellDeathsStage.setWidth(400.);
 			cellDeathsStage.setTitle("Cell Deaths");
 
 			WebView cellDeathsWebView = new WebView();
@@ -472,13 +473,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			partsListStage = new Stage();
 			partsListStage.setTitle("Parts List");
 
-			/*
-			 * TODO change partslist html to dom paradigm (see cell deaths)
-			 */
-
 			// build webview scene to render parts list
 			WebView partsListWebView = new WebView();
-			partsListWebView.getEngine().loadContent(PartsList.getPartsListAsHTMLTable());
+			partsListWebView.getEngine().loadContent(PartsList.partsListDOM().DOMtoString());
 
 			VBox root = new VBox();
 			root.getChildren().addAll(partsListWebView);
@@ -499,7 +496,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			// build webview scene to render html
 			WebView connectomeHTML = new WebView();
-			connectomeHTML.getEngine().loadContent(connectome.connectomeAsHTML());
+			connectomeHTML.getEngine().loadContent(connectome.connectomeDOM().DOMtoString());
 
 			VBox root = new VBox();
 			root.getChildren().addAll(connectomeHTML);
@@ -511,7 +508,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 		connectomeStage.show();
 	}
-	// ----- End menu items and buttons listeners -----
 
 	@FXML
 	public void openRotationController() {
@@ -572,6 +568,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 
 	}
+	// ----- End menu items and buttons listeners -----
 
 	public void init3DWindow(LineageData data) {
 		if (cellCases == null)
