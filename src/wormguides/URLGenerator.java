@@ -3,6 +3,8 @@ package wormguides;
 import java.util.ArrayList;
 
 import wormguides.model.ColorRule;
+import wormguides.model.Rule;
+import wormguides.model.MulticellularStructureRule;
 
 public class URLGenerator {
 
@@ -30,12 +32,100 @@ public class URLGenerator {
 		return builder.toString();
 	}
 
+	public static String generateInternal(ArrayList<Rule> rules, int time, double rX, double rY, double rZ, double tX,
+			double tY, double scale, double dim) {
+		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
+		builder.append(generateInternalParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
+		builder.append("/browser/");
+		return builder.toString();
+	}
+
 	private static String generateParameterString(ArrayList<ColorRule> rules, int time, double rX, double rY, double rZ,
 			double tX, double tY, double scale, double dim) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(generateSetParameters(rules));
 		builder.append(generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim));
 		return builder.toString();
+	}
+
+	private static String generateInternalParameterString(ArrayList<Rule> rules, int time, double rX, double rY,
+			double rZ, double tX, double tY, double scale, double dim) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(generateInternalSetParameters(rules));
+		builder.append(generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim));
+		return builder.toString();
+	}
+
+	private static String generateInternalSetParameters(ArrayList<Rule> rules) {
+		StringBuilder builder = new StringBuilder("/set");
+
+		for (Rule rule : rules) {
+			// rule from cell search
+			if (rule instanceof ColorRule) {
+				ColorRule colorRule = (ColorRule) rule;
+				String ruleText = colorRule.getSearchedText();
+
+				if (ruleText.indexOf("'") != -1) {
+					ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
+					ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
+				}
+				builder.append("/").append(ruleText);
+
+				// search types
+				switch (colorRule.getSearchType()) {
+				case LINEAGE:
+					builder.append("-s");
+					break;
+				case DESCRIPTION:
+					builder.append("-d");
+					break;
+				case FUNCTIONAL:
+					builder.append("-n");
+					break;
+				case MULTICELL:
+					builder.append("-m");
+					break;
+				case GENE:
+					builder.append("-g");
+					break;
+				default:
+					break;
+				}
+
+				// ancestry modifiers
+				// descendant <
+				if (colorRule.isDescendantSelected())
+					builder.append("%3E");
+				// cell $
+				if (colorRule.isCellSelected())
+					builder.append("$");
+				// cell body #
+				if (colorRule.isCellBodySelected())
+					builder.append("#");
+				// ancestor >
+				if (colorRule.isAncestorSelected())
+					builder.append("%3C");
+
+				// color
+				String color = colorRule.getColor().toString();
+				color = color.substring(color.indexOf("x") + 1, color.length() - 2);
+				builder.append("+%23ff").append(color);
+
+			}
+			// rule from multicellular structure search
+			else if (rule instanceof MulticellularStructureRule) {
+				MulticellularStructureRule structureRule = (MulticellularStructureRule) rule;
+				String ruleName = structureRule.getSearchedText();
+				
+				builder.append("/").append(ruleName);
+				String color = structureRule.getColor().toString();
+				color = color.substring(color.indexOf("x") + 1, color.length() - 2);
+				builder.append("+%23ff").append(color);
+			}
+		}
+
+		return builder.toString();
+
 	}
 
 	private static String generateSetParameters(ArrayList<ColorRule> rules) {

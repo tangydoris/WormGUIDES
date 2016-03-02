@@ -102,6 +102,32 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 
+/**
+ * The controller for the 3D subscene inside the root layout. This class
+ * contains the subscene itself, and places it into the AnchorPane called
+ * modelAnchorPane inside the root layout. It is also responsible for refreshing
+ * the scene on time, search, stories, notes, and rules change. This class
+ * contains observable properties that are passed to other classes so that a
+ * subscene refresh can be trigger from that other class. <br>
+ * <br>
+ * 
+ * An "entity" in the subscene is either a cell, cell body, or multicellular
+ * structure. These are graphically represented by the Shape3Ds Sphere and
+ * MeshView available in JavaFX. Sphere's represent cells and MeshView's
+ * represent cell bodies and multicellular structures (see {@link Sphere} and
+ * {@link MeshView}). Notes and labels are rendered as Texts (see {@link Text}).
+ * This class queries the lineage data ({@link LineageData}) and list of scene
+ * elements ({@link SceneElementsList}) for a certain time and renders the
+ * entities, notes, story, and labels present in that time frame. <br>
+ * <br>
+ * 
+ * For coloring of entities, this class queries an observable list of rules (
+ * {@link Rule}) to see which ones apply to a particular entity, then queries
+ * the color hash ({@link ColorHash}) for the material ({@link PhongMaterial})
+ * to use for the entity.
+ * 
+ */
+
 public class Window3DController {
 
 	private Stage parentStage;
@@ -234,7 +260,7 @@ public class Window3DController {
 	private int count;
 	private String movieName;
 	private String moviePath;
-	private File frameDir; 
+	private File frameDir;
 
 	private BooleanProperty update3D;
 
@@ -457,8 +483,7 @@ public class Window3DController {
 		};
 
 		cellCases = cases;
-		
-		
+
 		movieFiles = new Vector<File>();
 		javaPictures = new Vector<JavaPicture>();
 		count = -1;
@@ -1811,51 +1836,52 @@ public class Window3DController {
 			}
 		}
 	}
-	
+
 	public void captureImagesForMovie() {
-		
+
 		movieFiles.clear();
 		count = -1;
-		
+
 		Stage fileChooserStage = new Stage();
-		
+
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Choose Save Location");
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
-		
+
 		File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
-		
+
 		if (fakeFile == null) {
 			System.out.println("null file");
 			return;
 		}
-		
-		//save the name from the file chooser for later MOV file
+
+		// save the name from the file chooser for later MOV file
 		movieName = fakeFile.getName();
 		moviePath = fakeFile.getAbsolutePath();
-		
-		//make a temp directory for the frames at the given save location
+
+		// make a temp directory for the frames at the given save location
 		String path = fakeFile.getAbsolutePath();
 		if (path.lastIndexOf("/") < 0) {
-			path = path.substring(0, path.lastIndexOf("\\")+1) + "tempFrameDir";
+			path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
 		} else {
-			path = path.substring(0, path.lastIndexOf("/")+1) + "tempFrameDir";
+			path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
 		}
-		
+
 		frameDir = new File(path);
-		
+
 		try {
 			frameDir.mkdir();
-		} catch (SecurityException se) {}
-		
+		} catch (SecurityException se) {
+		}
+
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
-	
+
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				if (captureVideo != null) {
 					if (captureVideo.get()) {
-						
+
 						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
 						try {
@@ -1874,45 +1900,45 @@ public class Window3DController {
 			}
 		});
 	}
-	
+
 	public void convertImagesToMovie() {
-		
-		//make our files into JavaPicture
+
+		// make our files into JavaPicture
 		javaPictures.clear();
-		
+
 		for (File movieFile : movieFiles) {
 			JavaPicture jp = new JavaPicture();
-			
+
 			jp.loadImage(movieFile);
-			
+
 			javaPictures.addElement(jp);
 		}
-		
+
 		if (javaPictures.size() > 0) {
-			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int)subscene.getWidth(),
-					(int) subscene.getHeight(), 5, movieName, javaPictures);
-			
-			//move the movie to the originally specified location
+			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(),
+					5, movieName, javaPictures);
+
+			// move the movie to the originally specified location
 			File movJustMade = new File(movieName);
 			movJustMade.renameTo(new File(moviePath));
-			
-			//remove the .movtemp.jpg file
+
+			// remove the .movtemp.jpg file
 			File movtempjpg = new File(".movtemp.jpg");
 			if (movtempjpg != null) {
 				movtempjpg.delete();
 			}
 		}
-		
-		//remove all of the images in the frame directory
+
+		// remove all of the images in the frame directory
 		if (frameDir != null && frameDir.isDirectory()) {
 			File[] frames = frameDir.listFiles();
 			for (File frame : frames) {
 				frame.delete();
 			}
-			
+
 			frameDir.delete();
 		}
-		
+
 	}
 
 	/*
@@ -2052,7 +2078,7 @@ public class Window3DController {
 		rotateY.setAngle(ry);
 		rotateZ.setAngle(rz);
 	}
-	
+
 	public void setCaptureVideo(BooleanProperty captureVideo) {
 		this.captureVideo = captureVideo;
 	}
@@ -2309,6 +2335,14 @@ public class Window3DController {
 		};
 	}
 
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'uniform nucleus' is
+	 * ticked/unticked in the display tab. On change, the scene refreshes and
+	 * cell bodies are highlighted/unhighlighted accordingly.
+	 * 
+	 * @return The listener.
+	 */
 	public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -2319,6 +2353,13 @@ public class Window3DController {
 		};
 	}
 
+	/**
+	 * This JavaFX {@link Service} of type Void spools a thread that<br>
+	 * 1) retrieves the data for cells, cell bodies, and multicellular
+	 * structures for the current time<br>
+	 * 2) clears the notes, labels, and entities in the subscene<br>
+	 * 3) adds the current notes, labels, and entities to the subscene
+	 */
 	private final class RenderService extends Service<Void> {
 		@Override
 		protected Task<Void> createTask() {
@@ -2339,6 +2380,12 @@ public class Window3DController {
 		}
 	}
 
+	/**
+	 * This JavaFX {@link Service} of type Void spools a thread to play the
+	 * subscene movie. It waits the time in milliseconds defined in the variable
+	 * WAIT_TIME_MILLI (defined in the parent class) before rendering the next
+	 * time frame.
+	 */
 	private final class PlayService extends Service<Void> {
 		@Override
 		protected final Task<Void> createTask() {
@@ -2370,6 +2417,13 @@ public class Window3DController {
 		}
 	}
 
+	/**
+	 * This class is the {@link ChangeListener} that listens changes in the
+	 * height or width of the modelAnchorPane in which the subscene lives. When
+	 * the size changes, front-facing billboards and sprites (notes and labels)
+	 * are repositioned to align with their appropriate positions (whether it is
+	 * a location to an entity).
+	 */
 	private final class SubsceneSizeListener implements ChangeListener<Number> {
 		@Override
 		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -2378,6 +2432,14 @@ public class Window3DController {
 		}
 	}
 
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'cell nucleus' is
+	 * ticked/unticked in the search tab. On change, the scene refreshes and
+	 * cell bodies are highlighted/unhighlighted accordingly.
+	 * 
+	 * @return The listener.
+	 */
 	public ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -2388,6 +2450,14 @@ public class Window3DController {
 		};
 	}
 
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
+	 * in the search tab. On change, the scene refreshes and cell bodies are
+	 * highlighted/unhighlighted accordingly.
+	 * 
+	 * @return The listener.
+	 */
 	public ChangeListener<Boolean> getCellBodyTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
@@ -2398,6 +2468,14 @@ public class Window3DController {
 		};
 	}
 
+	/**
+	 * This class is the Comparator for Shape3Ds that compares based on opacity.
+	 * This is used for z-buffering for semi-opaque materials. Entities with
+	 * opaque materials should be rendered last (added first to the root
+	 * {@link Group}.
+	 * 
+	 * @return The Shape3D comparator.
+	 */
 	private class OpacityComparator implements Comparator<Shape3D> {
 		@Override
 		public int compare(Shape3D o1, Shape3D o2) {
@@ -2420,6 +2498,12 @@ public class Window3DController {
 		};
 	}
 
+	/**
+	 * The getter for the {@link EventHandler} for the {@link MouseEvent} that
+	 * is fired upon clicking on a note. The handler expands the note on click.
+	 * 
+	 * @return The event handler.
+	 */
 	public EventHandler<MouseEvent> getNoteClickHandler() {
 		return new EventHandler<MouseEvent>() {
 			@Override
@@ -2453,6 +2537,10 @@ public class Window3DController {
 	private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
 			TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
 
+	/**
+	 * The wait time (in milliseconds) between consecutive time frames while a
+	 * movie is playing.
+	 */
 	private final long WAIT_TIME_MILLI = 200;
 
 	private final double CAMERA_INITIAL_DISTANCE = -220;
@@ -2461,11 +2549,25 @@ public class Window3DController {
 
 	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
 
-	private final double Z_SCALE = 5, X_SCALE = 1, Y_SCALE = 1;
+	/**
+	 * The scale of the subscene z-coordinate axis so that the embryo does not
+	 * appear flat and squished.
+	 */
+	private final double Z_SCALE = 5;
+	/** The scale of the subscene x-coordinate axis. */
+	private final double X_SCALE = 1;
+	/** The scale of the subscene y-coordinate axis. */
+	private final double Y_SCALE = 1;
+
 	private final double BILLBOARD_SCALE = 0.9;
 
 	private final double SIZE_SCALE = 1;
+	/** The radius of all spheres when 'uniform size' is ticked. */
 	private final double UNIFORM_RADIUS = 4;
+	/**
+	 * The default camera zoom of the embryo. On program startup, the embryo is
+	 * zoomed in so that the entire embryo is not visible.
+	 */
 	private final double INITIAL_ZOOM = 1.5;
 
 }

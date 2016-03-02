@@ -11,6 +11,7 @@ import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.controllers.ContextMenuController;
+import wormguides.loaders.ImageLoader;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -34,6 +35,8 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
@@ -46,10 +49,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class SulstonTreePane extends ScrollPane {
 
@@ -86,12 +91,12 @@ public class SulstonTreePane extends ScrollPane {
 	private StringProperty selectedNameLabeled;
 
 	private Stage ownStage;
-	
+
 	private Pane canvas;
-	
-	private final static int timeOffsetX = 20;
+	private final static int timeOffsetX = 20; // 17?
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
+
 		@Override
 		public void handle(MouseEvent event) {
 			String sourceName = ((Node) event.getSource()).getId();
@@ -116,6 +121,7 @@ public class SulstonTreePane extends ScrollPane {
 				updateDrawing();
 			}
 		}
+
 	};
 
 	public SulstonTreePane() {
@@ -128,21 +134,25 @@ public class SulstonTreePane extends ScrollPane {
 		super();
 
 		this.ownStage = ownStage;
-		
+
 		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
 			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth, Number newStageWidth) {
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
+					Number newStageWidth) {
 				if (canvas != null) {
-					canvas.setPrefWidth(newStageWidth.doubleValue());;
+					canvas.setPrefWidth(newStageWidth.doubleValue());
+					;
 				}
 			}
 		});
-		
+
 		ownStage.heightProperty().addListener(new ChangeListener<Number>() {
 			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageHeight, Number newStageHeight) {
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageHeight,
+					Number newStageHeight) {
 				if (canvas != null) {
-					canvas.setPrefHeight(newStageHeight.doubleValue());;
+					canvas.setPrefHeight(newStageHeight.doubleValue());
+					;
 				}
 			}
 		});
@@ -219,7 +229,7 @@ public class SulstonTreePane extends ScrollPane {
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
-		
+
 		canvas.setVisible(true);
 
 		this.getChildren().add(contentGroup);
@@ -236,27 +246,42 @@ public class SulstonTreePane extends ScrollPane {
 		// this.setPrefSize(maxX,400);
 
 		// add controls for zoom
-		Text tp = new Text(15, 20, "+");
-		Text tm = new Text(40, 25, "-");
-		tp.setFont(new Font(25));
-		tm.setFont(new Font(35));
+		Button plus = new Button();
+		plus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		plus.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
+		plus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
+				+ "-fx-background-color: transparent;");
+		plus.setPrefSize(30, 30);
+		plus.setMaxSize(30, 30);
+		plus.setMinSize(30, 30);
 
-		contentGroup.getChildren().add(tp);
-		contentGroup.getChildren().add(tm);
+		Button minus = new Button();
+		minus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+		minus.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
+		minus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
+				+ "-fx-background-color: transparent;");
+		minus.setPrefSize(30, 30);
+		minus.setMaxSize(30, 30);
+		minus.setMinSize(30, 30);
 
-		tm.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				scaleTransform.setX(scaleTransform.getX() * .75);
-				scaleTransform.setY(scaleTransform.getY() * .75);
-			}
-		});
+		contentGroup.getChildren().add(plus);
+		contentGroup.getChildren().add(minus);
+		plus.getTransforms().add(new Translate(50, 5));
+		minus.getTransforms().add(new Translate(15, 5));
 
-		tp.setOnMousePressed(new EventHandler<MouseEvent>() {
+		plus.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				scaleTransform.setX(scaleTransform.getX() * 1.3333);
 				scaleTransform.setY(scaleTransform.getY() * 1.3333);
+			}
+		});
+
+		minus.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				scaleTransform.setX(scaleTransform.getX() * .75);
+				scaleTransform.setY(scaleTransform.getY() * .75);
 			}
 		});
 
@@ -265,8 +290,8 @@ public class SulstonTreePane extends ScrollPane {
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
-		bindLocation(tm, (ScrollPane) this, yetanotherlevel);
-		bindLocation(tp, (ScrollPane) this, yetanotherlevel);
+		bindLocation(plus, (ScrollPane) this, yetanotherlevel);
+		bindLocation(minus, (ScrollPane) this, yetanotherlevel);
 
 		contextMenuController = controller;
 		contextMenuStage = contextMenuController.getOwnStage();
@@ -323,20 +348,20 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setEndY(iYmin + time.getValue());
 		timeIndicatorBar.setStartY(iYmin + time.getValue());
 		timeIndicator.setY(iYmin + time.getValue());
-		
-		timeIndicator.setText(Integer.toString(time.get()+20));
+
+		timeIndicator.setText(Integer.toString(time.get() + 20));
 		// System.out.println("adjusting time line");
 	}
 
-	private void bindLocation(Text n, ScrollPane s, Pane scontent) {
-		n.layoutYProperty().bind(
+	private void bindLocation(Button plus, ScrollPane s, Pane scontent) {
+		plus.layoutYProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.vvalueProperty()
 						// multiplied by (scrollableAreaHeight -
 						// visibleViewportHeight)
 						.multiply(scontent.heightProperty().subtract(new ScrollPaneViewPortHeightBinding(s))));
 
-		n.layoutXProperty().bind(
+		plus.layoutXProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.hvalueProperty()
 						// multiplied by (scrollableAreaHeight -
@@ -400,12 +425,11 @@ public class SulstonTreePane extends ScrollPane {
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-						if (lnewcolors != null){
+						if (lnewcolors != null) {
 							currline.setStroke(lnewcolors);
-						}
-						else{
-							if (currline != null && currline.getId() != null){
-								if (!currline.getId().equals("time")){
+						} else {
+							if (currline != null && currline.getId() != null) {
+								if (!currline.getId().equals("time")) {
 									currline.setStroke(Color.BLACK);
 								}
 							}
@@ -448,10 +472,8 @@ public class SulstonTreePane extends ScrollPane {
 				}
 
 				else if (rule instanceof ColorRule) {
-					if (((ColorRule) rule).appliesToCell(cellname)) {
-						System.out.println(rule.toString());
+					if (((ColorRule) rule).appliesToCell(cellname))
 						colors.add(rule.getColor());
-					}
 				}
 			}
 
@@ -462,7 +484,6 @@ public class SulstonTreePane extends ScrollPane {
 
 				if (i != null) {
 					ImagePattern ip = new ImagePattern(i, 0, 0, 21, 21, false);
-					System.out.println("returning for - " + cellname + ": " + ip.toString());
 					return ip;
 				}
 			}

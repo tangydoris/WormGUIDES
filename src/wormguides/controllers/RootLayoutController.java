@@ -240,8 +240,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	// rotation controller
 	private Stage rotationControllerStage;
 	RotationController rotationController;
-	
-	//movie capture
+
+	// movie capture
 	@FXML
 	private MenuItem captureVideoMenuItem;
 	@FXML
@@ -325,6 +325,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					window3DController.getSelectedNameLabeled());
 
 			treeStage.setScene(new Scene(sp));
+
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
 		}
@@ -378,11 +379,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 						Optional<ButtonType> result = warning.showAndWait();
 						if (result.get() == warning.getButtonTypeOkay()) {
 							urlLoadStage.hide();
-							URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+							URLLoader.process(urlLoadWindow.getInputURL(), window3DController, structuresLayer);
 						}
 					} else {
 						urlLoadStage.hide();
-						URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+						URLLoader.process(urlLoadWindow.getInputURL(), window3DController, structuresLayer);
 					}
 				}
 			});
@@ -542,30 +543,30 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		rotationControllerStage.show();
 		rotationControllerStage.toFront();
 	}
-	
+
 	@FXML
 	public void captureVideo() {
 		captureVideoMenuItem.setDisable(true);
 		stopCaptureVideoMenuItem.setDisable(false);
 		captureVideo.set(true);
-		
-		//start the image capture
+
+		// start the image capture
 		if (window3DController != null) {
 			window3DController.captureImagesForMovie();
 		}
 	}
-	
+
 	@FXML
 	public void stopCaptureAndSave() {
 		captureVideoMenuItem.setDisable(false);
 		stopCaptureVideoMenuItem.setDisable(true);
 		captureVideo.set(false);
-		
-		//convert captured images to movie
+
+		// convert captured images to movie
 		if (window3DController != null) {
 			window3DController.convertImagesToMovie();
 		}
-		
+
 	}
 	// ----- End menu items and buttons listeners -----
 
@@ -815,8 +816,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void setIcons() {
 		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
 		forwardButton.setGraphic(ImageLoader.getForwardIcon());
-		zoomInButton.setGraphic(ImageLoader.getPlusIcon());
-		zoomOutButton.setGraphic(ImageLoader.getMinusIcon());
+		zoomInButton.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
+		zoomOutButton.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
 
 		this.playIcon = ImageLoader.getPlayIcon();
 		this.pauseIcon = ImageLoader.getPauseIcon();
@@ -931,70 +932,70 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void assertFXMLNodes() {
-		assert(rootBorderPane != null);
-		assert(modelAnchorPane != null);
-		assert(sceneControlsBox != null);
-		assert(displayVBox != null);
-		assert(infoPane != null);
+		assert (rootBorderPane != null);
+		assert (modelAnchorPane != null);
+		assert (sceneControlsBox != null);
+		assert (displayVBox != null);
+		assert (infoPane != null);
 
-		assert(timeSlider != null);
-		assert(backwardButton != null);
-		assert(forwardButton != null);
-		assert(playButton != null);
-		assert(timeLabel != null);
-		assert(totalNucleiLabel != null);
-		assert(zoomInButton != null);
-		assert(zoomOutButton != null);
+		assert (timeSlider != null);
+		assert (backwardButton != null);
+		assert (forwardButton != null);
+		assert (playButton != null);
+		assert (timeLabel != null);
+		assert (totalNucleiLabel != null);
+		assert (zoomInButton != null);
+		assert (zoomOutButton != null);
 
-		assert(mainTabPane != null);
-		assert(colorAndDisplayTab != null);
-		assert(colorAndDisplayTabPane != null);
-		assert(cellsTab != null);
-		assert(displayTab != null);
-		assert(storiesTab != null);
+		assert (mainTabPane != null);
+		assert (colorAndDisplayTab != null);
+		assert (colorAndDisplayTabPane != null);
+		assert (cellsTab != null);
+		assert (displayTab != null);
+		assert (storiesTab != null);
 
-		assert(searchField != null);
-		assert(searchResultsListView != null);
-		assert(sysRadioBtn != null);
-		assert(desRadioBtn != null);
-		assert(genRadioBtn != null);
-		assert(conRadioBtn != null);
-		assert(multiRadioBtn != null);
+		assert (searchField != null);
+		assert (searchResultsListView != null);
+		assert (sysRadioBtn != null);
+		assert (desRadioBtn != null);
+		assert (genRadioBtn != null);
+		assert (conRadioBtn != null);
+		assert (multiRadioBtn != null);
 
-		assert(cellNucleusTick != null);
-		assert(cellBodyTick != null);
-		assert(ancestorTick != null);
-		assert(descendantTick != null);
-		assert(descendantLabel != null);
-		assert(colorPickerPane != null);
-		assert(colorPicker != null);
+		assert (cellNucleusTick != null);
+		assert (cellBodyTick != null);
+		assert (ancestorTick != null);
+		assert (descendantTick != null);
+		assert (descendantLabel != null);
+		assert (colorPickerPane != null);
+		assert (colorPicker != null);
 
-		assert(presynapticTick != null);
-		assert(postsynapticTick != null);
-		assert(electricalTick != null);
-		assert(neuromuscularTick != null);
+		assert (presynapticTick != null);
+		assert (postsynapticTick != null);
+		assert (electricalTick != null);
+		assert (neuromuscularTick != null);
 
-		assert(rulesListView != null);
-		assert(addSearchBtn != null);
+		assert (rulesListView != null);
+		assert (addSearchBtn != null);
 
-		assert(displayedName != null);
-		assert(moreInfoClickableText != null);
-		assert(displayedDescription != null);
+		assert (displayedName != null);
+		assert (moreInfoClickableText != null);
+		assert (displayedDescription != null);
 
-		assert(displayedStory != null);
-		assert(displayedStoryDescription != null);
+		assert (displayedStory != null);
+		assert (displayedStoryDescription != null);
 
-		assert(uniformSizeCheckBox != null);
-		assert(opacitySlider != null);
+		assert (uniformSizeCheckBox != null);
+		assert (opacitySlider != null);
 
-		assert(addStructureRuleBtn != null);
-		assert(structureRuleColorPicker != null);
-		assert(structuresSearchListView != null);
-		assert(allStructuresListView != null);
+		assert (addStructureRuleBtn != null);
+		assert (structureRuleColorPicker != null);
+		assert (structuresSearchListView != null);
+		assert (allStructuresListView != null);
 
-		assert(storiesListView != null);
-		assert(noteEditorBtn != null);
-		assert(newStory != null);
+		assert (storiesListView != null);
+		assert (noteEditorBtn != null);
+		assert (newStory != null);
 	}
 
 	private void initStructuresLayer() {
@@ -1016,8 +1017,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initStoriesLayer() {
+		if (structuresLayer == null)
+			initStructuresLayer();
+
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, structuresLayer);
 
 		window3DController.setStoriesLayer(storiesLayer);
 
@@ -1147,7 +1151,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setTime(window3DController.getEndTime());
 
 		viewTreeAction();
-		
+
 		captureVideo = new SimpleBooleanProperty(false);
 		if (window3DController != null) {
 			window3DController.setCaptureVideo(captureVideo);

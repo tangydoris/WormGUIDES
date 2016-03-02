@@ -318,9 +318,8 @@ public abstract class Rule {
 		return ruleChanged;
 	}
 
-	// TODO
 	public String toString() {
-		return text + " - visible: " + isVisible();
+		return toStringFull();
 	}
 
 	public boolean equals(ColorRule other) {
