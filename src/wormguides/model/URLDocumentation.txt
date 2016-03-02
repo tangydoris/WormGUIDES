@@ -1,8 +1,11 @@
 Note:	The Android and web URLs are currently equivalent.
 Note:	URLs are generated using the UTF8 values.
+Note:	The "added later" parameters are only added to parsing, not to URL generation. 
+		User-facing URL generation currently follows the original API.
+		Internal URL generation supports the new parameters.
 
 Rule Type:
-MulticellularStructureRule	->	"-m" (added later to support rules added from the 'Structures' tab)
+MulticellularStructureRule	->	"-M" (added later to support rules added from the 'Structures' tab)
 ColorRule					->	not specified (original API)
 
 Search Type:
@@ -10,6 +13,7 @@ Description	->	"-d"
 Systematic 	->	"-s"
 Functional 	->	"-n"
 Gene		->	"-g"
+Multicell	->	"-m"
 
 Systematic, Proper		->	-s-n
 Description, Proper		->	-d-n

@@ -70,8 +70,8 @@ public class URLLoader {
 			boolean isMulticellStructureRule = false;
 
 			try {
-				// ColorRule or StructureRule?
-				if (sb.indexOf("-m") > -1)
+				// determine if rule is ColorRule or StructureRule
+				if (sb.indexOf("-M") > -1)
 					isMulticellStructureRule = true;
 
 				// parse other args
@@ -79,25 +79,31 @@ public class URLLoader {
 					noTypeSpecified = false;
 					types.add("-s");
 					int i = sb.indexOf("-s");
-					sb.replace(i, i + 2, "");
+					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-n") > -1) {
 					noTypeSpecified = false;
 					types.add("-n");
 					int i = sb.indexOf("-n");
-					sb.replace(i, i + 2, "");
+					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-d") > -1) {
 					noTypeSpecified = false;
 					types.add("-d");
 					int i = sb.indexOf("-d");
-					sb.replace(i, i + 2, "");
+					sb.replace(i, i+2, "");
 				}
 				if (sb.indexOf("-g") > -1) {
 					noTypeSpecified = false;
 					types.add("-g");
 					int i = sb.indexOf("-g");
-					sb.replace(i, i + 2, "");
+					sb.replace(i, i+2, "");
+				}
+				if (sb.indexOf("-m") > -1) {
+					noTypeSpecified = false;
+					types.add("-m");
+					int i = sb.indexOf("-m");
+					sb.replace(i, i+2, "");
 				}
 
 				String colorString = sb.substring(sb.indexOf("+") + 6, sb.length());
@@ -151,6 +157,10 @@ public class URLLoader {
 
 					if (types.contains("-g"))
 						Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+					
+					if (types.contains("-m"))
+						Search.addColorRule(SearchType.MULTICELL, name, Color.web(colorString), options);
+					
 					// if no type present, default is systematic
 					if (noTypeSpecified) {
 						SearchType type = SearchType.LINEAGE;

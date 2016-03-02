@@ -236,7 +236,7 @@ public class StoriesLayer {
 		// copy current rules changes back to story
 		if (activeStory != null) {
 			activeStory.setActive(false);
-			ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
 			// fix subclassing for rule and colorrule
 			// TODO currently only supports rules for cells/cell bodies, not
 			// multicell structures
@@ -246,7 +246,7 @@ public class StoriesLayer {
 			}
 
 			activeStory.setColorURL(
-					URLGenerator.generateIOS(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
+					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 							window3DController.getRotationY(), window3DController.getRotationZ(),
 							window3DController.getTranslationX(), window3DController.getTranslationY(),
 							window3DController.getScale(), window3DController.getOthersVisibility()));
@@ -269,13 +269,13 @@ public class StoriesLayer {
 				URLLoader.process(activeStory.getColorURL(), window3DController, structuresLayer);
 			} else {
 				useInternalRules.set(true);
-				ArrayList<ColorRule> rulesCopy = new ArrayList<ColorRule>();
+				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
 				for (Rule rule : currentRules) {
 					if (rule instanceof ColorRule)
 						rulesCopy.add((ColorRule) rule);
 				}
 				activeStory.setColorURL(
-						URLGenerator.generateIOS(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
+						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 								window3DController.getRotationY(), window3DController.getRotationZ(),
 								window3DController.getTranslationX(), window3DController.getTranslationY(),
 								window3DController.getScale(), window3DController.getOthersVisibility()));
