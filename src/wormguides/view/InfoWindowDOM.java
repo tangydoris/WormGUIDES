@@ -115,7 +115,7 @@ public class InfoWindowDOM {
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
 		// view in wiring diagram
 		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
-		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network: </em>");
+		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network:  (image is placeholder for interactive wiring diagram rendering)</em>");
 		HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
 		viewWDDiv.addChild(viewWDP);
 		viewWDDiv.addChild(viewWDImg);
