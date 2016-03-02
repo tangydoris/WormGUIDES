@@ -116,12 +116,12 @@
                                                                <children>
                                                                   <HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" prefWidth="298.0" spacing="15.0" VBox.vgrow="NEVER">
                                                                      <children>
-                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="62.0" text="Find Cells:">
+                                                                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="93.0" text="Find Cells:">
                                                                            <font>
                                                                               <Font size="14.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <Label prefHeight="265.0" prefWidth="213.0" text="(cell/structure name, keyword, phrase)" />
+                                                                        <Label prefHeight="22.0" prefWidth="205.0" text="(cell/structure name, keyword, phrase)" />
                                                                      </children>
                                                                   </HBox>
                                                                   <HBox fillHeight="false" VBox.vgrow="NEVER">

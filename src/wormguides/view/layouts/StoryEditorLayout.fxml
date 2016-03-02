@@ -394,7 +394,7 @@
                                           <Font size="14.0" />
                                        </font>
                                        <tooltip>
-                                          <Tooltip text="Future feature will allow attachment of notes to parts of cells." />
+                                          <Tooltip text="Future feature will allow control of note location." />
                                        </tooltip>
                                     </Label>
                                  </children>
