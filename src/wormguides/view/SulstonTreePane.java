@@ -83,8 +83,8 @@ public class SulstonTreePane extends ScrollPane {
 						// branch gap
 	// seems to be some multiple of this?
 
-	private int iXmax = 20; // left margin
-	private int iYmin = 20;
+	private int iXmax = 19; // left margin
+	private int iYmin = 19;
 
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
@@ -93,7 +93,9 @@ public class SulstonTreePane extends ScrollPane {
 	private Stage ownStage;
 
 	private Pane canvas;
-	private final static int timeOffsetX = 20; // 17?
+	private final static int timeLabelOffsetX = 20;
+	
+	private final static int timeOffset = 19;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
 
@@ -349,7 +351,7 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setStartY(iYmin + time.getValue());
 		timeIndicator.setY(iYmin + time.getValue());
 
-		timeIndicator.setText(Integer.toString(time.get() + 20));
+		timeIndicator.setText(Integer.toString(time.get() + timeOffset));
 		// System.out.println("adjusting time line");
 	}
 
@@ -449,7 +451,7 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setId("time");
 		
 		//add time indicator
-		timeIndicator = new Text(timeOffsetX, iYmin + timevalue, Integer.toString(time.get()+20));
+		timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get() + timeOffset));
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");
