@@ -25,6 +25,7 @@ public class TerminalCellCase {
 	private ArrayList<String> electricalPartners;
 	private ArrayList<String> neuromuscularPartners;
 	
+	private boolean hasAnatomy;
 	private ArrayList<String> anatomy;
 	private ArrayList<String> geneExpression;
 	private ArrayList<ArrayList<String>> homologues; //homologues[0] will contain L/R homologues, homologues[1] will contain additional symmetries
@@ -77,7 +78,10 @@ public class TerminalCellCase {
 		this.electricalPartners = electricalPartners;
 		this.neuromuscularPartners = neuromuscularPartners;
 		
-		this.anatomy = setAnatomy();
+		this.hasAnatomy = Anatomy.hasAnatomy(this.funcName);
+		if (hasAnatomy) {
+			setAnatomy();
+		}
 		this.geneExpression = setExpressionsFromWORMBASE();
 		this.homologues = setHomologues();
 		this.references = setReferences();
@@ -261,19 +265,15 @@ public class TerminalCellCase {
 		return "<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a><br><br>" + content;
 	}
 	
-	private ArrayList<String> setAnatomy() {
-		ArrayList<String> anatomy = new ArrayList<String>();
+	/**
+	 * Sets the anatomy information is applicable to this cell
+	 */
+	private void setAnatomy() {
+		if (this.funcName == null) return;
 		
-		if (this.funcName == null) return anatomy;
-		
-		
-		/*
-		 * TESTING PURPOSES
-		 */
-		anatomy.add("anatomy entry");
-		anatomy.add("another anatomy entry");
-		
-		return anatomy;
+		if (Anatomy.hasAnatomy(this.funcName)) {
+			this.anatomy = Anatomy.getAnatomy(this.funcName); 
+		}
 	}
 	
 	/**
@@ -618,8 +618,16 @@ public class TerminalCellCase {
 		return "";
 	}
 	
+	public boolean getHasAnatomyFlag() {
+		return this.hasAnatomy;
+	}
+	
 	public ArrayList<String> getAnatomy() {
-		return this.anatomy;
+		if (this.hasAnatomy) {
+			return this.anatomy;
+		} else {
+			return null;
+		}
 	}
 	
 	public ArrayList<String> getPresynapticPartners() {

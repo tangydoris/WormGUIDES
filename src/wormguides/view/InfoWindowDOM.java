@@ -55,7 +55,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName()
-				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 
@@ -87,22 +87,6 @@ public class InfoWindowDOM {
 			HTMLNode functionWORMATLASP = new HTMLNode("p", "", "", terminalCase.getFunctionWORMATLAS());
 			functionWORMATLASDiv.addChild(functionWORMATLASP);
 		}
-
-		// anatomy
-		HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
-		HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-		HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> Anatomy: </strong>");
-		anatomyTopContainerDiv.addChild(collapseAnatomyButton);
-		anatomyTopContainerDiv.addChild(anatomyTitle);
-		HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "height: 0px; visibility: hidden;");
-		HTMLNode anatomyUL = new HTMLNode("ul");
-		for (String anatomyEntry : terminalCase.getAnatomy()) {
-			HTMLNode li = new HTMLNode("li", "", "", anatomyEntry);
-			anatomyUL.addChild(li);
-		}
-		anatomyDiv.addChild(anatomyUL);
 
 		// wiring
 		HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
@@ -193,7 +177,7 @@ public class InfoWindowDOM {
 		if (isneuronpage) {
 			wiringPartnersDiv.addChild(wiringPartnersUL);
 			wiringPartnersDiv.addChild(viewWDDiv); // reversed order of these
-													// elements -AS
+			// elements -AS
 		}
 
 		// expresses
@@ -209,8 +193,8 @@ public class InfoWindowDOM {
 		Collections.sort(expresses);
 		String geneExpressionStr = expresses.toString();
 		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
-																							// surrounding
-																							// brackets
+		// surrounding
+		// brackets
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
 
@@ -385,19 +369,19 @@ public class InfoWindowDOM {
 
 		if (isneuronpage) {
 			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); // will
-																														// contain
-																														// external
-																														// info
-																														// and
-																														// parts
-																														// list
-																														// description.
-																														// float
-																														// left
-																														// for
-																														// img
-																														// on
-																														// right
+			// contain
+			// external
+			// info
+			// and
+			// parts
+			// list
+			// description.
+			// float
+			// left
+			// for
+			// img
+			// on
+			// right
 
 			topContainerDiv.addChild(cellNameDiv);
 			topContainerDiv.addChild(partsListDescrDiv);
@@ -414,8 +398,52 @@ public class InfoWindowDOM {
 			body.addChild(partsListDescrDiv);
 		}
 
-		body.addChild(anatomyTopContainerDiv);
-		body.addChild(anatomyDiv);
+
+		// anatomy --> only build if anatomy info present
+		if (terminalCase.getHasAnatomyFlag()) {
+			HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
+			HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton",
+					"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+			HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; margin-top: 2%; float: left;",
+					"<strong> Anatomy: </strong>");
+			anatomyTopContainerDiv.addChild(collapseAnatomyButton);
+			anatomyTopContainerDiv.addChild(anatomyTitle);
+			HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "height: 0px; visibility: hidden;");
+			HTMLNode anatomyUL = new HTMLNode("ul");
+			ArrayList<String> anatomy = terminalCase.getAnatomy();
+			/* there are 5 fields: name, type, location, function, neurotransmitter
+			 * we'll add labels to the data based on corresponding indices i.e. 0-4
+			 * if a data value is '*' it indicates that the field is N/A and we'll skip those cases
+			 */
+			if (anatomy.size() == 5) { //we won't add name
+				String type = anatomy.get(1);
+				String location = anatomy.get(2);
+				String function = anatomy.get(3);
+				String neurotransmitter = anatomy.get(4);
+				
+				if (!type.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Type: </em>" + type));
+				}
+				
+				if (!location.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Location: </em>" + location));
+				}
+				
+				if (!function.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Function: </em>" + function));
+				}
+				
+				if (!neurotransmitter.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurotransmitter: </em>" + neurotransmitter));
+				}
+				
+				anatomyDiv.addChild(anatomyUL);
+				body.addChild(anatomyTopContainerDiv);
+				body.addChild(anatomyDiv);
+				body.addChild(collapseAnatomyButton.makeCollapseButtonScript()); //add script here for scoping purposes
+			}
+		}
+		
 
 		// only add this section if its contents exist
 		if (isneuronpage) {
@@ -436,7 +464,6 @@ public class InfoWindowDOM {
 
 		// add collapse scripts to body
 		body.addChild(collapseFunctionButton.makeCollapseButtonScript());
-		body.addChild(collapseAnatomyButton.makeCollapseButtonScript());
 		body.addChild(collapseWiringPartnersButton.makeCollapseButtonScript());
 		body.addChild(collapseGeneExpressionButton.makeCollapseButtonScript());
 		body.addChild(collapseHomologuesButton.makeHomologuesCollapseButtonScript());
@@ -474,7 +501,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
 		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName()
-				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+		+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 
@@ -491,10 +518,10 @@ public class InfoWindowDOM {
 		HTMLNode lrUL = new HTMLNode("ul");
 		HTMLNode lrLI = new HTMLNode("li", "", "", "<strong>L/R</strong>");
 		HTMLNode lrLI2 = new HTMLNode("li", "", "", nonTerminalCase.getEmbryonicHomology()); // is
-																								// this
-																								// the
-																								// left/right
-																								// option?
+		// this
+		// the
+		// left/right
+		// option?
 		lrUL.addChild(lrLI);
 		lrUL.addChild(lrLI2);
 		homologuesLeftRightListDiv.addChild(lrUL);
@@ -524,7 +551,7 @@ public class InfoWindowDOM {
 
 			if (functionalName != null) {
 				descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName()
-						+ ")</strong>";
+				+ ")</strong>";
 			} else {
 				descendant = "<strong>" + terminalDescendant.getCellName() + "</strong>";
 			}
@@ -542,12 +569,12 @@ public class InfoWindowDOM {
 		// description for non terminal cell
 		HTMLNode partsListDescrDiv = new HTMLNode("div", "partsListDescr", "");
 		int terminalnum = nonTerminalCase.getTerminalDescendants().size();// #
-																			// of
-																			// terminals
+		// of
+		// terminals
 		String partsListDescription = "Embryonic progenitor cell that generates " + terminalnum + " cells at hatching.";
 		HTMLNode partsListDescrP = new HTMLNode("p", "", "", partsListDescription);
 		partsListDescrDiv.addChild(partsListDescrP);
-		
+
 		// expresses
 		HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
 		HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse",
@@ -561,11 +588,10 @@ public class InfoWindowDOM {
 		Collections.sort(expresses);
 		String geneExpressionStr = expresses.toString();
 		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
-																									// surrounding
-																									// brackets
+		// surrounding
+		// brackets
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
-
 
 		// links
 		HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
@@ -610,13 +636,13 @@ public class InfoWindowDOM {
 			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
-				
+
 		// references
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-						"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
 		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
-						"<strong> References: </strong>");
+				"<strong> References: </strong>");
 		referencesTopContainerDiv.addChild(collapseReferencesButton);
 		referencesTopContainerDiv.addChild(referencesTitle);
 		HTMLNode referencesTEXTPRESSODiv = new HTMLNode("div", "references", "height: 0px; visibility: hidden;");
