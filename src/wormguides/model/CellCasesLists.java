@@ -2,6 +2,7 @@ package wormguides.model;
 
 import java.util.ArrayList;
 
+import wormguides.AnatomyTerm;
 import wormguides.view.InfoWindow;
 import wormguides.view.InfoWindowDOM;
 
@@ -22,12 +23,14 @@ public class CellCasesLists {
 
 	private ArrayList<TerminalCellCase> terminalCases;
 	private ArrayList<NonTerminalCellCase> nonTerminalCases;
+	private ArrayList<AnatomyTermCase> anatomyTermCases;
 
 	private InfoWindow infoWindow;
 
 	public CellCasesLists(InfoWindow window) {
 		terminalCases = new ArrayList<TerminalCellCase>();
 		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
+		anatomyTermCases = new ArrayList<AnatomyTermCase>();
 		infoWindow = window;
 	}
 
@@ -124,6 +127,27 @@ public class CellCasesLists {
 				infoWindow.addTab(ntcDOM);
 		}
 	}
+	
+	public void makeAnatomyTermCase(AnatomyTerm term) {
+		AnatomyTermCase termCase = new AnatomyTermCase(term);
+		
+		addAnatomyTermCase(termCase);
+	}
+	
+	private void addAnatomyTermCase(AnatomyTermCase termCase) {
+		if (termCase != null) {
+			anatomyTermCases.add(termCase);
+			
+			//create dom
+			InfoWindowDOM termCaseDOM = new InfoWindowDOM(termCase);
+			
+			//add dom to InfoWindow
+			if (infoWindow != null) {
+				infoWindow.addTab(termCaseDOM);
+			}
+			
+		}
+	}
 
 	/**
 	 * Searches the list of terminal cases for a case corresponding to the given cell
@@ -164,6 +188,18 @@ public class CellCasesLists {
 		}
 		return false;
 	}
+	
+	public boolean containsAnatomyTermCase(String term) {
+		if (anatomyTermCases != null) {
+			for (AnatomyTermCase atc : anatomyTermCases) {
+				if (atc.getName().toLowerCase().equals(term.toLowerCase())) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Checks if a cell name has a corresponding case in the terminal cases OR non terminal cases
@@ -171,8 +207,8 @@ public class CellCasesLists {
 	 * @param cellName
 	 * @return boolean corresponding to if the cell case is found
 	 */
-	public boolean hasCellCase(String cellName) {
-		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName);
+	public boolean hasCellCase(String cellName) { //TODO refactor this to just be name
+		return containsTerminalCase(cellName) || containsNonTerminalCase(cellName) || containsAnatomyTermCase(cellName);
 	}
 
 	/**
@@ -198,6 +234,14 @@ public class CellCasesLists {
 				}
 			}
 		}
+		
+		if (containsAnatomyTermCase(cellName)) {
+			for (int i = 0; i < anatomyTermCases.size(); i++) {
+				if (anatomyTermCases.get(i).getName().toLowerCase().equals(cellName.toLowerCase())) {
+					anatomyTermCases.remove(i);
+					return;
+				}
+			}
+		}	
 	}
-
 }

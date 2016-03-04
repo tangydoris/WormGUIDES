@@ -396,6 +396,13 @@ public class HTMLNode {
 
 		return new HTMLNode("script", script, true);
 	}
+	
+	public HTMLNode handleAmphidClickScript() {
+		String script = "function handleAmphidClick() {" + newLine + "app.handleAmphidClick();"
+				+ newLine + "}"; 
+		
+		return new HTMLNode("script", script, true);
+	}
 
 	public String getTag() {
 		if (this.tag != null) {
