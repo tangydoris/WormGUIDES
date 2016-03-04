@@ -242,7 +242,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> External Links: </strong>");
+				"<strong>External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
@@ -654,7 +654,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> External Links: </strong>");
+				"<strong>External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
@@ -872,7 +872,7 @@ public class InfoWindowDOM {
 			HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 					"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 			HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
-					"<strong> External Links: </strong>");
+					"<strong>External Links: </strong>");
 			linksTopContainerDiv.addChild(collapseLinksButton);
 			linksTopContainerDiv.addChild(linksTitle);
 			HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
