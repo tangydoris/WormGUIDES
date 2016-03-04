@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -89,10 +88,8 @@ import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
-import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
-import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
@@ -830,7 +827,7 @@ public class Window3DController {
 
 					if (event.getButton() == MouseButton.SECONDARY) {
 						if (sceneElementsList.isMulticellStructureName(name))
-							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR);
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR_STRUCTURE_BASED);
 						else
 							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
 					}
@@ -1289,30 +1286,22 @@ public class Window3DController {
 					}
 
 					// If mesh has with name(s), then process rules (cell or
-					// shape)
-					// that apply to it
+					// shape) that apply to it
 					else {
-						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
-
-						// iterate over rulesList
+						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule instanceof MulticellularStructureRule) {
-								// check equivalence of shape rule to scene name
-								if (((MulticellularStructureRule) rule).appliesTo(sceneName)) {
-									colors.add(Color.web(rule.getColor().toString()));
-								}
-							}
+							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
+								colors.add(rule.getColor());
 
-							else if (rule instanceof ColorRule) {
-								// iterate over cells and check if cells apply
+							else {
 								for (String name : allNames) {
-									if (((ColorRule) rule).appliesToBody(name)) {
+									if (rule.appliesToCellBody(name))
 										colors.add(rule.getColor());
-									}
 								}
 							}
 						}
+						Collections.sort(colors, colorComparator);
 
 						// if any rules applied
 						if (!colors.isEmpty())
@@ -1369,13 +1358,15 @@ public class Window3DController {
 			}
 			// not in search mode
 			else {
-				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
+				ArrayList<Color> colors = new ArrayList<Color>();
+				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
-					if (rule.appliesToCell(cellNames[i])) {
+					if (rule.appliesToCellNucleus(cellNames[i])) {
 						colors.add(Color.web(rule.getColor().toString()));
 					}
 				}
+				Collections.sort(colors, colorComparator);
 				material = colorHash.getMaterial(colors);
 
 				if (colors.isEmpty())
@@ -2038,12 +2029,11 @@ public class Window3DController {
 			contextMenuStage.hide();
 	}
 
-	public ArrayList<ColorRule> getColorRulesList() {
-		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (Rule rule : currentRulesList) {
-			if (rule instanceof ColorRule)
-				list.add((ColorRule) rule);
-		}
+	public ArrayList<Rule> getColorRulesList() {
+		ArrayList<Rule> list = new ArrayList<Rule>();
+		for (Rule rule : currentRulesList)
+			list.add(rule);
+
 		return list;
 	}
 
@@ -2051,7 +2041,7 @@ public class Window3DController {
 		return currentRulesList;
 	}
 
-	public void setColorRulesList(ArrayList<ColorRule> list) {
+	public void setColorRulesList(ArrayList<Rule> list) {
 		currentRulesList.clear();
 		currentRulesList.setAll(list);
 	}

@@ -7,13 +7,13 @@ public enum SearchType {
 	DESCRIPTION ("\"PartsList\" Description"),
 	GENE ("Gene"),
 	CONNECTOME ("Connectome"),
-	/*
-	 * This MULTICELL enum is different from SearchOption.MULTICELLULAR
-	 * SearchTyle.MULTICELL tells the Search class to only look for multicellular structures
+	/**
+	 * This SearchType.MULTICELL enum is different from SearchOption.MULTICELLULAR.
+	 * SearchTyle.MULTICELL tells the Search class to only look for cells specified by multicellular structures.
 	 * SearchOption.MULTICELLULAR is used to distinguish multicell structures from cell bodies
 	 * when meshes in the 3D window query the rules
 	 */
-	MULTICELL ("Multicellular Structure"),
+	MULTICELLULAR_CELL_BASED ("Multicellular Structure"),
 	NEIGHBOR ("Neighbor");
 	
 	

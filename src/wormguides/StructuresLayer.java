@@ -27,7 +27,6 @@ import javafx.util.Callback;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AppFont;
-import wormguides.model.MulticellularStructureRule;
 import wormguides.model.PartsList;
 
 public class StructuresLayer {
@@ -121,9 +120,8 @@ public class StructuresLayer {
 	}
 
 	private void deselectAllStructures() {
-		for (String name : nameListCellMap.keySet()) {
+		for (String name : nameListCellMap.keySet())
 			nameListCellMap.get(name).setSelected(false);
-		}
 	}
 
 	public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
@@ -150,14 +148,11 @@ public class StructuresLayer {
 	public void addStructureRule(String name, Color color) {
 		if (name == null || color == null)
 			return;
-
+		
 		// Check for validity of name
-		if (allStructuresList.contains(name)) {
-			name = name.trim();
-			ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
-			optionsArray.add(SearchOption.MULTICELLULAR);
-			rulesList.add(new MulticellularStructureRule(name, color, optionsArray));
-		}
+		name = name.trim();
+		if (allStructuresList.contains(name))
+			Search.addMulticellularStructureRule(name, color);
 	}
 
 	public EventHandler<ActionEvent> getColorPickerListener() {

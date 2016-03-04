@@ -19,7 +19,7 @@ import javafx.scene.layout.VBox;
 import wormguides.URLGenerator;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.ImageLoader;
-import wormguides.model.ColorRule;
+import wormguides.model.Rule;
 
 public class URLWindow extends AnchorPane {
 
@@ -102,7 +102,7 @@ public class URLWindow extends AnchorPane {
 
 	public void resetURLs() {
 		if (scene != null) {
-			ArrayList<ColorRule> list = scene.getColorRulesList();
+			ArrayList<Rule> list = scene.getColorRulesList();
 			urlString = URLGenerator.generateAndroid(list, scene.getTime(), scene.getRotationX(), scene.getRotationY(),
 					scene.getRotationZ(), scene.getTranslationX(), scene.getTranslationY(), scene.getScale(),
 					scene.getOthersVisibility());

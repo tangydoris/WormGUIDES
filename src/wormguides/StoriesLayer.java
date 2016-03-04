@@ -48,7 +48,6 @@ import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
 import wormguides.loaders.StoryFileUtil;
 import wormguides.loaders.URLLoader;
-import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Rule;
@@ -64,7 +63,7 @@ public class StoriesLayer {
 	private Stage parentStage;
 
 	private SceneElementsList sceneElementsList;
-	
+
 	private StructuresLayer structuresLayer;
 
 	private ObservableList<Story> stories;
@@ -102,7 +101,7 @@ public class StoriesLayer {
 			Button newStoryButton, StructuresLayer structuresLayer) {
 
 		parentStage = parent;
-		
+
 		this.structuresLayer = structuresLayer;
 
 		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -209,8 +208,7 @@ public class StoriesLayer {
 				if (activeStory != null) {
 					updateColorURL();
 					StoryFileUtil.saveToCSVFile(activeStory, file, timeOffset);
-				}
-				else
+				} else
 					System.out.println("no active story to save");
 				// TODO make error pop up
 			} catch (IOException e) {
@@ -221,21 +219,17 @@ public class StoriesLayer {
 			System.out.println("file saved");
 		}
 	}
-	
+
 	/**
-	 * Because the Color URL is set on New Note, we need to update the color URL before saving
-	 * to account for additions and deletions
+	 * Because the Color URL is set on New Note, we need to update the color URL
+	 * before saving to account for additions and deletions
 	 */
 	private void updateColorURL() {
 		if (activeStory != null) {
 			activeStory.setActive(false);
 			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-			// fix subclassing for rule and colorrule
-			// TODO currently only supports rules for cells/cell bodies, not
-			// multicell structures
 			for (Rule rule : currentRules) {
-				if (rule instanceof ColorRule)
-					rulesCopy.add((ColorRule) rule);
+				rulesCopy.add(rule);
 			}
 
 			activeStory.setColorURL(
@@ -245,7 +239,7 @@ public class StoriesLayer {
 							window3DController.getScale(), window3DController.getOthersVisibility()));
 		}
 	}
-	
+
 	public StringProperty getActiveStoryProperty() {
 		return activeStoryProperty;
 	}
@@ -263,12 +257,8 @@ public class StoriesLayer {
 		if (activeStory != null) {
 			activeStory.setActive(false);
 			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-			// fix subclassing for rule and colorrule
-			// TODO currently only supports rules for cells/cell bodies, not
-			// multicell structures
 			for (Rule rule : currentRules) {
-				if (rule instanceof ColorRule)
-					rulesCopy.add((ColorRule) rule);
+				rulesCopy.add(rule);
 			}
 
 			activeStory.setColorURL(
@@ -297,8 +287,7 @@ public class StoriesLayer {
 				useInternalRules.set(true);
 				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
 				for (Rule rule : currentRules) {
-					if (rule instanceof ColorRule)
-						rulesCopy.add((ColorRule) rule);
+						rulesCopy.add(rule);
 				}
 				activeStory.setColorURL(
 						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
@@ -324,7 +313,7 @@ public class StoriesLayer {
 		if (timeProperty.get() != startTime)
 			timeProperty.set(startTime);
 		else {
-			rebuildSceneFlag.set(true); // TODO is this buggy?? (doris)
+			rebuildSceneFlag.set(true);
 			rebuildSceneFlag.set(false);
 		}
 	}
@@ -555,11 +544,9 @@ public class StoriesLayer {
 
 			loader.setController(editController);
 
-			//loader.setRoot(editController);
-			
+			// loader.setRoot(editController);
 
 			loader.setRoot(editController);
-
 
 			try {
 				editStage.setScene(new Scene((AnchorPane) loader.load()));

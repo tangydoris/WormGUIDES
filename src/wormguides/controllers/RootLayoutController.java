@@ -917,7 +917,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		conRadioBtn.setToggleGroup(typeToggleGroup);
 		conRadioBtn.setUserData(SearchType.CONNECTOME);
 		multiRadioBtn.setToggleGroup(typeToggleGroup);
-		multiRadioBtn.setUserData(SearchType.MULTICELL);
+		multiRadioBtn.setUserData(SearchType.MULTICELLULAR_CELL_BASED);
 
 		typeToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override

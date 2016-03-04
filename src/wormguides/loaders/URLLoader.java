@@ -70,75 +70,85 @@ public class URLLoader {
 			boolean isMulticellStructureRule = false;
 
 			try {
-				// determine if rule is ColorRule or StructureRule
-				if (sb.indexOf("-M") > -1)
+				// determine if rule is a cell/cellbody rule, or a multicelllar
+				// structure rule
+				if (sb.indexOf("M") > -1)
 					isMulticellStructureRule = true;
 
-				// parse other args
-				if (sb.indexOf("-s") > -1) {
-					noTypeSpecified = false;
-					types.add("-s");
-					int i = sb.indexOf("-s");
-					sb.replace(i, i+2, "");
-				}
-				if (sb.indexOf("-n") > -1) {
-					noTypeSpecified = false;
-					types.add("-n");
-					int i = sb.indexOf("-n");
-					sb.replace(i, i+2, "");
-				}
-				if (sb.indexOf("-d") > -1) {
-					noTypeSpecified = false;
-					types.add("-d");
-					int i = sb.indexOf("-d");
-					sb.replace(i, i+2, "");
-				}
-				if (sb.indexOf("-g") > -1) {
-					noTypeSpecified = false;
-					types.add("-g");
-					int i = sb.indexOf("-g");
-					sb.replace(i, i+2, "");
-				}
-				if (sb.indexOf("-m") > -1) {
-					noTypeSpecified = false;
-					types.add("-m");
-					int i = sb.indexOf("-m");
-					sb.replace(i, i+2, "");
+				// multicellular structure rules have a null SearchType
+				else {
+					// parse other args
+					if (sb.indexOf("-s") > -1) {
+						noTypeSpecified = false;
+						types.add("-s");
+						int i = sb.indexOf("-s");
+						sb.replace(i, i + 2, "");
+					}
+					if (sb.indexOf("-n") > -1) {
+						noTypeSpecified = false;
+						types.add("-n");
+						int i = sb.indexOf("-n");
+						sb.replace(i, i + 2, "");
+					}
+					if (sb.indexOf("-d") > -1) {
+						noTypeSpecified = false;
+						types.add("-d");
+						int i = sb.indexOf("-d");
+						sb.replace(i, i + 2, "");
+					}
+					if (sb.indexOf("-g") > -1) {
+						noTypeSpecified = false;
+						types.add("-g");
+						int i = sb.indexOf("-g");
+						sb.replace(i, i + 2, "");
+					}
+					if (sb.indexOf("-m") > -1) {
+						noTypeSpecified = false;
+						types.add("-m");
+						int i = sb.indexOf("-m");
+						sb.replace(i, i + 2, "");
+					}
 				}
 
 				String colorString = sb.substring(sb.indexOf("+") + 6, sb.length());
 
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-				if (sb.indexOf("%3C") > -1) {
-					options.add(SearchOption.ANCESTOR);
-					int i = sb.indexOf("%3C");
-					sb.replace(i, i+3, "");
-				}
-				if (sb.indexOf(">") > -1) {
-					options.add(SearchOption.ANCESTOR);
-					int i = sb.indexOf(">");
-					sb.replace(i, i+1, "");
-				}
-				if (sb.indexOf("$") > -1) {
-					options.add(SearchOption.CELL);
-					options.add(SearchOption.CELLBODY);
-					int i = sb.indexOf("$");
-					sb.replace(i, i+1, "");
-				}
-				if (rule.indexOf("%3E") > -1) {
-					options.add(SearchOption.DESCENDANT);
-					int i = sb.indexOf("%3E");
-					sb.replace(i, i+3, "");
-				}
-				if (sb.indexOf("<") > -1) {
-					options.add(SearchOption.DESCENDANT);
-					int i = sb.indexOf("<");
-					sb.replace(i, i+1, "");
-				}
-				if (sb.indexOf("#") > -1) {
-					options.add(SearchOption.CELLBODY);
-					int i = sb.indexOf("#");
-					sb.replace(i, i+1, "");
+				if (isMulticellStructureRule) {
+					options.add(SearchOption.MULTICELLULAR_STRUCTURE_BASED);
+					int i = sb.indexOf("M");
+					sb.replace(i, i + 1, "");
+					
+				} else {
+					if (sb.indexOf("%3C") > -1) {
+						options.add(SearchOption.ANCESTOR);
+						int i = sb.indexOf("%3C");
+						sb.replace(i, i + 3, "");
+					}
+					if (sb.indexOf(">") > -1) {
+						options.add(SearchOption.ANCESTOR);
+						int i = sb.indexOf(">");
+						sb.replace(i, i + 1, "");
+					}
+					if (sb.indexOf("$") > -1) {
+						options.add(SearchOption.CELL);
+						int i = sb.indexOf("$");
+						sb.replace(i, i + 1, "");
+					}
+					if (rule.indexOf("%3E") > -1) {
+						options.add(SearchOption.DESCENDANT);
+						int i = sb.indexOf("%3E");
+						sb.replace(i, i + 3, "");
+					}
+					if (sb.indexOf("<") > -1) {
+						options.add(SearchOption.DESCENDANT);
+						int i = sb.indexOf("<");
+						sb.replace(i, i + 1, "");
+					}
+					if (sb.indexOf("#") > -1) {
+						options.add(SearchOption.CELLBODY);
+						int i = sb.indexOf("#");
+						sb.replace(i, i + 1, "");
+					}
 				}
 
 				// extract name from what's left of rule
@@ -157,10 +167,16 @@ public class URLLoader {
 
 					if (types.contains("-g"))
 						Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
-					
+
 					if (types.contains("-m"))
-						Search.addColorRule(SearchType.MULTICELL, name, Color.web(colorString), options);
-					
+						Search.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
+
+					if (types.contains("-b"))
+						Search.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+
+					if (types.contains("-c"))
+						Search.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+
 					// if no type present, default is systematic
 					if (noTypeSpecified) {
 						SearchType type = SearchType.LINEAGE;
@@ -168,7 +184,8 @@ public class URLLoader {
 							type = SearchType.GENE;
 						Search.addColorRule(type, name, Color.web(colorString), options);
 					}
-				} else { // add StructureRule
+					
+				} else { // add multicellular structure rule
 					structuresLayer.addStructureRule(name, Color.web(colorString));
 				}
 

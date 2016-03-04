@@ -1,9 +1,7 @@
 package wormguides.view;
 
 import wormguides.model.ColorHash;
-import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
-import wormguides.model.MulticellularStructureRule;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.ColorComparator;
@@ -13,6 +11,8 @@ import wormguides.SearchType;
 import wormguides.controllers.ContextMenuController;
 import wormguides.loaders.ImageLoader;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -94,7 +94,7 @@ public class SulstonTreePane extends ScrollPane {
 
 	private Pane canvas;
 	private final static int timeLabelOffsetX = 20;
-	
+
 	private final static int timeOffset = 19;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
@@ -449,8 +449,8 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
 		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicatorBar.setId("time");
-		
-		//add time indicator
+
+		// add time indicator
 		timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get() + timeOffset));
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
@@ -466,18 +466,13 @@ public class SulstonTreePane extends ScrollPane {
 	// retrieves material for use as texture on lines
 	private Paint paintThatAppliesToCell(String cellname) {
 		if (cellname != null) {
-			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				if (rule instanceof MulticellularStructureRule) {
-					// nothing
-				}
-
-				else if (rule instanceof ColorRule) {
-					if (((ColorRule) rule).appliesToCell(cellname))
-						colors.add(rule.getColor());
-				}
+				if (rule.appliesToCellNucleus(cellname))
+					colors.add(rule.getColor());
 			}
+			Collections.sort(colors, new ColorComparator());
 
 			// translate color list to material from material cache
 			if (!colors.isEmpty()) {
@@ -495,23 +490,11 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	private Color ColorsThatApplyToCell(String cellname) {
-		// TreeSet<Color> colors = new TreeSet<Color>();
-
 		// iterate over rulesList
 		for (Rule rule : rules) {
-
-			if (rule instanceof MulticellularStructureRule) {
-				// nothing
-			}
-
-			else if (rule instanceof ColorRule) {
-				// iterate over cells and check if cells apply
-				if (((ColorRule) rule).appliesToBody(cellname)) {
-					// colors.add(rule.getColor());
-					return rule.getColor();
-				}
-
-			}
+			// iterate over cells and check if cells apply
+			if (rule.appliesToCellNucleus(cellname))
+				return rule.getColor();
 		}
 		return null; // colors;
 	}

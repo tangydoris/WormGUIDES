@@ -20,7 +20,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import wormguides.model.CellCasesLists;
-import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -144,10 +143,8 @@ public class Search {
 					String searched = WormBaseQuery.getSearchedText();
 					geneSearchQueue.remove(searched);
 					for (Rule rule : rulesList) {
-						if (rule instanceof ColorRule) {
-							if (rule.getSearchedText().contains("'" + searched + "'")) {
-								rule.setCells(geneSearchService.getValue());
-							}
+						if (rule.getSearchedText().contains("'" + searched + "'")) {
+							rule.setCells(geneSearchService.getValue());
 						}
 					}
 					geneResultsUpdated.set(!geneResultsUpdated.get());
@@ -192,12 +189,11 @@ public class Search {
 			}
 		}
 
-		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-		options.add(SearchOption.CELL);
-		ColorRule tempRule = new ColorRule(sb.toString(), color);
+		Rule tempRule = new Rule(sb.toString(), color, SearchType.CONNECTOME, SearchOption.CELL);
 		tempRule.setCells(connectome.queryConnectivity(cellName, isPresynaptic, isPostsynaptic, isElectrical,
 				isNeuromuscular, true));
-		tempRule.setText(sb.toString());
+		tempRule.setSearchedText(cellName);
+		tempRule.resetLabel(sb.toString());
 
 		rulesList.add(tempRule);
 		return tempRule;
@@ -279,12 +275,10 @@ public class Search {
 		rulesList = list;
 	}
 
-	public boolean containsColorRule(ColorRule other) {
+	public boolean containsColorRule(Rule other) {
 		for (Rule rule : rulesList) {
-			if (rule instanceof ColorRule) {
-				if (rule.equals(other))
-					return true;
-			}
+			if (rule.equals(other))
+				return true;
 		}
 		return false;
 	}
@@ -314,10 +308,18 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdr", Color.web("0xc95aa9"), SearchOption.CELLBODY);
+		
+		// TODO remove later
+		addMulticellularStructureRule("amphid commissure right", Color.ORANGE);
+		addMulticellularStructureRule("amphid commissure left", Color.RED);
 	}
 
 	public void clearRules() {
 		rulesList.clear();
+	}
+
+	public static Rule addMulticellularStructureRule(String searched, Color color) {
+		return addColorRule(null, searched, color, SearchOption.MULTICELLULAR_STRUCTURE_BASED);
 	}
 
 	public static Rule addColorRule(SearchType type, String searched, Color color, SearchOption... options) {
@@ -327,60 +329,69 @@ public class Search {
 		return addColorRule(type, searched, color, optionsArray);
 	}
 
-	public static Rule addColorRule(SearchType type, String searched, Color color, ArrayList<SearchOption> options) {
-		SearchType tempType = Search.type;
-		Search.type = type;
+	public static Rule addColorRule(SearchType searchType, String searched, Color color,
+			ArrayList<SearchOption> options) {
+		SearchType tempType = type;
+		type = searchType;
 		Rule rule = addColorRule(searched, color, options);
-		Search.type = tempType;
+		type = tempType;
 		return rule;
 	}
 
 	private static Rule addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
-		// default search options is cell and descendant
-		if (options == null)
+		// default search options is cell
+		if (options == null) {
 			options = new ArrayList<SearchOption>();
+			options.add(SearchOption.CELL);
+		}
 
 		String label = "";
 		searched = searched.toLowerCase();
 		searched = searched.trim();
-		switch (type) {
-		case LINEAGE:
-			label = LineageTree.getCaseSensitiveName(searched);
-			if (label.isEmpty())
+		if (type != null) {
+			switch (type) {
+
+			case LINEAGE:
+				label = LineageTree.getCaseSensitiveName(searched);
+				if (label.isEmpty())
+					label = searched;
+				break;
+
+			case FUNCTIONAL:
+				label = "'" + searched + "' Functional";
+				break;
+
+			case DESCRIPTION:
+				label = "'" + searched + "' \"PartsList\" Description";
+				break;
+
+			case GENE:
+				geneSearchQueue.add(searched);
+				label = "'" + searched + "' Gene";
+				break;
+
+			case CONNECTOME:
+				label = "'" + searched + "' Connectome";
+				break;
+
+			case MULTICELLULAR_CELL_BASED:
+				label = "'" + searched + "' Multicellular Structure";
+				break;
+
+			case NEIGHBOR:
+				label = "'" + searched + "' Neighbors";
+				break;
+
+			default:
 				label = searched;
-			break;
-
-		case FUNCTIONAL:
-			label = "'" + searched + "' Functional";
-			break;
-
-		case DESCRIPTION:
-			label = "'" + searched + "' \"PartsList\" Description";
-			break;
-
-		case GENE:
-			geneSearchQueue.add(searched);
-			label = "'" + searched + "' Gene";
-			break;
-
-		case CONNECTOME:
-			label = "'" + searched + "' Connectome";
-			break;
-
-		case MULTICELL:
-			label = "'" + searched + "' Multicellular Structure";
-			break;
-
-		case NEIGHBOR:
-			label = "'" + searched + "' Neighbors";
-			break;
-
-		default:
+				break;
+			}
+		} else { // if search type is null, then rule was a multicellular
+					// structure rule
 			label = searched;
-			break;
 		}
 
-		ColorRule rule = new ColorRule(label, color, options, type);
+		Rule rule = new Rule(label, color, type, options);
 
 		ArrayList<String> cells;
 
@@ -402,114 +413,118 @@ public class Search {
 		ArrayList<String> cells = new ArrayList<String>();
 		searched = searched.toLowerCase();
 
-		switch (type) {
-		case LINEAGE:
-			for (String name : activeLineageNames) {
-				if (name.toLowerCase().equals(searched))
-					cells.add(name);
-			}
-			break;
+		if (type != null) {
+			switch (type) {
+			case LINEAGE:
+				for (String name : activeLineageNames) {
+					if (name.toLowerCase().equals(searched))
+						cells.add(name);
+				}
+				break;
 
-		case FUNCTIONAL:
-			String name;
-			for (int i = 0; i < functionalNames.size(); i++) {
-				name = functionalNames.get(i);
-				if (name.toLowerCase().startsWith(searched))
-					cells.add(PartsList.getLineageNameByIndex(i));
-			}
-			/*
-			 * for (String name : functionalNames) { if
-			 * (name.toLowerCase().startsWith(searched))
-			 * cells.add(PartsList.getLineageNameByFunctionalName(name)); }
-			 */
-			break;
+			case FUNCTIONAL:
+				String name;
+				for (int i = 0; i < functionalNames.size(); i++) {
+					name = functionalNames.get(i);
+					if (name.toLowerCase().startsWith(searched))
+						cells.add(PartsList.getLineageNameByIndex(i));
+				}
+				/*
+				 * for (String name : functionalNames) { if
+				 * (name.toLowerCase().startsWith(searched))
+				 * cells.add(PartsList.getLineageNameByFunctionalName(name)); }
+				 */
+				break;
 
-		case DESCRIPTION:
-			// TODO some cells with the searched term are not showing up in
-			// results list
-			// this is because some cells have the same description and it
-			// gives the first one found
+			case DESCRIPTION:
+				// TODO some cells with the searched term are not showing up in
+				// results list
+				// this is because some cells have the same description and it
+				// gives the first one found
 
-			// FIXED ^^ ???
+				// FIXED ^^ ???
 
-			// for searching with multiple terms, perform individual searches
-			// and return the intersection of the hits
-			ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
-			String[] keywords = searched.split(" ");
-			for (String keyword : keywords) {
-				ArrayList<String> results = new ArrayList<String>();
-				for (int i = 0; i < descriptions.size(); i++) {
-					String textLowerCase = descriptions.get(i).toLowerCase();
+				// for searching with multiple terms, perform individual
+				// searches
+				// and return the intersection of the hits
+				ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+				String[] keywords = searched.split(" ");
+				for (String keyword : keywords) {
+					ArrayList<String> results = new ArrayList<String>();
+					for (int i = 0; i < descriptions.size(); i++) {
+						String textLowerCase = descriptions.get(i).toLowerCase();
 
-					// look for match
-					if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
-						// get cell name that corresponds to matching
-						// description
-						String cell = PartsList.getLineageNameByIndex(i);
+						// look for match
+						if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+							// get cell name that corresponds to matching
+							// description
+							String cell = PartsList.getLineageNameByIndex(i);
 
-						// only add new entries
-						if (!results.contains(cell)) {
-							results.add(cell);
+							// only add new entries
+							if (!results.contains(cell)) {
+								results.add(cell);
+							}
+						}
+					}
+					// add the results to the hits
+					hits.add(results);
+				}
+
+				// find the intersection among the results --> using the first
+				// list
+				// to find matches
+				if (hits.size() > 0) {
+					ArrayList<String> results = hits.get(0);
+					for (int k = 0; k < results.size(); k++) {
+						String cell = results.get(k);
+
+						// look for a match in rest of the hits
+						boolean intersection = true;
+						for (int i = 1; i < hits.size(); i++) {
+							if (!hits.get(i).contains(cell)) {
+								intersection = false;
+							}
+						}
+
+						if (intersection && !cells.contains(cell)) {
+							cells.add(cell);
 						}
 					}
 				}
-				// add the results to the hits
-				hits.add(results);
-			}
 
-			// find the intersection among the results --> using the first list
-			// to find matches
-			if (hits.size() > 0) {
-				ArrayList<String> results = hits.get(0);
-				for (int k = 0; k < results.size(); k++) {
-					String cell = results.get(k);
+				break;
 
-					// look for a match in rest of the hits
-					boolean intersection = true;
-					for (int i = 1; i < hits.size(); i++) {
-						if (!hits.get(i).contains(cell)) {
-							intersection = false;
-						}
-					}
-
-					if (intersection && !cells.contains(cell)) {
-						cells.add(cell);
-					}
+			case GENE:
+				if (isGeneFormat(getSearchedText())) {
+					showLoadingService.restart();
+					WormBaseQuery.doSearch(getSearchedText());
 				}
-			}
+				break;
 
-			break;
-
-		case GENE:
-			if (isGeneFormat(getSearchedText())) {
-				showLoadingService.restart();
-				WormBaseQuery.doSearch(getSearchedText());
-			}
-			break;
-
-		case MULTICELL:
-			if (sceneElementsList != null) {
-				for (SceneElement se : sceneElementsList.getList()) {
-					if (se.isMulticellular()) {
-						if (isNameSearched(se.getSceneName(), searched)) {
-							for (String cellName : se.getAllCellNames()) {
-								if (!cells.contains(cellName))
-									cells.add(cellName);
+			case MULTICELLULAR_CELL_BASED:
+				if (sceneElementsList != null) {
+					for (SceneElement se : sceneElementsList.getList()) {
+						if (se.isMulticellular()) {
+							if (isNameSearched(se.getSceneName(), searched)) {
+								for (String cellName : se.getAllCellNames()) {
+									if (!cells.contains(cellName))
+										cells.add(cellName);
+								}
 							}
 						}
 					}
 				}
-			}
-			break;
+				break;
 
-		case CONNECTOME:
-			if (connectome != null) {
-				cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
-						electricalTicked, neuromuscularTicked, true));
+			case CONNECTOME:
+				if (connectome != null) {
+					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
+							electricalTicked, neuromuscularTicked, true));
+				}
+				break;
+			case NEIGHBOR:
+				cells = getNeighbors(searched);
 			}
-			break;
-		case NEIGHBOR:
-			cells = getNeighbors(searched);
 		}
 		return cells;
 	}
