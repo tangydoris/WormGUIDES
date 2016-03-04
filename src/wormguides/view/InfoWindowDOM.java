@@ -415,18 +415,28 @@ public class InfoWindowDOM {
 			 * we'll add labels to the data based on corresponding indices i.e. 0-4
 			 * if a data value is '*' it indicates that the field is N/A and we'll skip those cases
 			 */
-			if (anatomy.size() == 5) { //we won't add name
+			if (anatomy.size() == 7) { //we won't add name
 				String type = anatomy.get(1);
-				String location = anatomy.get(2);
-				String function = anatomy.get(3);
-				String neurotransmitter = anatomy.get(4);
+				String somaLocation = anatomy.get(2);
+				String neuriteLocation = anatomy.get(3);
+				String morphologicalFeature = anatomy.get(4);
+				String function = anatomy.get(5);
+				String neurotransmitter = anatomy.get(6);
 				
 				if (!type.equals("*")) {
 					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Type: </em>" + type));
 				}
 				
-				if (!location.equals("*")) {
-					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Location: </em>" + location));
+				if (!somaLocation.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Soma Location: </em>" + somaLocation));
+				}
+				
+				if (!neuriteLocation.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurite Location: </em>" + neuriteLocation));
+				}
+				
+				if (!morphologicalFeature.equals("*")) {
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Morphological Feature: </em>" + morphologicalFeature));
 				}
 				
 				if (!function.equals("*")) {
