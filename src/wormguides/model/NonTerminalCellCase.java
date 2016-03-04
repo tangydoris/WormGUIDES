@@ -1,5 +1,6 @@
 package wormguides.model;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -267,28 +268,38 @@ public class NonTerminalCellCase {
 	private ArrayList<String> buildLinks() {
 		ArrayList<String> links = new ArrayList<String>();
 
-		links.add(buildWORMBASELink());
+		links.add(buildWormatlasLink());
+		System.out.println("moved on");
 		links.add(addGoogleLink());
 		links.add(addGoogleWormatlasLink());
 
 		return links;
 	}
 
-	private String buildWORMBASELink() {
+	private String buildWormatlasLink() {
 		if (this.cellName == null)
-			return "";
-
-		String URL = wormbaseURL + this.cellName + wormbaseEXT;
-
+			return "";	
+		String URL = wormatlasURL + cellName.toUpperCase() + wormatlasURLEXT;
+		
 		try {
-			// URLConnection connection = new URL(URL).openConnection();
+			URL url = new URL(URL);
+			System.out.println(url.toExternalForm());
+			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.connect();
+			
+			if (connection.getResponseCode() == 404) {
+				return "";
+			} else if (connection.getResponseCode() == 200) {
+				return URL;
+			}
 		} catch (Exception e) {
-			// e.printStackTrace();
-			// a page wasn't found on wormatlas
-			System.out.println(this.cellName + " page not found on Wormbase");
+			e.printStackTrace();
+			System.out.println(this.cellName + " page not found on Wormatlas");
+			return "";
 		}
 
-		return URL;
+		return "";
 	}
 
 	private String addGoogleLink() {
@@ -341,6 +352,8 @@ public class NonTerminalCellCase {
 
 	private final static String wormbaseURL = "http://www.wormbase.org/db/get?name=";
 	private final static String wormbaseEXT = ";class=Anatomy_term";
+	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
+	private final static String wormatlasURLEXT = "mainframe.htm";
 	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
 	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
 	private final static String textpressoTitleStr = "Title: </span>";

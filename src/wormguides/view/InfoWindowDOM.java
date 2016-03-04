@@ -660,36 +660,41 @@ public class InfoWindowDOM {
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : nonTerminalCase.getLinks()) {
-			String anchor = link; // replaced with anchor if valid link
+			if (!link.equals("")) {
+				String anchor = link; // replaced with anchor if valid link
 
-			// begin after www.
-			int startIDX = link.indexOf("www.") + 4;
-			if (startIDX > 0) {
-				String placeholder = link.substring(startIDX);
+				// begin after www.
+				int startIDX = link.indexOf("www.") + 4;
+				if (startIDX > 0) {
+					String placeholder = link.substring(startIDX);
 
-				// find end of site name using '.'
-				int dotIDX = placeholder.indexOf(".");
-				if (dotIDX > 0) {
-					placeholder = placeholder.substring(0, dotIDX);
+					// find end of site name using '.'
+					int dotIDX = placeholder.indexOf(".");
+					if (dotIDX > 0) {
+						placeholder = placeholder.substring(0, dotIDX);
 
-					// check for google links
-					if (placeholder.equals("google")) {
-						// check if wormatlas specific search
-						if (link.contains("site:wormatlas.org")) {
-							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-									+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+						// check for google links
+						if (placeholder.equals("google")) {
+							// check if wormatlas specific search
+							if (link.contains("site:wormatlas.org")) {
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+							} else {
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ nonTerminalCase.getCellName() + " on Google</a>";
+							}
 						} else {
+							if (placeholder.toLowerCase().equals("cacr")) {
+								placeholder = "Textpresso";
+							}
 							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-									+ nonTerminalCase.getCellName() + " on Google</a>";
+									+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
 						}
-					} else {
-						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-								+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
 					}
 				}
+				HTMLNode li = new HTMLNode("li", "", "", anchor);
+				linksUL.addChild(li);
 			}
-			HTMLNode li = new HTMLNode("li", "", "", anchor);
-			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
 
@@ -811,9 +816,15 @@ public class InfoWindowDOM {
 			wormatlasAnatomyTopContainerDiv.addChild(wormatlasAnatomyTitle);
 			HTMLNode wormatlasAnatomyDiv = new HTMLNode("div", "wormatlasAnatomy", "height: 0px; visibility: hidden;");
 			HTMLNode wormatlasAnatomyUL = new HTMLNode("ul");
-
-			HTMLNode li1 = new HTMLNode("li", "", "", termCase.getWormatlasLink1());
-			HTMLNode li2 = new HTMLNode("li", "", "", termCase.getWormatlasLink2());
+			
+			String wormatlastAnchor1 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink1() + "\" onclick=\"handleLink(this)\">"
+					+ termCase.getWormatlasLink1() + "</a>";
+			
+			String wormatlastAnchor2 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink2() + "\" onclick=\"handleLink(this)\">"
+					+ termCase.getWormatlasLink2() + "</a>";
+			
+			HTMLNode li1 = new HTMLNode("li", "", "", wormatlastAnchor1);
+			HTMLNode li2 = new HTMLNode("li", "", "", wormatlastAnchor2);
 			wormatlasAnatomyUL.addChild(li1);
 			wormatlasAnatomyUL.addChild(li2);
 			wormatlasAnatomyDiv.addChild(wormatlasAnatomyUL);
@@ -827,22 +838,100 @@ public class InfoWindowDOM {
 			amphidCellsTopContainerDiv.addChild(collapseAmphidCellsButton);
 			amphidCellsTopContainerDiv.addChild(amphidCellsTitle);
 			HTMLNode amphidCellsDiv = new HTMLNode("div", "amphidCells", "height: 0px; visibility: hidden;");
-			HTMLNode amphidCellsUL = new HTMLNode("ul");
+			HTMLNode amphidCellsTable = new HTMLNode("table");
+			HTMLNode amphidCellsTHR = new HTMLNode("tr");
+			HTMLNode amphidCellsTHFuncName = new HTMLNode("th", "", "", "Functional Name");
+			HTMLNode amphidCellsTHLineageName = new HTMLNode("th", "", "", "Lineage Name");
+			HTMLNode amphidCellsTHDescription = new HTMLNode("th", "", "", "Description");
+			amphidCellsTHR.addChild(amphidCellsTHFuncName);
+			amphidCellsTHR.addChild(amphidCellsTHLineageName);
+			amphidCellsTHR.addChild(amphidCellsTHDescription);
+			amphidCellsTable.addChild(amphidCellsTHR);
 			for (String amphidCell : termCase.getAmphidCells()) {
-				amphidCellsUL.addChild(new HTMLNode("li", "", "", amphidCell));
+				HTMLNode tr = new HTMLNode("tr");
+				
+				int funcNameIdx = amphidCell.indexOf("*");
+				String funcName = amphidCell.substring(0, amphidCell.indexOf("*", 0));
+				
+				int lineageNameIdx = amphidCell.indexOf("*", funcNameIdx+1);
+				String lineageName = amphidCell.substring(funcNameIdx+1, lineageNameIdx);
+				
+				String acDescription = amphidCell.substring(lineageNameIdx+1);
+				
+				tr.addChild(new HTMLNode("td", "", "", funcName));
+				tr.addChild(new HTMLNode("td", "", "", lineageName));
+				tr.addChild(new HTMLNode("td", "", "", acDescription));
+				
+				amphidCellsTable.addChild(tr);
 			}
-			amphidCellsDiv.addChild(amphidCellsUL);
+			amphidCellsDiv.addChild(amphidCellsTable);
+			
+			
+			// links
+			HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
+			HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
+					"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+			HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+					"<strong> External Links: </strong>");
+			linksTopContainerDiv.addChild(collapseLinksButton);
+			linksTopContainerDiv.addChild(linksTitle);
+			HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
+			HTMLNode linksUL = new HTMLNode("ul");
+			for (String link : termCase.getLinks()) {
+				if (!link.equals("")) {
+					String anchor = link; // replaced with anchor if valid link
 
+					// begin after www.
+					int startIDX = link.indexOf("www.") + 4;
+					if (startIDX > 0) {
+						String placeholder = link.substring(startIDX);
+
+						// find end of site name using '.'
+						int dotIDX = placeholder.indexOf(".");
+						if (dotIDX > 0) {
+							placeholder = placeholder.substring(0, dotIDX);
+
+							// check for google links
+							if (placeholder.equals("google")) {
+								// check if wormatlas specific search
+								if (link.contains("site:wormatlas.org")) {
+									anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+											+ termCase.getName() + " on Google (searching Wormatlas)" + "</a>";
+								} else {
+									anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+											+ termCase.getName() + " on Google</a>";
+								}
+							} else {
+								if (placeholder.toLowerCase().equals("cacr")) {
+									placeholder = "Textpresso";
+								}
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ termCase.getName() + " on " + placeholder + "</a>";
+							}
+						}
+					}
+					HTMLNode li = new HTMLNode("li", "", "", anchor);
+					linksUL.addChild(li);
+				}
+			}
+			linksDiv.addChild(linksUL);
+			
 			//add divs to body
 			body.addChild(termDiv);
 			body.addChild(wormatlasAnatomyTopContainerDiv);
 			body.addChild(wormatlasAnatomyDiv);
 			body.addChild(amphidCellsTopContainerDiv);
 			body.addChild(amphidCellsDiv);
+			body.addChild(linksTopContainerDiv);
+			body.addChild(linksDiv);
 
 			//add collapse button scripts
 			body.addChild(collapseWormatlasAnatomyButton.makeCollapseButtonScript());
 			body.addChild(collapseAmphidCellsButton.makeCollapseButtonScript());
+			body.addChild(collapseLinksButton.makeCollapseButtonScript());
+			
+			// add link controller
+			body.addChild(body.addLinkHandlerScript());
 
 			// add head and body to html
 			html.addChild(head);

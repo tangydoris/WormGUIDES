@@ -33,11 +33,24 @@ public final class AnatomyTermCase {
 	public ArrayList<String> findAmphidCells() {
 		ArrayList<String> cells = new ArrayList<String>();
 		
-		for (String name : PartsList.getFunctionalNames()) {
-			System.out.println(name);
-			if (name.toLowerCase().contains(AMPHID)) {
-				System.out.println("GOT ONE: " + name);
-				cells.add(name);
+		ArrayList<String> functionalNames = PartsList.getFunctionalNames();
+		ArrayList<String> lineageNames = PartsList.getLineageNames();
+		ArrayList<String> descriptions = PartsList.getDescriptions();
+		for (int i = 0; i < descriptions.size(); i++)  {
+			if (descriptions.get(i).toLowerCase().contains(AMPHID)) {
+				String cell = "";
+				
+				if (functionalNames.get(i) != null) {
+					cell += (functionalNames.get(i) + "*");
+				}
+				
+				if (lineageNames.get(i) != null) {
+					cell += (lineageNames.get(i) + "*");
+				}
+				
+				cell += descriptions.get(i);
+				
+				cells.add(cell);
 			}
 		}
 		
@@ -91,6 +104,14 @@ public final class AnatomyTermCase {
 		if (wormatlasLink2 != null) {
 			return this.wormatlasLink2;
 		}
+		return null;
+	}
+	
+	public ArrayList<String> getLinks() {
+		if (this.links != null) {
+			return this.links;
+		}
+		
 		return null;
 	}
 
