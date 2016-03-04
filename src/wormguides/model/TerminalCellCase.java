@@ -193,71 +193,7 @@ public class TerminalCellCase {
 		content = content.substring(content.indexOf("Function"));
 		content = content.substring(content.indexOf(":")+1, content.indexOf("</td>")); //skip the "Function:" text
 
-		/*
-		 * find the anchor tags and change to:
-		 *  "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-		 *  paradigm
-		 */
-		String findStr = "<a ";
-		int lastIdx = 0;
-		
-		while (lastIdx != -1) {
-			lastIdx = content.indexOf(findStr, lastIdx);
-
-			//check if another anchor found
-			if (lastIdx != -1) {
-				//save the string preceding the anchor
-				String precedingStr = content.substring(0, lastIdx);
-				
-				
-				//find the end of the anchor and extract the anchor
-				int anchorEndIdx = content.indexOf(anchorClose, lastIdx);
-				String anchor = content.substring(lastIdx, anchorEndIdx + anchorClose.length());
-				
-				//extract the source href --> "href=\""
-				boolean isLink = true;
-				int startSrcIdx = anchor.indexOf(href) + href.length();
-				
-				String src = "";
-				//make sure not a citation i.e. first character is '#'
-				if (anchor.charAt(startSrcIdx) == '#') {
-					isLink = false;
-				} else {
-					src = anchor.substring(startSrcIdx, anchor.indexOf("\"", startSrcIdx));
-				}
-				
-				if (isLink) {
-					//check if relative src
-					if (!src.contains("www.") && !src.contains("http")) {
-						//remove path
-						if (src.contains("..")) {
-							src = src.substring(src.lastIndexOf("/") + 1);
-						}
-						src = wormatlasURL + src;
-					}
-					
-					//extract the anchor text --> skip over the first <
-					String text = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
-					
-					// build new anchor
-					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text + "</a>";
-
-					
-					//replace previous anchor
-					content = precedingStr + newAnchor + content.substring(anchorEndIdx + anchorClose.length());
-				} else {
-					//remove anchor
-					String txt = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
-					
-					content = precedingStr + txt + content.substring(anchorEndIdx + anchorClose.length());
-				}
-				
-				
-				//move lastIdx past just processed anchor
-				lastIdx += findStr.length();
-			}
-			
-		}
+		content = updateAnchors(content);
 
 		//add the link to the list
 		links.add(URL);
@@ -518,6 +454,10 @@ public class TerminalCellCase {
 					String year = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
 					
 					String reference = title + authors + ", " + year;
+					
+					//update the anchors
+					reference = updateAnchors(reference);
+					
 					references.add(reference);
 				}
 			}
@@ -581,6 +521,75 @@ public class TerminalCellCase {
 		}
 		
 		return "";
+	}
+	
+	private String updateAnchors(String content) {
+		/*
+		 * find the anchor tags and change to:
+		 *  "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+		 *  paradigm
+		 */
+		String findStr = "<a ";
+		int lastIdx = 0;
+		
+		while (lastIdx != -1) {
+			lastIdx = content.indexOf(findStr, lastIdx);
+
+			//check if another anchor found
+			if (lastIdx != -1) {
+				//save the string preceding the anchor
+				String precedingStr = content.substring(0, lastIdx);
+				
+				
+				//find the end of the anchor and extract the anchor
+				int anchorEndIdx = content.indexOf(anchorClose, lastIdx);
+				String anchor = content.substring(lastIdx, anchorEndIdx + anchorClose.length());
+				
+				//extract the source href --> "href=\""
+				boolean isLink = true;
+				int startSrcIdx = anchor.indexOf(href) + href.length();
+				
+				String src = "";
+				//make sure not a citation i.e. first character is '#'
+				if (anchor.charAt(startSrcIdx) == '#') {
+					isLink = false;
+				} else {
+					src = anchor.substring(startSrcIdx, anchor.indexOf("\"", startSrcIdx));
+				}
+				
+				if (isLink) {
+					//check if relative src
+					if (!src.contains("www.") && !src.contains("http")) {
+						//remove path
+						if (src.contains("..")) {
+							src = src.substring(src.lastIndexOf("/") + 1);
+						}
+						src = wormatlasURL + src;
+					}
+					
+					//extract the anchor text --> skip over the first <
+					String text = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
+					
+					// build new anchor
+					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text + "</a>";
+
+					
+					//replace previous anchor
+					content = precedingStr + newAnchor + content.substring(anchorEndIdx + anchorClose.length());
+				} else {
+					//remove anchor
+					String txt = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
+					
+					content = precedingStr + txt + content.substring(anchorEndIdx + anchorClose.length());
+				}
+				
+				
+				//move lastIdx past just processed anchor
+				lastIdx += findStr.length();
+			}
+		}
+		
+		return content;
 	}
 
 	public String getCellName() {

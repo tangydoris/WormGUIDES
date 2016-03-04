@@ -1000,6 +1000,14 @@ public class Search {
 			cellCases.removeCellCase(cellName);
 		}
 	}
+	
+	public static void addToInfoWindow(AnatomyTerm term) {
+		if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
+			if (!cellCases.containsAnatomyTermCase(term.getTerm())) {
+				cellCases.makeAnatomyTermCase(term);
+			}
+		}
+	}
 
 	/*
 	 * Method taken from RootLayoutController --> how can
