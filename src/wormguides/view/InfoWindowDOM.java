@@ -3,6 +3,8 @@ package wormguides.view;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import wormguides.AnatomyTerm;
+import wormguides.model.AnatomyTermCase;
 import wormguides.model.NonTerminalCellCase;
 import wormguides.model.PartsList;
 import wormguides.model.TerminalCellCase;
@@ -240,7 +242,7 @@ public class InfoWindowDOM {
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> External Links: </strong>");
+				"<strong>External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
@@ -415,35 +417,89 @@ public class InfoWindowDOM {
 			 * we'll add labels to the data based on corresponding indices i.e. 0-4
 			 * if a data value is '*' it indicates that the field is N/A and we'll skip those cases
 			 */
-			if (anatomy.size() == 5) { //we won't add name
+			if (anatomy.size() == 7) { //we won't add name
 				String type = anatomy.get(1);
-				String location = anatomy.get(2);
-				String function = anatomy.get(3);
-				String neurotransmitter = anatomy.get(4);
-				
+				String somaLocation = anatomy.get(2);
+				String neuriteLocation = anatomy.get(3);
+				String morphologicalFeature = anatomy.get(4);
+				String function = anatomy.get(5);
+				String neurotransmitter = anatomy.get(6);
+
+				boolean hasAmphidLink = false;
+
 				if (!type.equals("*")) {
+					//check for keyword: 'amphid'
+					if (type.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						//update occurences of 'amphid' with link
+						type = findAndUpdateOccurencesOfAmphid(type);
+					}
 					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Type: </em>" + type));
 				}
-				
-				if (!location.equals("*")) {
-					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Location: </em>" + location));
+
+				if (!somaLocation.equals("*")) {
+					if (somaLocation.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						somaLocation = findAndUpdateOccurencesOfAmphid(somaLocation);
+
+					}
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Soma Location: </em>" + somaLocation));
 				}
-				
+
+				if (!neuriteLocation.equals("*")) {
+					//check for keyword: 'amphid'
+					if (neuriteLocation.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						neuriteLocation = findAndUpdateOccurencesOfAmphid(neuriteLocation);
+					}
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurite Location: </em>" + neuriteLocation));
+				}
+
+				if (!morphologicalFeature.equals("*")) {
+					if (morphologicalFeature.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						morphologicalFeature = findAndUpdateOccurencesOfAmphid(morphologicalFeature);
+
+					}
+					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Morphological Feature: </em>" + morphologicalFeature));
+				}
+
 				if (!function.equals("*")) {
+					if (function.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						function = findAndUpdateOccurencesOfAmphid(function);
+
+					}
 					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Function: </em>" + function));
 				}
-				
+
 				if (!neurotransmitter.equals("*")) {
+					if (neurotransmitter.toLowerCase().contains(AMPHID)) {
+						hasAmphidLink = true;
+
+						neurotransmitter = findAndUpdateOccurencesOfAmphid(neurotransmitter);
+					}
 					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurotransmitter: </em>" + neurotransmitter));
 				}
-				
+
 				anatomyDiv.addChild(anatomyUL);
 				body.addChild(anatomyTopContainerDiv);
 				body.addChild(anatomyDiv);
 				body.addChild(collapseAnatomyButton.makeCollapseButtonScript()); //add script here for scoping purposes
+
+				//check if link handler for amphid is needed
+				if (hasAmphidLink) {
+					//add amphid link controller script
+					body.addChild(anatomyDiv.handleAmphidClickScript());
+				}
 			}
 		}
-		
+
 
 		// only add this section if its contents exist
 		if (isneuronpage) {
@@ -598,42 +654,47 @@ public class InfoWindowDOM {
 		HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
 				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
-				"<strong> External Links: </strong>");
+				"<strong>External Links: </strong>");
 		linksTopContainerDiv.addChild(collapseLinksButton);
 		linksTopContainerDiv.addChild(linksTitle);
 		HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
 		HTMLNode linksUL = new HTMLNode("ul");
 		for (String link : nonTerminalCase.getLinks()) {
-			String anchor = link; // replaced with anchor if valid link
+			if (!link.equals("")) {
+				String anchor = link; // replaced with anchor if valid link
 
-			// begin after www.
-			int startIDX = link.indexOf("www.") + 4;
-			if (startIDX > 0) {
-				String placeholder = link.substring(startIDX);
+				// begin after www.
+				int startIDX = link.indexOf("www.") + 4;
+				if (startIDX > 0) {
+					String placeholder = link.substring(startIDX);
 
-				// find end of site name using '.'
-				int dotIDX = placeholder.indexOf(".");
-				if (dotIDX > 0) {
-					placeholder = placeholder.substring(0, dotIDX);
+					// find end of site name using '.'
+					int dotIDX = placeholder.indexOf(".");
+					if (dotIDX > 0) {
+						placeholder = placeholder.substring(0, dotIDX);
 
-					// check for google links
-					if (placeholder.equals("google")) {
-						// check if wormatlas specific search
-						if (link.contains("site:wormatlas.org")) {
-							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-									+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+						// check for google links
+						if (placeholder.equals("google")) {
+							// check if wormatlas specific search
+							if (link.contains("site:wormatlas.org")) {
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+							} else {
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ nonTerminalCase.getCellName() + " on Google</a>";
+							}
 						} else {
+							if (placeholder.toLowerCase().equals("cacr")) {
+								placeholder = "Textpresso";
+							}
 							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-									+ nonTerminalCase.getCellName() + " on Google</a>";
+									+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
 						}
-					} else {
-						anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-								+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
 					}
 				}
+				HTMLNode li = new HTMLNode("li", "", "", anchor);
+				linksUL.addChild(li);
 			}
-			HTMLNode li = new HTMLNode("li", "", "", anchor);
-			linksUL.addChild(li);
 		}
 		linksDiv.addChild(linksUL);
 
@@ -726,6 +787,159 @@ public class InfoWindowDOM {
 
 		// add style node
 		buildStyleNode();
+	}
+
+	public InfoWindowDOM(AnatomyTermCase termCase) {
+		//build the amphid sensilla dom
+		if (termCase.getName().equals(AnatomyTerm.AMPHID_SENSILLA.getTerm())) {
+
+			this.html = new HTMLNode("html");
+			this.name = termCase.getName();
+
+			HTMLNode head = new HTMLNode("head");
+			HTMLNode body = new HTMLNode("body");
+
+			// term
+			HTMLNode termDiv = new HTMLNode("div", "externalInfo", "");
+			String term = "<strong>" + termCase.getName() + "</strong>";
+			String description = termCase.getDescription();
+			HTMLNode termP = new HTMLNode("p", "", "", term + "<br>" + description);
+			termDiv.addChild(termP);
+
+			// wormatlas anatomy
+			HTMLNode wormatlasAnatomyTopContainerDiv = new HTMLNode("div", "wormatlasAnatomyTopContainer", "");
+			HTMLNode collapseWormatlasAnatomyButton = new HTMLNode("button", "wormatlasAnatomyCollapse", "wormatlasAnatomyCollapseButton",
+					"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+			HTMLNode wormatlasAnatomyTitle = new HTMLNode("p", "wormatlasAnatomyTitle", "width: 95%; margin-top: 2%; float: left;",
+					"<strong> Wormatlas Anatomy: </strong>");
+			wormatlasAnatomyTopContainerDiv.addChild(collapseWormatlasAnatomyButton);
+			wormatlasAnatomyTopContainerDiv.addChild(wormatlasAnatomyTitle);
+			HTMLNode wormatlasAnatomyDiv = new HTMLNode("div", "wormatlasAnatomy", "height: 0px; visibility: hidden;");
+			HTMLNode wormatlasAnatomyUL = new HTMLNode("ul");
+			
+			String wormatlastAnchor1 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink1() + "\" onclick=\"handleLink(this)\">"
+					+ termCase.getWormatlasLink1() + "</a>";
+			
+			String wormatlastAnchor2 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink2() + "\" onclick=\"handleLink(this)\">"
+					+ termCase.getWormatlasLink2() + "</a>";
+			
+			HTMLNode li1 = new HTMLNode("li", "", "", wormatlastAnchor1);
+			HTMLNode li2 = new HTMLNode("li", "", "", wormatlastAnchor2);
+			wormatlasAnatomyUL.addChild(li1);
+			wormatlasAnatomyUL.addChild(li2);
+			wormatlasAnatomyDiv.addChild(wormatlasAnatomyUL);
+
+			// amphid cells
+			HTMLNode amphidCellsTopContainerDiv = new HTMLNode("div", "amphidCellsTopContainer", "");
+			HTMLNode collapseAmphidCellsButton = new HTMLNode("button", "amphidCellsCollapse", "amphidCellsCollapseButton",
+					"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+			HTMLNode amphidCellsTitle = new HTMLNode("p", "amphidCellsTitle", "width: 95%; margin-top: 2%; float: left;",
+					"<strong> Amphid Cells: </strong>");
+			amphidCellsTopContainerDiv.addChild(collapseAmphidCellsButton);
+			amphidCellsTopContainerDiv.addChild(amphidCellsTitle);
+			HTMLNode amphidCellsDiv = new HTMLNode("div", "amphidCells", "height: 0px; visibility: hidden;");
+			HTMLNode amphidCellsTable = new HTMLNode("table");
+			HTMLNode amphidCellsTHR = new HTMLNode("tr");
+			HTMLNode amphidCellsTHFuncName = new HTMLNode("th", "", "", "Functional Name");
+			HTMLNode amphidCellsTHLineageName = new HTMLNode("th", "", "", "Lineage Name");
+			HTMLNode amphidCellsTHDescription = new HTMLNode("th", "", "", "Description");
+			amphidCellsTHR.addChild(amphidCellsTHFuncName);
+			amphidCellsTHR.addChild(amphidCellsTHLineageName);
+			amphidCellsTHR.addChild(amphidCellsTHDescription);
+			amphidCellsTable.addChild(amphidCellsTHR);
+			for (String amphidCell : termCase.getAmphidCells()) {
+				HTMLNode tr = new HTMLNode("tr");
+				
+				int funcNameIdx = amphidCell.indexOf("*");
+				String funcName = amphidCell.substring(0, amphidCell.indexOf("*", 0));
+				
+				int lineageNameIdx = amphidCell.indexOf("*", funcNameIdx+1);
+				String lineageName = amphidCell.substring(funcNameIdx+1, lineageNameIdx);
+				
+				String acDescription = amphidCell.substring(lineageNameIdx+1);
+				
+				tr.addChild(new HTMLNode("td", "", "", funcName));
+				tr.addChild(new HTMLNode("td", "", "", lineageName));
+				tr.addChild(new HTMLNode("td", "", "", acDescription));
+				
+				amphidCellsTable.addChild(tr);
+			}
+			amphidCellsDiv.addChild(amphidCellsTable);
+			
+			
+			// links
+			HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
+			HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
+					"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
+			HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+					"<strong>External Links: </strong>");
+			linksTopContainerDiv.addChild(collapseLinksButton);
+			linksTopContainerDiv.addChild(linksTitle);
+			HTMLNode linksDiv = new HTMLNode("div", "links", "height: 0px; visibility: hidden;");
+			HTMLNode linksUL = new HTMLNode("ul");
+			for (String link : termCase.getLinks()) {
+				if (!link.equals("")) {
+					String anchor = link; // replaced with anchor if valid link
+
+					// begin after www.
+					int startIDX = link.indexOf("www.") + 4;
+					if (startIDX > 0) {
+						String placeholder = link.substring(startIDX);
+
+						// find end of site name using '.'
+						int dotIDX = placeholder.indexOf(".");
+						if (dotIDX > 0) {
+							placeholder = placeholder.substring(0, dotIDX);
+
+							// check for google links
+							if (placeholder.equals("google")) {
+								// check if wormatlas specific search
+								if (link.contains("site:wormatlas.org")) {
+									anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+											+ termCase.getName() + " on Google (searching Wormatlas)" + "</a>";
+								} else {
+									anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+											+ termCase.getName() + " on Google</a>";
+								}
+							} else {
+								if (placeholder.toLowerCase().equals("cacr")) {
+									placeholder = "Textpresso";
+								}
+								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+										+ termCase.getName() + " on " + placeholder + "</a>";
+							}
+						}
+					}
+					HTMLNode li = new HTMLNode("li", "", "", anchor);
+					linksUL.addChild(li);
+				}
+			}
+			linksDiv.addChild(linksUL);
+			
+			//add divs to body
+			body.addChild(termDiv);
+			body.addChild(wormatlasAnatomyTopContainerDiv);
+			body.addChild(wormatlasAnatomyDiv);
+			body.addChild(amphidCellsTopContainerDiv);
+			body.addChild(amphidCellsDiv);
+			body.addChild(linksTopContainerDiv);
+			body.addChild(linksDiv);
+
+			//add collapse button scripts
+			body.addChild(collapseWormatlasAnatomyButton.makeCollapseButtonScript());
+			body.addChild(collapseAmphidCellsButton.makeCollapseButtonScript());
+			body.addChild(collapseLinksButton.makeCollapseButtonScript());
+			
+			// add link controller
+			body.addChild(body.addLinkHandlerScript());
+
+			// add head and body to html
+			html.addChild(head);
+			html.addChild(body);
+
+			// add style node
+			buildStyleNode();
+		}
 	}
 
 	/**
@@ -827,6 +1041,39 @@ public class InfoWindowDOM {
 		return (newLine + "#" + node.getID() + " {" + newLine + node.getStyle() + newLine + "}");
 	}
 
+	/**
+	 * Finds all occurences of 'amphid' and replaces with a link using addAmphidLink()
+	 * 
+	 * @param str the string to be searched
+	 * @return the updated string with links
+	 */
+	private String findAndUpdateOccurencesOfAmphid(String str) {
+		//find all occurences of "Amphid" and add anchor at each point
+		int idx = str.toLowerCase().indexOf(AMPHID);
+		while (idx != -1) {
+			str = addAmphidLink(str, idx);
+			idx += amphidAnchor.length();
+			idx = str.toLowerCase().indexOf(AMPHID, idx);
+		}
+
+		return str;
+	}
+
+	/**
+	 * Adds an <a> to an anatomy section which contains the keyword "Amphid"
+	 * These links will generate a new info window page of the Amphid type
+	 * 
+	 * @param anatomyInfo the section which the link will be added to
+	 * @return updated anatomyInfo with link
+	 */
+	private String addAmphidLink(String anatomyInfo, int idx) {
+		if (idx == -1) return anatomyInfo;
+
+		String updated = anatomyInfo.substring(0, idx) + amphidAnchor + anatomyInfo.substring(idx+AMPHID.length());
+
+		return updated;
+	}
+
 	public HTMLNode getHTML() {
 		return this.html;
 	}
@@ -835,6 +1082,8 @@ public class InfoWindowDOM {
 		return this.name;
 	}
 
+	private final static String AMPHID = "amphid";
+	private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
 	private final static String doctypeTag = "<!DOCTYPE html>";
 	private final static String newLine = "\n";
 	// private final static String meta_charset = "<meta charset=\"utf-8\">";

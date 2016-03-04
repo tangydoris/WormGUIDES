@@ -18,14 +18,18 @@ import java.util.StringTokenizer;
 public class Anatomy {
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> types;
-	private static ArrayList<String> locations;
+	private static ArrayList<String> somaLocations;
+	private static ArrayList<String> neuriteLocations;
+	private static ArrayList<String> morphologicalFeatures;
 	private static ArrayList<String> functions;
 	private static ArrayList<String> neurotransmitters;
 	
 	static {
 		functionalNames = new ArrayList<String>();
 		types = new ArrayList<String>();
-		locations = new ArrayList<String>();
+		somaLocations = new ArrayList<String>();
+		neuriteLocations = new ArrayList<String>();
+		morphologicalFeatures = new ArrayList<String>();
 		functions = new ArrayList<String>();
 		neurotransmitters = new ArrayList<String>();
 		
@@ -40,11 +44,13 @@ public class Anatomy {
 			while ((line = br.readLine()) != null) {
 				StringTokenizer tokenizer = new StringTokenizer(line, ",");
 				
-				//valid line has 5 entires
-				if (tokenizer.countTokens() == 5) {
+				//valid line has 7 entires
+				if (tokenizer.countTokens() == 7) {
 					functionalNames.add(tokenizer.nextToken());
 					types.add(tokenizer.nextToken());
-					locations.add(tokenizer.nextToken());
+					somaLocations.add(tokenizer.nextToken());
+					neuriteLocations.add(tokenizer.nextToken());
+					morphologicalFeatures.add(tokenizer.nextToken());
 					functions.add(tokenizer.nextToken());
 					neurotransmitters.add(tokenizer.nextToken());
 				}
@@ -172,9 +178,23 @@ public class Anatomy {
 					anatomy.add("*");
 				}
 				
-				//add location
-				if (locations.get(idx) != null) {
-					anatomy.add(locations.get(idx));
+				//add soma location
+				if (somaLocations.get(idx) != null) {
+					anatomy.add(somaLocations.get(idx));
+				} else {
+					anatomy.add("*");
+				}
+				
+				//add neurite location
+				if (neuriteLocations.get(idx) != null) {
+					anatomy.add(neuriteLocations.get(idx));
+				} else {
+					anatomy.add("*");
+				}
+				
+				//add morphological features
+				if (morphologicalFeatures.get(idx) != null) {
+					anatomy.add(morphologicalFeatures.get(idx));
 				} else {
 					anatomy.add("*");
 				}
