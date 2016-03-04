@@ -319,7 +319,7 @@ public class Search {
 	}
 
 	public static Rule addMulticellularStructureRule(String searched, Color color) {
-		return addColorRule(null, searched, color, SearchOption.MULTICELLULAR_STRUCTURE_BASED);
+		return addColorRule(null, searched, color, SearchOption.MULTICELLULAR_NAME_BASED);
 	}
 
 	public static Rule addColorRule(SearchType type, String searched, Color color, SearchOption... options) {

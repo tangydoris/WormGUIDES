@@ -7,13 +7,12 @@ import javafx.scene.paint.Color;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
-import wormguides.StructuresLayer;
 import wormguides.controllers.Window3DController;
 import wormguides.model.Rule;
 
 public class URLLoader {
 
-	public static void process(String url, Window3DController window3DController, StructuresLayer structuresLayer) {
+	public static void process(String url, Window3DController window3DController) {
 		if (window3DController == null)
 			return;
 
@@ -56,12 +55,11 @@ public class URLLoader {
 		}
 
 		// process arguments
-		parseRules(ruleArgs, rulesList, structuresLayer);
+		parseRules(ruleArgs, rulesList);
 		parseViewArgs(viewArgs, window3DController);
 	}
 
-	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList,
-			StructuresLayer structuresLayer) {
+	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
 		rulesList.clear();
 		for (String rule : rules) {
 			ArrayList<String> types = new ArrayList<String>();
@@ -114,7 +112,7 @@ public class URLLoader {
 
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 				if (isMulticellStructureRule) {
-					options.add(SearchOption.MULTICELLULAR_STRUCTURE_BASED);
+					options.add(SearchOption.MULTICELLULAR_NAME_BASED);
 					int i = sb.indexOf("M");
 					sb.replace(i, i + 1, "");
 					
@@ -186,7 +184,7 @@ public class URLLoader {
 					}
 					
 				} else { // add multicellular structure rule
-					structuresLayer.addStructureRule(name, Color.web(colorString));
+					Search.addMulticellularStructureRule(name, Color.web(colorString));
 				}
 
 			} catch (StringIndexOutOfBoundsException e) {

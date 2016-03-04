@@ -64,8 +64,6 @@ public class StoriesLayer {
 
 	private SceneElementsList sceneElementsList;
 
-	private StructuresLayer structuresLayer;
-
 	private ObservableList<Story> stories;
 
 	private int timeOffset;
@@ -98,11 +96,9 @@ public class StoriesLayer {
 
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
 			Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
-			Button newStoryButton, StructuresLayer structuresLayer) {
+			Button newStoryButton) {
 
 		parentStage = parent;
-
-		this.structuresLayer = structuresLayer;
 
 		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -236,7 +232,7 @@ public class StoriesLayer {
 					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 							window3DController.getRotationY(), window3DController.getRotationZ(),
 							window3DController.getTranslationX(), window3DController.getTranslationY(),
-							window3DController.getScale(), window3DController.getOthersVisibility()));
+							window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
 		}
 	}
 
@@ -257,15 +253,14 @@ public class StoriesLayer {
 		if (activeStory != null) {
 			activeStory.setActive(false);
 			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-			for (Rule rule : currentRules) {
+			for (Rule rule : currentRules)
 				rulesCopy.add(rule);
-			}
 
 			activeStory.setColorURL(
 					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 							window3DController.getRotationY(), window3DController.getRotationZ(),
 							window3DController.getTranslationX(), window3DController.getTranslationY(),
-							window3DController.getScale(), window3DController.getOthersVisibility()));
+							window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
 		}
 
 		setActiveNote(null);
@@ -282,18 +277,18 @@ public class StoriesLayer {
 
 			if (!activeStory.getColorURL().isEmpty()) {
 				useInternalRules.set(false);
-				URLLoader.process(activeStory.getColorURL(), window3DController, structuresLayer);
+				URLLoader.process(activeStory.getColorURL(), window3DController);
 			} else {
 				useInternalRules.set(true);
 				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
 				for (Rule rule : currentRules) {
-						rulesCopy.add(rule);
+					rulesCopy.add(rule);
 				}
 				activeStory.setColorURL(
 						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 								window3DController.getRotationY(), window3DController.getRotationZ(),
 								window3DController.getTranslationX(), window3DController.getTranslationY(),
-								window3DController.getScale(), window3DController.getOthersVisibility()));
+								window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
 			}
 
 			if (activeStory.hasNotes()) {
@@ -304,7 +299,7 @@ public class StoriesLayer {
 		} else {
 			activeStoryProperty.set("");
 			useInternalRules.set(true);
-			URLLoader.process("", window3DController, structuresLayer);
+			URLLoader.process("", window3DController);
 		}
 
 		if (editController != null)

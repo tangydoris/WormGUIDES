@@ -827,7 +827,8 @@ public class Window3DController {
 
 					if (event.getButton() == MouseButton.SECONDARY) {
 						if (sceneElementsList.isMulticellStructureName(name))
-							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR_STRUCTURE_BASED);
+							showContextMenu(name, event.getScreenX(), event.getScreenY(),
+									SearchOption.MULTICELLULAR_NAME_BASED);
 						else
 							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
 					}
@@ -2103,6 +2104,23 @@ public class Window3DController {
 		double newTy = ty + newOriginY;
 		if (newTy > 0 && newTy < 450)
 			xform.t.setY(newTy);
+	}
+
+	/**
+	 * Used for internal URL generation of rules associated with stories
+	 * 
+	 * @return The value of the zoom {@link DoubleProperty}
+	 */
+	public double getScaleInternal() {
+		return zoom.get();
+	}
+
+	/**
+	 * Used for internal URL generation of rules associated with stories. Sets
+	 * the value of the zoom {@link DoubleProperty}
+	 */
+	public void setScaleInternal(double scale) {
+		zoom.set(scale);
 	}
 
 	public double getScale() {

@@ -237,7 +237,7 @@ public class Rule {
 	}
 
 	public boolean isMulticellularStructureRule() {
-		return options.contains(SearchOption.MULTICELLULAR_STRUCTURE_BASED);
+		return options.contains(SearchOption.MULTICELLULAR_NAME_BASED);
 	}
 
 	public void setCells(ArrayList<String> list) {
@@ -398,7 +398,7 @@ public class Rule {
 		if (!visible)
 			return false;
 
-		if (options.contains(SearchOption.MULTICELLULAR_STRUCTURE_BASED) && text.equalsIgnoreCase(name))
+		if (options.contains(SearchOption.MULTICELLULAR_NAME_BASED) && text.equalsIgnoreCase(name))
 			return true;
 
 		return false;

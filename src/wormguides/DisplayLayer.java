@@ -18,6 +18,24 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
+/**
+ * This class is the controller for the 'Display' tab where the list of rules
+ * are shown. It contains an {@link ArrayList} of color rules that are internal
+ * to the application as well as an {@link ObservableList} of color rules that
+ * display the rules used at that time in the 3d subscene.<br>
+ * <br>
+ * The current list of rules changes on story change. If no story is active,
+ * then the internal rules are copied to the current list and used. All changes
+ * made to the rules displayed in the tab are reflected in the current rules
+ * list. On context change (making a story active/inactive), the rules in the
+ * current list are stored back into the item that no longer has context
+ * (whether it is the internal rules or the story's rules).<br>
+ * <br>
+ * 
+ * 
+ * @see Rule
+ */
+
 public class DisplayLayer {
 
 	private ArrayList<Rule> internalRulesList;
