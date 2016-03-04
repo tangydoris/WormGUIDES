@@ -184,59 +184,66 @@
                                     <ComboBox fx:id="structuresComboBox" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="30.0" prefWidth="180.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
-                              <HBox maxWidth="1.7976931348623157E308">
+                              <VBox>
                                  <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" minWidth="160.0" text="Sub-Structure Location:">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
+                                    <HBox maxWidth="1.7976931348623157E308">
+                                       <children>
+                                          <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
+                                          <Label fx:id="substructureLabel" minWidth="160.0" text="Sub-Structure Location:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <tooltip>
+                                                <Tooltip text="Future feature will allow attachment of notes to parts of cells." />
+                                             </tooltip>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox maxWidth="1.7976931348623157E308">
+                                       <children>
+                                          <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
+                                          <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="34.0" text="Axon">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
+                                          <RadioButton fx:id="axonRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="subStructureToggle" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                          <Label disable="true" layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
+                                          <RadioButton fx:id="dendriteRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </RadioButton>
+                                          <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                                          <Label disable="true" layoutX="114.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="63.0" text="Cell Body">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
+                                          <RadioButton fx:id="cellBodyRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </RadioButton>
+                                       </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
-                              <HBox maxWidth="1.7976931348623157E308">
-                                 <children>
-                                    <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="34.0" text="Axon">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton fx:id="axonRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="subStructureToggle" />
-                                       </toggleGroup>
-                                    </RadioButton>
-                                    <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" layoutX="50.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="57.0" text="Dendrite">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton fx:id="dendriteRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="89.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </RadioButton>
-                                    <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                    <Label disable="true" layoutX="114.0" layoutY="10.0" maxHeight="1.7976931348623157E308" minWidth="63.0" text="Cell Body">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                    <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
-                                    <RadioButton fx:id="cellBodyRadioBtn" contentDisplay="TEXT_ONLY" disable="true" layoutX="148.0" layoutY="10.0" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$subStructureToggle">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </RadioButton>
-                                 </children>
-                              </HBox>
+                              </VBox>
                               <Region maxWidth="1.7976931348623157E308" />
                               <Label minWidth="33.0" text="Note is visible at time:">
                                  <font>
@@ -382,10 +389,13 @@
                               <HBox maxWidth="1.7976931348623157E308">
                                  <children>
                                     <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                    <Label disable="true" minWidth="47.0" text="Callout">
+                                    <Label minWidth="47.0" text="Callout">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
+                                       <tooltip>
+                                          <Tooltip text="Future feature will allow control of note location." />
+                                       </tooltip>
                                     </Label>
                                  </children>
                               </HBox>

@@ -1,0 +1,12 @@
+Name,Type,Location,Function,Neurotransmitter
+ASH,Sensory,Lateral ganglia of head, ciliated; polymodal; mechanosensory; osmosensory; odersensation,glutamate
+RIB,Interneuron,Nerve ring,Integration of information from outside and inner state; second layer interneuron,*
+AVG,Interneuron,Retrovesicular ganglion of head,pioneers the right tract of the ventral cord; guidepost neuron,*
+DD,motor neuron,body; ventral nerve cord, locomotion ,GABA
+DA,motor neuron,body; ventral nerve cord,Backwards locomotion,Acetylcholine
+RIVL,polymodal (interneuron and motor neuron),Nerve ring,Locomotion; local search behavior,*
+RIVR,polymodal (interneuron and motor neuron),Nerve ring,Locomotion; local search behavior,*
+SIAVL,interneuron; motorneuron,ventral ganglion of the head; nerve ring,sublateral cord,Acetylcholine
+SIAVR,interneuron; motorneuron,ventral ganglion of the head; nerve ring,sublateral cord,Acetylcholine
+SIBDL,interneuron; sublateral; motor neuron,lateral ganglia of head; nerve ring,sublateral cord,Acetylcholine
+SIBDR,interneuron; sublateral; motor neuron,lateral ganglia of head; nerve ring,sublateral cord,Acetylcholine

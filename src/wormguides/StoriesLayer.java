@@ -206,8 +206,10 @@ public class StoriesLayer {
 		// if user clicks save
 		if (file != null) {
 			try {
-				if (activeStory != null)
+				if (activeStory != null) {
+					updateColorURL();
 					StoryFileUtil.saveToCSVFile(activeStory, file, timeOffset);
+				}
 				else
 					System.out.println("no active story to save");
 				// TODO make error pop up
@@ -219,7 +221,31 @@ public class StoriesLayer {
 			System.out.println("file saved");
 		}
 	}
+	
+	/**
+	 * Because the Color URL is set on New Note, we need to update the color URL before saving
+	 * to account for additions and deletions
+	 */
+	private void updateColorURL() {
+		if (activeStory != null) {
+			activeStory.setActive(false);
+			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
+			// fix subclassing for rule and colorrule
+			// TODO currently only supports rules for cells/cell bodies, not
+			// multicell structures
+			for (Rule rule : currentRules) {
+				if (rule instanceof ColorRule)
+					rulesCopy.add((ColorRule) rule);
+			}
 
+			activeStory.setColorURL(
+					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
+							window3DController.getRotationY(), window3DController.getRotationZ(),
+							window3DController.getTranslationX(), window3DController.getTranslationY(),
+							window3DController.getScale(), window3DController.getOthersVisibility()));
+		}
+	}
+	
 	public StringProperty getActiveStoryProperty() {
 		return activeStoryProperty;
 	}

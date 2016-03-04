@@ -58,6 +58,7 @@ import wormguides.StructuresLayer;
 import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
+import wormguides.model.Anatomy;
 import wormguides.model.CellCasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -893,6 +894,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private void initCellDeaths() {
 		new CellDeaths();
 	}
+	
+	private void initAnatomy() {
+		new Anatomy();
+	}
 
 	private void initLineageTree(ArrayList<String> allCellNames) {
 		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
@@ -1092,6 +1097,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void initialize(URL url, ResourceBundle bundle) {
 		initPartsList();
 		initCellDeaths();
+		initAnatomy();
 		lineageData = AceTreeLoader.loadNucFiles();
 		initLineageTree(lineageData.getAllCellNames());
 
