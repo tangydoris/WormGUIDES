@@ -57,7 +57,8 @@ import wormguides.view.AppFont;
 
 /**
  * This class is the controller of the {@link ListView} in the 'Stories' tab.
- * The Constructor is called by {@link RootLayoutController} on initialization.
+ * The Constructor is called by the main application controller
+ * {@link RootLayoutController} on initialization.
  */
 public class StoriesLayer {
 
@@ -95,6 +96,36 @@ public class StoriesLayer {
 
 	private BooleanProperty update3D;
 
+	/**
+	 * Constructure called by {@link RootLayoutController}.
+	 * 
+	 * @param parent
+	 *            The {@link Stage} to which the main application belongs to.
+	 *            Used for initializing modality of the story editor popup
+	 *            window.
+	 * @param elementsList
+	 *            The {@link SceneElementsList} that contains all
+	 *            {@link SceneElement}s loaded on application startup
+	 * @param cellNameProperty
+	 *            The {@link StringProperty} whose value contains the String of
+	 *            the currently active cell, cell body, or multiceulluar
+	 *            structure name
+	 * @param data
+	 *            The {@link LineageData} that contains information about the
+	 *            nucleus lineage data loaded on application startup
+	 * @param sceneController
+	 *            The {@link Window3DController} that controls the 3D subscene
+	 * @param useInternalRulesFlag
+	 *            The {@link BooleanProperty} that is set to TRUE when the
+	 *            application should use the program's internal color rules,
+	 *            FALSE otherwise (use the story's rules instead)
+	 * @param movieTimeOffset
+	 *            The integer set the the value of the movie's time offset from
+	 *            the internal program's start time of 1
+	 * @param newStoryButton
+	 *            The reference to the {@link Button} whose functionality is to
+	 *            create a new story (located in the 'Stories' tab)
+	 */
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
 			Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
 			Button newStoryButton) {
@@ -296,7 +327,7 @@ public class StoriesLayer {
 			if (activeStory.getColorURL().isEmpty()) {
 				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
 				rulesCopy.addAll(currentRules);
-				
+
 				activeStory.setColorURL(
 						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 								window3DController.getRotationY(), window3DController.getRotationZ(),
@@ -315,7 +346,7 @@ public class StoriesLayer {
 		} else {
 			activeStoryProperty.set("");
 			useInternalRules.set(true);
-			//URLLoader.process("", window3DController);
+			// URLLoader.process("", window3DController);
 		}
 
 		if (editController != null)
@@ -329,6 +360,13 @@ public class StoriesLayer {
 		}
 	}
 
+	/**
+	 * Sets the active note to the input note parameter. Makes the current note
+	 * inactive, then makes the input note active.
+	 * 
+	 * @param note
+	 *            The {@link Note} that should become active
+	 */
 	public void setActiveNote(Note note) {
 		// deactivate the previous active note
 		if (activeNote != null)
@@ -352,31 +390,51 @@ public class StoriesLayer {
 			editController.setActiveNote(activeNote);
 	}
 
+	/**
+	 * Sets the flag that tells the {@link Window3DController} whether to update
+	 * the subscene.
+	 * 
+	 * @param update3D
+	 *            The {@link BooleanProperty} flag that is set to TRUE when the
+	 *            3D subscene should be udpated, FALSE otherwise
+	 */
 	public void setUpdate3DProperty(BooleanProperty update3D) {
 		this.update3D = update3D;
 	}
 
-	private Integer getEffectiveEndTime(Note activeNote) {
+	/**
+	 * Retrieve the effective end time of the input note parameter, whether it
+	 * is the one explicitly stated by the 'end time' field or the one
+	 * implicitly specified by the cell, cell body, or multicellular structure.
+	 * 
+	 * @param note
+	 *            The {@link Note} whose effective end time is queried
+	 * @return {@link Integer} that contains the value of the effective end time
+	 *         of the input note. An Integer object is returned instead of the
+	 *         primitive int so that it can be passed into the
+	 *         {@link Comparator} for notes.
+	 */
+	private Integer getEffectiveEndTime(Note note) {
 		int time = Integer.MIN_VALUE;
 
-		if (activeNote != null) {
-			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
+		if (note != null) {
+			if (note.attachedToCell() || note.attachedToStructure()) {
 
 				int entityStartTime;
 				int entityEndTime;
 
-				if (activeNote.attachedToCell()) {
-					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				if (note.attachedToCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(note.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(note.getCellName());
 				} else {
-					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
-					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(note.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(note.getCellName());
 				}
 
 				// attached to cell/structure and time is specified
-				if (activeNote.isTimeSpecified()) {
-					int noteStartTime = activeNote.getStartTime();
-					int noteEndTime = activeNote.getEndTime();
+				if (note.isTimeSpecified()) {
+					int noteStartTime = note.getStartTime();
+					int noteEndTime = note.getEndTime();
 
 					// make sure times actually overlap
 					if (noteStartTime <= entityEndTime && entityEndTime <= noteEndTime)
@@ -390,8 +448,8 @@ public class StoriesLayer {
 					time = entityEndTime;
 			}
 
-			else if (activeNote.isTimeSpecified()) {
-				time = activeNote.getEndTime();
+			else if (note.isTimeSpecified()) {
+				time = note.getEndTime();
 			}
 
 		}
@@ -399,27 +457,39 @@ public class StoriesLayer {
 		return new Integer(time);
 	}
 
-	private Integer getEffectiveStartTime(Note activeNote) {
+	/**
+	 * Retrieve the effective start time of the input note parameter, whether it
+	 * is the one explicitly stated by the 'start time' field or the one
+	 * implicitly specified by the cell, cell body, or multicellular structure.
+	 * 
+	 * @param note
+	 *            The {@link Note} whose effective start time is queried
+	 * @return {@link Integer} that contains the value of the effective start
+	 *         time of the input note. An Integer object is returned instead of
+	 *         the primitive int so that it can be passed into the
+	 *         {@link Comparator} for notes.
+	 */
+	private Integer getEffectiveStartTime(Note note) {
 		int time = Integer.MIN_VALUE;
 
-		if (activeNote != null) {
-			if (activeNote.attachedToCell() || activeNote.attachedToStructure()) {
+		if (note != null) {
+			if (note.attachedToCell() || note.attachedToStructure()) {
 
 				int entityStartTime;
 				int entityEndTime;
 
-				if (activeNote.attachedToCell()) {
-					entityStartTime = cellData.getFirstOccurrenceOf(activeNote.getCellName());
-					entityEndTime = cellData.getLastOccurrenceOf(activeNote.getCellName());
+				if (note.attachedToCell()) {
+					entityStartTime = cellData.getFirstOccurrenceOf(note.getCellName());
+					entityEndTime = cellData.getLastOccurrenceOf(note.getCellName());
 				} else {
-					entityStartTime = sceneElementsList.getFirstOccurrenceOf(activeNote.getCellName());
-					entityEndTime = sceneElementsList.getLastOccurrenceOf(activeNote.getCellName());
+					entityStartTime = sceneElementsList.getFirstOccurrenceOf(note.getCellName());
+					entityEndTime = sceneElementsList.getLastOccurrenceOf(note.getCellName());
 				}
 
 				// attached to cell/structure and time is specified
-				if (activeNote.isTimeSpecified()) {
-					int noteStartTime = activeNote.getStartTime();
-					int noteEndTime = activeNote.getEndTime();
+				if (note.isTimeSpecified()) {
+					int noteStartTime = note.getStartTime();
+					int noteEndTime = note.getEndTime();
 
 					// make sure times actually overlap
 					if (noteStartTime <= entityStartTime && entityStartTime <= noteEndTime)
@@ -433,8 +503,8 @@ public class StoriesLayer {
 					time = entityStartTime;
 			}
 
-			else if (activeNote.isTimeSpecified()) {
-				time = activeNote.getStartTime();
+			else if (note.isTimeSpecified()) {
+				time = note.getStartTime();
 			}
 
 		}
@@ -442,10 +512,20 @@ public class StoriesLayer {
 		return new Integer(time);
 	}
 
+	/**
+	 * @return The currently active {@link Story}.
+	 */
 	public Story getActiveStory() {
 		return activeStory;
 	}
 
+	/**
+	 * @param tagName
+	 *            The tag name of that note whose comments the user wants to
+	 *            retrieve
+	 * @return A {@link String} with the comments of the note whose tag name is
+	 *         specified by the input parameter
+	 */
 	public String getNoteComments(String tagName) {
 		String comments = "";
 		for (Story story : stories) {
@@ -466,9 +546,13 @@ public class StoriesLayer {
 		return notes;
 	}
 
-	/*
-	 * Returns array list of all active notes at input time Includes notes
-	 * attached to an entity if entity is present at input time
+	/**
+	 * 
+	 * @param time
+	 *            An integer whose value is the queried time
+	 * @return An {@link ArrayList} of all notes that can exist at the at input
+	 *         time. This includes notes attached to an entity if entity is
+	 *         present at input time. These notes are later filtered out.
 	 */
 	public ArrayList<Note> getNotesAtTime(int time) {
 		ArrayList<Note> notes = new ArrayList<Note>();
@@ -496,6 +580,10 @@ public class StoriesLayer {
 		return notes;
 	}
 
+	/**
+	 * @return A {@link String} representation of all stories visible in the
+	 *         'Stories' tab
+	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Stories:\n");
 		for (int i = 0; i < stories.size(); i++) {
@@ -512,11 +600,21 @@ public class StoriesLayer {
 		return sb.toString();
 	}
 
+	/**
+	 * @return The {@link ObservableList} containing all stories that are
+	 *         visible in the 'Stories' tab
+	 */
 	public ObservableList<Story> getStories() {
 		return stories;
 	}
 
-	// Used for sizing the widths each story item in the list view
+	/**
+	 * Used for sizing the widths each story item in the list view (May not be
+	 * used/ is deprecated)
+	 * 
+	 * @return A {@link ChangeListener} that listens to the change in the
+	 *         'Stories' tab {@link ListView} viewport
+	 */
 	public ChangeListener<Number> getListViewWidthListener() {
 		return new ChangeListener<Number>() {
 			@Override
@@ -527,7 +625,10 @@ public class StoriesLayer {
 		};
 	}
 
-	// Listener for edit button under stories list view
+	/**
+	 * @return The {@link EventHandler} for 'Edit Story' button's clicked
+	 *         {@link ActionEvent} in the 'Stories' tab
+	 */
 	public EventHandler<ActionEvent> getEditButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -537,6 +638,19 @@ public class StoriesLayer {
 		};
 	}
 
+	/**
+	 * Brings up the story/notes editor window, controlled by the
+	 * {@link StoryEditorController}. Upon the editor's initialization/fxml
+	 * load, listenable properties are passed to the editor so that the it can
+	 * rename labels/change the UI according to changes in time and active cell
+	 * name.<br>
+	 * <br>
+	 * The editor is initialized so that it always lives on top of the main
+	 * application window and moves when the main window is moved. This is to
+	 * ensure that the user can always edit a story when the window is opened
+	 * even when he/she is clicking around in the 3D subscene to change the
+	 * time/active cell.
+	 */
 	private void bringUpEditor() {
 		if (editStage == null) {
 			editController = new StoryEditorController(timeOffset, cellData,
@@ -554,9 +668,6 @@ public class StoriesLayer {
 			loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
 
 			loader.setController(editController);
-
-			// loader.setRoot(editController);
-
 			loader.setRoot(editController);
 
 			try {
@@ -615,11 +726,21 @@ public class StoriesLayer {
 		editStage.toFront();
 	}
 
+	/**
+	 * @return The {@link BooleanProperty} whose value is TRUE when the
+	 *         {@link Window3DController} should rebuild the subscene, and FALSE
+	 *         otherwise
+	 */
 	public BooleanProperty getRebuildSceneFlag() {
 		return rebuildSceneFlag;
 	}
 
-	// Renderer for story item
+	/**
+	 * @return The {@link Callback} that is the renderer for a {@link Story}
+	 *         item. It graphically renders an active story with black text and
+	 *         an inactive one with grey text. For an active story, its notes
+	 *         are also rendered beneath the story title and description.
+	 */
 	public Callback<ListView<Story>, ListCell<Story>> getStoryCellFactory() {
 		return new Callback<ListView<Story>, ListCell<Story>>() {
 			@Override
@@ -659,14 +780,29 @@ public class StoriesLayer {
 		};
 	}
 
-	// Used by story and note list cell graphics
+	/**
+	 * Changes the color of the input {@link Text} items by modifying the
+	 * java-fx css attribute '-fx-fill' to the specified input color. Used by
+	 * {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
+	 * 
+	 * @param color
+	 *            The {@link Color} to change the texts to
+	 * @param texts
+	 *            The listing of {@link Text} items whose color is to be changed
+	 */
 	public void colorTexts(Color color, Text... texts) {
 		for (Text text : texts)
 			text.setStyle("-fx-fill:" + color.toString().toLowerCase().replace("0x", "#"));
 	}
 
-	// Graphical representation of a story
-	// story becomes active when the title/description is clicked
+	/**
+	 * This private class is the graphical representation of a {@link Story}
+	 * item and a subclass of the JavaFX class {@link VBox}. It makes an
+	 * inactive story become active when the title/description is clicked, and
+	 * makes an active story become inactive when it is clicked. This graphical
+	 * item is rendered in the {@link ListCell} of the {@link ListView} in the
+	 * 'Stories' tab.
+	 */
 	private class StoryListCellGraphic extends VBox {
 
 		private Text title;
@@ -734,7 +870,16 @@ public class StoriesLayer {
 		}
 	}
 
-	// Graphical representation of a note
+	/**
+	 * This private class is the graphical representation of a {@link Note} item
+	 * and a subclass of the JavaFX class {@link VBox}. When a note is clicked,
+	 * the time property is changed so that the 3D subscene navigates to the
+	 * note's effective start time. This graphical item is rendered in the
+	 * {@link ListCell} of an active story in the {@link ListView} in the
+	 * 'Stories' tab. Note titles are also expandable (making the notes
+	 * description visible) by clicking on the triangle rendered to the left of
+	 * the note's title.
+	 */
 	public class NoteListCellGraphic extends VBox {
 
 		private HBox contentsContainer;
@@ -836,6 +981,16 @@ public class StoriesLayer {
 			});
 		}
 
+		/**
+		 * Highlights/un-highlights a cell according to the input parameter.
+		 * When a cell is highlighted/un-highighted, its text and background
+		 * colors change.
+		 * 
+		 * @param highlight
+		 *            The boolean whose value is TRUE when this
+		 *            {@link NoteListCellGraphic} is to be highlighted, FALSE
+		 *            when it is to be un-highlighted
+		 */
 		private void highlightCell(boolean highlight) {
 			if (highlight) {
 				setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
@@ -847,6 +1002,14 @@ public class StoriesLayer {
 			}
 		}
 
+		/**
+		 * Expands/hides a notes description according to the input parameter.
+		 * 
+		 * @param expanded
+		 *            The boolean whose value is TRUE when this
+		 *            {@link NoteListCellGraphic} is to be expanded, FALSE when
+		 *            it should only show the note title
+		 */
 		private void expandNote(boolean expanded) {
 			if (expanded) {
 				getChildren().add(contentsContainer);
