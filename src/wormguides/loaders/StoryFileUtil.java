@@ -14,7 +14,7 @@ import wormguides.model.Story;
  */
 public class StoryFileUtil {
 
-	public static Story loadFromCSVFile(ObservableList<Story> stories, File file, int offset) throws IOException {
+	public static Story loadFromCSVFile(ObservableList<Story> stories, File file, int offset) {
 		StoriesLoader.loadFromFile(file, stories, offset);
 		return null;
 	}

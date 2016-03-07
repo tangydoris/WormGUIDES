@@ -249,8 +249,6 @@ public class Window3DController {
 
 	private SubsceneSizeListener subsceneSizeListener;
 
-	// still screen capture counter and label and movie capture
-	private final static String imgName = "WormGUIDES_time_";
 	private BooleanProperty captureVideo;
 	private Vector<File> movieFiles;
 	Vector<JavaPicture> javaPictures;
@@ -1185,15 +1183,6 @@ public class Window3DController {
 		buildScene();
 	}
 
-	/*
-	 * public ChangeListener<Boolean> getRebuildFlagListener() { return new
-	 * ChangeListener<Boolean>() {
-	 * 
-	 * @Override public void changed(ObservableValue<? extends Boolean>
-	 * observable, Boolean oldValue, Boolean newValue) { if (newValue) {
-	 * buildScene(); } } }; }
-	 */
-
 	private void refreshScene() {
 		// clear note billboards, cell spheres and meshes
 		root.getChildren().clear();
@@ -1907,8 +1896,7 @@ public class Window3DController {
 		}
 
 		if (javaPictures.size() > 0) {
-			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(),
-					5, movieName, javaPictures);
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 5, movieName, javaPictures);
 
 			// move the movie to the originally specified location
 			File movJustMade = new File(movieName);
@@ -2566,9 +2554,13 @@ public class Window3DController {
 	private final double X_SCALE = 1;
 	/** The scale of the subscene y-coordinate axis. */
 	private final double Y_SCALE = 1;
-
+	/** Text size scale used for the rendering of billboard notes. */
 	private final double BILLBOARD_SCALE = 0.9;
 
+	/**
+	 * Scale used for the radii of spheres that represent cells, multiplied with
+	 * the cell's radius loaded from the nuc files.
+	 */
 	private final double SIZE_SCALE = 1;
 	/** The radius of all spheres when 'uniform size' is ticked. */
 	private final double UNIFORM_RADIUS = 4;

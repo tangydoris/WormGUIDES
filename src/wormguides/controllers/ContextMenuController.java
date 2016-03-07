@@ -82,8 +82,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private CellCasesLists cellCases;
 	private ProductionInfo productionInfo;
-	private Connectome connectome;
-
 	private Stage parentStage;
 
 	private BooleanProperty bringUpInfoProperty;
@@ -113,8 +111,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		parentStage = stage;
 		cellCases = cases;
 		productionInfo = info;
-		this.connectome = connectome;
-
 		loadingService = new Service<Void>() {
 			@Override
 			protected Task<Void> createTask() {

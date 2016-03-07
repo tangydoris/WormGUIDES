@@ -100,13 +100,12 @@ public class SceneElement {
 		// GeometryLoader loader = new GeometryLoader();
 
 		// check if complete resource
-		if (completeResourceFlag) {
+		if (completeResourceFlag)
 			return GeometryLoader.loadOBJ(resourceLocation);
-		} else {
-			// append time and ext to resource location
-			String objFile = resourceLocation + "_t" + time + OBJ_EXT;
-			return GeometryLoader.loadOBJ(objFile);
-		}
+
+		// append time and ext to resource location
+		String objFile = resourceLocation + "_t" + time + OBJ_EXT;
+		return GeometryLoader.loadOBJ(objFile);
 	}
 
 	public void setSceneName(String name) {

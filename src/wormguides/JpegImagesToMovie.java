@@ -418,7 +418,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 			format = new JPEGFormat(new Dimension(width, height),
 					Format.NOT_SPECIFIED,
 					Format.byteArray,
-					(float)frameRate,
+					frameRate,
 					75,
 					JPEGFormat.DEC_422);
 		}
@@ -450,7 +450,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 			//For JES, we pass around JavaPictures
 			//String imageFile = (String)images.elementAt(nextImage);
 
-			JavaPicture image = (JavaPicture)images.elementAt(nextImage);
+			JavaPicture image = images.elementAt(nextImage);
 
 			//  JavaPicture image = new JavaPicture((File)images.elementAt(nextImage));
 

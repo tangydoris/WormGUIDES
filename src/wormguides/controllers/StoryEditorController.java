@@ -112,7 +112,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private RadioButton lowLeftRadioBtn;
 	@FXML
 	private RadioButton lowRightRadioBtn;
-	private BooleanProperty storyCreated;
 	private BooleanProperty noteCreated;
 
 	@FXML
@@ -142,7 +141,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
 		frameOffset = timeOffset;
 
-		storyCreated = new SimpleBooleanProperty(false);
+		new SimpleBooleanProperty(false);
 		noteCreated = new SimpleBooleanProperty(false);
 
 		activeStory = null;

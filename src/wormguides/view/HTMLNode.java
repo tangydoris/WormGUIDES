@@ -82,7 +82,7 @@ public class HTMLNode {
 		this.onclick = null;
 		this.script = null;
 
-		this.children = new ArrayList<HTMLNode>();
+		this.children = new ArrayList<>();
 	}
 
 	/**

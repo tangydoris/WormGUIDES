@@ -39,8 +39,6 @@ public class InfoWindow {
 
 	private CellCasesLists cellCases;
 	private ProductionInfo productionInfo;
-	private Connectome connectome;
-
 	private String nameToQuery;
 	private Service<Void> addNameService;
 	private Service<Void> showLoadingService;
@@ -54,8 +52,6 @@ public class InfoWindow {
 
 		cellCases = cases;
 		productionInfo = info;
-		this.connectome = connectome;
-
 		tabPane = new TabPane();
 
 		scene = new Scene(new Group());

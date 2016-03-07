@@ -380,11 +380,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 						Optional<ButtonType> result = warning.showAndWait();
 						if (result.get() == warning.getButtonTypeOkay()) {
 							urlLoadStage.hide();
-							URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+							URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
 						}
 					} else {
 						urlLoadStage.hide();
-						URLLoader.process(urlLoadWindow.getInputURL(), window3DController);
+						URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
 					}
 				}
 			});
@@ -686,7 +686,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		searchResultsListView.setCellFactory(new StringListCellFactory());
 
 		// 'Others' opacity
-		opacitySlider.setValue(50);
+		opacitySlider.setValue(DEFAULT_TRANSPARENCY);
 
 		// Uniform nuclei size
 		uniformSizeCheckBox.setSelected(true);
@@ -839,11 +839,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private void setSlidersProperties() {
 		timeSlider.setMin(1);
 		timeSlider.setMax(window3DController.getEndTime());
-		timeSlider.setValue(window3DController.getStartTime());
 
 		opacitySlider.setMin(0);
 		opacitySlider.setMax(100);
-		opacitySlider.setValue(100);
+		opacitySlider.setValue(25);
 	}
 
 	private void initSearch() {
@@ -1163,4 +1162,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			window3DController.setCaptureVideo(captureVideo);
 		}
 	}
+	
+	/** Default transparency of 'other' entities on startup */
+	private final double DEFAULT_TRANSPARENCY = 20;
 }

@@ -38,9 +38,8 @@ public class TableLineageData implements LineageData {
 		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new String[1];
-		else {
-			return timeFrames.get(time).getNames();
-		}
+
+		return timeFrames.get(time).getNames();
 	}
 
 	@Override
@@ -48,8 +47,8 @@ public class TableLineageData implements LineageData {
 		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new Integer[1][3];
-		else
-			return timeFrames.get(time).getPositions();
+
+		return timeFrames.get(time).getPositions();
 	}
 
 	@Override
@@ -57,8 +56,8 @@ public class TableLineageData implements LineageData {
 		time--;
 		if (time >= getTotalTimePoints() || time < 0)
 			return new Integer[1];
-		else
-			return timeFrames.get(time).getDiameters();
+
+		return timeFrames.get(time).getDiameters();
 	}
 
 	public int getTotalTimePoints() {

@@ -31,8 +31,6 @@ import wormguides.model.PartsList;
 
 public class StructuresLayer {
 
-	private ObservableList<Rule> rulesList;
-
 	private ObservableList<String> allStructuresList;
 	private ObservableList<String> searchResultsList;
 
@@ -245,8 +243,8 @@ public class StructuresLayer {
 
 	// Called by RootLayourController to set reference to global rules list
 	public void setRulesList(ObservableList<Rule> list) {
-		if (list != null)
-			rulesList = list;
+		if (list != null) {
+		}
 	}
 
 	public String getSearchText() {

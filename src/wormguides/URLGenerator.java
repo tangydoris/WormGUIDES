@@ -58,84 +58,68 @@ public class URLGenerator {
 		StringBuilder builder = new StringBuilder("/set");
 
 		for (Rule rule : rules) {
-			builder.append("/").append(rule.getSearchedText());
+			String ruleName = rule.getSearchedText();
+			if (ruleName.indexOf("'") != -1) {
+				ruleName = ruleName.substring(0, ruleName.lastIndexOf("'"));
+				ruleName = ruleName.substring(ruleName.indexOf("'") + 1, ruleName.length());
+			}
+			builder.append("/").append(ruleName);
 
 			// rule from cell search
 			// rule from multicellular structure search
 			if (rule.isMulticellularStructureRule()) {
-				String color = rule.getColor().toString();
-				color = color.substring(color.indexOf("x") + 1, color.length() - 2);
-				builder.append("+%23ff").append(color);
-
 				// specify a multicellular structure rule that is not
-				// cell-based, but scenename-based
-				builder.append("M");
+				// cell-based, but scene name-based
+				builder.append("-M");
 			} else {
-				String ruleText = rule.getSearchedText();
-
-				if (ruleText.indexOf("'") != -1) {
-					ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
-					ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
-				}
-
 				// search types
-				if (rule.getSearchType() != null) {
-					switch (rule.getSearchType()) {
-					case LINEAGE:
-						builder.append("-s");
-						break;
-					case DESCRIPTION:
-						builder.append("-d");
-						break;
-					case FUNCTIONAL:
-						builder.append("-n");
-						break;
-					case MULTICELLULAR_CELL_BASED:
-						builder.append("-m");
-						break;
-					case GENE:
-						builder.append("-g");
-						break;
-					case NEIGHBOR:
-						builder.append("-b");
-						break;
-					case CONNECTOME:
-						builder.append("-c");
-						break;
-					default:
-						break;
-					}
+				switch (rule.getSearchType()) {
+				case LINEAGE:
+					builder.append("-s");
+					break;
+				case DESCRIPTION:
+					builder.append("-d");
+					break;
+				case FUNCTIONAL:
+					builder.append("-n");
+					break;
+				case MULTICELLULAR_CELL_BASED:
+					builder.append("-m");
+					break;
+				case GENE:
+					builder.append("-g");
+					break;
+				case NEIGHBOR:
+					builder.append("-b");
+					break;
+				case CONNECTOME:
+					builder.append("-c");
+					break;
+				default:
+					break;
 				}
 
-				if (rule.getSearchType() == null) { // not multicellular
-													// structure rule
-					// ancestry modifiers
-					// descendant
-					if (rule.isDescendantSelected())
-						builder.append("<");
-					// cell
-					if (rule.isCellSelected())
-						builder.append("$");
-					// cell body
-					if (rule.isCellBodySelected())
-						builder.append("#");
-					// ancestor
-					if (rule.isAncestorSelected())
-						builder.append(">");
-
-				} else { // multicellular structure rule
-					builder.append("M");
-				}
-
-				// color
-				String color = rule.getColor().toString();
-				color = color.substring(color.indexOf("x") + 1, color.length() - 2);
-				builder.append("+%23ff").append(color);
+				// ancestry modifiers
+				// descendant
+				if (rule.isDescendantSelected())
+					builder.append("<");
+				// cell
+				if (rule.isCellSelected())
+					builder.append("$");
+				// cell body
+				if (rule.isCellBodySelected())
+					builder.append("@");
+				// ancestor
+				if (rule.isAncestorSelected())
+					builder.append(">");
 			}
+
+			// color
+			String color = rule.getColor().toString();
+			color = color.substring(color.indexOf("x") + 1, color.length() - 2);
+			builder.append("+#ff").append(color);
 		}
-
 		return builder.toString();
-
 	}
 
 	private static String generateSetParameters(ArrayList<Rule> rules) {
@@ -149,9 +133,9 @@ public class URLGenerator {
 					ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
 				}
 				builder.append("/").append(ruleText);
-	
+
 				// search types
-				if (rule.getSearchType()==null)
+				if (rule.getSearchType() == null)
 					System.out.println(rule.toStringFull());
 				switch (rule.getSearchType()) {
 				case LINEAGE:
@@ -169,22 +153,22 @@ public class URLGenerator {
 				default:
 					break;
 				}
-	
+
 				// ancestry modifiers
 				// descendant <
 				if (rule.isDescendantSelected())
-					builder.append("%3E");
+					builder.append("<");
 				// cell $
 				if (rule.isCellSelected())
 					builder.append("$");
 				// ancestor >
 				if (rule.isAncestorSelected())
-					builder.append("%3C");
-	
+					builder.append(">");
+
 				// color
 				String color = rule.getColor().toString();
 				color = color.substring(color.indexOf("x") + 1, color.length() - 2);
-				builder.append("+%23ff").append(color);
+				builder.append("+#ff").append(color);
 			}
 		}
 

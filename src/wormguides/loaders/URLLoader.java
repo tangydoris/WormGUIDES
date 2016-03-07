@@ -12,7 +12,26 @@ import wormguides.model.Rule;
 
 public class URLLoader {
 
-	public static void process(String url, Window3DController window3DController) {
+	/**
+	 * Utility method that processes a url string and sets the correct view
+	 * parameters in the 3d subscene. Called by {@link StoriesLayer} and
+	 * {@link RootLayoutController} for scene sharing/loading and when changing
+	 * active/inactive stories. Documentation for URL (old and new APIs)
+	 * formatting and syntax can be found in URLDocumentation.txt inside the
+	 * package wormguides.model.
+	 * 
+	 * @param url
+	 *            String to be parsed (consisting of a prefix url, rules to be
+	 *            parsed, and view arguments)
+	 * @param window3DController
+	 *            Reference to the 3d subscene so that view arguments can be set
+	 *            accordingly
+	 * @param useInternalScaleFactor
+	 *            Boolean that tells the 3d subscene to use the internal scale
+	 *            factor, without scaling/translating it to match the old API.
+	 *            TRUE when called by {@link StoriesLayer}, FALSE otherwise.
+	 */
+	public static void process(String url, Window3DController window3DController, boolean useInternalScaleFactor) {
 		if (window3DController == null)
 			return;
 
@@ -54,9 +73,10 @@ public class URLLoader {
 				i++;
 		}
 
-		// process arguments
+		// process rules, add to current rules list
 		parseRules(ruleArgs, rulesList);
-		parseViewArgs(viewArgs, window3DController);
+		// process view arguments
+		parseViewArgs(viewArgs, window3DController, useInternalScaleFactor);
 	}
 
 	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
@@ -70,52 +90,53 @@ public class URLLoader {
 			try {
 				// determine if rule is a cell/cellbody rule, or a multicelllar
 				// structure rule
-				if (sb.indexOf("M") > -1)
-					isMulticellStructureRule = true;
 
 				// multicellular structure rules have a null SearchType
-				else {
-					// parse other args
-					if (sb.indexOf("-s") > -1) {
-						noTypeSpecified = false;
-						types.add("-s");
-						int i = sb.indexOf("-s");
-						sb.replace(i, i + 2, "");
-					}
-					if (sb.indexOf("-n") > -1) {
-						noTypeSpecified = false;
-						types.add("-n");
-						int i = sb.indexOf("-n");
-						sb.replace(i, i + 2, "");
-					}
-					if (sb.indexOf("-d") > -1) {
-						noTypeSpecified = false;
-						types.add("-d");
-						int i = sb.indexOf("-d");
-						sb.replace(i, i + 2, "");
-					}
-					if (sb.indexOf("-g") > -1) {
-						noTypeSpecified = false;
-						types.add("-g");
-						int i = sb.indexOf("-g");
-						sb.replace(i, i + 2, "");
-					}
-					if (sb.indexOf("-m") > -1) {
-						noTypeSpecified = false;
-						types.add("-m");
-						int i = sb.indexOf("-m");
-						sb.replace(i, i + 2, "");
-					}
+				// parse SearchType args
+				if (sb.indexOf("-s") > -1) {
+					noTypeSpecified = false;
+					types.add("-s");
+					int i = sb.indexOf("-s");
+					sb.replace(i, i + 2, "");
+				}
+				if (sb.indexOf("-n") > -1) {
+					noTypeSpecified = false;
+					types.add("-n");
+					int i = sb.indexOf("-n");
+					sb.replace(i, i + 2, "");
+				}
+				if (sb.indexOf("-d") > -1) {
+					noTypeSpecified = false;
+					types.add("-d");
+					int i = sb.indexOf("-d");
+					sb.replace(i, i + 2, "");
+				}
+				if (sb.indexOf("-g") > -1) {
+					noTypeSpecified = false;
+					types.add("-g");
+					int i = sb.indexOf("-g");
+					sb.replace(i, i + 2, "");
+				}
+				if (sb.indexOf("-m") > -1) {
+					noTypeSpecified = false;
+					types.add("-m");
+					int i = sb.indexOf("-m");
+					sb.replace(i, i + 2, "");
 				}
 
-				String colorString = sb.substring(sb.indexOf("+") + 6, sb.length());
+				String colorString = "";
+				if (sb.indexOf("+#ff") > -1)
+					colorString = sb.substring(sb.indexOf("+#ff") + 4);
+				else if (sb.indexOf("+%23ff") > -1)
+					colorString = sb.substring(sb.indexOf("+%23ff") + 6);
 
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-				if (isMulticellStructureRule) {
+
+				if (noTypeSpecified && sb.indexOf("-M") > -1) {
 					options.add(SearchOption.MULTICELLULAR_NAME_BASED);
-					int i = sb.indexOf("M");
-					sb.replace(i, i + 1, "");
-					
+					int i = sb.indexOf("-M");
+					sb.replace(i, i + 2, "");
+
 				} else {
 					if (sb.indexOf("%3C") > -1) {
 						options.add(SearchOption.ANCESTOR);
@@ -142,9 +163,9 @@ public class URLLoader {
 						int i = sb.indexOf("<");
 						sb.replace(i, i + 1, "");
 					}
-					if (sb.indexOf("#") > -1) {
+					if (sb.indexOf("@") > -1) {
 						options.add(SearchOption.CELLBODY);
-						int i = sb.indexOf("#");
+						int i = sb.indexOf("@");
 						sb.replace(i, i + 1, "");
 					}
 				}
@@ -182,7 +203,7 @@ public class URLLoader {
 							type = SearchType.GENE;
 						Search.addColorRule(type, name, Color.web(colorString), options);
 					}
-					
+
 				} else { // add multicellular structure rule
 					Search.addMulticellularStructureRule(name, Color.web(colorString));
 				}
@@ -210,7 +231,8 @@ public class URLLoader {
 		return true;
 	}
 
-	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController) {
+	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController,
+			boolean useInternalScaleFactor) {
 		// manipulate viewArgs arraylist so that rx ry and rz are grouped
 		// together
 		// to facilitate loading rotations in x and y
@@ -270,7 +292,10 @@ public class URLLoader {
 
 				case "scale":
 					try {
-						window3DController.setScale(Double.parseDouble(tokens[1]));
+						if (useInternalScaleFactor)
+							window3DController.setScaleInternal(Double.parseDouble(tokens[1]));
+						else
+							window3DController.setScale(Double.parseDouble(tokens[1]));
 					} catch (NumberFormatException nfe) {
 						System.out.println("error in parsing scale variable");
 						nfe.printStackTrace();

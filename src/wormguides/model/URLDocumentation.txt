@@ -1,6 +1,6 @@
 Note:	The Android and web URLs are currently equivalent.
 Note:	URLs are generated using the UTF8 values.
-Note:	The "added later" parameters are only added to parsing, not to URL generation. 
+Note:	The "* added later" parameters are only added to parsing, not to URL generation. 
 		User-facing URL generation currently follows the original API.
 		Internal URL generation supports the new parameters.
 
@@ -9,9 +9,9 @@ Lineage 	->	"-s"
 Functional 	->	"-n"
 Description	->	"-d"
 Gene		->	"-g"
-Multicell	->	"-m"
-Connectome	->	"-c"
-Neighbor	->	"-b"
+Multicell	->	"-m"	* added later
+Connectome	->	"-c"	* added later
+Neighbor	->	"-b"	* added later
 
 Systematic, Proper		->	-s-n
 Description, Proper		->	-d-n
@@ -28,20 +28,36 @@ Modifier:
 Cell Nucleus			->	"$"
 Descendant				->	"<" (%3E in UTF8)
 Ancestor				->	">" (%3C in UTF8)
-Cell Body				->	"#" (added later to color cell bodies)
-Multicellular Structure	->	"M"
+Cell Body				->	"@"	* added later
+Multicellular Structure	->	"-M"	* added later
 
 Ex.
-Cell, Descendant		->	"<$" (%3E$)
-Cell, Ancestor			->	"$>" ($%3C)
-Cell Body, Ancestor		->	"#>" (#%3C)
-Descendant, Ancestor	->	"<>" (%3E%3C)
-All						->	"<$#>" (%3E$%3C)
+Cell, Descendant		->	"<$" 	(%3E$)
+Cell, Ancestor			->	"$>" 	($%3C)
+Descendant, Ancestor	->	"<>"	(%3E%3C)
+All						->	"<$>" 	(%3E$%3C)
+All * added later		->	"-M<$@>	* added later
 
 Note:	The "$" is not used in the Android version. There is ambiguity in whether or not the cell
 		modifier is implicitly selected.
 
 
 Color:
-The RGB hex is placed after the search type and modifiers. We append "#ff" (or +%23ff in UTF8) 
+The RGB hex is placed after the search type and modifiers. We append "+#ff" (or +%23ff in UTF8) 
 followed by the hex value.
+
+Example URLs:
+Old API: "http://scene.wormguides.org/wormguides/testurlscript?/
+	set/ash-n$+#ff8fbc8f/rib-n$+#ff663366/avg-n$+#ffb41919/dd-n+#ff4a24c1/da-n+#ffc56002/
+	dd-n$+#ffb30a95/da-n$+#ffe6b34d/rivl-n+#ffc14d0e/rivr-n+#ffdbdd15/siavl-n+#ff50b428/
+	siavr-n+#ff278edb/sibdl-n+#ff6350dd/sibdr-n+#ffc95aa9/
+	view/time=400/rX=0.0/rY=0.0/rZ=0.0/tX=0.0/tY=0.0/scale=0.8461538461538461/dim=0.2/Android/"
+
+Internal (new) API: "http://scene.wormguides.org/wormguides/testurlscript?/
+	set/ash-n$#+#ff8fbc8f/rib-n$@+#ff663366/avg-n$@+#ffb41919/dd-n@+#ff4a24c1/da-n@+#ffc56002/
+	dd-n$+#ffb30a95/da-n$+#ffe6b34d/rivl-n@+#ffc14d0e/rivr-n@+#ffdbdd15/siavl-n@+#ff50b428/
+	siavr-n@+#ff278edb/sibdl-n@+#ff6350dd/sibdr-n@+#ffc95aa9/amphid commissure right-M+#ffffa500/
+	amphid commissure left-M+#ffff0000/
+	view/time=400/rX=0.0/rY=0.0/rZ=0.0/tX=0.0/tY=0.0/scale=1.5/dim=0.2/browser/"
+
+	

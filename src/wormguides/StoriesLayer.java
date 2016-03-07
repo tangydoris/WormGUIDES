@@ -55,8 +55,9 @@ import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AppFont;
 
-/*
- * Controller of the ListView in the 'Stories' tab
+/**
+ * This class is the controller of the {@link ListView} in the 'Stories' tab.
+ * The Constructor is called by {@link RootLayoutController} on initialization.
  */
 public class StoriesLayer {
 
@@ -144,11 +145,7 @@ public class StoriesLayer {
 		cellClickedProperty = window3DController.getCellClicked();
 
 		StoriesLoader.loadConfigFile(stories, timeOffset);
-
-		Story defaultStory = new Story("Blank Story", "This is a blank story. Create notes and set custom color rules!",
-				"");
-		stories.add(defaultStory);
-		setActiveStory(defaultStory);
+		addDefaultStory();
 
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -157,8 +154,8 @@ public class StoriesLayer {
 				Integer t2 = getEffectiveStartTime(o2);
 				if (t1.equals(t2))
 					return o1.getTagName().compareTo(o2.getTagName());
-				else
-					return t1.compareTo(t2);
+
+				return t1.compareTo(t2);
 			}
 		};
 
@@ -168,8 +165,19 @@ public class StoriesLayer {
 		}
 	}
 
-	/*
-	 * Loades story from file and sets it as active story
+	/**
+	 * Adds a blank default story upon initialization.
+	 */
+	private void addDefaultStory() {
+		Story defaultStory = new Story("Blank Story", "This is a blank story. Create notes and set custom color rules!",
+				"");
+		stories.add(defaultStory);
+		setActiveStory(defaultStory);
+	}
+
+	/**
+	 * Loades story from file and sets it as active story. Uses a
+	 * {@link FileChooser} to allow the user to pick a load location.
 	 */
 	public void loadStory() {
 		FileChooser chooser = new FileChooser();
@@ -179,17 +187,13 @@ public class StoriesLayer {
 
 		File file = chooser.showOpenDialog(parentStage);
 		if (file != null) {
-			try {
-				StoryFileUtil.loadFromCSVFile(stories, file, timeOffset);
-			} catch (IOException e) {
-				System.out.println("error occurred while saving story");
-				return;
-			}
+			StoryFileUtil.loadFromCSVFile(stories, file, timeOffset);
 		}
 	}
 
-	/*
-	 * Saves active story to file
+	/**
+	 * Saves active story to file. Uses a {@link FileChooser} to allow the user
+	 * to pick a save location.
 	 */
 	public void saveActiveStory() {
 		FileChooser chooser = new FileChooser();
@@ -236,25 +240,39 @@ public class StoriesLayer {
 		}
 	}
 
+	/**
+	 * @return The {@link StringProperty} activeStoryProperty that changes when
+	 *         the active story changes. The value of the String is the name of
+	 *         the currently active story.
+	 */
 	public StringProperty getActiveStoryProperty() {
 		return activeStoryProperty;
 	}
 
+	/**
+	 * @return The description of the current active story
+	 */
 	public String getActiveStoryDescription() {
 		if (activeStory != null)
 			return activeStory.getDescription();
-		else
-			return "";
+		return "";
 	}
 
+	/**
+	 * Ultimately sets the active story to the input {@link Story} parameter.
+	 * Sets the currently active story to be inactive if it is not null, then
+	 * sets the input story to active.
+	 * 
+	 * @param story
+	 *            The story that needs to be made active
+	 */
 	public void setActiveStory(Story story) {
 		// disable previous active story
 		// copy current rules changes back to story
 		if (activeStory != null) {
 			activeStory.setActive(false);
 			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-			for (Rule rule : currentRules)
-				rulesCopy.add(rule);
+			rulesCopy.addAll(currentRules);
 
 			activeStory.setColorURL(
 					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
@@ -264,6 +282,7 @@ public class StoriesLayer {
 		}
 
 		setActiveNote(null);
+		useInternalRules.set(true);
 
 		activeStory = story;
 		int startTime = timeProperty.get();
@@ -272,24 +291,21 @@ public class StoriesLayer {
 			activeStory.setActive(true);
 			activeStoryProperty.set(activeStory.getName());
 
-			if (activeStory.getColorURL().isEmpty())
-				useInternalRules.set(true);
-
-			if (!activeStory.getColorURL().isEmpty()) {
-				useInternalRules.set(false);
-				URLLoader.process(activeStory.getColorURL(), window3DController);
-			} else {
-				useInternalRules.set(true);
+			// if story does not come with a url, set its url to the
+			// program's internal rules
+			if (activeStory.getColorURL().isEmpty()) {
 				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-				for (Rule rule : currentRules) {
-					rulesCopy.add(rule);
-				}
+				rulesCopy.addAll(currentRules);
+				
 				activeStory.setColorURL(
 						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
 								window3DController.getRotationY(), window3DController.getRotationZ(),
 								window3DController.getTranslationX(), window3DController.getTranslationY(),
 								window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
+			} else { // if story does come with url, use it
+				useInternalRules.set(false);
 			}
+			URLLoader.process(activeStory.getColorURL(), window3DController, true);
 
 			if (activeStory.hasNotes()) {
 				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
@@ -299,7 +315,7 @@ public class StoriesLayer {
 		} else {
 			activeStoryProperty.set("");
 			useInternalRules.set(true);
-			URLLoader.process("", window3DController);
+			//URLLoader.process("", window3DController);
 		}
 
 		if (editController != null)

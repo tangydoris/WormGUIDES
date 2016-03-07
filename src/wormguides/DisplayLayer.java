@@ -2,8 +2,6 @@ package wormguides;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-
 import wormguides.model.Rule;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -31,7 +29,9 @@ import javafx.util.Callback;
  * current list are stored back into the item that no longer has context
  * (whether it is the internal rules or the story's rules).<br>
  * <br>
- * 
+ * The internal rules are the rules used when no story is active. On startup,
+ * the internal rules are the default rules added by the {@link Search} class in
+ * the static method addDefaultColorRules().
  * 
  * @see Rule
  */
@@ -42,6 +42,15 @@ public class DisplayLayer {
 	private ObservableList<Rule> currentRulesList;
 	private HashMap<Rule, Button> buttonMap;
 
+	/**
+	 * Constructor called by the application's main controller
+	 * {@link RootLayourController}.
+	 * 
+	 * @param useInternalRules
+	 *            {@link BooleanProperty} that tells the class whether to use
+	 *            the program's internal color rules (such as in the case where
+	 *            no story is active). On change, the current rules list
+	 */
 	public DisplayLayer(BooleanProperty useInternalRules) {
 		internalRulesList = new ArrayList<Rule>();
 		buttonMap = new HashMap<Rule, Button>();
@@ -61,23 +70,23 @@ public class DisplayLayer {
 								public void handle(ActionEvent event) {
 									currentRulesList.remove(rule);
 
-									Rule temp;
-									if (useInternalRules.get()) {
-										Iterator<Rule> iter = internalRulesList.iterator();
-										while (iter.hasNext()) {
-											temp = iter.next();
-											if (temp == rule)
-												iter.remove();
-										}
-									}
+									/*
+									 * Rule temp; if (useInternalRules.get()) {
+									 * Iterator<Rule> iter =
+									 * internalRulesList.iterator(); while
+									 * (iter.hasNext()) { temp = iter.next(); if
+									 * (temp == rule) iter.remove(); } }
+									 */
 									buttonMap.remove(rule);
 								}
 							});
 
 							// if using default rules, copy changes to internal
 							// rules list
+							/*
 							if (useInternalRules.get())
 								internalRulesList.add(rule);
+							*/
 						}
 					}
 				}
@@ -87,7 +96,6 @@ public class DisplayLayer {
 		useInternalRules.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				// TODO
 				// using internal rules now
 				// copy all internal rules to current list
 				if (newValue) {
@@ -97,7 +105,8 @@ public class DisplayLayer {
 				// not using internal rules anymore
 				// copy all current rule changes back to internal list
 				else {
-
+					internalRulesList.clear();
+					internalRulesList.addAll(currentRulesList);
 				}
 			}
 		});
