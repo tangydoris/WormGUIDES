@@ -96,11 +96,11 @@ public class Note {
 		return sceneExpandedProperty;
 	}
 
-	public boolean isSceneExpanded() {
+	public boolean isExpandedInScene() {
 		return sceneExpandedProperty.get();
 	}
 
-	public void setSceneExpanded(boolean expanded) {
+	public void setExpandedInScene(boolean expanded) {
 		sceneExpandedProperty.set(expanded);
 	}
 

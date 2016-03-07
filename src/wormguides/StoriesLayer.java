@@ -687,12 +687,12 @@ public class StoriesLayer {
 
 			title = new Text(story.getName());
 			title.setFont(AppFont.getBolderFont());
-			title.setWrappingWidth(width - 5);
+			title.setWrappingWidth(width - 15);
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 
 			description = new Text(story.getDescription());
 			description.setFont(AppFont.getFont());
-			description.setWrappingWidth(width - 5);
+			description.setWrappingWidth(width - 15);
 			description.setFontSmoothingType(FontSmoothingType.LCD);
 
 			container.getChildren().addAll(title, description);
@@ -775,7 +775,7 @@ public class StoriesLayer {
 			r1.setMaxWidth(USE_PREF_SIZE);
 
 			title = new Text(note.getTagName());
-			title.setWrappingWidth(width - 5 - r1.prefWidth(-1) - expandIcon.prefWidth(-1));
+			title.setWrappingWidth(width - 15 - r1.prefWidth(-1) - expandIcon.prefWidth(-1));
 			title.setFont(AppFont.getBolderFont());
 			title.setFontSmoothingType(FontSmoothingType.LCD);
 
@@ -793,7 +793,7 @@ public class StoriesLayer {
 			r2.setMaxWidth(USE_PREF_SIZE);
 
 			contents = new Text(note.getTagContents());
-			contents.setWrappingWidth(width - 5 - r2.prefWidth(-1));
+			contents.setWrappingWidth(width - 15 - r2.prefWidth(-1));
 			contents.setFont(AppFont.getFont());
 			contents.setFontSmoothingType(FontSmoothingType.LCD);
 

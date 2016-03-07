@@ -1506,11 +1506,12 @@ public class Window3DController {
 				if (note.attachedToLocation()) {
 					VBox box = new VBox(3);
 					box.getChildren().add(text);
-					// add marker to scene
+					// add inivisible location marker to scene at location
+					// specified by note
 					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
 					root.getChildren().add(marker);
 					entitySpriteMap.put(marker, box);
-
+					// add vbox to sprites pane
 					spritesPane.getChildren().add(box);
 				}
 
@@ -1526,9 +1527,8 @@ public class Window3DController {
 								box.getChildren().add(text);
 								entitySpriteMap.put(spheres[i], box);
 								spritesPane.getChildren().add(box);
-							} else {
+							} else
 								entitySpriteMap.get(spheres[i]).getChildren().add(text);
-							}
 
 							break;
 						}
@@ -1692,8 +1692,10 @@ public class Window3DController {
 	// if isOverlay is true, then the text is larger
 	private Text makeNoteGraphic(Note note) {
 		String title = note.getTagName();
-		if (note.isSceneExpanded())
+		if (note.isExpandedInScene())
 			title += ": " + note.getTagContents();
+		else
+			title += "\n[more text...]";
 
 		Text node = null;
 		if (note.getTagDisplay() != null) {
@@ -2510,11 +2512,11 @@ public class Window3DController {
 						Text picked = (Text) result;
 						Note note = currentGraphicNoteMap.get(picked);
 						if (note != null) {
-							note.setSceneExpanded(!note.isSceneExpanded());
-							if (note.isSceneExpanded())
+							note.setExpandedInScene(!note.isExpandedInScene());
+							if (note.isExpandedInScene())
 								picked.setText(note.getTagName() + ": " + note.getTagContents());
 							else
-								picked.setText(note.getTagName());
+								picked.setText(note.getTagName() + "\n[more text...]");
 						}
 					}
 				}
