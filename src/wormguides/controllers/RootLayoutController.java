@@ -630,12 +630,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				// stop playing movie when we reach the end time
-				timeSlider.setValueChanging(false);
 				timeSlider.setValue(time.get());
-				if (time.get() >= window3DController.getEndTime()) {
-					playingMovie.set(false);
+				if (time.get() >= window3DController.getEndTime() - 1) {
 					playButton.setGraphic(playIcon);
+					playingMovie.set(false);
 				}
 			}
 		});
@@ -643,13 +641,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				if (timeSlider.isValueChanging()) {
-					int newTime = newValue.intValue();
-					if (newTime != timeSlider.getValue() && window3DController != null) {
-						window3DController.setTime(newTime);
-						timeSlider.setValue(newTime);
-					}
-				}
+				int newTime = newValue.intValue();
+				if (newTime != timeSlider.getValue() && window3DController != null)
+					window3DController.setTime(newTime);
 			}
 		});
 
@@ -1178,5 +1172,5 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	 * Delay time in seconds before the application updates to the new time on
 	 * the slider
 	 */
-	//private final double TIME_SLIDER_TIME_DELAY = 0.5;
+	// private final double TIME_SLIDER_TIME_DELAY = 0.5;
 }

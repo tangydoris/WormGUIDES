@@ -175,19 +175,27 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 							String funcName = PartsList.getFunctionalNameByLineageName(cellName);
 							String searchName = cellName;
+							boolean isTerminalCase = false;
 							if (funcName != null)
-								searchName = funcName;
-							if (!cellCases.containsTerminalCase(searchName)) {
-								cellCases.makeTerminalCase(cellName, searchName,
-										connectome.queryConnectivity(searchName, true, false, false, false, false),
-										connectome.queryConnectivity(searchName, false, true, false, false, false),
-										connectome.queryConnectivity(searchName, false, false, true, false, false),
-										connectome.queryConnectivity(searchName, false, false, false, true, false),
-										productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(cellName));
+								isTerminalCase = true;
+							if (isTerminalCase) {
+								if (!cellCases.containsTerminalCase(searchName)) {
+									cellCases.makeTerminalCase(cellName, searchName,
+											connectome.queryConnectivity(searchName, true, false, false, false, false),
+											connectome.queryConnectivity(searchName, false, true, false, false, false),
+											connectome.queryConnectivity(searchName, false, false, true, false, false),
+											connectome.queryConnectivity(searchName, false, false, false, true, false),
+											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(cellName));
+								}
+								return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
 							}
-							return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
+							
+							if (!cellCases.containsNonTerminalCase(searchName)) {
+								cellCases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
+										productionInfo.getCellShapeData(cellName));
+							}
+							return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
 						}
-
 						return null;
 					};
 				};
@@ -367,30 +375,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 */
 	public void setColorNeighborsButtonListener(EventHandler<MouseEvent> handler) {
 		colorNeighbors.setOnMouseClicked(handler);
-	}
-
-	/**
-	 * Sets the listener for the 'wired to' button click in the menu. Called by
-	 * Window3DController
-	 * 
-	 * @param handler
-	 *            the handler (provided by Window3DController) that handles the
-	 *            'wired to' button click action
-	 */
-	public void setWiredToButtonListener(EventHandler<MouseEvent> handler) {
-		wiredTo.setOnMouseClicked(handler);
-	}
-
-	/**
-	 * Sets the listener for the 'gene expressions' button click in the menu.
-	 * Called by Window3DController
-	 * 
-	 * @param handler
-	 *            the handler (provided by Window3DController) that handles the
-	 *            'gene expressions' button click action
-	 */
-	public void setExpressesButtonListener(EventHandler<MouseEvent> handler) {
-		expresses.setOnMouseClicked(handler);
 	}
 
 	/**
