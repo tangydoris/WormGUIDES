@@ -793,7 +793,7 @@ public class Window3DController {
 			cellClicked.set(true);
 
 			if (event.getButton() == MouseButton.SECONDARY)
-				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL);
+				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
 			else if (event.getButton() == MouseButton.PRIMARY) {
 				if (allLabels.contains(name))
 					removeLabelFor(name);

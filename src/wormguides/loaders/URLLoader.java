@@ -149,7 +149,7 @@ public class URLLoader {
 						sb.replace(i, i + 1, "");
 					}
 					if (sb.indexOf("$") > -1) {
-						options.add(SearchOption.CELL);
+						options.add(SearchOption.CELLNUCLEUS);
 						int i = sb.indexOf("$");
 						sb.replace(i, i + 1, "");
 					}

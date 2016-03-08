@@ -7,7 +7,7 @@ public enum SearchOption {
 	 * with the searched name. This is the base list from which ANCESTOR and
 	 * DESCENDANT cells are queried.
 	 */
-	CELL("Cell Nucleus"),
+	CELLNUCLEUS("Cell Nucleus"),
 	/**
 	 * The CELLBODY enum tells the {@link Search} class to look for cell bodies
 	 * that contain the cells in the search results list.

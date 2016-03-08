@@ -128,7 +128,7 @@ public class RuleEditorController extends AnchorPane implements Initializable {
 	public ArrayList<SearchOption> getOptions() {
 		ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 		if (isCellTicked())
-			options.add(SearchOption.CELL);
+			options.add(SearchOption.CELLNUCLEUS);
 		if (isCellBodyTicked())
 			options.add(SearchOption.CELLBODY);
 		if (isAncestorsTicked())

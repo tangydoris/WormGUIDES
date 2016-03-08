@@ -321,7 +321,7 @@ public class SulstonTreePane extends ScrollPane {
 			contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELL);
+					Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 
 					contextMenuStage.hide();
@@ -332,7 +332,7 @@ public class SulstonTreePane extends ScrollPane {
 				@Override
 				public void handle(MouseEvent event) {
 					// call distance Search method
-					Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELL);
+					Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 					contextMenuStage.hide();
 				}

@@ -305,7 +305,7 @@ public class Rule {
 	}
 
 	public boolean isCellSelected() {
-		return options.contains(SearchOption.CELL);
+		return options.contains(SearchOption.CELLNUCLEUS);
 	}
 
 	public boolean isCellBodySelected() {
@@ -374,7 +374,7 @@ public class Rule {
 			return false;
 
 		if (cells != null) {
-			if (options.contains(SearchOption.CELL) && cells.contains(name))
+			if (options.contains(SearchOption.CELLNUCLEUS) && cells.contains(name))
 				return true;
 
 			for (String cell : cells) {

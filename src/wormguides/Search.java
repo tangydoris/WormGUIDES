@@ -189,7 +189,7 @@ public class Search {
 			}
 		}
 
-		Rule tempRule = new Rule(sb.toString(), color, SearchType.CONNECTOME, SearchOption.CELL);
+		Rule tempRule = new Rule(sb.toString(), color, SearchType.CONNECTOME, SearchOption.CELLNUCLEUS);
 		tempRule.setCells(connectome.queryConnectivity(cellName, isPresynaptic, isPostsynaptic, isElectrical,
 				isNeuromuscular, true));
 		tempRule.setSearchedText(cellName);
@@ -211,7 +211,7 @@ public class Search {
 		electricalTicked = isElectrical;
 		neuromuscularTicked = isNeuromuscular;
 
-		Rule rule = addColorRule(SearchType.CONNECTOME, searched, color, SearchOption.CELL);
+		Rule rule = addColorRule(SearchType.CONNECTOME, searched, color, SearchOption.CELLNUCLEUS);
 
 		presynapticTicked = tempPresyn;
 		postsynapticTicked = tempPostsyn;
@@ -293,13 +293,13 @@ public class Search {
 	}
 
 	public void addDefaultColorRules() {
-		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELL, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELL, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELL);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELL);
+		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 
 		// highlights 2/23/16 structures
 		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
@@ -308,7 +308,6 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdr", Color.web("0xc95aa9"), SearchOption.CELLBODY);
-
 	}
 
 	public void clearRules() {
@@ -339,7 +338,7 @@ public class Search {
 		// default search options is cell
 		if (options == null) {
 			options = new ArrayList<SearchOption>();
-			options.add(SearchOption.CELL);
+			options.add(SearchOption.CELLNUCLEUS);
 		}
 
 		String label = "";
@@ -730,7 +729,7 @@ public class Search {
 
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
 				if (cellNucleusTicked)
-					options.add(SearchOption.CELL);
+					options.add(SearchOption.CELLNUCLEUS);
 				if (cellBodyTicked)
 					options.add(SearchOption.CELLBODY);
 				if (ancestorTicked)

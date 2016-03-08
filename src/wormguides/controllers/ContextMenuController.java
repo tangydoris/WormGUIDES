@@ -412,7 +412,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 										@Override
 										public void handle(ActionEvent event) {
 											Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
-													SearchOption.CELL);
+													SearchOption.CELLNUCLEUS);
 											rule.showEditStage(parentStage);
 										}
 									});
