@@ -374,7 +374,7 @@ public class Rule {
 			return false;
 
 		if (cells != null) {
-			if (options.contains(SearchOption.CELLBODY) && cells.contains(name))
+			if (options.contains(SearchOption.CELL) && cells.contains(name))
 				return true;
 
 			for (String cell : cells) {

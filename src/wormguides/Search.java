@@ -308,10 +308,7 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdr", Color.web("0xc95aa9"), SearchOption.CELLBODY);
-		
-		// TODO remove later
-		addMulticellularStructureRule("amphid commissure right", Color.ORANGE);
-		addMulticellularStructureRule("amphid commissure left", Color.RED);
+
 	}
 
 	public void clearRules() {
@@ -522,8 +519,9 @@ public class Search {
 							electricalTicked, neuromuscularTicked, true));
 				}
 				break;
+
 			case NEIGHBOR:
-				cells = getNeighbors(searched);
+				cells.addAll(getNeighbors(searched));
 			}
 		}
 		return cells;
@@ -642,13 +640,18 @@ public class Search {
 		return ancestors;
 	}
 
-	/*
-	 * neighbor search mode: given cell: - find time range of cell - for each
+	/**
+	 * Neighbor search mode: given cell: - find time range of cell - for each
 	 * time point - find its nearest neighbor and compute d = distance to
 	 * neighbor - d = root((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2) - multiple d by
 	 * 1.5 - for position in positionsAtTime - compute d1 = distance from query
 	 * cell position to position - if d1 is <= d - if cell is not in results -
-	 * add cell - highlight results over lifetime of cell
+	 * add cell - highlight results over lifetime of cell.
+	 * 
+	 * @param cellName
+	 *            The String containing the lineage name of the queried cell
+	 * @return An {@link ArrayList} of Strings containing the cell lineage names
+	 *         of neighboring cells to cell with input cell lineage name
 	 */
 	public static ArrayList<String> getNeighbors(String cellName) {
 		ArrayList<String> results = new ArrayList<String>();
@@ -703,9 +706,8 @@ public class Search {
 					// compute distance from each cell to query cell
 					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
 						// only add new entries
-						if (!results.contains(names[n])) {
+						if (!results.contains(names[n]))
 							results.add(names[n]);
-						}
 					}
 				}
 			}
@@ -1000,7 +1002,7 @@ public class Search {
 			cellCases.removeCellCase(cellName);
 		}
 	}
-	
+
 	public static void addToInfoWindow(AnatomyTerm term) {
 		if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
 			if (!cellCases.containsAnatomyTermCase(term.getTerm())) {

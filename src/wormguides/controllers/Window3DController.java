@@ -874,6 +874,7 @@ public class Window3DController {
 	}
 
 	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
+		System.out.println("context menu search option - "+option);
 		if (contextMenuStage == null)
 			initContextMenuStage();
 
@@ -890,7 +891,6 @@ public class Window3DController {
 			public void handle(MouseEvent event) {
 				Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
-
 				contextMenuStage.hide();
 			}
 		});
@@ -1352,9 +1352,8 @@ public class Window3DController {
 				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
-					if (rule.appliesToCellNucleus(cellNames[i])) {
+					if (rule.appliesToCellNucleus(cellNames[i]))
 						colors.add(Color.web(rule.getColor().toString()));
-					}
 				}
 				Collections.sort(colors, colorComparator);
 				material = colorHash.getMaterial(colors);
