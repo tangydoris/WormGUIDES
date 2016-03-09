@@ -1281,23 +1281,27 @@ public class Window3DController {
 						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
+							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
 								colors.add(rule.getColor());
+							}
 
 							else {
 								for (String name : allNames) {
-									if (rule.appliesToCellBody(name))
+									if (rule.appliesToCellBody(name)) {
 										colors.add(rule.getColor());
+									}	
 								}
 							}
 						}
 						Collections.sort(colors, colorComparator);
 
 						// if any rules applied
-						if (!colors.isEmpty())
+						if (!colors.isEmpty()) {
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						else
+						}
+						else {
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+						}
 					}
 				}
 
@@ -1819,7 +1823,7 @@ public class Window3DController {
 		}
 	}
 
-	public void captureImagesForMovie() {
+	public boolean captureImagesForMovie() {
 
 		movieFiles.clear();
 		count = -1;
@@ -1834,7 +1838,7 @@ public class Window3DController {
 
 		if (fakeFile == null) {
 			System.out.println("null file");
-			return;
+			return false;
 		}
 
 		// save the name from the file chooser for later MOV file
@@ -1854,6 +1858,7 @@ public class Window3DController {
 		try {
 			frameDir.mkdir();
 		} catch (SecurityException se) {
+			return false;
 		}
 
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
@@ -1875,12 +1880,14 @@ public class Window3DController {
 								movieFiles.addElement(file);
 							}
 						} catch (Exception e) {
-							e.printStackTrace();
+							//e.printStackTrace();
 						}
 					}
 				}
 			}
 		});
+		
+		return true;
 	}
 
 	public void convertImagesToMovie() {
@@ -1897,7 +1904,7 @@ public class Window3DController {
 		}
 
 		if (javaPictures.size() > 0) {
-			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 5, movieName, javaPictures);
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 3, movieName, javaPictures);
 
 			// move the movie to the originally specified location
 			File movJustMade = new File(movieName);

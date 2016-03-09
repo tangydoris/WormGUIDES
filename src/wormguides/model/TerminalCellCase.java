@@ -356,7 +356,6 @@ public class TerminalCellCase {
 			
 			lastChar = base.charAt(base.length()-1);
 			lastChar = Character.toLowerCase(lastChar);
-			System.out.print(" - last char: " + lastChar);
 			//check for left, right, dorsal, or ventral suffix --> update cell
 			if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
 				//check if multiple suffixes
@@ -470,7 +469,6 @@ public class TerminalCellCase {
 					
 					//extract the title
 					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
-					//System.out.println(title);
 					
 					//move the index past the authors section
 					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;
@@ -498,8 +496,6 @@ public class TerminalCellCase {
 				}
 			}
 		}
-		
-		//"<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>
 		
 		//add the source
 		String source = "<em>Source:</em> <a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>";

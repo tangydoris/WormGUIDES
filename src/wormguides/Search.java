@@ -293,17 +293,17 @@ public class Search {
 	}
 
 	public void addDefaultColorRules() {
-		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
-
-		// highlights 2/23/16 structures
-		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xdbdd15"), SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+//		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
+//
+//		// highlights 2/23/16 structures
+//		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
+//		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xdbdd15"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "siavl", Color.web("0x50b428"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
