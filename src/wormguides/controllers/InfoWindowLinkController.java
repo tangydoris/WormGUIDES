@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 import wormguides.AnatomyTerm;
 import wormguides.Search;
+import wormguides.model.PartsList;
 
 /*
  * Callback class for our HTML page for a terminal cell case to open links in default browser
@@ -37,6 +38,15 @@ public class InfoWindowLinkController {
 	 * @param cellName the name of the clicked wiring partner
 	 */
 	public void handleWiringPartnerClick(String cellName) {
+		//handle the case of " " to "_" discrepancy --> change all spaces to underscore
+		if (cellName.contains(" ")) {
+			for (int i = 0; i < cellName.length(); i++) {
+				if (cellName.charAt(i) == ' ') {
+					cellName = cellName.substring(0, i) + "_" + cellName.substring(i+1);
+				}
+			}
+		}
+		
 		//view in 3D
 		viewInCellTheater(cellName);
 
