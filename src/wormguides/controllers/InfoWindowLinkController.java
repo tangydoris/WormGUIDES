@@ -80,5 +80,5 @@ public class InfoWindowLinkController {
 		labeledCellProperty.set(cellName);
 	}
 	
-	private final static String amphidSensilla = "amphid sensilla";
+	//private final static String amphidSensilla = "amphid sensilla";
 }

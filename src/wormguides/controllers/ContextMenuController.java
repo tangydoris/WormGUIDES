@@ -82,8 +82,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	private CellCasesLists cellCases;
 	private ProductionInfo productionInfo;
-	private Connectome connectome;
-
 	private Stage parentStage;
 
 	private BooleanProperty bringUpInfoProperty;
@@ -113,8 +111,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		parentStage = stage;
 		cellCases = cases;
 		productionInfo = info;
-		this.connectome = connectome;
-
 		loadingService = new Service<Void>() {
 			@Override
 			protected Task<Void> createTask() {
@@ -416,7 +412,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 										@Override
 										public void handle(ActionEvent event) {
 											Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
-													SearchOption.CELL);
+													SearchOption.CELLNUCLEUS);
 											rule.showEditStage(parentStage);
 										}
 									});

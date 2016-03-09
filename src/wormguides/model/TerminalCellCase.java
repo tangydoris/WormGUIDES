@@ -670,9 +670,8 @@ public class TerminalCellCase {
 	public ArrayList<String> getAnatomy() {
 		if (this.hasAnatomy) {
 			return this.anatomy;
-		} else {
-			return null;
 		}
+		return null;
 	}
 	
 	public ArrayList<String> getPresynapticPartners() {

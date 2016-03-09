@@ -10,18 +10,12 @@ public abstract class CellCase {
 	private String funcName;
 	private String lineageName;
 
-	private String functionWORMATLAS;
-
 	private ArrayList<String> geneExpression;
 	private ArrayList<ArrayList<String>> homologues;
 
 	private ArrayList<String> links;
 
-	private ArrayList<String> nuclearProductionInfo;
-	private ArrayList<String> cellShapeProductionInfo;
-
-	public CellCase(String lineageName, ArrayList<String> nuclearProductionInfo,
-			ArrayList<String> cellShapeProductionInfo) {
+	public CellCase(String lineageName) {
 		this.lineageName = lineageName;
 		funcName = PartsList.getFunctionalNameByLineageName(lineageName);
 		if (funcName == null)
@@ -29,8 +23,7 @@ public abstract class CellCase {
 
 		links = buildLinks();
 
-		// parse wormatlas for the "Function" field
-		functionWORMATLAS = setFunctionFromWORMATLAS();
+		setFunctionFromWORMATLAS();
 	}
 
 	protected abstract ArrayList<String> buildLinks();

@@ -30,6 +30,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.MainApp;
 import wormguides.SearchOption;
+import wormguides.SearchType;
 import wormguides.controllers.RuleEditorController;
 import wormguides.loaders.ImageLoader;
 import wormguides.view.AppFont;
@@ -39,7 +40,7 @@ import wormguides.view.AppFont;
  * the same layout (label, some space, 4 buttons)
  */
 
-public abstract class Rule {
+public class Rule {
 
 	private Stage editStage;
 
@@ -57,34 +58,43 @@ public abstract class Rule {
 	private ArrayList<String> cells;
 	private boolean cellsSet;
 
-	private boolean isStructureRule;
-
-	private HBox hbox = new HBox();
-	private Label label = new Label();
-	private Rectangle colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-	private Button editBtn = new Button();
-	private Button visibleBtn = new Button();
-	private Button deleteBtn = new Button();
-
-	private Tooltip toolTip = new Tooltip();
+	private HBox hbox;
+	private Label label;
+	private Rectangle colorRectangle;
+	private Button editBtn;
+	private Button visibleBtn;
+	private Button deleteBtn;
+	private Tooltip toolTip;
 
 	private RuleEditorController editController;
 	private SubmitHandler handler;
 
-	public Rule(String searched, Color color, ArrayList<SearchOption> options, boolean structureRule) {
-		setSearchedText(searched);
+	private SearchType searchType;
+
+	public Rule(String searched, Color color, SearchType type, SearchOption... options) {
+		this(searched, color, type, new ArrayList<SearchOption>(Arrays.asList(options)));
+	}
+
+	public Rule(String searched, Color color, SearchType type, ArrayList<SearchOption> options) {
+		hbox = new HBox();
+		label = new Label();
+		colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+		editBtn = new Button();
+		visibleBtn = new Button();
+		deleteBtn = new Button();
+		toolTip = new Tooltip();
+
+		searchType = type;
+		setOptions(options);
 		setColor(color);
+		setSearchedText(searched);
 
 		handler = new SubmitHandler();
-
-		isStructureRule = structureRule;
 
 		cells = new ArrayList<String>();
 		// if the cells list from Search is set for this rule, cellsSet is true
 		// is false before the list is set
 		cellsSet = false;
-
-		setOptions(options);
 
 		hbox.setSpacing(3);
 		hbox.setPadding(new Insets(3));
@@ -98,7 +108,6 @@ public abstract class Rule {
 		label.setMinHeight(UI_SIDE_LENGTH);
 		label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
 		label.setFont(AppFont.getFont());
-		resetLabel();
 
 		Region r = new Region();
 		HBox.setHgrow(r, Priority.ALWAYS);
@@ -215,7 +224,7 @@ public abstract class Rule {
 			if (textLowerCase.contains("functional") || textLowerCase.contains("description"))
 				editController.disableDescendantOption();
 
-			else if (isStructureRule)
+			else if (isMulticellularStructureRule())
 				editController.disableOptionsForStructureRule();
 
 		} catch (IOException e) {
@@ -225,6 +234,10 @@ public abstract class Rule {
 			System.out.println("error in instantiating rule editor - null pointer exception");
 			npe.printStackTrace();
 		}
+	}
+
+	public boolean isMulticellularStructureRule() {
+		return options.contains(SearchOption.MULTICELLULAR_NAME_BASED);
 	}
 
 	public void setCells(ArrayList<String> list) {
@@ -244,18 +257,15 @@ public abstract class Rule {
 		colorRectangle.setFill(color);
 	}
 
-	public void setText(String title) {
-		text = title;
-		resetLabel();
-	}
-
-	private void resetLabel() {
-		label.setText(toStringFull());
-	}
-
 	public void setSearchedText(String name) {
 		text = name;
 		textLowerCase = name.toLowerCase();
+
+		label.setText(toStringFull());
+	}
+
+	public void resetLabel(String labelString) {
+		label.setText(labelString);
 	}
 
 	public void setColor(Color color) {
@@ -295,7 +305,7 @@ public abstract class Rule {
 	}
 
 	public boolean isCellSelected() {
-		return options.contains(SearchOption.CELL);
+		return options.contains(SearchOption.CELLNUCLEUS);
 	}
 
 	public boolean isCellBodySelected() {
@@ -322,11 +332,20 @@ public abstract class Rule {
 		return toStringFull();
 	}
 
-	public boolean equals(ColorRule other) {
-		return text.equals(other.getSearchedText());
+	/**
+	 * @param other
+	 *            The other rule to compare this rule to
+	 * @return TRUE if the rules contain the same searched text; FALSE otherwise
+	 */
+	public boolean equals(Rule other) {
+		return text.equalsIgnoreCase(other.getSearchedText());
 	}
 
-	// Returns full string description of the Rule
+	/**
+	 * @return Full string description of the rule used in the tooltip and the
+	 *         label in the heading of the rule editor popup. The return string
+	 *         contains the rule's name and options.
+	 */
 	public String toStringFull() {
 		StringBuilder sb = new StringBuilder(text);
 		sb.append(" ");
@@ -344,8 +363,54 @@ public abstract class Rule {
 		return sb.toString();
 	}
 
-	// @param name : lineage name of cell body
-	public boolean appliesToBody(String name) {
+	/**
+	 * @param name
+	 *            lineage name of queried cell
+	 * @return TRUE if the rule is visible and applies to cell nucleus with
+	 *         specified name; FALSE otherwise
+	 */
+	public boolean appliesToCellNucleus(String name) {
+		if (!visible)
+			return false;
+
+		if (cells != null) {
+			if (options.contains(SearchOption.CELLNUCLEUS) && cells.contains(name))
+				return true;
+
+			for (String cell : cells) {
+				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
+					return true;
+
+				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param name
+	 *            scene name of multicellular structure
+	 * @return TRUE if the rule is visible and it applies to multicellcular
+	 *         structure with specified name; FALSE otherwise
+	 */
+	public boolean appliesToMulticellularStructure(String name) {
+		if (!visible)
+			return false;
+
+		if (options.contains(SearchOption.MULTICELLULAR_NAME_BASED) && text.equalsIgnoreCase(name))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * @param name
+	 *            lineage name of cellbody
+	 * @return TRUE if the rule is visible and applies to cell body with
+	 *         specified name; FALSE otherwise
+	 */
+	public boolean appliesToCellBody(String name) {
 		if (!visible)
 			return false;
 
@@ -364,35 +429,40 @@ public abstract class Rule {
 		return false;
 	}
 
-	// @param name : lineage name of cell
-	public boolean appliesToCell(String name) {
-		if (!visible)
-			return false;
-
-		if (cells != null) {
-			if (options.contains(SearchOption.CELL) && cells.contains(name))
-				return true;
-
-			for (String cell : cells) {
-				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
-					return true;
-
-				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
-					return true;
-			}
-		}
-
-		return false;
+	/**
+	 * Returns the {@link SearchType} of the rule. If the rule has the option
+	 * SearchOption.MULTICELLULAR, the return value is null and the rule is a
+	 * rule specific to multicellular structures (meaning the rule is defined by
+	 * its name instead of by its cells).
+	 * 
+	 * @return The SearchType of the rule
+	 */
+	public SearchType getSearchType() {
+		return searchType;
 	}
 
+	/**
+	 * @return TRUE if rule is visible; FALSE otherwise
+	 */
 	public boolean isVisible() {
 		return visible;
 	}
 
+	/**
+	 * Sets the ruleChanged {@link BooleanProperty} to the value defined by the
+	 * input parameter.
+	 * 
+	 * @param changed
+	 *            boolean stating whether the rule was changed
+	 */
 	public void setChanged(boolean changed) {
 		ruleChanged.set(changed);
 	}
 
+	/**
+	 * This private class is an {@link EventHandler} of {@link ActionEvent} that
+	 * handles a click on the 'Submit' button in the rule editor popup.
+	 */
 	private class SubmitHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
@@ -400,7 +470,8 @@ public abstract class Rule {
 				setColor(editController.getColor());
 				editStage.hide();
 				setOptions(editController.getOptions());
-				resetLabel();
+
+				label.setText(toStringFull());
 				toolTip.setText(toStringFull());
 
 				ruleChanged.set(true);
@@ -411,4 +482,5 @@ public abstract class Rule {
 
 	// length and width of color rule ui buttons
 	private static final int UI_SIDE_LENGTH = 22;
+
 }

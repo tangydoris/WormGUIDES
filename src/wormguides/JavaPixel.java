@@ -97,7 +97,7 @@ public class JavaPixel {
           */
 	 public void setRed(int nuRed)
 	 {
-	 	red = (int) (nuRed & 0xff);
+	 	red = nuRed & 0xff;
 	 	this.setPixel();
 	 }
          
@@ -108,7 +108,7 @@ public class JavaPixel {
           */
 	 public void setBlue(int nuBlue)
 	 {
-	 	blue = (int) (nuBlue & 0xff);
+	 	blue = nuBlue & 0xff;
 	 	this.setPixel();
 	 }
          
@@ -119,7 +119,7 @@ public class JavaPixel {
           */
 	 public void setGreen(int nuGreen)
 	 {
-	 	green = (int) (nuGreen & 0xff);
+	 	green = nuGreen & 0xff;
 	 	this.setPixel();
 	 }
 }

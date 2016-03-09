@@ -1,8 +1,8 @@
 package wormguides.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.TreeSet;
-
 import wormguides.ColorComparator;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -16,7 +16,7 @@ import javafx.scene.paint.PhongMaterial;
 
 public class ColorHash {
 
-	private HashMap<TreeSet<Color>, Material> materialHash;
+	private HashMap<ArrayList<Color>, Material> materialHash;
 	private HashMap<Material, Double> opacityHash;
 	private Material highlightMaterial;
 	private Material translucentMaterial;
@@ -26,12 +26,12 @@ public class ColorHash {
 	private HashMap<Double, Material> opacityMaterialHash;
 
 	public ColorHash() {
-		materialHash = new HashMap<TreeSet<Color>, Material>();
+		materialHash = new HashMap<ArrayList<Color>, Material>();
 		opacityHash = new HashMap<Material, Double>();
 
 		opacityMaterialHash = new HashMap<Double, Material>();
 		makeOthersMaterial(1.0);
-
+		
 		highlightMaterial = makeMaterial(Color.GOLD);
 		translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
 		makeMaterial(Color.WHITE);
@@ -48,7 +48,7 @@ public class ColorHash {
 			opacityMaterialHash.put(opacity, material);
 			opacityHash.put(material, opacity);
 		}
-
+		
 		return opacityMaterialHash.get(opacity);
 	}
 
@@ -69,15 +69,16 @@ public class ColorHash {
 
 		return material;
 	}
-
-	public Material makeMaterial(Color... colors) {
-		TreeSet<Color> colorSet = new TreeSet<Color>(new ColorComparator());
-		for (Color color : colors)
-			colorSet.add(color);
-		return makeMaterial(colorSet);
+	
+	public Material makeMaterial(Color color) {
+		ArrayList<Color> colors = new ArrayList<Color>();
+		colors.add(color);
+		return makeMaterial(colors);
 	}
 
-	public Material makeMaterial(TreeSet<Color> colors) {
+	public Material makeMaterial(ArrayList<Color> colors) {
+		Collections.sort(colors, new ColorComparator());
+		
 		WritableImage wImage = new WritableImage(200, 200);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);
@@ -89,7 +90,7 @@ public class ColorHash {
 			copy[0] = Color.WHITE;
 		} else if (colors.size() == 1) {
 			copy = new Color[1];
-			copy[0] = colors.first();
+			copy[0] = colors.get(0);
 		} else {
 			// we want first and last color to be the same because of JavaFX
 			// material wrapping bug
@@ -127,16 +128,6 @@ public class ColorHash {
 		return material;
 	}
 
-	public Material getMaterial(TreeSet<Color> colorSet) {
-		if (colorSet == null)
-			colorSet = new TreeSet<Color>();
-
-		if (materialHash.get(colorSet) == null)
-			materialHash.put(colorSet, makeMaterial(colorSet));
-
-		return materialHash.get(colorSet);
-	}
-
 	public double getMaterialOpacity(Material material) {
 		if (material != null)
 			return opacityHash.get(material);
@@ -150,6 +141,16 @@ public class ColorHash {
 
 	public Material getTranslucentMaterial() {
 		return translucentMaterial;
+	}
+
+	public Material getMaterial(ArrayList<Color> colors) {
+		if (colors == null)
+			colors = new ArrayList<Color>();
+
+		if (materialHash.get(colors) == null)
+			materialHash.put(colors, makeMaterial(colors));
+
+		return materialHash.get(colors);
 	}
 
 }

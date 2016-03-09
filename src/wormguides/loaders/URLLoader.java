@@ -7,13 +7,31 @@ import javafx.scene.paint.Color;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
-import wormguides.StructuresLayer;
 import wormguides.controllers.Window3DController;
 import wormguides.model.Rule;
 
 public class URLLoader {
 
-	public static void process(String url, Window3DController window3DController, StructuresLayer structuresLayer) {
+	/**
+	 * Utility method that processes a url string and sets the correct view
+	 * parameters in the 3d subscene. Called by {@link StoriesLayer} and
+	 * {@link RootLayoutController} for scene sharing/loading and when changing
+	 * active/inactive stories. Documentation for URL (old and new APIs)
+	 * formatting and syntax can be found in URLDocumentation.txt inside the
+	 * package wormguides.model.
+	 * 
+	 * @param url
+	 *            String to be parsed (consisting of a prefix url, rules to be
+	 *            parsed, and view arguments)
+	 * @param window3DController
+	 *            Reference to the 3d subscene so that view arguments can be set
+	 *            accordingly
+	 * @param useInternalScaleFactor
+	 *            Boolean that tells the 3d subscene to use the internal scale
+	 *            factor, without scaling/translating it to match the old API.
+	 *            TRUE when called by {@link StoriesLayer}, FALSE otherwise.
+	 */
+	public static void process(String url, Window3DController window3DController, boolean useInternalScaleFactor) {
 		if (window3DController == null)
 			return;
 
@@ -55,13 +73,13 @@ public class URLLoader {
 				i++;
 		}
 
-		// process arguments
-		parseRules(ruleArgs, rulesList, structuresLayer);
-		parseViewArgs(viewArgs, window3DController);
+		// process rules, add to current rules list
+		parseRules(ruleArgs, rulesList);
+		// process view arguments
+		parseViewArgs(viewArgs, window3DController, useInternalScaleFactor);
 	}
 
-	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList,
-			StructuresLayer structuresLayer) {
+	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
 		rulesList.clear();
 		for (String rule : rules) {
 			ArrayList<String> types = new ArrayList<String>();
@@ -70,75 +88,86 @@ public class URLLoader {
 			boolean isMulticellStructureRule = false;
 
 			try {
-				// determine if rule is ColorRule or StructureRule
-				if (sb.indexOf("-M") > -1)
-					isMulticellStructureRule = true;
+				// determine if rule is a cell/cellbody rule, or a multicelllar
+				// structure rule
 
-				// parse other args
+				// multicellular structure rules have a null SearchType
+				// parse SearchType args
 				if (sb.indexOf("-s") > -1) {
 					noTypeSpecified = false;
 					types.add("-s");
 					int i = sb.indexOf("-s");
-					sb.replace(i, i+2, "");
+					sb.replace(i, i + 2, "");
 				}
 				if (sb.indexOf("-n") > -1) {
 					noTypeSpecified = false;
 					types.add("-n");
 					int i = sb.indexOf("-n");
-					sb.replace(i, i+2, "");
+					sb.replace(i, i + 2, "");
 				}
 				if (sb.indexOf("-d") > -1) {
 					noTypeSpecified = false;
 					types.add("-d");
 					int i = sb.indexOf("-d");
-					sb.replace(i, i+2, "");
+					sb.replace(i, i + 2, "");
 				}
 				if (sb.indexOf("-g") > -1) {
 					noTypeSpecified = false;
 					types.add("-g");
 					int i = sb.indexOf("-g");
-					sb.replace(i, i+2, "");
+					sb.replace(i, i + 2, "");
 				}
 				if (sb.indexOf("-m") > -1) {
 					noTypeSpecified = false;
 					types.add("-m");
 					int i = sb.indexOf("-m");
-					sb.replace(i, i+2, "");
+					sb.replace(i, i + 2, "");
 				}
 
-				String colorString = sb.substring(sb.indexOf("+") + 6, sb.length());
+				String colorString = "";
+				if (sb.indexOf("+#ff") > -1)
+					colorString = sb.substring(sb.indexOf("+#ff") + 4);
+				else if (sb.indexOf("+%23ff") > -1)
+					colorString = sb.substring(sb.indexOf("+%23ff") + 6);
 
 				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
-				if (sb.indexOf("%3C") > -1) {
-					options.add(SearchOption.ANCESTOR);
-					int i = sb.indexOf("%3C");
-					sb.replace(i, i+3, "");
-				}
-				if (sb.indexOf(">") > -1) {
-					options.add(SearchOption.ANCESTOR);
-					int i = sb.indexOf(">");
-					sb.replace(i, i+1, "");
-				}
-				if (sb.indexOf("$") > -1) {
-					options.add(SearchOption.CELL);
-					options.add(SearchOption.CELLBODY);
-					int i = sb.indexOf("$");
-					sb.replace(i, i+1, "");
-				}
-				if (rule.indexOf("%3E") > -1) {
-					options.add(SearchOption.DESCENDANT);
-					int i = sb.indexOf("%3E");
-					sb.replace(i, i+3, "");
-				}
-				if (sb.indexOf("<") > -1) {
-					options.add(SearchOption.DESCENDANT);
-					int i = sb.indexOf("<");
-					sb.replace(i, i+1, "");
-				}
-				if (sb.indexOf("#") > -1) {
-					options.add(SearchOption.CELLBODY);
-					int i = sb.indexOf("#");
-					sb.replace(i, i+1, "");
+
+				if (noTypeSpecified && sb.indexOf("-M") > -1) {
+					options.add(SearchOption.MULTICELLULAR_NAME_BASED);
+					int i = sb.indexOf("-M");
+					sb.replace(i, i + 2, "");
+
+				} else {
+					if (sb.indexOf("%3C") > -1) {
+						options.add(SearchOption.ANCESTOR);
+						int i = sb.indexOf("%3C");
+						sb.replace(i, i + 3, "");
+					}
+					if (sb.indexOf(">") > -1) {
+						options.add(SearchOption.ANCESTOR);
+						int i = sb.indexOf(">");
+						sb.replace(i, i + 1, "");
+					}
+					if (sb.indexOf("$") > -1) {
+						options.add(SearchOption.CELLNUCLEUS);
+						int i = sb.indexOf("$");
+						sb.replace(i, i + 1, "");
+					}
+					if (rule.indexOf("%3E") > -1) {
+						options.add(SearchOption.DESCENDANT);
+						int i = sb.indexOf("%3E");
+						sb.replace(i, i + 3, "");
+					}
+					if (sb.indexOf("<") > -1) {
+						options.add(SearchOption.DESCENDANT);
+						int i = sb.indexOf("<");
+						sb.replace(i, i + 1, "");
+					}
+					if (sb.indexOf("@") > -1) {
+						options.add(SearchOption.CELLBODY);
+						int i = sb.indexOf("@");
+						sb.replace(i, i + 1, "");
+					}
 				}
 
 				// extract name from what's left of rule
@@ -157,10 +186,16 @@ public class URLLoader {
 
 					if (types.contains("-g"))
 						Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
-					
+
 					if (types.contains("-m"))
-						Search.addColorRule(SearchType.MULTICELL, name, Color.web(colorString), options);
-					
+						Search.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
+
+					if (types.contains("-b"))
+						Search.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+
+					if (types.contains("-c"))
+						Search.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+
 					// if no type present, default is systematic
 					if (noTypeSpecified) {
 						SearchType type = SearchType.LINEAGE;
@@ -168,8 +203,9 @@ public class URLLoader {
 							type = SearchType.GENE;
 						Search.addColorRule(type, name, Color.web(colorString), options);
 					}
-				} else { // add StructureRule
-					structuresLayer.addStructureRule(name, Color.web(colorString));
+
+				} else { // add multicellular structure rule
+					Search.addMulticellularStructureRule(name, Color.web(colorString));
 				}
 
 			} catch (StringIndexOutOfBoundsException e) {
@@ -195,7 +231,8 @@ public class URLLoader {
 		return true;
 	}
 
-	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController) {
+	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController,
+			boolean useInternalScaleFactor) {
 		// manipulate viewArgs arraylist so that rx ry and rz are grouped
 		// together
 		// to facilitate loading rotations in x and y
@@ -255,7 +292,10 @@ public class URLLoader {
 
 				case "scale":
 					try {
-						window3DController.setScale(Double.parseDouble(tokens[1]));
+						if (useInternalScaleFactor)
+							window3DController.setScaleInternal(Double.parseDouble(tokens[1]));
+						else
+							window3DController.setScale(Double.parseDouble(tokens[1]));
 					} catch (NumberFormatException nfe) {
 						System.out.println("error in parsing scale variable");
 						nfe.printStackTrace();

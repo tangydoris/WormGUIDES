@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -89,10 +88,8 @@ import wormguides.StoriesLayer;
 import wormguides.Xform;
 import wormguides.model.CellCasesLists;
 import wormguides.model.ColorHash;
-import wormguides.model.ColorRule;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
-import wormguides.model.MulticellularStructureRule;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
@@ -252,8 +249,6 @@ public class Window3DController {
 
 	private SubsceneSizeListener subsceneSizeListener;
 
-	// still screen capture counter and label and movie capture
-	private final static String imgName = "WormGUIDES_time_";
 	private BooleanProperty captureVideo;
 	private Vector<File> movieFiles;
 	Vector<JavaPicture> javaPictures;
@@ -798,7 +793,7 @@ public class Window3DController {
 			cellClicked.set(true);
 
 			if (event.getButton() == MouseButton.SECONDARY)
-				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL);
+				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
 			else if (event.getButton() == MouseButton.PRIMARY) {
 				if (allLabels.contains(name))
 					removeLabelFor(name);
@@ -830,7 +825,8 @@ public class Window3DController {
 
 					if (event.getButton() == MouseButton.SECONDARY) {
 						if (sceneElementsList.isMulticellStructureName(name))
-							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.MULTICELLULAR);
+							showContextMenu(name, event.getScreenX(), event.getScreenY(),
+									SearchOption.MULTICELLULAR_NAME_BASED);
 						else
 							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
 					}
@@ -878,6 +874,7 @@ public class Window3DController {
 	}
 
 	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
+		System.out.println("context menu search option - "+option);
 		if (contextMenuStage == null)
 			initContextMenuStage();
 
@@ -894,7 +891,6 @@ public class Window3DController {
 			public void handle(MouseEvent event) {
 				Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
-
 				contextMenuStage.hide();
 			}
 		});
@@ -1187,15 +1183,6 @@ public class Window3DController {
 		buildScene();
 	}
 
-	/*
-	 * public ChangeListener<Boolean> getRebuildFlagListener() { return new
-	 * ChangeListener<Boolean>() {
-	 * 
-	 * @Override public void changed(ObservableValue<? extends Boolean>
-	 * observable, Boolean oldValue, Boolean newValue) { if (newValue) {
-	 * buildScene(); } } }; }
-	 */
-
 	private void refreshScene() {
 		// clear note billboards, cell spheres and meshes
 		root.getChildren().clear();
@@ -1289,30 +1276,22 @@ public class Window3DController {
 					}
 
 					// If mesh has with name(s), then process rules (cell or
-					// shape)
-					// that apply to it
+					// shape) that apply to it
 					else {
-						TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
-
-						// iterate over rulesList
+						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule instanceof MulticellularStructureRule) {
-								// check equivalence of shape rule to scene name
-								if (((MulticellularStructureRule) rule).appliesTo(sceneName)) {
-									colors.add(Color.web(rule.getColor().toString()));
-								}
-							}
+							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
+								colors.add(rule.getColor());
 
-							else if (rule instanceof ColorRule) {
-								// iterate over cells and check if cells apply
+							else {
 								for (String name : allNames) {
-									if (((ColorRule) rule).appliesToBody(name)) {
+									if (rule.appliesToCellBody(name))
 										colors.add(rule.getColor());
-									}
 								}
 							}
 						}
+						Collections.sort(colors, colorComparator);
 
 						// if any rules applied
 						if (!colors.isEmpty())
@@ -1369,13 +1348,14 @@ public class Window3DController {
 			}
 			// not in search mode
 			else {
-				TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
+				ArrayList<Color> colors = new ArrayList<Color>();
+				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
-					if (rule.appliesToCell(cellNames[i])) {
+					if (rule.appliesToCellNucleus(cellNames[i]))
 						colors.add(Color.web(rule.getColor().toString()));
-					}
 				}
+				Collections.sort(colors, colorComparator);
 				material = colorHash.getMaterial(colors);
 
 				if (colors.isEmpty())
@@ -1525,11 +1505,12 @@ public class Window3DController {
 				if (note.attachedToLocation()) {
 					VBox box = new VBox(3);
 					box.getChildren().add(text);
-					// add marker to scene
+					// add inivisible location marker to scene at location
+					// specified by note
 					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
 					root.getChildren().add(marker);
 					entitySpriteMap.put(marker, box);
-
+					// add vbox to sprites pane
 					spritesPane.getChildren().add(box);
 				}
 
@@ -1545,9 +1526,8 @@ public class Window3DController {
 								box.getChildren().add(text);
 								entitySpriteMap.put(spheres[i], box);
 								spritesPane.getChildren().add(box);
-							} else {
+							} else
 								entitySpriteMap.get(spheres[i]).getChildren().add(text);
-							}
 
 							break;
 						}
@@ -1711,8 +1691,10 @@ public class Window3DController {
 	// if isOverlay is true, then the text is larger
 	private Text makeNoteGraphic(Note note) {
 		String title = note.getTagName();
-		if (note.isSceneExpanded())
+		if (note.isExpandedInScene())
 			title += ": " + note.getTagContents();
+		else
+			title += "\n[more text...]";
 
 		Text node = null;
 		if (note.getTagDisplay() != null) {
@@ -1915,8 +1897,7 @@ public class Window3DController {
 		}
 
 		if (javaPictures.size() > 0) {
-			JpegImagesToMovie jpegToMov = new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(),
-					5, movieName, javaPictures);
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 5, movieName, javaPictures);
 
 			// move the movie to the originally specified location
 			File movJustMade = new File(movieName);
@@ -2038,12 +2019,11 @@ public class Window3DController {
 			contextMenuStage.hide();
 	}
 
-	public ArrayList<ColorRule> getColorRulesList() {
-		ArrayList<ColorRule> list = new ArrayList<ColorRule>();
-		for (Rule rule : currentRulesList) {
-			if (rule instanceof ColorRule)
-				list.add((ColorRule) rule);
-		}
+	public ArrayList<Rule> getColorRulesList() {
+		ArrayList<Rule> list = new ArrayList<Rule>();
+		for (Rule rule : currentRulesList)
+			list.add(rule);
+
 		return list;
 	}
 
@@ -2051,7 +2031,7 @@ public class Window3DController {
 		return currentRulesList;
 	}
 
-	public void setColorRulesList(ArrayList<ColorRule> list) {
+	public void setColorRulesList(ArrayList<Rule> list) {
 		currentRulesList.clear();
 		currentRulesList.setAll(list);
 	}
@@ -2113,6 +2093,23 @@ public class Window3DController {
 		double newTy = ty + newOriginY;
 		if (newTy > 0 && newTy < 450)
 			xform.t.setY(newTy);
+	}
+
+	/**
+	 * Used for internal URL generation of rules associated with stories
+	 * 
+	 * @return The value of the zoom {@link DoubleProperty}
+	 */
+	public double getScaleInternal() {
+		return zoom.get();
+	}
+
+	/**
+	 * Used for internal URL generation of rules associated with stories. Sets
+	 * the value of the zoom {@link DoubleProperty}
+	 */
+	public void setScaleInternal(double scale) {
+		zoom.set(scale);
 	}
 
 	public double getScale() {
@@ -2514,11 +2511,11 @@ public class Window3DController {
 						Text picked = (Text) result;
 						Note note = currentGraphicNoteMap.get(picked);
 						if (note != null) {
-							note.setSceneExpanded(!note.isSceneExpanded());
-							if (note.isSceneExpanded())
+							note.setExpandedInScene(!note.isExpandedInScene());
+							if (note.isExpandedInScene())
 								picked.setText(note.getTagName() + ": " + note.getTagContents());
 							else
-								picked.setText(note.getTagName());
+								picked.setText(note.getTagName() + "\n[more text...]");
 						}
 					}
 				}
@@ -2558,9 +2555,13 @@ public class Window3DController {
 	private final double X_SCALE = 1;
 	/** The scale of the subscene y-coordinate axis. */
 	private final double Y_SCALE = 1;
-
+	/** Text size scale used for the rendering of billboard notes. */
 	private final double BILLBOARD_SCALE = 0.9;
 
+	/**
+	 * Scale used for the radii of spheres that represent cells, multiplied with
+	 * the cell's radius loaded from the nuc files.
+	 */
 	private final double SIZE_SCALE = 1;
 	/** The radius of all spheres when 'uniform size' is ticked. */
 	private final double UNIFORM_RADIUS = 4;

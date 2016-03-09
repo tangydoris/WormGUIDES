@@ -1,9 +1,7 @@
 package wormguides.view;
 
 import wormguides.model.ColorHash;
-import wormguides.model.ColorRule;
 import wormguides.model.LineageData;
-import wormguides.model.MulticellularStructureRule;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.ColorComparator;
@@ -13,6 +11,8 @@ import wormguides.SearchType;
 import wormguides.controllers.ContextMenuController;
 import wormguides.loaders.ImageLoader;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -94,7 +94,7 @@ public class SulstonTreePane extends ScrollPane {
 
 	private Pane canvas;
 	private final static int timeLabelOffsetX = 20;
-	
+
 	private final static int timeOffset = 19;
 
 	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
@@ -242,7 +242,7 @@ public class SulstonTreePane extends ScrollPane {
 		this.setPannable(true);
 		// this.getChildren().add(sp);
 
-		int x = addLines(lineageTreeRoot, canvas);
+		addLines(lineageTreeRoot, canvas);
 		this.setPrefSize(300, 300);
 
 		// this.setPrefSize(maxX,400);
@@ -292,8 +292,8 @@ public class SulstonTreePane extends ScrollPane {
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
-		bindLocation(plus, (ScrollPane) this, yetanotherlevel);
-		bindLocation(minus, (ScrollPane) this, yetanotherlevel);
+		bindLocation(plus, this, yetanotherlevel);
+		bindLocation(minus, this, yetanotherlevel);
 
 		contextMenuController = controller;
 		contextMenuStage = contextMenuController.getOwnStage();
@@ -321,7 +321,7 @@ public class SulstonTreePane extends ScrollPane {
 			contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELL);
+					Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 
 					contextMenuStage.hide();
@@ -332,7 +332,7 @@ public class SulstonTreePane extends ScrollPane {
 				@Override
 				public void handle(MouseEvent event) {
 					// call distance Search method
-					Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELL);
+					Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 					contextMenuStage.hide();
 				}
@@ -416,7 +416,6 @@ public class SulstonTreePane extends ScrollPane {
 	public void updateColoring() {
 		// iterate over all drawn lines and recompute their color
 		ObservableList<Node> contentnodes = mainPane.getChildren();
-		Paint newcolors = null;
 		for (Node currentnode : contentnodes) {
 			if (currentnode instanceof Line) {
 				Line currline = (Line) currentnode;
@@ -443,14 +442,14 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
-		int x = recursiveDraw(mainPane, 400, 10, 10, lineageTreeRoot, 10);
+		int x = recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
 		// add time indicator bar
 		int timevalue = time.getValue();
 		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
 		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicatorBar.setId("time");
-		
-		//add time indicator
+
+		// add time indicator
 		timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get() + timeOffset));
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
@@ -466,18 +465,13 @@ public class SulstonTreePane extends ScrollPane {
 	// retrieves material for use as texture on lines
 	private Paint paintThatAppliesToCell(String cellname) {
 		if (cellname != null) {
-			TreeSet<Color> colors = new TreeSet<Color>(new ColorComparator());
+			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				if (rule instanceof MulticellularStructureRule) {
-					// nothing
-				}
-
-				else if (rule instanceof ColorRule) {
-					if (((ColorRule) rule).appliesToCell(cellname))
-						colors.add(rule.getColor());
-				}
+				if (rule.appliesToCellNucleus(cellname))
+					colors.add(rule.getColor());
 			}
+			Collections.sort(colors, new ColorComparator());
 
 			// translate color list to material from material cache
 			if (!colors.isEmpty()) {
@@ -494,27 +488,18 @@ public class SulstonTreePane extends ScrollPane {
 		return null;
 	}
 
+	// Method not used
+	/*
 	private Color ColorsThatApplyToCell(String cellname) {
-		// TreeSet<Color> colors = new TreeSet<Color>();
-
 		// iterate over rulesList
 		for (Rule rule : rules) {
-
-			if (rule instanceof MulticellularStructureRule) {
-				// nothing
-			}
-
-			else if (rule instanceof ColorRule) {
-				// iterate over cells and check if cells apply
-				if (((ColorRule) rule).appliesToBody(cellname)) {
-					// colors.add(rule.getColor());
-					return rule.getColor();
-				}
-
-			}
+			// iterate over cells and check if cells apply
+			if (rule.appliesToCellNucleus(cellname))
+				return rule.getColor();
 		}
 		return null; // colors;
 	}
+	*/
 
 	private void drawTimeTicks() {
 		for (int i = 0; i <= 400; i = i + 100) {
@@ -537,7 +522,7 @@ public class SulstonTreePane extends ScrollPane {
 	// recursively draws each cell in Tree
 	// not sure what rootstart is
 	// note returns the midpoint of the sublineage just drawn
-	private int recursiveDraw(Pane mainPane, int h, int x, int ystart, TreeItem<String> cell, int rootStart) {
+	private int recursiveDraw(Pane mainPane, int h, int x, TreeItem<String> cell, int rootStart) {
 		boolean done = false;
 		String cellName = cell.getValue();
 
@@ -548,9 +533,9 @@ public class SulstonTreePane extends ScrollPane {
 		int lastTime = data.getLastOccurrenceOf(cellName);
 		if (startTime < 1)
 			startTime = 1;
-		int length = (int) ((lastTime - startTime));
+		int length = ((lastTime - startTime));
 
-		int yStartUse = (int) ((startTime + iYmin));
+		int yStartUse = ((startTime + iYmin));
 		nameYStartUseMap.put(cellName, new Integer(yStartUse));
 
 		// compute color
@@ -596,53 +581,52 @@ public class SulstonTreePane extends ScrollPane {
 			// if (x > iXmax) iXmax = x;
 			nameXUseMap.put(cellName, new Integer(x));
 			return x;
-		} else {
-
-			// note left right not working here or relying on presort
-			ObservableList<TreeItem<String>> childrenlist = cell.getChildren();
-
-			TreeItem<String> cLeft = childrenlist.get(0);
-			TreeItem<String> cRite = childrenlist.get(1);
-			// int nl = LineageTree.getChildCount(cLeft.getValue());///2;
-			// if (nl == 0) nl = 1;
-			int x1 = recursiveDraw(mainPane, h, x, yStartUse + length, cLeft, rootStart);
-			nameXUseMap.put(cLeft.getValue(), new Integer(x1));
-			int xx = maxX + xsc;
-			int x2 = recursiveDraw(mainPane, h, xx, yStartUse + length, cRite, rootStart);
-			nameXUseMap.put(cRite.getValue(), new Integer(x2));
-
-			Integer leftXUse = nameXUseMap.get(cLeft.getValue());
-			Integer rightXUse = nameXUseMap.get(cRite.getValue());
-			Integer leftYUse = nameYStartUseMap.get(cLeft.getValue());
-			Integer rightYUse = nameYStartUseMap.get(cRite.getValue());
-			// division line
-			// if(length>0){
-			Line lcell = new Line(leftXUse.intValue(), leftYUse.intValue(), rightXUse.intValue(), leftYUse.intValue());
-			if (!(lcolor == null))
-				lcell.setStroke(lcolor); // first for now
-			// lcell.setId(cLeft.getValue()+cRite.getValue()); //name division
-			// lines with child names
-
-			lcell.setId(cellName);// set division line to parent id to aid
-									// recoloring
-			mainPane.getChildren().add(lcell);
-			x = (x1 + x2) / 2;
-			length = leftYUse.intValue() - yStartUse;
-
-			// nonerminal case line drawn
-			lcell = new Line(x, yStartUse, x, leftYUse.intValue());
-			if (!(lcolor == null))
-				lcell.setStroke(lcolor); // first for now
-
-			lcell.setOnMousePressed(handler);// handler for collapse
-			lcell.setId(cellName);
-			Tooltip t = new Tooltip(cellName);
-			hackTooltipStartTiming(t, ttduration);
-			Tooltip.install(lcell, t);
-			mainPane.getChildren().add(lcell);
-			// }
-			return x;
 		}
+		
+		// note left right not working here or relying on presort
+		ObservableList<TreeItem<String>> childrenlist = cell.getChildren();
+
+		TreeItem<String> cLeft = childrenlist.get(0);
+		TreeItem<String> cRite = childrenlist.get(1);
+		// int nl = LineageTree.getChildCount(cLeft.getValue());///2;
+		// if (nl == 0) nl = 1;
+		int x1 = recursiveDraw(mainPane, h, x, cLeft, rootStart);
+		nameXUseMap.put(cLeft.getValue(), new Integer(x1));
+		int xx = maxX + xsc;
+		int x2 = recursiveDraw(mainPane, h, xx, cRite, rootStart);
+		nameXUseMap.put(cRite.getValue(), new Integer(x2));
+
+		Integer leftXUse = nameXUseMap.get(cLeft.getValue());
+		Integer rightXUse = nameXUseMap.get(cRite.getValue());
+		Integer leftYUse = nameYStartUseMap.get(cLeft.getValue());
+		nameYStartUseMap.get(cRite.getValue());
+		// division line
+		// if(length>0){
+		Line lcell = new Line(leftXUse.intValue(), leftYUse.intValue(), rightXUse.intValue(), leftYUse.intValue());
+		if (!(lcolor == null))
+			lcell.setStroke(lcolor); // first for now
+		// lcell.setId(cLeft.getValue()+cRite.getValue()); //name division
+		// lines with child names
+
+		lcell.setId(cellName);// set division line to parent id to aid
+								// recoloring
+		mainPane.getChildren().add(lcell);
+		x = (x1 + x2) / 2;
+		length = leftYUse.intValue() - yStartUse;
+
+		// nonerminal case line drawn
+		lcell = new Line(x, yStartUse, x, leftYUse.intValue());
+		if (!(lcolor == null))
+			lcell.setStroke(lcolor); // first for now
+
+		lcell.setOnMousePressed(handler);// handler for collapse
+		lcell.setId(cellName);
+		Tooltip t = new Tooltip(cellName);
+		hackTooltipStartTiming(t, ttduration);
+		Tooltip.install(lcell, t);
+		mainPane.getChildren().add(lcell);
+		// }
+		return x;
 	}
 
 	// stolen from web to hack these tooltips to come up faster

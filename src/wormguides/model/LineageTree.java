@@ -157,57 +157,47 @@ public class LineageTree {
 		if (desc.startsWith("p") && ances.startsWith("p")) {
 			if (desc.compareTo(ances) > 0)
 				return true;
-			else
-				return false;
+			return false;
 		}
 
 		// try to decipher lineage from names
-		if (desc.startsWith(ances) && desc.length() > ances.length()) {
-			if (!desc.equals("e")) {
-				return true;
-			}
-		}
+		if (desc.startsWith(ances) && desc.length() > ances.length() && !desc.equals("e"))
+			return true;
 
 		if (desc.startsWith("z")) {
 			if (ances.startsWith("p"))
 				return true;
-			else
-				return false;
+			return false;
 		}
 
 		if (desc.startsWith("d")) {
 			if (ances.equals("p3"))
 				return true;
-			else
-				return isDescendant("p3", ances);
+			return isDescendant("p3", ances);
 		}
 
 		if (desc.startsWith("c")) {
 			if (ances.equals("p2"))
 				return true;
-			else
-				return isDescendant("p2", ances);
+			return isDescendant("p2", ances);
 		}
 
 		if (desc.equals("ems")) {
 			if (ances.equals("p1"))
 				return true;
-			else
-				return isDescendant("p1", ances);
+			return isDescendant("p1", ances);
 		}
 
 		if (desc.startsWith("ms") || desc.startsWith("e")) {
 			if (ances.equals("ems"))
 				return true;
-			else
-				return isDescendant("ems", ances);
+			return isDescendant("ems", ances);
 		}
 
 		if (desc.startsWith("ab")) {
 			if (ances.equals("p0"))
 				return true;
-			else
-				return false;
+			return false;
 		}
 
 		return false;
