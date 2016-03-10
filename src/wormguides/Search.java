@@ -294,8 +294,10 @@ public class Search {
 
 	public void addDefaultColorRules() {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS,
+				SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS,
+				SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
