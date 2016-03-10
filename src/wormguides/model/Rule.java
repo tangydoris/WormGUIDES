@@ -415,15 +415,18 @@ public class Rule {
 			return false;
 
 		if (cells != null) {
-			if (options.contains(SearchOption.CELLBODY) && cells.contains(name))
+			if (options.contains(SearchOption.CELLBODY) && cells.contains(name)) {
 				return true;
+			}
 
 			for (String cell : cells) {
-				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell))
+				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell)) {
 					return true;
-
-				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell))
+				}
+					
+				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell)) {
 					return true;
+				}
 			}
 		}
 		return false;

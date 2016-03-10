@@ -303,7 +303,7 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 
-		// highlights 2/23/16 structures
+//		// highlights 2/23/16 structures
 		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xdbdd15"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "siavl", Color.web("0x50b428"), SearchOption.CELLBODY);

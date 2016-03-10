@@ -230,7 +230,6 @@ public class NonTerminalCellCase {
 					
 					//extract the title
 					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
-					//System.out.println(title);
 					
 					//move the index past the authors section
 					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;

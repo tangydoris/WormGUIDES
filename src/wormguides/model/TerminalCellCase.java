@@ -334,6 +334,7 @@ public class TerminalCellCase {
 		for (String lineageName : PartsList.getLineageNames()) {
 			//GET BASE NAME FOR LINEAGE NAME AS DONE ABOVE WITH CELL NAME
 			lineageName = PartsList.getFunctionalNameByLineageName(lineageName);
+
 			if (lineageName.toLowerCase().startsWith(cell)) {
 				partsListHits.add(lineageName);
 			}
@@ -343,14 +344,48 @@ public class TerminalCellCase {
 		 * Add hits to categories:
 		 * L/R: ends with l/r
 		 * AdditionalSymm: ends with d/v
+		 * 
+		 * NOTE:
+		 * RIAL will show as L/R homologue to RIVL because there is not currently 
+		 * logic that remembers what was peeled off the original base name
 		 */
 		for (String lineageName : partsListHits) {
+			
+			//the base name of the cell
+			String base = lineageName;
+			
+			lastChar = base.charAt(base.length()-1);
+			lastChar = Character.toLowerCase(lastChar);
+			//check for left, right, dorsal, or ventral suffix --> update cell
+			if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
+				//check if multiple suffixes
+				lastChar = base.charAt(base.length()-2);
+				lastChar = Character.toLowerCase(lastChar);
+				if (lastChar == 'l' || lastChar == 'r' || lastChar == 'd' || lastChar == 'v' || lastChar == 'a' || lastChar == 'p') {
+					base = base.substring(0, base.length()-2);
+				} else {
+					base = base.substring(0, base.length()-1);
+				}
+			} else if (Character.isDigit(lastChar)) { //check for # e.g. DD1 --> update cell
+				//check if double digit
+				if (Character.isDigit(base.length()-2)) {
+					base = base.substring(0, base.length()-2);
+				} else {
+					base = base.substring(0, base.length()-1);
+				}
+				
+			} else {}
+			
 			lastChar = lineageName.charAt(lineageName.length()-1);
 			lastChar = Character.toLowerCase(lastChar);
 			if (lastChar == 'l' || lastChar == 'r') {
-				leftRightHomologues.add(lineageName);
+				if (base.toLowerCase().equals(cell)) {
+					leftRightHomologues.add(lineageName);
+				}
 			} else if (lastChar == 'd' || lastChar == 'v' || Character.isDigit(lastChar)) {
-				additionalSymmetries.add(lineageName);
+				if (base.toLowerCase().equals(cell)) {
+					additionalSymmetries.add(lineageName);
+				}
 			}
 		}
 		
@@ -434,7 +469,6 @@ public class TerminalCellCase {
 					
 					//extract the title
 					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
-					//System.out.println(title);
 					
 					//move the index past the authors section
 					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;
@@ -462,8 +496,6 @@ public class TerminalCellCase {
 				}
 			}
 		}
-		
-		//"<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>
 		
 		//add the source
 		String source = "<em>Source:</em> <a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>";

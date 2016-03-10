@@ -17,14 +17,16 @@ Abprpaappaa(RIBR),Abprpaappaa,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_u
 Abplpaappaa(RIBL),Abplpaappaa,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_unc s2,wormguides/model/obj_files/ABplpaappaa,318,400,
 Amphid Commissure Right,Abprpaappaa Abprpaappap,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_unc s2,wormguides/model/obj_files/bundle_right,327,400,multicellular structure right test comment
 Amphid Commissure Left,Abplpaappaa Abplpaappap,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_unc s2,wormguides/model/obj_files/bundle_left,356,400,multicellular structure left test comment
-ABplpaapaaa(RIVL),ABplpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABplpaapaaa,295,400,"initial lim-4 attempt, there is something wrong still"
-ABprpaapaaa(RIVR),ABprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABprpaapaaa,295,400,
-ABplppaaaaa(SIAVL),ABplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABplppaaaaa,295,400,
-Abprppaaaaa(SIAVR),ABprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABprppaaaaa,295,400,
-ABprpapappa(SIBDR),Abprpapappa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABprpapappa,295,400,
-ABplpapappa(SIBDL),ABplpapappa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABplpapappa,295,400,
+ABplpaapaaa(RIVL),Abplpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABplpaapaaa,295,400,"initial lim-4 attempt, there is something wrong still"
+ABprpaapaaa(RIVR),Abprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABprpaapaaa,295,400,
+Abplpapappa(SIAVL),Abplpapappa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/Abplpapappa,295,400,
+Abprpapappa(SIAVR),Abprpapappa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/Abprpapappa,295,400,
+ABprppaaaaa(SIBDR),ABprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/Abprppaaaaa,295,400,
+Abplppaaaaa(SIBDL),ABplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/ABplppaaaaa,295,400,
 lim4_bundle_left,Abplpapappa Abplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/lim4_bundle_left,295,400,
 lim4_bundle_right,Abprpapappa Abprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/lim4_bundle_right,295,400,
 lim4_nerve_ring_left_early,Abplpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/lim4_nerve_ring_left_early,295,400,
 lim4_nerve_ring_right_early,Abprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/lim4_nerve_ring_right_early,295,400,
 lim4_nerve_ring,Abplpaapaaa Abprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/lim4_nerve_ring,295,400,
+sibdl_single,ABplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/sibdl_single,295,400,
+sibdr_single,ABprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/model/obj_files/sibdr_single,295,400,

@@ -32,33 +32,6 @@ public class EmbryonicAnalogousCells {
 
 				}
 			}
-			// JarFile jarFile = new JarFile(new File(JAR_NAME));
-			//
-			// Enumeration<JarEntry> entries = jarFile.entries();
-			// JarEntry entry;
-			// while (entries.hasMoreElements()){
-			// entry = entries.nextElement();
-			// if (entry.getName().equals(FILE_NAME)) {
-			// InputStream input = jarFile.getInputStream(entry);
-			// InputStreamReader isr = new InputStreamReader(input);
-			// BufferedReader br = new BufferedReader(isr);
-			//
-			// String line;
-			// while ((line = br.readLine()) != null) {
-			// String[] cells = line.split(",");
-			// if (cells.length == 2 &&
-			// cells[0].length() > 0 && cells[1].length() > 0) {
-			// EmbryonicHomology eh = new EmbryonicHomology(cells[0], cells[1]);
-			// homologues.add(eh);
-			// }
-			//
-			// }
-			//
-			// break;
-			// }
-			// }
-			// jarFile.close();
-
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
