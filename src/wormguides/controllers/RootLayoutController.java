@@ -553,7 +553,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		// start the image capture
 		if (window3DController != null) {
-			window3DController.captureImagesForMovie();
+			if (!window3DController.captureImagesForMovie()) {
+				//error saving movie, update UI
+				captureVideoMenuItem.setDisable(false);
+				stopCaptureVideoMenuItem.setDisable(true);
+				captureVideo.set(false);
+			}
 		}
 	}
 
@@ -1164,5 +1169,5 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 	
 	/** Default transparency of 'other' entities on startup */
-	private final double DEFAULT_TRANSPARENCY = 20;
+	private final double DEFAULT_TRANSPARENCY = 25;
 }

@@ -316,7 +316,7 @@ public class Connectome {
 
 		HTMLNode table = new HTMLNode("table");
 		HTMLNode trH = new HTMLNode("th");
-		HTMLNode th = new HTMLNode("th", "", "", "<strong>Cell:</strong>" + queryCell.toUpperCase());
+		HTMLNode th = new HTMLNode("th", "", "", "Cell: " + queryCell.toUpperCase());
 
 		trH.addChild(th);
 		table.addChild(trH);
