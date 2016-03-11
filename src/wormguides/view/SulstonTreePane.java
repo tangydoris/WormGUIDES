@@ -136,7 +136,7 @@ public class SulstonTreePane extends ScrollPane {
 		super();
 
 		this.ownStage = ownStage;
-
+		
 		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
@@ -168,22 +168,47 @@ public class SulstonTreePane extends ScrollPane {
 		});
 
 		this.hiddenNodes = new TreeSet<String>();
-		// start with founders visible
-		hiddenNodes.add("ABala");
-		hiddenNodes.add("ABalp");
-		hiddenNodes.add("ABara");
-		hiddenNodes.add("ABarp");
-		hiddenNodes.add("ABpla");
-		hiddenNodes.add("ABplp");
-		hiddenNodes.add("ABpra");
-		hiddenNodes.add("ABprp");
+		//empty lines indicate a different level of the lineage tree
+		hiddenNodes.add("ABalaa");
+		hiddenNodes.add("ABalap");
+		hiddenNodes.add("ABalpa");
+		hiddenNodes.add("ABalpp");
+		hiddenNodes.add("ABaraa");
+		hiddenNodes.add("ABarap");
+		hiddenNodes.add("ABarpa");
+		hiddenNodes.add("ABarpp");
+		hiddenNodes.add("ABplaa");
+		hiddenNodes.add("ABplap");
+		hiddenNodes.add("ABplpa");
+		
+		hiddenNodes.add("ABplppaa");
+		hiddenNodes.add("ABplpppp");
+		
+		
+		hiddenNodes.add("ABpraa");
+		hiddenNodes.add("ABprap");
+		
+		hiddenNodes.add("ABprpaaa");
 
-		hiddenNodes.add("MSa");
-		hiddenNodes.add("MSp");
+		hiddenNodes.add("ABprpapaa");
+		
+		hiddenNodes.add("Abprppaa");
+		
+		hiddenNodes.add("ABprppp");
+		
+		hiddenNodes.add("MSaa");
+		hiddenNodes.add("MSap");
+		hiddenNodes.add("MSpa");
+		hiddenNodes.add("MSpp");
+		
 		hiddenNodes.add("Ea");
 		hiddenNodes.add("Ep");
-		hiddenNodes.add("Ca");
-		hiddenNodes.add("Cp");
+		
+		hiddenNodes.add("Caa");
+		hiddenNodes.add("Cap");
+		hiddenNodes.add("Cpa");
+		hiddenNodes.add("Cpp");
+		
 		hiddenNodes.add("D");
 		hiddenNodes.add("P4");
 
@@ -299,6 +324,8 @@ public class SulstonTreePane extends ScrollPane {
 		contextMenuStage = contextMenuController.getOwnStage();
 
 		this.selectedNameLabeled = selectedNameLabeled;
+		
+		updateColoring();
 	}
 
 	private void resetSelectedNameLabeled(String name) {

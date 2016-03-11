@@ -320,6 +320,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void viewTreeAction() {
 		if (treeStage == null) {
 			treeStage = new Stage();
+			treeStage.setWidth(900.);
+			treeStage.setHeight(945.);
 			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
 					displayLayer.getRulesList(), window3DController.getColorHash(),
 					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
