@@ -81,6 +81,7 @@ import wormguides.ColorComparator;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
+import wormguides.Quaternion;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
@@ -263,6 +264,8 @@ public class Window3DController {
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
 
+	//private Quaternion quaternion;
+
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
@@ -428,6 +431,9 @@ public class Window3DController {
 		rotateX.setOnTransformChanged(getRotateXChangeHandler());
 		rotateY.setOnTransformChanged(getRotateYChangeHandler());
 		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
+		
+		//initialize quaternion
+		//quaternion = new Quaternion((double) newOriginX, (double) newOriginY, (double) newOriginZ);
 
 		uniformSize = false;
 
@@ -762,6 +768,7 @@ public class Window3DController {
 		}
 
 		else if (event.isPrimaryButtonDown()) {
+			//quaternion.updateQuaternion((rotateX.getAngle() + mouseDeltaY) % 360);
 			mouseDeltaX /= 2;
 			mouseDeltaY /= 2;
 

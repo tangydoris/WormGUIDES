@@ -1,5 +1,11 @@
 package wormguides.model;
 
+/**
+ * Defines 4 categories of synapses
+ * 
+ * @author bradenkatzman
+ *
+ */
 public enum SynapseType {
 	S_PRESYNAPTIC("S presynaptic"), R_POSTSYNAPTIC("R postsynaptic"), EJ_ELECTRICAL("EJ electrical"), NMJ_NEUROMUSCULAR(
 			"Nmj neuromuscular");

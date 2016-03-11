@@ -1,5 +1,11 @@
 package wormguides.model;
 
+/**
+ * Defines a single homology between two cells
+ * 
+ * @author bradenkatzman
+ *
+ */
 public class EmbryonicHomology {
 	private String cell_1;
 	private String cell_2;

@@ -7,6 +7,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * Class which holds the database of embryonic analogous cells as defined in 
+ * model/analogous_cell_file/
+ * 
+ * @author bradenkatzman
+ *
+ */
 public class EmbryonicAnalogousCells {
 
 	private static ArrayList<EmbryonicHomology> homologues;
@@ -37,9 +44,12 @@ public class EmbryonicAnalogousCells {
 		}
 	}
 
-	/*
-	 * find a match in the database given a query cell Case 1: matches a
+	/**
+	 * Find a match in the database given a query cell Case 1: matches a
 	 * homologous listing Case 2: descendant of a listed homology
+	 * 
+	 * @param cell the query cell
+	 * @return the match
 	 */
 	public static String findEmbryonicHomology(String cell) {
 		for (EmbryonicHomology eh : homologues) {
