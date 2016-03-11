@@ -293,15 +293,26 @@ public class Search {
 	}
 
 	public void addDefaultColorRules() {
-		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS,
-				SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS,
-				SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLBODY);
+		
+		//da rules
+		//addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xc56002"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xe6b34d"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da3", Color.web("0xe6b34d"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da4", Color.web("0xe6b34d"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), SearchOption.CELLBODY);
+		
+		//dd rules
+		//addColorRule(SearchType.FUNCTIONAL, "dd1", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd1", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd2", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd3", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd4", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd5", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "dd6", Color.web("0xb30a95"), SearchOption.CELLBODY);
+		
 
 //		// highlights 2/23/16 structures
 		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
