@@ -9,7 +9,6 @@ import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 import wormguides.AnatomyTerm;
 import wormguides.Search;
-import wormguides.model.PartsList;
 
 /**
  * Callback class for HTML pages

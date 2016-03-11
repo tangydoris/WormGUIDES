@@ -495,9 +495,6 @@ public class Window3DController {
 		PhongMaterial material = new PhongMaterial();
 		material.setDiffuseColor(Color.RED);
 		orientationIndicator = new Cylinder(radius, height);
-		// orientationIndicator.setTranslateX(newOriginX);
-		// orientationIndicator.setTranslateY(newOriginY);
-		// orientationIndicator.setTranslateZ(newOriginZ);
 		orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
 		orientationIndicator.setMaterial(material);
 
@@ -540,7 +537,6 @@ public class Window3DController {
 																		// orientation
 																		// in
 																		// image
-		// middleTransformGroup.getTransforms().add(new Scale(.5,.50,.5));
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 		// xy relocates z shrinks aparent by moving away from camera? improves
 		// resolution?
@@ -753,8 +749,7 @@ public class Window3DController {
 		mouseDeltaX /= 4;
 		mouseDeltaY /= 4;
 
-		if (event.isSecondaryButtonDown()
-				|| (event.isPrimaryButtonDown() && (event.isMetaDown() || event.isControlDown()))) {
+		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
 			double ty = xform.t.getTy() - mouseDeltaY;
 
@@ -799,9 +794,10 @@ public class Window3DController {
 			selectedName.set(name);
 			cellClicked.set(true);
 
-			if (event.getButton() == MouseButton.SECONDARY)
+			if (event.getButton() == MouseButton.SECONDARY
+					|| (event.getButton() == MouseButton.PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
 				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
-			else if (event.getButton() == MouseButton.PRIMARY) {
+			} else if (event.getButton() == MouseButton.PRIMARY) {
 				if (allLabels.contains(name))
 					removeLabelFor(name);
 
@@ -830,7 +826,8 @@ public class Window3DController {
 					selectedName.set(name);
 					found = true;
 
-					if (event.getButton() == MouseButton.SECONDARY) {
+					if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
+							&& (event.isMetaDown() || event.isControlDown()))) {
 						if (sceneElementsList.isMulticellStructureName(name))
 							showContextMenu(name, event.getScreenX(), event.getScreenY(),
 									SearchOption.MULTICELLULAR_NAME_BASED);
@@ -881,7 +878,6 @@ public class Window3DController {
 	}
 
 	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
-		System.out.println("context menu search option - "+option);
 		if (contextMenuStage == null)
 			initContextMenuStage();
 
@@ -991,16 +987,16 @@ public class Window3DController {
 		}
 	}
 
-	// Reposition sprites by projecting the sphere's 3d coordinate
-	// onto the front of the subscene
+	/**
+	 * Repositions sprites (labels and note sprites) by projecting the sphere's
+	 * 3d coordinate onto the front of the subscene
+	 */
 	private void repositionSprites() {
-		for (Node entity : entitySpriteMap.keySet()) {
+		for (Node entity : entitySpriteMap.keySet())
 			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
-		}
 
-		for (Node entity : entityLabelMap.keySet()) {
+		for (Node entity : entityLabelMap.keySet())
 			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
-		}
 	}
 
 	// Input text is the note/label geometry

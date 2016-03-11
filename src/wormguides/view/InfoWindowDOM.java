@@ -69,7 +69,7 @@ public class InfoWindowDOM {
 
 		// image
 		HTMLNode imgDiv = new HTMLNode("div", "imgDiv", "width: 50%; height: 10%; float: left;");
-		String imagetext = terminalCase.getImageURL();
+		terminalCase.getImageURL();
 		HTMLNode img = new HTMLNode(terminalCase.getImageURL(), true);
 		imgDiv.addChild(img);
 
