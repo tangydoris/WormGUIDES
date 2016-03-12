@@ -14,8 +14,6 @@ import wormguides.loaders.ImageLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
 import java.lang.reflect.Field;
 import javafx.util.Duration;
 import java.lang.Math;
@@ -61,13 +59,13 @@ public class SulstonTreePane extends ScrollPane {
 	private LineageData data;
 	private HashMap<String, Integer> nameXUseMap;
 	private HashMap<String, Integer> nameYStartUseMap;
-	private Set<String> hiddenNodes;
+	private ArrayList<String> hiddenNodes;
 	private TreeItem<String> lineageTreeRoot;
 
 	private ColorHash colorHash;
 
 	private int maxX = 0; // global to class to keep track of current x layout
-							// position
+	// position
 	private ObservableList<Rule> rules;
 	private Pane mainPane;
 	private Group zoomGroup;
@@ -80,7 +78,7 @@ public class SulstonTreePane extends ScrollPane {
 	private IntegerProperty time;
 
 	private int xsc = 5;// =XScale minimal spacing between branches, inter
-						// branch gap
+	// branch gap
 	// seems to be some multiple of this?
 
 	private int iXmax = 19; // left margin
@@ -136,7 +134,7 @@ public class SulstonTreePane extends ScrollPane {
 		super();
 
 		this.ownStage = ownStage;
-		
+
 		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
@@ -167,7 +165,7 @@ public class SulstonTreePane extends ScrollPane {
 			}
 		});
 
-		this.hiddenNodes = new TreeSet<String>();
+		this.hiddenNodes = new ArrayList<String>();
 		//empty lines indicate a different level of the lineage tree
 		hiddenNodes.add("ABalaa");
 		hiddenNodes.add("ABalap");
@@ -180,37 +178,38 @@ public class SulstonTreePane extends ScrollPane {
 		hiddenNodes.add("ABplaa");
 		hiddenNodes.add("ABplap");
 		hiddenNodes.add("ABplpa");
-		
+
 		hiddenNodes.add("ABplppaa");
 		hiddenNodes.add("ABplpppp");
-		
-		
+
+
 		hiddenNodes.add("ABpraa");
 		hiddenNodes.add("ABprap");
-		
+
 		hiddenNodes.add("ABprpaaa");
 
 		hiddenNodes.add("ABprpapaa");
-		
+
 		hiddenNodes.add("Abprppaa");
-		
+
 		hiddenNodes.add("ABprppp");
-		
+
 		hiddenNodes.add("MSaa");
 		hiddenNodes.add("MSap");
 		hiddenNodes.add("MSpa");
 		hiddenNodes.add("MSpp");
-		
+
 		hiddenNodes.add("Ea");
 		hiddenNodes.add("Ep");
-		
+
 		hiddenNodes.add("Caa");
 		hiddenNodes.add("Cap");
 		hiddenNodes.add("Cpa");
 		hiddenNodes.add("Cpp");
-		
+
 		hiddenNodes.add("D");
 		hiddenNodes.add("P4");
+
 
 		this.rules = rules;
 		this.colorHash = colorHash;
@@ -324,7 +323,7 @@ public class SulstonTreePane extends ScrollPane {
 		contextMenuStage = contextMenuController.getOwnStage();
 
 		this.selectedNameLabeled = selectedNameLabeled;
-		
+
 		updateColoring();
 	}
 
@@ -386,16 +385,16 @@ public class SulstonTreePane extends ScrollPane {
 		plus.layoutYProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.vvalueProperty()
-						// multiplied by (scrollableAreaHeight -
-						// visibleViewportHeight)
-						.multiply(scontent.heightProperty().subtract(new ScrollPaneViewPortHeightBinding(s))));
+				// multiplied by (scrollableAreaHeight -
+				// visibleViewportHeight)
+				.multiply(scontent.heightProperty().subtract(new ScrollPaneViewPortHeightBinding(s))));
 
 		plus.layoutXProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.hvalueProperty()
-						// multiplied by (scrollableAreaHeight -
-						// visibleViewportHeight)
-						.multiply(scontent.widthProperty().subtract(new ScrollPaneViewPortWidthBinding(s))));
+				// multiplied by (scrollableAreaHeight -
+				// visibleViewportHeight)
+				.multiply(scontent.widthProperty().subtract(new ScrollPaneViewPortWidthBinding(s))));
 
 	}
 
@@ -481,8 +480,6 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");
-		// System.out.println("after recursivedraw placing timelineat "+maxX+"
-		// "+timevalue);
 		mainPane.getChildren().add(timeIndicatorBar);
 		mainPane.getChildren().add(timeIndicator);
 		drawTimeTicks();
@@ -495,7 +492,7 @@ public class SulstonTreePane extends ScrollPane {
 			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				if (rule.appliesToCellNucleus(cellname))
+				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname))
 					colors.add(rule.getColor());
 			}
 			Collections.sort(colors, new ColorComparator());
@@ -517,16 +514,11 @@ public class SulstonTreePane extends ScrollPane {
 
 	// Method not used
 	/*
-	private Color ColorsThatApplyToCell(String cellname) {
-		// iterate over rulesList
-		for (Rule rule : rules) {
-			// iterate over cells and check if cells apply
-			if (rule.appliesToCellNucleus(cellname))
-				return rule.getColor();
-		}
-		return null; // colors;
-	}
-	*/
+	 * private Color ColorsThatApplyToCell(String cellname) { // iterate over
+	 * rulesList for (Rule rule : rules) { // iterate over cells and check if
+	 * cells apply if (rule.appliesToCellNucleus(cellname)) return
+	 * rule.getColor(); } return null; // colors; }
+	 */
 
 	private void drawTimeTicks() {
 		for (int i = 0; i <= 400; i = i + 100) {
@@ -609,7 +601,7 @@ public class SulstonTreePane extends ScrollPane {
 			nameXUseMap.put(cellName, new Integer(x));
 			return x;
 		}
-		
+
 		// note left right not working here or relying on presort
 		ObservableList<TreeItem<String>> childrenlist = cell.getChildren();
 
@@ -636,7 +628,7 @@ public class SulstonTreePane extends ScrollPane {
 		// lines with child names
 
 		lcell.setId(cellName);// set division line to parent id to aid
-								// recoloring
+		// recoloring
 		mainPane.getChildren().add(lcell);
 		x = (x1 + x2) / 2;
 		length = leftYUse.intValue() - yStartUse;

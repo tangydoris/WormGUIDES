@@ -14,8 +14,6 @@ import javax.imageio.ImageIO;
 
 import com.sun.javafx.scene.CameraHelper;
 
-//import sim.util.media.MovieEncoder;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -81,7 +79,6 @@ import wormguides.ColorComparator;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
-import wormguides.Quaternion;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
@@ -264,8 +261,33 @@ public class Window3DController {
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
 
-	//private Quaternion quaternion;
-
+	/**
+	 * Window3DController class constructor called by
+	 * {@link RootLayoutController} upon initialization.
+	 * 
+	 * @param parent
+	 *            {@link Stage} to which the main application belongs to.
+	 *            Reference used for context menu (whether it should appear in
+	 *            the sulston tree or the 3D subscene.
+	 * @param parentPane
+	 *            {@link AnchorPane} to which sprites, labels, and the notes
+	 *            info panel are added
+	 * @param data
+	 *            {@link LineageData} to contains cell information loaded from
+	 *            the nuclear files
+	 * @param cases
+	 *            {@link CellCasesList} that contains information about
+	 *            terminal/non-terminal cells
+	 * @param info
+	 *            {@link ProductionInfo} that contains information about
+	 *            segmentation and the movie time offset
+	 * @param connectome
+	 *            {@link Connectome} that contains information about the
+	 *            embryo's connectome
+	 * @param bringUpInfoProperty
+	 *            {@link BooleanProperty} that should be set to TRUE when the
+	 *            info window should be brought up, FALSE otherwise
+	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
@@ -431,9 +453,6 @@ public class Window3DController {
 		rotateX.setOnTransformChanged(getRotateXChangeHandler());
 		rotateY.setOnTransformChanged(getRotateYChangeHandler());
 		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
-		
-		//initialize quaternion
-		//quaternion = new Quaternion((double) newOriginX, (double) newOriginY, (double) newOriginZ);
 
 		uniformSize = false;
 
@@ -763,7 +782,6 @@ public class Window3DController {
 		}
 
 		else if (event.isPrimaryButtonDown()) {
-			//quaternion.updateQuaternion((rotateX.getAngle() + mouseDeltaY) % 360);
 			mouseDeltaX /= 2;
 			mouseDeltaY /= 2;
 
@@ -1284,7 +1302,8 @@ public class Window3DController {
 						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
+							if (rule.isMulticellularStructureRule()
+									&& rule.appliesToMulticellularStructure(sceneName)) {
 								colors.add(rule.getColor());
 							}
 
@@ -1292,7 +1311,7 @@ public class Window3DController {
 								for (String name : allNames) {
 									if (rule.appliesToCellBody(name)) {
 										colors.add(rule.getColor());
-									}	
+									}
 								}
 							}
 						}
@@ -1301,8 +1320,7 @@ public class Window3DController {
 						// if any rules applied
 						if (!colors.isEmpty()) {
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						}
-						else {
+						} else {
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 						}
 					}
@@ -1356,7 +1374,6 @@ public class Window3DController {
 			// not in search mode
 			else {
 				ArrayList<Color> colors = new ArrayList<Color>();
-				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
 					if (rule.appliesToCellNucleus(cellNames[i]))
@@ -1883,13 +1900,13 @@ public class Window3DController {
 								movieFiles.addElement(file);
 							}
 						} catch (Exception e) {
-							//e.printStackTrace();
+							// e.printStackTrace();
 						}
 					}
 				}
 			}
 		});
-		
+
 		return true;
 	}
 
