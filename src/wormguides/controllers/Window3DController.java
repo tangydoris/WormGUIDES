@@ -14,8 +14,6 @@ import javax.imageio.ImageIO;
 
 import com.sun.javafx.scene.CameraHelper;
 
-//import sim.util.media.MovieEncoder;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -263,6 +261,33 @@ public class Window3DController {
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
 
+	/**
+	 * Window3DController class constructor called by
+	 * {@link RootLayoutController} upon initialization.
+	 * 
+	 * @param parent
+	 *            {@link Stage} to which the main application belongs to.
+	 *            Reference used for context menu (whether it should appear in
+	 *            the sulston tree or the 3D subscene.
+	 * @param parentPane
+	 *            {@link AnchorPane} to which sprites, labels, and the notes
+	 *            info panel are added
+	 * @param data
+	 *            {@link LineageData} to contains cell information loaded from
+	 *            the nuclear files
+	 * @param cases
+	 *            {@link CellCasesList} that contains information about
+	 *            terminal/non-terminal cells
+	 * @param info
+	 *            {@link ProductionInfo} that contains information about
+	 *            segmentation and the movie time offset
+	 * @param connectome
+	 *            {@link Connectome} that contains information about the
+	 *            embryo's connectome
+	 * @param bringUpInfoProperty
+	 *            {@link BooleanProperty} that should be set to TRUE when the
+	 *            info window should be brought up, FALSE otherwise
+	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
@@ -1277,7 +1302,8 @@ public class Window3DController {
 						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
+							if (rule.isMulticellularStructureRule()
+									&& rule.appliesToMulticellularStructure(sceneName)) {
 								colors.add(rule.getColor());
 							}
 
@@ -1285,7 +1311,7 @@ public class Window3DController {
 								for (String name : allNames) {
 									if (rule.appliesToCellBody(name)) {
 										colors.add(rule.getColor());
-									}	
+									}
 								}
 							}
 						}
@@ -1294,8 +1320,7 @@ public class Window3DController {
 						// if any rules applied
 						if (!colors.isEmpty()) {
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						}
-						else {
+						} else {
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 						}
 					}
@@ -1876,13 +1901,13 @@ public class Window3DController {
 								movieFiles.addElement(file);
 							}
 						} catch (Exception e) {
-							//e.printStackTrace();
+							// e.printStackTrace();
 						}
 					}
 				}
 			}
 		});
-		
+
 		return true;
 	}
 

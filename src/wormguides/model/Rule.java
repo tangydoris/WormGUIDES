@@ -35,9 +35,13 @@ import wormguides.controllers.RuleEditorController;
 import wormguides.loaders.ImageLoader;
 import wormguides.view.AppFont;
 
-/*
- * Superclass for ColorRule and MulticellularStructureRule, which have
- * the same layout (label, some space, 4 buttons)
+/**
+ * This class is the color rule that determines the coloring/striping of cell,
+ * cell bodies, and multicellular structures. It is instantiated by the
+ * {@link Search} class and added to an {@link ObservableList} of Rules that are
+ * displayed in the 'Display Options' tab. This class also contains the JavaFX
+ * nodes that make up its graphical representation, which are used to display
+ * the rule in the {@link ListView} in the tab.
  */
 
 public class Rule {
@@ -71,10 +75,42 @@ public class Rule {
 
 	private SearchType searchType;
 
+	/**
+	 * Rule class constructor called by the {@link Search} class.
+	 * 
+	 * @param searched
+	 *            String that contains the term used when the user made a search
+	 *            to add this rule
+	 * @param color
+	 *            {@link Color} that the search cell(s), cell body(ies), and/or
+	 *            multicellular structure(s) should have in the 3D subscene
+	 * @param type
+	 *            {@link SearchType} enum that contains the type of search that
+	 *            was made
+	 * @param options
+	 *            The {@link SearchOption}(s) enum(s) that the rule should be
+	 *            extended to
+	 */
 	public Rule(String searched, Color color, SearchType type, SearchOption... options) {
 		this(searched, color, type, new ArrayList<SearchOption>(Arrays.asList(options)));
 	}
 
+	/**
+	 * Rule class constructor called by the {@link Search} class.
+	 * 
+	 * @param searched
+	 *            String that contains the term used when the user made a search
+	 *            to add this rule
+	 * @param color
+	 *            {@link Color} that the search cell(s), cell body(ies), and/or
+	 *            multicellular structure(s) should have in the 3D subscene
+	 * @param type
+	 *            {@link SearchType} enum that contains the type of search that
+	 *            was made
+	 * @param options
+	 *            The ArrayList of {@link SearchOption} enum(s) that the rule
+	 *            should be extended to
+	 */
 	public Rule(String searched, Color color, SearchType type, ArrayList<SearchOption> options) {
 		hbox = new HBox();
 		label = new Label();
@@ -98,7 +134,9 @@ public class Rule {
 
 		hbox.setSpacing(3);
 		hbox.setPadding(new Insets(3));
-		hbox.setPrefWidth(290);
+		hbox.setPrefWidth(275);
+		hbox.setMinWidth(275);
+		hbox.setMaxWidth(275);
 		hbox.setMinWidth(hbox.getPrefWidth());
 		hbox.setMaxWidth(hbox.getPrefWidth());
 
@@ -181,6 +219,12 @@ public class Rule {
 		visible = true;
 	}
 
+	/**
+	 * Shows the editor for the rule.
+	 * 
+	 * @param stage
+	 *            The {@link Stage} to which the rule editor window belongs to
+	 */
 	public void showEditStage(Stage stage) {
 		if (editStage == null)
 			initEditStage(stage);
@@ -191,6 +235,12 @@ public class Rule {
 		((Stage) editStage.getScene().getWindow()).toFront();
 	}
 
+	/**
+	 * Initializes the edit stage by loading the layout RuleEditorLayout.fxml.
+	 * 
+	 * @param stage
+	 *            The {@link Stage} to which the rule editor window belongs to
+	 */
 	private void initEditStage(Stage stage) {
 		editController = new RuleEditorController();
 
@@ -236,27 +286,64 @@ public class Rule {
 		}
 	}
 
+	/**
+	 * @return TRUE if the rule should color a multicellular structure, FALSE
+	 *         otherwise.
+	 */
 	public boolean isMulticellularStructureRule() {
 		return options.contains(SearchOption.MULTICELLULAR_NAME_BASED);
 	}
 
+	/**
+	 * Called by the {@link Search} class to set the baseline list of cells that
+	 * the rule affects. Multicellular structure rule cells are never set since
+	 * they are queried by name only.
+	 * 
+	 * @param list
+	 *            ArrayList of baseline cell names that should be affected by
+	 *            this rule. The list only contains immediate cells, not the
+	 *            ancestor or descendant cells.
+	 */
 	public void setCells(ArrayList<String> list) {
 		cells = list;
 		cellsSet = true;
 	}
 
+	/**
+	 * @return TRUE if the list of baseline cells are set by the {@link Search}
+	 *         class, FALSE otherwise
+	 */
 	public boolean areCellsSet() {
 		return cellsSet;
 	}
 
+	/**
+	 * @return the list of baseline cells that this rule affects, not including
+	 *         decsendant or ancestor cells.
+	 */
 	public ArrayList<String> getCells() {
 		return cells;
 	}
 
+	/**
+	 * Changes the color of the rectangle displayed next to the rule name in the
+	 * rule's graphical representation.
+	 * 
+	 * @param color
+	 *            The {@link Color} that the rectangle in the graphical
+	 *            representation of the rule should be changed to
+	 */
 	private void setColorButton(Color color) {
 		colorRectangle.setFill(color);
 	}
 
+	/**
+	 * Sets the searched term entered by the user when the rule was added.
+	 * 
+	 * @param name
+	 *            The String containing the search term entered by the user when
+	 *            the rule was added
+	 */
 	public void setSearchedText(String name) {
 		text = name;
 		textLowerCase = name.toLowerCase();
@@ -264,10 +351,23 @@ public class Rule {
 		label.setText(toStringFull());
 	}
 
+	/**
+	 * Resets the label in the graphical representation of the rule.
+	 * 
+	 * @param labelString
+	 *            The String that contains the contents for the new labels
+	 */
 	public void resetLabel(String labelString) {
 		label.setText(labelString);
 	}
 
+	/**
+	 * Sets the color of the rule.
+	 * 
+	 * @param color
+	 *            The {@link Color} that the rule should apply to the cell(s),
+	 *            cell body(ies), and/or multicellular structures it afffects
+	 */
 	public void setColor(Color color) {
 		this.color = color;
 		setColorButton(color);
@@ -423,7 +523,7 @@ public class Rule {
 				if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell)) {
 					return true;
 				}
-					
+
 				if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell)) {
 					return true;
 				}
