@@ -14,8 +14,6 @@ import wormguides.loaders.ImageLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
 import java.lang.reflect.Field;
 import javafx.util.Duration;
 import java.lang.Math;
@@ -61,7 +59,7 @@ public class SulstonTreePane extends ScrollPane {
 	private LineageData data;
 	private HashMap<String, Integer> nameXUseMap;
 	private HashMap<String, Integer> nameYStartUseMap;
-	private Set<String> hiddenNodes;
+	private ArrayList<String> hiddenNodes;
 	private TreeItem<String> lineageTreeRoot;
 
 	private ColorHash colorHash;
@@ -167,7 +165,7 @@ public class SulstonTreePane extends ScrollPane {
 			}
 		});
 
-		this.hiddenNodes = new TreeSet<String>();
+		this.hiddenNodes = new ArrayList<String>();
 		// start with founders visible
 		hiddenNodes.add("ABala");
 		hiddenNodes.add("ABalp");

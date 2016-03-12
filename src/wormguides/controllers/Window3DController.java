@@ -1374,7 +1374,6 @@ public class Window3DController {
 			// not in search mode
 			else {
 				ArrayList<Color> colors = new ArrayList<Color>();
-				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
 					if (rule.appliesToCellNucleus(cellNames[i]))
