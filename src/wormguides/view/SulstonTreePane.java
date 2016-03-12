@@ -454,8 +454,6 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");
-		// System.out.println("after recursivedraw placing timelineat "+maxX+"
-		// "+timevalue);
 		mainPane.getChildren().add(timeIndicatorBar);
 		mainPane.getChildren().add(timeIndicator);
 		drawTimeTicks();
@@ -468,7 +466,7 @@ public class SulstonTreePane extends ScrollPane {
 			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				if (rule.appliesToCellNucleus(cellname))
+				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname))
 					colors.add(rule.getColor());
 			}
 			Collections.sort(colors, new ColorComparator());
@@ -490,16 +488,11 @@ public class SulstonTreePane extends ScrollPane {
 
 	// Method not used
 	/*
-	private Color ColorsThatApplyToCell(String cellname) {
-		// iterate over rulesList
-		for (Rule rule : rules) {
-			// iterate over cells and check if cells apply
-			if (rule.appliesToCellNucleus(cellname))
-				return rule.getColor();
-		}
-		return null; // colors;
-	}
-	*/
+	 * private Color ColorsThatApplyToCell(String cellname) { // iterate over
+	 * rulesList for (Rule rule : rules) { // iterate over cells and check if
+	 * cells apply if (rule.appliesToCellNucleus(cellname)) return
+	 * rule.getColor(); } return null; // colors; }
+	 */
 
 	private void drawTimeTicks() {
 		for (int i = 0; i <= 400; i = i + 100) {
@@ -582,7 +575,7 @@ public class SulstonTreePane extends ScrollPane {
 			nameXUseMap.put(cellName, new Integer(x));
 			return x;
 		}
-		
+
 		// note left right not working here or relying on presort
 		ObservableList<TreeItem<String>> childrenlist = cell.getChildren();
 
