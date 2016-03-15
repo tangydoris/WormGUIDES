@@ -138,10 +138,8 @@ public class SulstonTreePane extends ScrollPane {
 			@Override
 			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
 					Number newStageWidth) {
-				if (canvas != null) {
+				if (canvas != null)
 					canvas.setPrefWidth(newStageWidth.doubleValue());
-					;
-				}
 			}
 		});
 
@@ -164,51 +162,8 @@ public class SulstonTreePane extends ScrollPane {
 			}
 		});
 
-		this.hiddenNodes = new ArrayList<String>();
-		//empty lines indicate a different level of the lineage tree
-		hiddenNodes.add("ABalaa");
-		hiddenNodes.add("ABalap");
-		hiddenNodes.add("ABalpa");
-		hiddenNodes.add("ABalpp");
-		hiddenNodes.add("ABaraa");
-		hiddenNodes.add("ABarap");
-		hiddenNodes.add("ABarpa");
-		hiddenNodes.add("ABarpp");
-		hiddenNodes.add("ABplaa");
-		hiddenNodes.add("ABplap");
-		hiddenNodes.add("ABplpa");
-
-		hiddenNodes.add("ABplppaa");
-		hiddenNodes.add("ABplpppp");
-
-
-		hiddenNodes.add("ABpraa");
-		hiddenNodes.add("ABprap");
-
-		hiddenNodes.add("ABprpaaa");
-
-		hiddenNodes.add("ABprpapaa");
-
-		hiddenNodes.add("Abprppaa");
-
-		hiddenNodes.add("ABprppp");
-
-		hiddenNodes.add("MSaa");
-		hiddenNodes.add("MSap");
-		hiddenNodes.add("MSpa");
-		hiddenNodes.add("MSpp");
-
-		hiddenNodes.add("Ea");
-		hiddenNodes.add("Ep");
-
-		hiddenNodes.add("Caa");
-		hiddenNodes.add("Cap");
-		hiddenNodes.add("Cpa");
-		hiddenNodes.add("Cpp");
-
-		hiddenNodes.add("D");
-		hiddenNodes.add("P4");
-
+		hiddenNodes = new ArrayList<String>();
+		setUpDefaultView();
 
 		this.rules = rules;
 		this.colorHash = colorHash;
@@ -262,7 +217,7 @@ public class SulstonTreePane extends ScrollPane {
 		this.setPannable(true);
 
 		addLines(lineageTreeRoot, canvas);
-		this.setPrefSize(520, 700);
+		this.setPrefSize(400, 700);
 
 		// add controls for zoom
 		Button plus = new Button();
@@ -325,28 +280,50 @@ public class SulstonTreePane extends ScrollPane {
 		selectedNameLabeled.set(name);
 	}
 
-	public void useStartupDefaultView() {
-		// expand specific lineages for default view on startup
-		// expand these
-		String[] cellsToExpand = new String[] { "ABala", "ABalp", "ABara", "ABarp", "ABpla", "ABprp", "ABpra", "MSa",
-				"MSp", "Ca", "Cp" };
-		for (String cell : cellsToExpand) {
-			if (hiddenNodes.contains(cell))
-				hiddenNodes.remove(cell);
-			else
-				hiddenNodes.add(cell);
-		}
-		// hide these
-		String[] cellsToHide = new String[] { "ABalaa", "ABalap", "ABalpa", "ABalpp", "ABaraa", "ABarap", "ABarpa",
-				"ABarpp", "ABplpa", "ABplaa", "ABplap", "ABplppaa", "ABplpppp", "ABpraa", "ABprap", "ABprpaaa",
-				"ABprpapaa", "ABprppaa", "ABprppp", "MSaa", "MSap", "MSpa", "MSpp", "Caa", "Cap", "Cpa", "Cpp" };
-		for (String cell : cellsToHide) {
-			if (hiddenNodes.contains(cell))
-				hiddenNodes.remove(cell);
-			else
-				hiddenNodes.add(cell);
-		}
-		updateDrawing();
+	public void setUpDefaultView() {
+		// empty lines indicate a different level of the lineage tree
+		hiddenNodes.add("ABalaa");
+		hiddenNodes.add("ABalap");
+		hiddenNodes.add("ABalpa");
+		hiddenNodes.add("ABalpp");
+		hiddenNodes.add("ABaraa");
+		hiddenNodes.add("ABarap");
+		hiddenNodes.add("ABarpa");
+		hiddenNodes.add("ABarpp");
+		hiddenNodes.add("ABplaa");
+		hiddenNodes.add("ABplap");
+		hiddenNodes.add("ABplpa");
+
+		hiddenNodes.add("ABplppaa");
+		hiddenNodes.add("ABplpppp");
+
+		hiddenNodes.add("ABpraa");
+		hiddenNodes.add("ABprap");
+
+		hiddenNodes.add("ABprpaaa");
+		hiddenNodes.add("ABprppaa");
+
+		hiddenNodes.add("ABprpapaa");
+
+		hiddenNodes.add("Abprppaa");
+
+		hiddenNodes.add("ABprppp");
+
+		hiddenNodes.add("MSaa");
+		hiddenNodes.add("MSap");
+		hiddenNodes.add("MSpa");
+		hiddenNodes.add("MSpp");
+
+		hiddenNodes.add("Ea");
+		hiddenNodes.add("Ep");
+
+		hiddenNodes.add("Caa");
+		hiddenNodes.add("Cap");
+		hiddenNodes.add("Cpa");
+		hiddenNodes.add("Cpp");
+
+		hiddenNodes.add("D");
+		hiddenNodes.add("P4");
 	}
 
 	private void showContextMenu(String name, double sceneX, double sceneY) {
@@ -401,16 +378,16 @@ public class SulstonTreePane extends ScrollPane {
 		plus.layoutYProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.vvalueProperty()
-				// multiplied by (scrollableAreaHeight -
-				// visibleViewportHeight)
-				.multiply(scontent.heightProperty().subtract(new ScrollPaneViewPortHeightBinding(s))));
+						// multiplied by (scrollableAreaHeight -
+						// visibleViewportHeight)
+						.multiply(scontent.heightProperty().subtract(new ScrollPaneViewPortHeightBinding(s))));
 
 		plus.layoutXProperty().bind(
 				// to vertical scroll shift (which ranges from 0 to 1)
 				s.hvalueProperty()
-				// multiplied by (scrollableAreaHeight -
-				// visibleViewportHeight)
-				.multiply(scontent.widthProperty().subtract(new ScrollPaneViewPortWidthBinding(s))));
+						// multiplied by (scrollableAreaHeight -
+						// visibleViewportHeight)
+						.multiply(scontent.widthProperty().subtract(new ScrollPaneViewPortWidthBinding(s))));
 
 	}
 
