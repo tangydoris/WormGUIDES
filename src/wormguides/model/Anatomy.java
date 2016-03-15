@@ -91,6 +91,13 @@ public class Anatomy {
 		return false;
 	}
 	
+	/**
+	 * Finds the base name of a cell i.e. the cell without dorsal, ventral,
+	 * left, right, etc. classifiers
+	 * 
+	 * @param cell the cell to find the base of
+	 * @return the base name of the cell
+	 */
 	private static String findRootOfCell(String cell) {
 		//remove number suffixes, l/r, d/v
 		Character lastChar = cell.charAt(cell.length() - 1);
@@ -214,8 +221,6 @@ public class Anatomy {
 				}
 			}
 		}
-		
-		
 		return anatomy;
 	}
 }

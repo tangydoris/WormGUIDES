@@ -10,9 +10,19 @@ import javafx.stage.Stage;
 import wormguides.AnatomyTerm;
 import wormguides.Search;
 
-/*
- * Callback class for our HTML page for a terminal cell case to open links in default browser
+/**
+ * Callback class for HTML pages
+ * 		HTML pages generated for Info Window contain links which
+ * 		when clicked fire a JS function that allows us to call
+ * 		back to our java code
  * 
+ * This class implements functionality for targeting the user's default
+ * broswer for linked websites, handles the clicking of a wiring partner
+ * to both generate a new cell case page and view the partner in 3D, and
+ * controls the generation of AnatomyTerm pages in the info window
+ * 
+ * @author bradenkatzman
+ *
  */
 public class InfoWindowLinkController {
 
@@ -24,6 +34,13 @@ public class InfoWindowLinkController {
 		labeledCellProperty = cellNameProperty;
 	}
 
+	/**
+	 * Targets the default browser and opens the supplied link
+	 * 
+	 * @param url the url of the page to be opened
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
 	public void handleLink(String url) throws IOException, URISyntaxException {
 		if (Desktop.isDesktopSupported()) {
 			Desktop.getDesktop().browse(new URI(url));
@@ -68,16 +85,27 @@ public class InfoWindowLinkController {
 		Search.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
 	}
 
+	/**
+	 * This method shows a clicked cell in the scene graph by taking advantage
+	 * of the string property labeledCellProperty from Window3D. When this property
+	 * is changed (i.e. a new cell name is set), a listener fires which navigates to
+	 * the birth of the cell in the embryo
+	 * 
+	 * @param cellName
+	 */
 	public void viewInCellTheater(String cellName) {
 		resetLabeledCellProperty(cellName);
 
 		parentStage.requestFocus();
 	}
 
+	/**
+	 * Changes the StringProperty labeledCellProperty to navigate to the cell in 3D
+	 * 
+	 * @param cellName  the cell to navigate to
+	 */
 	private void resetLabeledCellProperty(String cellName) {
 		labeledCellProperty.set("");
 		labeledCellProperty.set(cellName);
 	}
-	
-	//private final static String amphidSensilla = "amphid sensilla";
 }
