@@ -4,6 +4,15 @@ import java.util.ArrayList;
 
 import wormguides.AnatomyTerm;
 
+/**
+ * Defines a case i.e. an info window page type corresponding to an AnatomyTerm enum
+ * 
+ * This class holds in the information about the anatomy term to be used to generate
+ * an HTML page for the info window
+ * 
+ * @author bradenkatzman
+ *
+ */
 public final class AnatomyTermCase {
 	
 	private String name;
@@ -15,12 +24,22 @@ public final class AnatomyTermCase {
 	private String wormatlasLink1;
 	private String wormatlasLink2;
 	
+	/**
+	 * Sets the term based on the term in the enum
+	 * 
+	 * @param term the defining term
+	 */
 	public AnatomyTermCase(AnatomyTerm term) {
 		if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
 			initializeAmphidSensillaCase();
 		}
 	}
 	
+	/**
+	 * Initializes 'Amphid Sensilla' specific information
+	 * 	- amphid cells
+	 *  = 2 wormatlas links
+	 */
 	private void initializeAmphidSensillaCase() {
 		this.name = AnatomyTerm.AMPHID_SENSILLA.getTerm();
 		this.description = AnatomyTerm.AMPHID_SENSILLA.getDescription();
@@ -30,6 +49,11 @@ public final class AnatomyTermCase {
 		this.links = buildSearchBasedLinks();
 	}
 	
+	/**
+	 * Finds cells in the parts list whose descriptions contain 'Amphid'
+	 * 
+	 * @return the cells with 'Amphid' hits
+	 */
 	public ArrayList<String> findAmphidCells() {
 		ArrayList<String> cells = new ArrayList<String>();
 		
@@ -57,6 +81,10 @@ public final class AnatomyTermCase {
 		return cells;
 	}
 	
+	/**
+	 * Sets up the wormbase, google search and textpresso links
+	 * @return
+	 */
 	public ArrayList<String> buildSearchBasedLinks() {
 		ArrayList<String> searchBasedLinks = new ArrayList<String>();
 		

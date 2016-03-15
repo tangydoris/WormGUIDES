@@ -1,5 +1,13 @@
 package wormguides;
 
+/**
+ * Enum for anatomy terms which constitute special cases in the info window
+ * 
+ * Each AnatomyTerm has a term and a description
+ * 
+ * @author bradenkatzman
+ *
+ */
 public enum AnatomyTerm {
 
 	AMPHID_SENSILLA("Amphid Sensilla", "The amphids are a pair of laterally "
