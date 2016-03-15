@@ -329,6 +329,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
+			
+			sp.useStartupDefaultView();
 		}
 
 		treeStage.show();

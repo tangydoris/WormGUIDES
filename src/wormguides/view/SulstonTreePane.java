@@ -117,7 +117,6 @@ public class SulstonTreePane extends ScrollPane {
 					hiddenNodes.remove(sourceName);
 				else
 					hiddenNodes.add(sourceName);
-
 				updateDrawing();
 			}
 		}
@@ -223,7 +222,8 @@ public class SulstonTreePane extends ScrollPane {
 		mainPane = canvas;
 
 		// zooming
-		scaleTransform = new Scale(2, 2, 0, 0);
+		// TODO
+		scaleTransform = new Scale(1.75, 1.75, 0, 0);
 		Group contentGroup = new Group();
 		zoomGroup = new Group();
 		contentGroup.getChildren().add(zoomGroup);
@@ -233,17 +233,10 @@ public class SulstonTreePane extends ScrollPane {
 		canvas.setVisible(true);
 
 		this.getChildren().add(contentGroup);
-
-		// ScrollPane sp=new ScrollPane();
-
-		// sp.setContent(contentGroup);
 		this.setPannable(true);
-		// this.getChildren().add(sp);
 
 		addLines(lineageTreeRoot, canvas);
-		this.setPrefSize(300, 300);
-
-		// this.setPrefSize(maxX,400);
+		this.setPrefSize(520, 700);
 
 		// add controls for zoom
 		Button plus = new Button();
@@ -304,6 +297,30 @@ public class SulstonTreePane extends ScrollPane {
 		selectedNameLabeled.set(name);
 	}
 
+	public void useStartupDefaultView() {
+		// expand specific lineages for default view on startup
+		// expand these
+		String[] cellsToExpand = new String[] { "ABala", "ABalp", "ABara", "ABarp", "ABpla", "ABprp", "ABpra", "MSa",
+				"MSp", "Ca", "Cp" };
+		for (String cell : cellsToExpand) {
+			if (hiddenNodes.contains(cell))
+				hiddenNodes.remove(cell);
+			else
+				hiddenNodes.add(cell);
+		}
+		// hide these
+		String[] cellsToHide = new String[] { "ABalaa", "ABalap", "ABalpa", "ABalpp", "ABaraa", "ABarap", "ABarpa",
+				"ABarpp", "ABplpa", "ABplaa", "ABplap", "ABplppaa", "ABplpppp", "ABpraa", "ABprap", "ABprpaaa",
+				"ABprpapaa", "ABprppaa", "ABprppp", "MSaa", "MSap", "MSpa", "MSpp", "Caa", "Cap", "Cpa", "Cpp" };
+		for (String cell : cellsToHide) {
+			if (hiddenNodes.contains(cell))
+				hiddenNodes.remove(cell);
+			else
+				hiddenNodes.add(cell);
+		}
+		updateDrawing();
+	}
+
 	private void showContextMenu(String name, double sceneX, double sceneY) {
 		if (contextMenuStage != null) {
 			contextMenuController.setName(name);
@@ -350,7 +367,6 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicator.setY(iYmin + time.getValue());
 
 		timeIndicator.setText(Integer.toString(time.get() + timeOffset));
-		// System.out.println("adjusting time line");
 	}
 
 	private void bindLocation(Button plus, ScrollPane s, Pane scontent) {
@@ -373,7 +389,6 @@ public class SulstonTreePane extends ScrollPane {
 	// lifted code to create control zoom overlays
 	// we need this class because Bounds object doesn't support binding
 	private static class ScrollPaneViewPortHeightBinding extends DoubleBinding {
-
 		private final ScrollPane root;
 
 		public ScrollPaneViewPortHeightBinding(ScrollPane root) {
@@ -480,17 +495,8 @@ public class SulstonTreePane extends ScrollPane {
 				}
 			}
 		}
-
 		return null;
 	}
-
-	// Method not used
-	/*
-	 * private Color ColorsThatApplyToCell(String cellname) { // iterate over
-	 * rulesList for (Rule rule : rules) { // iterate over cells and check if
-	 * cells apply if (rule.appliesToCellNucleus(cellname)) return
-	 * rule.getColor(); } return null; // colors; }
-	 */
 
 	private void drawTimeTicks() {
 		for (int i = 0; i <= 400; i = i + 100) {
@@ -567,9 +573,7 @@ public class SulstonTreePane extends ScrollPane {
 			cellnametext.getTransforms().add(new Rotate(90, x - offsetx, yStartUse + length + offsety));
 			cellnametext.setFont(new Font(5));
 
-			// cellnametext.setRotationAxis(new Point3D(x,yStartUse+length,0));
 			mainPane.getChildren().add(cellnametext);
-			// if (x > iXmax) iXmax = x;
 			nameXUseMap.put(cellName, new Integer(x));
 			return x;
 		}
@@ -579,8 +583,6 @@ public class SulstonTreePane extends ScrollPane {
 
 		TreeItem<String> cLeft = childrenlist.get(0);
 		TreeItem<String> cRite = childrenlist.get(1);
-		// int nl = LineageTree.getChildCount(cLeft.getValue());///2;
-		// if (nl == 0) nl = 1;
 		int x1 = recursiveDraw(mainPane, h, x, cLeft, rootStart);
 		nameXUseMap.put(cLeft.getValue(), new Integer(x1));
 		int xx = maxX + xsc;
@@ -592,11 +594,9 @@ public class SulstonTreePane extends ScrollPane {
 		Integer leftYUse = nameYStartUseMap.get(cLeft.getValue());
 		nameYStartUseMap.get(cRite.getValue());
 		// division line
-		// if(length>0){
 		Line lcell = new Line(leftXUse.intValue(), leftYUse.intValue(), rightXUse.intValue(), leftYUse.intValue());
 		if (!(lcolor == null))
 			lcell.setStroke(lcolor); // first for now
-		// lcell.setId(cLeft.getValue()+cRite.getValue()); //name division
 		// lines with child names
 
 		lcell.setId(cellName);// set division line to parent id to aid
@@ -616,7 +616,6 @@ public class SulstonTreePane extends ScrollPane {
 		hackTooltipStartTiming(t, ttduration);
 		Tooltip.install(lcell, t);
 		mainPane.getChildren().add(lcell);
-		// }
 		return x;
 	}
 
@@ -638,13 +637,4 @@ public class SulstonTreePane extends ScrollPane {
 		}
 	}
 
-	/*
-	 * public final static int NAME = 4 ,TIME = 0 ,PLANE = 3 ,X = 1 ,Y = 2 ,DIA
-	 * = 5 ,PREV = 12 // index for this cell in the previous nuclei file ,START0
-	 * = 10 // y location where tree drawing starts ,START1 = 20 // y location
-	 * where root cell is placed //,BORDERS = 60 // combined unused space at top
-	 * and bottom (I think) ,BORDERS = 90 // combined unused space at top and
-	 * bottom (I think) ,LINEWIDTH = 5 ;
-	 * 
-	 */
 }
