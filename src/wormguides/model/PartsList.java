@@ -30,9 +30,9 @@ public class PartsList {
 			while ((line = br.readLine()) != null) {
 
 				String[] lineArray = line.split("\t");
-				functionalNames.add(lineArray[0]);
-				lineageNames.add(lineArray[1]);
-				descriptions.add(lineArray[2]);
+				functionalNames.add(lineArray[0].trim());
+				lineageNames.add(lineArray[1].trim());
+				descriptions.add(lineArray[2].trim());
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -40,14 +40,25 @@ public class PartsList {
 	}
 
 	public static boolean containsLineageName(String name) {
-		//if (name == null) return false;
+		if (name == null)
+			return false;
 		// case insensitive search
 		for (String lineageName : lineageNames) {
-			if (lineageName.toLowerCase().equals(name.toLowerCase())) {
+			if (lineageName.equalsIgnoreCase(name)) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public static String getLineageNameCorrectCase(String lineageName) {
+		lineageName.trim();
+		System.out.println("getting correct case for - "+lineageName);
+		for (String name : lineageNames) {
+			if (name.equalsIgnoreCase(lineageName))
+				return name;
+		}
+		return "ABCDEFG";
 	}
 
 	public static boolean containsFunctionalName(String name) {
@@ -55,7 +66,6 @@ public class PartsList {
 			if (funcName.equalsIgnoreCase(name))
 				return true;
 		}
-
 		return false;
 	}
 

@@ -1489,21 +1489,21 @@ public class Window3DController {
 	 * (if a mesh and a cell have the same name, the mesh is returned)
 	 */
 	private Shape3D getEntityWithName(String name) {
-		// give priority to meshes
-		// mesh view label
-		for (int i = 0; i < currentSceneElements.size(); i++) {
-			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-					&& currentSceneElementMeshes.get(i) != null) {
-				return currentSceneElementMeshes.get(i);
-			}
-		}
-
+		// give priority to spheres
 		// sphere label
 		for (int i = 0; i < cellNames.length; i++) {
 			if (spheres[i] != null) {
 				if (cellNames[i].equals(name)) {
 					return spheres[i];
 				}
+			}
+		}
+
+		// mesh view label
+		for (int i = 0; i < currentSceneElements.size(); i++) {
+			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+					&& currentSceneElementMeshes.get(i) != null) {
+				return currentSceneElementMeshes.get(i);
 			}
 		}
 
