@@ -199,9 +199,9 @@ public class SulstonTreePane extends ScrollPane {
 
 		// add controls for zoom
 		DropShadow shadow = new DropShadow();
-		shadow.setRadius(5);
-		shadow.setOffsetX(3);
-		shadow.setOffsetY(3);
+		shadow.setRadius(3.5);
+		shadow.setOffsetX(4);
+		shadow.setOffsetY(3.5);
 		shadow.setColor(ZOOM_BUTTONS_SHADOW_COLOR);
 		Button plus = new Button();
 		plus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -245,8 +245,6 @@ public class SulstonTreePane extends ScrollPane {
 		});
 
 		Pane yetanotherlevel = new Pane();
-		// TODO
-		// yetanotherlevel.setStyle("-fx-background-color: #e1e1ea;");
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
@@ -472,7 +470,6 @@ public class SulstonTreePane extends ScrollPane {
 		int x = recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
 		// add time indicator bar
 		int timevalue = time.getValue();
-		// TODO
 		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax, iYmin + timevalue);
 		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicatorBar.setId("time");
@@ -655,5 +652,5 @@ public class SulstonTreePane extends ScrollPane {
 	private final int ZOOM_BUTTON_SIZE = 30;
 	private final double DEFAULT_WINDOW_HEIGHT = 820;
 	private final double DEFAULT_WINDOW_WIDTH = 775;
-	private final Color ZOOM_BUTTONS_SHADOW_COLOR = Color.web("999999");
+	private final Color ZOOM_BUTTONS_SHADOW_COLOR = Color.web("AAAAAA");
 }
