@@ -518,7 +518,7 @@ public class Search {
 					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
 							electricalTicked, neuromuscularTicked, true));
 					// TODO is the cell itself ever in the wiring results?
-					//cells.remove(searched);
+					// cells.remove(searched);
 				}
 				break;
 
@@ -708,14 +708,13 @@ public class Search {
 					// compute distance from each cell to query cell
 					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
 						// only add new entries
-						if (!results.contains(names[n]))
+						if (!results.contains(names[n]) && !names[n].equalsIgnoreCase(cellName))
 							results.add(names[n]);
 					}
 				}
 			}
 		}
 
-		results.remove(cellName);
 		return results;
 	}
 
