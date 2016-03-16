@@ -715,6 +715,7 @@ public class Search {
 			}
 		}
 
+		results.remove(cellName);
 		return results;
 	}
 
