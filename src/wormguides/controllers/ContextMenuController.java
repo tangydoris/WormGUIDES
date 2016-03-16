@@ -37,9 +37,11 @@ import wormguides.model.Rule;
 import wormguides.model.TerminalCellCase;
 
 /**
- * ContextMenuController is the controller class for the context menu that shows
- * up on right click on a 3D entity. The menu can be accessed via the 3D
- * subscene or the sulston tree.
+ * This class is the controller for the context menu that shows up on right
+ * click on a 3D entity. The menu can be accessed via the 3D subscene or the
+ * sulston tree.
+ * 
+ * @author Doris Tang
  */
 
 public class ContextMenuController extends AnchorPane implements Initializable {
@@ -117,7 +119,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				return new Task<Void>() {
 					@Override
 					protected Void call() throws Exception {
-						final int modulus = 5;
+						final int modulus = 4;
 						while (true) {
 							if (isCancelled()) {
 								break;
@@ -136,9 +138,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 										break;
 									case 3:
 										loading += "...";
-										break;
-									case 4:
-										loading += "....";
 										break;
 									default:
 										break;
@@ -196,6 +195,52 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 			}
 		};
 
+		expressesQueryService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				loadingService.cancel();
+				resetLoadingMenuItem();
+				ArrayList<String> results = expressesQueryService.getValue();
+				if (results != null) {
+					for (String result : results) {
+						MenuItem item = new MenuItem(result);
+
+						item.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent event) {
+								Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
+										SearchOption.CELLNUCLEUS);
+								rule.showEditStage(parentStage);
+							}
+						});
+
+						expressesMenu.getItems().add(item);
+					}
+				}
+			}
+		});
+
+		expressesQueryService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						expressesMenu.getItems().addAll(loadingMenuItem);
+					}
+				});
+				loadingService.restart();
+			}
+		});
+
+		expressesQueryService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				resetLoadingMenuItem();
+				loadingService.cancel();
+			}
+		});
+
 		wiredToQueryService = new Service<ArrayList<ArrayList<String>>>() {
 			@Override
 			protected Task<ArrayList<ArrayList<String>>> createTask() {
@@ -220,16 +265,45 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 								results.add(NEURO_INDEX,
 										connectome.queryConnectivity(cellName, false, false, false, true, false));
 							}
-
 							return results;
 						}
-
 						return null;
 					};
 				};
 				return task;
 			}
 		};
+
+		// TODO
+		wiredToQueryService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				ArrayList<ArrayList<String>> results = wiredToQueryService.getValue();
+
+				if (results != null) {
+					colorAll.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, true, true, true,
+									true);
+							rule.showEditStage(parentStage);
+						}
+					});
+
+					populateWiredToMenu(results.get(PRE_SYN_INDEX), preSyn, true, false, false, false);
+					populateWiredToMenu(results.get(POST_SYN_INDEX), postSyn, false, true, false, false);
+					populateWiredToMenu(results.get(ELECTR_INDEX), electr, false, false, true, false);
+					populateWiredToMenu(results.get(NEURO_INDEX), neuro, false, false, false, true);
+				}
+
+				else {
+					wiredToMenu.getItems().clear();
+					wiredToMenu.getItems().add(new MenuItem("None"));
+				}
+
+				wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
+			}
+		});
 	}
 
 	/**
@@ -377,51 +451,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 					expressesMenu.setAutoHide(true);
 
-					expressesQueryService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							Platform.runLater(new Runnable() {
-								@Override
-								public void run() {
-									expressesMenu.getItems().addAll(loadingMenuItem);
-								}
-							});
-							loadingService.restart();
-						}
-					});
-
-					expressesQueryService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							resetLoadingMenuItem();
-							loadingService.cancel();
-						}
-					});
-
-					expressesQueryService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							loadingService.cancel();
-							resetLoadingMenuItem();
-							ArrayList<String> results = expressesQueryService.getValue();
-							if (results != null) {
-								for (String result : results) {
-									MenuItem item = new MenuItem(result);
-
-									item.setOnAction(new EventHandler<ActionEvent>() {
-										@Override
-										public void handle(ActionEvent event) {
-											Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
-													SearchOption.CELLNUCLEUS);
-											rule.showEditStage(parentStage);
-										}
-									});
-
-									expressesMenu.getItems().add(item);
-								}
-							}
-						}
-					});
 				}
 
 				expressesMenu.getItems().clear();
@@ -455,36 +484,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					postSyn = new Menu("Post-Synaptic");
 					electr = new Menu("Electrical");
 					neuro = new Menu("Neuromuscular");
-
-					wiredToQueryService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-						@Override
-						public void handle(WorkerStateEvent event) {
-							ArrayList<ArrayList<String>> results = wiredToQueryService.getValue();
-
-							if (results != null) {
-								colorAll.setOnAction(new EventHandler<ActionEvent>() {
-									@Override
-									public void handle(ActionEvent event) {
-										Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, true,
-												true, true, true);
-										rule.showEditStage(parentStage);
-									}
-								});
-
-								populateWiredToMenu(results.get(PRE_SYN_INDEX), preSyn, true, false, false, false);
-								populateWiredToMenu(results.get(POST_SYN_INDEX), postSyn, false, true, false, false);
-								populateWiredToMenu(results.get(ELECTR_INDEX), electr, false, false, true, false);
-								populateWiredToMenu(results.get(NEURO_INDEX), neuro, false, false, false, true);
-							}
-
-							else {
-								wiredToMenu.getItems().clear();
-								wiredToMenu.getItems().add(new MenuItem("None"));
-							}
-
-							wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
-						}
-					});
 				}
 
 				wiredToMenu.getItems().clear();

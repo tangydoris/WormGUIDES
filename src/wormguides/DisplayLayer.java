@@ -34,6 +34,7 @@ import javafx.util.Callback;
  * the static method addDefaultColorRules().
  * 
  * @see Rule
+ * @author Doris Tang
  */
 
 public class DisplayLayer {

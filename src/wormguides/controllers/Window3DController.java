@@ -121,6 +121,8 @@ import wormguides.model.SceneElementsList;
  * the color hash ({@link ColorHash}) for the material ({@link PhongMaterial})
  * to use for the entity.
  * 
+ * @author Doris Tang
+ * 
  */
 
 public class Window3DController {
@@ -402,7 +404,6 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				hideContextPopups();
-
 				if (newValue)
 					playService.restart();
 				else
@@ -2069,9 +2070,17 @@ public class Window3DController {
 
 	public void setTime(int t) {
 		if (startTime <= t && t <= endTime) {
-			time.set(t);
+			// TODO
+			System.out.println("end time internal - " + endTime);
 			hideContextPopups();
+			time.set(t);
 		}
+
+		else if (t < startTime)
+			time.set(startTime);
+
+		else if (t > endTime)
+			time.set(endTime);
 	}
 
 	public void setRotations(double rx, double ry, double rz) {
@@ -2325,12 +2334,8 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				hideContextPopups();
-
-				if (!playingMovie.get()) {
-					int t = time.get();
-					if (t > 1 && t <= getEndTime())
-						time.set(t - 1);
-				}
+				if (!playingMovie.get())
+					setTime(time.get() - 1);
 			}
 		};
 	}
@@ -2340,11 +2345,10 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				hideContextPopups();
-
 				if (!playingMovie.get()) {
 					int t = time.get();
-					if (t >= 1 && t < getEndTime() - 1)
-						time.set(t + 1);
+					if (t >= 1 && t < getEndTime())
+						setTime(time.get() + 1);
 				}
 			}
 		};
@@ -2423,7 +2427,7 @@ public class Window3DController {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								if (time.get() < endTime)
+								if (time.get() <= endTime)
 									setTime(time.get() + 1);
 								else
 									setTime(endTime);

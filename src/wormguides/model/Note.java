@@ -7,12 +7,29 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-/*
- * This class represents a note that belongs to a story (its parent)
+/**
+ * This class represents a note that belongs to a story (its parent). A note
+ * contains a tag name, tag contents, an attachment type {@link Type}, a tag
+ * display {@link Display}. It may contain a location to which it belongs in the
+ * subscene, a cell to which it is attached to, a marker name, an imaging
+ * source, a resource location that specifies the {@link SceneElement} it is
+ * attached to, a start/end time, and comments.<br>
+ * <br>
+ * Notes can appears as sprites, 3D billboards, front-facing 3D billboards, or
+ * as text in the info pane. Enums representing these displays can be found in
+ * the inner class {@link Display}. If blank, the note is without scope and does
+ * not appear in the subscene.<br>
+ * <br>
+ * Notes can be attached to entities such as cells, multicellular structures, or
+ * a location in the 3D subscene. Enums representing these attachment types can
+ * be found in the inner class {@link Type}. If a note is attached to a cell,
+ * structure, or location, but the cell, structure, or location is not
+ * specified, the note is without scope and does not appear in the subscene.
+ * 
+ * @author Doris Tang
  */
 public class Note {
 
-	// TODO Refactor this to be a single scene element?
 	// right now it is possible for a note to have multiple scene elements
 	// just by setting its resource location
 	private ArrayList<SceneElement> elements;

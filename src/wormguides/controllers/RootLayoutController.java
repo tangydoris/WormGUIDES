@@ -553,7 +553,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// start the image capture
 		if (window3DController != null) {
 			if (!window3DController.captureImagesForMovie()) {
-				//error saving movie, update UI
+				// error saving movie, update UI
 				captureVideoMenuItem.setDisable(false);
 				stopCaptureVideoMenuItem.setDisable(true);
 				captureVideo.set(false);
@@ -642,8 +642,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				int newTime = newValue.intValue();
-				if (newTime != timeSlider.getValue() && window3DController != null)
+				if (newTime != timeSlider.getValue() && window3DController != null) {
 					window3DController.setTime(newTime);
+					timeSlider.setValue(newTime);
+				}
 			}
 		});
 
@@ -897,7 +899,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private void initCellDeaths() {
 		new CellDeaths();
 	}
-	
+
 	private void initAnatomy() {
 		new Anatomy();
 	}
@@ -1128,7 +1130,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		Search.addDefaultColorRules();
 		Search.setActiveLineageNames(lineageData.getAllCellNames());
 		Search.setLineageData(lineageData);
-		
+
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
@@ -1165,7 +1167,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			window3DController.setCaptureVideo(captureVideo);
 		}
 	}
-	
+
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;
+	/**
+	 * Delay time in seconds before the application updates to the new time on
+	 * the slider
+	 */
+	private final double TIME_SLIDER_TIME_DELAY = 0.5;
 }

@@ -42,6 +42,8 @@ import wormguides.view.AppFont;
  * displayed in the 'Display Options' tab. This class also contains the JavaFX
  * nodes that make up its graphical representation, which are used to display
  * the rule in the {@link ListView} in the tab.
+ * 
+ * @author Doris Tang
  */
 
 public class Rule {

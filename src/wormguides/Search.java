@@ -296,22 +296,22 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLBODY);
-		
+
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		
+
 		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xff9966"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xffe6b4"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "sibd", Color.web("0xe6ccff"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "siav", Color.web("0x99b3ff"), SearchOption.CELLBODY);
-		
+
 		addColorRule(SearchType.FUNCTIONAL, "dd1", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd2", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd3", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd4", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd5", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd6", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
-		
+
 		addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da3", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da4", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
@@ -433,11 +433,6 @@ public class Search {
 					if (name.toLowerCase().startsWith(searched))
 						cells.add(PartsList.getLineageNameByIndex(i));
 				}
-				/*
-				 * for (String name : functionalNames) { if
-				 * (name.toLowerCase().startsWith(searched))
-				 * cells.add(PartsList.getLineageNameByFunctionalName(name)); }
-				 */
 				break;
 
 			case DESCRIPTION:
@@ -485,14 +480,12 @@ public class Search {
 						// look for a match in rest of the hits
 						boolean intersection = true;
 						for (int i = 1; i < hits.size(); i++) {
-							if (!hits.get(i).contains(cell)) {
+							if (!hits.get(i).contains(cell))
 								intersection = false;
-							}
 						}
 
-						if (intersection && !cells.contains(cell)) {
+						if (intersection && !cells.contains(cell))
 							cells.add(cell);
-						}
 					}
 				}
 
@@ -524,6 +517,8 @@ public class Search {
 				if (connectome != null) {
 					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
 							electricalTicked, neuromuscularTicked, true));
+					// TODO is the cell itself ever in the wiring results?
+					//cells.remove(searched);
 				}
 				break;
 

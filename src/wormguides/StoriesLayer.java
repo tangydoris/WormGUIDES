@@ -59,6 +59,8 @@ import wormguides.view.AppFont;
  * This class is the controller of the {@link ListView} in the 'Stories' tab.
  * The Constructor is called by the main application controller
  * {@link RootLayoutController} on initialization.
+ * 
+ * @author Doris Tang
  */
 public class StoriesLayer {
 
