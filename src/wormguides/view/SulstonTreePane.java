@@ -181,16 +181,18 @@ public class SulstonTreePane extends ScrollPane {
 		// zooming
 		scaleTransform = new Scale(1.75, 1.75, 0, 0);
 		Group contentGroup = new Group();
+		
 		zoomGroup = new Group();
+		
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
 
 		canvas.setVisible(true);
-		canvas.setPrefSize(750, 800);
 
 		this.getChildren().add(contentGroup);
 		this.setPannable(true);
+		this.setPrefSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
 		addLines(lineageTreeRoot, canvas);
 
@@ -643,4 +645,6 @@ public class SulstonTreePane extends ScrollPane {
 	}
 
 	private final int ZOOM_BUTTON_SIZE = 30;
+	private final double DEFAULT_WINDOW_HEIGHT = 820;
+	private final double DEFAULT_WINDOW_WIDTH = 750;
 }
