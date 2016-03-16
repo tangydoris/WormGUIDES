@@ -1130,11 +1130,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		setSlidersProperties();
 
 		initSearch();
+		ObservableList<Rule> list = displayLayer.getRulesList();
+		Search.setRulesList(list);
+		Search.addDefaultColorRules();
 		Search.setActiveLineageNames(lineageData.getAllCellNames());
 		Search.setLineageData(lineageData);
-
-		ObservableList<Rule> list = displayLayer.getRulesList();
-		search.setRulesList(list);
+		
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
@@ -1153,8 +1154,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
 		window3DController.setGeneResultsUpdated(search.getGeneResultsUpdated());
-
-		search.addDefaultColorRules();
 
 		addListeners();
 

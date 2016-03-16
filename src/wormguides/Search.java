@@ -271,7 +271,7 @@ public class Search {
 		return searched;
 	}
 
-	public void setRulesList(ObservableList<Rule> list) {
+	public static void setRulesList(ObservableList<Rule> list) {
 		rulesList = list;
 	}
 
@@ -292,7 +292,7 @@ public class Search {
 		};
 	}
 
-	public void addDefaultColorRules() {
+	public static void addDefaultColorRules() {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLBODY);
@@ -312,14 +312,10 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "dd5", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "dd6", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
 		
-		//da rules
-		
 		addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da3", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da4", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 		addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
-
-
 	}
 
 	public void clearRules() {

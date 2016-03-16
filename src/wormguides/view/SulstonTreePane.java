@@ -181,10 +181,8 @@ public class SulstonTreePane extends ScrollPane {
 		// zooming
 		scaleTransform = new Scale(1.75, 1.75, 0, 0);
 		Group contentGroup = new Group();
-		// TODO
 		zoomGroup = new Group();
 		contentGroup.getChildren().add(zoomGroup);
-		// TODO
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
 
