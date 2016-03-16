@@ -1719,7 +1719,7 @@ public class Window3DController {
 		if (note.isExpandedInScene())
 			title += ": " + note.getTagContents();
 		else
-			title += "\n[more text...]";
+			title += "\n[more...]";
 
 		Text node = null;
 		if (note.getTagDisplay() != null) {
@@ -2534,7 +2534,7 @@ public class Window3DController {
 							if (note.isExpandedInScene())
 								picked.setText(note.getTagName() + ": " + note.getTagContents());
 							else
-								picked.setText(note.getTagName() + "\n[more text...]");
+								picked.setText(note.getTagName() + "\n[more...]");
 						}
 					}
 				}
