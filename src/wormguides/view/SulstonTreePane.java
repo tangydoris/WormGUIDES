@@ -49,6 +49,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
@@ -67,7 +68,7 @@ public class SulstonTreePane extends ScrollPane {
 	private int maxX = 0; // global to class to keep track of current x layout
 	// position
 	private ObservableList<Rule> rules;
-	private Pane mainPane;
+	private AnchorPane mainPane;
 	private Group zoomGroup;
 
 	// Node content;
@@ -90,69 +91,50 @@ public class SulstonTreePane extends ScrollPane {
 
 	private Stage ownStage;
 
-	private Pane canvas;
+	private AnchorPane canvas;
 	private final static int timeLabelOffsetX = 20;
 
 	private final static int timeOffset = 19;
 
-	EventHandler<MouseEvent> handler = new EventHandler<MouseEvent>() {
-
-		@Override
-		public void handle(MouseEvent event) {
-			String sourceName = ((Node) event.getSource()).getId();
-
-			// right click
-			if (event.getButton() == MouseButton.SECONDARY
-					|| (event.getButton() == MouseButton.PRIMARY && (event.isControlDown() || event.isMetaDown()))) {
-				showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
-			}
-
-			// left click
-			else if (event.getButton() == MouseButton.PRIMARY) {
-				contextMenuStage.hide();
-
-				resetSelectedNameLabeled(sourceName);
-
-				if (hiddenNodes.contains(sourceName))
-					hiddenNodes.remove(sourceName);
-				else
-					hiddenNodes.add(sourceName);
-				updateDrawing();
-			}
-		}
-
-	};
-
-	public SulstonTreePane() {
-
-	}
+	private EventHandler<MouseEvent> clickHandler;
 
 	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot,
 			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, ContextMenuController controller,
 			StringProperty selectedNameLabeled) {
 		super();
 
-		this.ownStage = ownStage;
-
-		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
+		clickHandler = new EventHandler<MouseEvent>() {
 			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
-					Number newStageWidth) {
-				if (canvas != null)
-					canvas.setPrefWidth(newStageWidth.doubleValue());
-			}
-		});
+			public void handle(MouseEvent event) {
+				String sourceName = ((Node) event.getSource()).getId();
 
-		ownStage.heightProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageHeight,
-					Number newStageHeight) {
-				if (canvas != null) {
-					canvas.setPrefHeight(newStageHeight.doubleValue());
-					;
+				// right click
+				if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
+						&& (event.isControlDown() || event.isMetaDown()))) {
+					showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
+				}
+
+				// left click
+				else if (event.getButton() == MouseButton.PRIMARY) {
+					contextMenuStage.hide();
+
+					resetSelectedNameLabeled(sourceName);
+
+					if (hiddenNodes.contains(sourceName))
+						hiddenNodes.remove(sourceName);
+					else
+						hiddenNodes.add(sourceName);
+
+					updateDrawing();
 				}
 			}
-		});
+		};
+
+		this.ownStage = ownStage;
+
+		canvas = new AnchorPane();
+		mainPane = canvas;
+		this.data = data;
 
 		this.time = time;
 		time.addListener(new ChangeListener<Number>() {
@@ -187,7 +169,6 @@ public class SulstonTreePane extends ScrollPane {
 							});
 						}
 					}
-
 					if (change.wasRemoved())
 						updateColoring();
 				}
@@ -197,27 +178,23 @@ public class SulstonTreePane extends ScrollPane {
 		nameXUseMap = new HashMap<String, Integer>();
 		nameYStartUseMap = new HashMap<String, Integer>();
 
-		canvas = new Pane();
-		canvas.setStyle("-fx-background-color: #e1e1ea;");
-		this.data = data;
-		mainPane = canvas;
-
 		// zooming
-		// TODO
 		scaleTransform = new Scale(1.75, 1.75, 0, 0);
 		Group contentGroup = new Group();
+		// TODO
 		zoomGroup = new Group();
 		contentGroup.getChildren().add(zoomGroup);
+		// TODO
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
 
 		canvas.setVisible(true);
+		canvas.setPrefSize(750, 800);
 
 		this.getChildren().add(contentGroup);
 		this.setPannable(true);
 
 		addLines(lineageTreeRoot, canvas);
-		this.setPrefSize(400, 700);
 
 		// add controls for zoom
 		Button plus = new Button();
@@ -225,18 +202,18 @@ public class SulstonTreePane extends ScrollPane {
 		plus.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
 		plus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
 				+ "-fx-background-color: transparent;");
-		plus.setPrefSize(30, 30);
-		plus.setMaxSize(30, 30);
-		plus.setMinSize(30, 30);
+		plus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		plus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		plus.setMinSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 
 		Button minus = new Button();
 		minus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		minus.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
 		minus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
 				+ "-fx-background-color: transparent;");
-		minus.setPrefSize(30, 30);
-		minus.setMaxSize(30, 30);
-		minus.setMinSize(30, 30);
+		minus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		minus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		minus.setMinSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 
 		contentGroup.getChildren().add(plus);
 		contentGroup.getChildren().add(minus);
@@ -260,7 +237,8 @@ public class SulstonTreePane extends ScrollPane {
 		});
 
 		Pane yetanotherlevel = new Pane();
-		yetanotherlevel.setStyle("-fx-background-color: #e1e1ea;");
+		// TODO
+		// yetanotherlevel.setStyle("-fx-background-color: #e1e1ea;");
 		yetanotherlevel.getChildren().add(contentGroup);
 		this.setContent(yetanotherlevel);
 
@@ -273,6 +251,31 @@ public class SulstonTreePane extends ScrollPane {
 		this.selectedNameLabeled = selectedNameLabeled;
 
 		updateColoring();
+	}
+
+	/**
+	 * Called by {@link RootLayoutController} to resizes this scrollpane and
+	 * canvas to fit the window. Gets rid of extraneous space outside of the
+	 * tree.
+	 */
+	public void resizeStageContents() {
+		ownStage.widthProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageWidth,
+					Number newStageWidth) {
+				canvas.setPrefWidth(newStageWidth.doubleValue());
+			}
+		});
+		canvas.setPrefWidth(ownStage.widthProperty().get());
+
+		ownStage.heightProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldStageHeight,
+					Number newStageHeight) {
+				canvas.setPrefHeight(newStageHeight.doubleValue());
+			}
+		});
+		canvas.setPrefHeight(ownStage.heightProperty().get());
 	}
 
 	private void resetSelectedNameLabeled(String name) {
@@ -424,7 +427,6 @@ public class SulstonTreePane extends ScrollPane {
 
 	private void updateDrawing() {
 		// clear drawing
-		// System.out.println("update drawing");
 		mainPane.getChildren().clear();
 		maxX = 0;
 		// update drawing
@@ -555,7 +557,7 @@ public class SulstonTreePane extends ScrollPane {
 			hackTooltipStartTiming(t, ttduration);
 			Tooltip.install(lcell, t);
 			lcell.setId(cellName);
-			lcell.setOnMousePressed(handler);
+			lcell.setOnMousePressed(clickHandler);
 			if (done) { // this is a collapsed node not a terminal cell
 				// System.out.println("done rendering");
 				Circle circle = new Circle(2, Color.BLACK);
@@ -565,7 +567,7 @@ public class SulstonTreePane extends ScrollPane {
 				Tooltip.install(circle, t);
 				circle.setId(cellName);
 				mainPane.getChildren().add(circle);
-				circle.setOnMousePressed(handler);
+				circle.setOnMousePressed(clickHandler);
 			}
 			mainPane.getChildren().add(lcell);
 			int offsetx = 2;
@@ -615,7 +617,7 @@ public class SulstonTreePane extends ScrollPane {
 		if (!(lcolor == null))
 			lcell.setStroke(lcolor); // first for now
 
-		lcell.setOnMousePressed(handler);// handler for collapse
+		lcell.setOnMousePressed(clickHandler);// handler for collapse
 		lcell.setId(cellName);
 		Tooltip t = new Tooltip(cellName);
 		hackTooltipStartTiming(t, ttduration);
@@ -642,4 +644,5 @@ public class SulstonTreePane extends ScrollPane {
 		}
 	}
 
+	private final int ZOOM_BUTTON_SIZE = 30;
 }
