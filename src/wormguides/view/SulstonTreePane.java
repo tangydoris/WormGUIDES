@@ -52,6 +52,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -82,7 +83,7 @@ public class SulstonTreePane extends ScrollPane {
 	// branch gap
 	// seems to be some multiple of this?
 
-	private int iXmax = 19; // left margin
+	private int iXmax = 25; // left margin
 	private int iYmin = 19;
 
 	private Stage contextMenuStage;
@@ -181,9 +182,9 @@ public class SulstonTreePane extends ScrollPane {
 		// zooming
 		scaleTransform = new Scale(1.75, 1.75, 0, 0);
 		Group contentGroup = new Group();
-		
+
 		zoomGroup = new Group();
-		
+
 		contentGroup.getChildren().add(zoomGroup);
 		zoomGroup.getChildren().add(canvas);
 		zoomGroup.getTransforms().add(scaleTransform);
@@ -197,6 +198,11 @@ public class SulstonTreePane extends ScrollPane {
 		addLines(lineageTreeRoot, canvas);
 
 		// add controls for zoom
+		DropShadow shadow = new DropShadow();
+		shadow.setRadius(5);
+		shadow.setOffsetX(3);
+		shadow.setOffsetY(3);
+		shadow.setColor(ZOOM_BUTTONS_SHADOW_COLOR);
 		Button plus = new Button();
 		plus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		plus.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
@@ -205,6 +211,7 @@ public class SulstonTreePane extends ScrollPane {
 		plus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		plus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		plus.setMinSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		plus.setEffect(shadow);
 
 		Button minus = new Button();
 		minus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -214,6 +221,7 @@ public class SulstonTreePane extends ScrollPane {
 		minus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		minus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		minus.setMinSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
+		minus.setEffect(shadow);
 
 		contentGroup.getChildren().add(plus);
 		contentGroup.getChildren().add(minus);
@@ -373,7 +381,6 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setEndY(iYmin + time.getValue());
 		timeIndicatorBar.setStartY(iYmin + time.getValue());
 		timeIndicator.setY(iYmin + time.getValue());
-
 		timeIndicator.setText(Integer.toString(time.get() + timeOffset));
 	}
 
@@ -465,7 +472,8 @@ public class SulstonTreePane extends ScrollPane {
 		int x = recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
 		// add time indicator bar
 		int timevalue = time.getValue();
-		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax * 2, iYmin + timevalue);
+		// TODO
+		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax, iYmin + timevalue);
 		timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicatorBar.setId("time");
 
@@ -646,5 +654,6 @@ public class SulstonTreePane extends ScrollPane {
 
 	private final int ZOOM_BUTTON_SIZE = 30;
 	private final double DEFAULT_WINDOW_HEIGHT = 820;
-	private final double DEFAULT_WINDOW_WIDTH = 750;
+	private final double DEFAULT_WINDOW_WIDTH = 775;
+	private final Color ZOOM_BUTTONS_SHADOW_COLOR = Color.web("999999");
 }

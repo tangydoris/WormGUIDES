@@ -630,10 +630,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				// stop playing movie when we reach the end time
+				timeSlider.setValueChanging(false);
 				timeSlider.setValue(time.get());
-				if (time.get() >= window3DController.getEndTime() - 1) {
-					playButton.setGraphic(playIcon);
+				if (time.get() >= window3DController.getEndTime()) {
 					playingMovie.set(false);
+					playButton.setGraphic(playIcon);
 				}
 			}
 		});
@@ -641,10 +643,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				int newTime = newValue.intValue();
-				if (newTime != timeSlider.getValue() && window3DController != null) {
-					window3DController.setTime(newTime);
-					timeSlider.setValue(newTime);
+				if (timeSlider.isValueChanging()) {
+					int newTime = newValue.intValue();
+					if (newTime != timeSlider.getValue() && window3DController != null) {
+						window3DController.setTime(newTime);
+						timeSlider.setValue(newTime);
+					}
 				}
 			}
 		});
@@ -826,18 +830,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		zoomInButton.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
 		zoomOutButton.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
 
-		this.playIcon = ImageLoader.getPlayIcon();
-		this.pauseIcon = ImageLoader.getPauseIcon();
+		playIcon = ImageLoader.getPlayIcon();
+		pauseIcon = ImageLoader.getPauseIcon();
 		playButton.setGraphic(playIcon);
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (playingMovie.get()) {
-					playButton.setGraphic(playIcon);
-				} else {
-					playButton.setGraphic(pauseIcon);
-				}
 				playingMovie.set(!playingMovie.get());
+
+				if (playingMovie.get())
+					playButton.setGraphic(playIcon);
+				else
+					playButton.setGraphic(pauseIcon);
 			}
 		});
 	}
@@ -1174,5 +1178,5 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	 * Delay time in seconds before the application updates to the new time on
 	 * the slider
 	 */
-	private final double TIME_SLIDER_TIME_DELAY = 0.5;
+	//private final double TIME_SLIDER_TIME_DELAY = 0.5;
 }

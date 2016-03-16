@@ -1954,10 +1954,6 @@ public class Window3DController {
 	 * When called, a snapshot of the screen is saved
 	 */
 	public void stillscreenCapture() {
-		/*
-		 * TODO Open file save chooser
-		 */
-
 		Stage fileChooserStage = new Stage();
 
 		FileChooser fileChooser = new FileChooser();
@@ -2070,8 +2066,6 @@ public class Window3DController {
 
 	public void setTime(int t) {
 		if (startTime <= t && t <= endTime) {
-			// TODO
-			System.out.println("end time internal - " + endTime);
 			hideContextPopups();
 			time.set(t);
 		}
@@ -2345,11 +2339,8 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				hideContextPopups();
-				if (!playingMovie.get()) {
-					int t = time.get();
-					if (t >= 1 && t < getEndTime())
-						setTime(time.get() + 1);
-				}
+				if (!playingMovie.get())
+					setTime(time.get() + 1);
 			}
 		};
 	}
@@ -2427,10 +2418,7 @@ public class Window3DController {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								if (time.get() <= endTime)
-									setTime(time.get() + 1);
-								else
-									setTime(endTime);
+								setTime(time.get() + 1);
 							}
 						});
 						try {
