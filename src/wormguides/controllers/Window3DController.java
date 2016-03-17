@@ -1493,23 +1493,17 @@ public class Window3DController {
 		// mesh view label
 		for (int i = 0; i < currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-					&& currentSceneElementMeshes.get(i) != null) {
-				if (currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
-					//System.out.println("found mesh - " + currentSceneElements.get(i).getSceneName() + " bounds - "
-					//		+ currentSceneElementMeshes.get(i).getBoundsInParent().toString());
-					return currentSceneElementMeshes.get(i);
-				}
-			}
+					&& currentSceneElementMeshes.get(i) != null
+					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0)
+				return currentSceneElementMeshes.get(i);
 		}
+
 		// sphere label
 		for (int i = 0; i < cellNames.length; i++) {
-			if (spheres[i] != null) {
-				if (cellNames[i].equalsIgnoreCase(name)) {
-					//System.out.println("found sphere - " + cellNames[i]);
-					return spheres[i];
-				}
-			}
+			if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name))
+				return spheres[i];
 		}
+
 		return null;
 	}
 
@@ -2023,7 +2017,12 @@ public class Window3DController {
 		});
 	}
 
-	// Sets transparent anchor pane overlay for sprite notes display
+	/**
+	 * Sets transparent anchor pane overlay for sprite notes display
+	 * 
+	 * @param parentPane
+	 *            The {@link AnchorPane} in which labels and sprites reside
+	 */
 	public void setNotesPane(AnchorPane parentPane) {
 		if (parentPane != null) {
 			spritesPane = parentPane;

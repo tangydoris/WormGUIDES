@@ -57,7 +57,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
 		String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName()
-		+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 
@@ -101,7 +101,8 @@ public class InfoWindowDOM {
 		HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
 		// view in wiring diagram
 		HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
-		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "", "<em> View in Wiring Diagram Network:  (image is placeholder for interactive wiring diagram rendering)</em>");
+		HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "",
+				"<em> View in Wiring Diagram Network:  (image is placeholder for interactive wiring diagram rendering)</em>");
 		HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
 		viewWDDiv.addChild(viewWDP);
 		viewWDDiv.addChild(viewWDImg);
@@ -310,8 +311,9 @@ public class InfoWindowDOM {
 		/*
 		 * TODO cytoshow stub
 		 */
-//		HTMLNode liSTUB = new HTMLNode("li", "", "", "Cytoshow: [cytoshow link to this cell in EM data]");
-//		linksUL.addChild(liSTUB);
+		// HTMLNode liSTUB = new HTMLNode("li", "", "", "Cytoshow: [cytoshow
+		// link to this cell in EM data]");
+		// linksUL.addChild(liSTUB);
 
 		linksDiv.addChild(linksUL);
 
@@ -370,26 +372,15 @@ public class InfoWindowDOM {
 		productionInfoDiv.addChild(productionInfoUL);
 
 		if (isneuronpage) {
-			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;"); // will
-			// contain
-			// external
-			// info
-			// and
-			// parts
-			// list
-			// description.
-			// float
-			// left
-			// for
-			// img
-			// on
-			// right
+			HTMLNode topContainerDiv = new HTMLNode("div", "topContainer", "width: 50%; height: 10%; float: left;");
+			// will contain external info and parts list description.
+			// float left for img on right
 
 			topContainerDiv.addChild(cellNameDiv);
 			topContainerDiv.addChild(partsListDescrDiv);
 			// add divs to body
 			body.addChild(topContainerDiv);
-//			System.out.println("image text not null - " + imagetext);
+			// System.out.println("image text not null - " + imagetext);
 			body.addChild(imgDiv);
 			if (functionFound) {
 				body.addChild(functionWORMATLASTopContainerDiv);
@@ -399,7 +390,6 @@ public class InfoWindowDOM {
 			body.addChild(cellNameDiv);
 			body.addChild(partsListDescrDiv);
 		}
-
 
 		// anatomy --> only build if anatomy info present
 		if (terminalCase.getHasAnatomyFlag()) {
@@ -413,11 +403,13 @@ public class InfoWindowDOM {
 			HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "height: 0px; visibility: hidden;");
 			HTMLNode anatomyUL = new HTMLNode("ul");
 			ArrayList<String> anatomy = terminalCase.getAnatomy();
-			/* there are 5 fields: name, type, location, function, neurotransmitter
-			 * we'll add labels to the data based on corresponding indices i.e. 0-4
-			 * if a data value is '*' it indicates that the field is N/A and we'll skip those cases
+			/*
+			 * there are 5 fields: name, type, location, function,
+			 * neurotransmitter we'll add labels to the data based on
+			 * corresponding indices i.e. 0-4 if a data value is '*' it
+			 * indicates that the field is N/A and we'll skip those cases
 			 */
-			if (anatomy.size() == 7) { //we won't add name
+			if (anatomy.size() == 7) { // we won't add name
 				String type = anatomy.get(1);
 				String somaLocation = anatomy.get(2);
 				String neuriteLocation = anatomy.get(3);
@@ -428,11 +420,11 @@ public class InfoWindowDOM {
 				boolean hasAmphidLink = false;
 
 				if (!type.equals("*")) {
-					//check for keyword: 'amphid'
+					// check for keyword: 'amphid'
 					if (type.toLowerCase().contains(AMPHID)) {
 						hasAmphidLink = true;
 
-						//update occurences of 'amphid' with link
+						// update occurences of 'amphid' with link
 						type = findAndUpdateOccurencesOfAmphid(type);
 					}
 					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Type: </em>" + type));
@@ -449,7 +441,7 @@ public class InfoWindowDOM {
 				}
 
 				if (!neuriteLocation.equals("*")) {
-					//check for keyword: 'amphid'
+					// check for keyword: 'amphid'
 					if (neuriteLocation.toLowerCase().contains(AMPHID)) {
 						hasAmphidLink = true;
 
@@ -465,7 +457,8 @@ public class InfoWindowDOM {
 						morphologicalFeature = findAndUpdateOccurencesOfAmphid(morphologicalFeature);
 
 					}
-					anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Morphological Feature: </em>" + morphologicalFeature));
+					anatomyUL.addChild(
+							new HTMLNode("li", "", "", "<em>Morphological Feature: </em>" + morphologicalFeature));
 				}
 
 				if (!function.equals("*")) {
@@ -490,16 +483,20 @@ public class InfoWindowDOM {
 				anatomyDiv.addChild(anatomyUL);
 				body.addChild(anatomyTopContainerDiv);
 				body.addChild(anatomyDiv);
-				body.addChild(collapseAnatomyButton.makeCollapseButtonScript()); //add script here for scoping purposes
+				body.addChild(collapseAnatomyButton.makeCollapseButtonScript()); // add
+																					// script
+																					// here
+																					// for
+																					// scoping
+																					// purposes
 
-				//check if link handler for amphid is needed
+				// check if link handler for amphid is needed
 				if (hasAmphidLink) {
-					//add amphid link controller script
+					// add amphid link controller script
 					body.addChild(anatomyDiv.handleAmphidClickScript());
 				}
 			}
 		}
-
 
 		// only add this section if its contents exist
 		if (isneuronpage) {
@@ -557,7 +554,7 @@ public class InfoWindowDOM {
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
 		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName()
-		+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
+				+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
 		cellNameDiv.addChild(cellNameP);
 
@@ -607,7 +604,7 @@ public class InfoWindowDOM {
 
 			if (functionalName != null) {
 				descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName()
-				+ ")</strong>";
+						+ ")</strong>";
 			} else {
 				descendant = "<strong>" + terminalDescendant.getCellName() + "</strong>";
 			}
@@ -790,7 +787,7 @@ public class InfoWindowDOM {
 	}
 
 	public InfoWindowDOM(AnatomyTermCase termCase) {
-		//build the amphid sensilla dom
+		// build the amphid sensilla dom
 		if (termCase.getName().equals(AnatomyTerm.AMPHID_SENSILLA.getTerm())) {
 
 			this.html = new HTMLNode("html");
@@ -808,21 +805,22 @@ public class InfoWindowDOM {
 
 			// wormatlas anatomy
 			HTMLNode wormatlasAnatomyTopContainerDiv = new HTMLNode("div", "wormatlasAnatomyTopContainer", "");
-			HTMLNode collapseWormatlasAnatomyButton = new HTMLNode("button", "wormatlasAnatomyCollapse", "wormatlasAnatomyCollapseButton",
-					"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
-			HTMLNode wormatlasAnatomyTitle = new HTMLNode("p", "wormatlasAnatomyTitle", "width: 95%; margin-top: 2%; float: left;",
-					"<strong> Wormatlas Anatomy: </strong>");
+			HTMLNode collapseWormatlasAnatomyButton = new HTMLNode("button", "wormatlasAnatomyCollapse",
+					"wormatlasAnatomyCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+					true);
+			HTMLNode wormatlasAnatomyTitle = new HTMLNode("p", "wormatlasAnatomyTitle",
+					"width: 95%; margin-top: 2%; float: left;", "<strong> Wormatlas Anatomy: </strong>");
 			wormatlasAnatomyTopContainerDiv.addChild(collapseWormatlasAnatomyButton);
 			wormatlasAnatomyTopContainerDiv.addChild(wormatlasAnatomyTitle);
 			HTMLNode wormatlasAnatomyDiv = new HTMLNode("div", "wormatlasAnatomy", "height: 0px; visibility: hidden;");
 			HTMLNode wormatlasAnatomyUL = new HTMLNode("ul");
-			
-			String wormatlastAnchor1 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink1() + "\" onclick=\"handleLink(this)\">"
-					+ termCase.getWormatlasLink1() + "</a>";
-			
-			String wormatlastAnchor2 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink2() + "\" onclick=\"handleLink(this)\">"
-					+ termCase.getWormatlasLink2() + "</a>";
-			
+
+			String wormatlastAnchor1 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink1()
+					+ "\" onclick=\"handleLink(this)\">" + termCase.getWormatlasLink1() + "</a>";
+
+			String wormatlastAnchor2 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink2()
+					+ "\" onclick=\"handleLink(this)\">" + termCase.getWormatlasLink2() + "</a>";
+
 			HTMLNode li1 = new HTMLNode("li", "", "", wormatlastAnchor1);
 			HTMLNode li2 = new HTMLNode("li", "", "", wormatlastAnchor2);
 			wormatlasAnatomyUL.addChild(li1);
@@ -831,10 +829,11 @@ public class InfoWindowDOM {
 
 			// amphid cells
 			HTMLNode amphidCellsTopContainerDiv = new HTMLNode("div", "amphidCellsTopContainer", "");
-			HTMLNode collapseAmphidCellsButton = new HTMLNode("button", "amphidCellsCollapse", "amphidCellsCollapseButton",
-					"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
-			HTMLNode amphidCellsTitle = new HTMLNode("p", "amphidCellsTitle", "width: 95%; margin-top: 2%; float: left;",
-					"<strong> Amphid Cells: </strong>");
+			HTMLNode collapseAmphidCellsButton = new HTMLNode("button", "amphidCellsCollapse",
+					"amphidCellsCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+					true);
+			HTMLNode amphidCellsTitle = new HTMLNode("p", "amphidCellsTitle",
+					"width: 95%; margin-top: 2%; float: left;", "<strong> Amphid Cells: </strong>");
 			amphidCellsTopContainerDiv.addChild(collapseAmphidCellsButton);
 			amphidCellsTopContainerDiv.addChild(amphidCellsTitle);
 			HTMLNode amphidCellsDiv = new HTMLNode("div", "amphidCells", "height: 0px; visibility: hidden;");
@@ -849,24 +848,23 @@ public class InfoWindowDOM {
 			amphidCellsTable.addChild(amphidCellsTHR);
 			for (String amphidCell : termCase.getAmphidCells()) {
 				HTMLNode tr = new HTMLNode("tr");
-				
+
 				int funcNameIdx = amphidCell.indexOf("*");
 				String funcName = amphidCell.substring(0, amphidCell.indexOf("*", 0));
-				
-				int lineageNameIdx = amphidCell.indexOf("*", funcNameIdx+1);
-				String lineageName = amphidCell.substring(funcNameIdx+1, lineageNameIdx);
-				
-				String acDescription = amphidCell.substring(lineageNameIdx+1);
-				
+
+				int lineageNameIdx = amphidCell.indexOf("*", funcNameIdx + 1);
+				String lineageName = amphidCell.substring(funcNameIdx + 1, lineageNameIdx);
+
+				String acDescription = amphidCell.substring(lineageNameIdx + 1);
+
 				tr.addChild(new HTMLNode("td", "", "", funcName));
 				tr.addChild(new HTMLNode("td", "", "", lineageName));
 				tr.addChild(new HTMLNode("td", "", "", acDescription));
-				
+
 				amphidCellsTable.addChild(tr);
 			}
 			amphidCellsDiv.addChild(amphidCellsTable);
-			
-			
+
 			// links
 			HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
 			HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
@@ -915,8 +913,8 @@ public class InfoWindowDOM {
 				}
 			}
 			linksDiv.addChild(linksUL);
-			
-			//add divs to body
+
+			// add divs to body
 			body.addChild(termDiv);
 			body.addChild(wormatlasAnatomyTopContainerDiv);
 			body.addChild(wormatlasAnatomyDiv);
@@ -925,11 +923,11 @@ public class InfoWindowDOM {
 			body.addChild(linksTopContainerDiv);
 			body.addChild(linksDiv);
 
-			//add collapse button scripts
+			// add collapse button scripts
 			body.addChild(collapseWormatlasAnatomyButton.makeCollapseButtonScript());
 			body.addChild(collapseAmphidCellsButton.makeCollapseButtonScript());
 			body.addChild(collapseLinksButton.makeCollapseButtonScript());
-			
+
 			// add link controller
 			body.addChild(body.addLinkHandlerScript());
 
@@ -1002,8 +1000,10 @@ public class InfoWindowDOM {
 	 * attributes from children - only called if node is body tag and if body
 	 * has children
 	 * 
-	 * @param node the body node in which to search for nodes with style
-	 * @return all of the styles formatted as a string to go into a node in the head
+	 * @param node
+	 *            the body node in which to search for nodes with style
+	 * @return all of the styles formatted as a string to go into a node in the
+	 *         head
 	 */
 	private String findStyleInSubTree(HTMLNode node) {
 		String style = "";
@@ -1034,7 +1034,8 @@ public class InfoWindowDOM {
 	/**
 	 * Formats a style attribute for a specific node
 	 * 
-	 * @param node the node to build a style attribute for
+	 * @param node
+	 *            the node to build a style attribute for
 	 * @return a string representation of the style for the style node
 	 */
 	private String styleAsStr(HTMLNode node) {
@@ -1042,13 +1043,15 @@ public class InfoWindowDOM {
 	}
 
 	/**
-	 * Finds all occurences of 'amphid' and replaces with a link using addAmphidLink()
+	 * Finds all occurences of 'amphid' and replaces with a link using
+	 * addAmphidLink()
 	 * 
-	 * @param str the string to be searched
+	 * @param str
+	 *            the string to be searched
 	 * @return the updated string with links
 	 */
 	private String findAndUpdateOccurencesOfAmphid(String str) {
-		//find all occurences of "Amphid" and add anchor at each point
+		// find all occurences of "Amphid" and add anchor at each point
 		int idx = str.toLowerCase().indexOf(AMPHID);
 		while (idx != -1) {
 			str = addAmphidLink(str, idx);
@@ -1063,13 +1066,15 @@ public class InfoWindowDOM {
 	 * Adds an <a> to an anatomy section which contains the keyword "Amphid"
 	 * These links will generate a new info window page of the Amphid type
 	 * 
-	 * @param anatomyInfo the section which the link will be added to
+	 * @param anatomyInfo
+	 *            the section which the link will be added to
 	 * @return updated anatomyInfo with link
 	 */
 	private String addAmphidLink(String anatomyInfo, int idx) {
-		if (idx == -1) return anatomyInfo;
+		if (idx == -1)
+			return anatomyInfo;
 
-		String updated = anatomyInfo.substring(0, idx) + amphidAnchor + anatomyInfo.substring(idx+AMPHID.length());
+		String updated = anatomyInfo.substring(0, idx) + amphidAnchor + anatomyInfo.substring(idx + AMPHID.length());
 
 		return updated;
 	}

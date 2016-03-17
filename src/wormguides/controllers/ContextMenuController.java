@@ -196,6 +196,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 							}
 							return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
 						}
+						
 						return null;
 					};
 				};
