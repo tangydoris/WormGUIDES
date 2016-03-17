@@ -676,8 +676,8 @@ public class Window3DController {
 		}
 	}
 
-	/*
-	 * Remove transient label from sprites pane
+	/**
+	 * Removes transient label from sprites pane.
 	 */
 	private void removeTransientLabel() {
 		spritesPane.getChildren().remove(transientLabelText);
@@ -1336,7 +1336,7 @@ public class Window3DController {
 						String name = normalizeName(se.getSceneName());
 
 						if (!currentLabels.contains(name.toLowerCase()))
-							showTransientLabel(name, mesh);
+							showTransientLabel(name, getEntityWithName(name));
 					}
 				});
 				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -1484,29 +1484,32 @@ public class Window3DController {
 			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
 	}
 
-	/*
-	 * Returns the scene 3D entity with input name Pririty is given to meshes
-	 * (if a mesh and a cell have the same name, the mesh is returned)
+	/**
+	 * @return The {@link Shape3D} entity with input name. Priority is given to
+	 *         meshes (if a mesh and a cell have the same name, the mesh is
+	 *         returned)
 	 */
 	private Shape3D getEntityWithName(String name) {
-		// give priority to spheres
-		// sphere label
-		for (int i = 0; i < cellNames.length; i++) {
-			if (spheres[i] != null) {
-				if (cellNames[i].equals(name)) {
-					return spheres[i];
-				}
-			}
-		}
-
 		// mesh view label
 		for (int i = 0; i < currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i) != null) {
-				return currentSceneElementMeshes.get(i);
+				if (currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
+					//System.out.println("found mesh - " + currentSceneElements.get(i).getSceneName() + " bounds - "
+					//		+ currentSceneElementMeshes.get(i).getBoundsInParent().toString());
+					return currentSceneElementMeshes.get(i);
+				}
 			}
 		}
-
+		// sphere label
+		for (int i = 0; i < cellNames.length; i++) {
+			if (spheres[i] != null) {
+				if (cellNames[i].equalsIgnoreCase(name)) {
+					//System.out.println("found sphere - " + cellNames[i]);
+					return spheres[i];
+				}
+			}
+		}
 		return null;
 	}
 
