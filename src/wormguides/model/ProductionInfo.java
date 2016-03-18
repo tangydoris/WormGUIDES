@@ -52,23 +52,11 @@ public class ProductionInfo {
 	public ArrayList<String> getCellShapeData(String queryCell) {
 		ArrayList<String> cellShapeData = new ArrayList<String>();
 
-		queryCell = PartsList.getFunctionalNameByLineageName(queryCell);
-
-		if (queryCell == null) {
-			return cellShapeData;
-		}
-
 		for (int i = 0; i < productionInfoData.get(0).size(); i++) {
 			String cells = productionInfoData.get(0).get(i);
 			if (cells.contains(queryCell)) {
-				cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store
-																												// strain,
-																												// marker
-																												// data
-				cellShapeData.add(productionInfoData.get(1).get(i)); // store
-																		// image
-																		// series
-																		// data
+				cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store strain, marker data
+				cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
 			}
 		}
 
