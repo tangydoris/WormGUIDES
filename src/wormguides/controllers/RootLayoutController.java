@@ -328,15 +328,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			treeStage.setScene(new Scene(sp));
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
+			treeStage.show();
+			mainStage.show();
+		} else {
+			treeStage.show();
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((Stage) treeStage.getScene().getWindow()).toFront();
+				}
+			});
 		}
-
-		treeStage.show();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				((Stage) treeStage.getScene().getWindow()).toFront();
-			}
-		});
 	}
 
 	@FXML
