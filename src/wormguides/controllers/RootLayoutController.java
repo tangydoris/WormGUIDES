@@ -1158,6 +1158,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
+		/**
+		 * TODO
+		 * 	refactor: why didn't the second line of code automatically update the time slider?
+		 */
+		timeSlider.setValue(256.);
 		window3DController.setTime(lim4StoryStartTime);
 
 		viewTreeAction();
