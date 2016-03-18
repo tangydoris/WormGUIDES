@@ -1158,7 +1158,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
-		window3DController.setTime(window3DController.getEndTime());
+		window3DController.setTime(lim4StoryStartTime);
 
 		viewTreeAction();
 
@@ -1167,6 +1167,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			window3DController.setCaptureVideo(captureVideo);
 		}
 	}
+	
+	/**
+	 * lim 4 story start time
+	 * 	TODO
+	 * 	actual start time is 256 --> 237 is with +19 offset
+	 */
+	private final static int lim4StoryStartTime = 237;
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;

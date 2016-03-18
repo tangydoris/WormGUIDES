@@ -178,7 +178,7 @@ public class StoriesLayer {
 		cellClickedProperty = window3DController.getCellClicked();
 
 		StoriesLoader.loadConfigFile(stories, timeOffset);
-		addDefaultStory();
+		addBlankStory();
 
 		noteComparator = new Comparator<Note>() {
 			@Override
@@ -196,21 +196,22 @@ public class StoriesLayer {
 			story.setComparator(noteComparator);
 			story.sortNotes();
 		}
+		
+		setActiveStory(stories.get(0)); //makes lim-4 story default
 	}
 
 	/**
-	 * Adds a blank default story upon initialization.
+	 * Adds a blank story upon initialization.
 	 */
-	private void addDefaultStory() {
-		Story defaultStory = new Story("Blank Story",
-				"This is a blank story. Create notes and " + "set custom color rules!",
+	private void addBlankStory() {
+		Story blankStory = new Story("Template to Make Your Own Story",
+				"Shows all segmented neurons without " + "further annotation.",
 				"http://scene.wormguides.org/wormguides/testurlscript?/set/ash-n$@+#ff8"
 						+ "fbc8f/rib-n$@+#ff663366/avg-n$@+#ffb41919/dd-n@+#ff4a24c1/da-"
 						+ "n@+#ffc56002/dd-n$+#ffb30a95/da-n$+#ffe6b34d/rivl-n@+#ffffb366/"
 						+ "rivr-n@+#ffffe6b3/sibd-n@+#ffe6ccff/siav-n@+#ff8099ff/view/"
 						+ "time=393/rX=51.625/rY=-2.125/rZ=0.0/tX=0.0/tY=0.0/scale=2.25/dim=0.25/browser/");
-		stories.add(defaultStory);
-		setActiveStory(defaultStory);
+		stories.add(blankStory);
 	}
 
 	/**
