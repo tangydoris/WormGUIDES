@@ -28,7 +28,6 @@ public class PartsList {
 
 			String line;
 			while ((line = br.readLine()) != null) {
-
 				String[] lineArray = line.split("\t");
 				functionalNames.add(lineArray[0].trim());
 				lineageNames.add(lineArray[1].trim());
