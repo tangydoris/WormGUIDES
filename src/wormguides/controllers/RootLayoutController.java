@@ -632,7 +632,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				timeSlider.setValue(time.get());
+				timeSlider.setValue(time.get() + productionInfo.getMovieTimeOffset());
 				if (time.get() >= window3DController.getEndTime() - 1) {
 					playButton.setGraphic(playIcon);
 					playingMovie.set(false);
@@ -645,7 +645,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				int newTime = newValue.intValue();
 				if (newTime != timeSlider.getValue() && window3DController != null)
-					window3DController.setTime(newTime);
+					window3DController.setTime(newTime - productionInfo.getMovieTimeOffset());
 			}
 		});
 
@@ -842,13 +842,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		});
 	}
 
-	private void setSlidersProperties() {
-		timeSlider.setMin(1);
-		timeSlider.setMax(window3DController.getEndTime());
-
-		opacitySlider.setMin(0);
-		opacitySlider.setMax(100);
-		opacitySlider.setValue(25);
+	private void setTimeSliderProperties() {
+		int movieOffset = productionInfo.getMovieTimeOffset();
+		timeSlider.setMin(window3DController.getStartTime() + movieOffset);
+		timeSlider.setMax(window3DController.getEndTime() + movieOffset);
+		timeSlider.setValue(window3DController.getTime() + movieOffset);
 	}
 
 	private void initSearch() {
@@ -1122,7 +1120,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		init3DWindow(lineageData);
 		setPropertiesFrom3DWindow();
 
-		setSlidersProperties();
+		setTimeSliderProperties();
 
 		initSearch();
 		ObservableList<Rule> list = displayLayer.getRulesList();
@@ -1158,27 +1156,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
-		/**
-		 * TODO
-		 * 	refactor: why didn't the second line of code automatically update the time slider?
-		 */
-		timeSlider.setValue(256.);
-		window3DController.setTime(lim4StoryStartTime);
+		window3DController.resetTime(storiesLayer.getActiveStoryStartTime());
 
 		viewTreeAction();
 
 		captureVideo = new SimpleBooleanProperty(false);
-		if (window3DController != null) {
+		if (window3DController != null)
 			window3DController.setCaptureVideo(captureVideo);
-		}
 	}
-	
-	/**
-	 * lim 4 story start time
-	 * 	TODO
-	 * 	actual start time is 256 --> 237 is with +19 offset
-	 */
-	private final static int lim4StoryStartTime = 237;
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;

@@ -119,7 +119,14 @@ import wormguides.model.SceneElementsList;
  * For coloring of entities, this class queries an observable list of rules (
  * {@link Rule}) to see which ones apply to a particular entity, then queries
  * the color hash ({@link ColorHash}) for the material ({@link PhongMaterial})
- * to use for the entity.
+ * to use for the entity.<br>
+ * <br>
+ * 
+ * This class is agnostic to the movie time offset that affects the time shown
+ * in the lower right hand corner of the subscene. This class references time
+ * frames using integers in the range 1 to the number of frames. The internal
+ * timeline data structure consists of time frames and are indexed from 0 to the
+ * number of time frames - 1.
  * 
  * @author Doris Tang
  * 
@@ -351,7 +358,8 @@ public class Window3DController {
 
 					Shape3D entity = getEntityWithName(lineageName);
 					if (entity == null) {
-						//System.out.println("no matching shape to " + lineageName);
+						// System.out.println("no matching shape to " +
+						// lineageName);
 					}
 
 					// go to labeled name
@@ -362,41 +370,37 @@ public class Window3DController {
 					endTime = Search.getLastOccurenceOf(lineageName);
 
 					if (startTime <= 0) {
-						/* 
+						/*
 						 * TODO
 						 * 
-						 * patch made below to account for discrepancy between functional and lineage names. Found with P4:
-						 * 	at frame 63 there are cells including:
-						 * 		Ea
-								Ep
-								P4 (functional name. lineage is P0.pppp)
-								ABalpp (lineage name)
-								ABalpa
+						 * patch made below to account for discrepancy between
+						 * functional and lineage names. Found with P4: at frame
+						 * 63 there are cells including: Ea Ep P4 (functional
+						 * name. lineage is P0.pppp) ABalpp (lineage name)
+						 * ABalpa
 						 * 
-						 * 		
+						 * 
 						 */
-						
-						//try functional name
+
+						// try functional name
 						startTime = Search.getFirstOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
 						if (startTime <= 0) {
 							startTime = 1;
 						}
 					}
-						
+
 					if (endTime <= 0) {
 						endTime = Search.getLastOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
 						if (endTime <= 0) {
 							endTime = 1;
 						}
 					}
-					
+
 					if (time.get() < startTime || time.get() > endTime) {
 						time.set(startTime);
-					}
-					else {
+					} else {
 						insertLabelFor(lineageName, entity);
 					}
-						
 
 					highlightActiveCellLabel(entity);
 				}
@@ -1071,7 +1075,6 @@ public class Window3DController {
 					x += hOffset;
 					y += vOffset + 5;
 				}
-
 				noteGraphic.getTransforms().add(new Translate(x, y));
 			}
 		}
@@ -2096,6 +2099,12 @@ public class Window3DController {
 		return time.get();
 	}
 
+	/**
+	 * Sets the time at which the embryo should be shown.
+	 * 
+	 * @param t
+	 *            The time that should be shown in the embryo
+	 */
 	public void setTime(int t) {
 		if (startTime <= t && t <= endTime) {
 			hideContextPopups();
@@ -2107,6 +2116,20 @@ public class Window3DController {
 
 		else if (t > endTime)
 			time.set(endTime);
+	}
+
+	/**
+	 * Called by {@link RootLayoutController} upon initialization. The Time
+	 * property needs to be set to 0 then set again to the appropriate time in
+	 * order to trigger a change event. This way, the slider gets updated when
+	 * the application sets the initial time.
+	 * 
+	 * @param t
+	 *            The time that the application should show upon startup
+	 */
+	public void resetTime(int t) {
+		setTime(startTime);
+		setTime(t);
 	}
 
 	public void setRotations(double rx, double ry, double rz) {

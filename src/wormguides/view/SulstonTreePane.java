@@ -637,18 +637,18 @@ public class SulstonTreePane extends ScrollPane {
 								});
 							}
 						}
-//						if (change.wasRemoved())
-//							updateColoring();
 					}
 				}
 			});
 		}
 	}
 	
+	/*
 	private void restart() {
 		updateDrawing();
 		updateColoring();
 	}
+	*/
 
 	// stolen from web to hack these tooltips to come up faster
 	public static void hackTooltipStartTiming(Tooltip tooltip, int duration) {

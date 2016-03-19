@@ -438,18 +438,18 @@
                                                             <Font size="14.0" />
                                                          </font>
                                                       </CheckBox>
+                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Slider fx:id="opacitySlider" minorTickCount="5" value="25.0" VBox.vgrow="ALWAYS" />
                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Coloring Layers:">
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font>
                                                       </Label>
                                                       <ListView fx:id="rulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
-                                                      <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Visibility for Other Cells:">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Label>
-                                                      <Slider fx:id="opacitySlider" value="50.0" VBox.vgrow="ALWAYS" />
                                                    </children>
                                                 </VBox>
                                              </children>
@@ -492,7 +492,7 @@
                                     <Button id="backwardButton" fx:id="backwardButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
                                     <Button id="playButton" fx:id="playButton" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
                                     <Button id="forwardButton" fx:id="forwardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
-                                    <Slider fx:id="timeSlider" focusTraversable="false" maxWidth="1.7976931348623157E308" prefHeight="30.0" HBox.hgrow="ALWAYS" />
+                                    <Slider fx:id="timeSlider" blockIncrement="5.0" focusTraversable="false" majorTickUnit="50.0" maxWidth="1.7976931348623157E308" min="1.0" minorTickCount="5" prefHeight="30.0" value="1.0" HBox.hgrow="ALWAYS" />
                                     <Button fx:id="zoomOutButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
                                     <Button fx:id="zoomInButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" />
                                  </children>
@@ -503,7 +503,7 @@
                            <children>
                               <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <VBox maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER">
+                                    <VBox maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
                                        <children>
                                           <HBox>
                                              <children>
@@ -528,7 +528,6 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </Text>
-                                          <Region />
                                           <Text fx:id="displayedStory" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Active Story: none">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
@@ -544,7 +543,7 @@
                                           <Insets top="10.0" />
                                        </BorderPane.margin>
                                        <padding>
-                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </padding>
                                     </VBox>
                                  </content>
