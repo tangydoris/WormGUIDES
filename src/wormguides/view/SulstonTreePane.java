@@ -152,29 +152,7 @@ public class SulstonTreePane extends ScrollPane {
 		this.colorHash = colorHash;
 		this.lineageTreeRoot = lineageTreeRoot;
 
-		rules.addListener(new ListChangeListener<Rule>() {
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends Rule> change) {
-				while (change.next()) {
-					if (change.getAddedSize() > 0) {
-						updateColoring();
-
-						for (Rule rule : change.getAddedSubList()) {
-							rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
-								@Override
-								public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
-										Boolean newValue) {
-									if (newValue)
-										updateColoring();
-								}
-							});
-						}
-					}
-					if (change.wasRemoved())
-						updateColoring();
-				}
-			}
-		});
+		setRulesListener();
 
 		nameXUseMap = new HashMap<String, Integer>();
 		nameYStartUseMap = new HashMap<String, Integer>();
@@ -491,8 +469,16 @@ public class SulstonTreePane extends ScrollPane {
 			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname))
+				
+				//this occurs because the wormbase search thread hasn't finished yet
+				if (rule.getSearchType().equals(SearchType.GENE) && rule.getCells().isEmpty()) {
+					
+				}
+				
+				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname)) {
 					colors.add(rule.getColor());
+				}
+					
 			}
 			Collections.sort(colors, new ColorComparator());
 
@@ -629,6 +615,39 @@ public class SulstonTreePane extends ScrollPane {
 		Tooltip.install(lcell, t);
 		mainPane.getChildren().add(lcell);
 		return x;
+	}
+	
+	private void setRulesListener() {
+		if (this.rules != null) {
+			this.rules.addListener(new ListChangeListener<Rule>() {
+				@Override
+				public void onChanged(ListChangeListener.Change<? extends Rule> change) {
+					while (change.next()) {
+						updateColoring();
+						if (change.getAddedSize() > 0) {
+							for (Rule rule : change.getAddedSubList()) {
+								rule.getRuleChangedProperty().addListener(new ChangeListener<Boolean>() {
+									@Override
+									public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+											Boolean newValue) {
+										if (newValue) {
+											updateColoring();
+										}
+									}
+								});
+							}
+						}
+//						if (change.wasRemoved())
+//							updateColoring();
+					}
+				}
+			});
+		}
+	}
+	
+	private void restart() {
+		updateDrawing();
+		updateColoring();
 	}
 
 	// stolen from web to hack these tooltips to come up faster

@@ -350,6 +350,9 @@ public class Window3DController {
 						allLabels.add(lineageName);
 
 					Shape3D entity = getEntityWithName(lineageName);
+					if (entity == null) {
+						//System.out.println("no matching shape to " + lineageName);
+					}
 
 					// go to labeled name
 					int startTime;
@@ -358,16 +361,42 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
-					if (startTime <= 0)
-						startTime = 1;
-					if (endTime <= 0)
-						endTime = 1;
-
-					if (time.get() < startTime || time.get() > endTime)
+					if (startTime <= 0) {
+						/* 
+						 * TODO
+						 * 
+						 * patch made below to account for discrepancy between functional and lineage names. Found with P4:
+						 * 	at frame 63 there are cells including:
+						 * 		Ea
+								Ep
+								P4 (functional name. lineage is P0.pppp)
+								ABalpp (lineage name)
+								ABalpa
+						 * 
+						 * 		
+						 */
+						
+						//try functional name
+						startTime = Search.getFirstOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
+						if (startTime <= 0) {
+							startTime = 1;
+						}
+					}
+						
+					if (endTime <= 0) {
+						endTime = Search.getLastOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
+						if (endTime <= 0) {
+							endTime = 1;
+						}
+					}
+					
+					if (time.get() < startTime || time.get() > endTime) {
 						time.set(startTime);
-
-					else
+					}
+					else {
 						insertLabelFor(lineageName, entity);
+					}
+						
 
 					highlightActiveCellLabel(entity);
 				}
@@ -1500,8 +1529,9 @@ public class Window3DController {
 
 		// sphere label
 		for (int i = 0; i < cellNames.length; i++) {
-			if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name))
+			if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name)) {
 				return spheres[i];
+			}
 		}
 
 		return null;

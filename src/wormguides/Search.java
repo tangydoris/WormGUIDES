@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -321,6 +322,10 @@ public class Search {
 	public void clearRules() {
 		rulesList.clear();
 	}
+	
+	public static ObservableList<Rule> getRules() {
+		return rulesList;
+	}
 
 	public static Rule addMulticellularStructureRule(String searched, Color color) {
 		return addColorRule(null, searched, color, SearchOption.MULTICELLULAR_NAME_BASED);
@@ -399,13 +404,19 @@ public class Search {
 
 		ArrayList<String> cells;
 
-		if (type == SearchType.GENE)
-			WormBaseQuery.doSearch(searched);
-
-		else {
+		/**
+		 * TODO
+		 *  Why is the search done twice? If the color rule is being added, the gene search results have populated the list view
+		 */
+//		if (type == SearchType.GENE) {
+//			if (searchResultsList.isEmpty()) {
+//				WormBaseQuery.doSearch(searched);
+//			}
+//		} 
+//		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
-		}
+//		}
 
 		rulesList.add(rule);
 		searchResultsList.clear();
@@ -495,6 +506,7 @@ public class Search {
 				if (isGeneFormat(getSearchedText())) {
 					showLoadingService.restart();
 					WormBaseQuery.doSearch(getSearchedText());
+					cells = new ArrayList<String>(searchResultsList);
 				}
 				break;
 

@@ -328,15 +328,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			treeStage.setScene(new Scene(sp));
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
+			treeStage.show();
+			mainStage.show();
+		} else {
+			treeStage.show();
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((Stage) treeStage.getScene().getWindow()).toFront();
+				}
+			});
 		}
-
-		treeStage.show();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				((Stage) treeStage.getScene().getWindow()).toFront();
-			}
-		});
 	}
 
 	@FXML
@@ -1156,7 +1158,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
-		window3DController.setTime(window3DController.getEndTime());
+		/**
+		 * TODO
+		 * 	refactor: why didn't the second line of code automatically update the time slider?
+		 */
+		timeSlider.setValue(256.);
+		window3DController.setTime(lim4StoryStartTime);
 
 		viewTreeAction();
 
@@ -1165,6 +1172,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			window3DController.setCaptureVideo(captureVideo);
 		}
 	}
+	
+	/**
+	 * lim 4 story start time
+	 * 	TODO
+	 * 	actual start time is 256 --> 237 is with +19 offset
+	 */
+	private final static int lim4StoryStartTime = 237;
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;

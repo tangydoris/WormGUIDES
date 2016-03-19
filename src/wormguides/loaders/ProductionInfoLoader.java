@@ -8,8 +8,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+
+/**
+ * 
+ * Syntax rules for config file:
+ * 	- Replace ',' with ';' to support StringTokenizer with ',' delimeter (.csv file)
+ * 
+ * @author bradenkatzman
+ *
+ */
 public class ProductionInfoLoader {
 
+	/**
+	 * Tokenizes each line in the config file and creates a 2D array of the file
+	 * 
+	 * @return the 2D array
+	 */
 	public static ArrayList<ArrayList<String>> buildProductionInfo() {
 
 		URL url = ProductionInfoLoader.class.getResource("/wormguides/model/production_info_file/Production_Info.csv");
