@@ -2400,15 +2400,6 @@ public class Window3DController {
 		};
 	}
 
-	public EventHandler<ActionEvent> getUpdate3DListener() {
-		return new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-
-			}
-		};
-	}
-
 	/**
 	 * This method returns the {@link ChangeListener} that listens for the
 	 * {@link BooleanProperty} that changes when 'uniform nucleus' is

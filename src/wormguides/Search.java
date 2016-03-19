@@ -133,6 +133,7 @@ public class Search {
 					searchResultsList.clear();
 				}
 			});
+
 			geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				@Override
 				public void handle(WorkerStateEvent event) {

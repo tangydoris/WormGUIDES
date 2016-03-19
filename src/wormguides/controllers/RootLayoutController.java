@@ -633,10 +633,20 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				timeSlider.setValue(time.get() + productionInfo.getMovieTimeOffset());
-				if (time.get() >= window3DController.getEndTime() - 1) {
-					playButton.setGraphic(playIcon);
+				if (time.get() >= window3DController.getEndTime()) {
+					window3DController.setTime(window3DController.getEndTime());
 					playingMovie.set(false);
 				}
+			}
+		});
+
+		playingMovie.addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (newValue)
+					playButton.setGraphic(pauseIcon);
+				else
+					playButton.setGraphic(playIcon);
 			}
 		});
 
@@ -829,15 +839,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		playIcon = ImageLoader.getPlayIcon();
 		pauseIcon = ImageLoader.getPauseIcon();
 		playButton.setGraphic(playIcon);
+		// TODO
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				playingMovie.set(!playingMovie.get());
 
-				if (playingMovie.get())
-					playButton.setGraphic(playIcon);
-				else
-					playButton.setGraphic(pauseIcon);
 			}
 		});
 	}
