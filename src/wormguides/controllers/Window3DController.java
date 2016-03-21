@@ -55,6 +55,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.RotateEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -262,6 +263,8 @@ public class Window3DController {
 	private DoubleProperty rotateXAngle;
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
+	
+	private Quaternion quaternion;
 
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
@@ -428,6 +431,8 @@ public class Window3DController {
 		rotateX.setOnTransformChanged(getRotateXChangeHandler());
 		rotateY.setOnTransformChanged(getRotateYChangeHandler());
 		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
+		
+		quaternion = new Quaternion();
 
 		uniformSize = false;
 
@@ -764,6 +769,26 @@ public class Window3DController {
 		else if (event.isPrimaryButtonDown()) {
 			mouseDeltaX /= 2;
 			mouseDeltaY /= 2;
+			
+			if (quaternion != null) {
+				//System.out.println(rotateX.);
+				double angleOfRotation = rotationAngleFromMouseMovement(mouseDeltaX, mouseDeltaY);
+				//quaternion.updateOnRotate(Math.toRadians(angleOfRotation));
+				
+				ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+				
+				if (eulerAngles.size() == 3) {
+					double mX = (rotateX.getAngle() + mouseDeltaY) % 360;
+					double mY = (rotateY.getAngle() - mouseDeltaX) % 360;
+//					System.out.println("Mouse x,y = " + mX + ", " + mY);
+//					System.out.println("Euler x,y = " + eulerAngles.get(0) + ", " + eulerAngles.get(1));
+//					System.out.println(" ");
+					
+//					rotateX.setAngle(eulerAngles.get(2));
+//					rotateY.setAngle(eulerAngles.get(0));
+					System.out.println(Rotate.X_AXIS);
+				}
+			}
 
 			rotateX.setAngle((rotateX.getAngle() + mouseDeltaY) % 360);
 			rotateY.setAngle((rotateY.getAngle() - mouseDeltaX) % 360);
@@ -859,6 +884,16 @@ public class Window3DController {
 			selectedIndex.set(-1);
 			selectedName.set("");
 		}
+	}
+	
+	private double rotationAngleFromMouseMovement(double deltaX, double deltaY) {
+		//compute angle in radians
+		double rotationAngleRadians = Math.atan2(deltaY, deltaX);
+		
+		return rotationAngleRadians;
+		
+//		//return value in degrees
+//		return rotationAngleRadians *(180/Math.PI);
 	}
 
 	private String normalizeName(String name) {
