@@ -128,6 +128,24 @@ public class CellCasesLists {
 		}
 	}
 	
+	/**
+	 * Finds the case corresponding to the given cell
+	 * 
+	 * @param cellName the cell to search form
+	 * @return the case corresponding to the given cell
+	 */
+	public NonTerminalCellCase getNonTerminalCellCase(String cellName) {
+		if (!containsNonTerminalCase(cellName))
+			return null;
+
+		for (NonTerminalCellCase cellCase : nonTerminalCases) {
+			if (cellCase.getCellName().equalsIgnoreCase(cellName))
+				return cellCase;
+		}
+
+		return null;
+	}
+	
 	public void makeAnatomyTermCase(AnatomyTerm term) {
 		AnatomyTermCase termCase = new AnatomyTermCase(term);
 		

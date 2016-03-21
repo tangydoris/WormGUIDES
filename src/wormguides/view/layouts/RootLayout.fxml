@@ -303,7 +303,7 @@
                                                                   </HBox>
                                                                   <HBox maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                                                                      <children>
-                                                                        <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="45.0" HBox.hgrow="ALWAYS" />
+                                                                        <ColorPicker fx:id="colorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="55.0" HBox.hgrow="ALWAYS" />
                                                                      </children>
                                                                   </HBox>
                                                                   <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="22.0" text="Propagate Colors to:">

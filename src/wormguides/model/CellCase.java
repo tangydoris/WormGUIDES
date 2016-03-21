@@ -5,6 +5,17 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Top level class for a case in the info window which corresponds to a cell
+ * Either:
+ * 		- TerminalCellCase
+ * 		- NonTerminalCellCase
+ * 
+ * This class defines the characteristics shared between the two cell cases
+ * 
+ * @author bradenkatzman
+ *
+ */
 public abstract class CellCase {
 
 	private String funcName;
@@ -50,6 +61,11 @@ public abstract class CellCase {
 		return links;
 	}
 
+	/**
+	 * Finds the 'Function' section on Wormbase
+	 * 
+	 * @return the string representation of the HTML on Wormbase under 'Function'
+	 */
 	private String setFunctionFromWORMATLAS() {
 		if (this.funcName == null)
 			return "";
@@ -122,6 +138,12 @@ public abstract class CellCase {
 		return findFunctionInHTML(content, URL);
 	}
 
+	/**
+	 * Parses the HTML page for the function section, edtracts it
+	 * @param content the entire wormbase HTML page
+	 * @param URL the url for the wormbase page
+	 * @return the function section parsed from wormbase
+	 */
 	private String findFunctionInHTML(String content, String URL) {
 		// parse the html for "Function"
 		content = content.substring(content.indexOf("Function"));

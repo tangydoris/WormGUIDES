@@ -5,6 +5,13 @@ import wormguides.loaders.ProductionInfoLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
+/**
+ * Class which holds the database of production info defined in
+ * model/production_info_file/
+ * 
+ * @author bradenkatzman
+ *
+ */
 public class ProductionInfo {
 
 	private ArrayList<ArrayList<String>> productionInfoData;
@@ -17,12 +24,8 @@ public class ProductionInfo {
 		ArrayList<String> nuclearInfo = new ArrayList<String>();
 
 		if (productionInfoData.get(0).get(0).equals("all-nuclear positions")) {
-			nuclearInfo.add(productionInfoData.get(3).get(0) + ", " + productionInfoData.get(2).get(0)); // store
-																											// strain,
-																											// marker
-																											// data
-			nuclearInfo.add(productionInfoData.get(1).get(0)); // store image
-																// series data
+			nuclearInfo.add(productionInfoData.get(3).get(0) + ", " + productionInfoData.get(2).get(0)); // store, strain, marker, data
+			nuclearInfo.add(productionInfoData.get(1).get(0)); // store image, series data
 		}
 
 		return nuclearInfo;
@@ -49,23 +52,11 @@ public class ProductionInfo {
 	public ArrayList<String> getCellShapeData(String queryCell) {
 		ArrayList<String> cellShapeData = new ArrayList<String>();
 
-		queryCell = PartsList.getFunctionalNameByLineageName(queryCell);
-
-		if (queryCell == null) {
-			return cellShapeData;
-		}
-
 		for (int i = 0; i < productionInfoData.get(0).size(); i++) {
 			String cells = productionInfoData.get(0).get(i);
 			if (cells.contains(queryCell)) {
-				cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store
-																												// strain,
-																												// marker
-																												// data
-				cellShapeData.add(productionInfoData.get(1).get(i)); // store
-																		// image
-																		// series
-																		// data
+				cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store strain, marker data
+				cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
 			}
 		}
 
@@ -76,6 +67,11 @@ public class ProductionInfo {
 		return productionInfoData;
 	}
 
+	/**
+	 * Builds the production info as an HTML page with DOM paradigm
+	 * 
+	 * @return the dom for the info window
+	 */
 	public InfoWindowDOM getProductionInfoDOM() {
 		HTMLNode html = new HTMLNode("html");
 		HTMLNode head = new HTMLNode("head");

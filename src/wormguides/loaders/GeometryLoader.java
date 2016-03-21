@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
-/*
+
+/**
  * Utility Class
- * Builds 3D Geometry for Scene Elements to be placed in 3D scene
- *
+ * Builds 3D Geometry for Scene Elements to be placed in 3D scene graph
+ * 
+ * @author bradenkatzman
  * Created: Nov. 2nd, 2015
  */
-
 public class GeometryLoader {
 
 	private static final String vertexLine = "v ";
@@ -24,6 +25,12 @@ public class GeometryLoader {
 	private static ArrayList<int[]> faces;
 	private static TriangleMesh mesh;
 
+	/**
+	 * Builds a 3D shape from a file
+	 * 
+	 * @param fileName the name of the obj fle for the mesh
+	 * @return the 3D meshview
+	 */
 	public static MeshView loadOBJ(String fileName) {
 		/*
 		 * can't use '..' in getResouce --> instead use complete relative path
@@ -97,6 +104,9 @@ public class GeometryLoader {
 		return new MeshView(mesh);
 	}
 
+	/**
+	 * Builds the mesh from the loaded vertex coordinates and faces in the file
+	 */
 	private static void createMesh() {
 		int counter = 0;
 		int texCounter = 0;

@@ -59,7 +59,7 @@ public class CellDeaths {
 		dom.getHTML().addChild(body);
 		dom.buildStyleNode();
 	}
-
+	
 	public static boolean containsCell(String cell) {
 		if (cellDeaths != null) {
 			return cellDeaths.contains(cell.toLowerCase());

@@ -1,6 +1,7 @@
 package wormguides;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -271,7 +272,7 @@ public class Search {
 		return searched;
 	}
 
-	public void setRulesList(ObservableList<Rule> list) {
+	public static void setRulesList(ObservableList<Rule> list) {
 		rulesList = list;
 	}
 
@@ -292,26 +293,38 @@ public class Search {
 		};
 	}
 
-	public void addDefaultColorRules() {
-		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLNUCLEUS, SearchOption.CELLBODY);
+	public static void addDefaultColorRules() {
+		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), SearchOption.CELLBODY);
+
 		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
-		addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 
-//		// highlights 2/23/16 structures
-		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xc14d0e"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xdbdd15"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "siavl", Color.web("0x50b428"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "siavr", Color.web("0x278edb"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "sibdl", Color.web("0x6350dd"), SearchOption.CELLBODY);
-		addColorRule(SearchType.FUNCTIONAL, "sibdr", Color.web("0xc95aa9"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xff9966"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xffe6b4"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "sibd", Color.web("0xe6ccff"), SearchOption.CELLBODY);
+		addColorRule(SearchType.FUNCTIONAL, "siav", Color.web("0x99b3ff"), SearchOption.CELLBODY);
+
+		addColorRule(SearchType.FUNCTIONAL, "dd1", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "dd2", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "dd3", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "dd4", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "dd5", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "dd6", Color.web("0xb30a95"), SearchOption.CELLNUCLEUS);
+
+		addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "da3", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "da4", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
+		addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 	}
 
 	public void clearRules() {
 		rulesList.clear();
+	}
+	
+	public static ObservableList<Rule> getRules() {
+		return rulesList;
 	}
 
 	public static Rule addMulticellularStructureRule(String searched, Color color) {
@@ -391,13 +404,19 @@ public class Search {
 
 		ArrayList<String> cells;
 
-		if (type == SearchType.GENE)
-			WormBaseQuery.doSearch(searched);
-
-		else {
+		/**
+		 * TODO
+		 *  Why is the search done twice? If the color rule is being added, the gene search results have populated the list view
+		 */
+//		if (type == SearchType.GENE) {
+//			if (searchResultsList.isEmpty()) {
+//				WormBaseQuery.doSearch(searched);
+//			}
+//		} 
+//		else {
 			cells = getCellsList(searched);
 			rule.setCells(cells);
-		}
+//		}
 
 		rulesList.add(rule);
 		searchResultsList.clear();
@@ -425,11 +444,6 @@ public class Search {
 					if (name.toLowerCase().startsWith(searched))
 						cells.add(PartsList.getLineageNameByIndex(i));
 				}
-				/*
-				 * for (String name : functionalNames) { if
-				 * (name.toLowerCase().startsWith(searched))
-				 * cells.add(PartsList.getLineageNameByFunctionalName(name)); }
-				 */
 				break;
 
 			case DESCRIPTION:
@@ -477,14 +491,12 @@ public class Search {
 						// look for a match in rest of the hits
 						boolean intersection = true;
 						for (int i = 1; i < hits.size(); i++) {
-							if (!hits.get(i).contains(cell)) {
+							if (!hits.get(i).contains(cell))
 								intersection = false;
-							}
 						}
 
-						if (intersection && !cells.contains(cell)) {
+						if (intersection && !cells.contains(cell))
 							cells.add(cell);
-						}
 					}
 				}
 
@@ -494,6 +506,7 @@ public class Search {
 				if (isGeneFormat(getSearchedText())) {
 					showLoadingService.restart();
 					WormBaseQuery.doSearch(getSearchedText());
+					cells = new ArrayList<String>(searchResultsList);
 				}
 				break;
 
@@ -516,6 +529,8 @@ public class Search {
 				if (connectome != null) {
 					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
 							electricalTicked, neuromuscularTicked, true));
+					// TODO is the cell itself ever in the wiring results?
+					// cells.remove(searched);
 				}
 				break;
 
@@ -705,7 +720,7 @@ public class Search {
 					// compute distance from each cell to query cell
 					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
 						// only add new entries
-						if (!results.contains(names[n]))
+						if (!results.contains(names[n]) && !names[n].equalsIgnoreCase(cellName))
 							results.add(names[n]);
 					}
 				}

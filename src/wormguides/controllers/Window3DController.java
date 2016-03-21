@@ -14,8 +14,6 @@ import javax.imageio.ImageIO;
 
 import com.sun.javafx.scene.CameraHelper;
 
-//import sim.util.media.MovieEncoder;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -123,6 +121,8 @@ import wormguides.model.SceneElementsList;
  * {@link Rule}) to see which ones apply to a particular entity, then queries
  * the color hash ({@link ColorHash}) for the material ({@link PhongMaterial})
  * to use for the entity.
+ * 
+ * @author Doris Tang
  * 
  */
 
@@ -266,6 +266,33 @@ public class Window3DController {
 	
 	private Quaternion quaternion;
 
+	/**
+	 * Window3DController class constructor called by
+	 * {@link RootLayoutController} upon initialization.
+	 * 
+	 * @param parent
+	 *            {@link Stage} to which the main application belongs to.
+	 *            Reference used for context menu (whether it should appear in
+	 *            the sulston tree or the 3D subscene.
+	 * @param parentPane
+	 *            {@link AnchorPane} to which sprites, labels, and the notes
+	 *            info panel are added
+	 * @param data
+	 *            {@link LineageData} to contains cell information loaded from
+	 *            the nuclear files
+	 * @param cases
+	 *            {@link CellCasesList} that contains information about
+	 *            terminal/non-terminal cells
+	 * @param info
+	 *            {@link ProductionInfo} that contains information about
+	 *            segmentation and the movie time offset
+	 * @param connectome
+	 *            {@link Connectome} that contains information about the
+	 *            embryo's connectome
+	 * @param bringUpInfoProperty
+	 *            {@link BooleanProperty} that should be set to TRUE when the
+	 *            info window should be brought up, FALSE otherwise
+	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
@@ -326,6 +353,9 @@ public class Window3DController {
 						allLabels.add(lineageName);
 
 					Shape3D entity = getEntityWithName(lineageName);
+					if (entity == null) {
+						//System.out.println("no matching shape to " + lineageName);
+					}
 
 					// go to labeled name
 					int startTime;
@@ -334,16 +364,42 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
-					if (startTime <= 0)
-						startTime = 1;
-					if (endTime <= 0)
-						endTime = 1;
-
-					if (time.get() < startTime || time.get() > endTime)
+					if (startTime <= 0) {
+						/* 
+						 * TODO
+						 * 
+						 * patch made below to account for discrepancy between functional and lineage names. Found with P4:
+						 * 	at frame 63 there are cells including:
+						 * 		Ea
+								Ep
+								P4 (functional name. lineage is P0.pppp)
+								ABalpp (lineage name)
+								ABalpa
+						 * 
+						 * 		
+						 */
+						
+						//try functional name
+						startTime = Search.getFirstOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
+						if (startTime <= 0) {
+							startTime = 1;
+						}
+					}
+						
+					if (endTime <= 0) {
+						endTime = Search.getLastOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
+						if (endTime <= 0) {
+							endTime = 1;
+						}
+					}
+					
+					if (time.get() < startTime || time.get() > endTime) {
 						time.set(startTime);
-
-					else
+					}
+					else {
 						insertLabelFor(lineageName, entity);
+					}
+						
 
 					highlightActiveCellLabel(entity);
 				}
@@ -380,7 +436,6 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				hideContextPopups();
-
 				if (newValue)
 					playService.restart();
 				else
@@ -494,9 +549,6 @@ public class Window3DController {
 		PhongMaterial material = new PhongMaterial();
 		material.setDiffuseColor(Color.RED);
 		orientationIndicator = new Cylinder(radius, height);
-		// orientationIndicator.setTranslateX(newOriginX);
-		// orientationIndicator.setTranslateY(newOriginY);
-		// orientationIndicator.setTranslateZ(newOriginZ);
 		orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
 		orientationIndicator.setMaterial(material);
 
@@ -539,7 +591,6 @@ public class Window3DController {
 																		// orientation
 																		// in
 																		// image
-		// middleTransformGroup.getTransforms().add(new Scale(.5,.50,.5));
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 		// xy relocates z shrinks aparent by moving away from camera? improves
 		// resolution?
@@ -659,8 +710,8 @@ public class Window3DController {
 		}
 	}
 
-	/*
-	 * Remove transient label from sprites pane
+	/**
+	 * Removes transient label from sprites pane.
 	 */
 	private void removeTransientLabel() {
 		spritesPane.getChildren().remove(transientLabelText);
@@ -752,8 +803,7 @@ public class Window3DController {
 		mouseDeltaX /= 4;
 		mouseDeltaY /= 4;
 
-		if (event.isSecondaryButtonDown()
-				|| (event.isPrimaryButtonDown() && (event.isMetaDown() || event.isControlDown()))) {
+		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
 			double ty = xform.t.getTy() - mouseDeltaY;
 
@@ -817,9 +867,10 @@ public class Window3DController {
 			selectedName.set(name);
 			cellClicked.set(true);
 
-			if (event.getButton() == MouseButton.SECONDARY)
+			if (event.getButton() == MouseButton.SECONDARY
+					|| (event.getButton() == MouseButton.PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
 				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
-			else if (event.getButton() == MouseButton.PRIMARY) {
+			} else if (event.getButton() == MouseButton.PRIMARY) {
 				if (allLabels.contains(name))
 					removeLabelFor(name);
 
@@ -848,7 +899,8 @@ public class Window3DController {
 					selectedName.set(name);
 					found = true;
 
-					if (event.getButton() == MouseButton.SECONDARY) {
+					if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
+							&& (event.isMetaDown() || event.isControlDown()))) {
 						if (sceneElementsList.isMulticellStructureName(name))
 							showContextMenu(name, event.getScreenX(), event.getScreenY(),
 									SearchOption.MULTICELLULAR_NAME_BASED);
@@ -909,7 +961,6 @@ public class Window3DController {
 	}
 
 	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
-		System.out.println("context menu search option - "+option);
 		if (contextMenuStage == null)
 			initContextMenuStage();
 
@@ -1019,16 +1070,16 @@ public class Window3DController {
 		}
 	}
 
-	// Reposition sprites by projecting the sphere's 3d coordinate
-	// onto the front of the subscene
+	/**
+	 * Repositions sprites (labels and note sprites) by projecting the sphere's
+	 * 3d coordinate onto the front of the subscene
+	 */
 	private void repositionSprites() {
-		for (Node entity : entitySpriteMap.keySet()) {
+		for (Node entity : entitySpriteMap.keySet())
 			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
-		}
 
-		for (Node entity : entityLabelMap.keySet()) {
+		for (Node entity : entityLabelMap.keySet())
 			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
-		}
 	}
 
 	// Input text is the note/label geometry
@@ -1316,7 +1367,8 @@ public class Window3DController {
 						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
 
-							if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
+							if (rule.isMulticellularStructureRule()
+									&& rule.appliesToMulticellularStructure(sceneName)) {
 								colors.add(rule.getColor());
 							}
 
@@ -1324,7 +1376,7 @@ public class Window3DController {
 								for (String name : allNames) {
 									if (rule.appliesToCellBody(name)) {
 										colors.add(rule.getColor());
-									}	
+									}
 								}
 							}
 						}
@@ -1333,8 +1385,7 @@ public class Window3DController {
 						// if any rules applied
 						if (!colors.isEmpty()) {
 							mesh.setMaterial(colorHash.getMaterial(colors));
-						}
-						else {
+						} else {
 							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
 						}
 					}
@@ -1349,7 +1400,7 @@ public class Window3DController {
 						String name = normalizeName(se.getSceneName());
 
 						if (!currentLabels.contains(name.toLowerCase()))
-							showTransientLabel(name, mesh);
+							showTransientLabel(name, getEntityWithName(name));
 					}
 				});
 				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -1388,7 +1439,6 @@ public class Window3DController {
 			// not in search mode
 			else {
 				ArrayList<Color> colors = new ArrayList<Color>();
-				// TreeSet<Color> colors = new TreeSet<Color>(colorComparator);
 				for (Rule rule : currentRulesList) {
 					// just need to consult rule's active list
 					if (rule.appliesToCellNucleus(cellNames[i]))
@@ -1498,26 +1548,24 @@ public class Window3DController {
 			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
 	}
 
-	/*
-	 * Returns the scene 3D entity with input name Pririty is given to meshes
-	 * (if a mesh and a cell have the same name, the mesh is returned)
+	/**
+	 * @return The {@link Shape3D} entity with input name. Priority is given to
+	 *         meshes (if a mesh and a cell have the same name, the mesh is
+	 *         returned)
 	 */
 	private Shape3D getEntityWithName(String name) {
-		// give priority to meshes
 		// mesh view label
 		for (int i = 0; i < currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-					&& currentSceneElementMeshes.get(i) != null) {
+					&& currentSceneElementMeshes.get(i) != null
+					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0)
 				return currentSceneElementMeshes.get(i);
-			}
 		}
 
 		// sphere label
 		for (int i = 0; i < cellNames.length; i++) {
-			if (spheres[i] != null) {
-				if (cellNames[i].equals(name)) {
-					return spheres[i];
-				}
+			if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name)) {
+				return spheres[i];
 			}
 		}
 
@@ -1733,7 +1781,7 @@ public class Window3DController {
 		if (note.isExpandedInScene())
 			title += ": " + note.getTagContents();
 		else
-			title += "\n[more text...]";
+			title += "\n[more...]";
 
 		Text node = null;
 		if (note.getTagDisplay() != null) {
@@ -1915,13 +1963,13 @@ public class Window3DController {
 								movieFiles.addElement(file);
 							}
 						} catch (Exception e) {
-							//e.printStackTrace();
+							// e.printStackTrace();
 						}
 					}
 				}
 			}
 		});
-		
+
 		return true;
 	}
 
@@ -1968,10 +2016,6 @@ public class Window3DController {
 	 * When called, a snapshot of the screen is saved
 	 */
 	public void stillscreenCapture() {
-		/*
-		 * TODO Open file save chooser
-		 */
-
 		Stage fileChooserStage = new Stage();
 
 		FileChooser fileChooser = new FileChooser();
@@ -2038,7 +2082,12 @@ public class Window3DController {
 		});
 	}
 
-	// Sets transparent anchor pane overlay for sprite notes display
+	/**
+	 * Sets transparent anchor pane overlay for sprite notes display
+	 * 
+	 * @param parentPane
+	 *            The {@link AnchorPane} in which labels and sprites reside
+	 */
 	public void setNotesPane(AnchorPane parentPane) {
 		if (parentPane != null) {
 			spritesPane = parentPane;
@@ -2084,9 +2133,15 @@ public class Window3DController {
 
 	public void setTime(int t) {
 		if (startTime <= t && t <= endTime) {
-			time.set(t);
 			hideContextPopups();
+			time.set(t);
 		}
+
+		else if (t < startTime)
+			time.set(startTime);
+
+		else if (t > endTime)
+			time.set(endTime);
 	}
 
 	public void setRotations(double rx, double ry, double rz) {
@@ -2340,12 +2395,8 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				hideContextPopups();
-
-				if (!playingMovie.get()) {
-					int t = time.get();
-					if (t > 1 && t <= getEndTime())
-						time.set(t - 1);
-				}
+				if (!playingMovie.get())
+					setTime(time.get() - 1);
 			}
 		};
 	}
@@ -2355,12 +2406,8 @@ public class Window3DController {
 			@Override
 			public void handle(ActionEvent event) {
 				hideContextPopups();
-
-				if (!playingMovie.get()) {
-					int t = time.get();
-					if (t >= 1 && t < getEndTime() - 1)
-						time.set(t + 1);
-				}
+				if (!playingMovie.get())
+					setTime(time.get() + 1);
 			}
 		};
 	}
@@ -2438,10 +2485,7 @@ public class Window3DController {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								if (time.get() < endTime)
-									setTime(time.get() + 1);
-								else
-									setTime(endTime);
+								setTime(time.get() + 1);
 							}
 						});
 						try {
@@ -2557,7 +2601,7 @@ public class Window3DController {
 							if (note.isExpandedInScene())
 								picked.setText(note.getTagName() + ": " + note.getTagContents());
 							else
-								picked.setText(note.getTagName() + "\n[more text...]");
+								picked.setText(note.getTagName() + "\n[more...]");
 						}
 					}
 				}

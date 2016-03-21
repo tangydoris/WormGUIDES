@@ -326,18 +326,19 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					window3DController.getSelectedNameLabeled());
 
 			treeStage.setScene(new Scene(sp));
-
 			treeStage.setTitle("LineageTree");
 			treeStage.initModality(Modality.NONE);
+			treeStage.show();
+			mainStage.show();
+		} else {
+			treeStage.show();
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((Stage) treeStage.getScene().getWindow()).toFront();
+				}
+			});
 		}
-
-		treeStage.show();
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				((Stage) treeStage.getScene().getWindow()).toFront();
-			}
-		});
 	}
 
 	@FXML
@@ -554,7 +555,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// start the image capture
 		if (window3DController != null) {
 			if (!window3DController.captureImagesForMovie()) {
-				//error saving movie, update UI
+				// error saving movie, update UI
 				captureVideoMenuItem.setDisable(false);
 				stopCaptureVideoMenuItem.setDisable(true);
 				captureVideo.set(false);
@@ -825,18 +826,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		zoomInButton.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
 		zoomOutButton.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
 
-		this.playIcon = ImageLoader.getPlayIcon();
-		this.pauseIcon = ImageLoader.getPauseIcon();
+		playIcon = ImageLoader.getPlayIcon();
+		pauseIcon = ImageLoader.getPauseIcon();
 		playButton.setGraphic(playIcon);
 		playButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (playingMovie.get()) {
-					playButton.setGraphic(playIcon);
-				} else {
-					playButton.setGraphic(pauseIcon);
-				}
 				playingMovie.set(!playingMovie.get());
+
+				if (playingMovie.get())
+					playButton.setGraphic(playIcon);
+				else
+					playButton.setGraphic(pauseIcon);
 			}
 		});
 	}
@@ -898,7 +899,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private void initCellDeaths() {
 		new CellDeaths();
 	}
-	
+
 	private void initAnatomy() {
 		new Anatomy();
 	}
@@ -1124,11 +1125,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		setSlidersProperties();
 
 		initSearch();
+		ObservableList<Rule> list = displayLayer.getRulesList();
+		Search.setRulesList(list);
+		Search.addDefaultColorRules();
 		Search.setActiveLineageNames(lineageData.getAllCellNames());
 		Search.setLineageData(lineageData);
 
-		ObservableList<Rule> list = displayLayer.getRulesList();
-		search.setRulesList(list);
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
@@ -1148,8 +1150,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
 		window3DController.setGeneResultsUpdated(search.getGeneResultsUpdated());
 
-		search.addDefaultColorRules();
-
 		addListeners();
 
 		setIcons();
@@ -1158,7 +1158,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
-		window3DController.setTime(window3DController.getEndTime());
+		/**
+		 * TODO
+		 * 	refactor: why didn't the second line of code automatically update the time slider?
+		 */
+		timeSlider.setValue(256.);
+		window3DController.setTime(lim4StoryStartTime);
 
 		viewTreeAction();
 
@@ -1168,6 +1173,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 	}
 	
+	/**
+	 * lim 4 story start time
+	 * 	TODO
+	 * 	actual start time is 256 --> 237 is with +19 offset
+	 */
+	private final static int lim4StoryStartTime = 237;
+
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;
+	/**
+	 * Delay time in seconds before the application updates to the new time on
+	 * the slider
+	 */
+	// private final double TIME_SLIDER_TIME_DELAY = 0.5;
 }
