@@ -141,7 +141,7 @@ public class Window3DController {
 	private PerspectiveCamera camera;
 	private Xform xform;
 	private double mousePosX, mousePosY;
-	private double mouseOldX, mouseOldY;
+	private double mouseOldX, mouseOldY, mouseOldZ;
 	private double mouseDeltaX, mouseDeltaY;
 	private int newOriginX, newOriginY, newOriginZ;
 
@@ -343,10 +343,16 @@ public class Window3DController {
 				if (!newValue.isEmpty()) {
 					// value passed may be a functional name
 					// use lineage names instead
-					String lineageName = PartsList.getLineageNameByFunctionalName(newValue);
-					if (lineageName == null)
-						lineageName = newValue;
-
+//					String lineageName = PartsList.getLineageNameByFunctionalName(newValue);
+//					if (lineageName == null)
+//						lineageName = newValue;
+					/*
+					 * TODO
+					 * Removed above check (caused bugs with P4 clicked in lineage window)
+					 * 	check if this causes problems elsewhere
+					 */
+					String lineageName = newValue;
+					
 					selectedName.set(lineageName);
 
 					if (!allLabels.contains(lineageName))
@@ -365,32 +371,11 @@ public class Window3DController {
 					endTime = Search.getLastOccurenceOf(lineageName);
 
 					if (startTime <= 0) {
-						/* 
-						 * TODO
-						 * 
-						 * patch made below to account for discrepancy between functional and lineage names. Found with P4:
-						 * 	at frame 63 there are cells including:
-						 * 		Ea
-								Ep
-								P4 (functional name. lineage is P0.pppp)
-								ABalpp (lineage name)
-								ABalpa
-						 * 
-						 * 		
-						 */
-						
-						//try functional name
-						startTime = Search.getFirstOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
-						if (startTime <= 0) {
-							startTime = 1;
-						}
+						startTime = 1;
 					}
 						
 					if (endTime <= 0) {
-						endTime = Search.getLastOccurenceOf(PartsList.getFunctionalNameByLineageName(lineageName));
-						if (endTime <= 0) {
 							endTime = 1;
-						}
 					}
 					
 					if (time.get() < startTime || time.get() > endTime) {
@@ -426,6 +411,7 @@ public class Window3DController {
 		mousePosY = 0;
 		mouseOldX = 0;
 		mouseOldY = 0;
+		mouseOldZ = 0;
 		mouseDeltaX = 0;
 		mouseDeltaY = 0;
 
@@ -821,7 +807,15 @@ public class Window3DController {
 			mouseDeltaY /= 2;
 			
 			if (quaternion != null) {
-				//System.out.println(rotateX.);
+				/*
+				 * TODO
+				 * compute the distance between the initial xyz of mouse and final xyz of mouse
+				 * 
+				 * use the vectors from the origin to xyz(1) to xyz(2) and find the axis of rotation using cross product
+				 * 
+				 * pass the resulting axis of rotation to quaternion class
+				 * 
+				 */
 				double angleOfRotation = rotationAngleFromMouseMovement(mouseDeltaX, mouseDeltaY);
 				//quaternion.updateOnRotate(Math.toRadians(angleOfRotation));
 				
@@ -836,7 +830,6 @@ public class Window3DController {
 					
 //					rotateX.setAngle(eulerAngles.get(2));
 //					rotateY.setAngle(eulerAngles.get(0));
-					System.out.println(Rotate.X_AXIS);
 				}
 			}
 

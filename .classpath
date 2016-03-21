@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="wormguides/model/connectome_file/" kind="src" path="src"/>
@@ -6,13 +5,3 @@
 	<classpathentry exported="true" kind="lib" path="jmf.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
-=======
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="wormguides/model/connectome_file/" kind="src" path="src"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="jmf.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
->>>>>>> aeb0ea5679b43f62622a90f047a876bddcb3b361
