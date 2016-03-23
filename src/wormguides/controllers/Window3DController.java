@@ -140,10 +140,11 @@ public class Window3DController {
 	private Group root;
 	private PerspectiveCamera camera;
 	private Xform xform;
-	private double mousePosX, mousePosY;
+	private double mousePosX, mousePosY, mousePosZ;
 	private double mouseOldX, mouseOldY, mouseOldZ;
 	private double mouseDeltaX, mouseDeltaY;
 	private int newOriginX, newOriginY, newOriginZ;
+	private double angleOfRotation;
 
 	// housekeeping stuff
 	private IntegerProperty time;
@@ -409,11 +410,13 @@ public class Window3DController {
 
 		mousePosX = 0;
 		mousePosY = 0;
+		mousePosZ = 0;
 		mouseOldX = 0;
 		mouseOldY = 0;
-		mouseOldZ = 0;
+		mouseOldZ = 0.;
 		mouseDeltaX = 0;
 		mouseDeltaY = 0;
+		angleOfRotation = 0.;
 
 		playService = new PlayService();
 		playingMovie = new SimpleBooleanProperty();
@@ -779,15 +782,20 @@ public class Window3DController {
 		hideContextPopups();
 
 		spritesPane.setCursor(Cursor.CLOSED_HAND);
-
+		
 		mouseOldX = mousePosX;
 		mouseOldY = mousePosY;
+		mouseOldZ = mousePosZ;
 		mousePosX = event.getSceneX();
 		mousePosY = event.getSceneY();
 		mouseDeltaX = (mousePosX - mouseOldX);
 		mouseDeltaY = (mousePosY - mouseOldY);
 		mouseDeltaX /= 4;
 		mouseDeltaY /= 4;
+		
+		angleOfRotation = rotationAngleFromMouseMovement();
+		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
+		//mousePosZ = 0;
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
@@ -806,30 +814,34 @@ public class Window3DController {
 			mouseDeltaX /= 2;
 			mouseDeltaY /= 2;
 			
+			/* TODO 
+			 * Z COORDINATE
+			 */
 			if (quaternion != null) {
-				/*
-				 * TODO
-				 * compute the distance between the initial xyz of mouse and final xyz of mouse
-				 * 
-				 * use the vectors from the origin to xyz(1) to xyz(2) and find the axis of rotation using cross product
-				 * 
-				 * pass the resulting axis of rotation to quaternion class
-				 * 
-				 */
-				double angleOfRotation = rotationAngleFromMouseMovement(mouseDeltaX, mouseDeltaY);
-				//quaternion.updateOnRotate(Math.toRadians(angleOfRotation));
+//				double[] vectorToOldMousePos = vectorBWPoints(newOriginX, newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+//				double[] vectorToNewMousePos = vectorBWPoints(newOriginX, newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 				
-				ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
+				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
 				
-				if (eulerAngles.size() == 3) {
-					double mX = (rotateX.getAngle() + mouseDeltaY) % 360;
-					double mY = (rotateY.getAngle() - mouseDeltaX) % 360;
-//					System.out.println("Mouse x,y = " + mX + ", " + mY);
-//					System.out.println("Euler x,y = " + eulerAngles.get(0) + ", " + eulerAngles.get(1));
+				if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
+//					System.out.println("from origin to old mouse pos: <" + vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] + ", " + vectorToOldMousePos[2] + ">");
+//					System.out.println("from origin to old mouse pos: <" + vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] + ", " + vectorToNewMousePos[2] + ">");
 //					System.out.println(" ");
 					
-//					rotateX.setAngle(eulerAngles.get(2));
-//					rotateY.setAngle(eulerAngles.get(0));
+					//compute cross product
+					double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
+					if (cross.length == 3) {
+						//System.out.println("cross product: <" + cross[0] + ", " + cross[1] + ", " + cross[2] + ">");
+						quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+						
+						ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+						
+						if (eulerAngles.size() == 3) {
+//							rotateX.setAngle(eulerAngles.get(2));
+//							rotateY.setAngle(eulerAngles.get(0));
+						}
+					}
 				}
 			}
 
@@ -931,14 +943,51 @@ public class Window3DController {
 		}
 	}
 	
-	private double rotationAngleFromMouseMovement(double deltaX, double deltaY) {
-		//compute angle in radians
-		double rotationAngleRadians = Math.atan2(deltaY, deltaX);
+	private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
+		double[] vector = new double[3];
+		
+		double vx, vy, vz;
+		
+		vx = qx - px;
+		vy = qy - py;
+		vz = qz - pz;
+		
+		vector[0] = vx;
+		vector[1] = vy;
+		vector[2] = vz;
+		
+		return vector;
+	}
+	
+	private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
+		return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2*xCoord*yCoord*Math.cos(angleOfRotation)));
+	}
+	
+	//http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
+	private double rotationAngleFromMouseMovement() {
+		double rotationAngleRadians = Math.acos(((mouseOldX*mousePosX) + (mouseOldY*mousePosY) + (mouseOldZ*mousePosZ)) 
+				/ Math.sqrt((Math.pow(mouseOldX, 2)+Math.pow(mouseOldY, 2)+Math.pow(mouseOldZ, 2))*
+						(Math.pow(mousePosX, 2)+Math.pow(mousePosY, 2)+Math.pow(mousePosZ, 2))));
 		
 		return rotationAngleRadians;
+	}
+	
+	//http://mathworld.wolfram.com/CrossProduct.html
+	private double[] crossProduct(double[] u, double[] v) {
+		if (u.length != 3 || v.length != 3) return null;
 		
-//		//return value in degrees
-//		return rotationAngleRadians *(180/Math.PI);
+		double[] cross = new double[3];
+		
+		double cx, cy, cz;
+		cx = (u[1]*v[2]) - (u[2]*v[1]);
+		cy = (u[2]*v[0]) - (u[0]*v[2]);
+		cz = (u[0]*v[1]) - (u[1]*v[0]);
+		
+		cross[0] = cx;
+		cross[1] = cy;
+		cross[2] = cz;
+		
+		return cross;
 	}
 
 	private String normalizeName(String name) {

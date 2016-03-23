@@ -52,7 +52,7 @@ public class Quaternion {
 	 * @param axisY - the y axis of the rotation direction
 	 * @param axisZ - the z axis of the rotation direction
 	 */
-	public void updateOnRotate(double angOfRotation, int axisX, int axisY, int axisZ) {
+	public void updateOnRotate(double angOfRotation, double axisX, double axisY, double axisZ) {
 		//compute the local rotation quaternion
 		double w,x,y,z;
 		
