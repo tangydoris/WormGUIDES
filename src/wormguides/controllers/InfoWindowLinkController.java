@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 import wormguides.AnatomyTerm;
 import wormguides.Search;
+import wormguides.model.PartsList;
 
 /**
  * Callback class for HTML pages
@@ -64,7 +65,7 @@ public class InfoWindowLinkController {
 		}
 		
 		//view in 3D
-		viewInCellTheater(cellName);
+		viewInCellTheater(PartsList.getLineageNameByFunctionalName(cellName));
 
 		 if (!Search.hasCellCase(cellName)) {
 			 //generate a new cell case

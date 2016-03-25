@@ -351,6 +351,8 @@ public class Window3DController {
 					 * TODO
 					 * Removed above check (caused bugs with P4 clicked in lineage window)
 					 * 	check if this causes problems elsewhere
+					 * 
+					 * ***** If it does, we should do name translation before changing name *****
 					 */
 					String lineageName = newValue;
 					
@@ -360,8 +362,9 @@ public class Window3DController {
 						allLabels.add(lineageName);
 
 					Shape3D entity = getEntityWithName(lineageName);
-					if (entity == null) {
+					if (entity == null) { //don't change scene if no shape associated with name
 						//System.out.println("no matching shape to " + lineageName);
+						return;
 					}
 
 					// go to labeled name
