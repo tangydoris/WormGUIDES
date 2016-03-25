@@ -196,8 +196,8 @@ public class StoriesLayer {
 			story.setComparator(noteComparator);
 			story.sortNotes();
 		}
-		
-		setActiveStory(stories.get(0)); //makes lim-4 story default
+
+		setActiveStory(stories.get(0)); // makes lim-4 story default
 	}
 
 	/**
@@ -296,6 +296,15 @@ public class StoriesLayer {
 			return activeStory.getDescription();
 		return "";
 	}
+	
+	/**
+	 * @return Effective start time of currently active story
+	 */
+	public int getActiveStoryStartTime() {
+		if (activeStory!=null && activeStory.hasNotes())
+			return getEffectiveStartTime(activeStory.getNotes().get(0));
+		return Integer.MIN_VALUE;
+	}
 
 	/**
 	 * Ultimately sets the active story to the input {@link Story} parameter.
@@ -354,7 +363,6 @@ public class StoriesLayer {
 		} else {
 			activeStoryProperty.set("");
 			useInternalRules.set(true);
-			// URLLoader.process("", window3DController);
 		}
 
 		if (editController != null)
@@ -1028,7 +1036,8 @@ public class StoriesLayer {
 			}
 		}
 	}
-
+	
 	private final String NEW_STORY_TITLE = "New Story";
 	private final String NEW_STORY_DESCRIPTION = "New story description here";
+
 }

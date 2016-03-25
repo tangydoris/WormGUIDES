@@ -1,7 +1,6 @@
 package wormguides;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -134,6 +133,7 @@ public class Search {
 					searchResultsList.clear();
 				}
 			});
+
 			geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				@Override
 				public void handle(WorkerStateEvent event) {
@@ -322,7 +322,7 @@ public class Search {
 	public void clearRules() {
 		rulesList.clear();
 	}
-	
+
 	public static ObservableList<Rule> getRules() {
 		return rulesList;
 	}
@@ -405,18 +405,18 @@ public class Search {
 		ArrayList<String> cells;
 
 		/**
-		 * TODO
-		 *  Why is the search done twice? If the color rule is being added, the gene search results have populated the list view
+		 * TODO Why is the search done twice? If the color rule is being added,
+		 * the gene search results have populated the list view
 		 */
-//		if (type == SearchType.GENE) {
-//			if (searchResultsList.isEmpty()) {
-//				WormBaseQuery.doSearch(searched);
-//			}
-//		} 
-//		else {
-			cells = getCellsList(searched);
-			rule.setCells(cells);
-//		}
+		// if (type == SearchType.GENE) {
+		// if (searchResultsList.isEmpty()) {
+		// WormBaseQuery.doSearch(searched);
+		// }
+		// }
+		// else {
+		cells = getCellsList(searched);
+		rule.setCells(cells);
+		// }
 
 		rulesList.add(rule);
 		searchResultsList.clear();
