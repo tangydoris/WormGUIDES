@@ -644,7 +644,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				int newTime = newValue.intValue();
-				if (newTime != timeSlider.getValue() && window3DController != null)
+				if (window3DController != null) // removed newTime != timeSlider.getValue() && --> to use arrow keys b/c arrows automatically update timeSlider.value
 					window3DController.setTime(newTime);
 			}
 		});

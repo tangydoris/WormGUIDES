@@ -573,13 +573,7 @@ public class Window3DController {
 		t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
 		middleTransformGroup.getChildren().add(t);
 
-		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation
-																		// to
-																		// match
-																		// lateral
-																		// orientation
-																		// in
-																		// image
+		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation to match lateral orientation in image
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 		// xy relocates z shrinks aparent by moving away from camera? improves
 		// resolution?
@@ -959,6 +953,14 @@ public class Window3DController {
 		return vector;
 	}
 	
+	
+	/*
+	 * TODO
+	 * fix this
+	 * 
+	 */
+	//http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
+	//http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
 	private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
 		return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2*xCoord*yCoord*Math.cos(angleOfRotation)));
 	}
