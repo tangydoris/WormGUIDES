@@ -79,6 +79,7 @@ public class InfoWindow {
 						final int modulus = 5;
 						while (true) {
 							if (isCancelled()) {
+								infoWindowStage.setTitle("Cell Info Window");
 								break;
 							}
 							Platform.runLater(new Runnable() {
@@ -100,6 +101,7 @@ public class InfoWindow {
 										loading += "....";
 										break;
 									default:
+										//loading = "Cell Info Window";
 										break;
 									}
 									infoWindowStage.setTitle(loading);
@@ -178,24 +180,26 @@ public class InfoWindow {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.restart();
+				infoWindowStage.setTitle("Cell Info Window");
 			}
 		});
 		addNameService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
+				infoWindowStage.setTitle("Cell Info Window");
 			}
 		});
 		addNameService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
+				infoWindowStage.setTitle("Cell Info Window");
 			}
 		});
 		showLoadingService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
-				infoWindowStage.setTitle("Cell Info Window");
 				showWindow();
 			}
 		});
