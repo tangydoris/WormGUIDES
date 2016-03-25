@@ -653,7 +653,7 @@ public class Window3DController {
 		if (currentLabels.contains(name))
 			labelDrawn = true;
 
-		if (!labelDrawn) {
+		if (!labelDrawn && entity != null) {
 			Bounds b = entity.getBoundsInParent();
 
 			if (b != null) {
