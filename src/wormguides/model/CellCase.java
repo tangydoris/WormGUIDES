@@ -18,213 +18,368 @@ import java.util.Scanner;
  */
 public abstract class CellCase {
 
-	private String funcName;
 	private String lineageName;
-
 	private ArrayList<String> geneExpression;
-	private ArrayList<ArrayList<String>> homologues;
-
 	private ArrayList<String> links;
+	private ArrayList<String> references;
+	private ArrayList<String> nuclearProductionInfo;
+	private ArrayList<String> cellShapeProductionInfo;
 
-	public CellCase(String lineageName) {
+	public CellCase(String lineageName, ArrayList<String> nuclearProductionInfo, ArrayList<String> cellShapeProductionInfo) {
 		this.lineageName = lineageName;
-		funcName = PartsList.getFunctionalNameByLineageName(lineageName);
-		if (funcName == null)
-			funcName = "";
-
-		links = buildLinks();
-
-		setFunctionFromWORMATLAS();
+		
+		//initialize and populate links data structure
+		buildLinks();
+		
+		//initialize and populate gene expression data structure
+		setExpressionsFromWORMBASE();
+		
+		setReferences();
+		
+		this.nuclearProductionInfo = nuclearProductionInfo;
+		this.cellShapeProductionInfo = cellShapeProductionInfo;
 	}
-
-	protected abstract ArrayList<String> buildLinks();
-
-	protected abstract void findHomologues();
-
-	public String getFunctionalName() {
-		return funcName;
-	}
-
-	public String getLineageName() {
-		return lineageName;
-	}
-
-	public ArrayList<String> getExpressesWORMBASE() {
-		return geneExpression;
-	}
-
-	public ArrayList<ArrayList<String>> getHomologues() {
-		return homologues;
-	}
-
-	public ArrayList<String> getLinks() {
-		return links;
-	}
-
+	
 	/**
-	 * Finds the 'Function' section on Wormbase
 	 * 
-	 * @return the string representation of the HTML on Wormbase under 'Function'
+	 * @return the list of gene expressions from the wormbase page corresponding to this cell
 	 */
-	private String setFunctionFromWORMATLAS() {
-		if (this.funcName == null)
-			return "";
+	private void setExpressionsFromWORMBASE() {
+		this.geneExpression = new ArrayList<String>();
+		
+		String URL;
+		
+		String functionalName = PartsList.getFunctionalNameByLineageName(lineageName);
+		if (functionalName != null) {
+			URL = wormbaseURL + functionalName + wormbaseEXT; //terminal cell case
+		} else {
+			URL = wormbaseURL + this.lineageName + wormbaseEXT; //non terminal cell case
+		}
 
 		String content = "";
 		URLConnection connection = null;
-
-		/*
-		 * USING mainframe.htm EXT Leaving code for frameset.htm check
-		 */
-
-		/*
-		 * if R/L cell, find base name for URL e.g. ribr --> RIB
-		 * 
-		 * if no R/L, leave as is e.g. AVG
-		 */
-		String cell = this.funcName;
-		Character lastChar = cell.charAt(cell.length() - 1);
-		lastChar = Character.toLowerCase(lastChar);
-		if (lastChar == 'r' || lastChar == 'l') {
-			cell = cell.substring(0, cell.length() - 1);
-
-			// check if preceding d/v
-			lastChar = cell.charAt(cell.length() - 1);
-			lastChar = Character.toLowerCase(lastChar);
-			if (lastChar == 'd' || lastChar == 'v') {
-				cell = cell.substring(0, cell.length() - 1);
-			}
-		} else if (lastChar == 'd' || lastChar == 'v') { // will l/r ever come
-															// before d/v
-			cell = cell.substring(0, cell.length() - 1);
-
-			// check if preceding l/r
-			lastChar = cell.charAt(cell.length() - 1);
-			lastChar = Character.toLowerCase(lastChar);
-			if (lastChar == 'l' || lastChar == 'r') {
-				cell = cell.substring(0, cell.length() - 1);
-			}
-		} else if (Character.isDigit(lastChar)) {
-			cell = cell.substring(0, cell.length() - 1).toUpperCase() + "N";
-		}
-
-		String URL = wormatlasURL + cell.toUpperCase() + wormatlasURLEXT;
+		
 		try {
-			connection = new URL(URL).openConnection();
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();			
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.lineageName + " page not found on Wormbase");
+			return;
+		}
+		
+		//add the link to the list before parsing with cytoshow snippet (first link is more human readable)
+		links.add(URL);
+		
+		/*
+		 * Snippet adapted from cytoshow
+		 */
+		String[] logLines = content.split("wname=\"associations\"");
+		String restString = "";
+		if (logLines != null && logLines.length > 1 && logLines[1].split("\"").length > 1) {
+			restString = logLines[1].split("\"")[1];
+		}
+		
+		URL = "http://www.wormbase.org" + restString;
+		
+		try {
+			connection = new URL(URL).openConnection();			
 			Scanner scanner = new Scanner(connection.getInputStream());
 			scanner.useDelimiter("\\Z");
 			content = scanner.next();
 			scanner.close();
 		} catch (Exception e) {
-			// //try second extension
-			// URL = wormatlasURL + cell + wormatlasURLEXT;
-			// System.out.println("TRYING SECOND URL: " + URL);
-			//
-			// try {
-			// connection = new URL(URL).openConnection();
-			// Scanner scanner = new Scanner(connection.getInputStream());
-			// scanner.useDelimiter("\\Z");
-			// content = scanner.next();
-			// scanner.close();
-			// } catch (Exception e1) {
-			// //e1.printStackTrace();
-			// //a page wasn't found on wormatlas
-			// return this.cellName + " page not found on Wormatlas";
-			// }
-			// e1.printStackTrace();
-			// a page wasn't found on wormatlas
-			return null;
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.lineageName + " page not found on Wormbase (second URL)");
+			
+			//remove the link
+			for (int i = 0; i < links.size(); i++) {
+				if (links.get(i).startsWith(wormbaseURL)) {
+					links.remove(i);
+				}
+					
+			}
+			return;
 		}
-		return findFunctionInHTML(content, URL);
+		
+		//extract expressions
+		String[] genes = content.split("><");
+		for (String gene : genes) {
+			if (gene.startsWith("span class=\"locus\"")) {
+				gene = gene.substring(gene.indexOf(">")+1, gene.indexOf("<"));
+				geneExpression.add(gene);
+			}
+		}
 	}
 
-	/**
-	 * Parses the HTML page for the function section, edtracts it
-	 * @param content the entire wormbase HTML page
-	 * @param URL the url for the wormbase page
-	 * @return the function section parsed from wormbase
-	 */
-	private String findFunctionInHTML(String content, String URL) {
-		// parse the html for "Function"
-		content = content.substring(content.indexOf("Function"));
-		content = content.substring(content.indexOf(":") + 1, content.indexOf("</td>")); // skip
-																							// the
-																							// "Function:"
-																							// text
+	private void buildLinks() {
+		this.links = new ArrayList<String>();
+		
+		links.add(addGoogleLink());
+		links.add(addGoogleWormatlasLink());
+	}
+	
+	private String addGoogleLink() {
+		if (this.lineageName != null) {
+			String cell = lineageName;
+			
+			String functionalName = PartsList.getFunctionalNameByLineageName(lineageName);
+			if (functionalName != null) {
+				cell = functionalName; //terminal cell case
+			}
+			
+			
+			return googleURL + cell + "+c.+elegans";
+		}
 
+		return "";
+	}
+
+	private String addGoogleWormatlasLink() {
+		if (this.lineageName != null) {
+			String cell = lineageName;
+			
+			String functionalName = PartsList.getFunctionalNameByLineageName(lineageName);
+			if (functionalName != null) {
+				cell = functionalName; //terminal cell case
+			}
+			
+			return googleWormatlasURL + cell;
+		}
+
+		return "";
+	}
+	
+	protected void addLink(String link) {
+		if (links != null) {
+			links.add(link);
+		}
+	}
+	
+	/**
+	 * Finds the number of matches and documents for this cell on texpresso, and the first page of results
+	 *  
+	 * @return the number of matches, documents, and first page of results
+	 */
+	private void setReferences() {
+		this.references = new ArrayList<String>();
+			
+		String URL;
+		
+		String functionalName = PartsList.getFunctionalNameByLineageName(lineageName);
+		if (functionalName != null) {
+			URL = textpressoURL + functionalName + textpressoURLEXT; //terminal cell case
+		} else {
+			URL = textpressoURL + this.lineageName + textpressoURLEXT; //non terminal cell case
+		}
+				
+		String content = "";
+		URLConnection connection = null;
+		
+		try {
+			connection = new URL(URL).openConnection();			
+			Scanner scanner = new Scanner(connection.getInputStream());
+			scanner.useDelimiter("\\Z");
+			content = scanner.next();
+			scanner.close();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			//a page wasn't found on wormatlas
+			System.out.println(this.lineageName + " page not found on Textpresso");
+			return;
+		}
+		
+		int matchesIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">");
+		
+		if (matchesIDX > 0) {
+			matchesIDX--; //move back to the first digit
+			//find the start of the number of matches
+			String matchesStr = "";
+			for (;; matchesIDX--) {
+				char curr = content.charAt(matchesIDX);
+				if (Character.isDigit(curr)) {
+					matchesStr += curr;
+				} else {
+					break;
+				}
+			}
+			//reverse the string
+			matchesStr = new StringBuffer(matchesStr).reverse().toString();
+			
+			//find the number of documents
+			int documentsIDX = content.indexOf(" matches found in </span><span style=\"font-weight:bold;\">")+57;
+			
+			String documentsStr = "";
+			for (;; documentsIDX++) {
+				char curr = content.charAt(documentsIDX);
+				if (Character.isDigit(curr)) {
+					documentsStr += curr;
+				} else {
+					break;
+				}
+			}
+			
+			//add matches and documents to top of references list
+			references.add("<em>Textpresso</em>: " + matchesStr + " matches found in " + documentsStr + " documents");
+			/*
+			 * TODO
+			 * add textpresso url to page with open in browser
+			 */
+			
+			//parse the document for "Title: "
+			int lastIDX = 0;
+			while (lastIDX != -1) {
+				lastIDX = content.indexOf(textpressoTitleStr, lastIDX);
+				
+				if (lastIDX != -1) {
+					lastIDX += textpressoTitleStr.length(); //skip the title just seen
+					
+					//extract the title
+					String title = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					//move the index past the authors section
+					while (!content.substring(lastIDX).startsWith(textpressoAuthorsStr)) lastIDX++;
+					
+					lastIDX += textpressoAuthorsStr.length();
+					
+					//extract the authors
+					String authors = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					
+					//move the index past the year section
+					while (!content.substring(lastIDX).startsWith(textpressoYearStr)) lastIDX++;
+					
+					lastIDX += textpressoYearStr.length();
+					
+					//extract the year
+					String year = content.substring(lastIDX, content.indexOf("<br />", lastIDX));
+					
+					String reference = title + authors + ", " + year;
+					
+					//update anchors
+					reference = updateAnchors(reference);
+					
+					references.add(reference);
+				}
+			}
+		}
+		
+		//"<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>
+		
+		//add the source
+		String source = "<em>Source:</em> <a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>";
+		references.add(source);
+		
+		links.add(URL);
+	}
+	
+	protected String updateAnchors(String content) {
 		/*
-		 * find the anchor tags and change to: "<a href=\"#\" name=\"" + link +
-		 * "\" onclick=\"handleLink(this)\">" paradigm
+		 * find the anchor tags and change to:
+		 *  "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
+		 *  paradigm
 		 */
 		String findStr = "<a ";
 		int lastIdx = 0;
-
+		
 		while (lastIdx != -1) {
 			lastIdx = content.indexOf(findStr, lastIdx);
 
-			// check if another anchor found
+			//check if another anchor found
 			if (lastIdx != -1) {
-				// save the string preceding the anchor
+				//save the string preceding the anchor
 				String precedingStr = content.substring(0, lastIdx);
-
-				// find the end of the anchor and extract the anchor
+				
+				
+				//find the end of the anchor and extract the anchor
 				int anchorEndIdx = content.indexOf(anchorClose, lastIdx);
 				String anchor = content.substring(lastIdx, anchorEndIdx + anchorClose.length());
-
-				// extract the source href --> "href=\""
+				
+				//extract the source href --> "href=\""
 				boolean isLink = true;
 				int startSrcIdx = anchor.indexOf(href) + href.length();
-
+				
 				String src = "";
-				// make sure not a citation i.e. first character is '#'
+				//make sure not a citation i.e. first character is '#'
 				if (anchor.charAt(startSrcIdx) == '#') {
 					isLink = false;
 				} else {
 					src = anchor.substring(startSrcIdx, anchor.indexOf("\"", startSrcIdx));
 				}
-
+				
 				if (isLink) {
-					// check if relative src
+					//check if relative src
 					if (!src.contains("www.") && !src.contains("http")) {
-						// remove path
+						//remove path
 						if (src.contains("..")) {
 							src = src.substring(src.lastIndexOf("/") + 1);
 						}
 						src = wormatlasURL + src;
 					}
-
-					// extract the anchor text --> skip over the first <
+					
+					//extract the anchor text --> skip over the first <
 					String text = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
-
+					
 					// build new anchor
-					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text
-							+ "</a>";
+					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text + "</a>";
 
-					// replace previous anchor
+					
+					//replace previous anchor
 					content = precedingStr + newAnchor + content.substring(anchorEndIdx + anchorClose.length());
 				} else {
-					// remove anchor
+					//remove anchor
 					String txt = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
-
+					
 					content = precedingStr + txt + content.substring(anchorEndIdx + anchorClose.length());
 				}
-
-				// move lastIdx past just processed anchor
+				
+				
+				//move lastIdx past just processed anchor
 				lastIdx += findStr.length();
 			}
-
 		}
-
-		// add the link to the list
-		links.add(URL);
-
-		return "<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL
-				+ "</a><br><br>" + content;
+		return content;
+	}
+	
+	public String getLineageName() {
+		return this.lineageName;
+	}
+	
+	public ArrayList<String> getExpressesWORMBASE() {
+		return geneExpression;
+	}
+	
+	public ArrayList<String> getReferences() {
+		return references;
 	}
 
-	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
-	private final static String wormatlasURLEXT = "mainframe.htm";
+	public ArrayList<String> getLinks() {
+		return this.links;
+	}
+	
+	public ArrayList<String> getNuclearProductionInfo() {
+		return this.nuclearProductionInfo;
+	}
 
+	public ArrayList<String> getCellShapeProductionInfo() {
+		return this.cellShapeProductionInfo;
+	}
+
+	private final static String wormbaseURL = "http://www.wormbase.org/db/get?name=";
+	private final static String wormbaseEXT = ";class=Anatomy_term";
+	private final static String googleURL = "https://www.google.com/#q=";
+	private final static String googleWormatlasURL = "https://www.google.com/#q=site:wormatlas.org+";
+	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
+	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
+	private final static String textpressoTitleStr = "Title: </span>";
+	private final static String textpressoAuthorsStr = "Authors: </span>";
+	private final static String textpressoYearStr = "Year: </span>";
 	private final static String anchorClose = "</a>";
 	private final static String href = "href=\"";
+	protected final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 }

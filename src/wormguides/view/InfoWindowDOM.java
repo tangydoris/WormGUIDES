@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import wormguides.AnatomyTerm;
 import wormguides.model.AnatomyTermCase;
+import wormguides.model.CellCase;
 import wormguides.model.NonTerminalCellCase;
 import wormguides.model.PartsList;
 import wormguides.model.TerminalCellCase;
@@ -175,8 +176,7 @@ public class InfoWindowDOM {
 
 		boolean isneuronpage = (presynapticPartners.size() > 0 || electricalPartners.size() > 0
 				|| neuromuscularPartners.size() > 0 || postsynapticPartners.size() > 0);
-		// only add this section if it's a neuron (i.e. it appears in wiring
-		// diagram) -AS
+		// only add this section if it's a neuron (i.e. it appears in wiring diagram) -AS
 		if (isneuronpage) {
 			wiringPartnersDiv.addChild(wiringPartnersUL);
 			wiringPartnersDiv.addChild(viewWDDiv); // reversed order of these
@@ -195,9 +195,7 @@ public class InfoWindowDOM {
 		ArrayList<String> geneExpressions = terminalCase.getExpressesWORMBASE();
 		Collections.sort(geneExpressions);
 		String geneExpressionStr = geneExpressions.toString();
-		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
-		// surrounding
-		// brackets
+		geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove surrounding brackets
 		HTMLNode geneExpression = new HTMLNode("p", "", "", geneExpressionStr);
 		geneExpressionDiv.addChild(geneExpression);
 		boolean expresses = false;
@@ -298,8 +296,7 @@ public class InfoWindowDOM {
 							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
 									+ terminalCase.getCellName() + " on " + placeholder + "</a>";
 
-							// add wormbase link to end of gene expression
-							// section
+							// add wormbase link to end of gene expression section
 							if (placeholder.equals("Wormbase")) {
 								String wormbaseSource = "<em>Source:</em> " + anchor;
 								if (expresses) {
@@ -563,7 +560,7 @@ public class InfoWindowDOM {
 	 */
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
-		this.name = nonTerminalCase.getCellName();
+		this.name = nonTerminalCase.getLineageName();
 
 		HTMLNode head = new HTMLNode("head");
 
@@ -571,7 +568,7 @@ public class InfoWindowDOM {
 
 		// cell name
 		HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
-		String externalInfo = "<strong>" + nonTerminalCase.getCellName() + "</strong>";
+		String externalInfo = "<strong>" + nonTerminalCase.getLineageName() + "</strong>";
 		String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName()
 		+ "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
 		HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
@@ -698,17 +695,25 @@ public class InfoWindowDOM {
 							// check if wormatlas specific search
 							if (link.contains("site:wormatlas.org")) {
 								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-										+ nonTerminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+										+ nonTerminalCase.getLineageName() + " on Google (searching Wormatlas)" + "</a>";
 							} else {
 								anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-										+ nonTerminalCase.getCellName() + " on Google</a>";
+										+ nonTerminalCase.getLineageName() + " on Google</a>";
 							}
 						} else {
 							if (placeholder.toLowerCase().equals("cacr")) {
 								placeholder = "Textpresso";
 							}
 							anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-									+ nonTerminalCase.getCellName() + " on " + placeholder + "</a>";
+									+ nonTerminalCase.getLineageName() + " on " + placeholder + "</a>";
+							
+							// add wormbase link to end of gene expression section
+							if (placeholder.equals("wormbase")) {
+								String wormbaseSource = "<em>Source:</em> " + anchor;
+								if (expresses) {
+									geneExpressionDiv.addChild(new HTMLNode("p", "", "", wormbaseSource));
+								}
+							}
 						}
 					}
 				}
@@ -1122,7 +1127,9 @@ public class InfoWindowDOM {
 	public String getName() {
 		return this.name;
 	}
-
+	
+	private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
+	private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
 	private final static String AMPHID = "amphid";
 	private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
 	private final static String doctypeTag = "<!DOCTYPE html>";

@@ -138,7 +138,7 @@ public class InfoWindow {
 							}
 
 							if (PartsList.containsLineageName(lineageName)) {
-								if (cellCases.containsTerminalCase(lineageName)) {
+								if (cellCases.containsCellCase(lineageName)) {
 
 									// show the tab
 								} else {
@@ -157,7 +157,7 @@ public class InfoWindow {
 											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(funcName));
 								}
 							} else { // not in connectome --> non terminal case
-								if (cellCases.containsNonTerminalCase(lineageName)) {
+								if (cellCases.containsCellCase(lineageName)) {
 
 									// show tab
 								} else {

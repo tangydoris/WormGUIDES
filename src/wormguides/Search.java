@@ -1046,7 +1046,7 @@ public class Search {
 			}
 
 			if (PartsList.containsLineageName(name)) {
-				if (cellCases.containsTerminalCase(name)) {
+				if (cellCases.containsCellCase(name)) {
 
 					// show the tab
 				} else {
@@ -1061,7 +1061,7 @@ public class Search {
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { // not in connectome --> non terminal case
-				if (cellCases.containsNonTerminalCase(name)) {
+				if (cellCases.containsCellCase(name)) {
 
 					// show tab
 				} else {
