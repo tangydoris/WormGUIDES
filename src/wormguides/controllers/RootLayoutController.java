@@ -1055,7 +1055,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				}
 			}
 		});
-		displayedStory.setText("ActiveStory: " + storiesLayer.getActiveStory().getName());
+		displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
 		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 	}
 
