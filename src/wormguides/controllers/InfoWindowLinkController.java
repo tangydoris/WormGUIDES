@@ -55,21 +55,29 @@ public class InfoWindowLinkController {
 	 * @param cellName the name of the clicked wiring partner
 	 */
 	public void handleWiringPartnerClick(String cellName) {
+		//translate to lineage name
+		String cell = cellName;
+		
+		String lineageName = PartsList.getLineageNameByFunctionalName(cellName);
+		if (lineageName != null) {
+			cell = lineageName;
+		}
+		
 		//handle the case of " " to "_" discrepancy --> change all spaces to underscore
-		if (cellName.contains(" ")) {
-			for (int i = 0; i < cellName.length(); i++) {
-				if (cellName.charAt(i) == ' ') {
-					cellName = cellName.substring(0, i) + "_" + cellName.substring(i+1);
+		if (cell.contains(" ")) {
+			for (int i = 0; i < cell.length(); i++) {
+				if (cell.charAt(i) == ' ') {
+					cell = cell.substring(0, i) + "_" + cell.substring(i+1);
 				}
 			}
 		}
 		
 		//view in 3D
-		viewInCellTheater(PartsList.getLineageNameByFunctionalName(cellName));
+		viewInCellTheater(cell);
 
-		 if (!Search.hasCellCase(cellName)) {
+		 if (!Search.hasCellCase(cell)) {
 			 //generate a new cell case
-			 Search.addToInfoWindow(cellName);
+			 Search.addToInfoWindow(cell);
 		 } else {
 		 /*
 		 * TODO

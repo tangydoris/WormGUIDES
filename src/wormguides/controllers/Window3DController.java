@@ -362,11 +362,8 @@ public class Window3DController {
 						allLabels.add(lineageName);
 
 					Shape3D entity = getEntityWithName(lineageName);
-					if (entity == null) { //don't change scene if no shape associated with name
-						//System.out.println("no matching shape to " + lineageName);
-						return;
-					}
 
+					
 					// go to labeled name
 					int startTime;
 					int endTime;
@@ -374,13 +371,15 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
-					if (startTime <= 0) {
-						startTime = 1;
-					}
-						
-					if (endTime <= 0) {
-							endTime = 1;
-					}
+					if (startTime <= 0 || endTime <= 0) return; //if the entity doesn't appear in the lifetime of the embryo, don't change the scene
+					
+//					if (startTime <= 0) {
+//						startTime = 1;
+//					}
+//						
+//					if (endTime <= 0) {
+//							endTime = 1;
+//					}
 					
 					if (time.get() < startTime || time.get() > endTime) {
 						time.set(startTime);

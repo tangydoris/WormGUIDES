@@ -341,6 +341,10 @@ public class InfoWindowDOM {
 			referencesUL.addChild(li);
 		}
 		referencesTEXTPRESSODiv.addChild(referencesUL);
+		boolean hasReferences = false;
+		if (terminalCase.getReferences().size() > 1) { //need more than just the source
+			hasReferences = true;
+		}
 
 		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -520,8 +524,12 @@ public class InfoWindowDOM {
 		
 		body.addChild(linksTopContainerDiv);
 		body.addChild(linksDiv);
-		body.addChild(referencesTopContainerDiv);
-		body.addChild(referencesTEXTPRESSODiv);
+		
+		if (hasReferences) {
+			body.addChild(referencesTopContainerDiv);
+			body.addChild(referencesTEXTPRESSODiv);
+		}
+
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 
@@ -537,7 +545,11 @@ public class InfoWindowDOM {
 		}
 		
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
-		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
+		
+		if (hasReferences) {
+			body.addChild(collapseReferencesButton.makeCollapseButtonScript());
+		}
+		
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 
 		// link controller scripts
@@ -738,6 +750,10 @@ public class InfoWindowDOM {
 			referencesUL.addChild(li);
 		}
 		referencesTEXTPRESSODiv.addChild(referencesUL);
+		boolean hasReferences = false;
+		if (nonTerminalCase.getReferences().size() > 1) {
+			hasReferences = true;
+		}
 
 		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
@@ -796,8 +812,12 @@ public class InfoWindowDOM {
 		body.addChild(terminalDescendantsDiv);
 		body.addChild(linksTopContainerDiv);
 		body.addChild(linksDiv);
-		body.addChild(referencesTopContainerDiv);
-		body.addChild(referencesTEXTPRESSODiv);
+		
+		if (hasReferences) {
+			body.addChild(referencesTopContainerDiv);
+			body.addChild(referencesTEXTPRESSODiv);
+		}
+		
 		body.addChild(productionInfoTopContainerDiv);
 		body.addChild(productionInfoDiv);
 
@@ -812,7 +832,11 @@ public class InfoWindowDOM {
 		
 		body.addChild(collapseTerminalDescendantsButton.makeCollapseButtonScript());
 		body.addChild(collapseLinksButton.makeCollapseButtonScript());
-		body.addChild(collapseReferencesButton.makeCollapseButtonScript());
+		
+		if (hasReferences) {
+			body.addChild(collapseReferencesButton.makeCollapseButtonScript());
+		}
+
 		body.addChild(collapseProductionInfoButton.makeCollapseButtonScript());
 
 		// add link controller
