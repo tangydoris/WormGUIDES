@@ -19,7 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
-import wormguides.model.CellCasesLists;
+import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -70,7 +70,7 @@ public class Search {
 	private static boolean neuromuscularTicked;
 
 	// for cell cases searching
-	private static CellCasesLists cellCases;
+	private static CasesLists cases;
 
 	// for production info searching
 	private static ProductionInfo productionInfo;
@@ -982,9 +982,9 @@ public class Search {
 		}
 	}
 
-	public static void setCellCases(CellCasesLists cc) {
-		if (cc != null) {
-			cellCases = cc;
+	public static void setCases(CasesLists c) {
+		if (c != null) {
+			cases = c;
 		}
 	}
 
@@ -1001,8 +1001,8 @@ public class Search {
 	}
 
 	public static boolean hasCellCase(String cellName) {
-		if (cellCases != null) {
-			return cellCases.hasCellCase(cellName);
+		if (cases != null) {
+			return cases.hasCellCase(cellName);
 		}
 		return false;
 	}
@@ -1012,15 +1012,15 @@ public class Search {
 	 * STATIC WAY
 	 */
 	public static void removeCellCase(String cellName) {
-		if (cellCases != null && cellName != null) {
-			cellCases.removeCellCase(cellName);
+		if (cases != null && cellName != null) {
+			cases.removeCellCase(cellName);
 		}
 	}
 
 	public static void addToInfoWindow(AnatomyTerm term) {
 		if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
-			if (!cellCases.containsAnatomyTermCase(term.getTerm())) {
-				cellCases.makeAnatomyTermCase(term);
+			if (!cases.containsAnatomyTermCase(term.getTerm())) {
+				cases.makeAnatomyTermCase(term);
 			}
 		}
 	}
@@ -1041,19 +1041,19 @@ public class Search {
 
 		// GENERATE CELL TAB ON CLICK
 		if (name != null && !name.isEmpty()) {
-			if (cellCases == null || productionInfo == null) {
+			if (cases == null || productionInfo == null) {
 				return; // error check
 			}
 
 			if (PartsList.containsLineageName(name)) {
-				if (cellCases.containsCellCase(name)) {
+				if (cases.containsCellCase(name)) {
 
 					// show the tab
 				} else {
 					// translate the name if necessary
 					String funcName = connectome.checkQueryCell(name).toUpperCase();
 					// add a terminal case --> pass the wiring partners
-					cellCases.makeTerminalCase(name, funcName,
+					cases.makeTerminalCase(name, funcName,
 							connectome.queryConnectivity(funcName, true, false, false, false, false),
 							connectome.queryConnectivity(funcName, false, true, false, false, false),
 							connectome.queryConnectivity(funcName, false, false, true, false, false),
@@ -1061,12 +1061,12 @@ public class Search {
 							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
 				}
 			} else { // not in connectome --> non terminal case
-				if (cellCases.containsCellCase(name)) {
+				if (cases.containsCellCase(name)) {
 
 					// show tab
 				} else {
 					// add a non terminal case
-					cellCases.makeNonTerminalCase(name, productionInfo.getNuclearInfo(),
+					cases.makeNonTerminalCase(name, productionInfo.getNuclearInfo(),
 							productionInfo.getCellShapeData(name));
 				}
 			}

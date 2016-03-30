@@ -19,7 +19,7 @@ import wormguides.view.InfoWindowDOM;
  * @author katzmanb
  *
  */
-public class CellCasesLists {
+public class CasesLists {
 
 	private ArrayList<CellCase> cellCases;
 //	private ArrayList<TerminalCellCase> terminalCases;
@@ -28,7 +28,7 @@ public class CellCasesLists {
 
 	private InfoWindow infoWindow;
 
-	public CellCasesLists(InfoWindow window) {
+	public CasesLists(InfoWindow window) {
 		cellCases = new ArrayList<CellCase>();
 		
 //		terminalCases = new ArrayList<TerminalCellCase>();

@@ -86,7 +86,7 @@ import wormguides.SearchOption;
 import wormguides.SearchType;
 import wormguides.StoriesLayer;
 import wormguides.Xform;
-import wormguides.model.CellCasesLists;
+import wormguides.model.CasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -173,7 +173,7 @@ public class Window3DController {
 	private StringProperty selectedNameLabeled;
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
-	private CellCasesLists cellCases;
+	private CasesLists cases;
 	private BooleanProperty cellClicked;
 
 	// searched highlighting stuff
@@ -283,8 +283,8 @@ public class Window3DController {
 	 *            {@link LineageData} to contains cell information loaded from
 	 *            the nuclear files
 	 * @param cases
-	 *            {@link CellCasesList} that contains information about
-	 *            terminal/non-terminal cells
+	 *            {@link casesList} that contains information about
+	 *            terminal/non-terminal cells/anatomy terms
 	 * @param info
 	 *            {@link ProductionInfo} that contains information about
 	 *            segmentation and the movie time offset
@@ -295,7 +295,7 @@ public class Window3DController {
 	 *            {@link BooleanProperty} that should be set to TRUE when the
 	 *            info window should be brought up, FALSE otherwise
 	 */
-	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CellCasesLists cases,
+	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
 		parentStage = parent;
 
@@ -529,7 +529,7 @@ public class Window3DController {
 			}
 		};
 
-		cellCases = cases;
+		this.cases = cases;
 
 		movieFiles = new Vector<File>();
 		javaPictures = new Vector<JavaPicture>();
@@ -549,6 +549,14 @@ public class Window3DController {
 		this.bringUpInfoProperty = bringUpInfoProperty;
 
 		initializeUpdate3D();
+		
+		//initializeWithCannonicalOrientation();
+	}
+	
+	public void initializeWithCannonicalOrientation() {
+		//set default cannonical orientations
+
+		
 	}
 
 	private Group createOrientationIndicator() {
@@ -578,7 +586,7 @@ public class Window3DController {
 
 		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation to match lateral orientation in image
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
-		// xy relocates z shrinks aparent by moving away from camera? improves
+		// xy relocates z shrinks apparent by moving away from camera? improves
 		// resolution?
 		orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
 		orientationIndicator.getTransforms().add(new Translate(-newOriginX, -newOriginY, -newOriginZ));
@@ -818,7 +826,7 @@ public class Window3DController {
 			mouseDeltaY /= 2;
 			
 			/* TODO 
-			 * Z COORDINATE
+			 * how to get Z COORDINATE?
 			 */
 			if (quaternion != null) {
 //				double[] vectorToOldMousePos = vectorBWPoints(newOriginX, newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
@@ -1053,7 +1061,7 @@ public class Window3DController {
 
 	private void initContextMenuStage() {
 		if (contextMenuStage == null) {
-			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cellCases,
+			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases,
 					productionInfo, connectome);
 
 			contextMenuStage = new Stage();
@@ -1867,7 +1875,7 @@ public class Window3DController {
 		this.camera = new PerspectiveCamera(true);
 		this.xform = new Xform();
 		xform.reset();
-
+		
 		root.getChildren().add(xform);
 		xform.getChildren().add(camera);
 

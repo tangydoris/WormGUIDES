@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
-import wormguides.model.CellCasesLists;
+import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
@@ -37,7 +37,7 @@ public class InfoWindow {
 //	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
 
-	private CellCasesLists cellCases;
+	private CasesLists cases;
 	private ProductionInfo productionInfo;
 	private String nameToQuery;
 	private Service<Void> addNameService;
@@ -45,12 +45,12 @@ public class InfoWindow {
 
 	private int count; //to show loading in progress
 
-	public InfoWindow(Stage stage, StringProperty cellNameProperty, CellCasesLists cases, ProductionInfo info,
+	public InfoWindow(Stage stage, StringProperty cellNameProperty, CasesLists cases, ProductionInfo info,
 			Connectome connectome) {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Cell Info Window");
 
-		cellCases = cases;
+		this.cases = cases;
 		productionInfo = info;
 		tabPane = new TabPane();
 
@@ -132,13 +132,13 @@ public class InfoWindow {
 						final String lineageName = nameToQuery;
 
 						if (lineageName != null && !lineageName.isEmpty()) {
-							if (cellCases == null) {
+							if (cases == null) {
 								System.out.println("null cell cases");
 								return null; // error check
 							}
 
 							if (PartsList.containsLineageName(lineageName)) {
-								if (cellCases.containsCellCase(lineageName)) {
+								if (cases.containsCellCase(lineageName)) {
 
 									// show the tab
 								} else {
@@ -149,7 +149,7 @@ public class InfoWindow {
 									// add a terminal case --> pass the wiring
 									// partners
 									String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
-									cellCases.makeTerminalCase(lineageName, funcName,
+									cases.makeTerminalCase(lineageName, funcName,
 											connectome.queryConnectivity(funcName, true, false, false, false, false),
 											connectome.queryConnectivity(funcName, false, true, false, false, false),
 											connectome.queryConnectivity(funcName, false, false, true, false, false),
@@ -157,12 +157,12 @@ public class InfoWindow {
 											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(funcName));
 								}
 							} else { // not in connectome --> non terminal case
-								if (cellCases.containsCellCase(lineageName)) {
+								if (cases.containsCellCase(lineageName)) {
 
 									// show tab
 								} else {
 									// add a non terminal case
-									cellCases.makeNonTerminalCase(lineageName, productionInfo.getNuclearInfo(),
+									cases.makeNonTerminalCase(lineageName, productionInfo.getNuclearInfo(),
 											productionInfo.getCellShapeData(lineageName));
 								}
 							}

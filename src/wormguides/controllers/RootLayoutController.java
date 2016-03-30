@@ -59,7 +59,7 @@ import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
 import wormguides.model.Anatomy;
-import wormguides.model.CellCasesLists;
+import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.LineageTree;
@@ -224,7 +224,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private ProductionInfo productionInfo;
 
 	// info window Stuff
-	private CellCasesLists cellCases;
+	private CasesLists cases;
 	private InfoWindow infoWindow;
 	private BooleanProperty bringUpInfoProperty;
 
@@ -411,10 +411,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (infoWindow == null) {
 			initInfoWindow();
 
-			if (cellCases == null)
-				initCellCases();
+			if (cases == null)
+				initCases();
 			else
-				cellCases.setInfoWindow(infoWindow);
+				cases.setInfoWindow(infoWindow);
 		}
 
 		infoWindow.showWindow();
@@ -578,8 +578,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	// ----- End menu items and buttons listeners -----
 
 	public void init3DWindow(LineageData data) {
-		if (cellCases == null)
-			initCellCases();
+		if (cases == null)
+			initCases();
 		if (productionInfo == null)
 			initProductionInfo();
 		if (connectome == null)
@@ -589,7 +589,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 
-		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cellCases, productionInfo,
+		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo,
 				connectome, bringUpInfoProperty);
 		subscene = window3DController.getSubScene();
 
@@ -1080,17 +1080,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				initConnectome();
 			if (productionInfo == null)
 				initProductionInfo();
-			if (cellCases == null)
-				initCellCases();
+			if (cases == null)
+				initCases();
 
 			infoWindow = new InfoWindow(window3DController.getStage(), window3DController.getSelectedNameLabeled(),
-					cellCases, productionInfo, connectome);
+					cases, productionInfo, connectome);
 		}
 	}
 
-	private void initCellCases() {
-		cellCases = new CellCasesLists(infoWindow);
-		Search.setCellCases(cellCases);
+	private void initCases() {
+		cases = new CasesLists(infoWindow);
+		Search.setCases(cases);
 	}
 
 	private void initProductionInfo() {
