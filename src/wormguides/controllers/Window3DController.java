@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -646,6 +647,12 @@ public class Window3DController {
 	 * Insert transient label into sprites pane name = name that appears on the
 	 * label entity = entity that the label should show up on
 	 */
+	private void transientLabel(String name, Node entity) {
+		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && appliesToCurrentRules(name))) {
+			showTransientLabel(name, entity);
+		}
+	}
+	
 	private void showTransientLabel(String name, Node entity) {
 		boolean labelDrawn = false;
 
@@ -1400,7 +1407,7 @@ public class Window3DController {
 					// in regular view mode
 					ArrayList<String> allNames = se.getAllCellNames();
 					String sceneName = se.getSceneName();
-
+					
 					// default white meshes
 					if (allNames.isEmpty()) {
 						mesh.setMaterial(new PhongMaterial(Color.WHITE));
@@ -1412,7 +1419,6 @@ public class Window3DController {
 					else {
 						ArrayList<Color> colors = new ArrayList<Color>();
 						for (Rule rule : currentRulesList) {
-
 							if (rule.isMulticellularStructureRule()
 									&& rule.appliesToMulticellularStructure(sceneName)) {
 								colors.add(rule.getColor());
@@ -1446,7 +1452,7 @@ public class Window3DController {
 						String name = normalizeName(se.getSceneName());
 
 						if (!currentLabels.contains(name.toLowerCase()))
-							showTransientLabel(name, getEntityWithName(name));
+							transientLabel(name, getEntityWithName(name));
 					}
 				});
 				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -1515,7 +1521,7 @@ public class Window3DController {
 
 					if (!currentLabels.contains(name.toLowerCase())) {
 						// get cell body version of sphere, if there is one
-						showTransientLabel(name, getEntityWithName(name));
+						transientLabel(name, getEntityWithName(name));
 					}
 				}
 			});
@@ -1950,6 +1956,60 @@ public class Window3DController {
 					searchedMeshes[i] = false;
 			}
 		}
+	}
+	
+	public boolean appliesToCurrentRules(String name) {
+		// get the scene name associated with the cell
+		String sceneName = "";
+		ArrayList<String> cells = new ArrayList<String>();
+		for (int i = 0; i < sceneElementsList.elementsList.size(); i++) {
+			SceneElement currSE = sceneElementsList.elementsList.get(i);
+			
+			//check if multicellular structure --> find match with name in cells
+			if (currSE.isMulticellular()) {
+				if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
+					sceneName = name;
+					cells = currSE.getAllCellNames(); //save the cells in case there isn't an explicit structure rule but the structure is still colored
+				}
+			} else {
+				String sn = sceneElementsList.elementsList.get(i).getSceneName();
+				
+				StringTokenizer st = new StringTokenizer(sn);
+				if (st.countTokens() == 2) {
+					String sceneNameLineage = st.nextToken();
+					if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
+						sceneName = sn;
+						break;
+					}
+				}
+			}
+		}
+		
+		
+		if (sceneName.equals("")) {
+			sceneName = name;
+		}
+		
+		for (Rule rule : currentRulesList) {
+			if (rule.isMulticellularStructureRule()
+					&& rule.appliesToMulticellularStructure(sceneName)) {
+				return true;
+			} else if (rule.appliesToCellBody(name)) {
+				return true;
+			} else if (rule.appliesToCellNucleus(name)) {
+				return true;
+			} else { //check if cells corresponding to multicellular structure have rule - in the case of a non explicit multicellular rule but a structure that's colored
+				if (cells.size() > 0) {
+					for (String cell : cells) {
+						if (rule.appliesToCellBody(cell)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	public boolean captureImagesForMovie() {
