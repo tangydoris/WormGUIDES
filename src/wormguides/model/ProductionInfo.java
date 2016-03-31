@@ -1,6 +1,8 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 import wormguides.loaders.ProductionInfoLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
@@ -54,9 +56,17 @@ public class ProductionInfo {
 
 		for (int i = 0; i < productionInfoData.get(0).size(); i++) {
 			String cells = productionInfoData.get(0).get(i);
-			if (cells.contains(queryCell)) {
-				cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store strain, marker data
-				cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
+			
+			//delimit cells by ';'
+			StringTokenizer st = new StringTokenizer(cells, ";");
+			while (st.hasMoreTokens()) {
+				String str = st.nextToken().trim();
+				
+				if (str.toLowerCase().equals(queryCell.toLowerCase())) {
+					cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store strain, marker data
+					cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
+					break;
+				}
 			}
 		}
 

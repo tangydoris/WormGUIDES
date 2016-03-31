@@ -174,8 +174,8 @@ GLRVL	MSapaaaav	Set of six cells that form a thin cylindrical sheet between phar
 GLRVR	MSppaaaav	Set of six cells that form a thin cylindrical sheet between pharynx and ring neuropile; no chemical synapses, but gap junctions with muscle arms and RME motor neurons
 G1	ABprpaaaapa	Postembryonic blast cell, excretory socket in embryo
 G2	ABplapaapa	Postembryonic blast cell, excretory socket in L1, G2.p becomes socket later
-HOL	ABplaaappa	Seam hypodermal cell
-HOR	ABarpapppa	Seam hypodermal cell
+H0L	ABplaaappa	Seam hypodermal cell
+H0R	ABarpapppa	Seam hypodermal cell
 H1L	ABplaaappp	Seam hypodermal cell, postembryonic blast cell
 H1R	ABarpapppp	Seam hypodermal cell, postembryonic blast cell
 H2L	ABarppaaap	Seam hyopdermal cell, postemb. blast cell, L1 deirid socket

@@ -53,6 +53,12 @@ public class Connectome {
 				connectedCells.add(ns.getCell1());
 			}
 		}
+		
+		//make sure self isn't in list
+		if (connectedCells.contains(centralCell)) {
+			connectedCells.remove(centralCell);
+		}
+		
 		return connectedCells;
 	}
 

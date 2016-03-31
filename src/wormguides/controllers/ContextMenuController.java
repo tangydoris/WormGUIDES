@@ -29,7 +29,7 @@ import javafx.stage.WindowEvent;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.SearchType;
-import wormguides.model.CellCasesLists;
+import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
@@ -82,7 +82,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	private Menu preSyn, postSyn, electr, neuro;
 	private Service<ArrayList<ArrayList<String>>> wiredToQueryService;
 
-	private CellCasesLists cellCases;
+	private CasesLists cases;
 	private ProductionInfo productionInfo;
 	private Stage parentStage;
 
@@ -105,13 +105,13 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * @param connectome
 	 *            connectome object that has information about cell connectome
 	 */
-	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CellCasesLists cases,
+	public ContextMenuController(Stage stage, BooleanProperty bringUpInfoProperty, CasesLists cases,
 			ProductionInfo info, Connectome connectome) {
 		super();
 
 		this.bringUpInfoProperty = bringUpInfoProperty;
 		parentStage = stage;
-		cellCases = cases;
+		this.cases = cases;
 		productionInfo = info;
 		loadingService = new Service<Void>() {
 			@Override
@@ -168,7 +168,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					@Override
 					protected ArrayList<String> call() throws Exception {
 						if (cellName != null && !cellName.isEmpty()) {
-							if (cellCases == null) {
+							if (cases == null) {
 								System.out.println("null cell cases");
 								return null; // error check
 							}
@@ -179,22 +179,24 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 							if (funcName != null)
 								isTerminalCase = true;
 							if (isTerminalCase) {
-								if (!cellCases.containsTerminalCase(searchName)) {
-									cellCases.makeTerminalCase(cellName, searchName,
+								if (!cases.containsCellCase(searchName)) {
+									cases.makeTerminalCase(cellName, searchName,
 											connectome.queryConnectivity(searchName, true, false, false, false, false),
 											connectome.queryConnectivity(searchName, false, true, false, false, false),
 											connectome.queryConnectivity(searchName, false, false, true, false, false),
 											connectome.queryConnectivity(searchName, false, false, false, true, false),
 											productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(cellName));
 								}
-								return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
+//								return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
+								return cases.getCellCase(cellName).getExpressesWORMBASE();
 							}
 							
-							if (!cellCases.containsNonTerminalCase(searchName)) {
-								cellCases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
+							if (!cases.containsCellCase(searchName)) {
+								cases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
 										productionInfo.getCellShapeData(cellName));
 							}
-							return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
+							//return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
+							return cases.getCellCase(searchName).getExpressesWORMBASE();
 						}
 						
 						return null;
@@ -258,8 +260,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					protected ArrayList<ArrayList<String>> call() throws Exception {
 						if (cellName != null && !cellName.isEmpty()) {
 							ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
-							if (cellCases.containsTerminalCase(cellName)) {
-								TerminalCellCase terminalCase = cellCases.getTerminalCellCase(cellName);
+							if (cases.containsCellCase(cellName)) {
+//								TerminalCellCase terminalCase = cellCases.getTerminalCellCase(cellName);
+								TerminalCellCase terminalCase = (TerminalCellCase) cases.getCellCase(cellName);
 								results.add(PRE_SYN_INDEX, terminalCase.getPresynapticPartners());
 								results.add(POST_SYN_INDEX, terminalCase.getPostsynapticPartners());
 								results.add(ELECTR_INDEX, terminalCase.getElectricalPartners());
