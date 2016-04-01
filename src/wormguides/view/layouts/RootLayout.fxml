@@ -467,13 +467,13 @@
 			            <Insets />
 			         </GridPane.margin>
 			      </TabPane>
-            <AnchorPane minHeight="300.0" minWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
-                  <VBox fx:id="displayVBox" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+                  <VBox fx:id="displayVBox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                      <children>
-                        <AnchorPane>
+                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                            <children>
-                              <AnchorPane fx:id="modelAnchorPane" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <AnchorPane fx:id="modelAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
                                        <font>
@@ -499,11 +499,11 @@
                               </HBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0">
+                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0" VBox.vgrow="NEVER">
                            <children>
                               <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <content>
-                                    <VBox maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
+                                    <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
                                        <children>
                                           <HBox>
                                              <children>

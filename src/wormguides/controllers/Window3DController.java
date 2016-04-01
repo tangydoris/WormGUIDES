@@ -571,10 +571,7 @@ public class Window3DController {
 		Group middleTransformGroup = new Group();
 
 		// set up the orientation indicator in bottom right corner
-		String PA = "P     A";
-		//Reflection refl = new Reflection(0., 1., 0., 1.);
-		Text t = makeNoteBillboardText(PA);
-		//t.setEffect(refl);
+		Text t = makeNoteBillboardText("P     A");
 		t.setTranslateX(-10);
 		middleTransformGroup.getChildren().add(t);
 		
