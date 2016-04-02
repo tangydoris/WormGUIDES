@@ -1164,6 +1164,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		 */
 		timeSlider.setValue(256.);
 		window3DController.setTime(lim4StoryStartTime);
+		
+		window3DController.initializeWithCannonicalOrientation();
 
 		viewTreeAction();
 

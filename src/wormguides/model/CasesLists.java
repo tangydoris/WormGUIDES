@@ -1,6 +1,7 @@
 package wormguides.model;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import wormguides.AnatomyTerm;
 import wormguides.view.InfoWindow;
@@ -22,17 +23,12 @@ import wormguides.view.InfoWindowDOM;
 public class CasesLists {
 
 	private ArrayList<CellCase> cellCases;
-//	private ArrayList<TerminalCellCase> terminalCases;
-//	private ArrayList<NonTerminalCellCase> nonTerminalCases;
 	private ArrayList<AnatomyTermCase> anatomyTermCases;
 
 	private InfoWindow infoWindow;
 
 	public CasesLists(InfoWindow window) {
 		cellCases = new ArrayList<CellCase>();
-		
-//		terminalCases = new ArrayList<TerminalCellCase>();
-//		nonTerminalCases = new ArrayList<NonTerminalCellCase>();
 		anatomyTermCases = new ArrayList<AnatomyTermCase>();
 		infoWindow = window;
 	}
@@ -83,24 +79,6 @@ public class CasesLists {
 	}
 
 	/**
-	 * Finds the case corresponding to the given cell
-	 * 
-	 * @param cellName the cell to search form
-	 * @return the case corresponding to the given cell
-	 */
-//	public TerminalCellCase getTerminalCellCase(String cellName) {
-//		if (!containsTerminalCase(cellName))
-//			return null;
-//
-//		for (TerminalCellCase cellCase : terminalCases) {
-//			if (cellCase.getCellName().equalsIgnoreCase(cellName))
-//				return cellCase;
-//		}
-//
-//		return null;
-//	}
-
-	/**
 	 * Creates a non terminal case for a cell and adds the case to the list
 	 * 
 	 * @param cellName
@@ -133,36 +111,19 @@ public class CasesLists {
 		}
 	}
 	
-	/**
-	 * Finds the case corresponding to the given cell
-	 * 
-	 * @param cellName the cell to search form
-	 * @return the case corresponding to the given cell
-	 */
-//	public NonTerminalCellCase getNonTerminalCellCase(String cellName) {
-//		if (!containsNonTerminalCase(cellName))
-//			return null;
-//
-//		for (NonTerminalCellCase cellCase : nonTerminalCases) {
-//			if (cellCase.getLineageName().equalsIgnoreCase(cellName))
-//				return cellCase;
-//		}
-//
-//		return null;
-//	}
-	
 	public void makeAnatomyTermCase(AnatomyTerm term) {
-		AnatomyTermCase termCase = new AnatomyTermCase(term);
-		
-		addAnatomyTermCase(termCase);
+		if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
+			AmphidSensillaTerm amphidSensillaCase = new AmphidSensillaTerm(term);
+			addAmphidSensillaTermCase(amphidSensillaCase);
+		}
 	}
 	
-	private void addAnatomyTermCase(AnatomyTermCase termCase) {
-		if (termCase != null) {
-			anatomyTermCases.add(termCase);
+	private void addAmphidSensillaTermCase(AmphidSensillaTerm amphidSensillaTermCase) {
+		if (amphidSensillaTermCase != null) {
+			anatomyTermCases.add(amphidSensillaTermCase);
 			
 			//create dom
-			InfoWindowDOM termCaseDOM = new InfoWindowDOM(termCase);
+			InfoWindowDOM termCaseDOM = new InfoWindowDOM(amphidSensillaTermCase);
 			
 			//add dom to InfoWindow
 			if (infoWindow != null) {
@@ -171,7 +132,7 @@ public class CasesLists {
 			
 		}
 	}
-	
+
 	public CellCase getCellCase(String cellName) {
 		String cell = cellName;
 		
@@ -207,46 +168,6 @@ public class CasesLists {
 		
 		return false;
 	}
-
-//	/**
-//	 * Searches the list of terminal cases for a case corresponding to the given cell
-//	 * 
-//	 * 
-//	 * @param cellName the cell to be searched for
-//	 * @return boolean corresponding to if the cell was found
-//	 */
-//	public boolean containsTerminalCase(String cellName) {
-//		if (terminalCases != null) {
-//			for (TerminalCellCase tCase : terminalCases) {
-//				if (tCase.getCellName().equals(cellName)
-//						|| tCase.getCellName().equals(PartsList.getFunctionalNameByLineageName(cellName))) {
-//					return true;
-//				}
-//			}
-//			return false;
-//		}
-//		return false;
-//	}
-//
-//	/**
-//	 * Searches the list of non terminal cases for a case corresponding to the given cell
-//	 * 
-//	 * 
-//	 * @param cellName the cell to be searched for
-//	 * @return boolean corresponding to if the cell was found
-//	 */
-//	public boolean containsNonTerminalCase(String cellName) {
-//		if (nonTerminalCases != null) {
-//			for (NonTerminalCellCase ntCase : nonTerminalCases) {
-//				if (ntCase.getLineageName().equals(cellName)
-//						|| ntCase.getLineageName().equals(PartsList.getLineageNameByFunctionalName(cellName))) {
-//					return true;
-//				}
-//			}
-//			return false;
-//		}
-//		return false;
-//	}
 	
 	public boolean containsAnatomyTermCase(String term) {
 		if (anatomyTermCases != null) {
@@ -284,29 +205,15 @@ public class CasesLists {
 			cell = lineage;
 		}
 		
-//		if (containsTerminalCase(cellName)) {
-//			for (int i = 0; i < terminalCases.size(); i++) {
-//				if (terminalCases.get(i).getCellName().toLowerCase().equals(cellName.toLowerCase())) {
-//					terminalCases.remove(i);
-//					return;
-//				}
-//			}
-//		}
-//
-//		if (containsNonTerminalCase(cellName)) {
-//			for (int i = 0; i < nonTerminalCases.size(); i++) {
-//				if (nonTerminalCases.get(i).getLineageName().toLowerCase().equals(cellName.toLowerCase())) {
-//					nonTerminalCases.remove(i);
-//					return;
-//				}
-//			}
-//		}
-		
 		if (containsCellCase(cell)) {
-			for (CellCase cellCase : cellCases) {
-				if (cellCase.getLineageName().toLowerCase().equals(cell.toLowerCase())) {
-					cellCases.remove(cellCase);
+			try {
+				for (CellCase cellCase : cellCases) {
+					if (cellCase.getLineageName().toLowerCase().equals(cell.toLowerCase())) {
+						cellCases.remove(cellCase);
+					}
 				}
+			} catch (ConcurrentModificationException e) {
+				//e.printStackTrace();
 			}
 		}
 		

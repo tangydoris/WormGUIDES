@@ -296,6 +296,15 @@ public class TerminalCellCase extends CellCase {
 			}
 		}
 		
+		//remove self from lists
+		if (leftRightHomologues.contains(this.funcName)) {
+			leftRightHomologues.remove(this.funcName);
+		}
+		
+		if (additionalSymmetries.contains(this.funcName)) {
+			additionalSymmetries.remove(this.funcName);
+		}
+		
 		homologues.add(leftRightHomologues);
 		homologues.add(additionalSymmetries);
 		

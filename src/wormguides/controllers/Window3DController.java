@@ -51,6 +51,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -549,14 +550,16 @@ public class Window3DController {
 		this.bringUpInfoProperty = bringUpInfoProperty;
 
 		initializeUpdate3D();
-		
-		//initializeWithCannonicalOrientation();
 	}
 	
 	public void initializeWithCannonicalOrientation() {
 		//set default cannonical orientations
 
-		
+		rotateX.setAngle(cannonicalOrientationX);
+		rotateY.setAngle(cannonicalOrientationY);
+
+		repositionSprites();
+		repositionNoteBillboardFronts();
 	}
 
 	private Group createOrientationIndicator() {
@@ -571,6 +574,8 @@ public class Window3DController {
 		Text t = makeNoteBillboardText("P     A");
 		t.setTranslateX(-10);
 		middleTransformGroup.getChildren().add(t);
+		
+		
 
 		t = makeNoteBillboardText("D     V");
 		t.setTranslateX(-42);
@@ -2727,6 +2732,9 @@ public class Window3DController {
 		return this.parentStage;
 	}
 
+	private final static double cannonicalOrientationX = 95.;
+	private final static double cannonicalOrientationY = 175.0;
+	
 	private final String CS = ", ";
 
 	private final String FILL_COLOR_HEX = "#272727";
