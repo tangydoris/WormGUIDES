@@ -14,8 +14,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
-import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
+import wormguides.layers.SearchLayer;
 import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
@@ -37,7 +37,6 @@ public class InfoWindow {
 //	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
 
-	private CasesLists cases;
 	private ProductionInfo productionInfo;
 	private String nameToQuery;
 	private Service<Void> addNameService;
@@ -50,7 +49,6 @@ public class InfoWindow {
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Cell Info Window");
 
-		this.cases = cases;
 		productionInfo = info;
 		tabPane = new TabPane();
 
@@ -267,7 +265,7 @@ public class InfoWindow {
 					public void handle(Event e) {
 						Tab t = (Tab) e.getSource();
 						String cellName = t.getId();
-						Search.removeCellCase(cellName);
+						SearchLayer.removeCellCase(cellName);
 					}
 				});
 

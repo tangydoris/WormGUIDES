@@ -30,15 +30,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.MainApp;
 import wormguides.SearchOption;
-import wormguides.SearchType;
 import wormguides.controllers.RuleEditorController;
+import wormguides.layers.SearchType;
 import wormguides.loaders.ImageLoader;
 import wormguides.view.AppFont;
 
 /**
  * This class is the color rule that determines the coloring/striping of cell,
  * cell bodies, and multicellular structures. It is instantiated by the
- * {@link Search} class and added to an {@link ObservableList} of Rules that are
+ * {@link SearchLayer} class and added to an {@link ObservableList} of Rules that are
  * displayed in the 'Display Options' tab. This class also contains the JavaFX
  * nodes that make up its graphical representation, which are used to display
  * the rule in the {@link ListView} in the tab.
@@ -78,7 +78,7 @@ public class Rule {
 	private SearchType searchType;
 
 	/**
-	 * Rule class constructor called by the {@link Search} class.
+	 * Rule class constructor called by the {@link SearchLayer} class.
 	 * 
 	 * @param searched
 	 *            String that contains the term used when the user made a search
@@ -98,7 +98,7 @@ public class Rule {
 	}
 
 	/**
-	 * Rule class constructor called by the {@link Search} class.
+	 * Rule class constructor called by the {@link SearchLayer} class.
 	 * 
 	 * @param searched
 	 *            String that contains the term used when the user made a search
@@ -297,7 +297,7 @@ public class Rule {
 	}
 
 	/**
-	 * Called by the {@link Search} class to set the baseline list of cells that
+	 * Called by the {@link SearchLayer} class to set the baseline list of cells that
 	 * the rule affects. Multicellular structure rule cells are never set since
 	 * they are queried by name only.
 	 * 
@@ -312,7 +312,7 @@ public class Rule {
 	}
 
 	/**
-	 * @return TRUE if the list of baseline cells are set by the {@link Search}
+	 * @return TRUE if the list of baseline cells are set by the {@link SearchLayer}
 	 *         class, FALSE otherwise
 	 */
 	public boolean areCellsSet() {

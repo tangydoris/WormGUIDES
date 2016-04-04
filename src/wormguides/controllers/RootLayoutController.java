@@ -48,13 +48,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import wormguides.DisplayLayer;
 import wormguides.MainApp;
-import wormguides.Search;
-import wormguides.SearchType;
-import wormguides.StoriesLayer;
 import wormguides.StringListCellFactory;
-import wormguides.StructuresLayer;
+import wormguides.layers.DisplayLayer;
+import wormguides.layers.SearchLayer;
+import wormguides.layers.SearchType;
+import wormguides.layers.StoriesLayer;
+import wormguides.layers.StructuresLayer;
 import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
@@ -144,7 +144,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Tab storiesTab;
 
 	// Cells tab
-	private Search search;
+	private SearchLayer search;
 	@FXML
 	private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -219,6 +219,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button noteEditorBtn;
 	@FXML
 	private Button newStory;
+	@FXML
+	private Button deleteStory;
 
 	// production information
 	private ProductionInfo productionInfo;
@@ -755,8 +757,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			displayedDescription.setText(storiesLayer.getNoteComments(name));
 
 		// Cell body/structue
-		if (Search.isStructureWithComment(name))
-			displayedDescription.setText(Search.getStructureComment(name));
+		if (SearchLayer.isStructureWithComment(name))
+			displayedDescription.setText(SearchLayer.getStructureComment(name));
 
 		// Cell lineage name
 		else {
@@ -852,7 +854,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initSearch() {
-		search = new Search();
+		search = new SearchLayer();
 
 		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
 
@@ -1006,6 +1008,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		assert (storiesListView != null);
 		assert (noteEditorBtn != null);
 		assert (newStory != null);
+		assert (deleteStory != null);
 	}
 
 	private void initStructuresLayer() {
@@ -1031,7 +1034,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			initStructuresLayer();
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory);
 
 		window3DController.setStoriesLayer(storiesLayer);
 
@@ -1065,12 +1068,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (window3DController != null)
 			window3DController.setSceneElementsList(elementsList);
 
-		Search.setSceneElementsList(elementsList);
+		SearchLayer.setSceneElementsList(elementsList);
 	}
 
 	private void initConnectome() {
 		connectome = new Connectome();
-		Search.setConnectome(connectome);
+		SearchLayer.setConnectome(connectome);
 	}
 
 	private void initInfoWindow() {
@@ -1090,12 +1093,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	private void initCases() {
 		cases = new CasesLists(infoWindow);
-		Search.setCases(cases);
+		SearchLayer.setCases(cases);
 	}
 
 	private void initProductionInfo() {
 		productionInfo = new ProductionInfo();
-		Search.setProductionInfo(productionInfo);
+		SearchLayer.setProductionInfo(productionInfo);
 	}
 
 	@Override
@@ -1126,10 +1129,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		initSearch();
 		ObservableList<Rule> list = displayLayer.getRulesList();
-		Search.setRulesList(list);
-		Search.addDefaultColorRules();
-		Search.setActiveLineageNames(lineageData.getAllCellNames());
-		Search.setLineageData(lineageData);
+		SearchLayer.setRulesList(list);
+		SearchLayer.addDefaultColorRules();
+		SearchLayer.setActiveLineageNames(lineageData.getAllCellNames());
+		SearchLayer.setLineageData(lineageData);
 
 		window3DController.setRulesList(list);
 

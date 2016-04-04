@@ -51,11 +51,9 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Reflection;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.RotateEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -82,11 +80,11 @@ import wormguides.ColorComparator;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
-import wormguides.Search;
 import wormguides.SearchOption;
-import wormguides.SearchType;
-import wormguides.StoriesLayer;
 import wormguides.Xform;
+import wormguides.layers.SearchLayer;
+import wormguides.layers.SearchType;
+import wormguides.layers.StoriesLayer;
 import wormguides.model.CasesLists;
 import wormguides.model.ColorHash;
 import wormguides.model.Connectome;
@@ -370,8 +368,8 @@ public class Window3DController {
 					int startTime;
 					int endTime;
 
-					startTime = Search.getFirstOccurenceOf(lineageName);
-					endTime = Search.getLastOccurenceOf(lineageName);
+					startTime = SearchLayer.getFirstOccurenceOf(lineageName);
+					endTime = SearchLayer.getLastOccurenceOf(lineageName);
 
 					if (startTime <= 0 || endTime <= 0) return; //if the entity doesn't appear in the lifetime of the embryo, don't change the scene
 					
@@ -1041,7 +1039,7 @@ public class Window3DController {
 		contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
+				Rule rule = SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
 				contextMenuStage.hide();
 			}
@@ -1051,7 +1049,7 @@ public class Window3DController {
 			@Override
 			public void handle(MouseEvent event) {
 				// call distance Search method
-				Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, option);
+				Rule rule = SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
 				contextMenuStage.hide();
 			}

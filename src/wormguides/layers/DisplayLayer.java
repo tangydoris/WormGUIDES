@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import javafx.util.Callback;
  * (whether it is the internal rules or the story's rules).<br>
  * <br>
  * The internal rules are the rules used when no story is active. On startup,
- * the internal rules are the default rules added by the {@link Search} class in
+ * the internal rules are the default rules added by the {@link SearchLayer} class in
  * the static method addDefaultColorRules().
  * 
  * @see Rule
@@ -70,24 +70,9 @@ public class DisplayLayer {
 								@Override
 								public void handle(ActionEvent event) {
 									currentRulesList.remove(rule);
-
-									/*
-									 * Rule temp; if (useInternalRules.get()) {
-									 * Iterator<Rule> iter =
-									 * internalRulesList.iterator(); while
-									 * (iter.hasNext()) { temp = iter.next(); if
-									 * (temp == rule) iter.remove(); } }
-									 */
 									buttonMap.remove(rule);
 								}
 							});
-
-							// if using default rules, copy changes to internal
-							// rules list
-							/*
-							if (useInternalRules.get())
-								internalRulesList.add(rule);
-							*/
 						}
 					}
 				}

@@ -26,9 +26,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import wormguides.Search;
 import wormguides.SearchOption;
-import wormguides.SearchType;
+import wormguides.layers.SearchLayer;
+import wormguides.layers.SearchType;
 import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
@@ -82,7 +82,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	private Menu preSyn, postSyn, electr, neuro;
 	private Service<ArrayList<ArrayList<String>>> wiredToQueryService;
 
-	private CasesLists cases;
 	private ProductionInfo productionInfo;
 	private Stage parentStage;
 
@@ -111,7 +110,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 		this.bringUpInfoProperty = bringUpInfoProperty;
 		parentStage = stage;
-		this.cases = cases;
 		productionInfo = info;
 		loadingService = new Service<Void>() {
 			@Override
@@ -219,7 +217,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 						item.setOnAction(new EventHandler<ActionEvent>() {
 							@Override
 							public void handle(ActionEvent event) {
-								Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
+								Rule rule = SearchLayer.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
 										SearchOption.CELLNUCLEUS);
 								rule.showEditStage(parentStage);
 							}
@@ -296,7 +294,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 					colorAll.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, true, true, true,
+							Rule rule = SearchLayer.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, true, true, true,
 									true);
 							rule.showEditStage(parentStage);
 						}
@@ -537,7 +535,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 		all.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
+				Rule rule = SearchLayer.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
 						isElectrical, isNeuromuscular);
 				rule.showEditStage(parentStage);
 			}
@@ -550,7 +548,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 			item.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
-					Rule rule = Search.addConnectomeColorRule(result, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
+					Rule rule = SearchLayer.addConnectomeColorRule(result, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
 							isElectrical, isNeuromuscular);
 					rule.showEditStage(parentStage);
 				}

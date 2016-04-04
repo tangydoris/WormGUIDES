@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.layers;
 
 public enum SearchType {
 

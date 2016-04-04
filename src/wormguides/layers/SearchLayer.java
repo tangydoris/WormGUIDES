@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +19,9 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
+import wormguides.AnatomyTerm;
+import wormguides.SearchOption;
+import wormguides.WormBaseQuery;
 import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -29,7 +32,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 
-public class Search {
+public class SearchLayer {
 
 	private static ArrayList<String> activeLineageNames;
 	private static ArrayList<String> functionalNames;

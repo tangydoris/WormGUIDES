@@ -2,11 +2,9 @@ package wormguides.model;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import wormguides.Search;
+import wormguides.layers.SearchLayer;
 
 /**
  * A non terminal cell object which contains the information for the Information Window feature
@@ -45,7 +43,7 @@ public class NonTerminalCellCase extends CellCase {
 	private ArrayList<TerminalDescendant> buildTerminalDescendants() {
 		ArrayList<TerminalDescendant> terminalDescendants = new ArrayList<TerminalDescendant>();
 
-		ArrayList<String> descendantsList = Search.getDescendantsList(getLineageName());
+		ArrayList<String> descendantsList = SearchLayer.getDescendantsList(getLineageName());
 
 		// add each descendant as terminal descendant object
 		for (String descendant : descendantsList) {

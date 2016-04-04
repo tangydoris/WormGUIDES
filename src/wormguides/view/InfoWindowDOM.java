@@ -3,10 +3,7 @@ package wormguides.view;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import wormguides.AnatomyTerm;
 import wormguides.model.AmphidSensillaTerm;
-import wormguides.model.AnatomyTermCase;
-import wormguides.model.CellCase;
 import wormguides.model.NonTerminalCellCase;
 import wormguides.model.PartsList;
 import wormguides.model.TerminalCellCase;
@@ -1149,8 +1146,8 @@ public class InfoWindowDOM {
 		return this.name;
 	}
 
-	private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
-	private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
+	//private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
+	//private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
 	private final static String AMPHID = "amphid";
 	private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
 	private final static String doctypeTag = "<!DOCTYPE html>";

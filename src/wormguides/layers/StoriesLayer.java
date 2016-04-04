@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.layers;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +43,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import wormguides.MainApp;
+import wormguides.URLGenerator;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
@@ -130,7 +132,7 @@ public class StoriesLayer {
 	 */
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
 			Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
-			Button newStoryButton) {
+			Button newStoryButton, Button deleteStoryButton) {
 
 		parentStage = parent;
 
@@ -143,6 +145,17 @@ public class StoriesLayer {
 				setActiveNote(null);
 
 				bringUpEditor();
+			}
+		});
+
+		deleteStoryButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				if (activeStory != null) {
+					stories.remove(activeStory);
+					setActiveStory(null);
+					setActiveNote(null);
+				}
 			}
 		});
 
@@ -296,12 +309,12 @@ public class StoriesLayer {
 			return activeStory.getDescription();
 		return "";
 	}
-	
+
 	/**
 	 * @return Effective start time of currently active story
 	 */
 	public int getActiveStoryStartTime() {
-		if (activeStory!=null && activeStory.hasNotes())
+		if (activeStory != null && activeStory.hasNotes())
 			return getEffectiveStartTime(activeStory.getNotes().get(0));
 		return Integer.MIN_VALUE;
 	}
@@ -1036,7 +1049,7 @@ public class StoriesLayer {
 			}
 		}
 	}
-	
+
 	private final String NEW_STORY_TITLE = "New Story";
 	private final String NEW_STORY_DESCRIPTION = "New story description here";
 

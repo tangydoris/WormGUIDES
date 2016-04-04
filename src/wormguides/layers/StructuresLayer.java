@@ -1,4 +1,4 @@
-package wormguides;
+package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +150,7 @@ public class StructuresLayer {
 		// Check for validity of name
 		name = name.trim();
 		if (allStructuresList.contains(name))
-			Search.addMulticellularStructureRule(name, color);
+			SearchLayer.addMulticellularStructureRule(name, color);
 	}
 
 	public EventHandler<ActionEvent> getColorPickerListener() {
