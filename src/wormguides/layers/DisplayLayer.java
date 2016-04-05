@@ -2,6 +2,8 @@ package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import wormguides.Search;
 import wormguides.model.Rule;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -30,7 +32,7 @@ import javafx.util.Callback;
  * (whether it is the internal rules or the story's rules).<br>
  * <br>
  * The internal rules are the rules used when no story is active. On startup,
- * the internal rules are the default rules added by the {@link SearchLayer} class in
+ * the internal rules are the default rules added by the {@link Search} class in
  * the static method addDefaultColorRules().
  * 
  * @see Rule

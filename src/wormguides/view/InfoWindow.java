@@ -14,8 +14,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
+import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
-import wormguides.layers.SearchLayer;
 import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.PartsList;
@@ -169,7 +169,6 @@ public class InfoWindow {
 					}
 
 				};
-
 				return task;
 			}
 		};
@@ -178,27 +177,36 @@ public class InfoWindow {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.restart();
-				infoWindowStage.setTitle("Cell Info Window");
 			}
 		});
 		addNameService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
-				infoWindowStage.setTitle("Cell Info Window");
+				setInfoWindowTitle();
 			}
 		});
 		addNameService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showLoadingService.cancel();
-				infoWindowStage.setTitle("Cell Info Window");
+				setInfoWindowTitle();
 			}
 		});
 		showLoadingService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				showWindow();
+				setInfoWindowTitle();
+			}
+		});
+	}
+	
+	private void setInfoWindowTitle() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				infoWindowStage.setTitle("Cell Info Window");
 			}
 		});
 	}
@@ -265,7 +273,7 @@ public class InfoWindow {
 					public void handle(Event e) {
 						Tab t = (Tab) e.getSource();
 						String cellName = t.getId();
-						SearchLayer.removeCellCase(cellName);
+						Search.removeCellCase(cellName);
 					}
 				});
 

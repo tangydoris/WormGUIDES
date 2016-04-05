@@ -49,9 +49,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import wormguides.MainApp;
+import wormguides.Search;
 import wormguides.StringListCellFactory;
 import wormguides.layers.DisplayLayer;
-import wormguides.layers.SearchLayer;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
@@ -144,7 +144,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Tab storiesTab;
 
 	// Cells tab
-	private SearchLayer search;
+	private Search search;
 	@FXML
 	private TextField searchField;
 	private BooleanProperty clearSearchField;
@@ -757,8 +757,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			displayedDescription.setText(storiesLayer.getNoteComments(name));
 
 		// Cell body/structue
-		if (SearchLayer.isStructureWithComment(name))
-			displayedDescription.setText(SearchLayer.getStructureComment(name));
+		if (Search.isStructureWithComment(name))
+			displayedDescription.setText(Search.getStructureComment(name));
 
 		// Cell lineage name
 		else {
@@ -854,25 +854,25 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initSearch() {
-		search = new SearchLayer();
+		search = new Search();
 
-		typeToggleGroup.selectedToggleProperty().addListener(search.getTypeToggleListener());
+		typeToggleGroup.selectedToggleProperty().addListener(Search.getTypeToggleListener());
 
 		// connectome checkboxes
-		presynapticTick.selectedProperty().addListener(search.getPresynapticTickListener());
-		postsynapticTick.selectedProperty().addListener(search.getPostsynapticTickListener());
-		electricalTick.selectedProperty().addListener(search.getElectricalTickListener());
-		neuromuscularTick.selectedProperty().addListener(search.getNeuromuscularTickListener());
+		presynapticTick.selectedProperty().addListener(Search.getPresynapticTickListener());
+		postsynapticTick.selectedProperty().addListener(Search.getPostsynapticTickListener());
+		electricalTick.selectedProperty().addListener(Search.getElectricalTickListener());
+		neuromuscularTick.selectedProperty().addListener(Search.getNeuromuscularTickListener());
 
-		cellNucleusTick.selectedProperty().addListener(search.getCellNucleusTickListener());
-		cellBodyTick.selectedProperty().addListener(search.getCellBodyTickListener());
-		ancestorTick.selectedProperty().addListener(search.getAncestorTickListner());
-		descendantTick.selectedProperty().addListener(search.getDescendantTickListner());
+		cellNucleusTick.selectedProperty().addListener(Search.getCellNucleusTickListener());
+		cellBodyTick.selectedProperty().addListener(Search.getCellBodyTickListener());
+		ancestorTick.selectedProperty().addListener(Search.getAncestorTickListner());
+		descendantTick.selectedProperty().addListener(Search.getDescendantTickListner());
 		colorPicker.setOnAction(search.getColorPickerListener());
-		addSearchBtn.setOnAction(search.getAddButtonListener());
+		addSearchBtn.setOnAction(Search.getAddButtonListener());
 
 		clearSearchField = new SimpleBooleanProperty(false);
-		search.setClearSearchFieldProperty(clearSearchField);
+		Search.setClearSearchFieldProperty(clearSearchField);
 		clearSearchField.addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -883,7 +883,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			}
 		});
 
-		searchField.textProperty().addListener(search.getTextFieldListener());
+		searchField.textProperty().addListener(Search.getTextFieldListener());
 	}
 
 	private void initDisplayLayer() {
@@ -1068,12 +1068,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (window3DController != null)
 			window3DController.setSceneElementsList(elementsList);
 
-		SearchLayer.setSceneElementsList(elementsList);
+		Search.setSceneElementsList(elementsList);
 	}
 
 	private void initConnectome() {
 		connectome = new Connectome();
-		SearchLayer.setConnectome(connectome);
+		Search.setConnectome(connectome);
 	}
 
 	private void initInfoWindow() {
@@ -1093,12 +1093,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	private void initCases() {
 		cases = new CasesLists(infoWindow);
-		SearchLayer.setCases(cases);
+		Search.setCases(cases);
 	}
 
 	private void initProductionInfo() {
 		productionInfo = new ProductionInfo();
-		SearchLayer.setProductionInfo(productionInfo);
+		Search.setProductionInfo(productionInfo);
 	}
 
 	@Override
@@ -1129,10 +1129,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		initSearch();
 		ObservableList<Rule> list = displayLayer.getRulesList();
-		SearchLayer.setRulesList(list);
-		SearchLayer.addDefaultColorRules();
-		SearchLayer.setActiveLineageNames(lineageData.getAllCellNames());
-		SearchLayer.setLineageData(lineageData);
+		Search.setRulesList(list);
+		Search.addDefaultColorRules();
+		Search.setActiveLineageNames(lineageData.getAllCellNames());
+		Search.setLineageData(lineageData);
 
 		window3DController.setRulesList(list);
 
@@ -1147,11 +1147,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// stories layer
 		initStoriesLayer();
 
-		window3DController.setSearchResultsList(search.getSearchResultsList());
-		searchResultsListView.setItems(search.getSearchResultsList());
+		window3DController.setSearchResultsList(Search.getSearchResultsList());
+		searchResultsListView.setItems(Search.getSearchResultsList());
 
 		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
-		window3DController.setGeneResultsUpdated(search.getGeneResultsUpdated());
+		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
 
 		addListeners();
 

@@ -80,9 +80,9 @@ import wormguides.ColorComparator;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
+import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.Xform;
-import wormguides.layers.SearchLayer;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.model.CasesLists;
@@ -368,8 +368,8 @@ public class Window3DController {
 					int startTime;
 					int endTime;
 
-					startTime = SearchLayer.getFirstOccurenceOf(lineageName);
-					endTime = SearchLayer.getLastOccurenceOf(lineageName);
+					startTime = Search.getFirstOccurenceOf(lineageName);
+					endTime = Search.getLastOccurenceOf(lineageName);
 
 					if (startTime <= 0 || endTime <= 0) return; //if the entity doesn't appear in the lifetime of the embryo, don't change the scene
 					
@@ -1039,7 +1039,7 @@ public class Window3DController {
 		contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				Rule rule = SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
+				Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
 				contextMenuStage.hide();
 			}
@@ -1049,7 +1049,7 @@ public class Window3DController {
 			@Override
 			public void handle(MouseEvent event) {
 				// call distance Search method
-				Rule rule = SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, option);
+				Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, option);
 				rule.showEditStage(parentStage);
 				contextMenuStage.hide();
 			}

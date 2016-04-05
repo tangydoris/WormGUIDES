@@ -1,4 +1,4 @@
-package wormguides.layers;
+package wormguides;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,9 +19,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
-import wormguides.AnatomyTerm;
-import wormguides.SearchOption;
-import wormguides.WormBaseQuery;
+import wormguides.layers.SearchType;
 import wormguides.model.CasesLists;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
@@ -32,7 +30,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElement;
 import wormguides.model.SceneElementsList;
 
-public class SearchLayer {
+public class Search {
 
 	private static ArrayList<String> activeLineageNames;
 	private static ArrayList<String> functionalNames;
@@ -41,7 +39,7 @@ public class SearchLayer {
 	private static ObservableList<String> searchResultsList;
 	private static Comparator<String> nameComparator;
 	private static String searchedText;
-	private BooleanProperty clearSearchFieldProperty;
+	private static BooleanProperty clearSearchFieldProperty;
 
 	private static SearchType type;
 
@@ -75,8 +73,9 @@ public class SearchLayer {
 	// for cell cases searching
 	private static CasesLists cases;
 
-	// for production info searching
+	// for wiring partner click handling
 	private static ProductionInfo productionInfo;
+	private static WiringService wiringService;
 
 	// for lineage searching
 	private static LineageData lineageData;
@@ -406,20 +405,9 @@ public class SearchLayer {
 		Rule rule = new Rule(label, color, type, options);
 
 		ArrayList<String> cells;
-
-		/**
-		 * TODO Why is the search done twice? If the color rule is being added,
-		 * the gene search results have populated the list view
-		 */
-		// if (type == SearchType.GENE) {
-		// if (searchResultsList.isEmpty()) {
-		// WormBaseQuery.doSearch(searched);
-		// }
-		// }
-		// else {
+		
 		cells = getCellsList(searched);
 		rule.setCells(cells);
-		// }
 
 		rulesList.add(rule);
 		searchResultsList.clear();
@@ -532,8 +520,7 @@ public class SearchLayer {
 				if (connectome != null) {
 					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
 							electricalTicked, neuromuscularTicked, true));
-					// TODO is the cell itself ever in the wiring results?
-					// cells.remove(searched);
+					cells.remove(searched);
 				}
 				break;
 
@@ -701,15 +688,12 @@ public class SearchLayer {
 
 			// find nearest neighbor
 			if (x != -1 && y != -1 && z != -1) {
-				// int nearestNeighborIDX = -1; --> debugging
 				double distance = Double.MAX_VALUE;
 				for (int k = 0; k < positions.length; k++) {
 					if (k != queryIDX) {
 						double distanceFromQuery = distance(x, positions[k][0], y, positions[k][1], z, positions[k][2]);
-						if (distanceFromQuery < distance) {
+						if (distanceFromQuery < distance)
 							distance = distanceFromQuery;
-							// nearestNeighborIDX = k; --> debugging
-						}
 					}
 				}
 
@@ -737,7 +721,7 @@ public class SearchLayer {
 		return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
 	}
 
-	public EventHandler<ActionEvent> getAddButtonListener() {
+	public static EventHandler<ActionEvent> getAddButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -765,7 +749,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getCellNucleusTickListener() {
+	public static ChangeListener<Boolean> getCellNucleusTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -774,7 +758,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getCellBodyTickListener() {
+	public static ChangeListener<Boolean> getCellBodyTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -783,7 +767,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getAncestorTickListner() {
+	public static ChangeListener<Boolean> getAncestorTickListner() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -796,7 +780,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getDescendantTickListner() {
+	public static ChangeListener<Boolean> getDescendantTickListner() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -809,11 +793,11 @@ public class SearchLayer {
 		};
 	}
 
-	public void setClearSearchFieldProperty(BooleanProperty property) {
+	public static void setClearSearchFieldProperty(BooleanProperty property) {
 		clearSearchFieldProperty = property;
 	}
 
-	public ChangeListener<Toggle> getTypeToggleListener() {
+	public static ChangeListener<Toggle> getTypeToggleListener() {
 		return new ChangeListener<Toggle>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
@@ -823,15 +807,15 @@ public class SearchLayer {
 		};
 	}
 
-	public BooleanProperty getGeneResultsUpdated() {
+	public static BooleanProperty getGeneResultsUpdated() {
 		return geneResultsUpdated;
 	}
 
-	public ObservableList<String> getSearchResultsList() {
+	public static ObservableList<String> getSearchResultsList() {
 		return searchResultsList;
 	}
 
-	public ChangeListener<String> getTextFieldListener() {
+	public static ChangeListener<String> getTextFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -883,64 +867,6 @@ public class SearchLayer {
 	private static int getCountFinal(int count) {
 		final int out = count;
 		return out;
-	}
-
-	private static final class CellNameComparator implements Comparator<String> {
-		@Override
-		public int compare(String s1, String s2) {
-			return s1.compareTo(s2);
-		}
-	}
-
-	private static final class ShowLoadingService extends Service<Void> {
-		@Override
-		protected final Task<Void> createTask() {
-			return new Task<Void>() {
-				@Override
-				protected Void call() throws Exception {
-					final int modulus = 5;
-					while (true) {
-						if (isCancelled()) {
-							break;
-						}
-						Platform.runLater(new Runnable() {
-							@Override
-							public void run() {
-								searchResultsList.clear();
-								String loading = "Fetching data from WormBase";
-								int num = getCountFinal(count) % modulus;
-								switch (num) {
-								case 1:
-									loading += ".";
-									break;
-								case 2:
-									loading += "..";
-									break;
-								case 3:
-									loading += "...";
-									break;
-								case 4:
-									loading += "....";
-									break;
-								default:
-									break;
-								}
-								searchResultsList.add(loading);
-							}
-						});
-						try {
-							Thread.sleep(WAIT_TIME_MILLI);
-							count++;
-							if (count < 0)
-								count = 0;
-						} catch (InterruptedException ie) {
-							break;
-						}
-					}
-					return null;
-				}
-			};
-		}
 	}
 
 	public static void setSceneElementsList(SceneElementsList list) {
@@ -1028,56 +954,23 @@ public class SearchLayer {
 		}
 	}
 
-	/*
+	/**
 	 * Method taken from RootLayoutController --> how can
 	 * InfoWindowLinkController generate page without ptr to
-	 * RootLayoutController
+	 * RootLayoutController<br>
+	 * <br>
+	 * Called by InfoWindowLinkController
 	 */
 	public static void addToInfoWindow(String name) {
-		// service.restart();
+		if (wiringService == null)
+			wiringService = new WiringService();
 
-		// update to lineage name if function
-		String lineage = PartsList.getLineageNameByFunctionalName(name);
-		if (lineage != null) {
-			name = lineage;
-		}
-
-		// GENERATE CELL TAB ON CLICK
-		if (name != null && !name.isEmpty()) {
-			if (cases == null || productionInfo == null) {
-				return; // error check
-			}
-
-			if (PartsList.containsLineageName(name)) {
-				if (cases.containsCellCase(name)) {
-
-					// show the tab
-				} else {
-					// translate the name if necessary
-					String funcName = connectome.checkQueryCell(name).toUpperCase();
-					// add a terminal case --> pass the wiring partners
-					cases.makeTerminalCase(name, funcName,
-							connectome.queryConnectivity(funcName, true, false, false, false, false),
-							connectome.queryConnectivity(funcName, false, true, false, false, false),
-							connectome.queryConnectivity(funcName, false, false, true, false, false),
-							connectome.queryConnectivity(funcName, false, false, false, true, false),
-							productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(name));
-				}
-			} else { // not in connectome --> non terminal case
-				if (cases.containsCellCase(name)) {
-
-					// show tab
-				} else {
-					// add a non terminal case
-					cases.makeNonTerminalCase(name, productionInfo.getNuclearInfo(),
-							productionInfo.getCellShapeData(name));
-				}
-			}
-		}
+		searchedText = name;
+		wiringService.restart();
 	}
 
 	// connectome checkbox listeners
-	public ChangeListener<Boolean> getPresynapticTickListener() {
+	public static ChangeListener<Boolean> getPresynapticTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -1087,7 +980,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getPostsynapticTickListener() {
+	public static ChangeListener<Boolean> getPostsynapticTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -1097,7 +990,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getElectricalTickListener() {
+	public static ChangeListener<Boolean> getElectricalTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -1107,7 +1000,7 @@ public class SearchLayer {
 		};
 	}
 
-	public ChangeListener<Boolean> getNeuromuscularTickListener() {
+	public static ChangeListener<Boolean> getNeuromuscularTickListener() {
 		return new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -1115,6 +1008,114 @@ public class SearchLayer {
 				resultsUpdateService.restart();
 			}
 		};
+	}
+
+	private static final class CellNameComparator implements Comparator<String> {
+		@Override
+		public int compare(String s1, String s2) {
+			return s1.compareTo(s2);
+		}
+	}
+
+	private static final class WiringService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					String searched = searchedText;
+					// update to lineage name if function
+					String lineage = PartsList.getLineageNameByFunctionalName(searched);
+					if (lineage != null)
+						searched = lineage;
+
+					// GENERATE CELL TAB ON CLICK
+					if (searched != null && !searched.isEmpty()) {
+						if (cases == null || productionInfo == null)
+							return null; // error check
+
+						if (PartsList.containsLineageName(searched)) {
+							if (cases.containsCellCase(searched)) {
+
+								// show the tab
+							} else {
+								// translate the name if necessary
+								String funcName = connectome.checkQueryCell(searched).toUpperCase();
+								// add a terminal case --> pass the wiring
+								// partners
+								cases.makeTerminalCase(searched, funcName,
+										connectome.queryConnectivity(funcName, true, false, false, false, false),
+										connectome.queryConnectivity(funcName, false, true, false, false, false),
+										connectome.queryConnectivity(funcName, false, false, true, false, false),
+										connectome.queryConnectivity(funcName, false, false, false, true, false),
+										productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(searched));
+							}
+						} else { // not in connectome --> non terminal case
+							if (cases.containsCellCase(searched)) {
+
+								// show tab
+							} else {
+								// add a non terminal case
+								cases.makeNonTerminalCase(searched, productionInfo.getNuclearInfo(),
+										productionInfo.getCellShapeData(searched));
+							}
+						}
+					}
+					return null;
+				}
+			};
+		}
+	}
+
+	private static final class ShowLoadingService extends Service<Void> {
+		@Override
+		protected final Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					final int modulus = 5;
+					while (true) {
+						if (isCancelled()) {
+							break;
+						}
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								searchResultsList.clear();
+								String loading = "Fetching data from WormBase";
+								int num = getCountFinal(count) % modulus;
+								switch (num) {
+								case 1:
+									loading += ".";
+									break;
+								case 2:
+									loading += "..";
+									break;
+								case 3:
+									loading += "...";
+									break;
+								case 4:
+									loading += "....";
+									break;
+								default:
+									break;
+								}
+								searchResultsList.add(loading);
+							}
+						});
+						try {
+							Thread.sleep(WAIT_TIME_MILLI);
+							count++;
+							if (count < 0)
+								count = 0;
+						} catch (InterruptedException ie) {
+							break;
+						}
+					}
+					return null;
+				}
+			};
+		}
 	}
 
 	private static final long WAIT_TIME_MILLI = 750;

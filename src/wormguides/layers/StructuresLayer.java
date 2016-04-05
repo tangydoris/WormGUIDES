@@ -27,6 +27,7 @@ import javafx.util.Callback;
 import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.view.AppFont;
+import wormguides.Search;
 import wormguides.model.PartsList;
 
 public class StructuresLayer {
@@ -150,7 +151,7 @@ public class StructuresLayer {
 		// Check for validity of name
 		name = name.trim();
 		if (allStructuresList.contains(name))
-			SearchLayer.addMulticellularStructureRule(name, color);
+			Search.addMulticellularStructureRule(name, color);
 	}
 
 	public EventHandler<ActionEvent> getColorPickerListener() {

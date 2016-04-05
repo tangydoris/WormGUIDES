@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import wormguides.layers.SearchLayer;
 
 public class WormBaseQuery {
 
@@ -71,7 +70,7 @@ public class WormBaseQuery {
 
 									while (m.find()) {
 										String name = m.group(1);
-										if (SearchLayer.isLineageName(name) && !out.contains(name))
+										if (Search.isLineageName(name) && !out.contains(name))
 											out.add(name);
 									}
 								}

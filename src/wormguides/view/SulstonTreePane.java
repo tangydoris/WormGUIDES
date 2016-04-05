@@ -5,9 +5,9 @@ import wormguides.model.LineageData;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.ColorComparator;
+import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.ContextMenuController;
-import wormguides.layers.SearchLayer;
 import wormguides.layers.SearchType;
 import wormguides.loaders.ImageLoader;
 
@@ -328,7 +328,7 @@ public class SulstonTreePane extends ScrollPane {
 			contextMenuController.setColorButtonListener(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					Rule rule = SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELLNUCLEUS);
+					Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 
 					contextMenuStage.hide();
@@ -339,7 +339,7 @@ public class SulstonTreePane extends ScrollPane {
 				@Override
 				public void handle(MouseEvent event) {
 					// call distance Search method
-					Rule rule = SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS);
+					Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS);
 					rule.showEditStage(ownStage);
 					contextMenuStage.hide();
 				}

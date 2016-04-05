@@ -8,19 +8,18 @@ import java.net.URISyntaxException;
 import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 import wormguides.AnatomyTerm;
-import wormguides.layers.SearchLayer;
+import wormguides.Search;
 import wormguides.model.PartsList;
 
 /**
- * Callback class for HTML pages
- * 		HTML pages generated for Info Window contain links which
- * 		when clicked fire a JS function that allows us to call
- * 		back to our java code
+ * Callback class for HTML pages HTML pages generated for Info Window contain
+ * links which when clicked fire a JS function that allows us to call back to
+ * our java code
  * 
- * This class implements functionality for targeting the user's default
- * broswer for linked websites, handles the clicking of a wiring partner
- * to both generate a new cell case page and view the partner in 3D, and
- * controls the generation of AnatomyTerm pages in the info window
+ * This class implements functionality for targeting the user's default broswer
+ * for linked websites, handles the clicking of a wiring partner to both
+ * generate a new cell case page and view the partner in 3D, and controls the
+ * generation of AnatomyTerm pages in the info window
  * 
  * @author bradenkatzman
  *
@@ -38,7 +37,8 @@ public class InfoWindowLinkController {
 	/**
 	 * Targets the default browser and opens the supplied link
 	 * 
-	 * @param url the url of the page to be opened
+	 * @param url
+	 *            the url of the page to be opened
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
@@ -47,58 +47,59 @@ public class InfoWindowLinkController {
 			Desktop.getDesktop().browse(new URI(url));
 		}
 	}
-	
+
 	/**
-	 * Callback controller for wiring partner. When a wiring partner is clicked, 
+	 * Callback controller for wiring partner. When a wiring partner is clicked,
 	 * it is shown in 3D and an info window page is generated for the cell
 	 * 
-	 * @param cellName the name of the clicked wiring partner
+	 * @param cellName
+	 *            the name of the clicked wiring partner
 	 */
 	public void handleWiringPartnerClick(String cellName) {
-		//translate to lineage name
+		// translate to lineage name
 		String cell = cellName;
-		
+
 		String lineageName = PartsList.getLineageNameByFunctionalName(cellName);
 		if (lineageName != null) {
 			cell = lineageName;
 		}
-		
-		//handle the case of " " to "_" discrepancy --> change all spaces to underscore
+
+		// handle the case of " " to "_" discrepancy --> change all spaces to
+		// underscore
 		if (cell.contains(" ")) {
 			for (int i = 0; i < cell.length(); i++) {
 				if (cell.charAt(i) == ' ') {
-					cell = cell.substring(0, i) + "_" + cell.substring(i+1);
+					cell = cell.substring(0, i) + "_" + cell.substring(i + 1);
 				}
 			}
 		}
-		
-		//view in 3D
+
+		// view in 3D
 		viewInCellTheater(cell);
 
-		 if (!SearchLayer.hasCellCase(cell)) {
-			 //generate a new cell case
-			 SearchLayer.addToInfoWindow(cell);
-		 } else {
-		 /*
-		 * TODO
-		 * focus the tab if it already exists
-		 */
-		 }
+		if (!Search.hasCellCase(cell)) {
+			// generate a new cell case
+			Search.addToInfoWindow(cell);
+		} else {
+			/*
+			 * TODO focus the tab if it already exists
+			 */
+		}
 	}
-	
+
 	/**
-	 * Call back controller for keyword "amphid" click
-	 * Generates the "Amphid Sensilla" default info window page for now
+	 * Call back controller for keyword "amphid" click Generates the
+	 * "Amphid Sensilla" default info window page for now
 	 */
 	public void handleAmphidClick() {
-		SearchLayer.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
+		Search.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
 	}
 
 	/**
 	 * This method shows a clicked cell in the scene graph by taking advantage
-	 * of the string property labeledCellProperty from Window3D. When this property
-	 * is changed (i.e. a new cell name is set), a listener fires which navigates to
-	 * the birth of the cell in the embryo
+	 * of the string property labeledCellProperty from Window3D. When this
+	 * property is changed (i.e. a new cell name is set), a listener fires which
+	 * navigates to the birth of the cell in the embryo
 	 * 
 	 * @param cellName
 	 */
@@ -109,9 +110,11 @@ public class InfoWindowLinkController {
 	}
 
 	/**
-	 * Changes the StringProperty labeledCellProperty to navigate to the cell in 3D
+	 * Changes the StringProperty labeledCellProperty to navigate to the cell in
+	 * 3D
 	 * 
-	 * @param cellName  the cell to navigate to
+	 * @param cellName
+	 *            the cell to navigate to
 	 */
 	private void resetLabeledCellProperty(String cellName) {
 		labeledCellProperty.set("");

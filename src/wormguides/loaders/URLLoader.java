@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
+import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.Window3DController;
-import wormguides.layers.SearchLayer;
 import wormguides.layers.SearchType;
 import wormguides.model.Rule;
 
@@ -176,36 +176,36 @@ public class URLLoader {
 				// add regular ColorRule
 				if (!isMulticellStructureRule) {
 					if (types.contains("-s"))
-						SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
 
 					if (types.contains("-n"))
-						SearchLayer.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
 
 					if (types.contains("-d"))
-						SearchLayer.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
 
 					if (types.contains("-g"))
-						SearchLayer.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
 
 					if (types.contains("-m"))
-						SearchLayer.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
 
 					if (types.contains("-b"))
-						SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
 
 					if (types.contains("-c"))
-						SearchLayer.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+						Search.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
 
 					// if no type present, default is systematic
 					if (noTypeSpecified) {
 						SearchType type = SearchType.LINEAGE;
 						if (isGeneFormat(name))
 							type = SearchType.GENE;
-						SearchLayer.addColorRule(type, name, Color.web(colorString), options);
+						Search.addColorRule(type, name, Color.web(colorString), options);
 					}
 
 				} else { // add multicellular structure rule
-					SearchLayer.addMulticellularStructureRule(name, Color.web(colorString));
+					Search.addMulticellularStructureRule(name, Color.web(colorString));
 				}
 
 			} catch (StringIndexOutOfBoundsException e) {
