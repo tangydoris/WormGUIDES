@@ -694,9 +694,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		structuresSearchListView.setCellFactory(new StringListCellFactory());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringListCellFactory());
+		
+		timeSlider.setValue(0);
 
 		// 'Others' opacity
-		opacitySlider.setValue(DEFAULT_TRANSPARENCY);
+		opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
 
 		// Uniform nuclei size
 		uniformSizeCheckBox.setSelected(true);
@@ -852,7 +854,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		opacitySlider.setMin(0);
 		opacitySlider.setMax(100);
-		opacitySlider.setValue(25);
+		opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
 	}
 
 	private void initSearch() {
@@ -1167,7 +1169,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		 * TODO
 		 * 	refactor: why didn't the second line of code automatically update the time slider?
 		 */
-		timeSlider.setValue(256.);
+		timeSlider.setValue(storiesLayer.getActiveStoryStartTime());
 		window3DController.setTime(storiesLayer.getActiveStoryStartTime());
 		
 		window3DController.initializeWithCannonicalOrientation();
@@ -1181,7 +1183,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	/** Default transparency of 'other' entities on startup */
-	private final double DEFAULT_TRANSPARENCY = 25;
+	private final double DEFAULT_OTHERS_OPACITY = 25;
 	/**
 	 * Delay time in seconds before the application updates to the new time on
 	 * the slider
