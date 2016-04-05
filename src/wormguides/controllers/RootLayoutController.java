@@ -526,9 +526,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			rotationControllerStage = new Stage();
 
-			loader.setController(rotationController);
-			// loader.setRoot(rotationController); --> what does this line do in
-			// StoriesLayer?
+			loader.setController(rotationController); 
 
 			try {
 				rotationControllerStage.setScene(new Scene((AnchorPane) loader.load()));
@@ -578,6 +576,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	}
 	// ----- End menu items and buttons listeners -----
+	
+	public void promptStorySave() {
+		// TODO
+	}
 
 	public void init3DWindow(LineageData data) {
 		if (cases == null)
@@ -1166,7 +1168,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		 * 	refactor: why didn't the second line of code automatically update the time slider?
 		 */
 		timeSlider.setValue(256.);
-		window3DController.setTime(lim4StoryStartTime);
+		window3DController.setTime(storiesLayer.getActiveStoryStartTime());
 		
 		window3DController.initializeWithCannonicalOrientation();
 
@@ -1177,13 +1179,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			window3DController.setCaptureVideo(captureVideo);
 		}
 	}
-	
-	/**
-	 * lim 4 story start time
-	 * 	TODO
-	 * 	actual start time is 256 --> 237 is with +19 offset
-	 */
-	private final static int lim4StoryStartTime = 237;
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_TRANSPARENCY = 25;

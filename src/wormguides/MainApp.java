@@ -47,6 +47,11 @@ public class MainApp extends Application {
 			@Override
 			public void handle(WindowEvent event) {
 				System.out.println("exiting...");
+
+				// prompt user to save active story on application exit
+				if (controller != null)
+					controller.promptStorySave();
+
 				System.exit(0);
 			}
 		});
