@@ -48,6 +48,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.StringListCellFactory;
@@ -75,7 +76,7 @@ import wormguides.view.SulstonTreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-
+import wormguides.view.YesNoDialogPane;
 import javafx.scene.web.WebView;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -221,6 +222,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button newStory;
 	@FXML
 	private Button deleteStory;
+	private Stage promptStorySaveStage;
 
 	// production information
 	private ProductionInfo productionInfo;
@@ -299,8 +301,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void menuCloseAction() {
-		System.out.println("exiting...");
-		System.exit(0);
+		promptStorySave();
 	}
 
 	@FXML
@@ -526,7 +527,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 			rotationControllerStage = new Stage();
 
-			loader.setController(rotationController); 
+			loader.setController(rotationController);
 
 			try {
 				rotationControllerStage.setScene(new Scene((AnchorPane) loader.load()));
@@ -576,9 +577,47 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	}
 	// ----- End menu items and buttons listeners -----
-	
+
 	public void promptStorySave() {
 		// TODO
+		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
+			if (promptStorySaveStage == null) {
+				promptStorySaveStage = new Stage();
+				promptStorySaveStage.initStyle(StageStyle.UNDECORATED);
+				promptStorySaveStage.initModality(Modality.APPLICATION_MODAL);
+
+				YesNoDialogPane saveDialog = new YesNoDialogPane(
+						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No");
+				
+				saveDialog.setYesButtonAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						storiesLayer.saveActiveStory();
+						exitApplication();
+					}
+				});
+
+				saveDialog.setNoButtonAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						exitApplication();
+					}
+				});
+				
+				promptStorySaveStage.setScene(new Scene((AnchorPane) saveDialog));
+				promptStorySaveStage.setWidth(250);
+				promptStorySaveStage.setHeight(110);
+				promptStorySaveStage.setResizable(false);
+			}
+
+			promptStorySaveStage.show();
+			promptStorySaveStage.centerOnScreen();
+		}
+	}
+	
+	private void exitApplication() {
+		System.out.println("exiting...");
+		System.exit(0);
 	}
 
 	public void init3DWindow(LineageData data) {
@@ -593,8 +632,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 
-		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo,
-				connectome, bringUpInfoProperty);
+		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
+				bringUpInfoProperty);
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -648,7 +687,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				int newTime = newValue.intValue();
-				if (window3DController != null) // removed newTime != timeSlider.getValue() && --> to use arrow keys b/c arrows automatically update timeSlider.value
+				if (window3DController != null) // removed newTime !=
+												// timeSlider.getValue() && -->
+												// to use arrow keys b/c arrows
+												// automatically update
+												// timeSlider.value
 					window3DController.setTime(newTime);
 			}
 		});
@@ -694,7 +737,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		structuresSearchListView.setCellFactory(new StringListCellFactory());
 		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
 		searchResultsListView.setCellFactory(new StringListCellFactory());
-		
+
 		timeSlider.setValue(0);
 
 		// 'Others' opacity
@@ -1166,12 +1209,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeInfoPane();
 
 		/**
-		 * TODO
-		 * 	refactor: why didn't the second line of code automatically update the time slider?
+		 * TODO refactor: why didn't the second line of code automatically
+		 * update the time slider?
 		 */
 		timeSlider.setValue(storiesLayer.getActiveStoryStartTime());
 		window3DController.setTime(storiesLayer.getActiveStoryStartTime());
-		
+
 		window3DController.initializeWithCannonicalOrientation();
 
 		viewTreeAction();
