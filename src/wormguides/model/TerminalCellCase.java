@@ -54,13 +54,14 @@ public class TerminalCellCase extends CellCase {
 		
 		this.partsListDescription = PartsList.getDescriptionByLineageName(lineageName);
 		
+		
 		if (Character.isDigit(cellName.charAt(cellName.length() - 1))){
 			this.imageURL = graphicURL + cellName.toUpperCase() + jpgEXT;
 		} else {
 			this.imageURL = graphicURL + cellName.toLowerCase() + jpgEXT; 
 		}
 		
-		//parse wormatlas for the "Function" field
+		//parse wormatlas for the "Function" field, also set image field
 		this.functionWORMATLAS = setFunctionFromWORMATLAS();
 		
 		//set the wiring partners from connectome
@@ -163,7 +164,102 @@ public class TerminalCellCase extends CellCase {
 			//a page wasn't found on wormatlas
 			return null;
 		}
+		
+		//find the image src in the html and set the imageURL
+		findImageURLInHTML(content);
+		
 		return findFunctionInHTML(content, URL);
+	}
+	
+	private void findImageURLInHTML(String content) {
+		//find all instances of '/Images/
+		ArrayList<String> images = new ArrayList<String>();
+		String quotes = "\"";
+		String findStr = "/Images/";
+		int lastIdx = 0;
+		int closeQuoteIdx = 0;
+		
+		while (lastIdx != -1) {
+			lastIdx = content.indexOf(findStr, lastIdx);
+			
+			if (lastIdx != -1) {
+				//find the index of the closing quotes for the image url
+				closeQuoteIdx = content.indexOf(quotes, lastIdx);				
+				
+				//add the url to the list
+				images.add(content.substring(lastIdx, closeQuoteIdx));
+				
+				//move lastIdx past just processed image url
+				lastIdx += findStr.length();
+			}
+		}
+		
+		//look for matches, first check if funcName ends with number
+		boolean cellWithNum = Character.isDigit(funcName.charAt(funcName.length()-1));
+		for (String url : images) {
+			String imageName = url.substring(findStr.length(), url.indexOf("."));
+			
+			if (imageName.toLowerCase().equals(funcName.toLowerCase())) {
+				if (cellWithNum) {
+					this.imageURL = graphicURL + funcName.toUpperCase() + jpgEXT;
+					return;
+				} else {
+					this.imageURL = graphicURL + funcName.toLowerCase() + jpgEXT;
+					return;
+				}
+				
+			}
+			
+			//if funcName ends with number, check if the image has a range of numbers e.g. DA3-7, or if two consecutive images form a range
+			if (cellWithNum) {
+				//find the base name of the cell
+				String baseName = "";
+				for (int i = 0; i < funcName.length(); i++) {
+					if (!Character.isDigit(funcName.charAt(i))) {
+						baseName += funcName.charAt(i);
+					}
+				}
+				
+				//extract the number for this cell
+				int num = Character.getNumericValue(funcName.charAt(funcName.length()-1));
+				
+				//check if the image has a range
+				if (imageName.contains("-")) {
+					int upperBound = Integer.parseInt(imageName.substring(imageName.indexOf("-")+1));
+					int lowerBound = Character.getNumericValue(imageName.charAt(imageName.indexOf("-")-1));
+					
+					
+					
+					//check if the base name matches the image url and falls within the range
+					if (imageName.toLowerCase().startsWith(baseName.toLowerCase())) {
+						
+						if (num >= lowerBound && num <= upperBound) {
+							this.imageURL = graphicURLRange + imageName + jpgEXT;
+							return;
+						}
+					}
+				}
+				
+				//check if the two images form a range which this cell falls in i.e. wormatlas will use da3.jpg to represent da3-7 --> check for da3 and da8
+				else if (images.indexOf(url) != images.size()-1) { //make sure there is another entry in the list
+					String url2 = images.get(images.indexOf(url)+1);
+					String imageName2 = url2.substring(findStr.length(), url2.indexOf("."));
+					
+					//see if both images are for the same cell
+					if (imageName.toLowerCase().startsWith(baseName.toLowerCase()) && imageName2.toLowerCase().startsWith(baseName.toLowerCase())) {
+						//find the range formed by the two images
+						int lowerBound = Character.getNumericValue(imageName.charAt(imageName.length()-1));
+						int upperBound = Character.getNumericValue(imageName2.charAt(imageName2.length()-1));
+						
+						//check if num is between the range
+						if (num > lowerBound && num < upperBound) {
+							this.imageURL = graphicURLRange + imageName + jpgEXT;
+							return;
+						}						
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -413,6 +509,7 @@ public class TerminalCellCase extends CellCase {
 	}
 	
 	private final static String graphicURL = "http://www.wormatlas.org/neurons/Images/";
+	private final static String graphicURLRange = "http://www.wormatlas.org/neurons/Images/";
 	private final static String jpgEXT = ".jpg";
 	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 	private final static String wormatlasURLEXT = "mainframe.htm";
