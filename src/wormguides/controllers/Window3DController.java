@@ -555,6 +555,7 @@ public class Window3DController {
 
 		rotateX.setAngle(cannonicalOrientationX);
 		rotateY.setAngle(cannonicalOrientationY);
+		rotateZ.setAngle(cannonicalOrientationZ);
 
 		repositionSprites();
 		repositionNoteBillboardFronts();
@@ -2729,9 +2730,10 @@ public class Window3DController {
 	public Stage getStage() {
 		return this.parentStage;
 	}
-
-	private final static double cannonicalOrientationX = 95.;
-	private final static double cannonicalOrientationY = 175.0;
+	
+	private final static double cannonicalOrientationX = 145.;
+	private final static double cannonicalOrientationY = -170.;
+	private final static double cannonicalOrientationZ = 25.;
 	
 	private final String CS = ", ";
 
