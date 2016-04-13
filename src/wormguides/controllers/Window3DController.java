@@ -2354,6 +2354,8 @@ public class Window3DController {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateXAngle.set(rotateX.getAngle());
+				repositionSprites();
+				repositionNoteBillboardFronts();
 			}
 		};
 	}
@@ -2363,6 +2365,8 @@ public class Window3DController {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateYAngle.set(rotateY.getAngle());
+				repositionSprites();
+				repositionNoteBillboardFronts();
 			}
 		};
 	}
@@ -2372,6 +2376,8 @@ public class Window3DController {
 			@Override
 			public void handle(TransformChangedEvent arg0) {
 				rotateZAngle.set(rotateZ.getAngle());
+				repositionSprites();
+				repositionNoteBillboardFronts();
 			}
 		};
 	}
