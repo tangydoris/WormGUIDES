@@ -48,7 +48,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.StringListCellFactory;
@@ -76,7 +75,7 @@ import wormguides.view.SulstonTreePane;
 import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
-import wormguides.view.YesNoDialogPane;
+import wormguides.view.YesNoCancelDialogPane;
 import javafx.scene.web.WebView;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -583,12 +582,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
 			if (promptStorySaveStage == null) {
 				promptStorySaveStage = new Stage();
-				promptStorySaveStage.initStyle(StageStyle.UNDECORATED);
 				promptStorySaveStage.initModality(Modality.APPLICATION_MODAL);
 
-				YesNoDialogPane saveDialog = new YesNoDialogPane(
-						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No");
-				
+				YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
+						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
+						"Cancel");
+
 				saveDialog.setYesButtonAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
@@ -604,9 +603,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					}
 				});
 				
+				saveDialog.setCancelButtonAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						promptStorySaveStage.hide();
+					}
+				});
+
 				promptStorySaveStage.setScene(new Scene((AnchorPane) saveDialog));
-				promptStorySaveStage.setWidth(250);
-				promptStorySaveStage.setHeight(110);
+				promptStorySaveStage.setTitle("Exit WormGUIDES");
+				promptStorySaveStage.setWidth(290);
+				promptStorySaveStage.setHeight(140);
 				promptStorySaveStage.setResizable(false);
 			}
 
@@ -614,7 +621,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			promptStorySaveStage.centerOnScreen();
 		}
 	}
-	
+
 	private void exitApplication() {
 		System.out.println("exiting...");
 		System.exit(0);

@@ -484,7 +484,7 @@
                      <children>
                         <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                            <children>
-                              <AnchorPane fx:id="modelAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" style="-fx-border-color: black;" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <AnchorPane fx:id="modelAnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="300.0" minWidth="300.0" prefHeight="670.0" prefWidth="670.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <Label fx:id="timeLabel" layoutX="500.0" layoutY="581.0" text="Time 001" textAlignment="RIGHT" textFill="WHITE" translateZ="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
                                        <font>

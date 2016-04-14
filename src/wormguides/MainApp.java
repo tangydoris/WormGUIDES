@@ -73,6 +73,7 @@ public class MainApp extends Application {
 			// scene.getStylesheets().add("MainApp.css");
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(true);
+			primaryStage.centerOnScreen();
 
 			Parent root = scene.getRoot();
 			for (Node node : root.getChildrenUnmodifiable()) {
