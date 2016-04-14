@@ -70,6 +70,7 @@ import wormguides.model.Rule;
 import wormguides.model.SceneElementsList;
 import wormguides.model.Story;
 import wormguides.view.AboutPane;
+import wormguides.view.DraggableTab;
 import wormguides.view.InfoWindow;
 import wormguides.view.SulstonTreePane;
 import wormguides.view.URLLoadWarningDialog;
@@ -133,15 +134,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private TabPane mainTabPane;
 	@FXML
+	private Tab storiesTab;
+	@FXML
 	private Tab colorAndDisplayTab;
 	@FXML
 	private TabPane colorAndDisplayTabPane;
 	@FXML
 	private Tab cellsTab;
 	@FXML
-	private Tab displayTab;
+	private Tab structuresTab;
 	@FXML
-	private Tab storiesTab;
+	private Tab displayTab;
 
 	// Cells tab
 	private Search search;
@@ -1017,6 +1020,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		assert (colorAndDisplayTab != null);
 		assert (colorAndDisplayTabPane != null);
 		assert (cellsTab != null);
+		assert (structuresTab != null);
 		assert (displayTab != null);
 		assert (storiesTab != null);
 
@@ -1154,9 +1158,44 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		productionInfo = new ProductionInfo();
 		Search.setProductionInfo(productionInfo);
 	}
+	
+	/**
+	 * Replaces all application tabs with dockable ones ({@link DraggableTab})
+	 */
+	private void replaceTabsWithDraggableTabs() {
+		DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
+		cellsDragTab.setContent(cellsTab.getContent());
+		
+		DraggableTab structuresDragTab = new DraggableTab(structuresTab.getText());
+		structuresDragTab.setContent(structuresTab.getContent());
+		
+		DraggableTab displayDragTab = new DraggableTab(displayTab.getText());
+		displayDragTab.setContent(displayTab.getContent());
+		
+		colorAndDisplayTabPane.getTabs().clear();
+		cellsTab = cellsDragTab;
+		structuresTab = structuresDragTab;
+		displayTab = displayDragTab;
+		
+		colorAndDisplayTabPane.getTabs().addAll(cellsTab, structuresTab, displayTab);
+		
+		DraggableTab storiesDragTab = new DraggableTab(storiesTab.getText());
+		storiesDragTab.setContent(storiesTab.getContent());
+		
+		DraggableTab colorAndDisplayDragTab = new DraggableTab(colorAndDisplayTab.getText());
+		colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
+		
+		mainTabPane.getTabs().clear();
+		storiesTab = storiesDragTab;
+		colorAndDisplayTab = colorAndDisplayDragTab;
+		
+		mainTabPane.getTabs().addAll(storiesTab, colorAndDisplayTab);
+	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		replaceTabsWithDraggableTabs();
+		
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();

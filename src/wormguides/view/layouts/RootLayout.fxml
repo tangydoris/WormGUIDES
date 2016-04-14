@@ -359,7 +359,7 @@
                                           </AnchorPane>
                   			            </content>
                   			          </Tab>
-                                    <Tab closable="false" text="Find Structures">
+                                    <Tab fx:id="structuresTab" closable="false" text="Find Structures">
                                       <content>
                                         <AnchorPane>
                                              <children>
