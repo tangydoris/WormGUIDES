@@ -659,14 +659,23 @@ public class Window3DController {
 		return colorHash;
 	}
 
-	/*
-	 * Insert transient label into sprites pane name = name that appears on the
-	 * label entity = entity that the label should show up on
+	/**
+	 * Inserts a transient label into the sprites pane for the specified entity
+	 * if the entity is an 'other' entity that is less than 10% opaque.
+	 * 
+	 * @param name
+	 *            String containing the name that appears on the transient label
+	 * @param entity
+	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && appliesToCurrentRules(name))) {
+		/*
+		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && currentRulesApplyTo(name))) {
 			showTransientLabel(name, entity);
 		}
+		*/
+		if (currentRulesApplyTo(name))
+			showTransientLabel(name, entity);
 	}
 
 	private void showTransientLabel(String name, Node entity) {
@@ -1986,7 +1995,7 @@ public class Window3DController {
 		}
 	}
 
-	public boolean appliesToCurrentRules(String name) {
+	public boolean currentRulesApplyTo(String name) {
 		// get the scene name associated with the cell
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
@@ -2019,18 +2028,17 @@ public class Window3DController {
 			}
 		}
 
-		if (sceneName.equals("")) {
+		if (sceneName.equals(""))
 			sceneName = name;
-		}
 
 		for (Rule rule : currentRulesList) {
-			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
+			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
 				return true;
-			} else if (rule.appliesToCellBody(name)) {
+			else if (rule.appliesToCellBody(name))
 				return true;
-			} else if (rule.appliesToCellNucleus(name)) {
+			else if (rule.appliesToCellNucleus(name))
 				return true;
-			} else { // check if cells corresponding to multicellular structure
+			else { // check if cells corresponding to multicellular structure
 						// have rule - in the case of a non explicit
 						// multicellular rule but a structure that's colored
 				if (cells.size() > 0) {

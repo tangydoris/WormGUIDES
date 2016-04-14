@@ -80,6 +80,7 @@ import wormguides.view.YesNoCancelDialogPane;
 import javafx.scene.web.WebView;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -224,7 +225,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button newStory;
 	@FXML
 	private Button deleteStory;
-	private Stage promptStorySaveStage;
+	private Stage exitSaveStage;
 
 	// production information
 	private ProductionInfo productionInfo;
@@ -583,9 +584,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void promptStorySave() {
 		// TODO
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
-			if (promptStorySaveStage == null) {
-				promptStorySaveStage = new Stage();
-				promptStorySaveStage.initModality(Modality.APPLICATION_MODAL);
+			if (exitSaveStage == null) {
+				exitSaveStage = new Stage();
+				exitSaveStage.initModality(Modality.APPLICATION_MODAL);
 
 				YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
 						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
@@ -605,23 +606,27 @@ public class RootLayoutController extends BorderPane implements Initializable {
 						exitApplication();
 					}
 				});
-				
+
 				saveDialog.setCancelButtonAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						promptStorySaveStage.hide();
+						exitSaveStage.hide();
 					}
 				});
 
-				promptStorySaveStage.setScene(new Scene((AnchorPane) saveDialog));
-				promptStorySaveStage.setTitle("Exit WormGUIDES");
-				promptStorySaveStage.setWidth(290);
-				promptStorySaveStage.setHeight(140);
-				promptStorySaveStage.setResizable(false);
+				Scene exitScene = new Scene((AnchorPane) saveDialog);
+				exitSaveStage.setScene(exitScene);
+				exitSaveStage.setTitle("Exit WormGUIDES");
+				exitSaveStage.setWidth(290);
+				exitSaveStage.setHeight(140);
+				exitSaveStage.setResizable(false);
+
+				for (Node node : exitScene.getRoot().getChildrenUnmodifiable())
+					node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
 			}
 
-			promptStorySaveStage.show();
-			promptStorySaveStage.centerOnScreen();
+			exitSaveStage.show();
+			exitSaveStage.centerOnScreen();
 		}
 	}
 
@@ -1158,44 +1163,44 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		productionInfo = new ProductionInfo();
 		Search.setProductionInfo(productionInfo);
 	}
-	
+
 	/**
 	 * Replaces all application tabs with dockable ones ({@link DraggableTab})
 	 */
 	private void replaceTabsWithDraggableTabs() {
 		DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
 		cellsDragTab.setContent(cellsTab.getContent());
-		
+
 		DraggableTab structuresDragTab = new DraggableTab(structuresTab.getText());
 		structuresDragTab.setContent(structuresTab.getContent());
-		
+
 		DraggableTab displayDragTab = new DraggableTab(displayTab.getText());
 		displayDragTab.setContent(displayTab.getContent());
-		
+
 		colorAndDisplayTabPane.getTabs().clear();
 		cellsTab = cellsDragTab;
 		structuresTab = structuresDragTab;
 		displayTab = displayDragTab;
-		
+
 		colorAndDisplayTabPane.getTabs().addAll(cellsTab, structuresTab, displayTab);
-		
+
 		DraggableTab storiesDragTab = new DraggableTab(storiesTab.getText());
 		storiesDragTab.setContent(storiesTab.getContent());
-		
+
 		DraggableTab colorAndDisplayDragTab = new DraggableTab(colorAndDisplayTab.getText());
 		colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
-		
+
 		mainTabPane.getTabs().clear();
 		storiesTab = storiesDragTab;
 		colorAndDisplayTab = colorAndDisplayDragTab;
-		
+
 		mainTabPane.getTabs().addAll(storiesTab, colorAndDisplayTab);
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		replaceTabsWithDraggableTabs();
-		
+
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();

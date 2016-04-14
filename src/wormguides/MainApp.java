@@ -76,10 +76,9 @@ public class MainApp extends Application {
 			primaryStage.centerOnScreen();
 
 			Parent root = scene.getRoot();
-			for (Node node : root.getChildrenUnmodifiable()) {
+			for (Node node : root.getChildrenUnmodifiable())
 				node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
-			}
-
+			
 		} catch (IOException e) {
 			System.out.println("could not initialize root layout.");
 			e.printStackTrace();
