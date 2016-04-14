@@ -1208,12 +1208,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeSubscene();
 		sizeInfoPane();
 
-		/**
-		 * TODO refactor: why didn't the second line of code automatically
-		 * update the time slider?
-		 */
-		timeSlider.setValue(storiesLayer.getActiveStoryStartTime());
-		window3DController.setTime(storiesLayer.getActiveStoryStartTime());
+		timeSlider.setValue(window3DController.getEndTime());
 
 		window3DController.initializeWithCannonicalOrientation();
 

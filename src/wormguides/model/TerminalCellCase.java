@@ -278,7 +278,7 @@ public class TerminalCellCase extends CellCase {
 		//add the link to the list
 		/* links.add(URL); */
 		
-		return "<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a><br><br>" + content;
+		return content + "<br><em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>" ;
 	}
 	
 	/**

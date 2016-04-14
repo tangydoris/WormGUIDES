@@ -57,10 +57,10 @@ public class InfoWindow {
 
 		infoWindowStage.setScene(scene);
 
-		infoWindowStage.setMinHeight(400);
-		infoWindowStage.setMinWidth(500);
-		infoWindowStage.setHeight(600);
-		infoWindowStage.setWidth(700);
+		infoWindowStage.setMinHeight(300);
+		infoWindowStage.setMinWidth(600);
+		infoWindowStage.setHeight(620);
+		infoWindowStage.setWidth(950);
 
 		infoWindowStage.setResizable(true);
 

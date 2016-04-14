@@ -327,7 +327,7 @@ public class InfoWindowDOM {
 		// references
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> References: </strong>");
 		referencesTopContainerDiv.addChild(collapseReferencesButton);
@@ -347,7 +347,7 @@ public class InfoWindowDOM {
 		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
-				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
 				"width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
@@ -736,7 +736,7 @@ public class InfoWindowDOM {
 		// references
 		HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
 		HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-				"width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+				"width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
 				"<strong> References: </strong>");
 		referencesTopContainerDiv.addChild(collapseReferencesButton);
@@ -756,7 +756,7 @@ public class InfoWindowDOM {
 		// production info
 		HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
 		HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
-				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+", true);
+				"productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
 		HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
 				"width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
 		productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
