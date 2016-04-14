@@ -184,7 +184,7 @@ public class SulstonTreePane extends ScrollPane {
 		Button plus = new Button();
 		plus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		plus.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
-		plus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
+		plus.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;"
 				+ "-fx-background-color: transparent;");
 		plus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		plus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
@@ -194,7 +194,7 @@ public class SulstonTreePane extends ScrollPane {
 		Button minus = new Button();
 		minus.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		minus.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
-		minus.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;"
+		minus.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;"
 				+ "-fx-background-color: transparent;");
 		minus.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
 		minus.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);

@@ -22,10 +22,10 @@ public class TreePane extends AnchorPane {
 		AnchorPane.setRightAnchor(view, 0d);
 		AnchorPane.setBottomAnchor(view, 0d);
 		view.setFocusTraversable(false);
-		view.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		view.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
 		getChildren().add(view);
-		setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 	}
 
 }

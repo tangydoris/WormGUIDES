@@ -622,7 +622,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				exitSaveStage.setResizable(false);
 
 				for (Node node : exitScene.getRoot().getChildrenUnmodifiable())
-					node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 			}
 
 			exitSaveStage.show();

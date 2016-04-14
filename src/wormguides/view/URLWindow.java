@@ -54,14 +54,14 @@ public class URLWindow extends AnchorPane {
 		urlField.setFont(AppFont.getFont());
 		urlField.setPrefHeight(28);
 		urlField.setEditable(false);
-		urlField.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		urlField.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 		HBox.setHgrow(urlField, Priority.ALWAYS);
 		Button androidCopyBtn = new Button();
 		androidCopyBtn.setPrefSize(28, 28);
 		androidCopyBtn.setMinSize(28, 28);
 		androidCopyBtn.setMaxSize(28, 28);
 		androidCopyBtn.setTooltip(tooltip);
-		androidCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		androidCopyBtn.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 		androidCopyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 		androidCopyBtn.setGraphic(ImageLoader.getCopyIcon());
 		androidCopyBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -75,7 +75,7 @@ public class URLWindow extends AnchorPane {
 
 		resetBtn = new Button("Generate");
 		resetBtn.setPrefWidth(100);
-		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		resetBtn.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 		resetBtn.setFont(AppFont.getFont());
 		resetBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -86,7 +86,7 @@ public class URLWindow extends AnchorPane {
 
 		closeBtn = new Button("Close");
 		closeBtn.setPrefWidth(100);
-		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		closeBtn.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 		closeBtn.setFont(AppFont.getFont());
 		HBox hBox = new HBox();
 		hBox.setSpacing(20);

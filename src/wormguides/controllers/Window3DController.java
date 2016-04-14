@@ -1111,7 +1111,7 @@ public class Window3DController {
 				contextMenuStage.setTitle("Menu");
 
 				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
-					node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 				}
 
 				contextMenuController.setInfoButtonListener(new EventHandler<MouseEvent>() {

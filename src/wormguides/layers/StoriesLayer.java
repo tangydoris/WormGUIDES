@@ -742,7 +742,7 @@ public class StoriesLayer {
 				});
 
 				for (Node node : editStage.getScene().getRoot().getChildrenUnmodifiable()) {
-					node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 				}
 
 			} catch (IOException e) {
@@ -793,7 +793,7 @@ public class StoriesLayer {
 
 							Separator s = new Separator(Orientation.HORIZONTAL);
 							s.setFocusTraversable(false);
-							s.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+							s.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 							storyGraphic.getChildren().add(s);
 
 							setGraphic(storyGraphic);
