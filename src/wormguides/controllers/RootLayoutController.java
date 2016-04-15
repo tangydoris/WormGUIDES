@@ -554,7 +554,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void captureVideo() {
 		captureVideoMenuItem.setDisable(true);
 		stopCaptureVideoMenuItem.setDisable(false);
-		captureVideo.set(true);
 
 		// start the image capture
 		if (window3DController != null) {
@@ -899,9 +898,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				playingMovie.set(!playingMovie.get());
 
 				if (playingMovie.get())
-					playButton.setGraphic(playIcon);
-				else
 					playButton.setGraphic(pauseIcon);
+				else
+					playButton.setGraphic(playIcon);
 			}
 		});
 	}

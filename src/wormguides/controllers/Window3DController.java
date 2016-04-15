@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -252,6 +254,7 @@ public class Window3DController {
 	private SubsceneSizeListener subsceneSizeListener;
 
 	private BooleanProperty captureVideo;
+	private Timer timer;
 	private Vector<File> movieFiles;
 	Vector<JavaPicture> javaPictures;
 	private int count;
@@ -2093,30 +2096,65 @@ public class Window3DController {
 		}
 
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
-
-		time.addListener(new ChangeListener<Number>() {
+		
+		
+		
+		
+		captureVideo.set(true);
+		timer = new Timer();
+		
+		timer.schedule(new TimerTask() {
 			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				if (captureVideo != null) {
-					if (captureVideo.get()) {
+			public void run() {
+				if (captureVideo.get()) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
-						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+							try {
+								File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
 
-						try {
-							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-
-							if (file != null) {
-								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-								ImageIO.write(renderedImage, "JPEG", file);
-								movieFiles.addElement(file);
+								if (file != null) {
+									RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+									ImageIO.write(renderedImage, "JPEG", file);
+									movieFiles.addElement(file);
+								}
+							} catch (Exception e) {
+								// e.printStackTrace();
 							}
-						} catch (Exception e) {
-							// e.printStackTrace();
 						}
-					}
+					});
+					
+				} else {
+					timer.cancel();
 				}
 			}
-		});
+		}, 0, 1000);
+
+//		time.addListener(new ChangeListener<Number>() {
+//			@Override
+//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//				if (captureVideo != null) {
+//					if (captureVideo.get()) {
+//
+//						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+//
+//						try {
+//							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
+//
+//							if (file != null) {
+//								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+//								ImageIO.write(renderedImage, "JPEG", file);
+//								movieFiles.addElement(file);
+//							}
+//						} catch (Exception e) {
+//							// e.printStackTrace();
+//						}
+//					}
+//				}
+//			}
+//		});
 
 		return true;
 	}
@@ -2135,7 +2173,7 @@ public class Window3DController {
 		}
 
 		if (javaPictures.size() > 0) {
-			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 3, movieName, javaPictures);
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
 
 			// move the movie to the originally specified location
 			File movJustMade = new File(movieName);
@@ -2154,7 +2192,6 @@ public class Window3DController {
 			for (File frame : frames) {
 				frame.delete();
 			}
-
 			frameDir.delete();
 		}
 
