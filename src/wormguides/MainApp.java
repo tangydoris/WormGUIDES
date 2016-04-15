@@ -47,7 +47,7 @@ public class MainApp extends Application {
 			@Override
 			public void handle(WindowEvent event) {
 				event.consume();
-				
+
 				// prompt user to save active story on application exit
 				if (controller != null)
 					controller.promptStorySave();
@@ -70,14 +70,13 @@ public class MainApp extends Application {
 			rootLayout = (BorderPane) loader.load();
 
 			scene = new Scene(rootLayout);
-			// scene.getStylesheets().add("MainApp.css");
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(true);
+			primaryStage.centerOnScreen();
 
 			Parent root = scene.getRoot();
-			for (Node node : root.getChildrenUnmodifiable()) {
-				node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
-			}
+			for (Node node : root.getChildrenUnmodifiable())
+				node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
 		} catch (IOException e) {
 			System.out.println("could not initialize root layout.");

@@ -25,7 +25,7 @@ import javafx.stage.WindowEvent;
  * A draggable tab that can optionally be detached from its tab pane and shown
  * in a separate window. This can be added to any normal TabPane, however a
  * TabPane with draggable tabs must *only* have DraggableTabs, normal tabs and
- * DrragableTabs mixed will cause issues!
+ * DragableTabs mixed will cause issues!
  * <p>
  * 
  * @author Michael Berry
@@ -58,6 +58,7 @@ public class DraggableTab extends Tab {
 	 *            the text to appear on the tag label.
 	 */
 	public DraggableTab(String text) {
+		super();
 		nameLabel = new Label(text);
 		setGraphic(nameLabel);
 		detachable = true;

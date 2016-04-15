@@ -21,14 +21,15 @@ import javafx.scene.text.TextAlignment;
  * 
  * @author Doris Tang
  */
-public class YesNoDialogPane extends AnchorPane {
+public class YesNoCancelDialogPane extends AnchorPane {
 
 	private Button yesBtn;
 	private Button noBtn;
+	private Button cancelBtn;
 
 	private Text promptText;
 
-	public YesNoDialogPane(String prompt, String yesButtonText, String noButonText) {
+	public YesNoCancelDialogPane(String prompt, String yesButtonText, String noButtonText, String cancelButtonText) {
 		super();
 
 		VBox mainVBox = new VBox(10);
@@ -54,26 +55,34 @@ public class YesNoDialogPane extends AnchorPane {
 		yesBtn.setMaxHeight(Integer.MAX_VALUE);
 
 		noBtn = new Button();
-		noBtn.setText(noButonText);
+		noBtn.setText(noButtonText);
 		noBtn.setFont(AppFont.getFont());
 		noBtn.setPrefWidth(70);
 		noBtn.setMaxHeight(Integer.MAX_VALUE);
 		
+		cancelBtn = new Button();
+		cancelBtn.setText(cancelButtonText);
+		cancelBtn.setFont(AppFont.getFont());
+		cancelBtn.setPrefWidth(70);
+		cancelBtn.setMaxHeight(Integer.MAX_VALUE);
+
 		Region r1 = new Region();
 		sizeRegion(r1);
 		Region r2 = new Region();
 		sizeRegion(r2);
 		Region r3 = new Region();
 		sizeRegion(r3);
-		
+		Region r4 = new Region();
+		sizeRegion(r4);
+
 		HBox btnHBox = new HBox(10);
-		btnHBox.getChildren().addAll(r1, yesBtn, r2, noBtn, r3);
-		
+		btnHBox.getChildren().addAll(r1, yesBtn, r2, noBtn, r3, cancelBtn, r4);
+
 		mainVBox.getChildren().add(btnHBox);
 
 		getChildren().add(mainVBox);
 	}
-	
+
 	private void sizeRegion(Region r) {
 		HBox.setHgrow(r, Priority.ALWAYS);
 	}
@@ -84,5 +93,9 @@ public class YesNoDialogPane extends AnchorPane {
 
 	public void setNoButtonAction(EventHandler<ActionEvent> handler) {
 		noBtn.setOnAction(handler);
+	}
+	
+	public void setCancelButtonAction(EventHandler<ActionEvent> handler) {
+		cancelBtn.setOnAction(handler);
 	}
 }

@@ -93,35 +93,27 @@ public class URLLoader {
 
 				// multicellular structure rules have a null SearchType
 				// parse SearchType args
-				if (sb.indexOf("-s") > -1) {
-					noTypeSpecified = false;
+				if (sb.indexOf("-s") > -1) // systematic/functional
 					types.add("-s");
-					int i = sb.indexOf("-s");
-					sb.replace(i, i + 2, "");
-				}
-				if (sb.indexOf("-n") > -1) {
-					noTypeSpecified = false;
+				if (sb.indexOf("-n") > -1) // lineage
 					types.add("-n");
-					int i = sb.indexOf("-n");
-					sb.replace(i, i + 2, "");
-				}
-				if (sb.indexOf("-d") > -1) {
-					noTypeSpecified = false;
+				if (sb.indexOf("-d") > -1) // description
 					types.add("-d");
-					int i = sb.indexOf("-d");
-					sb.replace(i, i + 2, "");
-				}
-				if (sb.indexOf("-g") > -1) {
-					noTypeSpecified = false;
+				if (sb.indexOf("-g") > -1) // gene
 					types.add("-g");
-					int i = sb.indexOf("-g");
-					sb.replace(i, i + 2, "");
-				}
-				if (sb.indexOf("-m") > -1) {
-					noTypeSpecified = false;
+				if (sb.indexOf("-m") > -1) // multicell
 					types.add("-m");
-					int i = sb.indexOf("-m");
-					sb.replace(i, i + 2, "");
+				if (sb.indexOf("-c") > -1) // connectome
+					types.add("-c");
+				if (sb.indexOf("-b") > -1) // neighbor
+					types.add("-b");
+				
+				if (!types.isEmpty()) {
+					noTypeSpecified = false;
+					for (String arg : types) {
+						int i = sb.indexOf(arg);
+						sb.replace(i, i + 2, "");
+					}
 				}
 
 				String colorString = "";
@@ -189,12 +181,12 @@ public class URLLoader {
 
 					if (types.contains("-m"))
 						Search.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
-
-					if (types.contains("-b"))
-						Search.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
-
+					
 					if (types.contains("-c"))
 						Search.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+					
+					if (types.contains("-b"))
+						Search.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
 
 					// if no type present, default is systematic
 					if (noTypeSpecified) {

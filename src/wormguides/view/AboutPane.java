@@ -28,7 +28,7 @@ public class AboutPane extends AnchorPane {
 
 		e_1.setWrapText(true);
 
-		e_1.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+		e_1.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
 		getChildren().add(e_1);
 	}

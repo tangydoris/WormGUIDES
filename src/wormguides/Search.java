@@ -170,7 +170,7 @@ public class Search {
 			boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
 
 		StringBuilder sb = new StringBuilder("'");
-		sb.append(cellName).append("' Connectome");
+		sb.append(cellName.toLowerCase()).append("' Connectome");
 
 		ArrayList<String> types = new ArrayList<String>();
 		if (isPresynaptic)
@@ -195,7 +195,7 @@ public class Search {
 		Rule tempRule = new Rule(sb.toString(), color, SearchType.CONNECTOME, SearchOption.CELLNUCLEUS);
 		tempRule.setCells(connectome.queryConnectivity(cellName, isPresynaptic, isPostsynaptic, isElectrical,
 				isNeuromuscular, true));
-		tempRule.setSearchedText(cellName);
+		tempRule.setSearchedText(sb.toString());
 		tempRule.resetLabel(sb.toString());
 
 		rulesList.add(tempRule);

@@ -267,7 +267,7 @@ public class Window3DController {
 	private DoubleProperty rotateXAngle;
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
-	
+
 	private Quaternion quaternion;
 
 	/**
@@ -347,18 +347,19 @@ public class Window3DController {
 				if (!newValue.isEmpty()) {
 					// value passed may be a functional name
 					// use lineage names instead
-//					String lineageName = PartsList.getLineageNameByFunctionalName(newValue);
-//					if (lineageName == null)
-//						lineageName = newValue;
+					// String lineageName =
+					// PartsList.getLineageNameByFunctionalName(newValue);
+					// if (lineageName == null)
+					// lineageName = newValue;
 					/*
-					 * TODO
-					 * Removed above check (caused bugs with P4 clicked in lineage window)
-					 * 	check if this causes problems elsewhere
+					 * TODO Removed above check (caused bugs with P4 clicked in
+					 * lineage window) check if this causes problems elsewhere
 					 * 
-					 * ***** If it does, we should do name translation before changing name *****
+					 * ***** If it does, we should do name translation before
+					 * changing name *****
 					 */
 					String lineageName = newValue;
-					
+
 					selectedName.set(lineageName);
 
 					if (!allLabels.contains(lineageName))
@@ -366,7 +367,6 @@ public class Window3DController {
 
 					Shape3D entity = getEntityWithName(lineageName);
 
-					
 					// go to labeled name
 					int startTime;
 					int endTime;
@@ -374,23 +374,23 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
-					if (startTime <= 0 || endTime <= 0) return; //if the entity doesn't appear in the lifetime of the embryo, don't change the scene
-					
-//					if (startTime <= 0) {
-//						startTime = 1;
-//					}
-//						
-//					if (endTime <= 0) {
-//							endTime = 1;
-//					}
-					
+					if (startTime <= 0 || endTime <= 0)
+						return; // if the entity doesn't appear in the lifetime
+								// of the embryo, don't change the scene
+
+					// if (startTime <= 0) {
+					// startTime = 1;
+					// }
+					//
+					// if (endTime <= 0) {
+					// endTime = 1;
+					// }
+
 					if (time.get() < startTime || time.get() > endTime) {
 						time.set(startTime);
-					}
-					else {
+					} else {
 						insertLabelFor(lineageName, entity);
 					}
-						
 
 					highlightActiveCellLabel(entity);
 				}
@@ -480,7 +480,7 @@ public class Window3DController {
 		rotateX.setOnTransformChanged(getRotateXChangeHandler());
 		rotateY.setOnTransformChanged(getRotateYChangeHandler());
 		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
-		
+
 		quaternion = new Quaternion();
 
 		uniformSize = false;
@@ -552,9 +552,9 @@ public class Window3DController {
 
 		initializeUpdate3D();
 	}
-	
+
 	public void initializeWithCannonicalOrientation() {
-		//set default cannonical orientations
+		// set default cannonical orientations
 
 		rotateX.setAngle(cannonicalOrientationX);
 		rotateY.setAngle(cannonicalOrientationY);
@@ -576,8 +576,6 @@ public class Window3DController {
 		Text t = makeNoteBillboardText("P     A");
 		t.setTranslateX(-10);
 		middleTransformGroup.getChildren().add(t);
-		
-		
 
 		t = makeNoteBillboardText("D     V");
 		t.setTranslateX(-42);
@@ -591,7 +589,13 @@ public class Window3DController {
 		t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
 		middleTransformGroup.getChildren().add(t);
 
-		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation to match lateral orientation in image
+		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation
+																		// to
+																		// match
+																		// lateral
+																		// orientation
+																		// in
+																		// image
 		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 		// xy relocates z shrinks apparent by moving away from camera? improves
 		// resolution?
@@ -658,16 +662,25 @@ public class Window3DController {
 		return colorHash;
 	}
 
-	/*
-	 * Insert transient label into sprites pane name = name that appears on the
-	 * label entity = entity that the label should show up on
+	/**
+	 * Inserts a transient label into the sprites pane for the specified entity
+	 * if the entity is an 'other' entity that is less than 10% opaque.
+	 * 
+	 * @param name
+	 *            String containing the name that appears on the transient label
+	 * @param entity
+	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && appliesToCurrentRules(name))) {
+		/*
+		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && currentRulesApplyTo(name))) {
 			showTransientLabel(name, entity);
 		}
+		*/
+		if (currentRulesApplyTo(name))
+			showTransientLabel(name, entity);
 	}
-	
+
 	private void showTransientLabel(String name, Node entity) {
 		boolean labelDrawn = false;
 
@@ -800,7 +813,7 @@ public class Window3DController {
 		hideContextPopups();
 
 		spritesPane.setCursor(Cursor.CLOSED_HAND);
-		
+
 		mouseOldX = mousePosX;
 		mouseOldY = mousePosY;
 		mouseOldZ = mousePosZ;
@@ -810,10 +823,10 @@ public class Window3DController {
 		mouseDeltaY = (mousePosY - mouseOldY);
 		mouseDeltaX /= 4;
 		mouseDeltaY /= 4;
-		
+
 		angleOfRotation = rotationAngleFromMouseMovement();
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-		//mousePosZ = 0;
+		// mousePosZ = 0;
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
@@ -831,33 +844,42 @@ public class Window3DController {
 		else if (event.isPrimaryButtonDown()) {
 			mouseDeltaX /= 2;
 			mouseDeltaY /= 2;
-			
-			/* TODO 
-			 * how to get Z COORDINATE?
+
+			/*
+			 * TODO how to get Z COORDINATE?
 			 */
 			if (quaternion != null) {
-//				double[] vectorToOldMousePos = vectorBWPoints(newOriginX, newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-//				double[] vectorToNewMousePos = vectorBWPoints(newOriginX, newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
-				
-				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
-				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
-				
+				// double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
+				// newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+				// double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
+				// newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
+
+				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, newOriginX, newOriginY,
+						newOriginZ);
+				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, newOriginX, newOriginY,
+						newOriginZ);
+
 				if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-//					System.out.println("from origin to old mouse pos: <" + vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] + ", " + vectorToOldMousePos[2] + ">");
-//					System.out.println("from origin to old mouse pos: <" + vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] + ", " + vectorToNewMousePos[2] + ">");
-//					System.out.println(" ");
-					
-					//compute cross product
+					// System.out.println("from origin to old mouse pos: <" +
+					// vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
+					// ", " + vectorToOldMousePos[2] + ">");
+					// System.out.println("from origin to old mouse pos: <" +
+					// vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
+					// ", " + vectorToNewMousePos[2] + ">");
+					// System.out.println(" ");
+
+					// compute cross product
 					double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
 					if (cross.length == 3) {
-						//System.out.println("cross product: <" + cross[0] + ", " + cross[1] + ", " + cross[2] + ">");
+						// System.out.println("cross product: <" + cross[0] + ",
+						// " + cross[1] + ", " + cross[2] + ">");
 						quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
-						
+
 						ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
-						
+
 						if (eulerAngles.size() == 3) {
-//							rotateX.setAngle(eulerAngles.get(2));
-//							rotateY.setAngle(eulerAngles.get(0));
+							// rotateX.setAngle(eulerAngles.get(2));
+							// rotateY.setAngle(eulerAngles.get(0));
 						}
 					}
 				}
@@ -960,59 +982,60 @@ public class Window3DController {
 			selectedName.set("");
 		}
 	}
-	
+
 	private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
 		double[] vector = new double[3];
-		
+
 		double vx, vy, vz;
-		
+
 		vx = qx - px;
 		vy = qy - py;
 		vz = qz - pz;
-		
+
 		vector[0] = vx;
 		vector[1] = vy;
 		vector[2] = vz;
-		
+
 		return vector;
 	}
-	
-	
+
 	/*
-	 * TODO
-	 * fix this
+	 * TODO fix this
 	 * 
 	 */
-	//http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
-	//http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
+	// http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
+	// --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
+	// http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
 	private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
-		return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2*xCoord*yCoord*Math.cos(angleOfRotation)));
+		return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
 	}
-	
-	//http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
+
+	// http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
 	private double rotationAngleFromMouseMovement() {
-		double rotationAngleRadians = Math.acos(((mouseOldX*mousePosX) + (mouseOldY*mousePosY) + (mouseOldZ*mousePosZ)) 
-				/ Math.sqrt((Math.pow(mouseOldX, 2)+Math.pow(mouseOldY, 2)+Math.pow(mouseOldZ, 2))*
-						(Math.pow(mousePosX, 2)+Math.pow(mousePosY, 2)+Math.pow(mousePosZ, 2))));
-		
+		double rotationAngleRadians = Math
+				.acos(((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
+						/ Math.sqrt((Math.pow(mouseOldX, 2) + Math.pow(mouseOldY, 2) + Math.pow(mouseOldZ, 2))
+								* (Math.pow(mousePosX, 2) + Math.pow(mousePosY, 2) + Math.pow(mousePosZ, 2))));
+
 		return rotationAngleRadians;
 	}
-	
-	//http://mathworld.wolfram.com/CrossProduct.html
+
+	// http://mathworld.wolfram.com/CrossProduct.html
 	private double[] crossProduct(double[] u, double[] v) {
-		if (u.length != 3 || v.length != 3) return null;
-		
+		if (u.length != 3 || v.length != 3)
+			return null;
+
 		double[] cross = new double[3];
-		
+
 		double cx, cy, cz;
-		cx = (u[1]*v[2]) - (u[2]*v[1]);
-		cy = (u[2]*v[0]) - (u[0]*v[2]);
-		cz = (u[0]*v[1]) - (u[1]*v[0]);
-		
+		cx = (u[1] * v[2]) - (u[2] * v[1]);
+		cy = (u[2] * v[0]) - (u[0] * v[2]);
+		cz = (u[0] * v[1]) - (u[1] * v[0]);
+
 		cross[0] = cx;
 		cross[1] = cy;
 		cross[2] = cz;
-		
+
 		return cross;
 	}
 
@@ -1052,8 +1075,10 @@ public class Window3DController {
 		contextMenuController.setColorNeighborsButtonListener(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				// call distance Search method
-				Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, option);
+				// color neighboring cell bodies, multicellular structures, as
+				// well as nuclei
+				Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS,
+						SearchOption.CELLBODY);
 				rule.showEditStage(parentStage);
 				contextMenuStage.hide();
 			}
@@ -1068,8 +1093,8 @@ public class Window3DController {
 
 	private void initContextMenuStage() {
 		if (contextMenuStage == null) {
-			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases,
-					productionInfo, connectome);
+			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases, productionInfo,
+					connectome);
 
 			contextMenuStage = new Stage();
 			contextMenuStage.initStyle(StageStyle.UNDECORATED);
@@ -1089,7 +1114,7 @@ public class Window3DController {
 				contextMenuStage.setTitle("Menu");
 
 				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
-					node.setStyle("-fx-focus-color: -fx-outer-border; " + "-fx-faint-focus-color: transparent;");
+					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 				}
 
 				contextMenuController.setInfoButtonListener(new EventHandler<MouseEvent>() {
@@ -1422,7 +1447,7 @@ public class Window3DController {
 					// in regular view mode
 					ArrayList<String> allNames = se.getAllCellNames();
 					String sceneName = se.getSceneName();
-					
+
 					// default white meshes
 					if (allNames.isEmpty()) {
 						mesh.setMaterial(new PhongMaterial(Color.WHITE));
@@ -1882,7 +1907,7 @@ public class Window3DController {
 		this.camera = new PerspectiveCamera(true);
 		this.xform = new Xform();
 		xform.reset();
-		
+
 		root.getChildren().add(xform);
 		xform.getChildren().add(camera);
 
@@ -1972,23 +1997,29 @@ public class Window3DController {
 			}
 		}
 	}
-	
-	public boolean appliesToCurrentRules(String name) {
+
+	public boolean currentRulesApplyTo(String name) {
 		// get the scene name associated with the cell
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
 		for (int i = 0; i < sceneElementsList.elementsList.size(); i++) {
 			SceneElement currSE = sceneElementsList.elementsList.get(i);
-			
-			//check if multicellular structure --> find match with name in cells
+
+			// check if multicellular structure --> find match with name in
+			// cells
 			if (currSE.isMulticellular()) {
 				if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
 					sceneName = name;
-					cells = currSE.getAllCellNames(); //save the cells in case there isn't an explicit structure rule but the structure is still colored
+					cells = currSE.getAllCellNames(); // save the cells in case
+														// there isn't an
+														// explicit structure
+														// rule but the
+														// structure is still
+														// colored
 				}
 			} else {
 				String sn = sceneElementsList.elementsList.get(i).getSceneName();
-				
+
 				StringTokenizer st = new StringTokenizer(sn);
 				if (st.countTokens() == 2) {
 					String sceneNameLineage = st.nextToken();
@@ -1999,21 +2030,20 @@ public class Window3DController {
 				}
 			}
 		}
-		
-		
-		if (sceneName.equals("")) {
+
+		if (sceneName.equals(""))
 			sceneName = name;
-		}
-		
+
 		for (Rule rule : currentRulesList) {
-			if (rule.isMulticellularStructureRule()
-					&& rule.appliesToMulticellularStructure(sceneName)) {
+			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
 				return true;
-			} else if (rule.appliesToCellBody(name)) {
+			else if (rule.appliesToCellBody(name))
 				return true;
-			} else if (rule.appliesToCellNucleus(name)) {
+			else if (rule.appliesToCellNucleus(name))
 				return true;
-			} else { //check if cells corresponding to multicellular structure have rule - in the case of a non explicit multicellular rule but a structure that's colored
+			else { // check if cells corresponding to multicellular structure
+						// have rule - in the case of a non explicit
+						// multicellular rule but a structure that's colored
 				if (cells.size() > 0) {
 					for (String cell : cells) {
 						if (rule.appliesToCellBody(cell)) {
@@ -2023,7 +2053,7 @@ public class Window3DController {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -2774,11 +2804,11 @@ public class Window3DController {
 	public Stage getStage() {
 		return this.parentStage;
 	}
-	
+
 	private final static double cannonicalOrientationX = 145.;
 	private final static double cannonicalOrientationY = -170.;
 	private final static double cannonicalOrientationZ = 25.;
-	
+
 	private final String CS = ", ";
 
 	private final String FILL_COLOR_HEX = "#272727";
