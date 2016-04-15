@@ -551,7 +551,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	public void captureVideo() {
 		captureVideoMenuItem.setDisable(true);
 		stopCaptureVideoMenuItem.setDisable(false);
-		captureVideo.set(true);
 
 		// start the image capture
 		if (window3DController != null) {
