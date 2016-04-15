@@ -898,9 +898,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				playingMovie.set(!playingMovie.get());
 
 				if (playingMovie.get())
-					playButton.setGraphic(playIcon);
-				else
 					playButton.setGraphic(pauseIcon);
+				else
+					playButton.setGraphic(playIcon);
 			}
 		});
 	}

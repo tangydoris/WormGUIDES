@@ -2192,7 +2192,6 @@ public class Window3DController {
 			for (File frame : frames) {
 				frame.delete();
 			}
-
 			frameDir.delete();
 		}
 
