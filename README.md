@@ -14,7 +14,7 @@ URL feature documentation can be found in src/wormguides/model/URLDocumentation.
 
 WormGUIDES is a collaboration led by Drs. Zhirong Bao (MSKCC), Daniel Colon-Ramos (Yale), William Mohler (UConn) and Hari Shroff (NIH). For more information, visit our website at http://wormguides.org. 
 
-The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhirong Bao and Dr. William Mohler. Major contributors of the desktop app include Doris Tang (New York University) and Dr. Anthony Santella of the Bao Laboratory. For questions or comments contact support@wormguides.org.
+The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhirong Bao and Dr. William Mohler. Major contributors of the desktop app include Doris Tang (New York University) and Braden Katzman (Columbia University) and Dr. Anthony Santella of the Bao Laboratory. For questions or comments contact support@wormguides.org.
 <br><br><br>
 
 
