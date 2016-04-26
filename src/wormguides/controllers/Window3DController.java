@@ -821,7 +821,6 @@ public class Window3DController {
 
 		angleOfRotation = rotationAngleFromMouseMovement();
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-		// mousePosZ = 0;
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
@@ -1168,13 +1167,29 @@ public class Window3DController {
 			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
 	}
 
-	// Input text is the note/label geometry
-	// Input entity is the cell/body/mesh that the text should align with
+	/**
+	 * Aligns a note graphic to its entity. The graphic is either a {@link Text}
+	 * or a {@link VBox}. The graphic is removed if it ends up outside the
+	 * bounds of the subscene window after a transformation, and only reinserted
+	 * if its bounds are within the window again.
+	 * 
+	 * @param noteGraphic
+	 *            Graphical representation of a note/notes (can either be a
+	 *            {@link Text} or a {@link VBox}
+	 * @param node
+	 *            Entity that the note graphic should attach to
+	 * @param isLabel
+	 *            True if a label is being aligned, false otherwise
+	 */
 	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
 		if (node != null) {
-			Bounds b = node.getBoundsInParent();
-			// System.out.println("static - "+b.toString());
+			// graphic could have been previously removed due to
+			// out-of-bounds-ness
+			if (!spritesPane.getChildren().contains(noteGraphic)) {
+				spritesPane.getChildren().add(noteGraphic);
+			}
 
+			Bounds b = node.getBoundsInParent();
 			if (b != null) {
 				noteGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
@@ -1192,8 +1207,24 @@ public class Window3DController {
 					x += hOffset;
 					y += vOffset + 5;
 				}
+				
+				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+				Bounds graphicBounds = noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
 
-				noteGraphic.getTransforms().add(new Translate(x, y));
+				if (graphicBounds != null && paneBounds != null) {
+					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
+							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
+							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
+									- OUT_OF_BOUNDS_THRESHOLD))
+							// lower bound
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
+							// right bound
+					) {
+						spritesPane.getChildren().remove(noteGraphic);
+					} else { // note graphic is within bounds
+						noteGraphic.getTransforms().add(new Translate(x, y));
+					}
+				}
 			}
 		}
 	}
@@ -1215,9 +1246,9 @@ public class Window3DController {
 		return -1;
 	}
 
-	/*
-	 * Calls service to retrieve subscene data at current time point then render
-	 * entities, notes, and labels
+	/**
+	 * Calls the {@link Service} to retrieve subscene data at current time point
+	 * then render entities, notes, and labels
 	 */
 	private void buildScene() {
 		// Spool thread for actual rendering to subscene
@@ -1412,6 +1443,27 @@ public class Window3DController {
 
 		repositionSprites();
 		repositionNoteBillboardFronts();
+
+		removeOutOfBoundsSprites();
+	}
+
+	private void removeOutOfBoundsSprites() {
+		Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+
+		Iterator<Node> iter = spritesPane.getChildren().iterator();
+		while (iter.hasNext()) {
+			Node node = iter.next();
+			if (node != subscene) {
+				Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
+
+				if (spriteBounds.getMinX() < paneBounds.getMinX() - 10
+						&& spriteBounds.getMinY() < paneBounds.getMinY() - 10
+						&& spriteBounds.getMaxX() > paneBounds.getMaxX() + 10
+						&& spriteBounds.getMaxY() > paneBounds.getMaxY() + 10) {
+					iter.remove();
+				}
+			}
+		}
 	}
 
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
@@ -2843,5 +2895,9 @@ public class Window3DController {
 	 * zoomed in so that the entire embryo is not visible.
 	 */
 	private final double INITIAL_ZOOM = 1.5;
-
+	/**
+	 * The number of pixels that a sprite (note or label) can be outside the
+	 * sprite pane bounds before being removed from the subscene.
+	 */
+	private final int OUT_OF_BOUNDS_THRESHOLD = 5;
 }
