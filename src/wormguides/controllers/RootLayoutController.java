@@ -581,11 +581,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	// ----- End menu items and buttons listeners -----
 
 	public void promptStorySave() {
-		// TODO
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
 			if (exitSaveStage == null) {
 				exitSaveStage = new Stage();
 				exitSaveStage.initModality(Modality.APPLICATION_MODAL);
+				exitSaveStage.initOwner(mainStage);
 
 				YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
 						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",

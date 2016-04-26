@@ -79,6 +79,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import wormguides.ColorComparator;
+import wormguides.ColorHash;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
@@ -88,7 +89,6 @@ import wormguides.Xform;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.model.CasesLists;
-import wormguides.model.ColorHash;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
@@ -673,10 +673,9 @@ public class Window3DController {
 	 */
 	private void transientLabel(String name, Node entity) {
 		/*
-		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && currentRulesApplyTo(name))) {
-			showTransientLabel(name, entity);
-		}
-		*/
+		 * if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 &&
+		 * currentRulesApplyTo(name))) { showTransientLabel(name, entity); }
+		 */
 		if (currentRulesApplyTo(name))
 			showTransientLabel(name, entity);
 	}
@@ -1113,9 +1112,8 @@ public class Window3DController {
 				contextMenuStage.setResizable(false);
 				contextMenuStage.setTitle("Menu");
 
-				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
+				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable())
 					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
-				}
 
 				contextMenuController.setInfoButtonListener(new EventHandler<MouseEvent>() {
 					@Override
@@ -2042,8 +2040,8 @@ public class Window3DController {
 			else if (rule.appliesToCellNucleus(name))
 				return true;
 			else { // check if cells corresponding to multicellular structure
-						// have rule - in the case of a non explicit
-						// multicellular rule but a structure that's colored
+					// have rule - in the case of a non explicit
+					// multicellular rule but a structure that's colored
 				if (cells.size() > 0) {
 					for (String cell : cells) {
 						if (rule.appliesToCellBody(cell)) {
@@ -2096,13 +2094,10 @@ public class Window3DController {
 		}
 
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
-		
-		
-		
-		
+
 		captureVideo.set(true);
 		timer = new Timer();
-		
+
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -2125,36 +2120,40 @@ public class Window3DController {
 							}
 						}
 					});
-					
+
 				} else {
 					timer.cancel();
 				}
 			}
 		}, 0, 1000);
 
-//		time.addListener(new ChangeListener<Number>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//				if (captureVideo != null) {
-//					if (captureVideo.get()) {
-//
-//						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
-//
-//						try {
-//							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-//
-//							if (file != null) {
-//								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-//								ImageIO.write(renderedImage, "JPEG", file);
-//								movieFiles.addElement(file);
-//							}
-//						} catch (Exception e) {
-//							// e.printStackTrace();
-//						}
-//					}
-//				}
-//			}
-//		});
+		// time.addListener(new ChangeListener<Number>() {
+		// @Override
+		// public void changed(ObservableValue<? extends Number> observable,
+		// Number oldValue, Number newValue) {
+		// if (captureVideo != null) {
+		// if (captureVideo.get()) {
+		//
+		// WritableImage screenCapture = subscene.snapshot(new
+		// SnapshotParameters(), null);
+		//
+		// try {
+		// File file = new File(frameDirPath + "movieFrame" + count++ +
+		// ".JPEG");
+		//
+		// if (file != null) {
+		// RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture,
+		// null);
+		// ImageIO.write(renderedImage, "JPEG", file);
+		// movieFiles.addElement(file);
+		// }
+		// } catch (Exception e) {
+		// // e.printStackTrace();
+		// }
+		// }
+		// }
+		// }
+		// });
 
 		return true;
 	}

@@ -1,10 +1,10 @@
 package wormguides.view;
 
-import wormguides.model.ColorHash;
 import wormguides.model.LineageData;
 import wormguides.model.PartsList;
 import wormguides.model.Rule;
 import wormguides.ColorComparator;
+import wormguides.ColorHash;
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.ContextMenuController;

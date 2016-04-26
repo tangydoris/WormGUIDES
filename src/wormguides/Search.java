@@ -186,7 +186,6 @@ public class Search {
 
 			for (int i = 0; i < types.size(); i++) {
 				sb.append(types.get(i));
-
 				if (i != types.size() - 1)
 					sb.append(", ");
 			}
@@ -405,7 +404,7 @@ public class Search {
 		Rule rule = new Rule(label, color, type, options);
 
 		ArrayList<String> cells;
-		
+
 		cells = getCellsList(searched);
 		rule.setCells(cells);
 
