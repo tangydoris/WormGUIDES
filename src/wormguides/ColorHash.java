@@ -10,8 +10,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
-/*
- * Hash of a combination of Colors mapped to a Material
+/**
+ * ColorHash is a number of combinations of Colors mapped to a {@link Material}.
+ * {@link Window3DController} and {@link SulstonTreePane} query this class to
+ * find the appropriate color striping to apply to a cell/its lineage. This
+ * class also contains a map of the material to the opacity (0.0->1.0) of the
+ * least opaque color in a Material. This is used so that the "most opaque"
+ * materials can be rendered first, followed by sheerer ones.
  */
 
 public class ColorHash {
@@ -80,7 +85,7 @@ public class ColorHash {
 		Collections.sort(colors, new ColorComparator());
 
 		// TODO
-		WritableImage wImage = new WritableImage(10, 10);
+		WritableImage wImage = new WritableImage(90, 90);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);
 		double opacity = 1.0;
@@ -113,17 +118,9 @@ public class ColorHash {
 
 		for (int i = 0; i < copy.length; i++) {
 			color = copy[i];
-			
 			for (int j = i * segmentLength; j < (i + 1) * segmentLength; j++) {
 				for (int k = 0; k < wImage.getWidth(); k++) {
-					//writer.setColor(k, j, color); // original
-					// TODO debugging
-					
-					if (temp.length == 2)
-						writer.setColor(j, k, color);
-						//System.out.println("i, j, k - "+i+", "+j+", "+k);
-					else
-						writer.setColor(j, k, color);
+					writer.setColor(k, j, color);
 				}
 			}
 		}
