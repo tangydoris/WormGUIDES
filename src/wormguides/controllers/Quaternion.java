@@ -7,10 +7,6 @@ public class Quaternion {
 	
 	/**
 	 * Initial quaternion will be <1,0,0,0> i.e. no rotation
-	 * 
-	 * @param originX
-	 * @param originY
-	 * @param originZ
 	 */
 	public Quaternion() {
 		this.w = 1.;
@@ -26,9 +22,6 @@ public class Quaternion {
 	 * @param x
 	 * @param y
 	 * @param z
-	 * @param originX
-	 * @param originY
-	 * @param originZ
 	 */
 	private Quaternion (double w, double x, double y, double z) {
 		this.w = w;
@@ -81,42 +74,43 @@ public class Quaternion {
 	 */
 	private void multiplyQuaternions(Quaternion local_rotation) {
 		
-		this.w = ((this.getW()*local_rotation.getW()) - (this.getX()*local_rotation.getX())
-				- (this.getY()*local_rotation.getY()) - (this.getZ()*local_rotation.getZ()));
+		this.w = ((getW()*local_rotation.getW()) - (getX()*local_rotation.getX())
+				- (getY()*local_rotation.getY()) - (getZ()*local_rotation.getZ()));
 		
-		this.x = ((this.getW()*local_rotation.getX()) + (this.getX()*local_rotation.getW())
-				+ (this.getY()*local_rotation.getZ()) - (this.getZ()*local_rotation.getY()));
+		this.x = ((getW()*local_rotation.getX()) + (getX()*local_rotation.getW())
+				+ (getY()*local_rotation.getZ()) - (getZ()*local_rotation.getY()));
 		
-		this.y = ((this.getW()*local_rotation.getY()) - (this.getX()*local_rotation.getZ())
-				+ (this.getY()*local_rotation.getW()) + (this.getZ()*local_rotation.getX()));
+		this.y = ((getW()*local_rotation.getY()) - (getX()*local_rotation.getZ())
+				+ (getY()*local_rotation.getW()) + (getZ()*local_rotation.getX()));
 		
-		this.z = ((this.getW()*local_rotation.getZ()) + (this.getX()*local_rotation.getY())
-				- (this.getY()*local_rotation.getW()) + (this.getZ()*local_rotation.getW()));
+		this.z = ((getW()*local_rotation.getZ()) + (getX()*local_rotation.getY())
+				- (getY()*local_rotation.getW()) + (getZ()*local_rotation.getW()));
 		
 		//normalize quaternion
-		double magnitude = Math.sqrt(Math.pow(this.getW(), 2) + Math.pow(this.getX(), 2) + Math.pow(this.getY(), 2) + Math.pow(this.getZ(), 2));
+		double magnitude = Math.sqrt(Math.pow(getW(), 2) + Math.pow(getX(), 2) + Math.pow(getY(), 2) + Math.pow(getZ(), 2));
 		
-		this.w = this.getW()/magnitude;
-		this.x = this.getX()/magnitude;
-		this.y = this.getY()/magnitude;
-		this.z = this.getZ()/magnitude;
+		this.w = getW()/magnitude;
+		this.x = getX()/magnitude;
+		this.y = getY()/magnitude;
+		this.z = getZ()/magnitude;
 	}
 	
 	
 	public double getW() {
-		return this.w;
+		return w;
 	}
 	
 	public double getX() {
-		return this.x;
+		return x;
 	}
 	
 	public double getY() {
-		return this.y;
+		return y;
 	}
 	
 	public double getZ() {
-		return this.y;
+		//return y;
+		return z;
 	}
 	
 	/**

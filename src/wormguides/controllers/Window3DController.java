@@ -672,10 +672,6 @@ public class Window3DController {
 	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		/*
-		 * if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 &&
-		 * currentRulesApplyTo(name))) { showTransientLabel(name, entity); }
-		 */
 		if (currentRulesApplyTo(name))
 			showTransientLabel(name, entity);
 	}
@@ -929,7 +925,6 @@ public class Window3DController {
 					}
 				}
 			}
-
 		}
 
 		// Cell body/structure
@@ -1377,10 +1372,8 @@ public class Window3DController {
 				iter.remove();
 		}
 
-		// root.getChildren().add(orientationIndicator);
 		double newrotate = computeInterpolatedValue(time.get(), keyFramesRotate, keyValuesRotate);
 		indicatorRotation.setAngle(-newrotate);
-		// System.out.println(time.get()+" rotation is "+newrotate);
 		indicatorRotation.setAxis(new Point3D(1, 0, 0));
 	}
 
