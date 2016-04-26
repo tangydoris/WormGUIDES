@@ -1,9 +1,9 @@
-package wormguides.model;
+package wormguides;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import wormguides.ColorComparator;
+
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -31,7 +31,7 @@ public class ColorHash {
 
 		opacityMaterialHash = new HashMap<Double, Material>();
 		makeOthersMaterial(1.0);
-		
+
 		highlightMaterial = makeMaterial(Color.GOLD);
 		translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
 		makeMaterial(Color.WHITE);
@@ -48,7 +48,7 @@ public class ColorHash {
 			opacityMaterialHash.put(opacity, material);
 			opacityHash.put(material, opacity);
 		}
-		
+
 		return opacityMaterialHash.get(opacity);
 	}
 
@@ -69,7 +69,7 @@ public class ColorHash {
 
 		return material;
 	}
-	
+
 	public Material makeMaterial(Color color) {
 		ArrayList<Color> colors = new ArrayList<Color>();
 		colors.add(color);
@@ -78,8 +78,9 @@ public class ColorHash {
 
 	public Material makeMaterial(ArrayList<Color> colors) {
 		Collections.sort(colors, new ColorComparator());
-		
-		WritableImage wImage = new WritableImage(200, 200);
+
+		// TODO
+		WritableImage wImage = new WritableImage(10, 10);
 		PixelWriter writer = wImage.getPixelWriter();
 		Color[] temp = colors.toArray(new Color[colors.size()]);
 		double opacity = 1.0;
@@ -107,16 +108,22 @@ public class ColorHash {
 		}
 
 		// for more than two colors, we want segments
-		int segmentLength = (int) wImage.getHeight() / copy.length;
+		int segmentLength = (int) (wImage.getHeight() / copy.length);
 		Color color = Color.BLACK;
 
 		for (int i = 0; i < copy.length; i++) {
+			color = copy[i];
+			
 			for (int j = i * segmentLength; j < (i + 1) * segmentLength; j++) {
 				for (int k = 0; k < wImage.getWidth(); k++) {
-					if (j < (i + 1) * segmentLength)
-						color = copy[i];
-
-					writer.setColor(k, j, color);
+					//writer.setColor(k, j, color); // original
+					// TODO debugging
+					
+					if (temp.length == 2)
+						writer.setColor(j, k, color);
+						//System.out.println("i, j, k - "+i+", "+j+", "+k);
+					else
+						writer.setColor(j, k, color);
 				}
 			}
 		}
