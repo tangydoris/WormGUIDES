@@ -173,6 +173,7 @@ public class DraggableTab extends Tab {
 								public void run() {
 									Tab selected = oldTabPane.getSelectionModel().getSelectedItem();
 									oldTabPane.getTabs().add(DraggableTab.this);
+									oldTabPane.getSelectionModel().select(DraggableTab.this);
 									oldTabPane.getSelectionModel().select(selected);
 								}
 							});

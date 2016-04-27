@@ -276,7 +276,7 @@
                                                                   </HBox>
                                                                   <HBox maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
                                                                      <children>
-                                                                        <ListView fx:id="searchResultsListView" HBox.hgrow="ALWAYS" />
+                                                                        <ListView fx:id="searchResultsListView" minHeight="40.0" HBox.hgrow="ALWAYS" />
                                                                      </children>
                                                                   </HBox>
                                                                   <HBox prefHeight="11.0" prefWidth="298.0" VBox.vgrow="NEVER">
