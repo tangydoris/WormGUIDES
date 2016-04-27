@@ -1202,12 +1202,12 @@ public class Window3DController {
 
 				if (isLabel) {
 					x += hOffset;
-					y -= (vOffset + 5);
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 				} else {
 					x += hOffset;
-					y += vOffset + 5;
+					y += vOffset + LABEL_SPRITE_Y_OFFSET;
 				}
-				
+
 				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
 				Bounds graphicBounds = noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
 
@@ -1218,7 +1218,7 @@ public class Window3DController {
 									- OUT_OF_BOUNDS_THRESHOLD))
 							// lower bound
 							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
-							// right bound
+					// right bound
 					) {
 						spritesPane.getChildren().remove(noteGraphic);
 					} else { // note graphic is within bounds
@@ -2866,7 +2866,6 @@ public class Window3DController {
 	private final long WAIT_TIME_MILLI = 200;
 
 	private final double CAMERA_INITIAL_DISTANCE = -220;
-
 	private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
 
 	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
@@ -2900,4 +2899,8 @@ public class Window3DController {
 	 * sprite pane bounds before being removed from the subscene.
 	 */
 	private final int OUT_OF_BOUNDS_THRESHOLD = 5;
+	/**
+	 * The int used when calculating the y offset between a sprite and label.
+	 */
+	private final int LABEL_SPRITE_Y_OFFSET = 5;
 }

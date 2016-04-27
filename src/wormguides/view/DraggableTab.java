@@ -2,6 +2,8 @@ package wormguides.view;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -12,6 +14,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -39,6 +42,9 @@ public class DraggableTab extends Tab {
 	private Stage dragStage;
 	private boolean detachable;
 
+	// customize tab closing
+	private boolean closeable;
+
 	static {
 		markerStage = new Stage();
 		markerStage.initStyle(StageStyle.UNDECORATED);
@@ -62,6 +68,7 @@ public class DraggableTab extends Tab {
 		nameLabel = new Label(text);
 		setGraphic(nameLabel);
 		detachable = true;
+		closeable = true;
 		dragStage = new Stage();
 		dragStage.initStyle(StageStyle.UNDECORATED);
 		StackPane dragStagePane = new StackPane();
@@ -135,9 +142,11 @@ public class DraggableTab extends Tab {
 					}
 					final Stage newStage = new Stage();
 					final TabPane pane = new TabPane();
+					if (!closeable) {
+						pane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+					}
 					tabPanes.add(pane);
 					newStage.setOnHiding(new EventHandler<WindowEvent>() {
-
 						@Override
 						public void handle(WindowEvent t) {
 							tabPanes.remove(pane);
@@ -146,7 +155,6 @@ public class DraggableTab extends Tab {
 					getTabPane().getTabs().remove(DraggableTab.this);
 					pane.getTabs().add(DraggableTab.this);
 					pane.getTabs().addListener(new ListChangeListener<Tab>() {
-
 						@Override
 						public void onChanged(ListChangeListener.Change<? extends Tab> change) {
 							if (pane.getTabs().isEmpty()) {
@@ -156,6 +164,20 @@ public class DraggableTab extends Tab {
 					});
 					newStage.setScene(new Scene(pane));
 					newStage.initStyle(StageStyle.UTILITY);
+					// redock tab on new window close
+					newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+						@Override
+						public void handle(WindowEvent event) {
+							Platform.runLater(new Runnable() {
+								@Override
+								public void run() {
+									Tab selected = oldTabPane.getSelectionModel().getSelectedItem();
+									oldTabPane.getTabs().add(DraggableTab.this);
+									oldTabPane.getSelectionModel().select(selected);
+								}
+							});
+						}
+					});
 					newStage.setX(t.getScreenX());
 					newStage.setY(t.getScreenY());
 					newStage.show();
@@ -163,7 +185,6 @@ public class DraggableTab extends Tab {
 					pane.requestFocus();
 				}
 			}
-
 		});
 	}
 
@@ -177,6 +198,18 @@ public class DraggableTab extends Tab {
 	 */
 	public void setDetachable(boolean detachable) {
 		this.detachable = detachable;
+	}
+
+	/**
+	 * Set whether it's possible to remove the tab completely without a method
+	 * of retrieval. Defaults to true.
+	 * <p>
+	 * 
+	 * @param closeable
+	 *            true if the tab should be closeable, false otherwise.
+	 */
+	public void setCloseable(boolean closeable) {
+		this.closeable = closeable;
 	}
 
 	/**

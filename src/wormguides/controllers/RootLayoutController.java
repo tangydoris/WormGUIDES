@@ -1168,12 +1168,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	 */
 	private void replaceTabsWithDraggableTabs() {
 		DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
+		cellsDragTab.setCloseable(false);
 		cellsDragTab.setContent(cellsTab.getContent());
 
 		DraggableTab structuresDragTab = new DraggableTab(structuresTab.getText());
+		structuresDragTab.setCloseable(false);
 		structuresDragTab.setContent(structuresTab.getContent());
 
 		DraggableTab displayDragTab = new DraggableTab(displayTab.getText());
+		displayDragTab.setCloseable(false);
 		displayDragTab.setContent(displayTab.getContent());
 
 		colorAndDisplayTabPane.getTabs().clear();
@@ -1184,9 +1187,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		colorAndDisplayTabPane.getTabs().addAll(cellsTab, structuresTab, displayTab);
 
 		DraggableTab storiesDragTab = new DraggableTab(storiesTab.getText());
+		storiesDragTab.setCloseable(false);
 		storiesDragTab.setContent(storiesTab.getContent());
 
 		DraggableTab colorAndDisplayDragTab = new DraggableTab(colorAndDisplayTab.getText());
+		colorAndDisplayDragTab.setCloseable(false);
 		colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
 
 		mainTabPane.getTabs().clear();
