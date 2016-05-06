@@ -1,4 +1,4 @@
-package wormguides.controllers;
+package wormguides.model;
 
 import java.util.ArrayList;
 

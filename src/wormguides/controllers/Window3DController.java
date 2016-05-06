@@ -95,6 +95,7 @@ import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
+import wormguides.model.Quaternion;
 import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
@@ -879,8 +880,8 @@ public class Window3DController {
 				}
 			}
 
-			rotateX.setAngle((rotateX.getAngle() + mouseDeltaY) % 360);
-			rotateY.setAngle((rotateY.getAngle() - mouseDeltaX) % 360);
+			rotateX.setAngle(rotateX.getAngle() + mouseDeltaY);
+			rotateY.setAngle(rotateY.getAngle() - mouseDeltaX);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -2521,15 +2522,15 @@ public class Window3DController {
 	}
 
 	public DoubleProperty getRotateXAngleProperty() {
-		return this.rotateXAngle;
+		return rotateXAngle;
 	}
 
 	public DoubleProperty getRotateYAngleProperty() {
-		return this.rotateYAngle;
+		return rotateYAngle;
 	}
 
 	public DoubleProperty getRotateZAngleProperty() {
-		return this.rotateZAngle;
+		return rotateZAngle;
 	}
 
 	public SubScene getSubScene() {
