@@ -146,7 +146,8 @@ public class Window3DController {
 	private double mousePosX, mousePosY, mousePosZ;
 	private double mouseOldX, mouseOldY, mouseOldZ;
 	private double mouseDeltaX, mouseDeltaY;
-	private int newOriginX, newOriginY, newOriginZ;
+	// average position offsets of nuclei from zero
+	private int offsetX, offsetY, offsetZ;
 	private double angleOfRotation;
 
 	// housekeeping stuff
@@ -299,8 +300,13 @@ public class Window3DController {
 	 *            info window should be brought up, FALSE otherwise
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
-			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
+			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
+			int offsetZ) {
 		parentStage = parent;
+
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		this.offsetZ = offsetZ;
 
 		root = new Group();
 		cellData = data;
@@ -458,9 +464,9 @@ public class Window3DController {
 		othersOpacity = new SimpleDoubleProperty(1);
 		otherCells = new ArrayList<String>();
 
-		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
-		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
-		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
+		rotateX = new Rotate(0, Rotate.X_AXIS);
+		rotateY = new Rotate(0, Rotate.Y_AXIS);
+		rotateZ = new Rotate(0, Rotate.Z_AXIS);
 
 		// initialize
 		rotateXAngle = new SimpleDoubleProperty(1);
@@ -601,9 +607,7 @@ public class Window3DController {
 		// xy relocates z shrinks apparent by moving away from camera? improves
 		// resolution?
 		orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
-		orientationIndicator.getTransforms().add(new Translate(-newOriginX, -newOriginY, -newOriginZ));
 		orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
-		orientationIndicator.getTransforms().add(new Translate(newOriginX, newOriginY, newOriginZ));
 		orientationIndicator.getChildren().add(middleTransformGroup);
 		middleTransformGroup.getTransforms().add(indicatorRotation);
 		return orientationIndicator;
@@ -849,10 +853,14 @@ public class Window3DController {
 				// double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
 				// newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 
-				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, newOriginX, newOriginY,
-						newOriginZ);
-				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, newOriginX, newOriginY,
-						newOriginZ);
+				/*
+				 * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
+				 * mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
+				 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
+				 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
+				 */
+				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
+				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
 				if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
 					// System.out.println("from origin to old mouse pos: <" +
@@ -1281,7 +1289,6 @@ public class Window3DController {
 		}
 
 		if (sceneElementsList != null) {
-			// System.out.println("scene elements at time "+requestedTime);
 			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
 			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 				// add meshes from each scene element
@@ -1289,8 +1296,8 @@ public class Window3DController {
 				MeshView mesh = se.buildGeometry(requestedTime - 1);
 
 				if (mesh != null) {
-					// null mesh when file not found thrown
 					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ));
 
 					// add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
@@ -1298,7 +1305,6 @@ public class Window3DController {
 					// add scene element to rendered scene element reference for
 					// on click responsiveness
 					currentSceneElements.add(se);
-					// System.out.println(se.toString());
 				}
 			}
 		}
@@ -1354,6 +1360,7 @@ public class Window3DController {
 						if (mesh != null) {
 							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
 							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ));
 							currentNoteMeshMap.put(note, mesh);
 						}
 					}
@@ -1962,30 +1969,7 @@ public class Window3DController {
 		xform.setScaleX(X_SCALE);
 		xform.setScaleY(Y_SCALE);
 
-		setNewOrigin();
-
 		subscene.setCamera(camera);
-	}
-
-	private void setNewOrigin() {
-		// Find average X Y positions of initial timepoint
-		Integer[][] positions = cellData.getPositions(startTime);
-		int numCells = positions.length;
-		int sumX = 0;
-		int sumY = 0;
-		int sumZ = 0;
-		for (int i = 0; i < numCells; i++) {
-			sumX += positions[i][X_COR_INDEX];
-			sumY += positions[i][Y_COR_INDEX];
-			sumZ += positions[i][Z_COR_INDEX];
-		}
-		newOriginX = (int) Math.round(X_SCALE * sumX / numCells);
-		newOriginY = (int) Math.round(Y_SCALE * sumY / numCells);
-		newOriginZ = (int) Math.round(Z_SCALE * sumZ / numCells);
-
-		// Set new origin to average X Y positions
-		xform.setTranslate(newOriginX, newOriginY, newOriginZ);
-		System.out.println("origin xyz: " + newOriginX + " " + newOriginY + " " + newOriginZ);
 	}
 
 	public void setSearchResultsList(ObservableList<String> list) {
@@ -2046,8 +2030,8 @@ public class Window3DController {
 		// get the scene name associated with the cell
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
-		for (int i = 0; i < sceneElementsList.elementsList.size(); i++) {
-			SceneElement currSE = sceneElementsList.elementsList.get(i);
+		for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
+			SceneElement currSE = sceneElementsList.getElementsList().get(i);
 
 			// check if multicellular structure --> find match with name in
 			// cells
@@ -2062,7 +2046,7 @@ public class Window3DController {
 														// colored
 				}
 			} else {
-				String sn = sceneElementsList.elementsList.get(i).getSceneName();
+				String sn = sceneElementsList.getElementsList().get(i).getSceneName();
 
 				StringTokenizer st = new StringTokenizer(sn);
 				if (st.countTokens() == 2) {
@@ -2403,21 +2387,21 @@ public class Window3DController {
 	}
 
 	public double getTranslationX() {
-		return xform.t.getTx() - newOriginX;
+		return xform.t.getTx();
 	}
 
 	public void setTranslationX(double tx) {
-		double newTx = tx + newOriginX;
+		double newTx = tx;
 		if (newTx > 0 && newTx < 450)
 			xform.t.setX(newTx);
 	}
 
 	public double getTranslationY() {
-		return xform.t.getTy() - newOriginY;
+		return xform.t.getTy();
 	}
 
 	public void setTranslationY(double ty) {
-		double newTy = ty + newOriginY;
+		double newTy = ty;
 		if (newTy > 0 && newTy < 450)
 			xform.t.setY(newTy);
 	}
@@ -2546,7 +2530,6 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				othersOpacity.set(Math.round(newValue.doubleValue()) / 100d);
-
 				buildScene();
 			}
 		};

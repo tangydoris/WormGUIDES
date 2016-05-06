@@ -9,17 +9,25 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import wormguides.model.TableLineageData;
 
-// Loader class to read nuclei files
+/**
+ * This loader class reads the nuclei files located in
+ * wormguides.model.nuclei_files and creates a {@link TableLineageData} from the
+ * data.
+ * 
+ * @author Doris Tang
+ */
 public class AceTreeLoader {
 
+	private static int avgX, avgY, avgZ;
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 
 	public static TableLineageData loadNucFiles() {
-
 		TableLineageData tld = new TableLineageData(allCellNames);
 
 		try {
-			tld.addFrame(); //accounts for first tld.addFrame() added when reading from JAR --> from dir name first entry match
+			tld.addFrame(); // accounts for first tld.addFrame() added when
+							// reading from JAR --> from dir name first entry
+							// match
 			URL url;
 			int i = 1;
 			for (; i < 10; i++) {
@@ -30,17 +38,17 @@ public class AceTreeLoader {
 					System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
 				}
 			}
-			
+
 			for (; i < 100; i++) {
 				url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
-				if (url != null) { 
+				if (url != null) {
 					process(tld, i, url.openStream());
 				} else {
 					System.out.println("Could not process file: " + ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
 				}
 			}
-			
-			for (;i < 401; i++) {
+
+			for (; i < 401; i++) {
 				url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + i + ENTRY_EXT);
 				if (url != null) {
 					process(tld, i, url.openStream());
@@ -49,28 +57,55 @@ public class AceTreeLoader {
 				}
 			}
 
-			
-//			JarFile jarFile = new JarFile(new File("WormGUIDES.jar"));
-//
-//			Enumeration<JarEntry> entries = jarFile.entries();
-//			int time = 0;
-//
-//			JarEntry entry;
-//			while (entries.hasMoreElements()) {
-//				entry = entries.nextElement();
-//				if (entry.getName().startsWith(ENTRY_PREFIX)) {
-//					InputStream input = jarFile.getInputStream(entry);
-//					process(tld, time++, input);
-//				}
-//			}
-//
-//			jarFile.close();
-
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 
+		// translate all cells to center around (0,0,0)
+		setOriginToZero(tld);
+
 		return tld;
+	}
+
+	public static int getAvgXOffsetFromZero() {
+		return avgX;
+	}
+
+	public static int getAvgYOffsetFromZero() {
+		return avgY;
+	}
+
+	public static int getAvgZOffsetFromZero() {
+		return avgZ;
+	}
+
+	private static void setOriginToZero(TableLineageData lineageData) {
+		int totalPositions = 0;
+		double sumX, sumY, sumZ;
+		sumX = 0d;
+		sumY = 0d;
+		sumZ = 0d;
+
+		// sum up all x-, y- and z-coordinates of nuclei
+		for (int i = 0; i < lineageData.getTotalTimePoints(); i++) {
+			Integer[][] positionsArray = lineageData.getPositions(i);
+			for (int j = 1; j < positionsArray.length; j++) {
+				sumX += positionsArray[j][X_POS_IND];
+				sumY += positionsArray[j][Y_POS_IND];
+				sumZ += positionsArray[j][Z_POS_IND];
+				totalPositions++;
+			}
+		}
+
+		// find average of x-, y- and z-coordinates
+		avgX = (int) sumX / totalPositions;
+		avgY = (int) sumY / totalPositions;
+		avgZ = (int) sumZ / totalPositions;
+
+		System.out.println("average nuclei position offsets from zero: " + avgX + ", " + avgY + ", " + avgZ);
+
+		// offset all nuclei x-, y- and z- positions by x, y and z averages
+		lineageData.shiftAllPositions(avgX, avgY, avgZ);
 	}
 
 	private static void process(TableLineageData tld, int time, InputStream input) throws IOException {
@@ -104,13 +139,10 @@ public class AceTreeLoader {
 			int diameter = Integer.parseInt(tokens[DIAMETER]);
 
 			tld.addNucleus(time, name, x, y, z, diameter);
+
 		} catch (NumberFormatException nfe) {
 			System.out.println("Incorrect format in nucleus file for time " + time + ".");
 		}
-	}
-
-	public static boolean isLineageName(String name) {
-		return allCellNames.contains(name);
 	}
 
 	private static final String ENTRY_PREFIX = "/wormguides/model/nuclei_files/";
@@ -121,4 +153,9 @@ public class AceTreeLoader {
 	private final static String oneZeroPad = "0";
 	private final static String twoZeroPad = "00";
 
+	/**
+	 * Indicies of the x-, y- and z-coordinates in the position Integer array
+	 * for a nucleus in a time frame.
+	 */
+	private static final int X_POS_IND = 0, Y_POS_IND = 1, Z_POS_IND = 2;
 }

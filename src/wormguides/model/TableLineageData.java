@@ -22,6 +22,12 @@ public class TableLineageData implements LineageData {
 		this.allCellNames = allCellNames;
 	}
 
+	public void shiftAllPositions(int x, int y, int z) {
+		for (int i = 0; i < timeFrames.size(); i++) {
+			timeFrames.get(i).shiftPositions(x, y, z);
+		}
+	}
+
 	@Override
 	public ArrayList<String> getAllCellNames() {
 		allCellNames.sort(new Comparator<String>() {
@@ -95,7 +101,6 @@ public class TableLineageData implements LineageData {
 				}
 			}
 		}
-
 		return time;
 	}
 
@@ -151,6 +156,24 @@ public class TableLineageData implements LineageData {
 			diameters = new ArrayList<Integer>();
 		}
 
+		/**
+		 * Shifts all the positions in this Frame by a specified x-, y- and
+		 * z-offset.
+		 * 
+		 * @param x
+		 *            Amount of offset the x-coordinates by
+		 * @param y
+		 *            Amount of offset the y-coordinates by
+		 * @param z
+		 *            Amount of offset the z-coordinates by
+		 */
+		private void shiftPositions(int x, int y, int z) {
+			for (int i = 0; i < positions.size(); i++) {
+				Integer[] pos = positions.get(i);
+				positions.set(i, new Integer[] { pos[0] - x, pos[1] - y, pos[2] - z });
+			}
+		}
+
 		private void addName(String name) {
 			names.add(name);
 		}
@@ -170,8 +193,7 @@ public class TableLineageData implements LineageData {
 		}
 
 		private Integer[][] getPositions() {
-			if (positionsArray == null)
-				positionsArray = positions.toArray(new Integer[positions.size()][3]);
+			positionsArray = positions.toArray(new Integer[positions.size()][3]);
 			return positionsArray;
 		}
 

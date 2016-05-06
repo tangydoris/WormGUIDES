@@ -209,6 +209,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Text displayedDescription;
 
 	// scene elements stuff
+	// average x-, y- and z-coordinate offsets of nuclei from zero
 	private SceneElementsList elementsList;
 
 	// Story stuff
@@ -435,9 +436,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			cellShapesIndexStage = new Stage();
 			cellShapesIndexStage.setTitle("Cell Shapes Index");
 
-			if (elementsList == null) {
+			if (elementsList == null)
 				initSceneElementsList();
-			}
 
 			// webview to render cell shapes list i.e. elementsList
 			WebView cellShapesIndexWebView = new WebView();
@@ -647,7 +647,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
-				bringUpInfoProperty);
+				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
+				AceTreeLoader.getAvgZOffsetFromZero());
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1124,6 +1125,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 	}
 
+	/**
+	 * Initializes the {@link SceneElementsList} that contains all the
+	 * {@link SceneElement} objects visible in all time frames.
+	 * 
+	 * @param offsetX
+	 *            Average x-coordinate offset of nuclei from zero
+	 * @param offsetY
+	 *            Average y-coordinate offset of nuclei from zero
+	 * @param offsetZ
+	 *            Average a-coordinate offset of nuclei from zero
+	 */
 	private void initSceneElementsList() {
 		elementsList = new SceneElementsList();
 
@@ -1208,6 +1220,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
+
 		lineageData = AceTreeLoader.loadNucFiles();
 		initLineageTree(lineageData.getAllCellNames());
 
