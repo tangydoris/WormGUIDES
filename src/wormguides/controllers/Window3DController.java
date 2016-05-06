@@ -1297,7 +1297,7 @@ public class Window3DController {
 
 				if (mesh != null) {
 					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
-					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ));
+					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ*Z_SCALE));
 
 					// add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
@@ -1360,7 +1360,7 @@ public class Window3DController {
 						if (mesh != null) {
 							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
 							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
-							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ));
+							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ*Z_SCALE));
 							currentNoteMeshMap.put(note, mesh);
 						}
 					}
@@ -1965,9 +1965,6 @@ public class Window3DController {
 		camera.setNearClip(CAMERA_NEAR_CLIP);
 		camera.setFarClip(CAMERA_FAR_CLIP);
 		camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-
-		xform.setScaleX(X_SCALE);
-		xform.setScaleY(Y_SCALE);
 
 		subscene.setCamera(camera);
 	}
