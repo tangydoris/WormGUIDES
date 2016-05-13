@@ -53,7 +53,6 @@ public class MainApp extends Application {
 					controller.promptStorySave();
 			}
 		});
-
 	}
 
 	public void initRootLayout() {

@@ -79,6 +79,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import wormguides.ColorComparator;
+import wormguides.ColorHash;
 import wormguides.JavaPicture;
 import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
@@ -88,13 +89,13 @@ import wormguides.Xform;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.model.CasesLists;
-import wormguides.model.ColorHash;
 import wormguides.model.Connectome;
 import wormguides.model.LineageData;
 import wormguides.model.Note;
 import wormguides.model.Note.Display;
 import wormguides.model.PartsList;
 import wormguides.model.ProductionInfo;
+import wormguides.model.Quaternion;
 import wormguides.view.AppFont;
 import wormguides.model.Rule;
 import wormguides.model.SceneElement;
@@ -672,11 +673,6 @@ public class Window3DController {
 	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		/*
-		if (othersOpacity.get() > .1 || (othersOpacity.get() <= .1 && currentRulesApplyTo(name))) {
-			showTransientLabel(name, entity);
-		}
-		*/
 		if (currentRulesApplyTo(name))
 			showTransientLabel(name, entity);
 	}
@@ -826,7 +822,6 @@ public class Window3DController {
 
 		angleOfRotation = rotationAngleFromMouseMovement();
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-		// mousePosZ = 0;
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
 			double tx = xform.t.getTx() - mouseDeltaX;
@@ -885,8 +880,8 @@ public class Window3DController {
 				}
 			}
 
-			rotateX.setAngle((rotateX.getAngle() + mouseDeltaY) % 360);
-			rotateY.setAngle((rotateY.getAngle() - mouseDeltaX) % 360);
+			rotateX.setAngle(rotateX.getAngle() + mouseDeltaY);
+			rotateY.setAngle(rotateY.getAngle() - mouseDeltaX);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -930,7 +925,6 @@ public class Window3DController {
 					}
 				}
 			}
-
 		}
 
 		// Cell body/structure
@@ -1113,9 +1107,8 @@ public class Window3DController {
 				contextMenuStage.setResizable(false);
 				contextMenuStage.setTitle("Menu");
 
-				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
+				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable())
 					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
-				}
 
 				contextMenuController.setInfoButtonListener(new EventHandler<MouseEvent>() {
 					@Override
@@ -1175,13 +1168,29 @@ public class Window3DController {
 			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
 	}
 
-	// Input text is the note/label geometry
-	// Input entity is the cell/body/mesh that the text should align with
+	/**
+	 * Aligns a note graphic to its entity. The graphic is either a {@link Text}
+	 * or a {@link VBox}. The graphic is removed if it ends up outside the
+	 * bounds of the subscene window after a transformation, and only reinserted
+	 * if its bounds are within the window again.
+	 * 
+	 * @param noteGraphic
+	 *            Graphical representation of a note/notes (can either be a
+	 *            {@link Text} or a {@link VBox}
+	 * @param node
+	 *            Entity that the note graphic should attach to
+	 * @param isLabel
+	 *            True if a label is being aligned, false otherwise
+	 */
 	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
 		if (node != null) {
-			Bounds b = node.getBoundsInParent();
-			// System.out.println("static - "+b.toString());
+			// graphic could have been previously removed due to
+			// out-of-bounds-ness
+			if (!spritesPane.getChildren().contains(noteGraphic)) {
+				spritesPane.getChildren().add(noteGraphic);
+			}
 
+			Bounds b = node.getBoundsInParent();
 			if (b != null) {
 				noteGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
@@ -1194,13 +1203,29 @@ public class Window3DController {
 
 				if (isLabel) {
 					x += hOffset;
-					y -= (vOffset + 5);
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 				} else {
 					x += hOffset;
-					y += vOffset + 5;
+					y += vOffset + LABEL_SPRITE_Y_OFFSET;
 				}
 
-				noteGraphic.getTransforms().add(new Translate(x, y));
+				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+				Bounds graphicBounds = noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
+
+				if (graphicBounds != null && paneBounds != null) {
+					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
+							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
+							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
+									- OUT_OF_BOUNDS_THRESHOLD))
+							// lower bound
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
+					// right bound
+					) {
+						spritesPane.getChildren().remove(noteGraphic);
+					} else { // note graphic is within bounds
+						noteGraphic.getTransforms().add(new Translate(x, y));
+					}
+				}
 			}
 		}
 	}
@@ -1222,9 +1247,9 @@ public class Window3DController {
 		return -1;
 	}
 
-	/*
-	 * Calls service to retrieve subscene data at current time point then render
-	 * entities, notes, and labels
+	/**
+	 * Calls the {@link Service} to retrieve subscene data at current time point
+	 * then render entities, notes, and labels
 	 */
 	private void buildScene() {
 		// Spool thread for actual rendering to subscene
@@ -1379,10 +1404,8 @@ public class Window3DController {
 				iter.remove();
 		}
 
-		// root.getChildren().add(orientationIndicator);
 		double newrotate = computeInterpolatedValue(time.get(), keyFramesRotate, keyValuesRotate);
 		indicatorRotation.setAngle(-newrotate);
-		// System.out.println(time.get()+" rotation is "+newrotate);
 		indicatorRotation.setAxis(new Point3D(1, 0, 0));
 	}
 
@@ -1421,6 +1444,27 @@ public class Window3DController {
 
 		repositionSprites();
 		repositionNoteBillboardFronts();
+
+		removeOutOfBoundsSprites();
+	}
+
+	private void removeOutOfBoundsSprites() {
+		Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+
+		Iterator<Node> iter = spritesPane.getChildren().iterator();
+		while (iter.hasNext()) {
+			Node node = iter.next();
+			if (node != subscene) {
+				Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
+
+				if (spriteBounds.getMinX() < paneBounds.getMinX() - 10
+						&& spriteBounds.getMinY() < paneBounds.getMinY() - 10
+						&& spriteBounds.getMaxX() > paneBounds.getMaxX() + 10
+						&& spriteBounds.getMaxY() > paneBounds.getMaxY() + 10) {
+					iter.remove();
+				}
+			}
+		}
 	}
 
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
@@ -2042,8 +2086,8 @@ public class Window3DController {
 			else if (rule.appliesToCellNucleus(name))
 				return true;
 			else { // check if cells corresponding to multicellular structure
-						// have rule - in the case of a non explicit
-						// multicellular rule but a structure that's colored
+					// have rule - in the case of a non explicit
+					// multicellular rule but a structure that's colored
 				if (cells.size() > 0) {
 					for (String cell : cells) {
 						if (rule.appliesToCellBody(cell)) {
@@ -2096,13 +2140,10 @@ public class Window3DController {
 		}
 
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
-		
-		
-		
-		
+
 		captureVideo.set(true);
 		timer = new Timer();
-		
+
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -2125,36 +2166,40 @@ public class Window3DController {
 							}
 						}
 					});
-					
+
 				} else {
 					timer.cancel();
 				}
 			}
 		}, 0, 1000);
 
-//		time.addListener(new ChangeListener<Number>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//				if (captureVideo != null) {
-//					if (captureVideo.get()) {
-//
-//						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
-//
-//						try {
-//							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-//
-//							if (file != null) {
-//								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-//								ImageIO.write(renderedImage, "JPEG", file);
-//								movieFiles.addElement(file);
-//							}
-//						} catch (Exception e) {
-//							// e.printStackTrace();
-//						}
-//					}
-//				}
-//			}
-//		});
+		// time.addListener(new ChangeListener<Number>() {
+		// @Override
+		// public void changed(ObservableValue<? extends Number> observable,
+		// Number oldValue, Number newValue) {
+		// if (captureVideo != null) {
+		// if (captureVideo.get()) {
+		//
+		// WritableImage screenCapture = subscene.snapshot(new
+		// SnapshotParameters(), null);
+		//
+		// try {
+		// File file = new File(frameDirPath + "movieFrame" + count++ +
+		// ".JPEG");
+		//
+		// if (file != null) {
+		// RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture,
+		// null);
+		// ImageIO.write(renderedImage, "JPEG", file);
+		// movieFiles.addElement(file);
+		// }
+		// } catch (Exception e) {
+		// // e.printStackTrace();
+		// }
+		// }
+		// }
+		// }
+		// });
 
 		return true;
 	}
@@ -2477,15 +2522,15 @@ public class Window3DController {
 	}
 
 	public DoubleProperty getRotateXAngleProperty() {
-		return this.rotateXAngle;
+		return rotateXAngle;
 	}
 
 	public DoubleProperty getRotateYAngleProperty() {
-		return this.rotateYAngle;
+		return rotateYAngle;
 	}
 
 	public DoubleProperty getRotateZAngleProperty() {
-		return this.rotateZAngle;
+		return rotateZAngle;
 	}
 
 	public SubScene getSubScene() {
@@ -2822,7 +2867,6 @@ public class Window3DController {
 	private final long WAIT_TIME_MILLI = 200;
 
 	private final double CAMERA_INITIAL_DISTANCE = -220;
-
 	private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
 
 	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
@@ -2851,5 +2895,13 @@ public class Window3DController {
 	 * zoomed in so that the entire embryo is not visible.
 	 */
 	private final double INITIAL_ZOOM = 1.5;
-
+	/**
+	 * The number of pixels that a sprite (note or label) can be outside the
+	 * sprite pane bounds before being removed from the subscene.
+	 */
+	private final int OUT_OF_BOUNDS_THRESHOLD = 5;
+	/**
+	 * The int used when calculating the y offset between a sprite and label.
+	 */
+	private final int LABEL_SPRITE_Y_OFFSET = 5;
 }
