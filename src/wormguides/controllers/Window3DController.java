@@ -71,7 +71,6 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.TransformChangedEvent;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -448,9 +447,9 @@ public class Window3DController {
 		rotateZ = new Rotate(0, Rotate.Z_AXIS);
 
 		// initialize
-		rotateXAngle = new SimpleDoubleProperty(1);
-		rotateYAngle = new SimpleDoubleProperty(1);
-		rotateZAngle = new SimpleDoubleProperty(1);
+		rotateXAngle = new SimpleDoubleProperty(0.0);
+		rotateYAngle = new SimpleDoubleProperty(0.0);
+		rotateZAngle = new SimpleDoubleProperty(0.0);
 
 		// set intial values
 		rotateXAngle.set(rotateX.getAngle());
@@ -461,11 +460,6 @@ public class Window3DController {
 		rotateXAngle.addListener(getRotateXAngleListener());
 		rotateYAngle.addListener(getRotateYAngleListener());
 		rotateZAngle.addListener(getRotateZAngleListener());
-
-		// set listeners to update doubleproperties ^^
-		rotateX.setOnTransformChanged(getRotateXChangeHandler());
-		rotateY.setOnTransformChanged(getRotateYChangeHandler());
-		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
 
 		quaternion = new Quaternion();
 
@@ -541,13 +535,9 @@ public class Window3DController {
 
 	public void initializeWithCannonicalOrientation() {
 		// set default cannonical orientations
-
-		rotateX.setAngle(cannonicalOrientationX);
-		rotateY.setAngle(cannonicalOrientationY);
-		rotateZ.setAngle(cannonicalOrientationZ);
-
-		repositionSprites();
-		repositionNoteBillboardFronts();
+		rotateXAngle.set(cannonicalOrientationX);
+		rotateYAngle.set(cannonicalOrientationY);
+		rotateZAngle.set(cannonicalOrientationZ);
 	}
 
 	private Group createOrientationIndicator() {
@@ -801,8 +791,9 @@ public class Window3DController {
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-			xform.setTx(xform.t.getTx() - mouseDeltaX);
-			xform.setTy(xform.t.getTy() - mouseDeltaY);
+
+			xform.setTranslateX(xform.getTranslateX() - mouseDeltaX);
+			xform.setTranslateY(xform.getTranslateY() - mouseDeltaY);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -853,9 +844,13 @@ public class Window3DController {
 				}
 			}
 
-			// TODO Fix x-axis rotation
-			rotateX.setAngle(rotateX.getAngle() - mouseDeltaY);
-			// rotateY.setAngle(rotateY.getAngle() + mouseDeltaX);
+			double modifier = 10.0;
+			double modifierFactor = 0.1;
+
+			rotateXAngle.set(
+					((rotateXAngle.get() + mouseDeltaY * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
+			rotateYAngle.set(
+					((rotateYAngle.get() + mouseDeltaX * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -1125,6 +1120,7 @@ public class Window3DController {
 					double x = b.getMaxX();
 					double y = b.getMaxY() + b.getHeight() / 2;
 					double z = b.getMaxZ();
+
 					billboard.getTransforms().addAll(new Translate(x, y, z),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
@@ -1264,7 +1260,7 @@ public class Window3DController {
 				MeshView mesh = se.buildGeometry(requestedTime - 1);
 
 				if (mesh != null) {
-					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
 					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 
 					// add rendered mesh to meshes list
@@ -1328,7 +1324,7 @@ public class Window3DController {
 
 						if (mesh != null) {
 							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+							mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
 							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 							currentNoteMeshMap.put(note, mesh);
 						}
@@ -1565,7 +1561,7 @@ public class Window3DController {
 
 			sphere.setMaterial(material);
 
-			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
+			sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
 			sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
 					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
 
@@ -1783,7 +1779,7 @@ public class Window3DController {
 			else if (note.isBillboard()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					text.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
 					text.getTransforms().addAll(new Translate(note.getX(), note.getY(), note.getZ()),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
@@ -1883,7 +1879,7 @@ public class Window3DController {
 
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
-		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
+		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
 		sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
 		// make marker transparent
 		sphere.setMaterial(colorHash.getOthersMaterial(0));
@@ -2329,15 +2325,17 @@ public class Window3DController {
 	}
 
 	public void setRotations(double rx, double ry, double rz) {
+		rotateXAngle.set(rx);
+		rotateYAngle.set(ry);
+		rotateZAngle.set(rz);
 		/*
 		 * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
 		 * Math.toDegrees(rz);
 		 */
 
-		// rotateX.setAngle(rx+180);
-		rotateX.setAngle(rx);
-		rotateY.setAngle(ry);
-		rotateZ.setAngle(rz);
+		/*
+		 * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
+		 */
 	}
 
 	public void setCaptureVideo(BooleanProperty captureVideo) {
@@ -2345,35 +2343,31 @@ public class Window3DController {
 	}
 
 	public double getRotationX() {
-		return rotateX.getAngle();
+		return rotateXAngle.get();
 	}
 
 	public double getRotationY() {
-		return rotateY.getAngle();
+		return rotateYAngle.get();
 	}
 
 	public double getRotationZ() {
-		return rotateZ.getAngle();
+		return rotateZAngle.get();
 	}
 
 	public double getTranslationX() {
-		return xform.t.getTx();
+		return camera.getTranslateX();
 	}
 
 	public void setTranslationX(double tx) {
-		double newTx = tx;
-		if (newTx > 0 && newTx < 450)
-			xform.t.setX(newTx);
+		camera.setTranslateX(tx);
 	}
 
 	public double getTranslationY() {
-		return xform.t.getTy();
+		return camera.getTranslateY();
 	}
 
 	public void setTranslationY(double ty) {
-		double newTy = ty;
-		if (newTy > 0 && newTy < 450)
-			xform.t.setY(newTy);
+		camera.setTranslateY(ty);
 	}
 
 	/**
@@ -2415,44 +2409,36 @@ public class Window3DController {
 		othersOpacity.set(dim);
 	}
 
-	private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateXAngle.set(rotateX.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
-
-	private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateYAngle.set(rotateY.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
-
-	private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateZAngle.set(rotateZ.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
+	/*
+	 * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateXAngle.set(rotateX.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateYAngle.set(rotateY.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateZAngle.set(rotateZ.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 */
 
 	private ChangeListener<Number> getRotateXAngleListener() {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateX.setAngle(rotateXAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateX(newAngle);
+				rotateX.setAngle(newAngle);
 			}
 		};
 	}
@@ -2461,7 +2447,9 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateY.setAngle(rotateYAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateY(newAngle);
+				rotateY.setAngle(newAngle);
 			}
 		};
 	}
@@ -2470,7 +2458,9 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateZ.setAngle(rotateZAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateZ(newAngle);
+				rotateZ.setAngle(newAngle);
 			}
 		};
 	}
@@ -2802,9 +2792,9 @@ public class Window3DController {
 		return this.parentStage;
 	}
 
-	private final static double cannonicalOrientationX = 145.;
-	private final static double cannonicalOrientationY = -170.;
-	private final static double cannonicalOrientationZ = 25.;
+	private final static double cannonicalOrientationX = -175.959;
+	private final static double cannonicalOrientationY = 177.143;
+	private final static double cannonicalOrientationZ = -11.02;
 
 	private final String CS = ", ";
 
