@@ -677,7 +677,7 @@ public class Window3DController {
 	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		if (currentRulesApplyTo(name))
+		if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25)
 			showTransientLabel(name, entity);
 	}
 
@@ -721,7 +721,7 @@ public class Window3DController {
 				double hOffset = b.getWidth() / 2;
 
 				x += hOffset;
-				y -= vOffset + 5;
+				y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 
 				transientLabelText.getTransforms().add(new Translate(x, y));
 
@@ -821,6 +821,7 @@ public class Window3DController {
 		mousePosY = event.getSceneY();
 		mouseDeltaX = (mousePosX - mouseOldX);
 		mouseDeltaY = (mousePosY - mouseOldY);
+
 		mouseDeltaX /= 2;
 		mouseDeltaY /= 2;
 
@@ -836,7 +837,6 @@ public class Window3DController {
 		}
 
 		else if (event.isPrimaryButtonDown()) {
-
 			/*
 			 * TODO how to get Z COORDINATE?
 			 */
@@ -881,8 +881,9 @@ public class Window3DController {
 				}
 			}
 
-			rotateX.setAngle(rotateX.getAngle() + mouseDeltaY);
-			rotateY.setAngle(rotateY.getAngle() - mouseDeltaX);
+			// TODO Fix x-axis rotation
+			rotateX.setAngle(rotateX.getAngle() - mouseDeltaY);
+			// rotateY.setAngle(rotateY.getAngle() + mouseDeltaX);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -1175,7 +1176,7 @@ public class Window3DController {
 	 * bounds of the subscene window after a transformation, and only reinserted
 	 * if its bounds are within the window again.
 	 * 
-	 * @param noteGraphic
+	 * @param noteOrLabelGraphic
 	 *            Graphical representation of a note/notes (can either be a
 	 *            {@link Text} or a {@link VBox}
 	 * @param node
@@ -1183,17 +1184,18 @@ public class Window3DController {
 	 * @param isLabel
 	 *            True if a label is being aligned, false otherwise
 	 */
-	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
+	private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
 		if (node != null) {
 			// graphic could have been previously removed due to
 			// out-of-bounds-ness
-			if (!spritesPane.getChildren().contains(noteGraphic)) {
-				spritesPane.getChildren().add(noteGraphic);
-			}
+			/*
+			 * if (!spritesPane.getChildren().contains(noteGraphic)) {
+			 * spritesPane.getChildren().add(noteGraphic); }
+			 */
 
 			Bounds b = node.getBoundsInParent();
 			if (b != null) {
-				noteGraphic.getTransforms().clear();
+				noteOrLabelGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
 						(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
 				double x = p.getX();
@@ -1210,23 +1212,25 @@ public class Window3DController {
 					y += vOffset + LABEL_SPRITE_Y_OFFSET;
 				}
 
-				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-				Bounds graphicBounds = noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
+				noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
 
-				if (graphicBounds != null && paneBounds != null) {
-					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
-							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
-							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
-									- OUT_OF_BOUNDS_THRESHOLD))
-							// lower bound
-							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
-					// right bound
-					) {
-						spritesPane.getChildren().remove(noteGraphic);
-					} else { // note graphic is within bounds
-						noteGraphic.getTransforms().add(new Translate(x, y));
-					}
-				}
+				/*
+				 * Bounds paneBounds =
+				 * spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+				 * Bounds graphicBounds =
+				 * noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
+				 * 
+				 * if (graphicBounds != null && paneBounds != null) { if (x <
+				 * -OUT_OF_BOUNDS_THRESHOLD // left bound || y <
+				 * -OUT_OF_BOUNDS_THRESHOLD // upper bound ||
+				 * ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) <
+				 * (paneBounds.getMinY() - OUT_OF_BOUNDS_THRESHOLD)) // lower
+				 * bound || ((x + graphicBounds.getWidth()) >
+				 * paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD) // right
+				 * bound ) { spritesPane.getChildren().remove(noteGraphic); }
+				 * else { // note graphic is within bounds
+				 * noteGraphic.getTransforms().add(new Translate(x, y)); } }
+				 */
 			}
 		}
 	}
@@ -1290,7 +1294,7 @@ public class Window3DController {
 
 				if (mesh != null) {
 					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
-					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ*Z_SCALE));
+					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 
 					// add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
@@ -1353,7 +1357,7 @@ public class Window3DController {
 						if (mesh != null) {
 							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
 							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
-							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ*Z_SCALE));
+							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 							currentNoteMeshMap.put(note, mesh);
 						}
 					}
@@ -1589,7 +1593,8 @@ public class Window3DController {
 
 			sphere.setMaterial(material);
 
-			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(positions[i][X_COR_INDEX] * X_SCALE,
+			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
+			sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
 					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
 
 			spheres[i] = sphere;
@@ -1904,7 +1909,8 @@ public class Window3DController {
 
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
-		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
+		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX);
+		sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
 		// make marker transparent
 		sphere.setMaterial(colorHash.getOthersMaterial(0));
 		return sphere;
