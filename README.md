@@ -3,8 +3,7 @@ Desktop version of the WormGUIDES iPad and Android apps.
 
 Source code can be found at https://github.com/tangydoris/WormGUIDES.
 
-Version currently uses JRE 1.8 version 60+. Source built using JRE 1.8 version 66 downloaded from https://jdk8.java.net/download.html.
-
+Version currently uses JRE 1.8 version 60+. Source built using JRE 1.8 version 77 downloaded from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html<br>
 URL feature documentation can be found in src/wormguides/model/URLDocumentation.txt.
 <br><br><br>
 
@@ -14,7 +13,7 @@ URL feature documentation can be found in src/wormguides/model/URLDocumentation.
 
 WormGUIDES is a collaboration led by Drs. Zhirong Bao (MSKCC), Daniel Colon-Ramos (Yale), William Mohler (UConn) and Hari Shroff (NIH). For more information, visit our website at http://wormguides.org. 
 
-The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhirong Bao and Dr. William Mohler. Major contributors of the desktop app include Doris Tang (New York University) and Braden Katzman (Columbia University) and Dr. Anthony Santella of the Bao Laboratory. For questions or comments contact support@wormguides.org.
+The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhirong Bao and Dr. William Mohler. Major contributors of the desktop app include Doris Tang (New York University), Braden Katzman (Columbia University) and Dr. Anthony Santella of the Bao Laboratory. For questions or comments contact support@wormguides.org.
 <br><br><br>
 
 
@@ -23,7 +22,7 @@ The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhiron
 
 #####Eclipse Setup:
 Download Eclipse Mars<br>
-Download the latest JDK (currently using early release of Java 1.8.0_66 found at https://jdk8.java.net/download.html)<br>
+Download the latest JDK (currently version 1.8 at http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)<br>
 Make sure environment variables point to the bin directory of the jdk (usually found in C:/Program Files/Java/jdk.../bin)<br>
 If Eclipse cannot open, try to modify the eclipse.ini configuration file in the main eclipse directory<br>
 Change the required java version in the argument -Dosgi.requiredJavaVersion from 1.7 to 1.8<br>
