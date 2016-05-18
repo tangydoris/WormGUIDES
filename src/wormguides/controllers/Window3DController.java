@@ -692,7 +692,7 @@ public class Window3DController {
 					double hOffset = b.getWidth() / 2;
 
 					x += hOffset;
-					y -= (vOffset + 5);
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 
 					transientLabelText.getTransforms().add(new Translate(x, y));
 
@@ -1164,9 +1164,13 @@ public class Window3DController {
 	 */
 	private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
 		if (node != null) {
-			Bounds b = node.getBoundsInParent();
-			// System.out.println("static - "+b.toString());
+			// graphic could have been previously removed due to
+			// out-of-bounds-ness
+			if (!spritesPane.getChildren().contains(noteOrLabelGraphic)) {
+				spritesPane.getChildren().add(noteOrLabelGraphic);
+			}
 
+			Bounds b = node.getBoundsInParent();
 			if (b != null) {
 				noteOrLabelGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
@@ -1179,13 +1183,29 @@ public class Window3DController {
 
 				if (isLabel) {
 					x += hOffset;
-					y -= (vOffset + 5);
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 				} else {
 					x += hOffset;
 					y += vOffset + 5;
 				}
 
-				noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+				Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
+
+				if (graphicBounds != null && paneBounds != null) {
+					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
+							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
+							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
+									- OUT_OF_BOUNDS_THRESHOLD))
+							// lower bound
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
+					// right bound
+					) {
+						spritesPane.getChildren().remove(noteOrLabelGraphic);
+					} else { // note graphic is within bounds
+						noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+					}
+				}
 			}
 		}
 	}
