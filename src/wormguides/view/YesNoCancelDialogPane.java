@@ -3,6 +3,7 @@ package wormguides.view;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -80,6 +81,8 @@ public class YesNoCancelDialogPane extends AnchorPane {
 
 		HBox btnHBox = new HBox(10);
 		btnHBox.getChildren().addAll(r1, yesBtn, r2, noBtn, r3, cancelBtn, r4);
+		for (Node child : btnHBox.getChildrenUnmodifiable())
+			child.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
 		mainVBox.getChildren().add(btnHBox);
 

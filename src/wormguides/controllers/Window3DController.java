@@ -347,24 +347,12 @@ public class Window3DController {
 					selectedIndex.set(selected);
 			}
 		});
+
 		selectedNameLabeled = new SimpleStringProperty("");
 		selectedNameLabeled.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					// value passed may be a functional name
-					// use lineage names instead
-					// String lineageName =
-					// PartsList.getLineageNameByFunctionalName(newValue);
-					// if (lineageName == null)
-					// lineageName = newValue;
-					/*
-					 * TODO Removed above check (caused bugs with P4 clicked in
-					 * lineage window) check if this causes problems elsewhere
-					 * 
-					 * ***** If it does, we should do name translation before
-					 * changing name *****
-					 */
 					String lineageName = newValue;
 
 					selectedName.set(lineageName);
@@ -381,23 +369,14 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
+					// do not change scene is entity does not exist at any time
 					if (startTime <= 0 || endTime <= 0)
-						return; // if the entity doesn't appear in the lifetime
-								// of the embryo, don't change the scene
+						return;
 
-					// if (startTime <= 0) {
-					// startTime = 1;
-					// }
-					//
-					// if (endTime <= 0) {
-					// endTime = 1;
-					// }
-
-					if (time.get() < startTime || time.get() > endTime) {
+					if (time.get() < startTime || time.get() > endTime)
 						time.set(startTime);
-					} else {
+					else
 						insertLabelFor(lineageName, entity);
-					}
 
 					highlightActiveCellLabel(entity);
 				}
@@ -677,55 +656,48 @@ public class Window3DController {
 	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25)
-			showTransientLabel(name, entity);
-	}
+		if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25) {
 
-	private void showTransientLabel(String name, Node entity) {
-		boolean labelDrawn = false;
+			if (!currentLabels.contains(name) && entity != null) {
+				Bounds b = entity.getBoundsInParent();
 
-		if (currentLabels.contains(name))
-			labelDrawn = true;
+				if (b != null) {
+					String funcName = PartsList.getFunctionalNameByLineageName(name);
+					if (funcName != null)
+						name = funcName;
 
-		if (!labelDrawn && entity != null) {
-			Bounds b = entity.getBoundsInParent();
+					transientLabelText = makeNoteSpriteText(name);
 
-			if (b != null) {
-				String funcName = PartsList.getFunctionalNameByLineageName(name);
-				if (funcName != null)
-					name = funcName;
+					transientLabelText.setWrappingWidth(-1);
+					transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
+					transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							event.consume();
+						}
+					});
+					transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							event.consume();
+						}
+					});
 
-				transientLabelText = makeNoteSpriteText(name);
+					Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
+							(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+					double x = p.getX();
+					double y = p.getY();
 
-				transientLabelText.setWrappingWidth(-1);
-				transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
-				transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						event.consume();
-					}
-				});
-				transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						event.consume();
-					}
-				});
+					double vOffset = b.getHeight() / 2;
+					double hOffset = b.getWidth() / 2;
 
-				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-						(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
-				double x = p.getX();
-				double y = p.getY();
+					x += hOffset;
+					y -= (vOffset + 5);
 
-				double vOffset = b.getHeight() / 2;
-				double hOffset = b.getWidth() / 2;
+					transientLabelText.getTransforms().add(new Translate(x, y));
 
-				x += hOffset;
-				y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
-
-				transientLabelText.getTransforms().add(new Translate(x, y));
-
-				spritesPane.getChildren().add(transientLabelText);
+					spritesPane.getChildren().add(transientLabelText);
+				}
 			}
 		}
 	}
@@ -927,6 +899,7 @@ public class Window3DController {
 					}
 				}
 			}
+
 		}
 
 		// Cell body/structure
@@ -956,9 +929,10 @@ public class Window3DController {
 						else {
 							allLabels.add(name);
 							currentLabels.add(name);
-							insertLabelFor(name, node);
 
-							highlightActiveCellLabel((Shape3D) node);
+							Shape3D entity = getEntityWithName(name);
+							insertLabelFor(name, entity);
+							highlightActiveCellLabel(entity);
 						}
 					}
 
@@ -1163,11 +1137,15 @@ public class Window3DController {
 	 * 3d coordinate onto the front of the subscene
 	 */
 	private void repositionSprites() {
-		for (Node entity : entitySpriteMap.keySet())
-			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+		if (entitySpriteMap != null) {
+			for (Node entity : entitySpriteMap.keySet())
+				alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+		}
 
-		for (Node entity : entityLabelMap.keySet())
-			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+		if (entityLabelMap != null) {
+			for (Node entity : entityLabelMap.keySet())
+				alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+		}
 	}
 
 	/**
@@ -1186,14 +1164,9 @@ public class Window3DController {
 	 */
 	private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
 		if (node != null) {
-			// graphic could have been previously removed due to
-			// out-of-bounds-ness
-			/*
-			 * if (!spritesPane.getChildren().contains(noteGraphic)) {
-			 * spritesPane.getChildren().add(noteGraphic); }
-			 */
-
 			Bounds b = node.getBoundsInParent();
+			// System.out.println("static - "+b.toString());
+
 			if (b != null) {
 				noteOrLabelGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
@@ -1206,31 +1179,13 @@ public class Window3DController {
 
 				if (isLabel) {
 					x += hOffset;
-					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+					y -= (vOffset + 5);
 				} else {
 					x += hOffset;
-					y += vOffset + LABEL_SPRITE_Y_OFFSET;
+					y += vOffset + 5;
 				}
 
 				noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
-
-				/*
-				 * Bounds paneBounds =
-				 * spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-				 * Bounds graphicBounds =
-				 * noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
-				 * 
-				 * if (graphicBounds != null && paneBounds != null) { if (x <
-				 * -OUT_OF_BOUNDS_THRESHOLD // left bound || y <
-				 * -OUT_OF_BOUNDS_THRESHOLD // upper bound ||
-				 * ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) <
-				 * (paneBounds.getMinY() - OUT_OF_BOUNDS_THRESHOLD)) // lower
-				 * bound || ((x + graphicBounds.getWidth()) >
-				 * paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD) // right
-				 * bound ) { spritesPane.getChildren().remove(noteGraphic); }
-				 * else { // note graphic is within bounds
-				 * noteGraphic.getTransforms().add(new Translate(x, y)); } }
-				 */
 			}
 		}
 	}
@@ -1312,16 +1267,17 @@ public class Window3DController {
 		currentLabels.clear();
 
 		for (String label : allLabels) {
-			for (String cell : cellNames) {
-				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+
+			for (int i = 0; i < currentSceneElements.size(); i++) {
+				if (!currentLabels.contains(label)
+						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
 					currentLabels.add(label);
 					break;
 				}
 			}
 
-			for (int i = 0; i < currentSceneElements.size(); i++) {
-				if (!currentLabels.contains(label)
-						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
+			for (String cell : cellNames) {
+				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
 					currentLabels.add(label);
 					break;
 				}
@@ -1658,6 +1614,7 @@ public class Window3DController {
 			return;
 		}
 
+		// otherwise, create a highlight new label
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
 		Text text;
 		if (funcName != null)
@@ -1691,16 +1648,17 @@ public class Window3DController {
 
 	/**
 	 * @return The {@link Shape3D} entity with input name. Priority is given to
-	 *         meshes (if a mesh and a cell have the same name, the mesh is
-	 *         returned)
+	 *         meshes (if a mesh and a cell have the same name, then the mesh is
+	 *         returned).
 	 */
 	private Shape3D getEntityWithName(String name) {
 		// mesh view label
 		for (int i = 0; i < currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i) != null
-					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0)
+					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
 				return currentSceneElementMeshes.get(i);
+			}
 		}
 
 		// sphere label
