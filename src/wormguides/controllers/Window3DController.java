@@ -821,28 +821,21 @@ public class Window3DController {
 		mousePosY = event.getSceneY();
 		mouseDeltaX = (mousePosX - mouseOldX);
 		mouseDeltaY = (mousePosY - mouseOldY);
-		mouseDeltaX /= 4;
-		mouseDeltaY /= 4;
+		mouseDeltaX /= 2;
+		mouseDeltaY /= 2;
 
 		angleOfRotation = rotationAngleFromMouseMovement();
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-			double tx = xform.t.getTx() - mouseDeltaX;
-			double ty = xform.t.getTy() - mouseDeltaY;
-
-			if (tx > 0 && tx < 450)
-				xform.t.setX(tx);
-			if (ty > 0 && ty < 450)
-				xform.t.setY(ty);
+			xform.setTx(xform.t.getTx() - mouseDeltaX);
+			xform.setTy(xform.t.getTy() - mouseDeltaY);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
 		}
 
 		else if (event.isPrimaryButtonDown()) {
-			mouseDeltaX /= 2;
-			mouseDeltaY /= 2;
 
 			/*
 			 * TODO how to get Z COORDINATE?
@@ -1955,8 +1948,8 @@ public class Window3DController {
 	}
 
 	private void buildCamera() {
-		this.camera = new PerspectiveCamera(true);
-		this.xform = new Xform();
+		camera = new PerspectiveCamera(true);
+		xform = new Xform();
 		xform.reset();
 
 		root.getChildren().add(xform);
