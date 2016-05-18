@@ -1186,7 +1186,7 @@ public class Window3DController {
 					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 				} else {
 					x += hOffset;
-					y += vOffset + 5;
+					y += vOffset + LABEL_SPRITE_Y_OFFSET;
 				}
 
 				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
