@@ -1193,14 +1193,10 @@ public class Window3DController {
 				Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
 
 				if (graphicBounds != null && paneBounds != null) {
-					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
-							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
+					if (x < -OUT_OF_BOUNDS_THRESHOLD || y < -OUT_OF_BOUNDS_THRESHOLD
 							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
 									- OUT_OF_BOUNDS_THRESHOLD))
-							// lower bound
-							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
-					// right bound
-					) {
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
 						spritesPane.getChildren().remove(noteOrLabelGraphic);
 					} else { // note graphic is within bounds
 						noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
