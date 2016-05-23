@@ -2792,9 +2792,9 @@ public class Window3DController {
 		return this.parentStage;
 	}
 
-	private final static double cannonicalOrientationX = -164.94800;
-	private final static double cannonicalOrientationY = 145.31300;
-	private final static double cannonicalOrientationZ = 21.70700;
+	private final static double cannonicalOrientationX = 145.0;
+	private final static double cannonicalOrientationY = -166.0;
+	private final static double cannonicalOrientationZ = 24.0;
 
 	private final String CS = ", ";
 
