@@ -502,7 +502,7 @@ public class Search {
 
 			case MULTICELLULAR_CELL_BASED:
 				if (sceneElementsList != null) {
-					for (SceneElement se : sceneElementsList.getList()) {
+					for (SceneElement se : sceneElementsList.getElementsList()) {
 						if (se.isMulticellular()) {
 							if (isNameSearched(se.getSceneName(), searched)) {
 								for (String cellName : se.getAllCellNames()) {
@@ -552,7 +552,7 @@ public class Search {
 		}
 
 		// search in comments if name does not already apply
-		String comment = sceneElementsList.nameCommentsMap.get(nameLower);
+		String comment = sceneElementsList.getNameToCommentsMap().get(nameLower);
 		String commentLower = comment.toLowerCase();
 		for (String term : terms) {
 			if (!commentLower.contains(term)) {

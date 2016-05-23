@@ -22,9 +22,9 @@ import wormguides.view.InfoWindowDOM;
 
 public class SceneElementsList {
 
-	public ArrayList<SceneElement> elementsList;
-	public HashMap<String, ArrayList<String>> nameCellsMap;
-	public HashMap<String, String> nameCommentsMap;
+	private ArrayList<SceneElement> elementsList;
+	private HashMap<String, ArrayList<String>> nameCellsMap;
+	private HashMap<String, String> nameCommentsMap;
 
 	// this will eventually be constructed using a .txt file that contains the
 	// Scene Element information for the embryo
@@ -123,7 +123,7 @@ public class SceneElementsList {
 
 	private ArrayList<String> unpackCells(ArrayList<String> cells) {
 		ArrayList<String> unpackedCells = new ArrayList<String>();
-		
+
 		for (int i = 0; i < cells.size(); i++) {
 			String cell = cells.get(i);
 			// if cell starts with asterisk, recurse. else, add cel
@@ -223,10 +223,6 @@ public class SceneElementsList {
 		return sb.toString();
 	}
 
-	public ArrayList<SceneElement> getList() {
-		return elementsList;
-	}
-
 	public ArrayList<String> getAllMulticellSceneNames() {
 		ArrayList<String> names = new ArrayList<String>();
 		for (SceneElement se : elementsList) {
@@ -267,19 +263,19 @@ public class SceneElementsList {
 	public HashMap<String, ArrayList<String>> getNameToCellsMap() {
 		return this.nameCellsMap;
 	}
-	
+
 	public InfoWindowDOM sceneElementsListDOM() {
 		HTMLNode html = new HTMLNode("html");
 		HTMLNode head = new HTMLNode("head");
 		HTMLNode body = new HTMLNode("body");
-		
-		//add nodes to html
+
+		// add nodes to html
 		html.addChild(head);
 		html.addChild(body);
-		
+
 		HTMLNode sceneElementsListDiv = new HTMLNode("div");
 		HTMLNode sceneElementsListTable = new HTMLNode("table");
-		
+
 		// title row
 		HTMLNode trH = new HTMLNode("tr");
 		HTMLNode th1 = new HTMLNode("th", "", "", "Scene Name");
@@ -296,9 +292,8 @@ public class SceneElementsList {
 		trH.addChild(th5);
 		trH.addChild(th6);
 
-		
 		sceneElementsListTable.addChild(trH);
-		
+
 		for (SceneElement se : elementsList) {
 			HTMLNode tr = new HTMLNode("tr");
 			tr.addChild(new HTMLNode("td", "", "", se.getSceneName()));
@@ -309,15 +304,19 @@ public class SceneElementsList {
 			tr.addChild(new HTMLNode("td", "", "", se.getComments()));
 			sceneElementsListTable.addChild(tr);
 		}
-		
+
 		sceneElementsListDiv.addChild(sceneElementsListTable);
-		
+
 		body.addChild(sceneElementsListDiv);
-				
+
 		InfoWindowDOM dom = new InfoWindowDOM(html);
 		dom.buildStyleNode();
-		
+
 		return dom;
+	}
+
+	public ArrayList<SceneElement> getElementsList() {
+		return elementsList;
 	}
 
 	private final static String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";

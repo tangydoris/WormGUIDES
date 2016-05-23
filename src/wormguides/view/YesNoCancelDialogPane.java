@@ -2,6 +2,8 @@ package wormguides.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -38,6 +40,8 @@ public class YesNoCancelDialogPane extends AnchorPane {
 		AnchorPane.setRightAnchor(mainVBox, 10.0);
 		AnchorPane.setBottomAnchor(mainVBox, 10.0);
 
+		mainVBox.setStyle("-fx-background-color: white; -fx-border-color: black; ");
+
 		// initialize prompt text
 		promptText = new Text();
 		promptText.setFont(AppFont.getFont());
@@ -59,7 +63,7 @@ public class YesNoCancelDialogPane extends AnchorPane {
 		noBtn.setFont(AppFont.getFont());
 		noBtn.setPrefWidth(70);
 		noBtn.setMaxHeight(Integer.MAX_VALUE);
-		
+
 		cancelBtn = new Button();
 		cancelBtn.setText(cancelButtonText);
 		cancelBtn.setFont(AppFont.getFont());
@@ -77,8 +81,12 @@ public class YesNoCancelDialogPane extends AnchorPane {
 
 		HBox btnHBox = new HBox(10);
 		btnHBox.getChildren().addAll(r1, yesBtn, r2, noBtn, r3, cancelBtn, r4);
+		for (Node child : btnHBox.getChildrenUnmodifiable())
+			child.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
 		mainVBox.getChildren().add(btnHBox);
+
+		mainVBox.setPadding(new Insets(10, 0, 10, 0));
 
 		getChildren().add(mainVBox);
 	}
@@ -94,7 +102,7 @@ public class YesNoCancelDialogPane extends AnchorPane {
 	public void setNoButtonAction(EventHandler<ActionEvent> handler) {
 		noBtn.setOnAction(handler);
 	}
-	
+
 	public void setCancelButtonAction(EventHandler<ActionEvent> handler) {
 		cancelBtn.setOnAction(handler);
 	}

@@ -47,6 +47,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import wormguides.MainApp;
 import wormguides.Search;
@@ -80,7 +81,6 @@ import wormguides.view.YesNoCancelDialogPane;
 import javafx.scene.web.WebView;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Node;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -209,6 +209,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Text displayedDescription;
 
 	// scene elements stuff
+	// average x-, y- and z-coordinate offsets of nuclei from zero
 	private SceneElementsList elementsList;
 
 	// Story stuff
@@ -225,7 +226,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button newStory;
 	@FXML
 	private Button deleteStory;
-	private Stage exitSaveStage;
+
+	private Popup exitSavePopup;
 
 	// production information
 	private ProductionInfo productionInfo;
@@ -435,9 +437,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			cellShapesIndexStage = new Stage();
 			cellShapesIndexStage.setTitle("Cell Shapes Index");
 
-			if (elementsList == null) {
+			if (elementsList == null)
 				initSceneElementsList();
-			}
 
 			// webview to render cell shapes list i.e. elementsList
 			WebView cellShapesIndexWebView = new WebView();
@@ -582,18 +583,19 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	public void promptStorySave() {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
-			if (exitSaveStage == null) {
-				exitSaveStage = new Stage();
-				exitSaveStage.initModality(Modality.APPLICATION_MODAL);
-				exitSaveStage.initOwner(mainStage);
+			if (exitSavePopup == null) {
 
 				YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
 						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
 						"Cancel");
 
+				exitSavePopup = new Popup();
+				exitSavePopup.getContent().add(saveDialog);
+
 				saveDialog.setYesButtonAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
+						exitSavePopup.hide();
 						storiesLayer.saveActiveStory();
 						exitApplication();
 					}
@@ -602,6 +604,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				saveDialog.setNoButtonAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
+						exitSavePopup.hide();
 						exitApplication();
 					}
 				});
@@ -609,23 +612,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				saveDialog.setCancelButtonAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						exitSaveStage.hide();
+						exitSavePopup.hide();
 					}
 				});
 
-				Scene exitScene = new Scene((AnchorPane) saveDialog);
-				exitSaveStage.setScene(exitScene);
-				exitSaveStage.setTitle("Exit WormGUIDES");
-				exitSaveStage.setWidth(290);
-				exitSaveStage.setHeight(140);
-				exitSaveStage.setResizable(false);
-
-				for (Node node : exitScene.getRoot().getChildrenUnmodifiable())
-					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+				exitSavePopup.setAutoFix(true);
 			}
 
-			exitSaveStage.show();
-			exitSaveStage.centerOnScreen();
+			exitSavePopup.show(mainStage);
+			exitSavePopup.centerOnScreen();
 		}
 	}
 
@@ -647,7 +642,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
-				bringUpInfoProperty);
+				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
+				AceTreeLoader.getAvgZOffsetFromZero());
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1124,6 +1120,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 	}
 
+	/**
+	 * Initializes the {@link SceneElementsList} that contains all the
+	 * {@link SceneElement} objects visible in all time frames.
+	 * 
+	 * @param offsetX
+	 *            Average x-coordinate offset of nuclei from zero
+	 * @param offsetY
+	 *            Average y-coordinate offset of nuclei from zero
+	 * @param offsetZ
+	 *            Average a-coordinate offset of nuclei from zero
+	 */
 	private void initSceneElementsList() {
 		elementsList = new SceneElementsList();
 
@@ -1208,6 +1215,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
+
 		lineageData = AceTreeLoader.loadNucFiles();
 		initLineageTree(lineageData.getAllCellNames());
 

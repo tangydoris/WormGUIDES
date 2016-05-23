@@ -8,3 +8,6 @@ java.hprof.txt
 /compiledTest/
 /deployedTest/
 /build-libs/
+*.class
+/org/
+/org/*

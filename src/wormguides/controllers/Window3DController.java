@@ -71,7 +71,6 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.TransformChangedEvent;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -146,7 +145,8 @@ public class Window3DController {
 	private double mousePosX, mousePosY, mousePosZ;
 	private double mouseOldX, mouseOldY, mouseOldZ;
 	private double mouseDeltaX, mouseDeltaY;
-	private int newOriginX, newOriginY, newOriginZ;
+	// average position offsets of nuclei from zero
+	private int offsetX, offsetY, offsetZ;
 	private double angleOfRotation;
 
 	// housekeeping stuff
@@ -299,8 +299,13 @@ public class Window3DController {
 	 *            info window should be brought up, FALSE otherwise
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
-			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty) {
+			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
+			int offsetZ) {
 		parentStage = parent;
+
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		this.offsetZ = offsetZ;
 
 		root = new Group();
 		cellData = data;
@@ -341,24 +346,12 @@ public class Window3DController {
 					selectedIndex.set(selected);
 			}
 		});
+
 		selectedNameLabeled = new SimpleStringProperty("");
 		selectedNameLabeled.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					// value passed may be a functional name
-					// use lineage names instead
-					// String lineageName =
-					// PartsList.getLineageNameByFunctionalName(newValue);
-					// if (lineageName == null)
-					// lineageName = newValue;
-					/*
-					 * TODO Removed above check (caused bugs with P4 clicked in
-					 * lineage window) check if this causes problems elsewhere
-					 * 
-					 * ***** If it does, we should do name translation before
-					 * changing name *****
-					 */
 					String lineageName = newValue;
 
 					selectedName.set(lineageName);
@@ -375,23 +368,14 @@ public class Window3DController {
 					startTime = Search.getFirstOccurenceOf(lineageName);
 					endTime = Search.getLastOccurenceOf(lineageName);
 
+					// do not change scene is entity does not exist at any time
 					if (startTime <= 0 || endTime <= 0)
-						return; // if the entity doesn't appear in the lifetime
-								// of the embryo, don't change the scene
+						return;
 
-					// if (startTime <= 0) {
-					// startTime = 1;
-					// }
-					//
-					// if (endTime <= 0) {
-					// endTime = 1;
-					// }
-
-					if (time.get() < startTime || time.get() > endTime) {
+					if (time.get() < startTime || time.get() > endTime)
 						time.set(startTime);
-					} else {
+					else
 						insertLabelFor(lineageName, entity);
-					}
 
 					highlightActiveCellLabel(entity);
 				}
@@ -458,14 +442,14 @@ public class Window3DController {
 		othersOpacity = new SimpleDoubleProperty(1);
 		otherCells = new ArrayList<String>();
 
-		rotateX = new Rotate(0, 0, newOriginY, newOriginZ, Rotate.X_AXIS);
-		rotateY = new Rotate(0, newOriginX, 0, newOriginZ, Rotate.Y_AXIS);
-		rotateZ = new Rotate(0, newOriginX, newOriginY, 0, Rotate.Z_AXIS);
+		rotateX = new Rotate(0, Rotate.X_AXIS);
+		rotateY = new Rotate(0, Rotate.Y_AXIS);
+		rotateZ = new Rotate(0, Rotate.Z_AXIS);
 
 		// initialize
-		rotateXAngle = new SimpleDoubleProperty(1);
-		rotateYAngle = new SimpleDoubleProperty(1);
-		rotateZAngle = new SimpleDoubleProperty(1);
+		rotateXAngle = new SimpleDoubleProperty(0.0);
+		rotateYAngle = new SimpleDoubleProperty(0.0);
+		rotateZAngle = new SimpleDoubleProperty(0.0);
 
 		// set intial values
 		rotateXAngle.set(rotateX.getAngle());
@@ -476,11 +460,6 @@ public class Window3DController {
 		rotateXAngle.addListener(getRotateXAngleListener());
 		rotateYAngle.addListener(getRotateYAngleListener());
 		rotateZAngle.addListener(getRotateZAngleListener());
-
-		// set listeners to update doubleproperties ^^
-		rotateX.setOnTransformChanged(getRotateXChangeHandler());
-		rotateY.setOnTransformChanged(getRotateYChangeHandler());
-		rotateZ.setOnTransformChanged(getRotateZChangeHandler());
 
 		quaternion = new Quaternion();
 
@@ -556,13 +535,9 @@ public class Window3DController {
 
 	public void initializeWithCannonicalOrientation() {
 		// set default cannonical orientations
-
-		rotateX.setAngle(cannonicalOrientationX);
-		rotateY.setAngle(cannonicalOrientationY);
-		rotateZ.setAngle(cannonicalOrientationZ);
-
-		repositionSprites();
-		repositionNoteBillboardFronts();
+		rotateXAngle.set(cannonicalOrientationX);
+		rotateYAngle.set(cannonicalOrientationY);
+		rotateZAngle.set(cannonicalOrientationZ);
 	}
 
 	private Group createOrientationIndicator() {
@@ -601,9 +576,7 @@ public class Window3DController {
 		// xy relocates z shrinks apparent by moving away from camera? improves
 		// resolution?
 		orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
-		orientationIndicator.getTransforms().add(new Translate(-newOriginX, -newOriginY, -newOriginZ));
 		orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
-		orientationIndicator.getTransforms().add(new Translate(newOriginX, newOriginY, newOriginZ));
 		orientationIndicator.getChildren().add(middleTransformGroup);
 		middleTransformGroup.getTransforms().add(indicatorRotation);
 		return orientationIndicator;
@@ -673,55 +646,48 @@ public class Window3DController {
 	 *            The entity {@link Node} that the label should appear on
 	 */
 	private void transientLabel(String name, Node entity) {
-		if (currentRulesApplyTo(name))
-			showTransientLabel(name, entity);
-	}
+		if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25) {
 
-	private void showTransientLabel(String name, Node entity) {
-		boolean labelDrawn = false;
+			if (!currentLabels.contains(name) && entity != null) {
+				Bounds b = entity.getBoundsInParent();
 
-		if (currentLabels.contains(name))
-			labelDrawn = true;
+				if (b != null) {
+					String funcName = PartsList.getFunctionalNameByLineageName(name);
+					if (funcName != null)
+						name = funcName;
 
-		if (!labelDrawn && entity != null) {
-			Bounds b = entity.getBoundsInParent();
+					transientLabelText = makeNoteSpriteText(name);
 
-			if (b != null) {
-				String funcName = PartsList.getFunctionalNameByLineageName(name);
-				if (funcName != null)
-					name = funcName;
+					transientLabelText.setWrappingWidth(-1);
+					transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
+					transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							event.consume();
+						}
+					});
+					transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							event.consume();
+						}
+					});
 
-				transientLabelText = makeNoteSpriteText(name);
+					Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
+							(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+					double x = p.getX();
+					double y = p.getY();
 
-				transientLabelText.setWrappingWidth(-1);
-				transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
-				transientLabelText.setOnMouseEntered(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						event.consume();
-					}
-				});
-				transientLabelText.setOnMouseClicked(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						event.consume();
-					}
-				});
+					double vOffset = b.getHeight() / 2;
+					double hOffset = b.getWidth() / 2;
 
-				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-						(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
-				double x = p.getX();
-				double y = p.getY();
+					x += hOffset;
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 
-				double vOffset = b.getHeight() / 2;
-				double hOffset = b.getWidth() / 2;
+					transientLabelText.getTransforms().add(new Translate(x, y));
 
-				x += hOffset;
-				y -= vOffset + 5;
-
-				transientLabelText.getTransforms().add(new Translate(x, y));
-
-				spritesPane.getChildren().add(transientLabelText);
+					spritesPane.getChildren().add(transientLabelText);
+				}
 			}
 		}
 	}
@@ -817,29 +783,23 @@ public class Window3DController {
 		mousePosY = event.getSceneY();
 		mouseDeltaX = (mousePosX - mouseOldX);
 		mouseDeltaY = (mousePosY - mouseOldY);
-		mouseDeltaX /= 4;
-		mouseDeltaY /= 4;
+
+		mouseDeltaX /= 2;
+		mouseDeltaY /= 2;
 
 		angleOfRotation = rotationAngleFromMouseMovement();
 		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
 
 		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-			double tx = xform.t.getTx() - mouseDeltaX;
-			double ty = xform.t.getTy() - mouseDeltaY;
 
-			if (tx > 0 && tx < 450)
-				xform.t.setX(tx);
-			if (ty > 0 && ty < 450)
-				xform.t.setY(ty);
+			xform.setTranslateX(xform.getTranslateX() - mouseDeltaX);
+			xform.setTranslateY(xform.getTranslateY() - mouseDeltaY);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
 		}
 
 		else if (event.isPrimaryButtonDown()) {
-			mouseDeltaX /= 2;
-			mouseDeltaY /= 2;
-
 			/*
 			 * TODO how to get Z COORDINATE?
 			 */
@@ -849,10 +809,14 @@ public class Window3DController {
 				// double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
 				// newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 
-				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, newOriginX, newOriginY,
-						newOriginZ);
-				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, newOriginX, newOriginY,
-						newOriginZ);
+				/*
+				 * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
+				 * mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
+				 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
+				 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
+				 */
+				double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
+				double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
 				if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
 					// System.out.println("from origin to old mouse pos: <" +
@@ -880,8 +844,13 @@ public class Window3DController {
 				}
 			}
 
-			rotateX.setAngle(rotateX.getAngle() + mouseDeltaY);
-			rotateY.setAngle(rotateY.getAngle() - mouseDeltaX);
+			double modifier = 10.0;
+			double modifierFactor = 0.1;
+
+			rotateXAngle.set(
+					((rotateXAngle.get() + mouseDeltaY * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
+			rotateYAngle.set(
+					((rotateYAngle.get() + mouseDeltaX * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
 
 			repositionSprites();
 			repositionNoteBillboardFronts();
@@ -925,6 +894,7 @@ public class Window3DController {
 					}
 				}
 			}
+
 		}
 
 		// Cell body/structure
@@ -954,9 +924,10 @@ public class Window3DController {
 						else {
 							allLabels.add(name);
 							currentLabels.add(name);
-							insertLabelFor(name, node);
 
-							highlightActiveCellLabel((Shape3D) node);
+							Shape3D entity = getEntityWithName(name);
+							insertLabelFor(name, entity);
+							highlightActiveCellLabel(entity);
 						}
 					}
 
@@ -1149,6 +1120,7 @@ public class Window3DController {
 					double x = b.getMaxX();
 					double y = b.getMaxY() + b.getHeight() / 2;
 					double z = b.getMaxZ();
+
 					billboard.getTransforms().addAll(new Translate(x, y, z),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
@@ -1161,11 +1133,15 @@ public class Window3DController {
 	 * 3d coordinate onto the front of the subscene
 	 */
 	private void repositionSprites() {
-		for (Node entity : entitySpriteMap.keySet())
-			alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+		if (entitySpriteMap != null) {
+			for (Node entity : entitySpriteMap.keySet())
+				alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+		}
 
-		for (Node entity : entityLabelMap.keySet())
-			alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+		if (entityLabelMap != null) {
+			for (Node entity : entityLabelMap.keySet())
+				alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+		}
 	}
 
 	/**
@@ -1174,7 +1150,7 @@ public class Window3DController {
 	 * bounds of the subscene window after a transformation, and only reinserted
 	 * if its bounds are within the window again.
 	 * 
-	 * @param noteGraphic
+	 * @param noteOrLabelGraphic
 	 *            Graphical representation of a note/notes (can either be a
 	 *            {@link Text} or a {@link VBox}
 	 * @param node
@@ -1182,17 +1158,17 @@ public class Window3DController {
 	 * @param isLabel
 	 *            True if a label is being aligned, false otherwise
 	 */
-	private void alignTextWithEntity(Node noteGraphic, Node node, boolean isLabel) {
+	private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
 		if (node != null) {
 			// graphic could have been previously removed due to
 			// out-of-bounds-ness
-			if (!spritesPane.getChildren().contains(noteGraphic)) {
-				spritesPane.getChildren().add(noteGraphic);
+			if (!spritesPane.getChildren().contains(noteOrLabelGraphic)) {
+				spritesPane.getChildren().add(noteOrLabelGraphic);
 			}
 
 			Bounds b = node.getBoundsInParent();
 			if (b != null) {
-				noteGraphic.getTransforms().clear();
+				noteOrLabelGraphic.getTransforms().clear();
 				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
 						(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
 				double x = p.getX();
@@ -1210,20 +1186,16 @@ public class Window3DController {
 				}
 
 				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-				Bounds graphicBounds = noteGraphic.localToScreen(noteGraphic.getBoundsInLocal());
+				Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
 
 				if (graphicBounds != null && paneBounds != null) {
-					if (x < -OUT_OF_BOUNDS_THRESHOLD // left bound
-							|| y < -OUT_OF_BOUNDS_THRESHOLD // upper bound
+					if (x < -OUT_OF_BOUNDS_THRESHOLD || y < -OUT_OF_BOUNDS_THRESHOLD
 							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
 									- OUT_OF_BOUNDS_THRESHOLD))
-							// lower bound
-							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)
-					// right bound
-					) {
-						spritesPane.getChildren().remove(noteGraphic);
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
+						spritesPane.getChildren().remove(noteOrLabelGraphic);
 					} else { // note graphic is within bounds
-						noteGraphic.getTransforms().add(new Translate(x, y));
+						noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
 					}
 				}
 			}
@@ -1281,7 +1253,6 @@ public class Window3DController {
 		}
 
 		if (sceneElementsList != null) {
-			// System.out.println("scene elements at time "+requestedTime);
 			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
 			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
 				// add meshes from each scene element
@@ -1289,8 +1260,8 @@ public class Window3DController {
 				MeshView mesh = se.buildGeometry(requestedTime - 1);
 
 				if (mesh != null) {
-					// null mesh when file not found thrown
-					mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 
 					// add rendered mesh to meshes list
 					currentSceneElementMeshes.add(mesh);
@@ -1298,7 +1269,6 @@ public class Window3DController {
 					// add scene element to rendered scene element reference for
 					// on click responsiveness
 					currentSceneElements.add(se);
-					// System.out.println(se.toString());
 				}
 			}
 		}
@@ -1309,16 +1279,17 @@ public class Window3DController {
 		currentLabels.clear();
 
 		for (String label : allLabels) {
-			for (String cell : cellNames) {
-				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+
+			for (int i = 0; i < currentSceneElements.size(); i++) {
+				if (!currentLabels.contains(label)
+						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
 					currentLabels.add(label);
 					break;
 				}
 			}
 
-			for (int i = 0; i < currentSceneElements.size(); i++) {
-				if (!currentLabels.contains(label)
-						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
+			for (String cell : cellNames) {
+				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
 					currentLabels.add(label);
 					break;
 				}
@@ -1353,7 +1324,8 @@ public class Window3DController {
 
 						if (mesh != null) {
 							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-							mesh.getTransforms().addAll(rotateZ, rotateY, rotateX);
+							mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
 							currentNoteMeshMap.put(note, mesh);
 						}
 					}
@@ -1589,7 +1561,8 @@ public class Window3DController {
 
 			sphere.setMaterial(material);
 
-			sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(positions[i][X_COR_INDEX] * X_SCALE,
+			sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+			sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
 					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
 
 			spheres[i] = sphere;
@@ -1653,6 +1626,7 @@ public class Window3DController {
 			return;
 		}
 
+		// otherwise, create a highlight new label
 		String funcName = PartsList.getFunctionalNameByLineageName(name);
 		Text text;
 		if (funcName != null)
@@ -1686,16 +1660,17 @@ public class Window3DController {
 
 	/**
 	 * @return The {@link Shape3D} entity with input name. Priority is given to
-	 *         meshes (if a mesh and a cell have the same name, the mesh is
-	 *         returned)
+	 *         meshes (if a mesh and a cell have the same name, then the mesh is
+	 *         returned).
 	 */
 	private Shape3D getEntityWithName(String name) {
 		// mesh view label
 		for (int i = 0; i < currentSceneElements.size(); i++) {
 			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
 					&& currentSceneElementMeshes.get(i) != null
-					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0)
+					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
 				return currentSceneElementMeshes.get(i);
+			}
 		}
 
 		// sphere label
@@ -1804,7 +1779,7 @@ public class Window3DController {
 			else if (note.isBillboard()) {
 				// location attachment
 				if (note.attachedToLocation()) {
-					text.getTransforms().addAll(rotateZ, rotateY, rotateX);
+					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
 					text.getTransforms().addAll(new Translate(note.getX(), note.getY(), note.getZ()),
 							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
 				}
@@ -1904,7 +1879,8 @@ public class Window3DController {
 
 	private Sphere createLocationMarker(double x, double y, double z) {
 		Sphere sphere = new Sphere(1);
-		sphere.getTransforms().addAll(rotateZ, rotateY, rotateX, new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
+		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+		sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
 		// make marker transparent
 		sphere.setMaterial(colorHash.getOthersMaterial(0));
 		return sphere;
@@ -1948,8 +1924,8 @@ public class Window3DController {
 	}
 
 	private void buildCamera() {
-		this.camera = new PerspectiveCamera(true);
-		this.xform = new Xform();
+		camera = new PerspectiveCamera(true);
+		xform = new Xform();
 		xform.reset();
 
 		root.getChildren().add(xform);
@@ -1959,33 +1935,7 @@ public class Window3DController {
 		camera.setFarClip(CAMERA_FAR_CLIP);
 		camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
 
-		xform.setScaleX(X_SCALE);
-		xform.setScaleY(Y_SCALE);
-
-		setNewOrigin();
-
 		subscene.setCamera(camera);
-	}
-
-	private void setNewOrigin() {
-		// Find average X Y positions of initial timepoint
-		Integer[][] positions = cellData.getPositions(startTime);
-		int numCells = positions.length;
-		int sumX = 0;
-		int sumY = 0;
-		int sumZ = 0;
-		for (int i = 0; i < numCells; i++) {
-			sumX += positions[i][X_COR_INDEX];
-			sumY += positions[i][Y_COR_INDEX];
-			sumZ += positions[i][Z_COR_INDEX];
-		}
-		newOriginX = (int) Math.round(X_SCALE * sumX / numCells);
-		newOriginY = (int) Math.round(Y_SCALE * sumY / numCells);
-		newOriginZ = (int) Math.round(Z_SCALE * sumZ / numCells);
-
-		// Set new origin to average X Y positions
-		xform.setTranslate(newOriginX, newOriginY, newOriginZ);
-		System.out.println("origin xyz: " + newOriginX + " " + newOriginY + " " + newOriginZ);
 	}
 
 	public void setSearchResultsList(ObservableList<String> list) {
@@ -2046,8 +1996,8 @@ public class Window3DController {
 		// get the scene name associated with the cell
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
-		for (int i = 0; i < sceneElementsList.elementsList.size(); i++) {
-			SceneElement currSE = sceneElementsList.elementsList.get(i);
+		for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
+			SceneElement currSE = sceneElementsList.getElementsList().get(i);
 
 			// check if multicellular structure --> find match with name in
 			// cells
@@ -2062,7 +2012,7 @@ public class Window3DController {
 														// colored
 				}
 			} else {
-				String sn = sceneElementsList.elementsList.get(i).getSceneName();
+				String sn = sceneElementsList.getElementsList().get(i).getSceneName();
 
 				StringTokenizer st = new StringTokenizer(sn);
 				if (st.countTokens() == 2) {
@@ -2375,15 +2325,17 @@ public class Window3DController {
 	}
 
 	public void setRotations(double rx, double ry, double rz) {
+		rotateXAngle.set(rx);
+		rotateYAngle.set(ry);
+		rotateZAngle.set(rz);
 		/*
 		 * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
 		 * Math.toDegrees(rz);
 		 */
 
-		// rotateX.setAngle(rx+180);
-		rotateX.setAngle(rx);
-		rotateY.setAngle(ry);
-		rotateZ.setAngle(rz);
+		/*
+		 * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
+		 */
 	}
 
 	public void setCaptureVideo(BooleanProperty captureVideo) {
@@ -2391,35 +2343,31 @@ public class Window3DController {
 	}
 
 	public double getRotationX() {
-		return rotateX.getAngle();
+		return rotateXAngle.get();
 	}
 
 	public double getRotationY() {
-		return rotateY.getAngle();
+		return rotateYAngle.get();
 	}
 
 	public double getRotationZ() {
-		return rotateZ.getAngle();
+		return rotateZAngle.get();
 	}
 
 	public double getTranslationX() {
-		return xform.t.getTx() - newOriginX;
+		return camera.getTranslateX();
 	}
 
 	public void setTranslationX(double tx) {
-		double newTx = tx + newOriginX;
-		if (newTx > 0 && newTx < 450)
-			xform.t.setX(newTx);
+		camera.setTranslateX(tx);
 	}
 
 	public double getTranslationY() {
-		return xform.t.getTy() - newOriginY;
+		return camera.getTranslateY();
 	}
 
 	public void setTranslationY(double ty) {
-		double newTy = ty + newOriginY;
-		if (newTy > 0 && newTy < 450)
-			xform.t.setY(newTy);
+		camera.setTranslateY(ty);
 	}
 
 	/**
@@ -2461,44 +2409,36 @@ public class Window3DController {
 		othersOpacity.set(dim);
 	}
 
-	private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateXAngle.set(rotateX.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
-
-	private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateYAngle.set(rotateY.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
-
-	private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
-		return new EventHandler<TransformChangedEvent>() {
-			@Override
-			public void handle(TransformChangedEvent arg0) {
-				rotateZAngle.set(rotateZ.getAngle());
-				repositionSprites();
-				repositionNoteBillboardFronts();
-			}
-		};
-	}
+	/*
+	 * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateXAngle.set(rotateX.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateYAngle.set(rotateY.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateZAngle.set(rotateZ.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 */
 
 	private ChangeListener<Number> getRotateXAngleListener() {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateX.setAngle(rotateXAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateX(newAngle);
+				rotateX.setAngle(newAngle);
 			}
 		};
 	}
@@ -2507,7 +2447,9 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateY.setAngle(rotateYAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateY(newAngle);
+				rotateY.setAngle(newAngle);
 			}
 		};
 	}
@@ -2516,7 +2458,9 @@ public class Window3DController {
 		return new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				rotateZ.setAngle(rotateZAngle.get());
+				double newAngle = newValue.doubleValue();
+				// cameraTransformer.setRotateZ(newAngle);
+				rotateZ.setAngle(newAngle);
 			}
 		};
 	}
@@ -2546,7 +2490,6 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				othersOpacity.set(Math.round(newValue.doubleValue()) / 100d);
-
 				buildScene();
 			}
 		};
@@ -2849,9 +2792,9 @@ public class Window3DController {
 		return this.parentStage;
 	}
 
-	private final static double cannonicalOrientationX = 145.;
-	private final static double cannonicalOrientationY = -170.;
-	private final static double cannonicalOrientationZ = 25.;
+	private final static double cannonicalOrientationX = -175.959;
+	private final static double cannonicalOrientationY = 177.143;
+	private final static double cannonicalOrientationZ = -11.02;
 
 	private final String CS = ", ";
 
