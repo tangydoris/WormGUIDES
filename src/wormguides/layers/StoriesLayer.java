@@ -788,6 +788,7 @@ public class StoriesLayer {
 								for (Note note : story.getNotes()) {
 									NoteListCellGraphic noteGraphic = new NoteListCellGraphic(note);
 									storyGraphic.getChildren().add(noteGraphic);
+
 								}
 							}
 
@@ -930,7 +931,7 @@ public class StoriesLayer {
 			titleContainer.setMaxWidth(width);
 			titleContainer.setMinWidth(width);
 
-			expandIcon = new Text("â–¸");
+			expandIcon = new Text("â– ");
 			expandIcon.setPickOnBounds(true);
 			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
