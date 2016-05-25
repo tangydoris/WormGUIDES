@@ -1,5 +1,7 @@
 package wormguides.controllers;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -46,6 +48,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -412,6 +416,39 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
+	}
+	
+	@FXML
+	public void saveSearchResultsAction() {
+		Stage fileChooserStage = new Stage();
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
+		
+		try  {
+			File output = fileChooser.showSaveDialog(fileChooserStage);
+			
+			if (output == null) {
+				System.out.println("error creating file to write search results");
+				return;
+			}
+			
+			FileWriter writer = new FileWriter(output);
+			
+			
+			for (String s : searchResultsListView.getItems()) {
+				writer.write(s);
+				writer.write(System.lineSeparator());
+			}
+			
+			writer.flush();
+			writer.close();
+			
+		} catch (IOException e) {
+			System.out.println("IOException thrown writing search results to file");
+			return;
+		}
 	}
 
 	@FXML
