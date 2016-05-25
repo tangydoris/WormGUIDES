@@ -1,6 +1,7 @@
 package wormguides.controllers;
 
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.DoubleProperty;
@@ -122,20 +123,27 @@ public class RotationController extends AnchorPane implements Initializable {
 		};
 	}
 
+	/*
+	 * WHY CAN"T THESE BE HANDLED WITH CATCH PARSEEXCEPTION ??
+	 */
 	private ChangeListener<String> getRotateXAngleFieldListener() {
 		return new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
 					// check if within -360 to +360 range
-					try {
-						double rotateXAngleVal = Double.parseDouble(newValue);
-
-						if (rotateXAngleVal > -360. && rotateXAngleVal < 360.) {
-							xRotationAngle.set(rotateXAngleVal);
+					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
+						return;
+					} else {
+						try {	
+							double rotateXAngleVal = Double.parseDouble(newValue);
+								
+							if (rotateXAngleVal > -360. && rotateXAngleVal < 360.) {
+								xRotationAngle.set(rotateXAngleVal);
+							}
+						} catch (NumberFormatException e) {
+								// e.printStackTrace();
 						}
-					} catch (NumberFormatException e) {
-						// e.printStackTrace();
 					}
 				}
 			}
@@ -148,14 +156,18 @@ public class RotationController extends AnchorPane implements Initializable {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
 					// check if within -360 to +360 range
-					try {
+					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
+						return;
+					} else {
+						try {
 						double rotateYAngleVal = Double.parseDouble(newValue);
 
 						if (rotateYAngleVal > -360. && rotateYAngleVal < 360.) {
 							yRotationAngle.set(rotateYAngleVal);
 						}
-					} catch (NumberFormatException e) {
+					} catch (Exception e) {
 						// e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -168,14 +180,18 @@ public class RotationController extends AnchorPane implements Initializable {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
 					// check if within -360 to +360 range
-					try {
+					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
+						return;
+					} else {
+						try {
 						double rotateZAngleVal = Double.parseDouble(newValue);
 
 						if (rotateZAngleVal > -360. && rotateZAngleVal < 360.) {
 							zRotationAngle.set(rotateZAngleVal);
 						}
-					} catch (NumberFormatException e) {
+					} catch (Exception e) {
 						// e.printStackTrace();
+						}
 					}
 				}
 			}

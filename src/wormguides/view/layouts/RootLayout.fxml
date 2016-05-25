@@ -21,6 +21,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#menuSaveImageAction" text="Save Image" />
                   <MenuItem fx:id="menuGenerateURL" mnemonicParsing="false" onAction="#generateURLAction" text="Share Scene" />
                   <MenuItem fx:id="menuLoadURL" mnemonicParsing="false" onAction="#loadURLAction" text="Load Shared Scene" />
+                  <MenuItem fx:id="saveSearchResults" mnemonicParsing="false" onAction="#saveSearchResultsAction" text="Save Search Results" />
               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#menuCloseAction" text="Exit" />
             </items>
           </Menu>
