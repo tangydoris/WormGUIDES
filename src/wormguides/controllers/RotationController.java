@@ -1,7 +1,6 @@
 package wormguides.controllers;
 
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.DoubleProperty;

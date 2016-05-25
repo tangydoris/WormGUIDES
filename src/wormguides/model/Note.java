@@ -592,18 +592,21 @@ public class Note {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public class TagDisplayEnumException extends Exception {
 		public TagDisplayEnumException() {
 			super("Invalid note tag display enum, must be one of the " + "following: " + Display.valuesToString());
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public class AttachmentTypeEnumException extends Exception {
 		public AttachmentTypeEnumException() {
 			super("Invalid note attachment type enum, must be one of the " + "following: " + Type.valuesToString());
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public class LocationStringFormatException extends Exception {
 		public LocationStringFormatException() {
 			super("Invalid note location string format, must be 3 " + "integers separated by spaces.");
