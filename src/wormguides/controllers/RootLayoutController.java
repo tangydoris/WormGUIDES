@@ -1122,6 +1122,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					selectedName.set(newValue);
 			}
 		});
+		
 	}
 
 	private void initStoriesLayer() {
@@ -1130,6 +1131,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
 				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory);
+		
 
 		window3DController.setStoriesLayer(storiesLayer);
 
@@ -1253,16 +1255,22 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		initCellDeaths();
 		initAnatomy();
 
-		lineageData = AceTreeLoader.loadNucFiles();
+		
+		if (bundle != null) {					
+			lineageData = (LineageData) bundle.getObject("lineageData");
+		} else {
+			lineageData = AceTreeLoader.loadNucFiles();
+		}
+		
 		initLineageTree(lineageData.getAllCellNames());
-
+		
 		assertFXMLNodes();
 
 		initToggleGroup();
 		initDisplayLayer();
 
 		initializeWithLineageData();
-
+		
 		mainTabPane.getSelectionModel().select(storiesTab);
 	}
 
@@ -1284,16 +1292,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
-
+		
 		// connectome
 		initConnectome();
 
 		// structures layer
 		initStructuresLayer();
-
+		
 		// stories layer
 		initStoriesLayer();
-
+		
 		window3DController.setSearchResultsList(Search.getSearchResultsList());
 		searchResultsListView.setItems(Search.getSearchResultsList());
 
@@ -1301,23 +1309,24 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
 
 		addListeners();
-
-		setIcons();
+		
 		setLabels();
 
 		sizeSubscene();
 		sizeInfoPane();
 
 		timeSlider.setValue(window3DController.getEndTime());
-
+		
 		window3DController.initializeWithCannonicalOrientation();
-
+		
 		viewTreeAction();
 
 		captureVideo = new SimpleBooleanProperty(false);
 		if (window3DController != null) {
 			window3DController.setCaptureVideo(captureVideo);
 		}
+		
+
 	}
 
 	/** Default transparency of 'other' entities on startup */

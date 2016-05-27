@@ -14,7 +14,7 @@ import javafx.stage.WindowEvent;
 import wormguides.controllers.RootLayoutController;
 //import wormguides.view.RootLayout;
 import wormguides.loaders.ImageLoader;
-import wormguides.model.AceTreeResource;
+import wormguides.model.NucleiMgrAdapterResource;
 
 public class MainApp extends Application {
 
@@ -22,10 +22,9 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private RootLayoutController controller;
-	private static AceTreeResource aceTreeResource;
+	private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
-	public MainApp() {
-	}
+	public MainApp() {}
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -62,9 +61,8 @@ public class MainApp extends Application {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
 		
-		if (aceTreeResource != null) {
-			System.out.println("setting ace tree resource to loader --> passed from AceTree");
-			loader.setResources(aceTreeResource);
+		if (nucleiMgrAdapterResource != null) {
+			loader.setResources(nucleiMgrAdapterResource);
 		}
 
 		controller = new RootLayoutController();
@@ -90,9 +88,9 @@ public class MainApp extends Application {
 		}
 	}
 	
-	public static void startProgramatically(String[] args, AceTreeResource atr) {
+	public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
+		nucleiMgrAdapterResource = nmar;
 		launch(args);
-		aceTreeResource = atr;
 	}
 
 	public static void main(String[] args) {

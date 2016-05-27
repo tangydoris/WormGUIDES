@@ -204,7 +204,7 @@ public class StoriesLayer {
 				return t1.compareTo(t2);
 			}
 		};
-
+		
 		for (Story story : stories) {
 			story.setComparator(noteComparator);
 			story.sortNotes();

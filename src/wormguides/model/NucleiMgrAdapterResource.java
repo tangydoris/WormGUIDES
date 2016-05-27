@@ -1,12 +1,11 @@
 package wormguides.model;
 
 import java.util.ListResourceBundle;
-import wormguides.model.LineageData;
 
-public class AceTreeResource extends ListResourceBundle {
+public class NucleiMgrAdapterResource extends ListResourceBundle {
 	private LineageData lineageData;
 	
-	public AceTreeResource(LineageData data) {
+	public NucleiMgrAdapterResource(LineageData data) {
 		this.lineageData = data;
 	}
 	
