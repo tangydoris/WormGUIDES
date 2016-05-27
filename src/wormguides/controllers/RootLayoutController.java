@@ -261,6 +261,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private MenuItem stopCaptureVideoMenuItem;
 	private BooleanProperty captureVideo;
+	
+	private boolean renderGeometryFlag;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -680,7 +682,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero());
+				AceTreeLoader.getAvgZOffsetFromZero(), renderGeometryFlag);
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1258,8 +1260,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		
 		if (bundle != null) {					
 			lineageData = (LineageData) bundle.getObject("lineageData");
+			renderGeometryFlag = false;
 		} else {
 			lineageData = AceTreeLoader.loadNucFiles();
+			renderGeometryFlag = true;
 		}
 		
 		initLineageTree(lineageData.getAllCellNames());
@@ -1310,6 +1314,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		addListeners();
 		
+		setIcons();
 		setLabels();
 
 		sizeSubscene();
