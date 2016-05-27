@@ -202,7 +202,7 @@ public class Window3DController {
 	private final Rotate rotateZ;
 
 	// Scene Elements stuff
-	private boolean renderGeometryFlag;
+	private boolean defaultEmbryoFlag;
 	private SceneElementsList sceneElementsList;
 	private ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
@@ -313,7 +313,7 @@ public class Window3DController {
 		productionInfo = info;
 		this.connectome = connectome;
 		
-		this.renderGeometryFlag = renderGeometryFlag;
+		this.defaultEmbryoFlag = renderGeometryFlag;
 
 		startTime = productionInfo.getDefaultStartTime();
 
@@ -1243,11 +1243,11 @@ public class Window3DController {
 		totalNuclei.set(cellNames.length);
 
 		spheres = new Sphere[cellNames.length];
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			meshes = new MeshView[meshNames.length];
 		}
 
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// Start scene element list, find scene elements present at time, build
 			// and meshes
 			// empty meshes and scene element references from last rendering. Same
@@ -1290,7 +1290,7 @@ public class Window3DController {
 
 		for (String label : allLabels) {
 
-			if (renderGeometryFlag) {
+			if (defaultEmbryoFlag) {
 				for (int i = 0; i < currentSceneElements.size(); i++) {
 					if (!currentLabels.contains(label)
 							&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
@@ -1329,7 +1329,7 @@ public class Window3DController {
 				if (note.hasLocationError() || note.hasEntityNameError())
 					note.setTagDisplay(Display.OVERLAY);
 
-				if (renderGeometryFlag) {
+				if (defaultEmbryoFlag) {
 					// make mesh views for scene elements from note resources
 					if (note.hasSceneElements()) {
 						for (SceneElement se : note.getSceneElements()) {
@@ -1402,7 +1402,7 @@ public class Window3DController {
 		// add spheres
 		addCellGeometries(entities);
 
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// add scene element meshes (from notes and from scene elements list)
 			addSceneElementGeometries(entities);
 		}
@@ -1456,7 +1456,7 @@ public class Window3DController {
 	}
 
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// add scene elements from note resources
 			for (Note note : currentNoteMeshMap.keySet()) {
 				list.add(currentNoteMeshMap.get(note));
@@ -1682,7 +1682,7 @@ public class Window3DController {
 	 *         returned).
 	 */
 	private Shape3D getEntityWithName(String name) {
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// mesh view label
 			for (int i = 0; i < currentSceneElements.size(); i++) {
 				if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
@@ -1751,7 +1751,7 @@ public class Window3DController {
 						}
 					}
 				}
-				else if (renderGeometryFlag) {
+				else if (defaultEmbryoFlag) {
 					// structure attachment
 					if (note.attachedToStructure()) {
 						for (int i = 0; i < currentSceneElements.size(); i++) {
@@ -1787,7 +1787,7 @@ public class Window3DController {
 					}
 				}
 				// structure attachment
-				else if (renderGeometryFlag) {
+				else if (defaultEmbryoFlag) {
 					if (note.attachedToStructure()) {
 						for (int i = 0; i < currentSceneElements.size(); i++) {
 							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
@@ -1822,7 +1822,7 @@ public class Window3DController {
 					}
 				}
 				
-				else if (renderGeometryFlag) {
+				else if (defaultEmbryoFlag) {
 					// structure attachment
 					if (note.attachedToStructure()) {
 						for (int i = 0; i < currentSceneElements.size(); i++) {
@@ -1990,7 +1990,7 @@ public class Window3DController {
 
 	public void consultSearchResultsList() {
 		searchedCells = new boolean[cellNames.length];
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			searchedMeshes = new boolean[meshNames.length];
 		}
 		
@@ -2003,7 +2003,7 @@ public class Window3DController {
 				searchedCells[i] = false;
 		}
 
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// look for single celled meshes
 			for (int i = 0; i < meshNames.length; i++) {
 				if (sceneElementsAtTime.get(i).isMulticellular()) {
@@ -2027,7 +2027,7 @@ public class Window3DController {
 	public boolean currentRulesApplyTo(String name) {
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			// get the scene name associated with the cell
 			for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
 				SceneElement currSE = sceneElementsList.getElementsList().get(i);
@@ -2230,7 +2230,7 @@ public class Window3DController {
 	}
 
 	public void printMeshNames() {
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			for (int i = 0; i < meshNames.length; i++)
 				System.out.println(meshNames[i] + CS + meshes[i]);
 		}

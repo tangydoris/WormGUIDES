@@ -262,7 +262,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private MenuItem stopCaptureVideoMenuItem;
 	private BooleanProperty captureVideo;
 	
-	private boolean renderGeometryFlag;
+	private boolean defaultEmbryoFlag;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -337,7 +337,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
 					displayLayer.getRulesList(), window3DController.getColorHash(),
 					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-					window3DController.getSelectedNameLabeled());
+					window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
 
 			treeStage.setScene(new Scene(sp));
 			treeStage.setTitle("LineageTree");
@@ -665,6 +665,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	private void exitApplication() {
 		System.out.println("exiting...");
+		if (!defaultEmbryoFlag) {
+			Platform.exit();
+			return;
+		}
 		System.exit(0);
 	}
 
@@ -682,7 +686,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero(), renderGeometryFlag);
+				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag);
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1251,20 +1255,20 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		
+		if (bundle != null) {					
+			lineageData = (LineageData) bundle.getObject("lineageData");
+			defaultEmbryoFlag = false;
+		} else {
+			lineageData = AceTreeLoader.loadNucFiles();
+			defaultEmbryoFlag = true;
+		}
+		
 		replaceTabsWithDraggableTabs();
 
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
-
-		
-		if (bundle != null) {					
-			lineageData = (LineageData) bundle.getObject("lineageData");
-			renderGeometryFlag = false;
-		} else {
-			lineageData = AceTreeLoader.loadNucFiles();
-			renderGeometryFlag = true;
-		}
 		
 		initLineageTree(lineageData.getAllCellNames());
 		

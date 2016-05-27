@@ -98,11 +98,15 @@ public class SulstonTreePane extends ScrollPane {
 	private final static int timeOffset = 19;
 
 	private EventHandler<MouseEvent> clickHandler;
+	
+	private boolean defaultEmbryoFlag;
 
 	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot,
 			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, ContextMenuController controller,
-			StringProperty selectedNameLabeled) {
+			StringProperty selectedNameLabeled, boolean defaultEmbryoFlag) {
 		super();
+		
+		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
 		clickHandler = new EventHandler<MouseEvent>() {
 			@Override
@@ -357,7 +361,11 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setEndY(iYmin + time.getValue());
 		timeIndicatorBar.setStartY(iYmin + time.getValue());
 		timeIndicator.setY(iYmin + time.getValue());
-		timeIndicator.setText(Integer.toString(time.get() + timeOffset));
+		if (defaultEmbryoFlag) {
+			timeIndicator.setText(Integer.toString(time.get() + timeOffset));
+		} else {
+			timeIndicator.setText(Integer.toString(time.get()));
+		}
 	}
 
 	private void bindLocation(Button plus, ScrollPane s, Pane scontent) {
@@ -453,7 +461,12 @@ public class SulstonTreePane extends ScrollPane {
 		timeIndicatorBar.setId("time");
 
 		// add time indicator
-		timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get() + timeOffset));
+		if (defaultEmbryoFlag) {
+			timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get() + timeOffset));
+		} else {
+			timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get()));
+		}
+		
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");
