@@ -1136,7 +1136,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			initStructuresLayer();
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory, defaultEmbryoFlag);
 		
 
 		window3DController.setStoriesLayer(storiesLayer);
@@ -1326,7 +1326,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		timeSlider.setValue(window3DController.getEndTime());
 		
-		window3DController.initializeWithCannonicalOrientation();
+		//window3DController.initializeWithCannonicalOrientation();
 		
 		viewTreeAction();
 
