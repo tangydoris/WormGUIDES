@@ -99,6 +99,8 @@ public class StoriesLayer {
 	private Window3DController window3DController;
 
 	private BooleanProperty update3D;
+	
+	private boolean defaultEmbryoFlag;
 
 	/**
 	 * Constructure called by {@link RootLayoutController}.
@@ -132,9 +134,11 @@ public class StoriesLayer {
 	 */
 	public StoriesLayer(Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
 			Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
-			Button newStoryButton, Button deleteStoryButton) {
+			Button newStoryButton, Button deleteStoryButton, boolean defaultEmbryoFlag) {
 
 		parentStage = parent;
+		
+		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
 		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -190,7 +194,10 @@ public class StoriesLayer {
 		activeCellProperty = cellNameProperty;
 		cellClickedProperty = window3DController.getCellClicked();
 
-		StoriesLoader.loadConfigFile(stories, timeOffset);
+		if (defaultEmbryoFlag) {
+			StoriesLoader.loadConfigFile(stories, timeOffset);
+		}
+		
 		addBlankStory();
 
 		noteComparator = new Comparator<Note>() {
@@ -204,13 +211,13 @@ public class StoriesLayer {
 				return t1.compareTo(t2);
 			}
 		};
-
+		
 		for (Story story : stories) {
 			story.setComparator(noteComparator);
 			story.sortNotes();
 		}
 
-		setActiveStory(stories.get(0)); // makes lim-4 story default
+		setActiveStory(stories.get(0)); // makes lim-4 story on default embryo, template otherwise
 	}
 
 	/**

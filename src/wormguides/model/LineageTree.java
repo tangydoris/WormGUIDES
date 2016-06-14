@@ -110,7 +110,9 @@ public class LineageTree {
 
 		if (startingNode != null) {
 			parent = addCellHelper(newName, startingNode);
-			parent.getChildren().add(makeTreeItem(newName));
+			if (parent != null) {
+				parent.getChildren().add(makeTreeItem(newName));
+			}
 		}
 	}
 

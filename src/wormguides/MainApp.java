@@ -14,6 +14,7 @@ import javafx.stage.WindowEvent;
 import wormguides.controllers.RootLayoutController;
 //import wormguides.view.RootLayout;
 import wormguides.loaders.ImageLoader;
+import wormguides.model.NucleiMgrAdapterResource;
 
 public class MainApp extends Application {
 
@@ -21,9 +22,9 @@ public class MainApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private RootLayoutController controller;
+	private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
-	public MainApp() {
-	}
+	public MainApp() {}
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -59,6 +60,10 @@ public class MainApp extends Application {
 		// Load root layout from FXML file.
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
+		
+		if (nucleiMgrAdapterResource != null) {
+			loader.setResources(nucleiMgrAdapterResource);
+		}
 
 		controller = new RootLayoutController();
 		controller.setStage(primaryStage);
@@ -81,6 +86,11 @@ public class MainApp extends Application {
 			System.out.println("could not initialize root layout.");
 			e.printStackTrace();
 		}
+	}
+	
+	public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
+		nucleiMgrAdapterResource = nmar;
+		launch(args);
 	}
 
 	public static void main(String[] args) {

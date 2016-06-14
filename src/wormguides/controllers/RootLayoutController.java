@@ -261,6 +261,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private MenuItem stopCaptureVideoMenuItem;
 	private BooleanProperty captureVideo;
+	
+	private boolean defaultEmbryoFlag;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -335,7 +337,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
 					displayLayer.getRulesList(), window3DController.getColorHash(),
 					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-					window3DController.getSelectedNameLabeled());
+					window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
 
 			treeStage.setScene(new Scene(sp));
 			treeStage.setTitle("LineageTree");
@@ -663,6 +665,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	private void exitApplication() {
 		System.out.println("exiting...");
+		if (!defaultEmbryoFlag) {
+			Platform.exit();
+			return;
+		}
 		System.exit(0);
 	}
 
@@ -680,7 +686,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero());
+				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag);
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1122,6 +1128,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					selectedName.set(newValue);
 			}
 		});
+		
 	}
 
 	private void initStoriesLayer() {
@@ -1129,7 +1136,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			initStructuresLayer();
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory, defaultEmbryoFlag);
+		
 
 		window3DController.setStoriesLayer(storiesLayer);
 
@@ -1247,22 +1255,30 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		
+		if (bundle != null) {					
+			lineageData = (LineageData) bundle.getObject("lineageData");
+			defaultEmbryoFlag = false;
+		} else {
+			lineageData = AceTreeLoader.loadNucFiles();
+			defaultEmbryoFlag = true;
+		}
+		
 		replaceTabsWithDraggableTabs();
 
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
-
-		lineageData = AceTreeLoader.loadNucFiles();
+		
 		initLineageTree(lineageData.getAllCellNames());
-
+		
 		assertFXMLNodes();
 
 		initToggleGroup();
 		initDisplayLayer();
 
 		initializeWithLineageData();
-
+		
 		mainTabPane.getSelectionModel().select(storiesTab);
 	}
 
@@ -1284,16 +1300,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
-
+		
 		// connectome
 		initConnectome();
 
 		// structures layer
 		initStructuresLayer();
-
+		
 		// stories layer
 		initStoriesLayer();
-
+		
 		window3DController.setSearchResultsList(Search.getSearchResultsList());
 		searchResultsListView.setItems(Search.getSearchResultsList());
 
@@ -1301,7 +1317,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
 
 		addListeners();
-
+		
 		setIcons();
 		setLabels();
 
@@ -1309,15 +1325,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeInfoPane();
 
 		timeSlider.setValue(window3DController.getEndTime());
-
-		window3DController.initializeWithCannonicalOrientation();
-
+		
+		//window3DController.initializeWithCannonicalOrientation();
+		
 		viewTreeAction();
 
 		captureVideo = new SimpleBooleanProperty(false);
 		if (window3DController != null) {
 			window3DController.setCaptureVideo(captureVideo);
 		}
+		
+
 	}
 
 	/** Default transparency of 'other' entities on startup */
