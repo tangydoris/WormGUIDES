@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
+import wormguides.model.LineageData;
 import wormguides.model.TableLineageData;
 
 /**
@@ -62,7 +64,7 @@ public class AceTreeLoader {
 		}
 
 		// translate all cells to center around (0,0,0)
-		setOriginToZero(tld);
+		setOriginToZero(tld, true);
 
 		return tld;
 	}
@@ -79,7 +81,7 @@ public class AceTreeLoader {
 		return avgZ;
 	}
 
-	private static void setOriginToZero(TableLineageData lineageData) {
+	public static void setOriginToZero(LineageData lineageData, boolean defaultEmbryoFlag) {
 		int totalPositions = 0;
 		double sumX, sumY, sumZ;
 		sumX = 0d;
@@ -103,7 +105,8 @@ public class AceTreeLoader {
 		avgZ = (int) sumZ / totalPositions;
 
 		System.out.println("average nuclei position offsets from zero: " + avgX + ", " + avgY + ", " + avgZ);
-
+		
+		
 		// offset all nuclei x-, y- and z- positions by x, y and z averages
 		lineageData.shiftAllPositions(avgX, avgY, avgZ);
 	}

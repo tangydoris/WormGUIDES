@@ -19,5 +19,7 @@ public interface LineageData {
 	int getLastOccurrenceOf(String name);
 
 	boolean isCellName(String name);
+	
+	public void shiftAllPositions(int x, int y, int z);
 
 }

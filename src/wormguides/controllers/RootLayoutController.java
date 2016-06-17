@@ -666,7 +666,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private void exitApplication() {
 		System.out.println("exiting...");
 		if (!defaultEmbryoFlag) {
-			Platform.exit();
+			treeStage.hide();
+			mainStage.hide();
 			return;
 		}
 		System.exit(0);
@@ -1259,6 +1260,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (bundle != null) {					
 			lineageData = (LineageData) bundle.getObject("lineageData");
 			defaultEmbryoFlag = false;
+			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
 		} else {
 			lineageData = AceTreeLoader.loadNucFiles();
 			defaultEmbryoFlag = true;

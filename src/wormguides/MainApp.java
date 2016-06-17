@@ -3,6 +3,7 @@ package wormguides;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -19,13 +20,14 @@ import wormguides.model.NucleiMgrAdapterResource;
 public class MainApp extends Application {
 
 	private Scene scene;
-	private Stage primaryStage;
+	private static Stage primaryStage;
 	private BorderPane rootLayout;
 	private RootLayoutController controller;
 	private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
 	public MainApp() {}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void start(Stage primaryStage) {
 		System.out.println("start");
@@ -63,6 +65,7 @@ public class MainApp extends Application {
 		
 		if (nucleiMgrAdapterResource != null) {
 			loader.setResources(nucleiMgrAdapterResource);
+			Platform.setImplicitExit(false);
 		}
 
 		controller = new RootLayoutController();
