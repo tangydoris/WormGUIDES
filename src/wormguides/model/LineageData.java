@@ -22,6 +22,7 @@ public interface LineageData {
 	
 	public void shiftAllPositions(int x, int y, int z);
 	
-	public boolean isLineagedEmbryo();
-
+	public boolean isSulstonMode();
+	
+	public void setIsSulstonModeFlag(boolean isSulston);
 }

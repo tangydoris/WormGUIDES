@@ -32,7 +32,17 @@ public class ProductionInfo {
 
 		return nuclearInfo;
 	}
-
+	
+	public boolean getIsSulstonFlag() {
+		String flag = productionInfoData.get(9).get(0);
+		
+		if (flag.toLowerCase().equals(TRUE.toLowerCase())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public int getDefaultStartTime() {
 		return DEFAULT_START_TIME;
 	}
@@ -138,4 +148,5 @@ public class ProductionInfo {
 	}
 
 	private final int DEFAULT_START_TIME = 1;
+	private final static String TRUE = "TRUE";
 }

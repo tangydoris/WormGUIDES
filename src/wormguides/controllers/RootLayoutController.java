@@ -333,28 +333,26 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void viewTreeAction() {
-		if (lineageData.isLineagedEmbryo()) {
-			if (treeStage == null) {
-				treeStage = new Stage();
-				SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
-						displayLayer.getRulesList(), window3DController.getColorHash(),
-						window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-						window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
+		if (treeStage == null) {
+			treeStage = new Stage();
+			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
+				displayLayer.getRulesList(), window3DController.getColorHash(),
+				window3DController.getTimeProperty(), window3DController.getContextMenuController(),
+				window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
 
-				treeStage.setScene(new Scene(sp));
-				treeStage.setTitle("LineageTree");
-				treeStage.initModality(Modality.NONE);
-				treeStage.show();
-				mainStage.show();
-			} else {
-				treeStage.show();
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						((Stage) treeStage.getScene().getWindow()).toFront();
-					}
-				});
-			}
+			treeStage.setScene(new Scene(sp));
+			treeStage.setTitle("LineageTree");
+			treeStage.initModality(Modality.NONE);
+			treeStage.show();
+			mainStage.show();
+		} else {
+			treeStage.show();
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					((Stage) treeStage.getScene().getWindow()).toFront();
+				}
+			});
 		}
 	}
 
@@ -1039,7 +1037,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			Collections.sort(allCellNames);
 		}
 		
-		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
+		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
 		lineageTreeRoot = LineageTree.getRoot();
 	}
 
@@ -1287,6 +1285,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		initProductionInfo();
 		
 		if (bundle != null) {					
 			lineageData = (LineageData) bundle.getObject("lineageData");
@@ -1295,6 +1294,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		} else {
 			lineageData = AceTreeLoader.loadNucFiles();
 			defaultEmbryoFlag = true;
+			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
 		}
 		
 		replaceTabsWithDraggableTabs();
@@ -1302,8 +1302,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
-		
-		initLineageTree(lineageData.getAllCellNames());
 		
 		assertFXMLNodes();
 
@@ -1316,8 +1314,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	public void initializeWithLineageData() {
-		initProductionInfo();
-
+	
+		initLineageTree(lineageData.getAllCellNames());
+		
 		init3DWindow(lineageData);
 		setPropertiesFrom3DWindow();
 

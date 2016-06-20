@@ -452,8 +452,10 @@ public class SulstonTreePane extends ScrollPane {
 		}
 	}
 
-	private int addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
-		int x = recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
+	private void addLines(TreeItem<String> lineageTreeRoot, Pane mainPane) {
+		if (lineageTreeRoot != null) {
+			recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
+		}
 		// add time indicator bar
 		int timevalue = time.getValue();
 		timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax, iYmin + timevalue);
@@ -473,7 +475,6 @@ public class SulstonTreePane extends ScrollPane {
 		mainPane.getChildren().add(timeIndicatorBar);
 		mainPane.getChildren().add(timeIndicator);
 		drawTimeTicks();
-		return x;
 	}
 
 	// retrieves material for use as texture on lines
