@@ -539,7 +539,7 @@ public class SulstonTreePane extends ScrollPane {
 
 		int startTime = data.getFirstOccurrenceOf(cellName);
 		int lastTime = data.getLastOccurrenceOf(cellName);
-		if (startTime < 1)
+		if (startTime < 1 && defaultEmbryoFlag)
 			startTime = 1;
 		int length = ((lastTime - startTime));
 
