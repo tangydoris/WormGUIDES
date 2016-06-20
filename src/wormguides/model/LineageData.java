@@ -21,5 +21,7 @@ public interface LineageData {
 	boolean isCellName(String name);
 	
 	public void shiftAllPositions(int x, int y, int z);
+	
+	public boolean isLineagedEmbryo();
 
 }

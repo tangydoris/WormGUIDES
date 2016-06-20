@@ -301,7 +301,7 @@ public class Window3DController {
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-			int offsetZ, boolean renderGeometryFlag) {
+			int offsetZ, boolean defaultEmbryoFlag) {
 		parentStage = parent;
 
 		this.offsetX = offsetX;
@@ -313,10 +313,14 @@ public class Window3DController {
 		productionInfo = info;
 		this.connectome = connectome;
 		
-		this.defaultEmbryoFlag = renderGeometryFlag;
+		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
-		startTime = productionInfo.getDefaultStartTime();
-
+		if (defaultEmbryoFlag) {
+			startTime = productionInfo.getDefaultStartTime();
+		} else {
+			startTime = 0;
+		}
+		
 		time = new SimpleIntegerProperty(startTime);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -474,7 +478,7 @@ public class Window3DController {
 		colorComparator = new ColorComparator();
 		opacityComparator = new OpacityComparator();
 		
-		if (renderGeometryFlag) {
+		if (defaultEmbryoFlag) {
 			currentSceneElementMeshes = new ArrayList<MeshView>();
 			currentSceneElements = new ArrayList<SceneElement>();
 		}

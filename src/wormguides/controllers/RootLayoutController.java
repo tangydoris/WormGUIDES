@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -332,26 +333,28 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void viewTreeAction() {
-		if (treeStage == null) {
-			treeStage = new Stage();
-			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
-					displayLayer.getRulesList(), window3DController.getColorHash(),
-					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-					window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
+		if (lineageData.isLineagedEmbryo()) {
+			if (treeStage == null) {
+				treeStage = new Stage();
+				SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
+						displayLayer.getRulesList(), window3DController.getColorHash(),
+						window3DController.getTimeProperty(), window3DController.getContextMenuController(),
+						window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
 
-			treeStage.setScene(new Scene(sp));
-			treeStage.setTitle("LineageTree");
-			treeStage.initModality(Modality.NONE);
-			treeStage.show();
-			mainStage.show();
-		} else {
-			treeStage.show();
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					((Stage) treeStage.getScene().getWindow()).toFront();
-				}
-			});
+				treeStage.setScene(new Scene(sp));
+				treeStage.setTitle("LineageTree");
+				treeStage.initModality(Modality.NONE);
+				treeStage.show();
+				mainStage.show();
+			} else {
+				treeStage.show();
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						((Stage) treeStage.getScene().getWindow()).toFront();
+					}
+				});
+			}
 		}
 	}
 
@@ -899,12 +902,22 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void setLabels() {
-		int timeOffset = productionInfo.getMovieTimeOffset();
+		int timeOffset;
+		if (defaultEmbryoFlag) {
+			timeOffset = productionInfo.getMovieTimeOffset();
+		} else {
+			timeOffset = 0;
+		}
 
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+				if (defaultEmbryoFlag) {
+					timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+				} else {
+					timeLabel.setText("~" + (time.get()) + " min");
+				}
+				
 			}
 		});
 		timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
@@ -946,7 +959,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void setSlidersProperties() {
-		timeSlider.setMin(1);
+		if (defaultEmbryoFlag) {
+			timeSlider.setMin(1);
+		} else {
+			timeSlider.setMin(0);
+		}
+		
 		timeSlider.setMax(window3DController.getEndTime());
 
 		opacitySlider.setMin(0);
@@ -1008,6 +1026,19 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initLineageTree(ArrayList<String> allCellNames) {
+		if (!defaultEmbryoFlag) {
+			// remove unlineaged cells
+			for (int i = 0; i < allCellNames.size(); i++) {
+				if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase()) || 
+						allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
+					allCellNames.remove(i--);
+				}
+			}
+			
+			//sort the lineage names that remain
+			Collections.sort(allCellNames);
+		}
+		
 		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
 		lineageTreeRoot = LineageTree.getRoot();
 	}
@@ -1302,6 +1333,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setRulesList(list);
 
 		initSceneElementsList();
+
 		
 		// connectome
 		initConnectome();
@@ -1339,6 +1371,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		
 
 	}
+	
+	private final static String unLineagedStart = "Nuc";
+	private final static String ROOT = "ROOT";
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_OTHERS_OPACITY = 25;

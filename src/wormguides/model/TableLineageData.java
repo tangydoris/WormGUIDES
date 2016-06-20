@@ -140,6 +140,10 @@ public class TableLineageData implements LineageData {
 
 		return out;
 	}
+	
+	public boolean isLineagedEmbryo() {
+		return true; //default embryo
+	}
 
 	public class Frame {
 		private ArrayList<String> names;
