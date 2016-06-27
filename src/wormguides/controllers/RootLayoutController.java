@@ -1231,7 +1231,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				initCases();
 
 			infoWindow = new InfoWindow(window3DController.getStage(), window3DController.getSelectedNameLabeled(),
-					cases, productionInfo, connectome);
+					cases, productionInfo, connectome, defaultEmbryoFlag, lineageData);
 		}
 	}
 
