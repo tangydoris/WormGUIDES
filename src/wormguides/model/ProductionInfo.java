@@ -43,6 +43,10 @@ public class ProductionInfo {
 		}
 	}
 	
+	public int getTotalTimePoints() {
+		return Integer.parseInt(productionInfoData.get(10).get(0));
+	}
+	
 	public int getDefaultStartTime() {
 		return DEFAULT_START_TIME;
 	}

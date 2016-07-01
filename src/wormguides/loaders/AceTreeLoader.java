@@ -23,7 +23,7 @@ public class AceTreeLoader {
 	private static int avgX, avgY, avgZ;
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 
-	public static TableLineageData loadNucFiles() {
+	public static TableLineageData loadNucFiles(int totalTimePoints) {
 		TableLineageData tld = new TableLineageData(allCellNames);
 
 		try {
@@ -31,31 +31,28 @@ public class AceTreeLoader {
 							// reading from JAR --> from dir name first entry
 							// match
 			URL url;
-			int i = 1;
-			for (; i < 10; i++) {
-				url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
-				if (url != null) {
-					process(tld, i, url.openStream());
-				} else {
-					System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
-				}
-			}
-
-			for (; i < 100; i++) {
-				url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
-				if (url != null) {
-					process(tld, i, url.openStream());
-				} else {
-					System.out.println("Could not process file: " + ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
-				}
-			}
-
-			for (; i < 401; i++) {
-				url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + i + ENTRY_EXT);
-				if (url != null) {
-					process(tld, i, url.openStream());
-				} else {
-					System.out.println("Could not process file: " + ENTRY_PREFIX + t + i + ENTRY_EXT);
+			for (int i = 1; i <= totalTimePoints; i++) {
+				if (i < 10) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
+					}
+				} else if (i >= 10 && i < 100) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
+					}
+				} else if (i >= 100) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + i + ENTRY_EXT);
+					}
 				}
 			}
 

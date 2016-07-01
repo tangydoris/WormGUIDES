@@ -38,6 +38,7 @@ public class ProductionInfoLoader {
 		ArrayList<String> cytoshowLinks = new ArrayList<String>();
 		ArrayList<String> movieStartTime = new ArrayList<String>();
 		ArrayList<String> isSulston = new ArrayList<String>();
+		ArrayList<String> totalTimePoints = new ArrayList<String>();
 
 		try {
 			InputStream stream = url.openStream();
@@ -76,6 +77,7 @@ public class ProductionInfoLoader {
 					cytoshowLinks.add(tokenizer.nextToken());
 					movieStartTime.add(tokenizer.nextToken());
 					isSulston.add(tokenizer.nextToken());
+					totalTimePoints.add(tokenizer.nextToken());
 				}
 			}
 
@@ -90,6 +92,7 @@ public class ProductionInfoLoader {
 			productionInfo.add(cytoshowLinks);
 			productionInfo.add(movieStartTime);
 			productionInfo.add(isSulston);
+			productionInfo.add(totalTimePoints);
 
 			return productionInfo;
 
@@ -101,11 +104,11 @@ public class ProductionInfoLoader {
 	}
 
 	// production info file location
-	private final static int NUMBER_OF_FIELDS = 10;
+	private final static int NUMBER_OF_FIELDS = 11;
 	private final static String productionInfoFilePath = "wormguides/model/production_info_file/"
 			+ "Production_Info.csv";
-	private static final String productInfoLine = "Production Information,,,,,,,,,";
-	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,"
-			+ "Segmentation,cytoshow link,Movie start time (min),isSulston?";
+	private static final String productInfoLine = "Production Information,,,,,,,,,,";
+	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,"
+			+ "cytoshow link,Movie start time (min),isSulston?,Total Time Points";
 
 }

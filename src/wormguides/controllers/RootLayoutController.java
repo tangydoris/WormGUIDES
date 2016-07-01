@@ -1292,7 +1292,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			defaultEmbryoFlag = false;
 			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
 		} else {
-			lineageData = AceTreeLoader.loadNucFiles();
+			lineageData = AceTreeLoader.loadNucFiles(productionInfo.getTotalTimePoints());
 			defaultEmbryoFlag = true;
 			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
 		}
