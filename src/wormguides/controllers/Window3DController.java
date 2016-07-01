@@ -160,8 +160,10 @@ public class Window3DController {
 	private static String[] meshNames;
 	private boolean[] searchedCells;
 	private boolean[] searchedMeshes;
-	private Integer[][] positions;
-	private Integer[] diameters;
+//	private Integer[][] positions;
+//	private Integer[] diameters;
+	private Double[][] positions;
+	private Double[] diameters;
 	private DoubleProperty zoom;
 
 	// switching timepoints stuff
@@ -337,8 +339,10 @@ public class Window3DController {
 		meshes = new MeshView[1];
 		cellNames = new String[1];
 		meshNames = new String[1];
-		positions = new Integer[1][3];
-		diameters = new Integer[1];
+//		positions = new Integer[1][3];
+//		diameters = new Integer[1];
+		positions = new Double[1][3];
+		diameters = new Double[1];
 		searchedCells = new boolean[1];
 		searchedMeshes = new boolean[1];
 

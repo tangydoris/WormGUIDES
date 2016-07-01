@@ -35,6 +35,7 @@ public class AceTreeLoader {
 				if (i < 10) {
 					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
 					if (url != null) {
+						System.out.println("adding");
 						process(tld, i, url.openStream());
 					} else {
 						System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
@@ -87,7 +88,7 @@ public class AceTreeLoader {
 
 		// sum up all x-, y- and z-coordinates of nuclei
 		for (int i = 0; i < lineageData.getTotalTimePoints(); i++) {
-			Integer[][] positionsArray = lineageData.getPositions(i);
+			Double[][] positionsArray = lineageData.getPositions(i);
 			for (int j = 1; j < positionsArray.length; j++) {
 				sumX += positionsArray[j][X_POS_IND];
 				sumY += positionsArray[j][Y_POS_IND];
@@ -95,6 +96,15 @@ public class AceTreeLoader {
 				totalPositions++;
 			}
 		}
+//		for (int i = 0; i < lineageData.getTotalTimePoints(); i++) {
+//			Integer[][] positionsArray = lineageData.getPositions(i);
+//			for (int j = 1; j < positionsArray.length; j++) {
+//				sumX += positionsArray[j][X_POS_IND];
+//				sumY += positionsArray[j][Y_POS_IND];
+//				sumZ += positionsArray[j][Z_POS_IND];
+//				totalPositions++;
+//			}
+//		}
 
 		// find average of x-, y- and z-coordinates
 		avgX = (int) sumX / totalPositions;
@@ -133,10 +143,14 @@ public class AceTreeLoader {
 	private static void makeNucleus(TableLineageData tld, int time, String[] tokens) {
 		try {
 			String name = tokens[IDENTITY];
-			int x = Integer.parseInt(tokens[XCOR]);
-			int y = Integer.parseInt(tokens[YCOR]);
-			int z = (int) Math.round(Double.parseDouble(tokens[ZCOR]));
-			int diameter = Integer.parseInt(tokens[DIAMETER]);
+//			int x = Integer.parseInt(tokens[XCOR]);
+//			int y = Integer.parseInt(tokens[YCOR]);
+//			int z = (int) Math.round(Double.parseDouble(tokens[ZCOR]));
+			
+			double x = Double.parseDouble(tokens[XCOR]);
+			double y = Double.parseDouble(tokens[YCOR]);
+			double z = Double.parseDouble(tokens[ZCOR]);
+			double diameter = Double.parseDouble(tokens[DIAMETER]);
 
 			tld.addNucleus(time, name, x, y, z, diameter);
 
