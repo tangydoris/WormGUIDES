@@ -35,7 +35,6 @@ public class AceTreeLoader {
 				if (i < 10) {
 					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
 					if (url != null) {
-						System.out.println("adding");
 						process(tld, i, url.openStream());
 					} else {
 						System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
