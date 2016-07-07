@@ -2833,7 +2833,8 @@ public class Window3DController {
 	 * The scale of the subscene z-coordinate axis so that the embryo does not
 	 * appear flat and squished.
 	 */
-	private final double Z_SCALE = 5;
+//	private final double Z_SCALE = 5;
+	private final double Z_SCALE = 1;
 	/** The scale of the subscene x-coordinate axis. */
 	private final double X_SCALE = 1;
 	/** The scale of the subscene y-coordinate axis. */
