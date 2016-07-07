@@ -688,7 +688,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag);
+				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag, 
+				productionInfo.getXScale(), productionInfo.getYScale(), productionInfo.getZScale());
+		
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());

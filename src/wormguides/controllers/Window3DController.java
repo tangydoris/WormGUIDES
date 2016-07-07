@@ -273,6 +273,11 @@ public class Window3DController {
 	private DoubleProperty rotateZAngle;
 
 	private Quaternion quaternion;
+	
+	// scales of the subscene coordinate axis --> from ProductionInfo.csv
+	private double X_SCALE;
+	private double Y_SCALE;
+	private double Z_SCALE;
 
 	/**
 	 * Window3DController class constructor called by
@@ -303,7 +308,7 @@ public class Window3DController {
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-			int offsetZ, boolean defaultEmbryoFlag) {
+			int offsetZ, boolean defaultEmbryoFlag, int X_SCALE, int Y_SCALE, int Z_SCALE) {
 		parentStage = parent;
 
 		this.offsetX = offsetX;
@@ -544,6 +549,11 @@ public class Window3DController {
 		this.bringUpInfoProperty = bringUpInfoProperty;
 
 		initializeUpdate3D();
+		
+		// set up the scaling values
+		this.X_SCALE = X_SCALE;
+		this.Y_SCALE = Y_SCALE;
+		this.Z_SCALE = Z_SCALE;
 	}
 
 	public void initializeWithCannonicalOrientation() {
@@ -2829,16 +2839,6 @@ public class Window3DController {
 
 	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
 
-	/**
-	 * The scale of the subscene z-coordinate axis so that the embryo does not
-	 * appear flat and squished.
-	 */
-//	private final double Z_SCALE = 5;
-	private final double Z_SCALE = 1;
-	/** The scale of the subscene x-coordinate axis. */
-	private final double X_SCALE = 1;
-	/** The scale of the subscene y-coordinate axis. */
-	private final double Y_SCALE = 1;
 	/** Text size scale used for the rendering of billboard notes. */
 	private final double BILLBOARD_SCALE = 0.9;
 

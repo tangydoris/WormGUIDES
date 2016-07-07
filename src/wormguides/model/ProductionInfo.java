@@ -47,6 +47,18 @@ public class ProductionInfo {
 		return Integer.parseInt(productionInfoData.get(10).get(0));
 	}
 	
+	public int getXScale() {
+		return Integer.parseInt(productionInfoData.get(11).get(0));
+	}
+	
+	public int getYScale() {
+		return Integer.parseInt(productionInfoData.get(12).get(0));
+	}
+	
+	public int getZScale() {
+		return Integer.parseInt(productionInfoData.get(13).get(0));
+	}
+	
 	public int getDefaultStartTime() {
 		return DEFAULT_START_TIME;
 	}
