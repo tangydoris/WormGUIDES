@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import wormguides.model.LineageData;
+import wormguides.model.ProductionInfo;
 import wormguides.model.TableLineageData;
 
 /**
@@ -23,15 +24,16 @@ public class AceTreeLoader {
 	private static int avgX, avgY, avgZ;
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 
-	public static TableLineageData loadNucFiles(int totalTimePoints) {
-		TableLineageData tld = new TableLineageData(allCellNames);
+	public static TableLineageData loadNucFiles(ProductionInfo productionInfo) {
+		TableLineageData tld = new TableLineageData(allCellNames,
+				productionInfo.getXScale(), productionInfo.getYScale(), productionInfo.getZScale());
 
 		try {
 			tld.addFrame(); // accounts for first tld.addFrame() added when
 							// reading from JAR --> from dir name first entry
 							// match
 			URL url;
-			for (int i = 1; i <= totalTimePoints; i++) {
+			for (int i = 1; i <= productionInfo.getTotalTimePoints(); i++) {
 				if (i < 10) {
 					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
 					if (url != null) {

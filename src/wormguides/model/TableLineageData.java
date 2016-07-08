@@ -13,14 +13,19 @@ public class TableLineageData implements LineageData {
 	private ArrayList<Frame> timeFrames;
 	private ArrayList<String> allCellNames;
 	private boolean isSulston;
+	private double[] xyzScale;
 
 	public TableLineageData() {
-		this(new ArrayList<String>());
+		this(new ArrayList<String>(), 1., 1., 1.);
 	}
 
-	public TableLineageData(ArrayList<String> allCellNames) {
+	public TableLineageData(ArrayList<String> allCellNames, double X_SCALE, double Y_SCALE, double Z_SCALE) {
 		timeFrames = new ArrayList<Frame>();
 		this.allCellNames = allCellNames;
+		this.xyzScale = new double[3];
+		xyzScale[0] = X_SCALE;
+		xyzScale[1] = Y_SCALE;
+		xyzScale[2] = Z_SCALE;
 	}
 
 	@Override
@@ -290,6 +295,11 @@ public class TableLineageData implements LineageData {
 		}
 
 		private final static String NEWLINE = "\n";
+	}
+
+	@Override
+	public double[] getXYZScale() {
+		return this.xyzScale;
 	}
 
 }

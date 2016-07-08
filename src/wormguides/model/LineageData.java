@@ -29,4 +29,6 @@ public interface LineageData {
 	public boolean isSulstonMode();
 	
 	public void setIsSulstonModeFlag(boolean isSulston);
+	
+	public double[] getXYZScale();
 }

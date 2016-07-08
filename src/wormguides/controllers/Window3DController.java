@@ -308,7 +308,7 @@ public class Window3DController {
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-			int offsetZ, boolean defaultEmbryoFlag, int X_SCALE, int Y_SCALE, int Z_SCALE) {
+			int offsetZ, boolean defaultEmbryoFlag, double X_SCALE, double Y_SCALE, double Z_SCALE) {
 		parentStage = parent;
 
 		this.offsetX = offsetX;
@@ -551,9 +551,16 @@ public class Window3DController {
 		initializeUpdate3D();
 		
 		// set up the scaling values
-		this.X_SCALE = X_SCALE;
-		this.Y_SCALE = Y_SCALE;
-		this.Z_SCALE = Z_SCALE;
+		/**
+		 * to convert from microns to pixel values, we set x,y = 1 and z = ratio of z to original y 
+		 */
+		if (X_SCALE != Y_SCALE) { // note that X_SCALE and Y_SCALE are not the same
+			System.err.println("X_SCALE does not equal Y_SCALE - using ratio of Z to X for Z_SCALE value in pixels" + "\n" + "X, Y should be the same value");
+		}
+		
+		this.X_SCALE = 1;
+		this.Y_SCALE = 1;
+		this.Z_SCALE = Z_SCALE / X_SCALE;
 	}
 
 	public void initializeWithCannonicalOrientation() {
