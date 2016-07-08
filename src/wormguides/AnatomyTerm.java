@@ -29,6 +29,7 @@ public enum AnatomyTerm {
 		return this.description;
 	}
 
+	@Override
 	public String toString() {
 		return getTerm() + ": " + getDescription();
 	}

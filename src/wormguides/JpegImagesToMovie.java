@@ -238,6 +238,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 	/**
 	 * Controller Listener.
 	 */
+	@Override
 	public void controllerUpdate(ControllerEvent evt) {
 
 		if (evt instanceof ConfigureCompleteEvent ||
@@ -280,6 +281,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 	/**
 	 * Event handler for the file writer.
 	 */
+	@Override
 	public void dataSinkUpdate(DataSinkEvent evt) {
 
 		if (evt instanceof EndOfStreamEvent) {
@@ -345,9 +347,11 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 			streams[0] = new ImageSourceStream(width, height, frameRate, images);
 		}
 
+		@Override
 		public void setLocator(MediaLocator source) {
 		}
 
+		@Override
 		public MediaLocator getLocator() {
 			return null;
 		}
@@ -356,25 +360,31 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		 * Content type is of RAW since we are sending buffers of video
 		 * frames without a container format.
 		 */
+		@Override
 		public String getContentType() {
 			return ContentDescriptor.RAW;
 		}
 
+		@Override
 		public void connect() {
 		}
 
+		@Override
 		public void disconnect() {
 		}
 
+		@Override
 		public void start() {
 		}
 
+		@Override
 		public void stop() {
 		}
 
 		/**
 		 * Return the ImageSourceStreams.
 		 */
+		@Override
 		public PullBufferStream[] getStreams() {
 			return streams;
 		}
@@ -384,14 +394,17 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		 * frames and frame rate.  But for the purpose of this program,
 		 * it's not necessary.
 		 */
+		@Override
 		public Time getDuration() {
 			return DURATION_UNKNOWN;
 		}
 
+		@Override
 		public Object[] getControls() {
 			return new Object[0];
 		}
 
+		@Override
 		public Object getControl(String type) {
 			return null;
 		}
@@ -426,6 +439,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		/**
 		 * We should never need to block assuming data are read from files.
 		 */
+		@Override
 		public boolean willReadBlock() {
 			return false;
 		}
@@ -434,6 +448,7 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		 * This is called from the Processor to read a frame worth
 		 * of video data.
 		 */
+		@Override
 		public void read(Buffer buf) throws IOException {
 
 			// Check if we've finished all the frames.
@@ -495,26 +510,32 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 		/**
 		 * Return the format of each video frame.  That will be JPEG.
 		 */
+		@Override
 		public Format getFormat() {
 			return format;
 		}
 
+		@Override
 		public ContentDescriptor getContentDescriptor() {
 			return new ContentDescriptor(ContentDescriptor.RAW);
 		}
 
+		@Override
 		public long getContentLength() {
 			return 0;
 		}
 
+		@Override
 		public boolean endOfStream() {
 			return ended;
 		}
 
+		@Override
 		public Object[] getControls() {
 			return new Object[0];
 		}
 
+		@Override
 		public Object getControl(String type) {
 			return null;
 		}

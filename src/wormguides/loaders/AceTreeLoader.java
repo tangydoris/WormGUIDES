@@ -127,8 +127,10 @@ public class AceTreeLoader {
 			String[] tokens = new String[TOKEN_ARRAY_SIZE];
 			StringTokenizer tokenizer = new StringTokenizer(line, ",");
 			int k = 0;
-			while (tokenizer.hasMoreTokens())
+			while (tokenizer.hasMoreTokens()) {
 				tokens[k++] = tokenizer.nextToken().trim();
+				
+			}
 
 			int valid = Integer.parseInt(tokens[VALID]);
 			if (valid == 1) {

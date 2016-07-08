@@ -27,7 +27,7 @@ public class LineageTree {
 	public LineageTree(String[] allCellNames, boolean isSulston) {
 		this.allCellNames = allCellNames;
 		
-		this.isSulston = isSulston;
+		LineageTree.isSulston = isSulston;
 		if (isSulston) {
 			root = new TreeItem<String>("P0");
 			// names of the cell added to tree upon initialization

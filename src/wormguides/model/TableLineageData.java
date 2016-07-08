@@ -23,6 +23,7 @@ public class TableLineageData implements LineageData {
 		this.allCellNames = allCellNames;
 	}
 
+	@Override
 	public void shiftAllPositions(int x, int y, int z) {
 		for (int i = 0; i < timeFrames.size(); i++) {
 			timeFrames.get(i).shiftPositions(x, y, z);
@@ -85,6 +86,7 @@ public class TableLineageData implements LineageData {
 //		return timeFrames.get(time).getDiameters();
 //	}
 
+	@Override
 	public int getTotalTimePoints() {
 		return timeFrames.size();
 	}
@@ -122,6 +124,7 @@ public class TableLineageData implements LineageData {
 //		}
 //	}
 
+	@Override
 	public int getFirstOccurrenceOf(String name) {
 		int time = Integer.MIN_VALUE;
 		name = name.trim();
@@ -137,6 +140,7 @@ public class TableLineageData implements LineageData {
 		return time;
 	}
 
+	@Override
 	public int getLastOccurrenceOf(String name) {
 		name = name.trim();
 		int time = getFirstOccurrenceOf(name);
@@ -156,6 +160,7 @@ public class TableLineageData implements LineageData {
 		return time + 1;
 	}
 
+	@Override
 	public boolean isCellName(String name) {
 		name = name.trim();
 		for (String cell : allCellNames) {
@@ -165,6 +170,7 @@ public class TableLineageData implements LineageData {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		String out = "";
 		int totalFrames = getTotalTimePoints();
@@ -174,10 +180,12 @@ public class TableLineageData implements LineageData {
 		return out;
 	}
 	
+	@Override
 	public boolean isSulstonMode() {
 		return isSulston; //default embryo
 	}
 	
+	@Override
 	public void setIsSulstonModeFlag(boolean isSulston) {
 		this.isSulston = isSulston;
 	}
@@ -271,6 +279,7 @@ public class TableLineageData implements LineageData {
 //			return diametersArray;
 //		}
 
+		@Override
 		public String toString() {
 			String out = "";
 			String[] names = getNames();

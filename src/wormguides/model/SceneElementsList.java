@@ -215,6 +215,7 @@ public class SceneElementsList {
 		return sceneElements;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("scene elements list:\n");
 		for (SceneElement se : elementsList) {

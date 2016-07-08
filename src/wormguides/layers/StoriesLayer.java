@@ -620,6 +620,7 @@ public class StoriesLayer {
 	 * @return A {@link String} representation of all stories visible in the
 	 *         'Stories' tab
 	 */
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("Stories:\n");
 		for (int i = 0; i < stories.size(); i++) {
