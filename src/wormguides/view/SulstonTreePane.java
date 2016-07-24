@@ -485,9 +485,9 @@ public class SulstonTreePane extends ScrollPane {
 			for (Rule rule : rules) {
 				
 				//this occurs because the wormbase search thread hasn't finished yet
-				if (rule.getSearchType().equals(SearchType.GENE) && rule.getCells().isEmpty()) {
-					
-				}
+//				if (rule.getSearchType().equals(SearchType.GENE) && rule.getCells().isEmpty()) {
+//					
+//				}
 				
 				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname)) {
 					colors.add(rule.getColor());
