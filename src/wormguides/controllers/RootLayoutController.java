@@ -190,6 +190,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private CheckBox uniformSizeCheckBox;
 	@FXML
+	private Button clearAllLabelsButton;
+	@FXML
 	private Slider opacitySlider;
 
 	// Structures tab
@@ -706,6 +708,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.addListenerToOpacitySlider(opacitySlider);
 
 		uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
+		clearAllLabelsButton.setOnAction(window3DController.getClearAllLabelsButtonListener());
 
 		cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
 		cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
@@ -1129,6 +1132,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		assert (displayedStoryDescription != null);
 
 		assert (uniformSizeCheckBox != null);
+		assert (clearAllLabelsButton != null);
 		assert (opacitySlider != null);
 
 		assert (addStructureRuleBtn != null);

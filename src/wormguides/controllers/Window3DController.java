@@ -2601,6 +2601,17 @@ public class Window3DController {
 			}
 		};
 	}
+	
+	public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				allLabels.clear();
+				currentLabels.clear();
+				buildScene();
+			}		
+		};
+	}
 
 	public EventHandler<ActionEvent> getUpdate3DListener() {
 		return new EventHandler<ActionEvent>() {
