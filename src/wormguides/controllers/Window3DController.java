@@ -2551,11 +2551,20 @@ public class Window3DController {
 				hideContextPopups();
 
 				double z = zoom.get();
-				z -= 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
+				/**
+				 * Workaround to avoid JavaFX bug --> stop zoom at 0
+				 * As of July 8, 2016
+				 * Noted by: Braden Katzman
+				 * 
+				 * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of passing through it
+				 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes 
+				 * appear, surrounded w/ artifacts.
+				 */
+				 if (z >= 0.25) {
+					 z -= 0.25;
+				 } else if (z < 0) {
+					 z = 0;
+				 }
 
 				zoom.set(z);
 			}
@@ -2570,10 +2579,6 @@ public class Window3DController {
 
 				double z = zoom.get();
 				z += 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
 
 				zoom.set(z);
 			}
