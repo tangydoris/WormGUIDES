@@ -315,7 +315,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void menuCloseAction() {
-		promptStorySave();
+		initCloseApplication();
 	}
 
 	@FXML
@@ -622,6 +622,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	}
 	// ----- End menu items and buttons listeners -----
+	
+	public void initCloseApplication() {
+		// check if there is an active story to prompt save dialog
+		if (storiesLayer.getActiveStory() != null) {
+			promptStorySave();
+		} else {
+			exitApplication();
+		}
+		
+	}
 
 	public void promptStorySave() {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
@@ -660,12 +670,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 				exitSavePopup.setAutoFix(true);
 			}
-
+			
 			exitSavePopup.show(mainStage);
 			exitSavePopup.centerOnScreen();
 		}
 	}
 
+	/*
+	 * TODO
+	 * refactor defaultEmbryoFlag --> default model, not where application was opened from
+	 */
 	private void exitApplication() {
 		System.out.println("exiting...");
 		if (!defaultEmbryoFlag) {
