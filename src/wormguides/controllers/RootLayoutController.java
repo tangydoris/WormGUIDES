@@ -190,6 +190,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private CheckBox uniformSizeCheckBox;
 	@FXML
+	private Button clearAllLabelsButton;
+	@FXML
 	private Slider opacitySlider;
 
 	// Structures tab
@@ -313,7 +315,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void menuCloseAction() {
-		promptStorySave();
+		initCloseApplication();
 	}
 
 	@FXML
@@ -620,6 +622,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	}
 	// ----- End menu items and buttons listeners -----
+	
+	public void initCloseApplication() {
+		// check if there is an active story to prompt save dialog
+		if (storiesLayer.getActiveStory() != null) {
+			promptStorySave();
+		} else {
+			exitApplication();
+		}
+		
+	}
 
 	public void promptStorySave() {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
@@ -658,12 +670,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 				exitSavePopup.setAutoFix(true);
 			}
-
+			
 			exitSavePopup.show(mainStage);
 			exitSavePopup.centerOnScreen();
 		}
 	}
 
+	/*
+	 * TODO
+	 * refactor defaultEmbryoFlag --> default model, not where application was opened from
+	 */
 	private void exitApplication() {
 		System.out.println("exiting...");
 		if (!defaultEmbryoFlag) {
@@ -706,6 +722,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.addListenerToOpacitySlider(opacitySlider);
 
 		uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
+		clearAllLabelsButton.setOnAction(window3DController.getClearAllLabelsButtonListener());
 
 		cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
 		cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
@@ -1129,6 +1146,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		assert (displayedStoryDescription != null);
 
 		assert (uniformSizeCheckBox != null);
+		assert (clearAllLabelsButton != null);
 		assert (opacitySlider != null);
 
 		assert (addStructureRuleBtn != null);
