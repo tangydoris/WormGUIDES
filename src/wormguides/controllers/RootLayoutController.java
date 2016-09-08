@@ -425,6 +425,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	
 	@FXML
 	public void saveSearchResultsAction() {
+		ObservableList<String> items = searchResultsListView.getItems();
+		if (!(items.size() > 0)) {
+			System.out.println("no search results to write to file");
+		}
+		
 		Stage fileChooserStage = new Stage();
 		
 		FileChooser fileChooser = new FileChooser();
@@ -434,22 +439,21 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		try  {
 			File output = fileChooser.showSaveDialog(fileChooserStage);
 			
+			// check
 			if (output == null) {
 				System.out.println("error creating file to write search results");
 				return;
 			}
 			
 			FileWriter writer = new FileWriter(output);
-			
-			
-			for (String s : searchResultsListView.getItems()) {
+		
+			for (String s : items) {
 				writer.write(s);
 				writer.write(System.lineSeparator());
 			}
 			
 			writer.flush();
 			writer.close();
-			
 		} catch (IOException e) {
 			System.out.println("IOException thrown writing search results to file");
 			return;

@@ -938,7 +938,7 @@ public class StoriesLayer {
 			titleContainer.setMaxWidth(width);
 			titleContainer.setMinWidth(width);
 
-			expandIcon = new Text("� ");
+			expandIcon = new Text("- ");
 			expandIcon.setPickOnBounds(true);
 			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
@@ -1050,10 +1050,10 @@ public class StoriesLayer {
 		private void expandNote(boolean expanded) {
 			if (expanded) {
 				getChildren().add(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▸", "▾"));
+				expandIcon.setText(expandIcon.getText().replace("â–¸", "â–¾"));
 			} else {
 				getChildren().remove(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▾", "▸"));
+				expandIcon.setText(expandIcon.getText().replace("â–¾", "â–¸"));
 			}
 		}
 	}
