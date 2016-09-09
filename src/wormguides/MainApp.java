@@ -3,6 +3,7 @@ package wormguides;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,17 +15,19 @@ import javafx.stage.WindowEvent;
 import wormguides.controllers.RootLayoutController;
 //import wormguides.view.RootLayout;
 import wormguides.loaders.ImageLoader;
+import wormguides.model.NucleiMgrAdapterResource;
 
 public class MainApp extends Application {
 
 	private Scene scene;
-	private Stage primaryStage;
+	private static Stage primaryStage;
 	private BorderPane rootLayout;
 	private RootLayoutController controller;
+	private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
 
-	public MainApp() {
-	}
+	public MainApp() {}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void start(Stage primaryStage) {
 		System.out.println("start");
@@ -48,9 +51,9 @@ public class MainApp extends Application {
 			public void handle(WindowEvent event) {
 				event.consume();
 
-				// prompt user to save active story on application exit
-				if (controller != null)
-					controller.promptStorySave();
+				if (controller != null) {
+					controller.initCloseApplication();
+				}
 			}
 		});
 	}
@@ -59,6 +62,11 @@ public class MainApp extends Application {
 		// Load root layout from FXML file.
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
+		
+		if (nucleiMgrAdapterResource != null) {
+			loader.setResources(nucleiMgrAdapterResource);
+			Platform.setImplicitExit(false);
+		}
 
 		controller = new RootLayoutController();
 		controller.setStage(primaryStage);
@@ -81,6 +89,11 @@ public class MainApp extends Application {
 			System.out.println("could not initialize root layout.");
 			e.printStackTrace();
 		}
+	}
+	
+	public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
+		nucleiMgrAdapterResource = nmar;
+		launch(args);
 	}
 
 	public static void main(String[] args) {

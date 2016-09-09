@@ -67,8 +67,8 @@ public class RuleEditorController extends AnchorPane implements Initializable {
 	}
 
 	public void disableOptionsForStructureRule() {
-		cellBodyTick.setSelected(true);
-
+		cellBodyLabel.setDisable(true);
+		cellBodyTick.setDisable(true);
 		cellLabel.setDisable(true);
 		cellTick.setDisable(true);
 		ancLabel.setDisable(true);

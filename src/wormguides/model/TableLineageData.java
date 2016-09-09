@@ -12,6 +12,7 @@ public class TableLineageData implements LineageData {
 
 	private ArrayList<Frame> timeFrames;
 	private ArrayList<String> allCellNames;
+	private boolean isSulston;
 
 	public TableLineageData() {
 		this(new ArrayList<String>());
@@ -139,6 +140,14 @@ public class TableLineageData implements LineageData {
 			out += (i + 1) + Frame.NEWLINE + timeFrames.get(i).toString() + Frame.NEWLINE;
 
 		return out;
+	}
+	
+	public boolean isSulstonMode() {
+		return isSulston; //default embryo
+	}
+	
+	public void setIsSulstonModeFlag(boolean isSulston) {
+		this.isSulston = isSulston;
 	}
 
 	public class Frame {

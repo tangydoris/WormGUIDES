@@ -1,8 +1,11 @@
 package wormguides.controllers;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -46,6 +49,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -185,6 +190,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private CheckBox uniformSizeCheckBox;
 	@FXML
+	private Button clearAllLabelsButton;
+	@FXML
 	private Slider opacitySlider;
 
 	// Structures tab
@@ -257,6 +264,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private MenuItem stopCaptureVideoMenuItem;
 	private BooleanProperty captureVideo;
+	
+	private boolean defaultEmbryoFlag;
 
 	// ----- Begin menu items and buttons listeners -----
 	@FXML
@@ -306,7 +315,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@FXML
 	public void menuCloseAction() {
-		promptStorySave();
+		initCloseApplication();
 	}
 
 	@FXML
@@ -329,9 +338,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (treeStage == null) {
 			treeStage = new Stage();
 			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
-					displayLayer.getRulesList(), window3DController.getColorHash(),
-					window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-					window3DController.getSelectedNameLabeled());
+				displayLayer.getRulesList(), window3DController.getColorHash(),
+				window3DController.getTimeProperty(), window3DController.getContextMenuController(),
+				window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
 
 			treeStage.setScene(new Scene(sp));
 			treeStage.setTitle("LineageTree");
@@ -412,6 +421,43 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
+	}
+	
+	@FXML
+	public void saveSearchResultsAction() {
+		ObservableList<String> items = searchResultsListView.getItems();
+		if (!(items.size() > 0)) {
+			System.out.println("no search results to write to file");
+		}
+		
+		Stage fileChooserStage = new Stage();
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
+		
+		try  {
+			File output = fileChooser.showSaveDialog(fileChooserStage);
+			
+			// check
+			if (output == null) {
+				System.out.println("error creating file to write search results");
+				return;
+			}
+			
+			FileWriter writer = new FileWriter(output);
+		
+			for (String s : items) {
+				writer.write(s);
+				writer.write(System.lineSeparator());
+			}
+			
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("IOException thrown writing search results to file");
+			return;
+		}
 	}
 
 	@FXML
@@ -580,6 +626,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	}
 	// ----- End menu items and buttons listeners -----
+	
+	public void initCloseApplication() {
+		// check if there is an active story to prompt save dialog
+		if (storiesLayer.getActiveStory() != null) {
+			promptStorySave();
+		} else {
+			exitApplication();
+		}
+		
+	}
 
 	public void promptStorySave() {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
@@ -618,14 +674,23 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 				exitSavePopup.setAutoFix(true);
 			}
-
+			
 			exitSavePopup.show(mainStage);
 			exitSavePopup.centerOnScreen();
 		}
 	}
 
+	/*
+	 * TODO
+	 * refactor defaultEmbryoFlag --> default model, not where application was opened from
+	 */
 	private void exitApplication() {
 		System.out.println("exiting...");
+		if (!defaultEmbryoFlag) {
+			treeStage.hide();
+			mainStage.hide();
+			return;
+		}
 		System.exit(0);
 	}
 
@@ -643,7 +708,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero());
+				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag);
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -661,6 +726,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.addListenerToOpacitySlider(opacitySlider);
 
 		uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
+		clearAllLabelsButton.setOnAction(window3DController.getClearAllLabelsButtonListener());
 
 		cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
 		cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
@@ -855,12 +921,22 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void setLabels() {
-		int timeOffset = productionInfo.getMovieTimeOffset();
+		int timeOffset;
+		if (defaultEmbryoFlag) {
+			timeOffset = productionInfo.getMovieTimeOffset();
+		} else {
+			timeOffset = 0;
+		}
 
 		time.addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+				if (defaultEmbryoFlag) {
+					timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+				} else {
+					timeLabel.setText("~" + (time.get()) + " min");
+				}
+				
 			}
 		});
 		timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
@@ -902,7 +978,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void setSlidersProperties() {
-		timeSlider.setMin(1);
+		if (defaultEmbryoFlag) {
+			timeSlider.setMin(1);
+		} else {
+			timeSlider.setMin(0);
+		}
+		
 		timeSlider.setMax(window3DController.getEndTime());
 
 		opacitySlider.setMin(0);
@@ -964,7 +1045,20 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void initLineageTree(ArrayList<String> allCellNames) {
-		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]));
+		if (!defaultEmbryoFlag) {
+			// remove unlineaged cells
+			for (int i = 0; i < allCellNames.size(); i++) {
+				if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase()) || 
+						allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
+					allCellNames.remove(i--);
+				}
+			}
+			
+			//sort the lineage names that remain
+			Collections.sort(allCellNames);
+		}
+		
+		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
 		lineageTreeRoot = LineageTree.getRoot();
 	}
 
@@ -1056,6 +1150,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		assert (displayedStoryDescription != null);
 
 		assert (uniformSizeCheckBox != null);
+		assert (clearAllLabelsButton != null);
 		assert (opacitySlider != null);
 
 		assert (addStructureRuleBtn != null);
@@ -1085,6 +1180,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					selectedName.set(newValue);
 			}
 		});
+		
 	}
 
 	private void initStoriesLayer() {
@@ -1092,7 +1188,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			initStructuresLayer();
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory);
+				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory, defaultEmbryoFlag);
+		
 
 		window3DController.setStoriesLayer(storiesLayer);
 
@@ -1156,7 +1253,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				initCases();
 
 			infoWindow = new InfoWindow(window3DController.getStage(), window3DController.getSelectedNameLabeled(),
-					cases, productionInfo, connectome);
+					cases, productionInfo, connectome, defaultEmbryoFlag, lineageData);
 		}
 	}
 
@@ -1210,28 +1307,38 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
+		initProductionInfo();
+		
+		if (bundle != null) {					
+			lineageData = (LineageData) bundle.getObject("lineageData");
+			defaultEmbryoFlag = false;
+			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
+		} else {
+			lineageData = AceTreeLoader.loadNucFiles(productionInfo.getTotalTimePoints());
+			defaultEmbryoFlag = true;
+			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
+		}
+		
 		replaceTabsWithDraggableTabs();
 
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
-
-		lineageData = AceTreeLoader.loadNucFiles();
-		initLineageTree(lineageData.getAllCellNames());
-
+		
 		assertFXMLNodes();
 
 		initToggleGroup();
 		initDisplayLayer();
 
 		initializeWithLineageData();
-
+		
 		mainTabPane.getSelectionModel().select(storiesTab);
 	}
 
 	public void initializeWithLineageData() {
-		initProductionInfo();
-
+	
+		initLineageTree(lineageData.getAllCellNames());
+		
 		init3DWindow(lineageData);
 		setPropertiesFrom3DWindow();
 
@@ -1248,15 +1355,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		initSceneElementsList();
 
+		
 		// connectome
 		initConnectome();
 
 		// structures layer
 		initStructuresLayer();
-
+		
 		// stories layer
 		initStoriesLayer();
-
+		
 		window3DController.setSearchResultsList(Search.getSearchResultsList());
 		searchResultsListView.setItems(Search.getSearchResultsList());
 
@@ -1264,7 +1372,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
 
 		addListeners();
-
+		
 		setIcons();
 		setLabels();
 
@@ -1272,16 +1380,21 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		sizeInfoPane();
 
 		timeSlider.setValue(window3DController.getEndTime());
-
-		window3DController.initializeWithCannonicalOrientation();
-
+		
+		//window3DController.initializeWithCannonicalOrientation();
+		
 		viewTreeAction();
 
 		captureVideo = new SimpleBooleanProperty(false);
 		if (window3DController != null) {
 			window3DController.setCaptureVideo(captureVideo);
 		}
+		
+
 	}
+	
+	private final static String unLineagedStart = "Nuc";
+	private final static String ROOT = "ROOT";
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_OTHERS_OPACITY = 25;

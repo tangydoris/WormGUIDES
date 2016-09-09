@@ -38,6 +38,16 @@ public abstract class CellCase {
 		
 		this.nuclearProductionInfo = nuclearProductionInfo;
 		this.cellShapeProductionInfo = cellShapeProductionInfo;
+		
+		// check if empty --> happens on run from AceTree or other non default embryo
+		// add unknown label
+		if (this.nuclearProductionInfo.size() == 0) {
+			this.nuclearProductionInfo.add("Unknown - non-default embryo");
+		}
+		
+		if (this.cellShapeProductionInfo.size() == 0) {
+			this.cellShapeProductionInfo.add("Unknown - non-default embryo");
+		}
 	}
 	
 	/**

@@ -202,6 +202,7 @@ public class Window3DController {
 	private final Rotate rotateZ;
 
 	// Scene Elements stuff
+	private boolean defaultEmbryoFlag;
 	private SceneElementsList sceneElementsList;
 	private ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
@@ -300,7 +301,7 @@ public class Window3DController {
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-			int offsetZ) {
+			int offsetZ, boolean defaultEmbryoFlag) {
 		parentStage = parent;
 
 		this.offsetX = offsetX;
@@ -311,9 +312,15 @@ public class Window3DController {
 		cellData = data;
 		productionInfo = info;
 		this.connectome = connectome;
+		
+		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
-		startTime = productionInfo.getDefaultStartTime();
-
+		if (defaultEmbryoFlag) {
+			startTime = productionInfo.getDefaultStartTime();
+		} else {
+			startTime = 0;
+		}
+		
 		time = new SimpleIntegerProperty(startTime);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -470,9 +477,11 @@ public class Window3DController {
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
 		opacityComparator = new OpacityComparator();
-
-		currentSceneElementMeshes = new ArrayList<MeshView>();
-		currentSceneElements = new ArrayList<SceneElement>();
+		
+		if (defaultEmbryoFlag) {
+			currentSceneElementMeshes = new ArrayList<MeshView>();
+			currentSceneElements = new ArrayList<SceneElement>();
+		}
 
 		currentNotes = new ArrayList<Note>();
 		currentGraphicNoteMap = new HashMap<Node, Note>();
@@ -1238,41 +1247,46 @@ public class Window3DController {
 		totalNuclei.set(cellNames.length);
 
 		spheres = new Sphere[cellNames.length];
-		meshes = new MeshView[meshNames.length];
-
-		// Start scene element list, find scene elements present at time, build
-		// and meshes
-		// empty meshes and scene element references from last rendering. Same
-		// for story elements
-		if (sceneElementsList != null)
-			meshNames = sceneElementsList.getSceneElementNamesAtTime(requestedTime);
-
-		if (!currentSceneElementMeshes.isEmpty()) {
-			currentSceneElementMeshes.clear();
-			currentSceneElements.clear();
+		if (defaultEmbryoFlag) {
+			meshes = new MeshView[meshNames.length];
 		}
 
-		if (sceneElementsList != null) {
-			sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
-			for (int i = 0; i < sceneElementsAtTime.size(); i++) {
-				// add meshes from each scene element
-				SceneElement se = sceneElementsAtTime.get(i);
-				MeshView mesh = se.buildGeometry(requestedTime - 1);
+		if (defaultEmbryoFlag) {
+			// Start scene element list, find scene elements present at time, build
+			// and meshes
+			// empty meshes and scene element references from last rendering. Same
+			// for story elements
+			if (sceneElementsList != null)
+				meshNames = sceneElementsList.getSceneElementNamesAtTime(requestedTime);
 
-				if (mesh != null) {
-					mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-					mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+			if (!currentSceneElementMeshes.isEmpty()) {
+				currentSceneElementMeshes.clear();
+				currentSceneElements.clear();
+			}
 
-					// add rendered mesh to meshes list
-					currentSceneElementMeshes.add(mesh);
+			if (sceneElementsList != null) {
+				sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
+				for (int i = 0; i < sceneElementsAtTime.size(); i++) {
+					// add meshes from each scene element
+					SceneElement se = sceneElementsAtTime.get(i);
+					MeshView mesh = se.buildGeometry(requestedTime - 1);
 
-					// add scene element to rendered scene element reference for
-					// on click responsiveness
-					currentSceneElements.add(se);
+					if (mesh != null) {
+						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+						mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+
+						// add rendered mesh to meshes list
+						currentSceneElementMeshes.add(mesh);
+
+						// add scene element to rendered scene element reference for
+						// on click responsiveness
+						currentSceneElements.add(se);
+					}
 				}
 			}
+			// End scene element mesh loading/building
 		}
-		// End scene element mesh loading/building
+		
 
 		// Label stuff
 		entityLabelMap.clear();
@@ -1280,11 +1294,13 @@ public class Window3DController {
 
 		for (String label : allLabels) {
 
-			for (int i = 0; i < currentSceneElements.size(); i++) {
-				if (!currentLabels.contains(label)
-						&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
-					currentLabels.add(label);
-					break;
+			if (defaultEmbryoFlag) {
+				for (int i = 0; i < currentSceneElements.size(); i++) {
+					if (!currentLabels.contains(label)
+							&& label.equalsIgnoreCase(normalizeName(currentSceneElements.get(i).getSceneName()))) {
+						currentLabels.add(label);
+						break;
+					}
 				}
 			}
 
@@ -1317,16 +1333,18 @@ public class Window3DController {
 				if (note.hasLocationError() || note.hasEntityNameError())
 					note.setTagDisplay(Display.OVERLAY);
 
-				// make mesh views for scene elements from note resources
-				if (note.hasSceneElements()) {
-					for (SceneElement se : note.getSceneElements()) {
-						MeshView mesh = se.buildGeometry(requestedTime);
+				if (defaultEmbryoFlag) {
+					// make mesh views for scene elements from note resources
+					if (note.hasSceneElements()) {
+						for (SceneElement se : note.getSceneElements()) {
+							MeshView mesh = se.buildGeometry(requestedTime);
 
-						if (mesh != null) {
-							mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-							mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-							mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
-							currentNoteMeshMap.put(note, mesh);
+							if (mesh != null) {
+								mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
+								mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+								mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+								currentNoteMeshMap.put(note, mesh);
+							}
 						}
 					}
 				}
@@ -1388,9 +1406,11 @@ public class Window3DController {
 		// add spheres
 		addCellGeometries(entities);
 
-		// add scene element meshes (from notes and from scene elements list)
-		addSceneElementGeometries(entities);
-
+		if (defaultEmbryoFlag) {
+			// add scene element meshes (from notes and from scene elements list)
+			addSceneElementGeometries(entities);
+		}
+		
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
 
@@ -1440,88 +1460,90 @@ public class Window3DController {
 	}
 
 	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
-		// add scene elements from note resources
-		for (Note note : currentNoteMeshMap.keySet()) {
-			list.add(currentNoteMeshMap.get(note));
-		}
+		if (defaultEmbryoFlag) {
+			// add scene elements from note resources
+			for (Note note : currentNoteMeshMap.keySet()) {
+				list.add(currentNoteMeshMap.get(note));
+			}
 
-		// Consult rules
-		if (!currentSceneElements.isEmpty()) {
-			for (int i = 0; i < currentSceneElements.size(); i++) {
-				SceneElement se = currentSceneElements.get(i);
-				MeshView mesh = currentSceneElementMeshes.get(i);
+			// Consult rules
+			if (!currentSceneElements.isEmpty()) {
+				for (int i = 0; i < currentSceneElements.size(); i++) {
+					SceneElement se = currentSceneElements.get(i);
+					MeshView mesh = currentSceneElementMeshes.get(i);
 
-				// in search mode
-				if (inSearch) {
-					if (cellBodyTicked && searchedMeshes[i])
-						mesh.setMaterial(colorHash.getHighlightMaterial());
-					else
-						mesh.setMaterial(colorHash.getTranslucentMaterial());
-				}
-
-				else {
-					// in regular view mode
-					ArrayList<String> allNames = se.getAllCellNames();
-					String sceneName = se.getSceneName();
-
-					// default white meshes
-					if (allNames.isEmpty()) {
-						mesh.setMaterial(new PhongMaterial(Color.WHITE));
-						mesh.setCullFace(CullFace.NONE);
+					// in search mode
+					if (inSearch) {
+						if (cellBodyTicked && searchedMeshes[i])
+							mesh.setMaterial(colorHash.getHighlightMaterial());
+						else
+							mesh.setMaterial(colorHash.getTranslucentMaterial());
 					}
 
-					// If mesh has with name(s), then process rules (cell or
-					// shape) that apply to it
 					else {
-						ArrayList<Color> colors = new ArrayList<Color>();
-						for (Rule rule : currentRulesList) {
-							if (rule.isMulticellularStructureRule()
-									&& rule.appliesToMulticellularStructure(sceneName)) {
-								colors.add(rule.getColor());
-							}
+						// in regular view mode
+						ArrayList<String> allNames = se.getAllCellNames();
+						String sceneName = se.getSceneName();
 
-							else {
-								for (String name : allNames) {
-									if (rule.appliesToCellBody(name)) {
-										colors.add(rule.getColor());
+						// default white meshes
+						if (allNames.isEmpty()) {
+							mesh.setMaterial(new PhongMaterial(Color.WHITE));
+							mesh.setCullFace(CullFace.NONE);
+						}
+
+						// If mesh has with name(s), then process rules (cell or
+						// shape) that apply to it
+						else {
+							ArrayList<Color> colors = new ArrayList<Color>();
+							for (Rule rule : currentRulesList) {
+								if (rule.isMulticellularStructureRule()
+										&& rule.appliesToMulticellularStructure(sceneName)) {
+									colors.add(rule.getColor());
+								}
+
+								else {
+									for (String name : allNames) {
+										if (rule.appliesToCellBody(name)) {
+											colors.add(rule.getColor());
+										}
 									}
 								}
 							}
-						}
-						Collections.sort(colors, colorComparator);
+							Collections.sort(colors, colorComparator);
 
-						// if any rules applied
-						if (!colors.isEmpty()) {
-							mesh.setMaterial(colorHash.getMaterial(colors));
-						} else {
-							mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+							// if any rules applied
+							if (!colors.isEmpty()) {
+								mesh.setMaterial(colorHash.getMaterial(colors));
+							} else {
+								mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+							}
 						}
 					}
+
+					mesh.setOnMouseEntered(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							spritesPane.setCursor(Cursor.HAND);
+
+							// make label appear
+							String name = normalizeName(se.getSceneName());
+
+							if (!currentLabels.contains(name.toLowerCase()))
+								transientLabel(name, getEntityWithName(name));
+						}
+					});
+					mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
+						@Override
+						public void handle(MouseEvent event) {
+							spritesPane.setCursor(Cursor.DEFAULT);
+
+							// make label disappear
+							removeTransientLabel();
+						}
+					});
+
+					list.add(mesh);
 				}
-
-				mesh.setOnMouseEntered(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						spritesPane.setCursor(Cursor.HAND);
-
-						// make label appear
-						String name = normalizeName(se.getSceneName());
-
-						if (!currentLabels.contains(name.toLowerCase()))
-							transientLabel(name, getEntityWithName(name));
-					}
-				});
-				mesh.setOnMouseExited(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						spritesPane.setCursor(Cursor.DEFAULT);
-
-						// make label disappear
-						removeTransientLabel();
-					}
-				});
-
-				list.add(mesh);
 			}
 		}
 	}
@@ -1664,12 +1686,14 @@ public class Window3DController {
 	 *         returned).
 	 */
 	private Shape3D getEntityWithName(String name) {
-		// mesh view label
-		for (int i = 0; i < currentSceneElements.size(); i++) {
-			if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-					&& currentSceneElementMeshes.get(i) != null
-					&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
-				return currentSceneElementMeshes.get(i);
+		if (defaultEmbryoFlag) {
+			// mesh view label
+			for (int i = 0; i < currentSceneElements.size(); i++) {
+				if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+						&& currentSceneElementMeshes.get(i) != null
+						&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
+					return currentSceneElementMeshes.get(i);
+				}
 			}
 		}
 
@@ -1731,19 +1755,20 @@ public class Window3DController {
 						}
 					}
 				}
-
-				// structure attachment
-				else if (note.attachedToStructure()) {
-					for (int i = 0; i < currentSceneElements.size(); i++) {
-						if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-							MeshView mesh = currentSceneElementMeshes.get(i);
-							if (!entitySpriteMap.containsKey(mesh)) {
-								VBox box = new VBox(3);
-								box.getChildren().add(text);
-								entitySpriteMap.put(mesh, box);
-								spritesPane.getChildren().add(box);
-							} else
-								entitySpriteMap.get(mesh).getChildren().add(text);
+				else if (defaultEmbryoFlag) {
+					// structure attachment
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								MeshView mesh = currentSceneElementMeshes.get(i);
+								if (!entitySpriteMap.containsKey(mesh)) {
+									VBox box = new VBox(3);
+									box.getChildren().add(text);
+									entitySpriteMap.put(mesh, box);
+									spritesPane.getChildren().add(box);
+								} else
+									entitySpriteMap.get(mesh).getChildren().add(text);
+							}
 						}
 					}
 				}
@@ -1766,14 +1791,17 @@ public class Window3DController {
 					}
 				}
 				// structure attachment
-				else if (note.attachedToStructure()) {
-					for (int i = 0; i < currentSceneElements.size(); i++) {
-						if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-							billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+				else if (defaultEmbryoFlag) {
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+							}
 						}
 					}
 				}
 			}
+					
 
 			// BILLBOARD
 			else if (note.isBillboard()) {
@@ -1797,14 +1825,17 @@ public class Window3DController {
 						}
 					}
 				}
-				// structure attachment
-				else if (note.attachedToStructure()) {
-					for (int i = 0; i < currentSceneElements.size(); i++) {
-						if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-							text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
-							double offset = 5;
-							text.getTransforms().addAll(new Translate(offset, offset),
-									new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+				
+				else if (defaultEmbryoFlag) {
+					// structure attachment
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
+								double offset = 5;
+								text.getTransforms().addAll(new Translate(offset, offset),
+										new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+							}
 						}
 					}
 				}
@@ -1963,7 +1994,10 @@ public class Window3DController {
 
 	public void consultSearchResultsList() {
 		searchedCells = new boolean[cellNames.length];
-		searchedMeshes = new boolean[meshNames.length];
+		if (defaultEmbryoFlag) {
+			searchedMeshes = new boolean[meshNames.length];
+		}
+		
 
 		// look for searched cells
 		for (int i = 0; i < cellNames.length; i++) {
@@ -1973,61 +2007,65 @@ public class Window3DController {
 				searchedCells[i] = false;
 		}
 
-		// look for single celled meshes
-		for (int i = 0; i < meshNames.length; i++) {
-			if (sceneElementsAtTime.get(i).isMulticellular()) {
-				searchedMeshes[i] = true;
-				for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
-					if (localSearchResults.contains(name))
-						searchedMeshes[i] &= true;
-					else
-						searchedMeshes[i] &= false;
-				}
-			} else {
-				if (localSearchResults.contains(meshNames[i]))
+		if (defaultEmbryoFlag) {
+			// look for single celled meshes
+			for (int i = 0; i < meshNames.length; i++) {
+				if (sceneElementsAtTime.get(i).isMulticellular()) {
 					searchedMeshes[i] = true;
-				else
-					searchedMeshes[i] = false;
+					for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
+						if (localSearchResults.contains(name))
+							searchedMeshes[i] &= true;
+						else
+							searchedMeshes[i] &= false;
+					}
+				} else {
+					if (localSearchResults.contains(meshNames[i]))
+						searchedMeshes[i] = true;
+					else
+						searchedMeshes[i] = false;
+				}
 			}
 		}
 	}
 
 	public boolean currentRulesApplyTo(String name) {
-		// get the scene name associated with the cell
 		String sceneName = "";
 		ArrayList<String> cells = new ArrayList<String>();
-		for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
-			SceneElement currSE = sceneElementsList.getElementsList().get(i);
+		if (defaultEmbryoFlag) {
+			// get the scene name associated with the cell
+			for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
+				SceneElement currSE = sceneElementsList.getElementsList().get(i);
 
-			// check if multicellular structure --> find match with name in
-			// cells
-			if (currSE.isMulticellular()) {
-				if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
-					sceneName = name;
-					cells = currSE.getAllCellNames(); // save the cells in case
-														// there isn't an
-														// explicit structure
-														// rule but the
-														// structure is still
-														// colored
-				}
-			} else {
-				String sn = sceneElementsList.getElementsList().get(i).getSceneName();
+				// check if multicellular structure --> find match with name in
+				// cells
+				if (currSE.isMulticellular()) {
+					if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
+						sceneName = name;
+						cells = currSE.getAllCellNames(); // save the cells in case
+															// there isn't an
+															// explicit structure
+															// rule but the
+															// structure is still
+															// colored
+					}
+				} else {
+					String sn = sceneElementsList.getElementsList().get(i).getSceneName();
 
-				StringTokenizer st = new StringTokenizer(sn);
-				if (st.countTokens() == 2) {
-					String sceneNameLineage = st.nextToken();
-					if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
-						sceneName = sn;
-						break;
+					StringTokenizer st = new StringTokenizer(sn);
+					if (st.countTokens() == 2) {
+						String sceneNameLineage = st.nextToken();
+						if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
+							sceneName = sn;
+							break;
+						}
 					}
 				}
 			}
+
+			if (sceneName.equals(""))
+				sceneName = name;
 		}
-
-		if (sceneName.equals(""))
-			sceneName = name;
-
+		
 		for (Rule rule : currentRulesList) {
 			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
 				return true;
@@ -2122,35 +2160,6 @@ public class Window3DController {
 				}
 			}
 		}, 0, 1000);
-
-		// time.addListener(new ChangeListener<Number>() {
-		// @Override
-		// public void changed(ObservableValue<? extends Number> observable,
-		// Number oldValue, Number newValue) {
-		// if (captureVideo != null) {
-		// if (captureVideo.get()) {
-		//
-		// WritableImage screenCapture = subscene.snapshot(new
-		// SnapshotParameters(), null);
-		//
-		// try {
-		// File file = new File(frameDirPath + "movieFrame" + count++ +
-		// ".JPEG");
-		//
-		// if (file != null) {
-		// RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture,
-		// null);
-		// ImageIO.write(renderedImage, "JPEG", file);
-		// movieFiles.addElement(file);
-		// }
-		// } catch (Exception e) {
-		// // e.printStackTrace();
-		// }
-		// }
-		// }
-		// }
-		// });
-
 		return true;
 	}
 
@@ -2225,8 +2234,10 @@ public class Window3DController {
 	}
 
 	public void printMeshNames() {
-		for (int i = 0; i < meshNames.length; i++)
-			System.out.println(meshNames[i] + CS + meshes[i]);
+		if (defaultEmbryoFlag) {
+			for (int i = 0; i < meshNames.length; i++)
+				System.out.println(meshNames[i] + CS + meshes[i]);
+		}
 	}
 
 	// sets everything associated with color rules
@@ -2540,11 +2551,20 @@ public class Window3DController {
 				hideContextPopups();
 
 				double z = zoom.get();
-				z -= 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
+				/**
+				 * Workaround to avoid JavaFX bug --> stop zoom at 0
+				 * As of July 8, 2016
+				 * Noted by: Braden Katzman
+				 * 
+				 * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of passing through it
+				 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes 
+				 * appear, surrounded w/ artifacts.
+				 */
+				 if (z >= 0.25) {
+					 z -= 0.25;
+				 } else if (z < 0) {
+					 z = 0;
+				 }
 
 				zoom.set(z);
 			}
@@ -2559,10 +2579,6 @@ public class Window3DController {
 
 				double z = zoom.get();
 				z += 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
 
 				zoom.set(z);
 			}
@@ -2588,6 +2604,17 @@ public class Window3DController {
 				if (!playingMovie.get())
 					setTime(time.get() + 1);
 			}
+		};
+	}
+	
+	public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				allLabels.clear();
+				currentLabels.clear();
+				buildScene();
+			}		
 		};
 	}
 
@@ -2792,9 +2819,9 @@ public class Window3DController {
 		return this.parentStage;
 	}
 
-	private final static double cannonicalOrientationX = -175.959;
-	private final static double cannonicalOrientationY = 177.143;
-	private final static double cannonicalOrientationZ = -11.02;
+	private final static double cannonicalOrientationX = 145.0;
+	private final static double cannonicalOrientationY = -166.0;
+	private final static double cannonicalOrientationZ = 24.0;
 
 	private final String CS = ", ";
 

@@ -24,9 +24,9 @@
                      </font>
                   </Label>
                   <Region prefHeight="26.0" prefWidth="14.0" />
-                  <Slider fx:id="yRotationSlider" max="360.0" min="-360.0" prefHeight="24.0" prefWidth="212.0" />
+                  <Slider max="360.0" min="-360.0" prefHeight="24.0" prefWidth="212.0" fx:id="xRotationSlider" />
                   <Region prefHeight="26.0" prefWidth="18.0" />
-                  <TextField fx:id="rotateYAngleField" prefHeight="25.0" prefWidth="53.0" />
+                  <TextField fx:id="rotateXAngleField" prefHeight="25.0" prefWidth="53.0" />
                </children>
             </HBox>
             <HBox>
@@ -37,9 +37,9 @@
                      </font>
                   </Label>
                   <Region prefHeight="26.0" prefWidth="14.0" />
-                  <Slider max="360.0" min="-360.0" prefHeight="26.0" prefWidth="212.0" fx:id="xRotationSlider" />
+                  <Slider fx:id="yRotationSlider" max="360.0" min="-360.0" prefHeight="26.0" prefWidth="212.0" />
                   <Region prefHeight="26.0" prefWidth="18.0" />
-                  <TextField fx:id="rotateXAngleField" prefHeight="25.0" prefWidth="53.0" />
+                  <TextField fx:id="rotateYAngleField" prefHeight="25.0" prefWidth="53.0" />
                </children>
             </HBox>
             <HBox>
