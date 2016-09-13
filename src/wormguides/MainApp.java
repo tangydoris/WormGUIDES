@@ -12,91 +12,89 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
 import wormguides.controllers.RootLayoutController;
-//import wormguides.view.RootLayout;
 import wormguides.loaders.ImageLoader;
 import wormguides.model.NucleiMgrAdapterResource;
 
 public class MainApp extends Application {
 
-	private Scene scene;
-	private static Stage primaryStage;
-	private BorderPane rootLayout;
-	private RootLayoutController controller;
-	private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
+    private static Stage primaryStage;
+    private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
+    private Scene scene;
+    private BorderPane rootLayout;
+    private RootLayoutController controller;
 
-	public MainApp() {}
+    public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
+        nucleiMgrAdapterResource = nmar;
+        launch(args);
+    }
 
-	@SuppressWarnings("static-access")
-	@Override
-	public void start(Stage primaryStage) {
-		System.out.println("start");
+    public static void main(String[] args) {
+        launch(args);
+    }
 
-		ImageLoader.loadImages();
+    @Override
+    public void start(Stage primaryStage) {
+        System.out.println("start");
 
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("WormGUIDES");
+        ImageLoader.loadImages();
 
-		long start_time = System.nanoTime();
-		initRootLayout();
-		long end_time = System.nanoTime();
-		double difference = (end_time - start_time) / 1e6;
-		System.out.println("root layout init " + difference + "ms");
+        MainApp.primaryStage = primaryStage;
+        MainApp.primaryStage.setTitle("WormGUIDES");
 
-		primaryStage.setResizable(true);
-		primaryStage.show();
+        long start_time = System.nanoTime();
+        initRootLayout();
+        long end_time = System.nanoTime();
+        double difference = (end_time - start_time) / 1e6;
+        System.out.println("root layout init " + difference + "ms");
 
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				event.consume();
+        primaryStage.setResizable(true);
+        primaryStage.show();
 
-				if (controller != null) {
-					controller.initCloseApplication();
-				}
-			}
-		});
-	}
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                event.consume();
 
-	public void initRootLayout() {
-		// Load root layout from FXML file.
-		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
-		
-		if (nucleiMgrAdapterResource != null) {
-			loader.setResources(nucleiMgrAdapterResource);
-			Platform.setImplicitExit(false);
-		}
+                if (controller != null) {
+                    controller.initCloseApplication();
+                }
+            }
+        });
+    }
 
-		controller = new RootLayoutController();
-		controller.setStage(primaryStage);
-		loader.setController(controller);
-		loader.setRoot(controller);
+    public void initRootLayout() {
+        // Load root layout from FXML file.
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
 
-		try {
-			rootLayout = (BorderPane) loader.load();
+        if (nucleiMgrAdapterResource != null) {
+            loader.setResources(nucleiMgrAdapterResource);
+            Platform.setImplicitExit(false);
+        }
 
-			scene = new Scene(rootLayout);
-			primaryStage.setScene(scene);
-			primaryStage.setResizable(true);
-			primaryStage.centerOnScreen();
+        controller = new RootLayoutController();
+        controller.setStage(primaryStage);
+        loader.setController(controller);
+        loader.setRoot(controller);
 
-			Parent root = scene.getRoot();
-			for (Node node : root.getChildrenUnmodifiable())
-				node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+        try {
+            rootLayout = loader.load();
 
-		} catch (IOException e) {
-			System.out.println("could not initialize root layout.");
-			e.printStackTrace();
-		}
-	}
-	
-	public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
-		nucleiMgrAdapterResource = nmar;
-		launch(args);
-	}
+            scene = new Scene(rootLayout);
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(true);
+            primaryStage.centerOnScreen();
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+            Parent root = scene.getRoot();
+            for (Node node : root.getChildrenUnmodifiable()) {
+                node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+            }
+
+        } catch (IOException e) {
+            System.out.println("could not initialize root layout.");
+            e.printStackTrace();
+        }
+    }
 }

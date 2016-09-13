@@ -1,3 +1,4 @@
+AB	P0.a	Embryonic founder cell
 ADAL	ABplapaaaapp	Ring interneurons
 ADAR	ABprapaaaapp	Ring interneurons
 ADEL	ABplapaaaapa	Anterior deirid, sensory neuron, dopaminergic
@@ -87,6 +88,7 @@ BAGL	ABalppappap	Neuron, ciliated ending in head, no supporting cells, associate
 BAGR	ABarappppap	Neuron, ciliated ending in head, no supporting cells, associated with ILso
 BDUL	ABarppaappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles
 BDUR	ABarpppappp	Neuron, process runs along excretory canal and into ring, unique darkly staining synaptic vesicles
+C	P0.ppa	Embryonic founder cell
 CA1	P3.aapa	ABplappaaaaapa or ABprappaaaaapa. Male specific cell, not reconstructed
 CA2	P4aapa	ABprappaaaaapa or ABplappaaaaapa. Male specific cell, not reconstructed
 CA3	P5.aapa	ABplappaapaapa or ABprappaapaapa. Male specific cell, not reconstructed
@@ -124,6 +126,7 @@ CP6	P8.aapp	ABprappappaapp or ABplappappaapp. Male specific motor neuron in vent
 CP7	P9.aapp	ABplapapapaapp or ABprapapapaapp. Male specific motor neuron in ventral cord
 CP8	P10.aapp	ABprapapapaapp or ABplapapapaapp. Male specific interneuron, project into preanal ganglion
 CP9	P11.aapp	ABplapappaaapp. Male specific interneuron, project into preanal ganglion
+D	P0.pppa	Embryonic founder cell
 DA1	ABprppapaap	Ventral cord motor neurons, innervate dorsal muscles
 DA2	ABplppapapa	Ventral cord motor neurons, innervate dorsal muscles
 DA3	ABprppapapa	Ventral cord motor neurons, innervate dorsal muscles
@@ -155,6 +158,7 @@ DX1/2	F.lvda	ABplppppapplvda. Male specific neuron, darkly staining cell body in
 DX1/2	F.rvda	ABplppppapprvda. Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
 DX3/4	U.laa	ABplppppapalaa. Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
 DX3/4	U.raa	ABplppppaparaa. Male specific neuron, darkly staining cell body in pre- anal ganglion, process penetrate basement membrane and contact muscles
+E	P0.pap	Embryonic founder cell
 EF1/2	F.lvdp	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
 EF1/2	F.rvdp	Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
 EF3/4	U.lap	ABplppppapalap. Male specific neuron, large cell body in preanal ganglion, synaptic inputs from ray neurons.
@@ -230,6 +234,7 @@ M5	MSpaaapap	Pharyngeal motorneurons
 MCL	ABalpaaappp	Pharyngeal neurons that synapse onto marginal cells
 MCR	ABarapaappp	Pharyngeal neurons that synapse onto marginal cells
 MI	ABaraappaaa	Pharyngeal motor neuron/interneuron
+MS	P0.paa	Embryonic founder cell
 NSML	ABaraapapaav	Pharyngeal neurosecretory motorneuron, contain serotonin
 NSMR	ABaraapppaav	Pharyngeal neurosecretory motorneuron, contain serotonin
 OLLL	ABalppppapaa	Lateral outer labial neurons
@@ -250,6 +255,8 @@ OLQsoDL	ABarpaaaaal	Quadrant outer labial socket
 OLQsoDR	ABarpaaaaar	Quadrant outer labial socket
 OLQsoVL	ABalppaaapp	Quadrant outer labial socket
 OLQsoVR	ABalaappapp	Quadrant outer labial socket
+P0	Z	Single cell zygote
+P4	P0.pppp	Embryonic founder cell of germ line
 P1/2L	ABplapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
 P1/2R	ABprapaapp	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
 P3/4L	ABplappaaa	Postembryonic blast cells for ventral cord motorneurons, ventral hypodermis, vulva, male preanal ganglion; ventral hypodermis in L1
@@ -312,7 +319,7 @@ PVPL	ABplppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventr
 PVPR	ABprppppaaa	Interneuron, cell body in lumbar ganglion, projects along ventral cord to nerve ring
 PVQL	ABplapppaaa	Interneuron, projects along ventral cord to ring
 PVQR	ABprapppaaa	Interneuron, projects along ventral cord to ring
-PVR	Caappa	Interneuron, projects along ventral cord to ring
+PVR	Caappv	Interneuron, projects along ventral cord to ring
 PVT	ABplpappppa	Interneuron, projects along ventral cord to ring
 PVV	P11.paaa	ABplapappapaaa. Male specific motor neuron, ventral cord
 PVWL	TL.ppa	ABplapppppppa. Interneuron, posterior ventral cord, few synapses
@@ -391,7 +398,7 @@ RIH	ABprpappaaa	Ring interneuron
 RIML	ABplppaapap	Ring motor neuron
 RIMR	ABprppaapap	Ring motor neuron
 RIPL	ABalpapaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring
-RIPR	ABprappaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring
+RIPR	ABarappaaaa	Ring/pharynx interneuron, only direct connection between pharynx and ring
 RIR	ABprpapppaa	Ring interneuron
 RIS	ABprpappapa	Ring interneuron
 RIVL	ABplpaapaaa	Ring interneuron
@@ -529,6 +536,8 @@ XXXL	ABplaaapaa	Embryonic head hypodermal cell
 XXXR	ABarpappaa	Embryonic head hypodermal cell
 Y	ABprpppaaaa	Rectal cell at hatching, becomes PDA in hermaphrodite, postembryonic blast cell in male
 Z1	MSpppaap	Somatic gonad precursor cell
+Z2	P0.ppppp	Germ line precursor cell
+Z3	P0.ppppa	Germ line precursor cell
 Z4	MSappaap	Somatic gonad precursor cell
 Anterior_arcade_DR	ABaraaapppa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
 Anterior_arcade_DL	ABalpaappaa	Interface between pharynx and hypodermis, form anterior part of the buccal cavity
@@ -593,8 +602,8 @@ hyp7	ABarppaapa	Embryonic large hypodermal syncytium
 hyp7	ABarpppapa	Embryonic large hypodermal syncytium
 hyp7	ABplaapppa	Embryonic large hypodermal syncytium
 hyp7	ABplaapppp	Embryonic large hypodermal syncytium
-hyp7	ABplappppa	Embryonic large hypodermal syncytium
-hyp7	ABpraapppa	Embryonic large hypodermal syncytium
+hyp7	AB.plappppa	Embryonic large hypodermal syncytium
+hyp7	AB.praapppa	Embryonic large hypodermal syncytium
 hyp7	ABpraapppp	Embryonic large hypodermal syncytium
 hyp7	ABprappppa	Embryonic large hypodermal syncytium
 hyp7	Caaaaa	Embryonic large hypodermal syncytium
@@ -613,7 +622,7 @@ hyp8/9	ABplpppapap	Tail ventral hypodermis
 hyp8/9	ABprpppapap	Tail ventral hypodermis
 hyp10	ABplppppppp	Tail ventral hypodermis
 hyp10	ABprppppppp	Tail ventral hypodermis
-hyp11	Cpappa	Tail dorsal hypodermis
+hyp11	Cpappv	Tail dorsal hypodermis
 hyp12	P12.pa	Preanal hypodermis
 hyp_hook	P10.papp	Hook
 hyp_hook	P11.ppaa	Hypodermis associated with hook sensillum of male
@@ -647,7 +656,7 @@ m1DR_of_pm1	ABaraappaap	Pharyngeal muscle cell
 m1L_of_pm1	ABaraaaaaap	Pharyngeal muscle cell
 m1R_of_pm1	ABaraaaaapp	Pharyngeal muscle cell
 m1VL_of_pm1	ABalpaaaapa	Pharyngeal muscle cell
-m1VR_of_pm1	ABaraaaaapa	Pharyngeal muscle cell
+m1VR_of_pm1	ABarapaaapa	Pharyngeal muscle cell
 m2DL_of_pm2	ABaraapaapa	Pharyngeal muscle cell
 m2DR_of_pm2	ABaraappapa	Pharyngeal muscle cell
 m2L_of_pm2	ABalpaaapaa	Pharyngeal muscle cell
@@ -665,7 +674,7 @@ m4DR	MSpaaaapp	Pharyngeal muscle cell
 m4L	MSaaapaap	Pharyngeal muscle cell
 m4R	ABaraaapapp	Pharyngeal muscle cell
 m4VL	MSaapaaaa	Pharyngeal muscle cell
-m4VR	MSpapappp	Pharyngeal muscle cell
+m4VR	MSpapaaaa	Pharyngeal muscle cell
 m5DL	MSaaaapap	Pharyngeal muscle cell
 m5DR	MSpaaappa	Pharyngeal muscle cell
 m5L	ABaraapapap	Pharyngeal muscle cell
@@ -726,10 +735,12 @@ VL5_VBW_muscle	Daaaa	Body wall muscle
 DL7_DBW_muscle	Daaap	Body wall muscle
 VL4_VBW_muscle	Daapa	Body wall muscle
 VL6_VBW_muscle	Daapp	Body wall muscle
+body_wall_muscle	Dapaa	Body wall muscle
+body_wall_muscle	Dapap	Body wall muscle
 DL8_DBW_muscle	Dappaa	Body wall muscle
-DL10_DBW_muscle	Daappap	Body wall muscle
-DL12_DBW_muscle	Daapppa	Body wall muscle
-DL14_DBW_muscle	Daapppp	Body wall muscle
+DL10_DBW_muscle	Dappap	Body wall muscle
+DL12_DBW_muscle	Dapppa	Body wall muscle
+DL14_DBW_muscle	Dapppp	Body wall muscle
 VR5_VBW_muscle	Dpaaa	Body wall muscle
 DR7_DBW_muscle	Dpaap	Body wall muscle
 VR4_VBW_muscle	Dpapa	Body wall muscle
