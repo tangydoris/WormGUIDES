@@ -5,4 +5,4 @@ out/
 .project
 *.iml
 
-*.jar
+.DS_Store
