@@ -1,7 +1,6 @@
 package wormguides.models;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /*
  * All times known to data structures begin at 1
@@ -15,28 +14,23 @@ public class TableLineageData implements LineageData {
     private boolean isSulston;
 
     public TableLineageData() {
-        this(new ArrayList<String>());
+        this(new ArrayList<>());
     }
 
     public TableLineageData(ArrayList<String> allCellNames) {
-        timeFrames = new ArrayList<Frame>();
+        timeFrames = new ArrayList<>();
         this.allCellNames = allCellNames;
     }
 
     public void shiftAllPositions(int x, int y, int z) {
-        for (int i = 0; i < timeFrames.size(); i++) {
-            timeFrames.get(i).shiftPositions(x, y, z);
+        for (Frame timeFrame : timeFrames) {
+            timeFrame.shiftPositions(x, y, z);
         }
     }
 
     @Override
     public ArrayList<String> getAllCellNames() {
-        allCellNames.sort(new Comparator<String>() {
-            @Override
-            public int compare(String s0, String s1) {
-                return s0.compareTo(s1);
-            }
-        });
+        allCellNames.sort(String::compareTo);
         return allCellNames;
     }
 
@@ -169,9 +163,9 @@ public class TableLineageData implements LineageData {
         private Integer[] diametersArray;
 
         private Frame() {
-            names = new ArrayList<String>();
-            positions = new ArrayList<Integer[]>();
-            diameters = new ArrayList<Integer>();
+            names = new ArrayList<>();
+            positions = new ArrayList<>();
+            diameters = new ArrayList<>();
         }
 
         /**
@@ -226,8 +220,8 @@ public class TableLineageData implements LineageData {
         public String toString() {
             String out = "";
             String[] names = getNames();
-            for (int i = 0; i < names.length; i++) {
-                out += names[i] + NEWLINE;
+            for (String name : names) {
+                out += name + NEWLINE;
             }
             return out;
         }

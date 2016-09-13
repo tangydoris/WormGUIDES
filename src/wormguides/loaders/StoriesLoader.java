@@ -113,25 +113,17 @@ public class StoriesLoader {
 
 						note.setComments(split[COMMENTS_INDEX]);
 
-					} catch (ArrayIndexOutOfBoundsException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
+                    } catch (ArrayIndexOutOfBoundsException | NumberFormatException | LocationStringFormatException |
+                            AttachmentTypeEnumException e) {
+                        System.out.println(e.toString());
+                        System.out.println(line);
 					} catch (TagDisplayEnumException e) {
 						System.out.println(e.toString());
 						System.out.println(line);
 						e.printStackTrace();
-					} catch (AttachmentTypeEnumException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					} catch (LocationStringFormatException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
-					} catch (NumberFormatException e) {
-						System.out.println(e.toString());
-						System.out.println(line);
 					}
-				}
-			}
+                }
+            }
 
 			reader.close();
 

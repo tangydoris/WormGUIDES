@@ -32,7 +32,7 @@ public class AmphidSensillaTerm extends AnatomyTermCase {
      * @return the cells with 'Amphid' hits
      */
     public ArrayList<String> findAmphidCells() {
-        ArrayList<String> cells = new ArrayList<String>();
+        ArrayList<String> cells = new ArrayList<>();
 
         ArrayList<String> functionalNames = PartsList.getFunctionalNames();
         ArrayList<String> lineageNames = PartsList.getLineageNames();
@@ -61,10 +61,10 @@ public class AmphidSensillaTerm extends AnatomyTermCase {
     /**
      * Sets up the wormbase, google search and textpresso links
      *
-     * @return
+     * @return list of search links
      */
     public ArrayList<String> buildSearchBasedLinks() {
-        ArrayList<String> searchBasedLinks = new ArrayList<String>();
+        ArrayList<String> searchBasedLinks = new ArrayList<>();
 
         //add wormbase link
         searchBasedLinks.add("http://www.wormbase.org/species/all/anatomy_term/WBbt:0005391#01--10");

@@ -24,7 +24,7 @@ public class ProductionInfo {
     }
 
     public ArrayList<String> getNuclearInfo() {
-        ArrayList<String> nuclearInfo = new ArrayList<String>();
+        ArrayList<String> nuclearInfo = new ArrayList<>();
 
         if (productionInfoData.get(0).get(0).equals("all-nuclear positions")) {
             nuclearInfo.add(productionInfoData.get(3).get(0) + ", " + productionInfoData.get(2)
@@ -64,7 +64,7 @@ public class ProductionInfo {
     }
 
     public ArrayList<String> getCellShapeData(String queryCell) {
-        ArrayList<String> cellShapeData = new ArrayList<String>();
+        ArrayList<String> cellShapeData = new ArrayList<>();
 
         for (int i = 0; i < productionInfoData.get(0).size(); i++) {
             String cells = productionInfoData.get(0).get(i);
@@ -129,8 +129,8 @@ public class ProductionInfo {
         int rows = productionInfoData.get(0).size();
         for (int i = 0; i < rows; i++) {
             HTMLNode tr = new HTMLNode("tr");
-            for (int k = 0; k < productionInfoData.size(); k++) {
-                String data = productionInfoData.get(k).get(i);
+            for (ArrayList<String> aProductionInfoData : productionInfoData) {
+                String data = aProductionInfoData.get(i);
                 HTMLNode td = new HTMLNode("td", "", "", data);
                 tr.addChild(td);
             }

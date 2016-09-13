@@ -18,7 +18,7 @@ import javafx.scene.text.TextAlignment;
  * text and two buttons, yes and no. The Strings for these three components are
  * set upon initialization.<br>
  * <br>
- * Initialized from {@link RootLayoutController} before application exit to save
+ * Initialized from {@link wormguides.controllers.RootLayoutController} before application exit to save
  * the active story.
  * 
  * @author Doris Tang

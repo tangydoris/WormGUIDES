@@ -46,7 +46,7 @@ public class SceneElement {
 
         // make sure there is proper capitalization in cell names
         // specificially "Ab" instead of "AB"
-        ArrayList<String> editedNames = new ArrayList<String>();
+        ArrayList<String> editedNames = new ArrayList<>();
         Iterator<String> iter = cellNames.iterator();
         String name;
         while (iter.hasNext()) {
@@ -64,7 +64,7 @@ public class SceneElement {
             String sceneName, String cellName, String markerName, String imagingSource,
             String resourceLocation, int startTime, int endTime, String comments) {
         this.sceneName = sceneName;
-        this.cellNames = new ArrayList<String>();
+        this.cellNames = new ArrayList<>();
         cellNames.add(cellName);
         this.markerName = markerName;
         this.embryoName = ""; // will fill this field in later?
@@ -251,14 +251,13 @@ public class SceneElement {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder("SceneElement[");
-        sb.append("@scenename=").append(sceneName);
-        sb.append("; @startTime=").append(startTime);
-        sb.append("; @endTime=").append(endTime);
-        sb.append("; @cells=").append(cellNames.toString());
-        sb.append("; @resourceLocation=").append(resourceLocation);
-        sb.append("; @comments=").append(comments);
-        sb.append("]");
-        return sb.toString();
+        String sb = "SceneElement[" + "@scenename=" + sceneName +
+                "; @startTime=" + startTime +
+                "; @endTime=" + endTime +
+                "; @cells=" + cellNames.toString() +
+                "; @resourceLocation=" + resourceLocation +
+                "; @comments=" + comments +
+                "]";
+        return sb;
     }
 }

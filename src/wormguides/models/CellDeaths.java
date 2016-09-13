@@ -22,7 +22,7 @@ public class CellDeaths {
     private static InfoWindowDOM dom;
 
     static {
-        cellDeaths = new ArrayList<String>();
+        cellDeaths = new ArrayList<>();
 
         // build the dom
         dom = new InfoWindowDOM();
@@ -62,10 +62,7 @@ public class CellDeaths {
     }
 
     public static boolean containsCell(String cell) {
-        if (cellDeaths != null) {
-            return cellDeaths.contains(cell.toLowerCase());
-        }
-        return false;
+        return cellDeaths != null && cellDeaths.contains(cell.toLowerCase());
     }
 
     public static String getCellDeathsDOMAsString() {

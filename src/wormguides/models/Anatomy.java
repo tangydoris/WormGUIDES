@@ -25,13 +25,13 @@ public class Anatomy {
     private static ArrayList<String> neurotransmitters;
 
     static {
-        functionalNames = new ArrayList<String>();
-        types = new ArrayList<String>();
-        somaLocations = new ArrayList<String>();
-        neuriteLocations = new ArrayList<String>();
-        morphologicalFeatures = new ArrayList<String>();
-        functions = new ArrayList<String>();
-        neurotransmitters = new ArrayList<String>();
+        functionalNames = new ArrayList<>();
+        types = new ArrayList<>();
+        somaLocations = new ArrayList<>();
+        neuriteLocations = new ArrayList<>();
+        morphologicalFeatures = new ArrayList<>();
+        functions = new ArrayList<>();
+        neurotransmitters = new ArrayList<>();
 
         try {
 
@@ -62,29 +62,29 @@ public class Anatomy {
     }
 
     /**
-     * Checks if the supplied cell has an anatomy description
-     * <p>
-     * If a lineage name is given, it is translated to a functional name first
+     * Checks if the supplied cell has an anatomy description. If a lineage name is given, it is translated to a
+     * functional name first.
      *
-     * @param cell
+     * @param cellName
+     *         name of the cell, lineage or functional
      *
-     * @return
+     * @return true if cell has anatomy, false otherwise
      */
-    public static boolean hasAnatomy(String cell) {
-        cell = checkQueryCell(cell);
+    public static boolean hasAnatomy(String cellName) {
+        cellName = checkQueryCell(cellName);
 
         //check for exact match
         for (String funcName : functionalNames) {
-            if (funcName.equals(cell)) {
+            if (funcName.equals(cellName)) {
                 return true;
             }
         }
 
-        cell = findRootOfCell(cell);
+        cellName = findRootOfCell(cellName);
 
         //check for match with updated cell name
         for (String funcName : functionalNames) {
-            if (funcName.equals(cell)) {
+            if (funcName.equals(cellName)) {
                 return true;
             }
         }
@@ -150,19 +150,20 @@ public class Anatomy {
     /**
      * Provides anatomy info for a given cell
      *
-     * @param cell
+     * @param cellName
+     *         name of the cell
      *
      * @return the anatomy information for the given cell
      */
-    public static ArrayList<String> getAnatomy(String cell) {
-        ArrayList<String> anatomy = new ArrayList<String>();
+    public static ArrayList<String> getAnatomy(String cellName) {
+        ArrayList<String> anatomy = new ArrayList<>();
 
-        if (hasAnatomy(cell)) {
+        if (hasAnatomy(cellName)) {
             int idx = -1;
 
             //exact match
             for (int i = 0; i < functionalNames.size(); i++) {
-                if (functionalNames.get(i).equals(cell)) {
+                if (functionalNames.get(i).equals(cellName)) {
                     idx = i;
                     break;
                 }
@@ -170,11 +171,11 @@ public class Anatomy {
 
             //if no exact match, update cell and search again
             if (idx == -1) {
-                cell = findRootOfCell(cell);
+                cellName = findRootOfCell(cellName);
 
                 //check for match with updated cell name
                 for (int i = 0; i < functionalNames.size(); i++) {
-                    if (functionalNames.get(i).equals(cell)) {
+                    if (functionalNames.get(i).equals(cellName)) {
                         idx = i;
                     }
                 }

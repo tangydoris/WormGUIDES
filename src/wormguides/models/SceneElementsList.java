@@ -8,7 +8,6 @@ package wormguides.models;
  */
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
@@ -31,9 +31,9 @@ public class SceneElementsList {
     // this will eventually be constructed using a .txt file that contains the
     // Scene Element information for the embryo
     public SceneElementsList() {
-        elementsList = new ArrayList<SceneElement>();
-        nameCellsMap = new HashMap<String, ArrayList<String>>();
-        nameCommentsMap = new HashMap<String, String>();
+        elementsList = new ArrayList<>();
+        nameCellsMap = new HashMap<>();
+        nameCommentsMap = new HashMap<>();
 
         buildListFromConfig();
     }
@@ -58,8 +58,6 @@ public class SceneElementsList {
                 processCells();
             }
 
-        } catch (FileNotFoundException e) {
-            System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
         } catch (IOException e) {
             System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
         }
@@ -79,7 +77,7 @@ public class SceneElementsList {
 
                 // BUIILD SCENE ELEMENT
                 // vector of cell names
-                ArrayList<String> cellNames = new ArrayList<String>();
+                ArrayList<String> cellNames = new ArrayList<>();
                 StringTokenizer st = new StringTokenizer(splits[1]);
                 while (st.hasMoreTokens()) {
                     cellNames.add(st.nextToken());
@@ -102,7 +100,6 @@ public class SceneElementsList {
             reader.close();
         } catch (IOException e) {
             System.out.println("Invalid file: '" + CELL_CONFIG_FILE_NAME);
-            return;
         }
     }
 
@@ -126,21 +123,19 @@ public class SceneElementsList {
     }
 
     private ArrayList<String> unpackCells(ArrayList<String> cells) {
-        ArrayList<String> unpackedCells = new ArrayList<String>();
+        ArrayList<String> unpackedCells = new ArrayList<>();
 
-        for (int i = 0; i < cells.size(); i++) {
-            String cell = cells.get(i);
+        for (String cell : cells) {
             // if cell starts with asterisk, recurse. else, add cel
             if (cell.startsWith(asterisk)) {
-                for (int j = 0; j < elementsList.size(); j++) {
-                    SceneElement se = elementsList.get(j);
-
-                    // find the matching resource location
-                    if (se.getResourceLocation().endsWith(cell.substring(1))) {
-                        // recursively unpack matching location's cell list
-                        unpackedCells.addAll(unpackCells(se.getAllCellNames()));
-                    }
-                }
+                // find the matching resource location
+// recursively unpack matching location's cell list
+                elementsList.stream()
+                        .filter(se -> se.getResourceLocation().endsWith(cell.substring(1)))
+                        .forEachOrdered(se -> {
+                            // recursively unpack matching location's cell list
+                            unpackedCells.addAll(unpackCells(se.getAllCellNames()));
+                        });
             } else {
                 // only add cell name entry if not already added
                 if (!unpackedCells.contains(cell)) {
@@ -200,28 +195,22 @@ public class SceneElementsList {
 
     public String[] getSceneElementNamesAtTime(int time) {
         // Add lineage names of all structures at time
-        ArrayList<String> list = new ArrayList<String>();
-        for (SceneElement se : elementsList) {
-            if (se.existsAtTime(time)) {
-                if (se.isMulticellular()) {
-                    list.add(se.getSceneName());
-                } else {
-                    list.add(se.getAllCellNames().get(0));
-                }
+        ArrayList<String> list = new ArrayList<>();
+        elementsList.stream().filter(se -> se.existsAtTime(time)).forEachOrdered(se -> {
+            if (se.isMulticellular()) {
+                list.add(se.getSceneName());
+            } else {
+                list.add(se.getAllCellNames().get(0));
             }
-        }
+        });
 
         return list.toArray(new String[list.size()]);
     }
 
     public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-        ArrayList<SceneElement> sceneElements = new ArrayList<SceneElement>();
-        for (int i = 0; i < elementsList.size(); i++) {
-            SceneElement se = elementsList.get(i);
-            if (se.existsAtTime(time)) {
-                sceneElements.add(se);
-            }
-        }
+        ArrayList<SceneElement> sceneElements = elementsList.stream()
+                .filter(se -> se.existsAtTime(time))
+                .collect(Collectors.toCollection(ArrayList::new));
         return sceneElements;
     }
 
@@ -234,22 +223,18 @@ public class SceneElementsList {
     }
 
     public ArrayList<String> getAllMulticellSceneNames() {
-        ArrayList<String> names = new ArrayList<String>();
-        for (SceneElement se : elementsList) {
-            if (se.isMulticellular() && !names.contains(se)) {
-                names.add(se.getSceneName());
-            }
-        }
+        ArrayList<String> names = new ArrayList<>();
+        elementsList.stream()
+                .filter(se -> se.isMulticellular() && !names.contains(se))
+                .forEachOrdered(se -> names.add(se.getSceneName()));
         return names;
     }
 
     public ArrayList<SceneElement> getMulticellSceneElements() {
-        ArrayList<SceneElement> elements = new ArrayList<SceneElement>();
-        for (SceneElement se : elementsList) {
-            if (se.isMulticellular() && !elements.contains(se)) {
-                elements.add(se);
-            }
-        }
+        ArrayList<SceneElement> elements = new ArrayList<>();
+        elementsList.stream()
+                .filter(se -> se.isMulticellular() && !elements.contains(se))
+                .forEachOrdered(elements::add);
         return elements;
     }
 

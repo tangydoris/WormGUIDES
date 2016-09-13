@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
 /**
  * This class represents a note that belongs to a story (its parent). A note
@@ -68,12 +66,9 @@ public class Note {
         startTime = endTime = Integer.MIN_VALUE;
         comments = "";
         changedProperty = new SimpleBooleanProperty(false);
-        changedProperty.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    setChanged(false);
-                }
+        changedProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                setChanged(false);
             }
         });
 
@@ -242,9 +237,7 @@ public class Note {
 
     public void addSceneElementsToList(SceneElementsList list) {
         if (list != null && elements != null) {
-            for (SceneElement se : elements) {
-                list.addSceneElement(se);
-            }
+            elements.forEach(list::addSceneElement);
         }
     }
 
@@ -356,7 +349,7 @@ public class Note {
         if (location != null && location.trim().toLowerCase().endsWith(".obj")) {
             resourceLocation = location.trim();
 
-            elements = new ArrayList<SceneElement>();
+            elements = new ArrayList<>();
             SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource, resourceLocation, startTime,
                     endTime + 1, comments);
             se.setLocation(x, y, z);
@@ -413,16 +406,15 @@ public class Note {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Note[").append("@Name='").append(tagName).append("' ");
-        sb.append("@Type=").append(attachmentType).append(" ");
-        sb.append("@Display=").append(tagDisplay).append(" ");
-        sb.append("@Time=").append(startTime).append(", ").append(endTime).append(" ");
-        sb.append("@Location=").append(x).append(", ").append(y).append(", ").append(z).append(" ");
-        sb.append("@Cell='").append(cellName).append("' ");
-        sb.append("@Resource='").append(resourceLocation).append("']");
+        String sb = "Note[" + "@Name='" + tagName + "' " +
+                "@Type=" + attachmentType + " " +
+                "@Display=" + tagDisplay + " " +
+                "@Time=" + startTime + ", " + endTime + " " +
+                "@Location=" + x + ", " + y + ", " + z + " " +
+                "@Cell='" + cellName + "' " +
+                "@Resource='" + resourceLocation + "']";
 
-        return sb.toString();
+        return sb;
     }
 
     public boolean isTagDisplayEnum(String display) {
@@ -441,11 +433,10 @@ public class Note {
     // or if there is no tag display method specified
     // false otherwise
     public boolean isWithoutScope() {
-        if (tagDisplay.equals(Display.BLANK)) {
-            return true;
-        }
-
-        return !tagDisplay.equals(Display.OVERLAY) && attachmentType.equals(Type.CELL) && !isEntitySpecified();
+        return tagDisplay.equals(Display.BLANK)
+                || !tagDisplay.equals(Display.OVERLAY)
+                && attachmentType.equals(Type.CELL)
+                && !isEntitySpecified();
 
     }
 

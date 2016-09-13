@@ -19,7 +19,7 @@ public class EmbryonicAnalogousCells {
 	private static ArrayList<EmbryonicHomology> homologues;
 
 	static {
-		homologues = new ArrayList<EmbryonicHomology>();
+        homologues = new ArrayList<>();
 
 		URL url = EmbryonicAnalogousCells.class.getResource("analogous_cell_file/EmbryonicAnalogousCells.csv");
 

@@ -33,7 +33,7 @@ public class AceTreeLoader {
      */
     private static final int X_POS_IND = 0, Y_POS_IND = 1, Z_POS_IND = 2;
     private static int avgX, avgY, avgZ;
-	private static ArrayList<String> allCellNames = new ArrayList<String>();
+    private static ArrayList<String> allCellNames = new ArrayList<>();
 
 	public static TableLineageData loadNucFiles(int totalTimePoints) {
 		TableLineageData tld = new TableLineageData(allCellNames);
@@ -73,7 +73,7 @@ public class AceTreeLoader {
 		}
 
 		// translate all cells to center around (0,0,0)
-		setOriginToZero(tld, true);
+        setOriginToZero(tld);
 
 		return tld;
 	}
@@ -90,9 +90,9 @@ public class AceTreeLoader {
 		return avgZ;
 	}
 
-	public static void setOriginToZero(LineageData lineageData, boolean defaultEmbryoFlag) {
-		int totalPositions = 0;
-		double sumX, sumY, sumZ;
+    public static void setOriginToZero(LineageData lineageData) {
+        int totalPositions = 0;
+        double sumX, sumY, sumZ;
 		sumX = 0d;
 		sumY = 0d;
 		sumZ = 0d;

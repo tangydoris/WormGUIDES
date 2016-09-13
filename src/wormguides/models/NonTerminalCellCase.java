@@ -10,94 +10,98 @@ import partslist.PartsList;
 
 /**
  * A non terminal cell object which contains the information for the Information Window feature
- * 
- * @author katzmanb
  *
+ * @author katzmanb
  */
 public class NonTerminalCellCase extends CellCase {
 
     private final static String wormatlasURLEXT = "mainframe.htm";
     private String embryonicHomology;
-	private ArrayList<TerminalDescendant> terminalDescendants;
+    private ArrayList<TerminalDescendant> terminalDescendants;
 
-	/**
-     *
-     * @param cellName
-	 * @param nuclearProductionInfo the production information under Nuclear
-	 * @param cellShapeProductionInfo the production information under Cell Shape
-	 */
-	public NonTerminalCellCase(String lineageName, ArrayList<String> nuclearProductionInfo,
-			ArrayList<String> cellShapeProductionInfo) {
-		super(lineageName, nuclearProductionInfo, cellShapeProductionInfo);
+    /**
+     * @param lineageName
+     *         name of the non-terminal cell case
+     * @param nuclearProductionInfo
+     *         the production information under Nuclear
+     * @param cellShapeProductionInfo
+     *         the production information under Cell Shape
+     */
+    public NonTerminalCellCase(
+            String lineageName,
+            ArrayList<String> nuclearProductionInfo,
+            ArrayList<String> cellShapeProductionInfo) {
 
-		// reference embryonic analogues cells db for homology
-		this.embryonicHomology = EmbryonicAnalogousCells.findEmbryonicHomology(getLineageName());
+        super(lineageName, nuclearProductionInfo, cellShapeProductionInfo);
 
-		this.terminalDescendants = buildTerminalDescendants();
+        // reference embryonic analogues cells db for homology
+        this.embryonicHomology = EmbryonicAnalogousCells.findEmbryonicHomology(getLineageName());
 
-		addLink(buildWormatlasLink());
-	}
+        this.terminalDescendants = buildTerminalDescendants();
 
-	/**
-	 * Finds the terminal descendants of the cell using the parts list
+        addLink(buildWormatlasLink());
+    }
+
+    /**
+     * Finds the terminal descendants of the cell using the parts list
      *
      * @return the list of terminal descendants
-	 */
-	private ArrayList<TerminalDescendant> buildTerminalDescendants() {
-		ArrayList<TerminalDescendant> terminalDescendants = new ArrayList<TerminalDescendant>();
+     */
+    private ArrayList<TerminalDescendant> buildTerminalDescendants() {
+        ArrayList<TerminalDescendant> terminalDescendants = new ArrayList<>();
 
-		ArrayList<String> descendantsList = Search.getDescendantsList(getLineageName());
+        ArrayList<String> descendantsList = Search.getDescendantsList(getLineageName());
 
-		// add each descendant as terminal descendant object
-		for (String descendant : descendantsList) {
-			String partsListDescription = PartsList.getDescriptionByLineageName(descendant);
-			if (partsListDescription == null) {
-				if (CellDeaths.containsCell(descendant)) {
-					partsListDescription = "Cell Death";
-				} else {
-					partsListDescription = "";
-				}
-			}
-			terminalDescendants.add(new TerminalDescendant(descendant, partsListDescription));
-		}
+        // add each descendant as terminal descendant object
+        for (String descendant : descendantsList) {
+            String partsListDescription = PartsList.getDescriptionByLineageName(descendant);
+            if (partsListDescription == null) {
+                if (CellDeaths.containsCell(descendant)) {
+                    partsListDescription = "Cell Death";
+                } else {
+                    partsListDescription = "";
+                }
+            }
+            terminalDescendants.add(new TerminalDescendant(descendant, partsListDescription));
+        }
 
-		return terminalDescendants;
-	}
+        return terminalDescendants;
+    }
 
-	private String buildWormatlasLink() {
+    private String buildWormatlasLink() {
         if (getLineageName() == null) {
             return "";
         }
 
-		String URL = wormatlasURL + getLineageName().toUpperCase() + wormatlasURLEXT;
+        String URL = wormatlasURL + getLineageName().toUpperCase() + wormatlasURLEXT;
 
         try {
-			URL url = new URL(URL);
-			HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-			connection.setRequestMethod("GET");
-			connection.connect();
+            URL url = new URL(URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
 
             if (connection.getResponseCode() == 404) {
-				return "";
-			} else if (connection.getResponseCode() == 200) {
-				return URL;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(getLineageName() + " page not found on Wormatlas");
-			return "";
-		}
+                return "";
+            } else if (connection.getResponseCode() == 200) {
+                return URL;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(getLineageName() + " page not found on Wormatlas");
+            return "";
+        }
 
-		return "";
-	}
+        return "";
+    }
 
-	public String getEmbryonicHomology() {
-		return this.embryonicHomology;
-	}
+    public String getEmbryonicHomology() {
+        return this.embryonicHomology;
+    }
 
-	public ArrayList<TerminalDescendant> getTerminalDescendants() {
-		return this.terminalDescendants;
-	}
+    public ArrayList<TerminalDescendant> getTerminalDescendants() {
+        return this.terminalDescendants;
+    }
 
 }
 
@@ -360,7 +364,8 @@ public class NonTerminalCellCase extends CellCase {
 //		//"<em>Source: </em><a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>
 //		
 //		//add the source
-//		String source = "<em>Source:</em> <a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL + "</a>";
+//		String source = "<em>Source:</em> <a href=\"#\" name=\"" + URL + "\" onclick=\"handleLink(this)\">" + URL +
+// "</a>";
 //		references.add(source);
 //		
 //		links.add(URL);
@@ -466,7 +471,8 @@ public class NonTerminalCellCase extends CellCase {
 //					String text = anchor.substring(anchor.indexOf(">") + 1, anchor.substring(1).indexOf("<") + 1);
 //					
 //					// build new anchor
-//					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text + "</a>";
+//					String newAnchor = "<a href=\"#\" name=\"" + src + "\" onclick=\"handleLink(this)\">" + text +
+// "</a>";
 //
 //					
 //					//replace previous anchor
@@ -524,8 +530,15 @@ public class NonTerminalCellCase extends CellCase {
 //	private final static String wormbaseEXT = ";class=Anatomy_term";
 //	private final static String wormatlasURL = "http://www.wormatlas.org/neurons/Individual%20Neurons/";
 //	private final static String wormatlasURLEXT = "mainframe.htm";
-//	private final static String textpressoURL = "http://textpresso-www.cacr.caltech.edu/cgi-bin/celegans/search?searchstring=";
-//	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
+//	private final static String textpressoURL = "http://textpresso-www.cacr.caltech
+// .edu/cgi-bin/celegans/search?searchstring=";
+//	private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;
+// cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;
+// cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;
+// exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;target=title;
+// target=introduction;target=materials;target=results;target=discussion;target=conclusion;target=acknowledgments;
+// target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;authorfilter=;journalfilter=;
+// yearfilter=;docidfilter=;";
 //	private final static String textpressoTitleStr = "Title: </span>";
 //	private final static String textpressoAuthorsStr = "Authors: </span>";
 //	private final static String textpressoYearStr = "Year: </span>";

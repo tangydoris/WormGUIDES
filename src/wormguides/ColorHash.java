@@ -12,7 +12,7 @@ import javafx.scene.paint.PhongMaterial;
 
 /**
  * ColorHash is a number of combinations of Colors mapped to a {@link Material}.
- * {@link Window3DController} and {@link SulstonTreePane} query this class to
+ * {@link wormguides.controllers.Window3DController} and {@link wormguides.view.SulstonTreePane} query this class to
  * find the appropriate color striping to apply to a cell/its lineage. This
  * class also contains a map of the material to the opacity (0.0->1.0) of the
  * least opaque color in a Material. This is used so that the "most opaque"
@@ -31,11 +31,11 @@ public class ColorHash {
 	private HashMap<Double, Material> opacityMaterialHash;
 
 	public ColorHash() {
-		materialHash = new HashMap<ArrayList<Color>, Material>();
-		opacityHash = new HashMap<Material, Double>();
+        materialHash = new HashMap<>();
+		opacityHash = new HashMap<>();
 
-		opacityMaterialHash = new HashMap<Double, Material>();
-		makeOthersMaterial(1.0);
+		opacityMaterialHash = new HashMap<>();
+        makeOthersMaterial(1.0);
 
 		highlightMaterial = makeMaterial(Color.GOLD);
 		translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
@@ -76,7 +76,7 @@ public class ColorHash {
 	}
 
 	public Material makeMaterial(Color color) {
-		ArrayList<Color> colors = new ArrayList<Color>();
+        ArrayList<Color> colors = new ArrayList<>();
 		colors.add(color);
 		return makeMaterial(colors);
 	}
@@ -101,8 +101,7 @@ public class ColorHash {
 			// we want first and last color to be the same because of JavaFX
 			// material wrapping bug
 			copy = new Color[colors.size() + 1];
-			for (int i = 0; i < colors.size(); i++)
-				copy[i] = temp[i];
+            System.arraycopy(temp, 0, copy, 0, colors.size());
 			copy[colors.size()] = temp[0];
 		}
 
@@ -148,11 +147,11 @@ public class ColorHash {
 	}
 
 	public Material getMaterial(ArrayList<Color> colors) {
-		if (colors == null)
-			colors = new ArrayList<Color>();
+        if (colors == null) {
+			colors = new ArrayList<>();
+		}
 
-		if (materialHash.get(colors) == null)
-			materialHash.put(colors, makeMaterial(colors));
+		materialHash.putIfAbsent(colors, makeMaterial(colors));
 
 		return materialHash.get(colors);
 	}

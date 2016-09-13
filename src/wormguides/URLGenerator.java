@@ -8,60 +8,91 @@ public class URLGenerator {
 
 	public static String generateIOS(ArrayList<Rule> rules, int time, double rX, double rY, double rZ, double tX,
 			double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder("wormguides://wormguides/testurlscript?");
-		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
-		builder.append("/iOS/");
-		return builder.toString();
-	}
+        String builder = "wormguides://wormguides/testurlscript?" + generateParameterString(
+                rules,
+                time,
+                rX,
+                rY,
+                rZ,
+                tX,
+                tY,
+                scale,
+                dim) +
+                "/iOS/";
+        return builder;
+    }
 
 	public static String generateAndroid(ArrayList<Rule> rules, int time, double rX, double rY, double rZ, double tX,
 			double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
-		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
-		builder.append("/Android/");
-		return builder.toString();
-	}
+        String builder = "http://scene.wormguides.org/wormguides/testurlscript?" + generateParameterString(
+                rules,
+                time,
+                rX,
+                rY,
+                rZ,
+                tX,
+                tY,
+                scale,
+                dim) +
+                "/Android/";
+        return builder;
+    }
 
 	public static String generateWeb(ArrayList<Rule> rules, int time, double rX, double rY, double rZ, double tX,
 			double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
-		builder.append(generateParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
-		builder.append("/browser/");
-		return builder.toString();
-	}
+        String builder = "http://scene.wormguides.org/wormguides/testurlscript?" + generateParameterString(
+                rules,
+                time,
+                rX,
+                rY,
+                rZ,
+                tX,
+                tY,
+                scale,
+                dim) +
+                "/browser/";
+        return builder;
+    }
 
 	public static String generateInternal(ArrayList<Rule> rules, int time, double rX, double rY, double rZ, double tX,
 			double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder("http://scene.wormguides.org/wormguides/testurlscript?");
-		builder.append(generateInternalParameterString(rules, time, rX, rY, rZ, tX, tY, scale, dim));
-		builder.append("/browser/");
-		return builder.toString();
-	}
+        String builder =
+                "http://scene.wormguides.org/wormguides/testurlscript?" + generateInternalParameterString(
+                        rules,
+                        time,
+                        rX,
+                        rY,
+                        rZ,
+                        tX,
+                        tY,
+                        scale,
+                        dim) +
+                        "/browser/";
+        return builder;
+    }
 
 	private static String generateParameterString(ArrayList<Rule> rules, int time, double rX, double rY, double rZ,
 			double tX, double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(generateSetParameters(rules));
-		builder.append(generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim));
-		return builder.toString();
-	}
+        String builder = generateSetParameters(rules) +
+                generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim);
+        return builder;
+    }
 
 	private static String generateInternalParameterString(ArrayList<Rule> rules, int time, double rX, double rY,
 			double rZ, double tX, double tY, double scale, double dim) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(generateInternalSetParameters(rules));
-		builder.append(generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim));
-		return builder.toString();
-	}
+        String builder = generateInternalSetParameters(rules) +
+                generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim);
+        return builder;
+    }
 
 	private static String generateInternalSetParameters(ArrayList<Rule> rules) {
 		StringBuilder builder = new StringBuilder("/set");
 
 		for (Rule rule : rules) {
 			String ruleName = rule.getSearchedText();
-			if (ruleName.indexOf("'") != -1) {
-				ruleName = ruleName.substring(0, ruleName.lastIndexOf("'"));
-				ruleName = ruleName.substring(ruleName.indexOf("'") + 1, ruleName.length());
+            if (ruleName.contains("'")) {
+                ruleName = ruleName.substring(0, ruleName.lastIndexOf("'"));
+                ruleName = ruleName.substring(ruleName.indexOf("'") + 1, ruleName.length());
 			}
 			builder.append("/").append(ruleName);
 
@@ -128,9 +159,9 @@ public class URLGenerator {
 		for (Rule rule : rules) {
 			if (!rule.isMulticellularStructureRule()) {
 				String ruleText = rule.getSearchedText();
-				if (ruleText.indexOf("'") != -1) {
-					ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
-					ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
+                if (ruleText.contains("'")) {
+                    ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
+                    ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
 				}
 				builder.append("/").append(ruleText);
 
@@ -177,25 +208,24 @@ public class URLGenerator {
 
 	private static String generateViewParameters(int time, double rX, double rY, double rZ, double tX, double tY,
 			double scale, double dim) {
-		StringBuilder builder = new StringBuilder("/view");
+        String builder = "/view" + "/time=" + time +
+                "/rX=" + rX +
+                "/rY=" + rY +
+                "/rZ=" + rZ +
+                "/tX=" + tX +
+                "/tY=" + tY +
+                "/scale=" + scale +
+                "/dim=" + dim;
 
-		// time
-		builder.append("/time=").append(time);
+        // time
 
-		// rotation
-		builder.append("/rX=").append(rX);
-		builder.append("/rY=").append(rY);
-		builder.append("/rZ=").append(rZ);
+        // rotation
 
-		// translation
-		builder.append("/tX=").append(tX);
-		builder.append("/tY=").append(tY);
+        // translation
 
-		// others
-		builder.append("/scale=").append(scale);
-		builder.append("/dim=").append(dim);
+        // others
 
-		return builder.toString();
-	}
+        return builder;
+    }
 
 }

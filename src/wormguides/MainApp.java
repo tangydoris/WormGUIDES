@@ -4,14 +4,12 @@ import java.io.IOException;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import wormguides.controllers.RootLayoutController;
 import wormguides.loaders.ImageLoader;
@@ -52,14 +50,11 @@ public class MainApp extends Application {
         primaryStage.setResizable(true);
         primaryStage.show();
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                event.consume();
+        primaryStage.setOnCloseRequest(event -> {
+            event.consume();
 
-                if (controller != null) {
-                    controller.initCloseApplication();
-                }
+            if (controller != null) {
+                controller.initCloseApplication();
             }
         });
     }

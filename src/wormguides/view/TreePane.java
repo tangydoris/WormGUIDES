@@ -7,8 +7,8 @@ import javafx.scene.layout.AnchorPane;
 public class TreePane extends AnchorPane {
 
 	public TreePane() {
-		this(new TreeItem<String>("null root"));
-	}
+        this(new TreeItem<>("null root"));
+    }
 
 	public TreePane(TreeItem<String> root) {
 		super();
@@ -16,9 +16,9 @@ public class TreePane extends AnchorPane {
 		setPrefHeight(500.0);
 		setPrefWidth(250.0);
 
-		TreeView<String> view = new TreeView<String>(root);
-		AnchorPane.setTopAnchor(view, 0d);
-		AnchorPane.setLeftAnchor(view, 0d);
+        TreeView<String> view = new TreeView<>(root);
+        AnchorPane.setTopAnchor(view, 0d);
+        AnchorPane.setLeftAnchor(view, 0d);
 		AnchorPane.setRightAnchor(view, 0d);
 		AnchorPane.setBottomAnchor(view, 0d);
 		view.setFocusTraversable(false);

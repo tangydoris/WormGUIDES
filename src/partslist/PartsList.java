@@ -17,9 +17,9 @@ public class PartsList {
 	private static ArrayList<String> descriptions;
 
 	static {
-		functionalNames = new ArrayList<String>();
-		lineageNames = new ArrayList<String>();
-		descriptions = new ArrayList<String>();
+        functionalNames = new ArrayList<>();
+        lineageNames = new ArrayList<>();
+        descriptions = new ArrayList<>();
 
 		try {
             URL url = PartsList.class.getResource("/partslist/partslist.txt");

@@ -9,7 +9,7 @@ import javafx.scene.control.TreeItem;
 public class LineageTree {
 
     // maps a lower case cell name to its tree node
-    private static HashMap<String, TreeItem<String>> nameNodeHash = new HashMap<String, TreeItem<String>>();
+    private static HashMap<String, TreeItem<String>> nameNodeHash = new HashMap<>();
     private static TreeItem<String> root;
     private static boolean isSulston;
     private ArrayList<String> treeBaseNames;
@@ -26,12 +26,12 @@ public class LineageTree {
 
         this.isSulston = isSulston;
         if (isSulston) {
-            root = new TreeItem<String>("P0");
+            root = new TreeItem<>("P0");
             // names of the cell added to tree upon initialization
             String[] baseNames = {
                     "p0", "ab", "aba", "abal", "abar", "abp", "abpl", "abpr", "p1", "ems", "ms", "e", "p2",
                     "c", "p3", "d", "p4", "z2", "z3"};
-            treeBaseNames = new ArrayList<String>(Arrays.asList(baseNames));
+            treeBaseNames = new ArrayList<>(Arrays.asList(baseNames));
 
             // zero-th root layer
             nameNodeHash.put("p0", root);
@@ -116,31 +116,19 @@ public class LineageTree {
             }
 
             if (desc.startsWith("d")) {
-                if (ances.equals("p3")) {
-                    return true;
-                }
-                return isDescendant("p3", ances);
+                return ances.equals("p3") || isDescendant("p3", ances);
             }
 
             if (desc.startsWith("c")) {
-                if (ances.equals("p2")) {
-                    return true;
-                }
-                return isDescendant("p2", ances);
+                return ances.equals("p2") || isDescendant("p2", ances);
             }
 
             if (desc.equals("ems")) {
-                if (ances.equals("p1")) {
-                    return true;
-                }
-                return isDescendant("p1", ances);
+                return ances.equals("p1") || isDescendant("p1", ances);
             }
 
             if (desc.startsWith("ms") || desc.startsWith("e")) {
-                if (ances.equals("ems")) {
-                    return true;
-                }
-                return isDescendant("ems", ances);
+                return ances.equals("ems") || isDescendant("ems", ances);
             }
 
             if (desc.startsWith("ab")) {
@@ -233,7 +221,7 @@ public class LineageTree {
     }
 
     private TreeItem<String> makeTreeItem(String name) {
-        TreeItem<String> node = new TreeItem<String>(name);
+        TreeItem<String> node = new TreeItem<>(name);
         nameNodeHash.put(name.toLowerCase(), node);
         return node;
     }
