@@ -995,7 +995,7 @@ public class Search {
                             return null; // error check
                         }
 
-                        if (PartsList.containsLineageName(searched)) {
+                        if (PartsList.isLineageName(searched)) {
                             if (cases.containsCellCase(searched)) {
 
                                 // show the tab

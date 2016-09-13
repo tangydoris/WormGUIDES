@@ -105,7 +105,7 @@ public class Connectome {
      * @return the resultant translated or untranslated cell name
      */
     public String checkQueryCell(String queryCell) {
-        if (PartsList.containsLineageName(queryCell)) {
+        if (PartsList.isLineageName(queryCell)) {
             queryCell = PartsList.getFunctionalNameByLineageName(queryCell).toLowerCase();
         }
 
@@ -158,7 +158,7 @@ public class Connectome {
             boolean areLineageNamesReturned) {
 
         // query only works for lineage names
-        if (PartsList.containsFunctionalName(queryCell)) {
+        if (PartsList.isFunctionalName(queryCell)) {
             queryCell = PartsList.getLineageNameByFunctionalName(queryCell);
         }
 

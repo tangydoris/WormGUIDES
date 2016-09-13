@@ -493,7 +493,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
             // build webview scene to render parts list
             WebView partsListWebView = new WebView();
-            partsListWebView.getEngine().loadContent(PartsList.partsListDOM().DOMtoString());
+            partsListWebView.getEngine().loadContent(PartsList.createPartsListDOM().DOMtoString());
 
             VBox root = new VBox();
             root.getChildren().addAll(partsListWebView);

@@ -149,7 +149,7 @@ public class InfoWindow {
                                 return null; // error check
                             }
 
-                            if (PartsList.containsLineageName(lineageName)) {
+                            if (PartsList.isLineageName(lineageName)) {
                                 if (cases.containsCellCase(lineageName)) {
 
                                     // show the tab

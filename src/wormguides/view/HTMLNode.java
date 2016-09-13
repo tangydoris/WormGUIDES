@@ -1,11 +1,13 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import java.util.ArrayList;
 
 /**
  * Nodes for the DOM tree
- *
- * @author katzmanb
  */
 public class HTMLNode {
 

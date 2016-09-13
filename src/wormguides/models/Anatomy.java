@@ -140,7 +140,7 @@ public class Anatomy {
      * @return the resultant translated or untranslated cell name
      */
     private static String checkQueryCell(String queryCell) {
-        if (PartsList.containsLineageName(queryCell)) {
+        if (PartsList.isLineageName(queryCell)) {
             queryCell = PartsList.getFunctionalNameByLineageName(queryCell).toUpperCase();
         }
 
