@@ -7,9 +7,11 @@ import java.net.URISyntaxException;
 
 import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
+
 import wormguides.AnatomyTerm;
 import wormguides.Search;
-import wormguides.model.PartsList;
+
+import partslist.PartsList;
 
 /**
  * Callback class for HTML pages HTML pages generated for Info Window contain

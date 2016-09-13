@@ -8,8 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import wormguides.model.LineageData;
-import wormguides.model.TableLineageData;
+import wormguides.models.LineageData;
+import wormguides.models.TableLineageData;
 
 /**
  * This loader class reads the nuclei files located in
@@ -20,7 +20,19 @@ import wormguides.model.TableLineageData;
  */
 public class AceTreeLoader {
 
-	private static int avgX, avgY, avgZ;
+    private static final String ENTRY_PREFIX = "/wormguides/models/nuclei_files/";
+    private static final String t = "t";
+    private static final String ENTRY_EXT = "-nuclei";
+    private static final int TOKEN_ARRAY_SIZE = 21;
+    private static final int VALID = 1, XCOR = 5, YCOR = 6, ZCOR = 7, DIAMETER = 8, IDENTITY = 9;
+    private final static String oneZeroPad = "0";
+    private final static String twoZeroPad = "00";
+    /**
+     * Indicies of the x-, y- and z-coordinates in the position Integer array
+     * for a nucleus in a time frame.
+     */
+    private static final int X_POS_IND = 0, Y_POS_IND = 1, Z_POS_IND = 2;
+    private static int avgX, avgY, avgZ;
 	private static ArrayList<String> allCellNames = new ArrayList<String>();
 
 	public static TableLineageData loadNucFiles(int totalTimePoints) {
@@ -102,8 +114,8 @@ public class AceTreeLoader {
 		avgZ = (int) sumZ / totalPositions;
 
 		System.out.println("average nuclei position offsets from zero: " + avgX + ", " + avgY + ", " + avgZ);
-		
-		
+
+
 		// offset all nuclei x-, y- and z- positions by x, y and z averages
 		lineageData.shiftAllPositions(avgX, avgY, avgZ);
 	}
@@ -144,18 +156,4 @@ public class AceTreeLoader {
 			System.out.println("Incorrect format in nucleus file for time " + time + ".");
 		}
 	}
-
-	private static final String ENTRY_PREFIX = "/wormguides/model/nuclei_files/";
-	private static final String t = "t";
-	private static final String ENTRY_EXT = "-nuclei";
-	private static final int TOKEN_ARRAY_SIZE = 21;
-	private static final int VALID = 1, XCOR = 5, YCOR = 6, ZCOR = 7, DIAMETER = 8, IDENTITY = 9;
-	private final static String oneZeroPad = "0";
-	private final static String twoZeroPad = "00";
-
-	/**
-	 * Indicies of the x-, y- and z-coordinates in the position Integer array
-	 * for a nucleus in a time frame.
-	 */
-	private static final int X_POS_IND = 0, Y_POS_IND = 1, Z_POS_IND = 2;
 }

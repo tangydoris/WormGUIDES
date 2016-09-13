@@ -15,7 +15,7 @@ import javafx.stage.WindowEvent;
 
 import wormguides.controllers.RootLayoutController;
 import wormguides.loaders.ImageLoader;
-import wormguides.model.NucleiMgrAdapterResource;
+import wormguides.models.NucleiMgrAdapterResource;
 
 public class MainApp extends Application {
 

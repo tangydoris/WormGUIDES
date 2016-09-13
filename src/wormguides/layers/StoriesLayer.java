@@ -30,7 +30,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -43,6 +42,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+
 import wormguides.MainApp;
 import wormguides.URLGenerator;
 import wormguides.controllers.StoryEditorController;
@@ -50,11 +50,11 @@ import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
 import wormguides.loaders.StoryFileUtil;
 import wormguides.loaders.URLLoader;
-import wormguides.model.LineageData;
-import wormguides.model.Note;
-import wormguides.model.Rule;
-import wormguides.model.SceneElementsList;
-import wormguides.model.Story;
+import wormguides.models.LineageData;
+import wormguides.models.Note;
+import wormguides.models.Rule;
+import wormguides.models.SceneElementsList;
+import wormguides.models.Story;
 import wormguides.view.AppFont;
 
 /**
@@ -66,46 +66,35 @@ import wormguides.view.AppFont;
  */
 public class StoriesLayer {
 
-	private Stage parentStage;
-
+    private final String NEW_STORY_TITLE = "New Story";
+    private final String NEW_STORY_DESCRIPTION = "New story description here";
+    private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
+    private Stage parentStage;
 	private SceneElementsList sceneElementsList;
-
 	private ObservableList<Story> stories;
-
 	private int timeOffset;
-
 	private double width;
 	private Stage editStage;
-
 	private BooleanProperty rebuildSceneFlag;
-
 	private StoryEditorController editController;
-
 	private Note activeNote;
 	private Story activeStory;
-
 	private StringProperty activeStoryProperty;
 	private StringProperty activeCellProperty;
 	private BooleanProperty cellClickedProperty;
-
 	private IntegerProperty timeProperty;
-
 	private LineageData cellData;
-
 	private Comparator<Note> noteComparator;
-
 	private ObservableList<Rule> currentRules;
 	private BooleanProperty useInternalRules;
 	private Window3DController window3DController;
-
 	private BooleanProperty update3D;
-	
 	private boolean defaultEmbryoFlag;
 
 	/**
 	 * Constructure called by {@link RootLayoutController}.
-	 * 
-	 * @param parent
+     *
+     * @param parent
 	 *            The {@link Stage} to which the main application belongs to.
 	 *            Used for initializing modality of the story editor popup
 	 *            window.
@@ -137,7 +126,7 @@ public class StoriesLayer {
 			Button newStoryButton, Button deleteStoryButton, boolean defaultEmbryoFlag) {
 
 		parentStage = parent;
-		
+
 		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
 		newStoryButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -197,7 +186,7 @@ public class StoriesLayer {
 		if (defaultEmbryoFlag) {
 			StoriesLoader.loadConfigFile(stories, timeOffset);
 		}
-		
+
 		addBlankStory();
 
 		noteComparator = new Comparator<Note>() {
@@ -211,7 +200,7 @@ public class StoriesLayer {
 				return t1.compareTo(t2);
 			}
 		};
-		
+
 		for (Story story : stories) {
 			story.setComparator(noteComparator);
 			story.sortNotes();
@@ -327,80 +316,10 @@ public class StoriesLayer {
 	}
 
 	/**
-	 * Ultimately sets the active story to the input {@link Story} parameter.
-	 * Sets the currently active story to be inactive if it is not null, then
-	 * sets the input story to active.
-	 * 
-	 * @param story
-	 *            The story that needs to be made active
-	 */
-	public void setActiveStory(Story story) {
-		// disable previous active story
-		// copy current rules changes back to story
-		if (activeStory != null) {
-			activeStory.setActive(false);
-			ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-			rulesCopy.addAll(currentRules);
-
-			activeStory.setColorURL(
-					URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
-							window3DController.getRotationY(), window3DController.getRotationZ(),
-							window3DController.getTranslationX(), window3DController.getTranslationY(),
-							window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
-		}
-
-		setActiveNote(null);
-		useInternalRules.set(true);
-
-		activeStory = story;
-		int startTime = timeProperty.get();
-
-		if (activeStory != null) {
-			activeStory.setActive(true);
-			activeStoryProperty.set(activeStory.getName());
-
-			// if story does not come with a url, set its url to the
-			// program's internal rules
-			if (activeStory.getColorURL().isEmpty()) {
-				ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
-				rulesCopy.addAll(currentRules);
-
-				activeStory.setColorURL(
-						URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
-								window3DController.getRotationY(), window3DController.getRotationZ(),
-								window3DController.getTranslationX(), window3DController.getTranslationY(),
-								window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
-			} else { // if story does come with url, use it
-				useInternalRules.set(false);
-			}
-			URLLoader.process(activeStory.getColorURL(), window3DController, true);
-
-			if (activeStory.hasNotes()) {
-				startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
-				if (startTime < 1)
-					startTime = 1;
-			}
-		} else {
-			activeStoryProperty.set("");
-			useInternalRules.set(true);
-		}
-
-		if (editController != null)
-			editController.setActiveStory(activeStory);
-
-		if (timeProperty.get() != startTime)
-			timeProperty.set(startTime);
-		else {
-			rebuildSceneFlag.set(true);
-			rebuildSceneFlag.set(false);
-		}
-	}
-
-	/**
 	 * Sets the active note to the input note parameter. Makes the current note
 	 * inactive, then makes the input note active.
-	 * 
-	 * @param note
+     *
+     * @param note
 	 *            The {@link Note} that should become active
 	 */
 	public void setActiveNote(Note note) {
@@ -429,8 +348,8 @@ public class StoriesLayer {
 	/**
 	 * Sets the flag that tells the {@link Window3DController} whether to update
 	 * the subscene.
-	 * 
-	 * @param update3D
+     *
+     * @param update3D
 	 *            The {@link BooleanProperty} flag that is set to TRUE when the
 	 *            3D subscene should be udpated, FALSE otherwise
 	 */
@@ -442,8 +361,8 @@ public class StoriesLayer {
 	 * Retrieve the effective end time of the input note parameter, whether it
 	 * is the one explicitly stated by the 'end time' field or the one
 	 * implicitly specified by the cell, cell body, or multicellular structure.
-	 * 
-	 * @param note
+     *
+     * @param note
 	 *            The {@link Note} whose effective end time is queried
 	 * @return {@link Integer} that contains the value of the effective end time
 	 *         of the input note. An Integer object is returned instead of the
@@ -497,8 +416,8 @@ public class StoriesLayer {
 	 * Retrieve the effective start time of the input note parameter, whether it
 	 * is the one explicitly stated by the 'start time' field or the one
 	 * implicitly specified by the cell, cell body, or multicellular structure.
-	 * 
-	 * @param note
+     *
+     * @param note
 	 *            The {@link Note} whose effective start time is queried
 	 * @return {@link Integer} that contains the value of the effective start
 	 *         time of the input note. An Integer object is returned instead of
@@ -556,7 +475,79 @@ public class StoriesLayer {
 	}
 
 	/**
-	 * @param tagName
+     * Ultimately sets the active story to the input {@link Story} parameter.
+     * Sets the currently active story to be inactive if it is not null, then
+     * sets the input story to active.
+     *
+     * @param story
+     *            The story that needs to be made active
+     */
+    public void setActiveStory(Story story) {
+        // disable previous active story
+        // copy current rules changes back to story
+        if (activeStory != null) {
+            activeStory.setActive(false);
+            ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
+            rulesCopy.addAll(currentRules);
+
+            activeStory.setColorURL(
+                    URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
+                            window3DController.getRotationY(), window3DController.getRotationZ(),
+                            window3DController.getTranslationX(), window3DController.getTranslationY(),
+                            window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
+        }
+
+        setActiveNote(null);
+        useInternalRules.set(true);
+
+        activeStory = story;
+        int startTime = timeProperty.get();
+
+        if (activeStory != null) {
+            activeStory.setActive(true);
+            activeStoryProperty.set(activeStory.getName());
+
+            // if story does not come with a url, set its url to the
+            // program's internal rules
+            if (activeStory.getColorURL().isEmpty()) {
+                ArrayList<Rule> rulesCopy = new ArrayList<Rule>();
+                rulesCopy.addAll(currentRules);
+
+                activeStory.setColorURL(
+                        URLGenerator.generateInternal(rulesCopy, timeProperty.get(), window3DController.getRotationX(),
+                                window3DController.getRotationY(), window3DController.getRotationZ(),
+                                window3DController.getTranslationX(), window3DController.getTranslationY(),
+                                window3DController.getScaleInternal(), window3DController.getOthersVisibility()));
+            } else { // if story does come with url, use it
+                useInternalRules.set(false);
+            }
+            URLLoader.process(activeStory.getColorURL(), window3DController, true);
+
+            if (activeStory.hasNotes()) {
+                startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
+                if (startTime < 1) {
+                    startTime = 1;
+                }
+            }
+        } else {
+            activeStoryProperty.set("");
+            useInternalRules.set(true);
+        }
+
+        if (editController != null) {
+            editController.setActiveStory(activeStory);
+        }
+
+        if (timeProperty.get() != startTime) {
+            timeProperty.set(startTime);
+        } else {
+            rebuildSceneFlag.set(true);
+            rebuildSceneFlag.set(false);
+        }
+    }
+
+    /**
+     * @param tagName
 	 *            The tag name of that note whose comments the user wants to
 	 *            retrieve
 	 * @return A {@link String} with the comments of the note whose tag name is
@@ -583,8 +574,8 @@ public class StoriesLayer {
 	}
 
 	/**
-	 * 
-	 * @param time
+     *
+     * @param time
 	 *            An integer whose value is the queried time
 	 * @return An {@link ArrayList} of all notes that can exist at the at input
 	 *         time. This includes notes attached to an entity if entity is
@@ -647,8 +638,8 @@ public class StoriesLayer {
 	/**
 	 * Used for sizing the widths each story item in the list view (May not be
 	 * used/ is deprecated)
-	 * 
-	 * @return A {@link ChangeListener} that listens to the change in the
+     *
+     * @return A {@link ChangeListener} that listens to the change in the
 	 *         'Stories' tab {@link ListView} viewport
 	 */
 	public ChangeListener<Number> getListViewWidthListener() {
@@ -707,7 +698,7 @@ public class StoriesLayer {
 			loader.setRoot(editController);
 
 			try {
-				editStage.setScene(new Scene((AnchorPane) loader.load()));
+                editStage.setScene(new Scene(loader.load()));
 
 				editStage.setTitle("Story/Note Editor");
 				editStage.initOwner(parentStage);
@@ -821,8 +812,8 @@ public class StoriesLayer {
 	 * Changes the color of the input {@link Text} items by modifying the
 	 * java-fx css attribute '-fx-fill' to the specified input color. Used by
 	 * {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
-	 * 
-	 * @param color
+     *
+     * @param color
 	 *            The {@link Color} to change the texts to
 	 * @param texts
 	 *            The listing of {@link Text} items whose color is to be changed
@@ -1022,8 +1013,8 @@ public class StoriesLayer {
 		 * Highlights/un-highlights a cell according to the input parameter.
 		 * When a cell is highlighted/un-highighted, its text and background
 		 * colors change.
-		 * 
-		 * @param highlight
+         *
+         * @param highlight
 		 *            The boolean whose value is TRUE when this
 		 *            {@link NoteListCellGraphic} is to be highlighted, FALSE
 		 *            when it is to be un-highlighted
@@ -1041,8 +1032,8 @@ public class StoriesLayer {
 
 		/**
 		 * Expands/hides a notes description according to the input parameter.
-		 * 
-		 * @param expanded
+         *
+         * @param expanded
 		 *            The boolean whose value is TRUE when this
 		 *            {@link NoteListCellGraphic} is to be expanded, FALSE when
 		 *            it should only show the note title
@@ -1057,9 +1048,5 @@ public class StoriesLayer {
 			}
 		}
 	}
-
-	private final String NEW_STORY_TITLE = "New Story";
-	private final String NEW_STORY_DESCRIPTION = "New story description here";
-	private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
 
 }

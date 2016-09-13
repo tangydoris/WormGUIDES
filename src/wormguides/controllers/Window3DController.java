@@ -15,8 +15,6 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
-import com.sun.javafx.scene.CameraHelper;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -77,6 +75,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
 import wormguides.ColorComparator;
 import wormguides.ColorHash;
 import wormguides.JavaPicture;
@@ -87,18 +86,20 @@ import wormguides.SearchOption;
 import wormguides.Xform;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.LineageData;
-import wormguides.model.Note;
-import wormguides.model.Note.Display;
-import wormguides.model.PartsList;
-import wormguides.model.ProductionInfo;
-import wormguides.model.Quaternion;
+import wormguides.models.CasesLists;
+import wormguides.models.Connectome;
+import wormguides.models.LineageData;
+import wormguides.models.Note;
+import wormguides.models.Note.Display;
+import wormguides.models.ProductionInfo;
+import wormguides.models.Quaternion;
+import wormguides.models.Rule;
+import wormguides.models.SceneElement;
+import wormguides.models.SceneElementsList;
 import wormguides.view.AppFont;
-import wormguides.model.Rule;
-import wormguides.model.SceneElement;
-import wormguides.model.SceneElementsList;
+
+import com.sun.javafx.scene.CameraHelper;
+import partslist.PartsList;
 
 /**
  * The controller for the 3D subscene inside the root layout. This class
@@ -130,14 +131,66 @@ import wormguides.model.SceneElementsList;
 
 public class Window3DController {
 
-	private Stage parentStage;
-
+    private final static double cannonicalOrientationX = 145.0;
+    private final static double cannonicalOrientationY = -166.0;
+    private final static double cannonicalOrientationZ = 24.0;
+    private static Sphere[] spheres;
+    private static MeshView[] meshes;
+    private static String[] cellNames;
+    private static String[] meshNames;
+    // rotation stuff
+    private final Rotate rotateX;
+    private final Rotate rotateY;
+    private final Rotate rotateZ;
+    private final String CS = ", ";
+    private final String FILL_COLOR_HEX = "#272727";
+    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
+            TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
+    /**
+     * The wait time (in milliseconds) between consecutive time frames while a
+     * movie is playing.
+     */
+    private final long WAIT_TIME_MILLI = 200;
+    private final double CAMERA_INITIAL_DISTANCE = -220;
+    private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
+    private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
+    /**
+     * The scale of the subscene z-coordinate axis so that the embryo does not
+     * appear flat and squished.
+     */
+    private final double Z_SCALE = 5;
+    /** The scale of the subscene x-coordinate axis. */
+    private final double X_SCALE = 1;
+    /** The scale of the subscene y-coordinate axis. */
+    private final double Y_SCALE = 1;
+    /** Text size scale used for the rendering of billboard notes. */
+    private final double BILLBOARD_SCALE = 0.9;
+    /**
+     * Scale used for the radii of spheres that represent cells, multiplied with
+     * the cell's radius loaded from the nuc files.
+     */
+    private final double SIZE_SCALE = 1;
+    /** The radius of all spheres when 'uniform size' is ticked. */
+    private final double UNIFORM_RADIUS = 4;
+    /**
+     * The default camera zoom of the embryo. On program startup, the embryo is
+     * zoomed in so that the entire embryo is not visible.
+     */
+    private final double INITIAL_ZOOM = 1.5;
+    /**
+     * The number of pixels that a sprite (note or label) can be outside the
+     * sprite pane bounds before being removed from the subscene.
+     */
+    private final int OUT_OF_BOUNDS_THRESHOLD = 5;
+    /**
+     * The int used when calculating the y offset between a sprite and label.
+     */
+    private final int LABEL_SPRITE_Y_OFFSET = 5;
+    Vector<JavaPicture> javaPictures;
+    private Stage parentStage;
 	private LineageData cellData;
-
 	private SubScene subscene;
-
 	private TextField searchField;
-
 	// transformation stuff
 	private Group root;
 	private PerspectiveCamera camera;
@@ -148,27 +201,20 @@ public class Window3DController {
 	// average position offsets of nuclei from zero
 	private int offsetX, offsetY, offsetZ;
 	private double angleOfRotation;
-
 	// housekeeping stuff
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private int endTime;
 	private int startTime;
-	private static Sphere[] spheres;
-	private static MeshView[] meshes;
-	private static String[] cellNames;
-	private static String[] meshNames;
 	private boolean[] searchedCells;
 	private boolean[] searchedMeshes;
 	private Integer[][] positions;
 	private Integer[] diameters;
 	private DoubleProperty zoom;
-
 	// switching timepoints stuff
 	private BooleanProperty playingMovie;
 	private PlayService playService;
 	private RenderService renderService;
-
 	// subscene click cell selection stuff
 	private IntegerProperty selectedIndex;
 	private StringProperty selectedName;
@@ -177,40 +223,28 @@ public class Window3DController {
 	private ContextMenuController contextMenuController;
 	private CasesLists cases;
 	private BooleanProperty cellClicked;
-
 	// searched highlighting stuff
 	private boolean inSearch;
 	private ObservableList<String> searchResultsList;
 	private ArrayList<String> localSearchResults;
-
 	// color rules stuff
 	private ColorHash colorHash;
 	private ObservableList<Rule> currentRulesList;
 	private Comparator<Color> colorComparator;
 	private Comparator<Shape3D> opacityComparator;
-
 	// specific boolean listener for gene search results
 	private BooleanProperty geneResultsUpdated;
-
 	// opacity value for "other" cells (with no rule attached)
 	private DoubleProperty othersOpacity;
 	private ArrayList<String> otherCells;
-
-	// rotation stuff
-	private final Rotate rotateX;
-	private final Rotate rotateY;
-	private final Rotate rotateZ;
-
 	// Scene Elements stuff
 	private boolean defaultEmbryoFlag;
 	private SceneElementsList sceneElementsList;
 	private ArrayList<SceneElement> sceneElementsAtTime;
 	private ArrayList<MeshView> currentSceneElementMeshes;
 	private ArrayList<SceneElement> currentSceneElements;
-
 	// Uniform nuclei sizef
 	private boolean uniformSize;
-
 	// Cell body and cell nucleus highlighting in search mode
 	private boolean cellNucleusTicked;
 	private boolean cellBodyTicked;
@@ -223,20 +257,16 @@ public class Window3DController {
 	private HashMap<Node, Note> currentGraphicNoteMap;
 	// Map of current notes to their scene elements
 	private HashMap<Note, MeshView> currentNoteMeshMap;
-
 	private VBox overlayVBox;
 	private Pane spritesPane;
-
 	// maps of sprite/billboard front notes attached to cell, or cell and time
 	private HashMap<Node, VBox> entitySpriteMap;
 	private HashMap<Node, Node> billboardFrontEntityMap;
-
 	// Label stuff
 	private ArrayList<String> allLabels;
 	private ArrayList<String> currentLabels;
 	private HashMap<Node, Text> entityLabelMap;
 	private Text transientLabelText; // shows up on hover
-
 	// orientation indicator
 	private Cylinder orientationIndicator;
 	private Rotate indicatorRotation;// this is the time varying component of
@@ -244,38 +274,29 @@ public class Window3DController {
 	// private Group orientationIndicator;//this isn't needed globally really
 	private double[] keyValuesRotate = { 0, 45, 100, 100, 145 };
 	private double[] keyFramesRotate = { 1, 20, 320, 340, 400 }; // start
-
 	private EventHandler<MouseEvent> clickableMouseEnteredHandler;
 	private EventHandler<MouseEvent> clickableMouseExitedHandler;
-
 	private ProductionInfo productionInfo;
 	private Connectome connectome;
-
 	private BooleanProperty bringUpInfoProperty;
-
 	private SubsceneSizeListener subsceneSizeListener;
-
 	private BooleanProperty captureVideo;
 	private Timer timer;
 	private Vector<File> movieFiles;
-	Vector<JavaPicture> javaPictures;
 	private int count;
 	private String movieName;
 	private String moviePath;
 	private File frameDir;
-
 	private BooleanProperty update3D;
-
 	private DoubleProperty rotateXAngle;
 	private DoubleProperty rotateYAngle;
 	private DoubleProperty rotateZAngle;
-
 	private Quaternion quaternion;
 
 	/**
 	 * Window3DController class constructor called by
 	 * {@link RootLayoutController} upon initialization.
-	 * 
+     *
 	 * @param parent
 	 *            {@link Stage} to which the main application belongs to.
 	 *            Reference used for context menu (whether it should appear in
@@ -312,7 +333,7 @@ public class Window3DController {
 		cellData = data;
 		productionInfo = info;
 		this.connectome = connectome;
-		
+
 		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
 		if (defaultEmbryoFlag) {
@@ -320,7 +341,7 @@ public class Window3DController {
 		} else {
 			startTime = 0;
 		}
-		
+
 		time = new SimpleIntegerProperty(startTime);
 		time.addListener(new ChangeListener<Number>() {
 			@Override
@@ -477,7 +498,7 @@ public class Window3DController {
 		colorHash = new ColorHash();
 		colorComparator = new ColorComparator();
 		opacityComparator = new OpacityComparator();
-		
+
 		if (defaultEmbryoFlag) {
 			currentSceneElementMeshes = new ArrayList<MeshView>();
 			currentSceneElements = new ArrayList<SceneElement>();
@@ -648,7 +669,7 @@ public class Window3DController {
 	/**
 	 * Inserts a transient label into the sprites pane for the specified entity
 	 * if the entity is an 'other' entity that is less than 10% opaque.
-	 * 
+     *
 	 * @param name
 	 *            String containing the name that appears on the transient label
 	 * @param entity
@@ -974,8 +995,8 @@ public class Window3DController {
 	}
 
 	/*
-	 * TODO fix this
-	 * 
+     * TODO fix this
+	 *
 	 */
 	// http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
 	// --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
@@ -1079,11 +1100,11 @@ public class Window3DController {
 			loader.setLocation(MainApp.class.getResource("view/layouts/ContextMenuLayout.fxml"));
 
 			loader.setController(contextMenuController);
-			loader.setRoot(contextMenuController);
+            loader.setRoot(contextMenuController);
 
-			try {
-				contextMenuStage.setScene(new Scene((AnchorPane) loader.load()));
-				contextMenuStage.initModality(Modality.NONE);
+            try {
+                contextMenuStage.setScene(new Scene(loader.load()));
+                contextMenuStage.initModality(Modality.NONE);
 				contextMenuStage.setResizable(false);
 				contextMenuStage.setTitle("Menu");
 
@@ -1158,7 +1179,7 @@ public class Window3DController {
 	 * or a {@link VBox}. The graphic is removed if it ends up outside the
 	 * bounds of the subscene window after a transformation, and only reinserted
 	 * if its bounds are within the window again.
-	 * 
+     *
 	 * @param noteOrLabelGraphic
 	 *            Graphical representation of a note/notes (can either be a
 	 *            {@link Text} or a {@link VBox}
@@ -1286,7 +1307,7 @@ public class Window3DController {
 			}
 			// End scene element mesh loading/building
 		}
-		
+
 
 		// Label stuff
 		entityLabelMap.clear();
@@ -1410,7 +1431,7 @@ public class Window3DController {
 			// add scene element meshes (from notes and from scene elements list)
 			addSceneElementGeometries(entities);
 		}
-		
+
 		Collections.sort(entities, opacityComparator);
 		root.getChildren().addAll(entities);
 
@@ -1801,7 +1822,7 @@ public class Window3DController {
 					}
 				}
 			}
-					
+
 
 			// BILLBOARD
 			else if (note.isBillboard()) {
@@ -1825,7 +1846,7 @@ public class Window3DController {
 						}
 					}
 				}
-				
+
 				else if (defaultEmbryoFlag) {
 					// structure attachment
 					if (note.attachedToStructure()) {
@@ -1997,15 +2018,12 @@ public class Window3DController {
 		if (defaultEmbryoFlag) {
 			searchedMeshes = new boolean[meshNames.length];
 		}
-		
+
 
 		// look for searched cells
-		for (int i = 0; i < cellNames.length; i++) {
-			if (localSearchResults.contains(cellNames[i]))
-				searchedCells[i] = true;
-			else
-				searchedCells[i] = false;
-		}
+        for (int i = 0; i < cellNames.length; i++) {
+            searchedCells[i] = localSearchResults.contains(cellNames[i]);
+        }
 
 		if (defaultEmbryoFlag) {
 			// look for single celled meshes
@@ -2013,17 +2031,11 @@ public class Window3DController {
 				if (sceneElementsAtTime.get(i).isMulticellular()) {
 					searchedMeshes[i] = true;
 					for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
-						if (localSearchResults.contains(name))
-							searchedMeshes[i] &= true;
-						else
-							searchedMeshes[i] &= false;
-					}
-				} else {
-					if (localSearchResults.contains(meshNames[i]))
-						searchedMeshes[i] = true;
-					else
-						searchedMeshes[i] = false;
-				}
+                        searchedMeshes[i] &= localSearchResults.contains(name);
+                    }
+                } else {
+                    searchedMeshes[i] = localSearchResults.contains(meshNames[i]);
+                }
 			}
 		}
 	}
@@ -2065,7 +2077,7 @@ public class Window3DController {
 			if (sceneName.equals(""))
 				sceneName = name;
 		}
-		
+
 		for (Rule rule : currentRulesList) {
 			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName))
 				return true;
@@ -2275,7 +2287,7 @@ public class Window3DController {
 
 	/**
 	 * Sets transparent anchor pane overlay for sprite notes display
-	 * 
+     *
 	 * @param parentPane
 	 *            The {@link AnchorPane} in which labels and sprites reside
 	 */
@@ -2304,18 +2316,41 @@ public class Window3DController {
 	public ArrayList<Rule> getColorRulesList() {
 		ArrayList<Rule> list = new ArrayList<Rule>();
 		for (Rule rule : currentRulesList)
-			list.add(rule);
+            list.add(rule);
 
-		return list;
-	}
+        return list;
+    }
 
-	public ObservableList<Rule> getObservableColorRulesList() {
-		return currentRulesList;
-	}
+	/*
+     * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateXAngle.set(rotateX.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateYAngle.set(rotateY.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 * 
+	 * private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
+	 * return new EventHandler<TransformChangedEvent>() {
+	 * 
+	 * @Override public void handle(TransformChangedEvent arg0) {
+	 * rotateZAngle.set(rotateZ.getAngle()); repositionSprites();
+	 * repositionNoteBillboardFronts(); } }; }
+	 */
 
 	public void setColorRulesList(ArrayList<Rule> list) {
 		currentRulesList.clear();
-		currentRulesList.setAll(list);
+        currentRulesList.setAll(list);
+    }
+
+    public ObservableList<Rule> getObservableColorRulesList() {
+        return currentRulesList;
 	}
 
 	public int getTime() {
@@ -2383,7 +2418,7 @@ public class Window3DController {
 
 	/**
 	 * Used for internal URL generation of rules associated with stories
-	 * 
+     *
 	 * @return The value of the zoom {@link DoubleProperty}
 	 */
 	public double getScaleInternal() {
@@ -2416,32 +2451,9 @@ public class Window3DController {
 		return othersOpacity.get();
 	}
 
-	public void setOthersVisibility(double dim) {
+    public void setOthersVisibility(double dim) {
 		othersOpacity.set(dim);
 	}
-
-	/*
-	 * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateXAngle.set(rotateX.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 * 
-	 * private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateYAngle.set(rotateY.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 * 
-	 * private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateZAngle.set(rotateZ.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 */
 
 	private ChangeListener<Number> getRotateXAngleListener() {
 		return new ChangeListener<Number>() {
@@ -2555,10 +2567,10 @@ public class Window3DController {
 				 * Workaround to avoid JavaFX bug --> stop zoom at 0
 				 * As of July 8, 2016
 				 * Noted by: Braden Katzman
-				 * 
+                 *
 				 * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of passing through it
-				 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes 
-				 * appear, surrounded w/ artifacts.
+                 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes
+                 * appear, surrounded w/ artifacts.
 				 */
 				 if (z >= 0.25) {
 					 z -= 0.25;
@@ -2606,7 +2618,7 @@ public class Window3DController {
 			}
 		};
 	}
-	
+
 	public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
 		return new EventHandler<ActionEvent>() {
 			@Override
@@ -2614,7 +2626,7 @@ public class Window3DController {
 				allLabels.clear();
 				currentLabels.clear();
 				buildScene();
-			}		
+            }
 		};
 	}
 
@@ -2632,7 +2644,7 @@ public class Window3DController {
 	 * {@link BooleanProperty} that changes when 'uniform nucleus' is
 	 * ticked/unticked in the display tab. On change, the scene refreshes and
 	 * cell bodies are highlighted/unhighlighted accordingly.
-	 * 
+     *
 	 * @return The listener.
 	 */
 	public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
@@ -2640,9 +2652,85 @@ public class Window3DController {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				uniformSize = newValue.booleanValue();
-				buildScene();
-			}
-		};
+                buildScene();
+            }
+        };
+    }
+
+    /**
+     * This method returns the {@link ChangeListener} that listens for the
+     * {@link BooleanProperty} that changes when 'cell nucleus' is
+     * ticked/unticked in the search tab. On change, the scene refreshes and
+     * cell bodies are highlighted/unhighlighted accordingly.
+     *
+     * @return The listener.
+     */
+    public ChangeListener<Boolean> getCellNucleusTickListener() {
+        return new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                cellNucleusTicked = newValue;
+                buildScene();
+            }
+        };
+    }
+
+    /**
+     * This method returns the {@link ChangeListener} that listens for the
+     * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
+     * in the search tab. On change, the scene refreshes and cell bodies are
+     * highlighted/unhighlighted accordingly.
+     *
+     * @return The listener.
+     */
+    public ChangeListener<Boolean> getCellBodyTickListener() {
+        return new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                cellBodyTicked = newValue;
+                buildScene();
+            }
+        };
+    }
+
+    public ChangeListener<Boolean> getMulticellModeListener() {
+        return new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+            }
+        };
+    }
+
+    /**
+     * The getter for the {@link EventHandler} for the {@link MouseEvent} that
+     * is fired upon clicking on a note. The handler expands the note on click.
+     *
+     * @return The event handler.
+     */
+    public EventHandler<MouseEvent> getNoteClickHandler() {
+        return new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.isStillSincePress()) {
+                    Node result = event.getPickResult().getIntersectedNode();
+                    if (result instanceof Text) {
+                        Text picked = (Text) result;
+                        Note note = currentGraphicNoteMap.get(picked);
+                        if (note != null) {
+                            note.setExpandedInScene(!note.isExpandedInScene());
+                            if (note.isExpandedInScene())
+                                picked.setText(note.getTagName() + ": " + note.getTagContents());
+                            else
+                                picked.setText(note.getTagName() + "\n[more...]");
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    public Stage getStage() {
+		return this.parentStage;
 	}
 
 	/**
@@ -2722,47 +2810,11 @@ public class Window3DController {
 	}
 
 	/**
-	 * This method returns the {@link ChangeListener} that listens for the
-	 * {@link BooleanProperty} that changes when 'cell nucleus' is
-	 * ticked/unticked in the search tab. On change, the scene refreshes and
-	 * cell bodies are highlighted/unhighlighted accordingly.
-	 * 
-	 * @return The listener.
-	 */
-	public ChangeListener<Boolean> getCellNucleusTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				cellNucleusTicked = newValue;
-				buildScene();
-			}
-		};
-	}
-
-	/**
-	 * This method returns the {@link ChangeListener} that listens for the
-	 * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
-	 * in the search tab. On change, the scene refreshes and cell bodies are
-	 * highlighted/unhighlighted accordingly.
-	 * 
-	 * @return The listener.
-	 */
-	public ChangeListener<Boolean> getCellBodyTickListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				cellBodyTicked = newValue;
-				buildScene();
-			}
-		};
-	}
-
-	/**
 	 * This class is the Comparator for Shape3Ds that compares based on opacity.
 	 * This is used for z-buffering for semi-opaque materials. Entities with
 	 * opaque materials should be rendered last (added first to the root
 	 * {@link Group}.
-	 * 
+     *
 	 * @return The Shape3D comparator.
 	 */
 	private class OpacityComparator implements Comparator<Shape3D> {
@@ -2778,100 +2830,4 @@ public class Window3DController {
 				return 0;
 		}
 	}
-
-	public ChangeListener<Boolean> getMulticellModeListener() {
-		return new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-			}
-		};
-	}
-
-	/**
-	 * The getter for the {@link EventHandler} for the {@link MouseEvent} that
-	 * is fired upon clicking on a note. The handler expands the note on click.
-	 * 
-	 * @return The event handler.
-	 */
-	public EventHandler<MouseEvent> getNoteClickHandler() {
-		return new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if (event.isStillSincePress()) {
-					Node result = event.getPickResult().getIntersectedNode();
-					if (result instanceof Text) {
-						Text picked = (Text) result;
-						Note note = currentGraphicNoteMap.get(picked);
-						if (note != null) {
-							note.setExpandedInScene(!note.isExpandedInScene());
-							if (note.isExpandedInScene())
-								picked.setText(note.getTagName() + ": " + note.getTagContents());
-							else
-								picked.setText(note.getTagName() + "\n[more...]");
-						}
-					}
-				}
-			}
-		};
-	}
-
-	public Stage getStage() {
-		return this.parentStage;
-	}
-
-	private final static double cannonicalOrientationX = 145.0;
-	private final static double cannonicalOrientationY = -166.0;
-	private final static double cannonicalOrientationZ = 24.0;
-
-	private final String CS = ", ";
-
-	private final String FILL_COLOR_HEX = "#272727";
-
-	private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
-			TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-
-	/**
-	 * The wait time (in milliseconds) between consecutive time frames while a
-	 * movie is playing.
-	 */
-	private final long WAIT_TIME_MILLI = 200;
-
-	private final double CAMERA_INITIAL_DISTANCE = -220;
-	private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
-
-	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
-
-	/**
-	 * The scale of the subscene z-coordinate axis so that the embryo does not
-	 * appear flat and squished.
-	 */
-	private final double Z_SCALE = 5;
-	/** The scale of the subscene x-coordinate axis. */
-	private final double X_SCALE = 1;
-	/** The scale of the subscene y-coordinate axis. */
-	private final double Y_SCALE = 1;
-	/** Text size scale used for the rendering of billboard notes. */
-	private final double BILLBOARD_SCALE = 0.9;
-
-	/**
-	 * Scale used for the radii of spheres that represent cells, multiplied with
-	 * the cell's radius loaded from the nuc files.
-	 */
-	private final double SIZE_SCALE = 1;
-	/** The radius of all spheres when 'uniform size' is ticked. */
-	private final double UNIFORM_RADIUS = 4;
-	/**
-	 * The default camera zoom of the embryo. On program startup, the embryo is
-	 * zoomed in so that the entire embryo is not visible.
-	 */
-	private final double INITIAL_ZOOM = 1.5;
-	/**
-	 * The number of pixels that a sprite (note or label) can be outside the
-	 * sprite pane bounds before being removed from the subscene.
-	 */
-	private final int OUT_OF_BOUNDS_THRESHOLD = 5;
-	/**
-	 * The int used when calculating the y offset between a sprite and label.
-	 */
-	private final int LABEL_SPRITE_Y_OFFSET = 5;
 }

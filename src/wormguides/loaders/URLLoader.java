@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
+
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.Window3DController;
 import wormguides.layers.SearchType;
-import wormguides.model.Rule;
+import wormguides.models.Rule;
 
 public class URLLoader {
 

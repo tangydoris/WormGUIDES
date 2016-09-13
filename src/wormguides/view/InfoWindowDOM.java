@@ -3,11 +3,12 @@ package wormguides.view;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import wormguides.model.AmphidSensillaTerm;
-import wormguides.model.NonTerminalCellCase;
-import wormguides.model.PartsList;
-import wormguides.model.TerminalCellCase;
-import wormguides.model.TerminalDescendant;
+import wormguides.models.AmphidSensillaTerm;
+import wormguides.models.NonTerminalCellCase;
+import wormguides.models.TerminalCellCase;
+import wormguides.models.TerminalDescendant;
+
+import partslist.PartsList;
 
 /**
  * The document object model for WormGUIDES external information windows
@@ -16,16 +17,22 @@ import wormguides.model.TerminalDescendant;
  *
  */
 public class InfoWindowDOM {
-	private HTMLNode html;
+    //private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
+    //private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
+    private final static String AMPHID = "amphid";
+    private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
+
+    // other future dom uses: connectome, parts list, cell shapes index
+    private final static String doctypeTag = "<!DOCTYPE html>";
+    private final static String newLine = "\n";
+    private HTMLNode html;
 	private String name;
 
-	// other future dom uses: connectome, parts list, cell shapes index
-
 	/*
-	 * TODO - when necessary getNode(String ID) removeNode(String ID)
+     * TODO - when necessary getNode(String ID) removeNode(String ID)
 	 * addChildToNode(String parentID, HTMLNode child) -- need this? add title
 	 * tag to head
-	 * 
+	 *
 	 */
 	public InfoWindowDOM() {
 		this.html = new HTMLNode("html");
@@ -41,8 +48,8 @@ public class InfoWindowDOM {
 
 	/**
 	 * A DOM for a terminal cell case
-	 * 
-	 * @param terminalCase
+     *
+     * @param terminalCase
 	 */
 	public InfoWindowDOM(TerminalCellCase terminalCase) {
 		this.html = new HTMLNode("html");
@@ -565,8 +572,8 @@ public class InfoWindowDOM {
 
 	/**
 	 * A DOM for a non terminal cell case
-	 * 
-	 * @param nonTerminalCase
+     *
+     * @param nonTerminalCase
 	 */
 	public InfoWindowDOM(NonTerminalCellCase nonTerminalCase) {
 		this.html = new HTMLNode("html");
@@ -1000,8 +1007,8 @@ public class InfoWindowDOM {
 	}
 
 	/**
-	 * 
-	 * @return the dom as a string to be set to the content of a WebView
+     *
+     * @return the dom as a string to be set to the content of a WebView
 	 */
 	public String DOMtoString() {
 		String domAsString = doctypeTag;
@@ -1015,8 +1022,8 @@ public class InfoWindowDOM {
 
 	/**
 	 * Iterates through the DOM and builds the style tag add to the head node
-	 * 
-	 * Nodes with style are classified by their having an ID or not
+     *
+     * Nodes with style are classified by their having an ID or not
 	 */
 	public void buildStyleNode() {
 		if (html == null)
@@ -1044,8 +1051,8 @@ public class InfoWindowDOM {
 
 	/**
 	 * Adds the compiled style string to a style node in the head node
-	 * 
-	 * @param head
+     *
+     * @param head
 	 * @param style
 	 */
 	private void addStyleNodeToHead(HTMLNode head, String style) {
@@ -1058,8 +1065,8 @@ public class InfoWindowDOM {
 	 * called by buildStyleNode to scan the body node and extract style
 	 * attributes from children - only called if node is body tag and if body
 	 * has children
-	 * 
-	 * @param node
+     *
+     * @param node
 	 *            the body node in which to search for nodes with style
 	 * @return all of the styles formatted as a string to go into a node in the
 	 *         head
@@ -1092,8 +1099,8 @@ public class InfoWindowDOM {
 
 	/**
 	 * Formats a style attribute for a specific node
-	 * 
-	 * @param node
+     *
+     * @param node
 	 *            the node to build a style attribute for
 	 * @return a string representation of the style for the style node
 	 */
@@ -1104,8 +1111,8 @@ public class InfoWindowDOM {
 	/**
 	 * Finds all occurences of 'amphid' and replaces with a link using
 	 * addAmphidLink()
-	 * 
-	 * @param str
+     *
+     * @param str
 	 *            the string to be searched
 	 * @return the updated string with links
 	 */
@@ -1124,8 +1131,8 @@ public class InfoWindowDOM {
 	/**
 	 * Adds an <a> to an anatomy section which contains the keyword "Amphid"
 	 * These links will generate a new info window page of the Amphid type
-	 * 
-	 * @param anatomyInfo
+     *
+     * @param anatomyInfo
 	 *            the section which the link will be added to
 	 * @return updated anatomyInfo with link
 	 */
@@ -1145,13 +1152,6 @@ public class InfoWindowDOM {
 	public String getName() {
 		return this.name;
 	}
-
-	//private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
-	//private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
-	private final static String AMPHID = "amphid";
-	private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
-	private final static String doctypeTag = "<!DOCTYPE html>";
-	private final static String newLine = "\n";
 	// private final static String meta_charset = "<meta charset=\"utf-8\">";
 	// private final static String meta_httpequiv_content = "<meta
 	// http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong

@@ -19,64 +19,56 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
+
 import wormguides.layers.SearchType;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.LineageData;
-import wormguides.model.LineageTree;
-import wormguides.model.PartsList;
-import wormguides.model.ProductionInfo;
-import wormguides.model.Rule;
-import wormguides.model.SceneElement;
-import wormguides.model.SceneElementsList;
+import wormguides.models.CasesLists;
+import wormguides.models.Connectome;
+import wormguides.models.LineageData;
+import wormguides.models.LineageTree;
+import wormguides.models.ProductionInfo;
+import wormguides.models.Rule;
+import wormguides.models.SceneElement;
+import wormguides.models.SceneElementsList;
+
+import partslist.PartsList;
 
 public class Search {
 
-	private static ArrayList<String> activeLineageNames;
+    private final static Service<Void> resultsUpdateService;
+    private final static Service<ArrayList<String>> geneSearchService;
+    private final static Service<Void> showLoadingService;
+    private static final long WAIT_TIME_MILLI = 750;
+    private static ArrayList<String> activeLineageNames;
 	private static ArrayList<String> functionalNames;
 	private static ArrayList<String> descriptions;
-
 	private static ObservableList<String> searchResultsList;
 	private static Comparator<String> nameComparator;
 	private static String searchedText;
 	private static BooleanProperty clearSearchFieldProperty;
-
 	private static SearchType type;
-
 	private static boolean cellNucleusTicked;
 	private static boolean cellBodyTicked;
 	private static boolean ancestorTicked;
 	private static boolean descendantTicked;
 	private static ObservableList<Rule> rulesList;
 	private static Color selectedColor;
-
-	private final static Service<Void> resultsUpdateService;
-	private final static Service<ArrayList<String>> geneSearchService;
-
 	private static BooleanProperty geneResultsUpdated;
-
-	private final static Service<Void> showLoadingService;
 	// count used to display ellipsis when gene search is running
 	private static int count;
 	private static LinkedList<String> geneSearchQueue;
-
 	// used for adding shape rules
 	private static SceneElementsList sceneElementsList;
-
 	// for connectome searching
 	private static Connectome connectome;
 	private static boolean presynapticTicked;
 	private static boolean postsynapticTicked;
 	private static boolean electricalTicked;
 	private static boolean neuromuscularTicked;
-
 	// for cell cases searching
 	private static CasesLists cases;
-
 	// for wiring partner click handling
 	private static ProductionInfo productionInfo;
 	private static WiringService wiringService;
-
 	// for lineage searching
 	private static LineageData lineageData;
 
@@ -277,23 +269,6 @@ public class Search {
 		rulesList = list;
 	}
 
-	public boolean containsColorRule(Rule other) {
-		for (Rule rule : rulesList) {
-			if (rule.equals(other))
-				return true;
-		}
-		return false;
-	}
-
-	public EventHandler<ActionEvent> getColorPickerListener() {
-		return new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				selectedColor = ((ColorPicker) event.getSource()).getValue();
-			}
-		};
-	}
-
 	public static void addDefaultColorRules() {
 		addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, SearchOption.CELLBODY);
 		addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), SearchOption.CELLBODY);
@@ -320,10 +295,6 @@ public class Search {
 		addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), SearchOption.CELLNUCLEUS);
 	}
 
-	public void clearRules() {
-		rulesList.clear();
-	}
-
 	public static ObservableList<Rule> getRules() {
 		return rulesList;
 	}
@@ -337,7 +308,7 @@ public class Search {
 		for (SearchOption option : options) {
 			optionsArray.add(option);
 		}
-			
+
 		return addColorRule(type, searched, color, optionsArray);
 	}
 
@@ -591,7 +562,7 @@ public class Search {
 				if (!descendants.contains(name) && LineageTree.isDescendant(name, queryCell)) {
 
 					/*
-					 * 
+                     *
 					 */
 
 					descendants.add(name);
@@ -652,8 +623,8 @@ public class Search {
 	 * 1.5 - for position in positionsAtTime - compute d1 = distance from query
 	 * cell position to position - if d1 is <= d - if cell is not in results -
 	 * add cell - highlight results over lifetime of cell.
-	 * 
-	 * @param cellName
+     *
+     * @param cellName
 	 *            The String containing the lineage name of the queried cell
 	 * @return An {@link ArrayList} of Strings containing the cell lineage names
 	 *         of neighboring cells to cell with input cell lineage name
@@ -861,10 +832,6 @@ public class Search {
 		}
 	}
 
-	public Service<Void> getResultsUpdateService() {
-		return resultsUpdateService;
-	}
-
 	private static int getCountFinal(int count) {
 		final int out = count;
 		return out;
@@ -880,11 +847,9 @@ public class Search {
 	}
 
 	public static boolean isStructureWithComment(String name) {
-		if (sceneElementsList != null && (sceneElementsList.isMulticellStructureName(name)))
-			return true;
+        return sceneElementsList != null && (sceneElementsList.isMulticellStructureName(name));
 
-		return false;
-	}
+    }
 
 	public static int getFirstOccurenceOf(String name) {
 		if (lineageData != null && lineageData.isCellName(name))
@@ -1011,6 +976,32 @@ public class Search {
 		};
 	}
 
+    public boolean containsColorRule(Rule other) {
+        for (Rule rule : rulesList) {
+            if (rule.equals(other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public EventHandler<ActionEvent> getColorPickerListener() {
+        return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectedColor = ((ColorPicker) event.getSource()).getValue();
+            }
+        };
+    }
+
+    public void clearRules() {
+        rulesList.clear();
+    }
+
+    public Service<Void> getResultsUpdateService() {
+        return resultsUpdateService;
+    }
+
 	private static final class CellNameComparator implements Comparator<String> {
 		@Override
 		public int compare(String s1, String s2) {
@@ -1118,6 +1109,4 @@ public class Search {
 			};
 		}
 	}
-
-	private static final long WAIT_TIME_MILLI = 750;
 }

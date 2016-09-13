@@ -3,8 +3,6 @@ package wormguides.layers;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import wormguides.Search;
-import wormguides.model.Rule;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,6 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+
+import wormguides.Search;
+import wormguides.models.Rule;
 
 /**
  * This class is the controller for the 'Display' tab where the list of rules

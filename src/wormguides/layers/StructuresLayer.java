@@ -24,11 +24,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import wormguides.model.Rule;
-import wormguides.model.SceneElementsList;
-import wormguides.view.AppFont;
+
 import wormguides.Search;
-import wormguides.model.PartsList;
+import wormguides.models.Rule;
+import wormguides.models.SceneElementsList;
+import wormguides.view.AppFont;
+
+import partslist.PartsList;
 
 public class StructuresLayer {
 
@@ -286,7 +288,8 @@ public class StructuresLayer {
 	// Graphical representation of a structure list cell
 	private class StructureListCellGraphic extends HBox {
 
-		private BooleanProperty isSelected;
+        private final double UI_HEIGHT = 28.0;
+        private BooleanProperty isSelected;
 		private Label label;
 
 		public StructureListCellGraphic(String name) {
@@ -346,8 +349,6 @@ public class StructuresLayer {
 				label.setTextFill(Color.BLACK);
 			}
 		}
-
-		private final double UI_HEIGHT = 28.0;
 	}
 
 }

@@ -26,15 +26,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.layers.SearchType;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.PartsList;
-import wormguides.model.ProductionInfo;
-import wormguides.model.Rule;
-import wormguides.model.TerminalCellCase;
+import wormguides.models.CasesLists;
+import wormguides.models.Connectome;
+import wormguides.models.ProductionInfo;
+import wormguides.models.Rule;
+import wormguides.models.TerminalCellCase;
+
+import partslist.PartsList;
 
 /**
  * This class is the controller for the context menu that shows up on right
@@ -46,15 +48,22 @@ import wormguides.model.TerminalCellCase;
 
 public class ContextMenuController extends AnchorPane implements Initializable {
 
-	private Stage ownStage;
-
+    /**
+     * Wait time in miliseconds between showing a different number of periods
+     * after 'loading'
+     */
+    private final long WAIT_TIME_MILLI = 750;
+    private final double MAX_MENU_HEIGHT = 200;
+    private final int PRE_SYN_INDEX = 0, POST_SYN_INDEX = 1, ELECTR_INDEX = 2, NEURO_INDEX = 3;
+    /** Default color of the rules that are created by the context menu */
+    private final Color DEFAULT_COLOR = Color.WHITE;
+    private Stage ownStage;
 	@FXML
 	private VBox mainVBox;
 	@FXML
 	private HBox expressesHBox;
 	@FXML
 	private HBox wiredToHBox;
-
 	@FXML
 	private Text nameText;
 	@FXML
@@ -67,29 +76,24 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	private Button wiredTo;
 	@FXML
 	private Button colorNeighbors;
-
 	private int count; // to show loading in progress
-
 	private String cellName; // lineage name of cell
 	private ContextMenu expressesMenu;
 	private MenuItem expressesTitle;
 	private MenuItem loadingMenuItem;
 	private Service<ArrayList<String>> expressesQueryService;
 	private Service<Void> loadingService;
-
 	private ContextMenu wiredToMenu;
 	private MenuItem colorAll;
 	private Menu preSyn, postSyn, electr, neuro;
 	private Service<ArrayList<ArrayList<String>>> wiredToQueryService;
-
 	private ProductionInfo productionInfo;
 	private Stage parentStage;
-
 	private BooleanProperty bringUpInfoProperty;
 
 	/**
 	 * Constructur for ContextMenuController
-	 * 
+     *
 	 * @param stage
 	 *            the parent stage (or popup window) that the context menu lives
 	 *            in, used for rule editing window popups
@@ -188,7 +192,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 //								return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
 								return cases.getCellCase(cellName).getExpressesWORMBASE();
 							}
-							
+
 							if (!cases.containsCellCase(searchName)) {
 								cases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
 										productionInfo.getCellShapeData(cellName));
@@ -196,11 +200,11 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 							//return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
 							return cases.getCellCase(searchName).getExpressesWORMBASE();
 						}
-						
+
 						return null;
-					};
-				};
-				return task;
+                    }
+                };
+                return task;
 			}
 		};
 
@@ -278,9 +282,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 							return results;
 						}
 						return null;
-					};
-				};
-				return task;
+                    }
+                };
+                return task;
 			}
 		};
 
@@ -314,11 +318,20 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 				wiredToMenu.show(wiredTo, Side.RIGHT, 0, 0);
 			}
 		});
+    }
+
+    /**
+     * Returns the stage that the popup context menu lives in
+     *
+     * @return Stage the stage that the menu lives in (its own stage)
+     */
+    public Stage getOwnStage() {
+        return ownStage;
 	}
 
 	/**
 	 * Sets the stage to which this popup menu belongs.
-	 * 
+     *
 	 * @param stage
 	 *            the stage to which this popup menu belongs. This is different
 	 *            from the parent's stage that owns this stage
@@ -329,18 +342,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	}
 
 	/**
-	 * Returns the stage that the popup context menu lives in
-	 * 
-	 * @return Stage the stage that the menu lives in (its own stage)
-	 */
-	public Stage getOwnStage() {
-		return ownStage;
-	}
-
-	/**
 	 * Sets the listener for the 'more info' button click in the menu. Called by
-	 * Window3DController
-	 * 
+     * Window3DController
+     *
 	 * @param handler
 	 *            the handler (provided by Window3DController) that handles the
 	 *            'more info' button click action
@@ -354,7 +358,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Called by Window3DController and SulstonTreePane since they handle the
 	 * click differently. A different mouse click listener is set depending on
 	 * where the menu pops up (whether in the 3D subscene or the sulston tree)
-	 * 
+     *
 	 * @param handler
 	 *            the handler (provided by Window3DController or
 	 *            SulstonTreePane) that handles the 'color this cell' button
@@ -369,7 +373,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Called by Window3DController and SulstonTreePane since they handle the
 	 * click differently. A different mouse click listener is set depending on
 	 * where the menu pops up (whether in the 3D subscene or the sulston tree)
-	 * 
+     *
 	 * @param handler
 	 *            the handler (provided by Window3DController or
 	 *            SulstonTreePane) that handles the 'color neighbors' button
@@ -383,17 +387,38 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Returns the cell name of the context menu (also its title). This name is
 	 * either the lineage name or the functional name (if the cell is a terminal
 	 * cell)
-	 * 
+     *
 	 * @return cell name (title of the context menu)
 	 */
 	public String getName() {
 		return cellName;
+    }
+
+    /**
+     * Sets the linage name (cell/cellbody scope) of the context menu
+     *
+     * @param name
+     *         lineage name of cell/cell body that the context menu is for
+     */
+    public void setName(String name) {
+        name = name.trim();
+
+        if (name.startsWith("Ab"))
+            name = "AB" + name.substring(2);
+
+        cellName = name;
+
+        String funcName = PartsList.getFunctionalNameByLineageName(name);
+        if (funcName != null)
+            name = name + " (" + funcName + ")";
+
+        nameText.setText(name);
 	}
 
 	/**
 	 * Disables/enables the 'wired to' button depending on whether the cell is
-	 * terminal or non-terminal.
-	 * 
+     * terminal or non-terminal.
+     *
 	 * @param disable
 	 *            if true, 'wired to' button is disabled, otherwise, the button
 	 *            is enabled
@@ -503,7 +528,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
 	/**
 	 * Populates the input menu with MenuItems for each of the wired-to results.
-	 * 
+     *
 	 * @param results
 	 *            Results from either a pre-synaptic, post-synaptic, electrical,
 	 *            or neuromuscular query to the connectome
@@ -560,7 +585,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 	 * Toggles the BooleanProperty bringUpInfoProperty so that the cell info
 	 * window is displayed. ContextMenuController listens for changes in this
 	 * toggle.
-	 * 
+     *
 	 * @return void
 	 */
 	@FXML
@@ -570,35 +595,4 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 			bringUpInfoProperty.set(false);
 		}
 	}
-
-	/**
-	 * Sets the linage name (cell/cellbody scope) of the context menu
-	 * 
-	 * @param name
-	 *            lineage name of cell/cell body that the context menu is for
-	 */
-	public void setName(String name) {
-		name = name.trim();
-
-		if (name.startsWith("Ab"))
-			name = "AB" + name.substring(2);
-
-		cellName = name;
-
-		String funcName = PartsList.getFunctionalNameByLineageName(name);
-		if (funcName != null)
-			name = name + " (" + funcName + ")";
-
-		nameText.setText(name);
-	}
-
-	/**
-	 * Wait time in miliseconds between showing a different number of periods
-	 * after 'loading'
-	 */
-	private final long WAIT_TIME_MILLI = 750;
-	private final double MAX_MENU_HEIGHT = 200;
-	private final int PRE_SYN_INDEX = 0, POST_SYN_INDEX = 1, ELECTR_INDEX = 2, NEURO_INDEX = 3;
-	/** Default color of the rules that are created by the context menu */
-	private final Color DEFAULT_COLOR = Color.WHITE;
 }

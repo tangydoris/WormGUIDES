@@ -8,14 +8,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import wormguides.model.NeuronalSynapse;
-import wormguides.model.SynapseType;
+import wormguides.models.NeuronalSynapse;
+import wormguides.models.SynapseType;
 
 public class ConnectomeLoader {
-	private String filePath;
+    private static final String s_presynapticV1 = "S";
+    private static final String s_presynapticV2 = "Sp";
+    private static final String r_postsynapticV1 = "R";
+    private static final String r_postsynapticV2 = "Rp";
+    private static final String ej_electrical = "EJ";
+    private static final String nmj_neuromuscular = "NMJ";
+    private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
+    private String filePath;
 
 	public ArrayList<NeuronalSynapse> loadConnectome() {
-		URL url = ConnectomeLoader.class.getResource("/wormguides/model/connectome_config_file/NeuronConnect.csv");
+        URL url = ConnectomeLoader.class.getResource("/wormguides/models/connectome_config_file/NeuronConnect.csv");
 
 		ArrayList<NeuronalSynapse> connectome = new ArrayList<NeuronalSynapse>();
 		try {
@@ -109,12 +116,4 @@ public class ConnectomeLoader {
 
 		return cell;
 	}
-
-	private static final String s_presynapticV1 = "S";
-	private static final String s_presynapticV2 = "Sp";
-	private static final String r_postsynapticV1 = "R";
-	private static final String r_postsynapticV2 = "Rp";
-	private static final String ej_electrical = "EJ";
-	private static final String nmj_neuromuscular = "NMJ";
-	private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
 }

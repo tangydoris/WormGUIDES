@@ -1,29 +1,14 @@
 package wormguides.view;
 
-import wormguides.model.LineageData;
-import wormguides.model.PartsList;
-import wormguides.model.Rule;
-import wormguides.ColorComparator;
-import wormguides.ColorHash;
-import wormguides.Search;
-import wormguides.SearchOption;
-import wormguides.controllers.ContextMenuController;
-import wormguides.layers.SearchType;
-import wormguides.loaders.ImageLoader;
-
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
-
-import java.lang.reflect.Field;
-import javafx.util.Duration;
-
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
-import java.lang.Math;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -40,12 +25,21 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
@@ -60,66 +54,63 @@ import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.control.TreeItem;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.util.Duration;
+
+import wormguides.ColorComparator;
+import wormguides.ColorHash;
+import wormguides.Search;
+import wormguides.SearchOption;
+import wormguides.controllers.ContextMenuController;
+import wormguides.layers.SearchType;
+import wormguides.loaders.ImageLoader;
+import wormguides.models.LineageData;
+import wormguides.models.Rule;
+
+import partslist.PartsList;
 
 public class SulstonTreePane extends ScrollPane {
 
-	private LineageData data;
+    private final static int timeLabelOffsetX = 20;
+    private final static int timeOffset = 19;
+    private final int ZOOM_BUTTON_SIZE = 30;
+    private final double DEFAULT_WINDOW_HEIGHT = 820;
+    private final double DEFAULT_WINDOW_WIDTH = 775;
+    private final Color ZOOM_BUTTONS_SHADOW_COLOR = Color.web("AAAAAA");
+    private LineageData data;
 	private HashMap<String, Integer> nameXUseMap;
 	private HashMap<String, Integer> nameYStartUseMap;
 	private ArrayList<String> hiddenNodes;
 	private TreeItem<String> lineageTreeRoot;
-
 	private ColorHash colorHash;
-
 	private int maxX = 0; // global to class to keep track of current x layout
 	// position
 	private ObservableList<Rule> rules;
 	private AnchorPane mainPane;
 	private Group zoomGroup;
-
-	// Node content;
+    // branch gap
+    // seems to be some multiple of this?
+    // Node content;
 	private Scale scaleTransform;
 	private Line timeIndicatorBar;
 	private Text timeIndicator;
 	private int ttduration = 0;
 	private IntegerProperty time;
-
 	private int xsc = 5;// =XScale minimal spacing between branches, inter
-	// branch gap
-	// seems to be some multiple of this?
-
 	private int iXmax = 25; // left margin
 	private int iYmin = 19;
-
 	private Stage contextMenuStage;
 	private ContextMenuController contextMenuController;
 	private StringProperty selectedNameLabeled;
-
 	private Stage ownStage;
-
 	private AnchorPane canvas;
-	private final static int timeLabelOffsetX = 20;
-
-	private final static int timeOffset = 19;
-
 	private EventHandler<MouseEvent> clickHandler;
-	
 	private boolean defaultEmbryoFlag;
 
 	public SulstonTreePane(Stage ownStage, LineageData data, TreeItem<String> lineageTreeRoot,
 			ObservableList<Rule> rules, ColorHash colorHash, IntegerProperty time, ContextMenuController controller,
 			StringProperty selectedNameLabeled, boolean defaultEmbryoFlag) {
 		super();
-		
+
 		this.defaultEmbryoFlag = defaultEmbryoFlag;
 
 		clickHandler = new EventHandler<MouseEvent>() {
@@ -251,26 +242,26 @@ public class SulstonTreePane extends ScrollPane {
 		contextMenuStage = contextMenuController.getOwnStage();
 
 		this.selectedNameLabeled = selectedNameLabeled;
-		
+
 		// keyboard shortcut for screenshot
 		ownStage.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(final KeyEvent keyEvent) {
 				if (keyEvent.getCode() == KeyCode.F5) {
 					Stage fileChooserStage = new Stage();
-					
+
 					FileChooser fileChooser = new FileChooser();
 					fileChooser.setTitle("Choose Save Location");
 					fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
-					
+
 					WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
-					
+
 					/*
 					 * write the image to a file
 					 */
 					try {
 						File file = fileChooser.showSaveDialog(fileChooserStage);
-						
+
 						if (file != null) {
 							RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
 							ImageIO.write(renderedImage, "png", file);
@@ -284,6 +275,24 @@ public class SulstonTreePane extends ScrollPane {
 
 		updateColoring();
 	}
+
+    // stolen from web to hack these tooltips to come up faster
+    public static void hackTooltipStartTiming(Tooltip tooltip, int duration) {
+        try {
+            Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+            fieldBehavior.setAccessible(true);
+            Object objBehavior = fieldBehavior.get(tooltip);
+
+            Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+            fieldTimer.setAccessible(true);
+            Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+            objTimer.getKeyFrames().clear();
+            objTimer.getKeyFrames().add(new KeyFrame(new Duration(duration)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * Called by {@link RootLayoutController} to resizes this scrollpane and
@@ -429,37 +438,6 @@ public class SulstonTreePane extends ScrollPane {
 
 	}
 
-	// lifted code to create control zoom overlays
-	// we need this class because Bounds object doesn't support binding
-	private static class ScrollPaneViewPortHeightBinding extends DoubleBinding {
-		private final ScrollPane root;
-
-		public ScrollPaneViewPortHeightBinding(ScrollPane root) {
-			this.root = root;
-			super.bind(root.viewportBoundsProperty());
-		}
-
-		@Override
-		protected double computeValue() {
-			return root.getViewportBounds().getHeight();
-		}
-	}
-
-	private static class ScrollPaneViewPortWidthBinding extends DoubleBinding {
-
-		private final ScrollPane root;
-
-		public ScrollPaneViewPortWidthBinding(ScrollPane root) {
-			this.root = root;
-			super.bind(root.viewportBoundsProperty());
-		}
-
-		@Override
-		protected double computeValue() {
-			return root.getViewportBounds().getWidth();
-		}
-	}
-
 	private void updateDrawing() {
 		// clear drawing
 		mainPane.getChildren().clear();
@@ -512,7 +490,7 @@ public class SulstonTreePane extends ScrollPane {
 		} else {
 			timeIndicator = new Text(timeLabelOffsetX, iYmin + timevalue, Integer.toString(time.get()));
 		}
-		
+
 		timeIndicator.setFont(new Font(6));
 		timeIndicator.setStroke(new Color(.5, .5, .5, .5));
 		timeIndicator.setId("timeValue");
@@ -521,23 +499,23 @@ public class SulstonTreePane extends ScrollPane {
 		drawTimeTicks();
 	}
 
-	// retrieves material for use as texture on lines
+    // retrieves material for use as texture on lines
 	private Paint paintThatAppliesToCell(String cellname) {
 		if (cellname != null) {
 			ArrayList<Color> colors = new ArrayList<Color>();
 			// iterate over rulesList
 			for (Rule rule : rules) {
-				
-				//this occurs because the wormbase search thread hasn't finished yet
+
+                //this occurs because the wormbase search thread hasn't finished yet
 //				if (rule.getSearchType().equals(SearchType.GENE) && rule.getCells().isEmpty()) {
-//					
+//
 //				}
-				
-				if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname)) {
+
+                if (rule.appliesToCellNucleus(cellname) || rule.appliesToCellBody(cellname)) {
 					colors.add(rule.getColor());
 				}
-					
-			}
+
+            }
 			Collections.sort(colors, new ColorComparator());
 
 			// translate color list to material from material cache
@@ -553,6 +531,13 @@ public class SulstonTreePane extends ScrollPane {
 		}
 		return null;
 	}
+
+	/*
+	private void restart() {
+		updateDrawing();
+		updateColoring();
+	}
+	*/
 
 	private void drawTimeTicks() {
 		for (int i = 0; i <= 400; i = i + 100) {
@@ -674,8 +659,8 @@ public class SulstonTreePane extends ScrollPane {
 		mainPane.getChildren().add(lcell);
 		return x;
 	}
-	
-	private void setRulesListener() {
+
+    private void setRulesListener() {
 		if (this.rules != null) {
 			this.rules.addListener(new ListChangeListener<Rule>() {
 				@Override
@@ -700,34 +685,35 @@ public class SulstonTreePane extends ScrollPane {
 			});
 		}
 	}
-	
-	/*
-	private void restart() {
-		updateDrawing();
-		updateColoring();
-	}
-	*/
 
-	// stolen from web to hack these tooltips to come up faster
-	public static void hackTooltipStartTiming(Tooltip tooltip, int duration) {
-		try {
-			Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
-			fieldBehavior.setAccessible(true);
-			Object objBehavior = fieldBehavior.get(tooltip);
+    // lifted code to create control zoom overlays
+    // we need this class because Bounds object doesn't support binding
+    private static class ScrollPaneViewPortHeightBinding extends DoubleBinding {
+        private final ScrollPane root;
 
-			Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
-			fieldTimer.setAccessible(true);
-			Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+        public ScrollPaneViewPortHeightBinding(ScrollPane root) {
+            this.root = root;
+            super.bind(root.viewportBoundsProperty());
+        }
 
-			objTimer.getKeyFrames().clear();
-			objTimer.getKeyFrames().add(new KeyFrame(new Duration(duration)));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        @Override
+        protected double computeValue() {
+            return root.getViewportBounds().getHeight();
+        }
 	}
 
-	private final int ZOOM_BUTTON_SIZE = 30;
-	private final double DEFAULT_WINDOW_HEIGHT = 820;
-	private final double DEFAULT_WINDOW_WIDTH = 775;
-	private final Color ZOOM_BUTTONS_SHADOW_COLOR = Color.web("AAAAAA");
+    private static class ScrollPaneViewPortWidthBinding extends DoubleBinding {
+
+        private final ScrollPane root;
+
+        public ScrollPaneViewPortWidthBinding(ScrollPane root) {
+            this.root = root;
+            super.bind(root.viewportBoundsProperty());
+        }
+
+        @Override
+        protected double computeValue() {
+            return root.getViewportBounds().getWidth();
+        }
+    }
 }

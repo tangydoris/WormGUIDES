@@ -10,16 +10,25 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import javafx.collections.ObservableList;
-import wormguides.model.Note;
-import wormguides.model.Story;
-import wormguides.model.Note.AttachmentTypeEnumException;
-import wormguides.model.Note.LocationStringFormatException;
-import wormguides.model.Note.TagDisplayEnumException;
+
+import wormguides.models.Note;
+import wormguides.models.Note.AttachmentTypeEnumException;
+import wormguides.models.Note.LocationStringFormatException;
+import wormguides.models.Note.TagDisplayEnumException;
+import wormguides.models.Story;
 
 /*
  * Used to load stories from the internal stories config file
  */
 public class StoriesLoader {
+
+    public static final int NUMBER_OF_CSV_FIELDS = 15;
+    public static final int STORY_NAME_INDEX = 0, STORY_DESCRIPTION_INDEX = 1, STORY_AUTHOR_INDEX = 12,
+            STORY_DATE_INDEX = 13, STORY_COLOR_URL_INDEX = 14;
+    public static final int NAME_INDEX = 0, CONTENTS_INDEX = 1, DISPLAY_INDEX = 2, TYPE_INDEX = 3, LOCATION_INDEX = 4,
+            CELLNAME_INDEX = 5, MARKER_INDEX = 6, IMG_SOURCE_INDEX = 7, RESOURCE_LOCATION_INDEX = 8,
+            START_TIME_INDEX = 9, END_TIME_INDEX = 10, COMMENTS_INDEX = 11;
+    private static final String StoryListConfig = "/wormguides/models/story_file/StoryListConfig.csv";
 
 	public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
 		if (file == null)
@@ -144,15 +153,4 @@ public class StoriesLoader {
 		}
 		return false;
 	}
-
-	public static final int NUMBER_OF_CSV_FIELDS = 15;
-
-	public static final int STORY_NAME_INDEX = 0, STORY_DESCRIPTION_INDEX = 1, STORY_AUTHOR_INDEX = 12,
-			STORY_DATE_INDEX = 13, STORY_COLOR_URL_INDEX = 14;
-
-	public static final int NAME_INDEX = 0, CONTENTS_INDEX = 1, DISPLAY_INDEX = 2, TYPE_INDEX = 3, LOCATION_INDEX = 4,
-			CELLNAME_INDEX = 5, MARKER_INDEX = 6, IMG_SOURCE_INDEX = 7, RESOURCE_LOCATION_INDEX = 8,
-			START_TIME_INDEX = 9, END_TIME_INDEX = 10, COMMENTS_INDEX = 11;
-
-	private static final String StoryListConfig = "/wormguides/model/story_file/StoryListConfig.csv";
 }

@@ -6,13 +6,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import javafx.collections.ObservableList;
-import wormguides.model.Note;
-import wormguides.model.Story;
+
+import wormguides.models.Note;
+import wormguides.models.Story;
 
 /*
  * Used for loading/saving stories
  */
 public class StoryFileUtil {
+
+    private static final String CS = ",", BR = "\n", NAME = "Tag Name", CONTENTS = "Tag Contents",
+            DISPLAY = "Tag Display", ATTACHMENT = "Attachment Type", LOCATION = "xyz Locatoin", CELLS = "Cells",
+            MARKER = "Marker", SOURCE = "Imaging Source", RESOURCE = "Resource Location", START = "Start Time",
+            END = "End Time", COMMENTS = "Comments", AUTHOR = "Author", DATE = "Date", COLOR = "Color Scheme Url";
 
 	public static Story loadFromCSVFile(ObservableList<Story> stories, File file, int offset) {
 		StoriesLoader.loadFromFile(file, stories, offset);
@@ -93,10 +99,5 @@ public class StoryFileUtil {
 		}
 		return sb.toString();
 	}
-
-	private static final String CS = ",", BR = "\n", NAME = "Tag Name", CONTENTS = "Tag Contents",
-			DISPLAY = "Tag Display", ATTACHMENT = "Attachment Type", LOCATION = "xyz Locatoin", CELLS = "Cells",
-			MARKER = "Marker", SOURCE = "Imaging Source", RESOURCE = "Resource Location", START = "Start Time",
-			END = "End Time", COMMENTS = "Comments", AUTHOR = "Author", DATE = "Date", COLOR = "Color Scheme Url";
 
 }

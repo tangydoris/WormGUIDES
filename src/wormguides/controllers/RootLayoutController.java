@@ -24,6 +24,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
@@ -49,11 +51,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+
 import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.StringListCellFactory;
@@ -64,17 +68,16 @@ import wormguides.layers.StructuresLayer;
 import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
-import wormguides.model.Anatomy;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.LineageData;
-import wormguides.model.LineageTree;
-import wormguides.model.PartsList;
-import wormguides.model.CellDeaths;
-import wormguides.model.ProductionInfo;
-import wormguides.model.Rule;
-import wormguides.model.SceneElementsList;
-import wormguides.model.Story;
+import wormguides.models.Anatomy;
+import wormguides.models.CasesLists;
+import wormguides.models.CellDeaths;
+import wormguides.models.Connectome;
+import wormguides.models.LineageData;
+import wormguides.models.LineageTree;
+import wormguides.models.ProductionInfo;
+import wormguides.models.Rule;
+import wormguides.models.SceneElementsList;
+import wormguides.models.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
 import wormguides.view.InfoWindow;
@@ -83,15 +86,18 @@ import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.YesNoCancelDialogPane;
-import javafx.scene.web.WebView;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
+
+import partslist.PartsList;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
-	// Root layout's own stage
+    private final static String unLineagedStart = "Nuc";
+    private final static String ROOT = "ROOT";
+    /** Default transparency of 'other' entities on startup */
+    private final double DEFAULT_OTHERS_OPACITY = 25;
+    RotationController rotationController;
+    // Root layout's own stage
 	private Stage mainStage;
-
 	// Popup windows
 	private Stage aboutStage;
 	private Stage treeStage;
@@ -102,18 +108,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Stage cellShapesIndexStage;
 	private Stage cellDeathsStage;
 	private Stage productionInfoStage;
-
 	// URL generation/loading
 	private URLWindow urlWindow;
 	private URLLoadWindow urlLoadWindow;
 	private URLLoadWarningDialog warning;
-
 	// 3D subscene stuff
 	private Window3DController window3DController;
 	private SubScene subscene;
 	private DoubleProperty subsceneWidth;
 	private DoubleProperty subsceneHeight;
-
 	// Panels stuff
 	@FXML
 	private BorderPane rootBorderPane;
@@ -125,7 +128,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private ScrollPane infoPane;
 	@FXML
 	private HBox sceneControlsBox;
-
 	// Subscene controls
 	@FXML
 	private Button backwardButton, forwardButton, playButton;
@@ -135,7 +137,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Slider timeSlider;
 	@FXML
 	private Button zoomInButton, zoomOutButton;
-
 	// Tab
 	@FXML
 	private TabPane mainTabPane;
@@ -151,7 +152,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Tab structuresTab;
 	@FXML
 	private Tab displayTab;
-
 	// Cells tab
 	private Search search;
 	@FXML
@@ -162,7 +162,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@FXML
 	private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
 	private ToggleGroup typeToggleGroup;
-
 	@FXML
 	private CheckBox cellNucleusTick, cellBodyTick, ancestorTick, descendantTick;
 	@FXML
@@ -173,15 +172,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private ColorPicker colorPicker;
 	@FXML
 	private Button addSearchBtn;
-
 	// Connectome stuff
 	private Connectome connectome;
 	@FXML
 	private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
-
 	// Cell selection
 	private StringProperty selectedName;
-
 	// Display Layer stuff
 	private DisplayLayer displayLayer;
 	private BooleanProperty useInternalRules;
@@ -193,7 +189,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button clearAllLabelsButton;
 	@FXML
 	private Slider opacitySlider;
-
 	// Structures tab
 	private StructuresLayer structuresLayer;
 	@FXML
@@ -206,7 +201,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button addStructureRuleBtn;
 	@FXML
 	private ColorPicker structureRuleColorPicker;
-
 	// Cell information
 	@FXML
 	private Text displayedName;
@@ -214,11 +208,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Text moreInfoClickableText;
 	@FXML
 	private Text displayedDescription;
-
 	// scene elements stuff
 	// average x-, y- and z-coordinate offsets of nuclei from zero
 	private SceneElementsList elementsList;
-
 	// Story stuff
 	@FXML
 	private Text displayedStory;
@@ -233,38 +225,28 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	private Button newStory;
 	@FXML
 	private Button deleteStory;
-
 	private Popup exitSavePopup;
-
 	// production information
 	private ProductionInfo productionInfo;
-
 	// info window Stuff
 	private CasesLists cases;
 	private InfoWindow infoWindow;
 	private BooleanProperty bringUpInfoProperty;
-
 	private ImageView playIcon, pauseIcon;
-
 	private IntegerProperty time;
 	private IntegerProperty totalNuclei;
 	private BooleanProperty playingMovie;
-
 	// Lineage tree
 	private TreeItem<String> lineageTreeRoot;
 	private LineageData lineageData;
-
 	// rotation controller
 	private Stage rotationControllerStage;
-	RotationController rotationController;
-
 	// movie capture
 	@FXML
 	private MenuItem captureVideoMenuItem;
 	@FXML
 	private MenuItem stopCaptureVideoMenuItem;
 	private BooleanProperty captureVideo;
-	
 	private boolean defaultEmbryoFlag;
 
 	// ----- Begin menu items and buttons listeners -----
@@ -333,7 +315,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		aboutStage.show();
 	}
 
-	@FXML
+    @FXML
 	public void viewTreeAction() {
 		if (treeStage == null) {
 			treeStage = new Stage();
@@ -422,37 +404,37 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		urlLoadWindow.clearField();
 		urlLoadStage.show();
 	}
-	
+
 	@FXML
 	public void saveSearchResultsAction() {
 		ObservableList<String> items = searchResultsListView.getItems();
 		if (!(items.size() > 0)) {
 			System.out.println("no search results to write to file");
 		}
-		
+
 		Stage fileChooserStage = new Stage();
-		
+
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Choose Save Location");
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
-		
+
 		try  {
 			File output = fileChooser.showSaveDialog(fileChooserStage);
-			
+
 			// check
 			if (output == null) {
 				System.out.println("error creating file to write search results");
 				return;
 			}
-			
+
 			FileWriter writer = new FileWriter(output);
-		
-			for (String s : items) {
+
+            for (String s : items) {
 				writer.write(s);
 				writer.write(System.lineSeparator());
 			}
-			
-			writer.flush();
+
+            writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			System.out.println("IOException thrown writing search results to file");
@@ -563,8 +545,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 		connectomeStage.show();
 	}
+    // ----- End menu items and buttons listeners -----
 
-	@FXML
+    @FXML
 	public void openRotationController() {
 		if (rotationControllerStage == null) {
 			FXMLLoader loader = new FXMLLoader();
@@ -580,7 +563,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			loader.setController(rotationController);
 
 			try {
-				rotationControllerStage.setScene(new Scene((AnchorPane) loader.load()));
+                rotationControllerStage.setScene(new Scene(loader.load()));
 
 				rotationControllerStage.setTitle("Rotation Controller");
 				rotationControllerStage.initOwner(mainStage);
@@ -625,17 +608,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 
 	}
-	// ----- End menu items and buttons listeners -----
-	
-	public void initCloseApplication() {
+
+    public void initCloseApplication() {
 		// check if there is an active story to prompt save dialog
 		if (storiesLayer.getActiveStory() != null) {
 			promptStorySave();
 		} else {
 			exitApplication();
 		}
-		
-	}
+
+    }
 
 	public void promptStorySave() {
 		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
@@ -674,8 +656,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 				exitSavePopup.setAutoFix(true);
 			}
-			
-			exitSavePopup.show(mainStage);
+
+            exitSavePopup.show(mainStage);
 			exitSavePopup.centerOnScreen();
 		}
 	}
@@ -936,8 +918,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				} else {
 					timeLabel.setText("~" + (time.get()) + " min");
 				}
-				
-			}
+
+            }
 		});
 		timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
 		timeLabel.toFront();
@@ -983,8 +965,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		} else {
 			timeSlider.setMin(0);
 		}
-		
-		timeSlider.setMax(window3DController.getEndTime());
+
+        timeSlider.setMax(window3DController.getEndTime());
 
 		opacitySlider.setMin(0);
 		opacitySlider.setMax(100);
@@ -1048,17 +1030,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		if (!defaultEmbryoFlag) {
 			// remove unlineaged cells
 			for (int i = 0; i < allCellNames.size(); i++) {
-				if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase()) || 
-						allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
+                if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase()) ||
+                        allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
 					allCellNames.remove(i--);
 				}
 			}
-			
-			//sort the lineage names that remain
+
+            //sort the lineage names that remain
 			Collections.sort(allCellNames);
 		}
-		
-		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
+
+        new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
 		lineageTreeRoot = LineageTree.getRoot();
 	}
 
@@ -1180,8 +1162,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 					selectedName.set(newValue);
 			}
 		});
-		
-	}
+
+    }
 
 	private void initStoriesLayer() {
 		if (structuresLayer == null)
@@ -1189,9 +1171,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
 				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory, defaultEmbryoFlag);
-		
 
-		window3DController.setStoriesLayer(storiesLayer);
+        window3DController.setStoriesLayer(storiesLayer);
 
 		storiesListView.setItems(storiesLayer.getStories());
 		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
@@ -1220,8 +1201,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	/**
 	 * Initializes the {@link SceneElementsList} that contains all the
 	 * {@link SceneElement} objects visible in all time frames.
-	 * 
-	 * @param offsetX
+     *
+     * @param offsetX
 	 *            Average x-coordinate offset of nuclei from zero
 	 * @param offsetY
 	 *            Average y-coordinate offset of nuclei from zero
@@ -1267,7 +1248,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		Search.setProductionInfo(productionInfo);
 	}
 
-	/**
+    /**
 	 * Replaces all application tabs with dockable ones ({@link DraggableTab})
 	 */
 	private void replaceTabsWithDraggableTabs() {
@@ -1308,9 +1289,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
 		initProductionInfo();
-		
-		if (bundle != null) {					
-			lineageData = (LineageData) bundle.getObject("lineageData");
+
+        if (bundle != null) {
+            lineageData = (LineageData) bundle.getObject("lineageData");
 			defaultEmbryoFlag = false;
 			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
 		} else {
@@ -1318,28 +1299,28 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			defaultEmbryoFlag = true;
 			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
 		}
-		
-		replaceTabsWithDraggableTabs();
+
+        replaceTabsWithDraggableTabs();
 
 		initPartsList();
 		initCellDeaths();
 		initAnatomy();
-		
-		assertFXMLNodes();
+
+        assertFXMLNodes();
 
 		initToggleGroup();
 		initDisplayLayer();
 
 		initializeWithLineageData();
-		
-		mainTabPane.getSelectionModel().select(storiesTab);
+
+        mainTabPane.getSelectionModel().select(storiesTab);
 	}
 
 	public void initializeWithLineageData() {
-	
-		initLineageTree(lineageData.getAllCellNames());
-		
-		init3DWindow(lineageData);
+
+        initLineageTree(lineageData.getAllCellNames());
+
+        init3DWindow(lineageData);
 		setPropertiesFrom3DWindow();
 
 		setSlidersProperties();
@@ -1355,50 +1336,42 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		initSceneElementsList();
 
-		
-		// connectome
+        // connectome
 		initConnectome();
 
 		// structures layer
 		initStructuresLayer();
-		
-		// stories layer
+
+        // stories layer
 		initStoriesLayer();
-		
-		window3DController.setSearchResultsList(Search.getSearchResultsList());
+
+        window3DController.setSearchResultsList(Search.getSearchResultsList());
 		searchResultsListView.setItems(Search.getSearchResultsList());
 
 		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
 		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
 
 		addListeners();
-		
-		setIcons();
+
+        setIcons();
 		setLabels();
 
 		sizeSubscene();
 		sizeInfoPane();
 
 		timeSlider.setValue(window3DController.getEndTime());
-		
-		//window3DController.initializeWithCannonicalOrientation();
-		
-		viewTreeAction();
+
+        //window3DController.initializeWithCannonicalOrientation();
+
+        viewTreeAction();
 
 		captureVideo = new SimpleBooleanProperty(false);
 		if (window3DController != null) {
 			window3DController.setCaptureVideo(captureVideo);
 		}
-		
 
-	}
-	
-	private final static String unLineagedStart = "Nuc";
-	private final static String ROOT = "ROOT";
-
-	/** Default transparency of 'other' entities on startup */
-	private final double DEFAULT_OTHERS_OPACITY = 25;
-	/**
+    }
+    /**
 	 * Delay time in seconds before the application updates to the new time on
 	 * the slider
 	 */

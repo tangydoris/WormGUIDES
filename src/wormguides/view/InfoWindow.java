@@ -15,14 +15,16 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import netscape.javascript.JSObject;
+
 import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.LineageData;
-import wormguides.model.PartsList;
-import wormguides.model.ProductionInfo;
+import wormguides.models.CasesLists;
+import wormguides.models.Connectome;
+import wormguides.models.LineageData;
+import wormguides.models.ProductionInfo;
+
+import netscape.javascript.JSObject;
+import partslist.PartsList;
 
 /**
  * The top level container for the list of Info Window cell cases pages. This holds the tabpane of cases
@@ -33,20 +35,20 @@ import wormguides.model.ProductionInfo;
 
 public class InfoWindow {
 
-	private Stage infoWindowStage;
+    private final static String Nuc = "Nuc";
+    public final String EVENT_TYPE_CLICK = "click";
+    private final long WAIT_TIME_MILLI = 750;
+    private Stage infoWindowStage;
 	private TabPane tabPane;
 	private Scene scene;
 	private Stage parentStage; // update scenes on links
 //	private IntegerProperty time;
 	private InfoWindowLinkController linkController;
-
 	private ProductionInfo productionInfo;
 	private String nameToQuery;
 	private Service<Void> addNameService;
 	private Service<Void> showLoadingService;
-
 	private int count; //to show loading in progress
-	
 	private boolean defaultEmbryoFlag;
 	private LineageData lineageData;
 
@@ -54,7 +56,7 @@ public class InfoWindow {
 			Connectome connectome, boolean defaultEmbryoFlag, LineageData lineageData) {
 		this.defaultEmbryoFlag = defaultEmbryoFlag;
 		this.lineageData = lineageData;
-		
+
 		infoWindowStage = new Stage();
 		infoWindowStage.setTitle("Cell Info Window");
 
@@ -137,7 +139,7 @@ public class InfoWindow {
 					protected Void call() throws Exception {
 						// GENERATE CELL TAB ON CLICK
 						final String lineageName = nameToQuery;
-						
+
 						if (!defaultEmbryoFlag && !lineageData.isSulstonMode()) {
 							System.out.println("first one");
 							return null;
@@ -164,7 +166,7 @@ public class InfoWindow {
 									// String tabTitle = queryName;
 									// add a terminal case --> pass the wiring
 									// partners
-									
+
 									// check default flag for image series info validation
 									if (defaultEmbryoFlag) {
 										String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
@@ -182,11 +184,11 @@ public class InfoWindow {
 												connectome.queryConnectivity(funcName, false, true, false, false, false),
 												connectome.queryConnectivity(funcName, false, false, true, false, false),
 												connectome.queryConnectivity(funcName, false, false, false, true, false),
-												new ArrayList<String>(), 
-												new ArrayList<String>());
+                                                new ArrayList<String>(),
+                                                new ArrayList<String>());
 									}
-									
-								}
+
+                                }
 							} else { // not in connectome --> non terminal case
 								if (cases.containsCellCase(lineageName)) {
 
@@ -198,12 +200,13 @@ public class InfoWindow {
 												productionInfo.getCellShapeData(lineageName));
 									} else {
 										System.out.println("third one");
-										cases.makeNonTerminalCase(lineageName, 
-												new ArrayList<String>(),
+                                        cases.makeNonTerminalCase(
+                                                lineageName,
+                                                new ArrayList<String>(),
 												new ArrayList<String>());
 									}
-									
-								}
+
+                                }
 							}
 						}
 						return null;
@@ -242,7 +245,26 @@ public class InfoWindow {
 			}
 		});
 	}
-	
+
+//	private void goToTabWithName(String name) {
+//		if (containsTab(name)) {
+//			for (Tab tab : tabPane.getTabs()) {
+//				if (tab.getText().equalsIgnoreCase(name)) {
+//					tabPane.getSelectionModel().select(tab);
+//					break;
+//				}
+//			}
+//		}
+//	}
+//
+//	private boolean containsTab(String name) {
+//		for (Tab tab : tabPane.getTabs()) {
+//			if (tab.getText().equalsIgnoreCase(name))
+//				return true;
+//		}
+//		return false;
+//	}
+
 	private void setInfoWindowTitle() {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -264,29 +286,10 @@ public class InfoWindow {
 		}
 	}
 
-//	private void goToTabWithName(String name) {
-//		if (containsTab(name)) {
-//			for (Tab tab : tabPane.getTabs()) {
-//				if (tab.getText().equalsIgnoreCase(name)) {
-//					tabPane.getSelectionModel().select(tab);
-//					break;
-//				}
-//			}
-//		}
-//	}
-//
-//	private boolean containsTab(String name) {
-//		for (Tab tab : tabPane.getTabs()) {
-//			if (tab.getText().equalsIgnoreCase(name))
-//				return true;
-//		}
-//		return false;
-//	}
-
 	/**
 	 * Adds a tab to the window in a separate thread
-	 * 
-	 * @param dom the dom to be added as a tab
+     *
+     * @param dom the dom to be added as a tab
 	 */
 	public void addTab(InfoWindowDOM dom) {
 		Platform.runLater(new Runnable() {
@@ -326,8 +329,4 @@ public class InfoWindow {
 	public Stage getStage() {
 		return infoWindowStage;
 	}
-
-	public final String EVENT_TYPE_CLICK = "click";
-	private final long WAIT_TIME_MILLI = 750;
-	private final static String Nuc = "Nuc";
 }

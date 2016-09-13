@@ -3,6 +3,7 @@ package wormguides.controllers;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -26,32 +27,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
+
 import wormguides.StringListCellFactory;
-import wormguides.model.LineageData;
-import wormguides.model.Note;
-import wormguides.model.Note.Display;
-import wormguides.model.Note.Type;
-import wormguides.model.Story;
+import wormguides.models.LineageData;
+import wormguides.models.Note;
+import wormguides.models.Note.Display;
+import wormguides.models.Note.Type;
+import wormguides.models.Story;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 
-	private LineageData cellData;
+    private final String NEW_NOTE_TITLE = "New Note";
+    private final String NEW_NOTE_CONTENTS = "New note contents here";
+    private LineageData cellData;
 	private int frameOffset;
-
 	@FXML
 	private TextField author;
 	@FXML
 	private TextField date;
-
 	@FXML
 	private Label activeCellLabel;
 	private StringProperty activeCellProperty;
 	private StringProperty sceneActiveCellProperty;
 	private IntegerProperty timeProperty;
-
 	@FXML
 	private Button delete;
-
 	// time stuff
 	@FXML
 	private ToggleGroup timeToggle;
@@ -67,7 +67,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private TextField endTimeField;
 	@FXML
 	private Label currentTimeLabel;
-
 	// attachment type stuff
 	@FXML
 	private ToggleGroup attachmentToggle;
@@ -77,7 +76,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private RadioButton globalRadioBtn;
 	@FXML
 	private RadioButton structureRadioBtn;
-
 	@FXML
 	private ToggleGroup subStructureToggle;
 	@FXML
@@ -86,16 +84,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	private StringListCellFactory factory;
 	@FXML
 	private RadioButton axonRadioBtn;
-	@FXML
-	private RadioButton dendriteRadioBtn;
-	@FXML
-	private RadioButton cellBodyRadioBtn;
 
 	// callout stuff
 	// @FXML private CheckBox calloutTick;
 	// @FXML private ToggleGroup calloutToggle;
-
-	// display type stuff
+    @FXML
+    private RadioButton dendriteRadioBtn;
+    @FXML
+    private RadioButton cellBodyRadioBtn;
+    // display type stuff
 	@FXML
 	private ToggleGroup displayToggle;
 	@FXML
@@ -113,20 +110,17 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 	@FXML
 	private RadioButton lowRightRadioBtn;
 	private BooleanProperty noteCreated;
-
 	@FXML
 	private TextField storyTitle;
 	@FXML
 	private TextArea storyDescription;
 	private Runnable storyRunnable;
 	private Story activeStory;
-
 	@FXML
 	private TextField titleField;
 	@FXML
 	private TextArea contentArea;
 	private Note activeNote;
-
 	private BooleanProperty update3D;
 
 	// Input nameProperty is the string property that changes with clicking
@@ -153,8 +147,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				if (newValue != null) {
 					Toggle selected = timeToggle.getSelectedToggle();
-					if (selected == null || ((Time) selected.getUserData()) != Time.CURRENT)
-						setCurrentTimeLabel(timeProperty.get() + frameOffset);
+                    if (selected == null || selected.getUserData() != Time.CURRENT)
+                        setCurrentTimeLabel(timeProperty.get() + frameOffset);
 				}
 			}
 		});
@@ -375,15 +369,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		return noteCreated;
 	}
 
-	public void setActiveNote(Note note) {
-		activeNote = note;
-
-		updateNoteFields();
-		updateType();
-		updateTime();
-		updateDisplay();
-	}
-
 	private void updateTime() {
 		if (timeToggle != null) {
 			setCurrentTimeLabel(timeProperty.get() + frameOffset);
@@ -548,25 +533,43 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 		return activeNote;
 	}
 
-	public void setActiveStory(Story story) {
-		activeStory = story;
-		updateStoryFields();
-	}
+    public void setActiveNote(Note note) {
+        activeNote = note;
+
+        updateNoteFields();
+        updateType();
+        updateTime();
+        updateDisplay();
+    }
 
 	public Story getActiveStory() {
 		return activeStory;
 	}
 
+    public void setActiveStory(Story story) {
+        activeStory = story;
+        updateStoryFields();
+    }
+
 	public void addDeleteButtonListener(EventHandler<ActionEvent> handler) {
 		delete.setOnAction(handler);
 	}
 
+    // ----- Begin button actions -----
+    @FXML
+    protected void newNote() {
+        if (activeStory != null) {
+            setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
+            setNoteCreated(true);
+        }
+    }
+
 	public enum Time {
 		GLOBAL, CURRENT, RANGE
-	};
+    }
 
-	// ----- Begin listeners ----
-	private class AuthorFieldListener implements ChangeListener<String> {
+    // ----- Begin listeners ----
+    private class AuthorFieldListener implements ChangeListener<String> {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 			if (activeStory != null)
@@ -673,6 +676,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			}
 		}
 	}
+    // ----- End listeners ----
 
 	private class EndTimeFieldListener implements ChangeListener<String> {
 		@Override
@@ -689,6 +693,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			}
 		}
 	}
+    // ----- End button actions -----
 
 	private class DisplayToggleListener implements ChangeListener<Toggle> {
 		@Override
@@ -757,19 +762,5 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 			}
 		}
 	}
-	// ----- End listeners ----
-
-	// ----- Begin button actions -----
-	@FXML
-	protected void newNote() {
-		if (activeStory != null) {
-			setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
-			setNoteCreated(true);
-		}
-	}
-	// ----- End button actions -----
-
-	private final String NEW_NOTE_TITLE = "New Note";
-	private final String NEW_NOTE_CONTENTS = "New note contents here";
 
 }

@@ -19,15 +19,24 @@ import java.util.StringTokenizer;
  */
 public class ProductionInfoLoader {
 
+    // production info file location
+    private final static int NUMBER_OF_FIELDS = 11;
+    private final static String productionInfoFilePath = "wormguides/models/production_info_file/"
+            + "Production_Info.csv";
+    private static final String productInfoLine = "Production Information,,,,,,,,,,";
+    private static final String headerLine =
+            "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,"
+                    + "cytoshow link,Movie start time (min),isSulston?,Total Time Points";
+
 	/**
 	 * Tokenizes each line in the config file and creates a 2D array of the file
-	 * 
-	 * @return the 2D array
+     *
+     * @return the 2D array
 	 */
 	public static ArrayList<ArrayList<String>> buildProductionInfo() {
 
-		URL url = ProductionInfoLoader.class.getResource("/wormguides/model/production_info_file/Production_Info.csv");
-		ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
+        URL url = ProductionInfoLoader.class.getResource("/wormguides/models/production_info_file/Production_Info.csv");
+        ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
 		ArrayList<String> cells = new ArrayList<String>();
 		ArrayList<String> imageSeries = new ArrayList<String>();
 		ArrayList<String> markers = new ArrayList<String>();
@@ -102,13 +111,5 @@ public class ProductionInfoLoader {
 
 		return productionInfo;
 	}
-
-	// production info file location
-	private final static int NUMBER_OF_FIELDS = 11;
-	private final static String productionInfoFilePath = "wormguides/model/production_info_file/"
-			+ "Production_Info.csv";
-	private static final String productInfoLine = "Production Information,,,,,,,,,,";
-	private static final String headerLine = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,"
-			+ "cytoshow link,Movie start time (min),isSulston?,Total Time Points";
 
 }

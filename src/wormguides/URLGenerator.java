@@ -2,7 +2,7 @@ package wormguides;
 
 import java.util.ArrayList;
 
-import wormguides.model.Rule;
+import wormguides.models.Rule;
 
 public class URLGenerator {
 
