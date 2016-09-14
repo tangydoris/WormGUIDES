@@ -1,11 +1,8 @@
-package wormguides.models;
 /*
- * Reference class for Scene Elements over life of embryo
- * Data structure which contains SceneElements
- *
- * Created: 0ct. 30, 2015
- * Author: Braden Katzman
+ * Bao Lab 2016
  */
+
+package wormguides.models;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +17,9 @@ import java.util.stream.Collectors;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
+/**
+ * Record of {@link SceneElement}s over the life of embryo
+ */
 public class SceneElementsList {
 
     private final static String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
@@ -48,26 +48,23 @@ public class SceneElementsList {
     }
 
     private void buildListFromConfig() {
-
         URL url = SceneElementsList.class.getResource("/wormguides/models/shapes_file/" + CELL_CONFIG_FILE_NAME);
-
-        try {
-            if (url != null) {
-                InputStream stream = url.openStream();
+        if (url != null) {
+            try (InputStream stream = url.openStream()) {
                 processStreamString(stream);
                 processCells();
-            }
 
-        } catch (IOException e) {
-            System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
+            } catch (IOException e) {
+                System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
+            }
         }
     }
 
     private void processStreamString(InputStream stream) {
-        InputStreamReader streamReader = new InputStreamReader(stream);
-        BufferedReader reader = new BufferedReader(streamReader);
+        try (InputStreamReader streamReader = new InputStreamReader(stream);
+                BufferedReader reader = new BufferedReader(streamReader)) {
 
-        try {
+            // skip csv file heading
             reader.readLine();
 
             String line;

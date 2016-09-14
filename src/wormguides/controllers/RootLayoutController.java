@@ -641,7 +641,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
      * refactor defaultEmbryoFlag --> default model, not where application was opened from
      */
     private void exitApplication() {
-        System.out.println("exiting...");
+        System.out.println("Exiting...");
         if (!defaultEmbryoFlag) {
             treeStage.hide();
             mainStage.hide();
@@ -1134,11 +1134,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
      */
     private void initSceneElementsList() {
         elementsList = new SceneElementsList();
-
         if (window3DController != null) {
             window3DController.setSceneElementsList(elementsList);
         }
-
         Search.setSceneElementsList(elementsList);
     }
 

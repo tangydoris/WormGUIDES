@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides;
 
 import java.io.IOException;
@@ -34,7 +38,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        System.out.println("start");
+        System.out.println("Starting WormGUIDES JavaFX application");
 
         ImageLoader.loadImages();
 
@@ -45,7 +49,7 @@ public class MainApp extends Application {
         initRootLayout();
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
-        System.out.println("root layout init " + difference + "ms");
+        System.out.println("Root layout init " + difference + "ms");
 
         primaryStage.setResizable(true);
         primaryStage.show();
