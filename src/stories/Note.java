@@ -1,36 +1,34 @@
-package wormguides.models;
+/*
+ * Bao Lab 2016
+ */
+
+package stories;
 
 import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import wormguides.models.SceneElement;
+import wormguides.models.SceneElementsList;
+
 /**
- * This class represents a note that belongs to a story (its parent). A note
- * contains a tag name, tag contents, an attachment type {@link Type}, a tag
- * display {@link Display}. It may contain a location to which it belongs in the
- * subscene, a cell to which it is attached to, a marker name, an imaging
- * source, a resource location that specifies the {@link SceneElement} it is
- * attached to, a start/end time, and comments.<br>
- * <br>
- * Notes can appears as sprites, 3D billboards, front-facing 3D billboards, or
- * as text in the info pane. Enums representing these displays can be found in
- * the inner class {@link Display}. If blank, the note is without scope and does
- * not appear in the subscene.<br>
- * <br>
- * Notes can be attached to entities such as cells, multicellular structures, or
- * a location in the 3D subscene. Enums representing these attachment types can
- * be found in the inner class {@link Type}. If a note is attached to a cell,
- * structure, or location, but the cell, structure, or location is not
- * specified, the note is without scope and does not appear in the subscene.
- *
- * @author Doris Tang
+ * This class represents a note that belongs to a story (its parent). A note contains a tag name, tag contents, an
+ * attachment type, and a tag display. It may contain a location to which it belongs in the subscene, a cell to which
+ * it is attached to, a marker name, an imaging attached to, a start/end time, and comments.
+ * <p>
+ * Notes can appears as sprites, 3D billboards, front-facing 3D billboards, or as text in the info pane. This is
+ * dictated by {@link Note.Display}. If blank, the note is without scope and does not appear in the subscene.
+ * <p>
+ * Notes can be attached to entities such as cells, multicellular structures, or a location in the 3D subscene. This
+ * is dictated by {@link Note.Type}. If a note is attached to a cell, structure, or location, but the cell,
+ * structure, or location is not specified, the note is without scope and does not appear in the subscene.
  */
 public class Note {
 
     private final String OBJ_EXT = ".obj";
-    // right now it is possible for a note to have multiple scene elements
-    // just by setting its resource location
+
+    // it is possible for a note to have multiple scene elements just by setting its resource location
     private ArrayList<SceneElement> elements;
     private String tagName;
     private String tagContents;
@@ -53,37 +51,36 @@ public class Note {
     // True when graphical representation is selected, false otherwise
     private BooleanProperty activeProperty;
 
-    public Note(Story parent) {
-        this.parent = parent;
+    public Note(final Story parent, final String tagName, final String tagContents) {
+        this(parent);
+        this.tagName = tagName;
+        this.tagContents = tagContents;
+    }
 
-        elements = null;
-        tagName = "";
-        tagContents = "";
-        x = y = z = Integer.MIN_VALUE;
-        cellName = "";
-        imagingSource = "";
-        resourceLocation = "";
-        startTime = endTime = Integer.MIN_VALUE;
-        comments = "";
-        changedProperty = new SimpleBooleanProperty(false);
-        changedProperty.addListener((observable, oldValue, newValue) -> {
+    public Note(final Story parent) {
+        this.parent = parent;
+        this.elements = null;
+        this.tagName = "";
+        this.tagContents = "";
+        this.x = this.y = this.z = Integer.MIN_VALUE;
+        this.cellName = "";
+        this.imagingSource = "";
+        this.resourceLocation = "";
+        this.startTime = endTime = Integer.MIN_VALUE;
+        this.comments = "";
+        this.changedProperty = new SimpleBooleanProperty(false);
+        this.changedProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 setChanged(false);
             }
         });
 
-        listExpandedProperty = new SimpleBooleanProperty(false);
-        sceneExpandedProperty = new SimpleBooleanProperty(false);
-        activeProperty = new SimpleBooleanProperty(false);
+        this.listExpandedProperty = new SimpleBooleanProperty(false);
+        this.sceneExpandedProperty = new SimpleBooleanProperty(false);
+        this.activeProperty = new SimpleBooleanProperty(false);
 
         setTagDisplay(Display.OVERLAY);
         setAttachmentType(Type.BLANK);
-    }
-
-    public Note(Story parent, String tagName, String tagContents) {
-        this(parent);
-        this.tagName = tagName;
-        this.tagContents = tagContents;
     }
 
     public String getLocationString() {
@@ -151,7 +148,7 @@ public class Note {
         }
     }
 
-    public void setTagDisplay(String display) throws TagDisplayEnumException {
+    public void setTagDisplay(final String display) throws TagDisplayEnumException {
         if (display != null) {
             for (Display d : Display.values()) {
                 if (d.equals(display.trim())) {
@@ -163,7 +160,7 @@ public class Note {
         }
     }
 
-    public void setAttachmentType(String type) throws AttachmentTypeEnumException {
+    public void setAttachmentType(final String type) throws AttachmentTypeEnumException {
         if (type != null) {
             for (Type t : Type.values()) {
                 if (t.equals(type.trim())) {
@@ -176,26 +173,27 @@ public class Note {
         }
     }
 
-    public void setLocation(String location) throws LocationStringFormatException {
+    public void setLocation(final String location) throws LocationStringFormatException {
         if (location != null && !location.isEmpty()) {
-            String[] coords = location.trim().split(" ");
+            final String[] coords = location.trim().split(" ");
 
             if (coords.length != 3) {
                 throw new LocationStringFormatException();
             }
 
             try {
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
-                int z = Integer.parseInt(coords[2]);
-                setLocation(x, y, z);
+                setLocation(
+                        Integer.parseInt(coords[0]),
+                        Integer.parseInt(coords[1]),
+                        Integer.parseInt(coords[2]));
+
             } catch (NumberFormatException e) {
                 throw new LocationStringFormatException();
             }
         }
     }
 
-    public void setLocation(int x, int y, int z) {
+    public void setLocation(final int x, final int y, final int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -207,8 +205,11 @@ public class Note {
         }
     }
 
-    public void setImagingSource(String source) {
-        if (source != null && !source.isEmpty() && source.trim().toLowerCase().endsWith(OBJ_EXT)) {
+    public void setImagingSource(final String source) {
+        if (source != null
+                && !source.isEmpty()
+                && source.trim().toLowerCase().endsWith(OBJ_EXT)) {
+
             imagingSource = source.trim();
 
             if (elements != null) {
@@ -252,7 +253,6 @@ public class Note {
     public void setTagName(String tagName) {
         if (tagName != null) {
             this.tagName = tagName;
-            // graphic.setTitle(tagName);
         }
 
         if (elements != null) {
@@ -269,7 +269,6 @@ public class Note {
     public void setTagContents(String tagContents) {
         if (tagContents != null) {
             this.tagContents = tagContents;
-            // graphic.setTitle(tagContents);
         }
     }
 
@@ -350,8 +349,15 @@ public class Note {
             resourceLocation = location.trim();
 
             elements = new ArrayList<>();
-            SceneElement se = new SceneElement(tagName, cellName, marker, imagingSource, resourceLocation, startTime,
-                    endTime + 1, comments);
+            final SceneElement se = new SceneElement(
+                    tagName,
+                    cellName,
+                    marker,
+                    imagingSource,
+                    resourceLocation,
+                    startTime,
+                    endTime + 1,
+                    comments);
             se.setLocation(x, y, z);
             elements.add(se);
         }
@@ -405,18 +411,6 @@ public class Note {
         }
     }
 
-    public String toString() {
-        String sb = "Note[" + "@Name='" + tagName + "' " +
-                "@Type=" + attachmentType + " " +
-                "@Display=" + tagDisplay + " " +
-                "@Time=" + startTime + ", " + endTime + " " +
-                "@Location=" + x + ", " + y + ", " + z + " " +
-                "@Cell='" + cellName + "' " +
-                "@Resource='" + resourceLocation + "']";
-
-        return sb;
-    }
-
     public boolean isTagDisplayEnum(String display) {
         for (Display d : Display.values()) {
             if (d.equals(display)) {
@@ -426,12 +420,15 @@ public class Note {
         return false;
     }
 
-    // Notes in error mode should not be displayed
-    // Returns true if time is not specified for CELLTIME and TIME attachment
-    // types
-    // or if cell name is not specified for CELL and CELLTIME attachment types
-    // or if there is no tag display method specified
-    // false otherwise
+    /**
+     * Tells whether a note is without scope. Such a note is not displayed. Not having scope is defined by any of the
+     * following combinations:
+     * 1. time is not specified for the CELLTIME or TIME attachment types
+     * 2. cell name is not specified for the CELLTIME or CELL attachment types
+     * 3. no tag display methods is specified
+     *
+     * @return true if the note is without scope, false otherwise
+     */
     public boolean isWithoutScope() {
         return tagDisplay.equals(Display.BLANK)
                 || !tagDisplay.equals(Display.OVERLAY)
@@ -441,12 +438,15 @@ public class Note {
     }
 
     public boolean hasLocationError() {
-        return attachmentType.equals(Type.LOCATION) && !isLoctionSpecified();
+        return attachmentType.equals(Type.LOCATION)
+                && !isLoctionSpecified();
 
     }
 
     public boolean hasEntityNameError() {
-        return !tagDisplay.equals(Display.OVERLAY) && (attachedToCell() || attachedToStructure()) && cellName.isEmpty();
+        return !tagDisplay.equals(Display.OVERLAY)
+                && (attachedToCell() || attachedToStructure())
+                && cellName.isEmpty();
 
     }
 
@@ -474,9 +474,12 @@ public class Note {
         return startTime >= 0 && endTime >= 0;
     }
 
-    // Returns true if note is visible at input time, or in sprite cell/celltime
-    // mode
-    // false otherwise
+    /**
+     * @param time
+     *         time to check
+     *
+     * @return true if note is visible at input time, or in sprite cell/celltime mode, false otherwise
+     */
     public boolean mayExistAtTime(int time) {
         if (!isWithoutScope()) {
             // If start and end times are not set
@@ -484,7 +487,6 @@ public class Note {
             if (!isTimeSpecified()) {
                 return true;
             }
-
             if (startTime <= time && time <= endTime) {
                 return true;
             }
@@ -493,10 +495,13 @@ public class Note {
         return false;
     }
 
-    // Returns true if location was specified in csv file
-    // false otherwise
+    /**
+     * @return true if location was specified in the CSV file, false otherwise
+     */
     public boolean isLoctionSpecified() {
-        return (x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && z != Integer.MIN_VALUE);
+        return (x != Integer.MIN_VALUE
+                && y != Integer.MIN_VALUE
+                && z != Integer.MIN_VALUE);
     }
 
     public boolean isOverlay() {
@@ -524,8 +529,21 @@ public class Note {
         return false;
     }
 
+    public String toString() {
+        return "Note[" + "@Name='" + tagName + "' " +
+                "@Type=" + attachmentType + " " +
+                "@Display=" + tagDisplay + " " +
+                "@Time=" + startTime + ", " + endTime + " " +
+                "@Location=" + x + ", " + y + ", " + z + " " +
+                "@Cell='" + cellName + "' " +
+                "@Resource='" + resourceLocation + "']";
+    }
+
     public enum Type {
-        LOCATION("location"), CELL("cell"), STRUCTURE("structure"), BLANK("");
+        LOCATION("location"),
+        CELL("cell"),
+        STRUCTURE("structure"),
+        BLANK("");
 
         private String type;
 
@@ -534,17 +552,11 @@ public class Note {
         }
 
         public static String valuesToString() {
-            StringBuilder sb = new StringBuilder();
-            int len = values().length;
-            Type[] values = values();
-            for (int i = 0; i < len; i++) {
-                if (i < len - 1) {
-                    sb.append(values[i]).append(", ");
-                } else {
-                    sb.append(values[i]);
-                }
+            final ArrayList<String> values = new ArrayList<>();
+            for (Type type : values()) {
+                values.add(type.toString());
             }
-            return sb.toString();
+            return String.join(",", values);
         }
 
         public String toString() {
@@ -561,7 +573,11 @@ public class Note {
     }
 
     public enum Display {
-        OVERLAY("overlay"), BILLBOARD("billboard"), BILLBOARD_FRONT("billboard front"), SPRITE("sprite"), BLANK("");
+        OVERLAY("overlay"),
+        BILLBOARD("billboard"),
+        BILLBOARD_FRONT("billboard front"),
+        SPRITE("sprite"),
+        BLANK("");
 
         private String display;
 
@@ -570,47 +586,38 @@ public class Note {
         }
 
         public static String valuesToString() {
-            StringBuilder sb = new StringBuilder();
-            int len = values().length;
-            Display[] values = values();
-            for (int i = 0; i < len; i++) {
-                if (i < len - 1) {
-                    sb.append(values[i]).append(", ");
-                } else {
-                    sb.append(values[i]);
-                }
+            final ArrayList<String> values = new ArrayList<>();
+            for (Display display : values()) {
+                values.add(display.toString());
             }
-            return sb.toString();
+            return String.join(",", values);
         }
 
         public String toString() {
             return display;
         }
 
-        public boolean equals(String display) {
+        public boolean equals(final String display) {
             return this.display.equalsIgnoreCase(display.trim());
         }
 
-        public boolean equals(Display display) {
+        public boolean equals(final Display display) {
             return this == display;
         }
     }
 
-    @SuppressWarnings("serial")
     public class TagDisplayEnumException extends Exception {
         public TagDisplayEnumException() {
             super("Invalid note tag display enum, must be one of the " + "following: " + Display.valuesToString());
         }
     }
 
-    @SuppressWarnings("serial")
     public class AttachmentTypeEnumException extends Exception {
         public AttachmentTypeEnumException() {
             super("Invalid note attachment type enum, must be one of the " + "following: " + Type.valuesToString());
         }
     }
 
-    @SuppressWarnings("serial")
     public class LocationStringFormatException extends Exception {
         public LocationStringFormatException() {
             super("Invalid note location string format, must be 3 " + "integers separated by spaces.");

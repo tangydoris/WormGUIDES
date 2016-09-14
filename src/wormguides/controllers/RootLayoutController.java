@@ -75,7 +75,6 @@ import wormguides.models.LineageTree;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
-import wormguides.models.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
 import wormguides.view.InfoWindow;
@@ -88,6 +87,7 @@ import wormguides.view.YesNoCancelDialogPane;
 import acetree.AceTreeLoader;
 import acetree.lineagedata.LineageData;
 import partslist.PartsList;
+import stories.Story;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 

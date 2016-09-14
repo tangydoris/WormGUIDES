@@ -1,4 +1,8 @@
-package wormguides.models;
+/*
+ * Bao Lab 2016
+ */
+
+package stories;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +16,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+/**
+ * Collection of {@link Note}s. In the application, each story is associated with a list of
+ * {@link wormguides.models.Rule}s. A story is either created during runtime by the user or loaded from one CSV line
+ * of a story config file.
+ */
 public class Story {
 
     private String name;
@@ -38,34 +47,34 @@ public class Story {
         this.author = author;
         this.date = date;
 
-        activeBooleanProperty = new SimpleBooleanProperty(false);
-        changedBooleanProperty = new SimpleBooleanProperty(false);
-        changedBooleanProperty.addListener((observable, oldValue, newValue) -> {
+        this.activeBooleanProperty = new SimpleBooleanProperty(false);
+        this.changedBooleanProperty = new SimpleBooleanProperty(false);
+        this.changedBooleanProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 setChanged(false);
             }
         });
 
-        notes = FXCollections.observableArrayList(note -> new Observable[]{note.getChangedProperty()});
-        notes.addListener(new ListChangeListener<Note>() {
+        this.notes = FXCollections.observableArrayList(note -> new Observable[]{note.getChangedProperty()});
+        this.notes.addListener(new ListChangeListener<Note>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends Note> c) {
                 while (c.next()) {
                     // note was edited
                     if (c.wasUpdated()) {
                         setChanged(true);
-                    } else {
-                        if (c.wasAdded()) {
-                            setChanged(true);
-                        } else if (c.wasRemoved()) {
-                            setChanged(true);
-                        }
+
+                    } else if (c.wasAdded()) {
+                        setChanged(true);
+
+                    } else if (c.wasRemoved()) {
+                        setChanged(true);
                     }
                 }
             }
         });
 
-        colorURL = url;
+        this.colorURL = url;
     }
 
     public String getColorURL() {
@@ -83,7 +92,7 @@ public class Story {
         }
     }
 
-    public void setComparator(Comparator<Note> comparator) {
+    public void setComparator(final Comparator<Note> comparator) {
         this.comparator = comparator;
     }
 
@@ -95,7 +104,7 @@ public class Story {
         return activeBooleanProperty.get();
     }
 
-    public void setActive(boolean isActive) {
+    public void setActive(final boolean isActive) {
         activeBooleanProperty.set(isActive);
     }
 
@@ -114,11 +123,10 @@ public class Story {
         return !notes.isEmpty();
     }
 
-    public ArrayList<Note> getPossibleNotesAtTime(int time) {
-        ArrayList<Note> list = notes.stream()
+    public ArrayList<Note> getPossibleNotesAtTime(final int time) {
+        return notes.stream()
                 .filter(note -> note.mayExistAtTime(time))
                 .collect(Collectors.toCollection(ArrayList::new));
-        return list;
     }
 
     public String getNoteComment(String tagName) {
@@ -162,7 +170,6 @@ public class Story {
         if (comparator != null) {
             Collections.sort(notes, comparator);
         }
-
         changedBooleanProperty.set(changed);
     }
 

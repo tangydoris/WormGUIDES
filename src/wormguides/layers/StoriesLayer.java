@@ -48,42 +48,47 @@ import wormguides.MainApp;
 import wormguides.URLGenerator;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
-import wormguides.loaders.StoriesLoader;
-import wormguides.loaders.StoryFileUtil;
 import wormguides.loaders.URLLoader;
-import wormguides.models.Note;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
-import wormguides.models.Story;
 import wormguides.view.AppFont;
 
 import acetree.lineagedata.LineageData;
+import stories.Note;
+import stories.StoriesLoader;
+import stories.Story;
+import stories.StoryFileUtil;
 
 /**
  * This class is the controller of the {@link ListView} in the 'Stories' tab.
  * The Constructor is called by the main application controller
  * {@link wormguides.controllers.RootLayoutController} on initialization.
- *
- * @author Doris Tang
  */
 public class StoriesLayer {
 
     private final String NEW_STORY_TITLE = "New Story";
     private final String NEW_STORY_DESCRIPTION = "New story description here";
     private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
+
     private Stage parentStage;
-    private SceneElementsList sceneElementsList;
-    private ObservableList<Story> stories;
-    private int timeOffset;
-    private double width;
+
     private Stage editStage;
-    private BooleanProperty rebuildSceneFlag;
     private StoryEditorController editController;
-    private Note activeNote;
     private Story activeStory;
     private StringProperty activeStoryProperty;
+    private Note activeNote;
+    private ObservableList<Story> stories;
+
     private StringProperty activeCellProperty;
     private BooleanProperty cellClickedProperty;
+
+    private SceneElementsList sceneElementsList;
+
+    private BooleanProperty rebuildSceneFlag;
+
+    private int timeOffset;
+    private double width;
+
     private IntegerProperty timeProperty;
     private LineageData cellData;
     private Comparator<Note> noteComparator;
@@ -94,39 +99,37 @@ public class StoriesLayer {
     private boolean defaultEmbryoFlag;
 
     /**
-     * Constructure called by {@link wormguides.controllers.RootLayoutController}.
+     * Constructor called by {@link wormguides.controllers.RootLayoutController}
      *
      * @param parent
-     *         The {@link Stage} to which the main application belongs to.
-     *         Used for initializing modality of the story editor popup
-     *         window.
+     *         stage that the main application belongs to. This is used for initializing modality of the story editor
+     *         popup window.
      * @param elementsList
-     *         The {@link SceneElementsList} that contains all
-     *         {@link wormguides.models.SceneElement}s loaded on application startup
+     *         list of all {@link wormguides.models.SceneElement}s loaded on application start
      * @param cellNameProperty
-     *         The {@link StringProperty} whose value contains the String of
-     *         the currently active cell, cell body, or multiceulluar
-     *         structure name
+     *         the currently active cell, cell body, or multiceulluar structure name
      * @param data
-     *         The {@link LineageData} that contains information about the
-     *         nucleus lineage data loaded on application startup
+     *         lineage data loaded on application start
      * @param sceneController
-     *         The {@link Window3DController} that controls the 3D subscene
+     *         controller for the 3D subscene
      * @param useInternalRulesFlag
-     *         The {@link BooleanProperty} that is set to TRUE when the
-     *         application should use the program's internal color rules,
-     *         FALSE otherwise (use the story's rules instead)
+     *         true if the application is using its internal rules, false if it is using a story's rules
      * @param movieTimeOffset
-     *         The integer set the the value of the movie's time offset from
-     *         the internal program's start time of 1
+     *         offset time of the movie from the application's internal start time of 1
      * @param newStoryButton
-     *         The reference to the {@link Button} whose functionality is to
-     *         create a new story (located in the 'Stories' tab)
+     *         the 'New Story' button in the Stories tab
      */
     public StoriesLayer(
-            Stage parent, SceneElementsList elementsList, StringProperty cellNameProperty, LineageData data,
-            Window3DController sceneController, BooleanProperty useInternalRulesFlag, int movieTimeOffset,
-            Button newStoryButton, Button deleteStoryButton, boolean defaultEmbryoFlag) {
+            Stage parent,
+            SceneElementsList elementsList,
+            StringProperty cellNameProperty,
+            LineageData data,
+            Window3DController sceneController,
+            BooleanProperty useInternalRulesFlag,
+            int movieTimeOffset,
+            Button newStoryButton,
+            Button deleteStoryButton,
+            boolean defaultEmbryoFlag) {
 
         parentStage = parent;
 
@@ -137,7 +140,6 @@ public class StoriesLayer {
             stories.add(story);
             setActiveStory(story);
             setActiveNote(null);
-
             bringUpEditor();
         });
 
@@ -149,36 +151,35 @@ public class StoriesLayer {
             }
         });
 
-        window3DController = sceneController;
-        useInternalRules = useInternalRulesFlag;
-        currentRules = window3DController.getObservableColorRulesList();
+        this.window3DController = sceneController;
+        this.useInternalRules = useInternalRulesFlag;
+        this.currentRules = window3DController.getObservableColorRulesList();
 
-        sceneElementsList = elementsList;
+        this.sceneElementsList = elementsList;
 
-        timeOffset = movieTimeOffset;
+        this.timeOffset = movieTimeOffset;
 
-        stories = FXCollections.observableArrayList(
+        this.stories = FXCollections.observableArrayList(
                 story -> new Observable[]{story.getChangedProperty(), story.getActiveProperty()});
-        stories.addListener(new ListChangeListener<Story>() {
+        this.stories.addListener(new ListChangeListener<Story>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends Story> c) {
                 while (c.next()) {
-                    // need this listener to detect change for some reason
-                    // leave this empty
+                    // need this listener to detect change for some reason leave this empty
                 }
             }
         });
 
-        timeProperty = window3DController.getTimeProperty();
-        rebuildSceneFlag = new SimpleBooleanProperty(false);
-        cellData = data;
+        this.timeProperty = window3DController.getTimeProperty();
+        this.rebuildSceneFlag = new SimpleBooleanProperty(false);
+        this.cellData = data;
 
-        width = 0;
+        this.width = 0;
 
-        activeStoryProperty = new SimpleStringProperty("");
+        this.activeStoryProperty = new SimpleStringProperty("");
 
-        activeCellProperty = cellNameProperty;
-        cellClickedProperty = window3DController.getCellClicked();
+        this.activeCellProperty = cellNameProperty;
+        this.cellClickedProperty = window3DController.getCellClicked();
 
         if (defaultEmbryoFlag) {
             StoriesLoader.loadConfigFile(stories, timeOffset);
@@ -186,7 +187,7 @@ public class StoriesLayer {
 
         addBlankStory();
 
-        noteComparator = (o1, o2) -> {
+        this.noteComparator = (o1, o2) -> {
             Integer t1 = getEffectiveStartTime(o1);
             Integer t2 = getEffectiveStartTime(o2);
             if (t1.equals(t2)) {
@@ -236,32 +237,27 @@ public class StoriesLayer {
     }
 
     /**
-     * Saves active story to file. Uses a {@link FileChooser} to allow the user
-     * to pick a save location.
+     * Saves active story to a file. {@link FileChooser} is used to allow the user to specify a save location and
+     * file name.
      */
     public void saveActiveStory() {
-        FileChooser chooser = new FileChooser();
+        final FileChooser chooser = new FileChooser();
         chooser.setTitle("Save Story");
         chooser.setInitialFileName("WormGUIDES Story.csv");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
+        final File file = chooser.showSaveDialog(parentStage);
 
-        File file = chooser.showSaveDialog(parentStage);
         // if user clicks save
         if (file != null) {
-            try {
-                if (activeStory != null) {
-                    updateColorURL();
-                    StoryFileUtil.saveToCSVFile(activeStory, file, timeOffset);
-                } else {
-                    System.out.println("no active story to save");
-                }
-                // TODO make error pop up
-            } catch (IOException e) {
-                // TODO make error pop up
-                System.out.println("error occurred while saving story");
-                return;
+
+            if (activeStory != null) {
+                updateColorURL();
+                StoryFileUtil.saveToCSVFile(activeStory, file, timeOffset);
+            } else {
+                System.out.println("No active story to save");
             }
-            System.out.println("file saved");
+
+            System.out.println("File saved");
         }
     }
 

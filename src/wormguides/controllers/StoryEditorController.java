@@ -33,12 +33,12 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 
 import wormguides.StringListCellFactory;
-import wormguides.models.Note;
-import wormguides.models.Note.Display;
-import wormguides.models.Note.Type;
-import wormguides.models.Story;
 
 import acetree.lineagedata.LineageData;
+import stories.Note;
+import stories.Note.Display;
+import stories.Note.Type;
+import stories.Story;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 

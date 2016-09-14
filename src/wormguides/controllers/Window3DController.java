@@ -93,8 +93,6 @@ import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.Connectome;
-import wormguides.models.Note;
-import wormguides.models.Note.Display;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Quaternion;
 import wormguides.models.Rule;
@@ -105,6 +103,8 @@ import wormguides.view.AppFont;
 import acetree.lineagedata.LineageData;
 import com.sun.javafx.scene.CameraHelper;
 import partslist.PartsList;
+import stories.Note;
+import stories.Note.Display;
 
 /**
  * The controller for the 3D subscene inside the root layout. This class
