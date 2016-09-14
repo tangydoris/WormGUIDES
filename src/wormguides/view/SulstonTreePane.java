@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import java.awt.image.RenderedImage;
@@ -62,9 +66,9 @@ import wormguides.SearchOption;
 import wormguides.controllers.ContextMenuController;
 import wormguides.layers.SearchType;
 import wormguides.loaders.ImageLoader;
-import wormguides.models.LineageData;
 import wormguides.models.Rule;
 
+import acetree.lineagedata.LineageData;
 import partslist.PartsList;
 
 public class SulstonTreePane extends ScrollPane {

@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.io.File;
@@ -61,14 +65,12 @@ import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
-import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
 import wormguides.models.Anatomy;
 import wormguides.models.CasesLists;
 import wormguides.models.CellDeaths;
 import wormguides.models.Connectome;
-import wormguides.models.LineageData;
 import wormguides.models.LineageTree;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
@@ -83,6 +85,8 @@ import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.YesNoCancelDialogPane;
 
+import acetree.AceTreeLoader;
+import acetree.lineagedata.LineageData;
 import partslist.PartsList;
 
 public class RootLayoutController extends BorderPane implements Initializable {

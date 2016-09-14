@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.net.URL;
@@ -29,11 +33,12 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 
 import wormguides.StringListCellFactory;
-import wormguides.models.LineageData;
 import wormguides.models.Note;
 import wormguides.models.Note.Display;
 import wormguides.models.Note.Type;
 import wormguides.models.Story;
+
+import acetree.lineagedata.LineageData;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 

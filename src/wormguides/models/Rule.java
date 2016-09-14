@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.io.IOException;
@@ -47,19 +51,28 @@ import wormguides.view.AppFont;
 
 public class Rule {
 
-    // length and width of color rule ui buttons
+    /** Length and width of color rule UI buttons */
     private static final int UI_SIDE_LENGTH = 22;
+
     private Stage editStage;
+
     private String text;
     private String textLowerCase;
+
     private ArrayList<SearchOption> options;
     private BooleanProperty ruleChanged;
     private boolean visible;
     private Color color;
-    private ImageView eyeIcon;
-    private ImageView eyeInvertIcon;
+
     private ArrayList<String> cells;
     private boolean cellsSet;
+
+    private RuleEditorController editController;
+
+    private SubmitHandler handler;
+
+    private SearchType searchType;
+
     private HBox hbox;
     private Label label;
     private Rectangle colorRectangle;
@@ -67,45 +80,38 @@ public class Rule {
     private Button visibleBtn;
     private Button deleteBtn;
     private Tooltip toolTip;
-    private RuleEditorController editController;
-    private SubmitHandler handler;
-    private SearchType searchType;
+    private ImageView eyeIcon;
+    private ImageView eyeInvertIcon;
 
     /**
-     * Rule class constructor called by the {@link wormguides.Search} class.
+     * Rule class constructor called by the {@link wormguides.Search} class
      *
      * @param searched
-     *         String that contains the term used when the user made a search
-     *         to add this rule
+     *         text that user searched
      * @param color
-     *         {@link Color} that the search cell(s), cell body(ies), and/or
-     *         multicellular structure(s) should have in the 3D subscene
+     *         color that the search cell(s), cell body(ies), and/or multicellular structure(s) should have in the 3D
+     *         subscene
      * @param type
-     *         {@link SearchType} enum that contains the type of search that
-     *         was made
+     *         type of search that was made
      * @param options
-     *         The {@link SearchOption}(s) enum(s) that the rule should be
-     *         extended to
+     *         options that the rule should be extended to
      */
     public Rule(String searched, Color color, SearchType type, SearchOption... options) {
         this(searched, color, type, new ArrayList<>(Arrays.asList(options)));
     }
 
     /**
-     * Rule class constructor called by the {@link wormguides.Search} class.
+     * Rule class constructor called by the {@link wormguides.Search} class
      *
      * @param searched
-     *         String that contains the term used when the user made a search
-     *         to add this rule
+     *         text that user searched
      * @param color
-     *         {@link Color} that the search cell(s), cell body(ies), and/or
-     *         multicellular structure(s) should have in the 3D subscene
+     *         color that the search cell(s), cell body(ies), and/or multicellular structure(s) should have in the 3D
+     *         subscene
      * @param type
-     *         {@link SearchType} enum that contains the type of search that
-     *         was made
+     *         type of search that was made
      * @param options
-     *         The ArrayList of {@link SearchOption} enum(s) that the rule
-     *         should be extended to
+     *         options that the rule should be extended to
      */
     public Rule(String searched, Color color, SearchType type, ArrayList<SearchOption> options) {
         hbox = new HBox();

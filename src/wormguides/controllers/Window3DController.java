@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.awt.image.RenderedImage;
@@ -89,7 +93,6 @@ import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.Connectome;
-import wormguides.models.LineageData;
 import wormguides.models.Note;
 import wormguides.models.Note.Display;
 import wormguides.models.ProductionInfo;
@@ -99,6 +102,7 @@ import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
 import wormguides.view.AppFont;
 
+import acetree.lineagedata.LineageData;
 import com.sun.javafx.scene.CameraHelper;
 import partslist.PartsList;
 
@@ -415,7 +419,7 @@ public class Window3DController {
         totalNuclei = new SimpleIntegerProperty();
         totalNuclei.set(0);
 
-        endTime = data.getTotalTimePoints() - 1;
+        endTime = data.getNumberOfTimePoints() - 1;
 
         createSubScene(parentPane.widthProperty().get(), parentPane.heightProperty().get());
         parentPane.getChildren().add(subscene);

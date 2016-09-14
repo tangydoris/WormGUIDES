@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import java.util.ArrayList;
@@ -17,9 +21,9 @@ import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
 import wormguides.models.CasesLists;
 import wormguides.models.Connectome;
-import wormguides.models.LineageData;
 import wormguides.models.ProductionInfo;
 
+import acetree.lineagedata.LineageData;
 import netscape.javascript.JSObject;
 import partslist.PartsList;
 

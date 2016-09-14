@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.layers;
 
 import java.io.File;
@@ -47,12 +51,13 @@ import wormguides.controllers.Window3DController;
 import wormguides.loaders.StoriesLoader;
 import wormguides.loaders.StoryFileUtil;
 import wormguides.loaders.URLLoader;
-import wormguides.models.LineageData;
 import wormguides.models.Note;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.models.Story;
 import wormguides.view.AppFont;
+
+import acetree.lineagedata.LineageData;
 
 /**
  * This class is the controller of the {@link ListView} in the 'Stories' tab.
