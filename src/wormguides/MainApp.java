@@ -51,9 +51,9 @@ public class MainApp extends Application {
 			public void handle(WindowEvent event) {
 				event.consume();
 
-				// prompt user to save active story on application exit
-				if (controller != null)
-					controller.promptStorySave();
+				if (controller != null) {
+					controller.initCloseApplication();
+				}
 			}
 		});
 	}

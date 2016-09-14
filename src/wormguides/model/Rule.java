@@ -368,7 +368,7 @@ public class Rule {
 	 * 
 	 * @param color
 	 *            The {@link Color} that the rule should apply to the cell(s),
-	 *            cell body(ies), and/or multicellular structures it afffects
+	 *            cell body(ies), and/or multicellular structures it affects
 	 */
 	public void setColor(Color color) {
 		this.color = color;
@@ -498,11 +498,13 @@ public class Rule {
 	 *         structure with specified name; FALSE otherwise
 	 */
 	public boolean appliesToMulticellularStructure(String name) {
-		if (!visible)
+		if (!visible) {
 			return false;
-
-		if (options.contains(SearchOption.MULTICELLULAR_NAME_BASED) && text.equalsIgnoreCase(name))
+		}
+		
+		if (options.contains(SearchOption.MULTICELLULAR_NAME_BASED) && text.equalsIgnoreCase(name)) {	
 			return true;
+		}
 
 		return false;
 	}
@@ -575,7 +577,11 @@ public class Rule {
 			if (editController != null) {
 				setColor(editController.getColor());
 				editStage.hide();
-				setOptions(editController.getOptions());
+				
+				// because the multicellular name based rule is not a check option, we need to override this function to avoid overwriting the multicellular search option
+				if (!options.contains(SearchOption.MULTICELLULAR_NAME_BASED)) {
+					setOptions(editController.getOptions());
+				}
 
 				label.setText(toStringFull());
 				toolTip.setText(toStringFull());

@@ -334,8 +334,10 @@ public class Search {
 
 	public static Rule addColorRule(SearchType type, String searched, Color color, SearchOption... options) {
 		ArrayList<SearchOption> optionsArray = new ArrayList<SearchOption>();
-		for (SearchOption option : options)
+		for (SearchOption option : options) {
 			optionsArray.add(option);
+		}
+			
 		return addColorRule(type, searched, color, optionsArray);
 	}
 

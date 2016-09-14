@@ -224,7 +224,7 @@ public class StoriesLayer {
 	 * Adds a blank story upon initialization.
 	 */
 	private void addBlankStory() {
-		Story blankStory = new Story("Template to Make Your Own Story",
+		Story blankStory = new Story(TEMPLATE_STORY_NAME,
 				"Shows all segmented neurons without " + "further annotation.",
 				"http://scene.wormguides.org/wormguides/testurlscript?/set/ash-n$@+#ff8"
 						+ "fbc8f/rib-n$@+#ff663366/avg-n$@+#ffb41919/dd-n@+#ff4a24c1/da-"
@@ -939,7 +939,7 @@ public class StoriesLayer {
 			titleContainer.setMaxWidth(width);
 			titleContainer.setMinWidth(width);
 
-			expandIcon = new Text("� ");
+			expandIcon = new Text("- ");
 			expandIcon.setPickOnBounds(true);
 			expandIcon.setFont(AppFont.getBolderFont());
 			expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
@@ -1051,15 +1051,16 @@ public class StoriesLayer {
 		private void expandNote(boolean expanded) {
 			if (expanded) {
 				getChildren().add(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▸", "▾"));
+				expandIcon.setText(expandIcon.getText().replace("â–¸", "â–¾"));
 			} else {
 				getChildren().remove(contentsContainer);
-				expandIcon.setText(expandIcon.getText().replace("▾", "▸"));
+				expandIcon.setText(expandIcon.getText().replace("â–¾", "â–¸"));
 			}
 		}
 	}
 
 	private final String NEW_STORY_TITLE = "New Story";
 	private final String NEW_STORY_DESCRIPTION = "New story description here";
+	private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
 
 }

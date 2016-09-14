@@ -57,6 +57,10 @@ public class RotationController extends AnchorPane implements Initializable {
 		xRotationSlider.setValue(xRotationAngle.get());
 		yRotationSlider.setValue(yRotationAngle.get());
 		zRotationSlider.setValue(zRotationAngle.get());
+		
+		rotateXAngleField.setText(this.xRotationAngle.toString());
+		rotateYAngleField.setText(this.yRotationAngle.toString());
+		rotateZAngleField.setText(this.zRotationAngle.toString());
 
 		rotateXAngleField.textProperty().bindBidirectional(xRotationAngle, new NumberStringConverter());
 		rotateYAngleField.textProperty().bindBidirectional(yRotationAngle, new NumberStringConverter());
@@ -130,19 +134,19 @@ public class RotationController extends AnchorPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					// check if within -360 to +360 range
-					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
-						return;
-					} else {
-						try {	
-							double rotateXAngleVal = Double.parseDouble(newValue);
+					// check if initialization
+					if (newValue.startsWith(DoublePropStr)) return;
+					
+					
+					try {
+						double rotateXAngleVal = Double.parseDouble(newValue);
 								
-							if (rotateXAngleVal > -360. && rotateXAngleVal < 360.) {
-								xRotationAngle.set(rotateXAngleVal);
-							}
-						} catch (NumberFormatException e) {
-								// e.printStackTrace();
+						if (rotateXAngleVal > -360. && rotateXAngleVal < 360.) {
+							xRotationAngle.set(rotateXAngleVal);
 						}
+					} catch (Exception e) {
+						xRotationAngle.set(ZERO);
+//						 e.printStackTrace();
 					}
 				}
 			}
@@ -154,19 +158,19 @@ public class RotationController extends AnchorPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					// check if within -360 to +360 range
-					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
-						return;
-					} else {
-						try {
+					// check if initialization
+					if (newValue.startsWith(DoublePropStr)) return;
+					
+					
+					try {
 						double rotateYAngleVal = Double.parseDouble(newValue);
 
 						if (rotateYAngleVal > -360. && rotateYAngleVal < 360.) {
 							yRotationAngle.set(rotateYAngleVal);
 						}
 					} catch (Exception e) {
+						yRotationAngle.set(ZERO);
 						// e.printStackTrace();
-						}
 					}
 				}
 			}
@@ -178,19 +182,18 @@ public class RotationController extends AnchorPane implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.isEmpty()) {
-					// check if within -360 to +360 range
-					if (newValue.length() > 1 && newValue.charAt(0) == '-' && !Character.isDigit(newValue.charAt(1))) {
-						return;
-					} else {
-						try {
+					// check if initialization
+					if (newValue.startsWith(DoublePropStr)) return;
+					
+					try {
 						double rotateZAngleVal = Double.parseDouble(newValue);
 
 						if (rotateZAngleVal > -360. && rotateZAngleVal < 360.) {
 							zRotationAngle.set(rotateZAngleVal);
 						}
 					} catch (Exception e) {
+						zRotationAngle.set(ZERO);
 						// e.printStackTrace();
-						}
 					}
 				}
 			}
@@ -202,4 +205,7 @@ public class RotationController extends AnchorPane implements Initializable {
 		assert(yRotationSlider != null);
 		assert(zRotationSlider != null);
 	}
+	
+	private final static double ZERO = 0.;
+	private final static String DoublePropStr = "DoubleProperty [value: ";
 }

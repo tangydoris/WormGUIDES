@@ -2572,7 +2572,6 @@ public class Window3DController {
 				hideContextPopups();
 
 				double z = zoom.get();
-				
 				/**
 				 * Workaround to avoid JavaFX bug --> stop zoom at 0
 				 * As of July 8, 2016
@@ -2582,6 +2581,7 @@ public class Window3DController {
 				 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes 
 				 * appear, surrounded w/ artifacts.
 				 */
+
 				if (z >= 0.25) {
 					z -= 0.25;
 				} else if (z < 0) {
@@ -2625,6 +2625,17 @@ public class Window3DController {
 				if (!playingMovie.get())
 					setTime(time.get() + 1);
 			}
+		};
+	}
+	
+	public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				allLabels.clear();
+				currentLabels.clear();
+				buildScene();
+			}		
 		};
 	}
 
