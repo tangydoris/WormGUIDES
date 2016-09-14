@@ -34,8 +34,8 @@ public class MainApp extends Application {
 
 		ImageLoader.loadImages();
 
-		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("WormGUIDES");
+		MainApp.primaryStage = primaryStage;
+		MainApp.primaryStage.setTitle("WormGUIDES");
 
 		long start_time = System.nanoTime();
 		initRootLayout();

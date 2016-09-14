@@ -160,8 +160,10 @@ public class Window3DController {
 	private static String[] meshNames;
 	private boolean[] searchedCells;
 	private boolean[] searchedMeshes;
-	private Integer[][] positions;
-	private Integer[] diameters;
+//	private Integer[][] positions;
+//	private Integer[] diameters;
+	private Double[][] positions;
+	private Double[] diameters;
 	private DoubleProperty zoom;
 
 	// switching timepoints stuff
@@ -271,6 +273,11 @@ public class Window3DController {
 	private DoubleProperty rotateZAngle;
 
 	private Quaternion quaternion;
+	
+	// scales of the subscene coordinate axis --> from ProductionInfo.csv
+	private double X_SCALE;
+	private double Y_SCALE;
+	private double Z_SCALE;
 
 	/**
 	 * Window3DController class constructor called by
@@ -301,7 +308,7 @@ public class Window3DController {
 	 */
 	public Window3DController(Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
 			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-			int offsetZ, boolean defaultEmbryoFlag) {
+			int offsetZ, boolean defaultEmbryoFlag, double X_SCALE, double Y_SCALE, double Z_SCALE) {
 		parentStage = parent;
 
 		this.offsetX = offsetX;
@@ -337,8 +344,10 @@ public class Window3DController {
 		meshes = new MeshView[1];
 		cellNames = new String[1];
 		meshNames = new String[1];
-		positions = new Integer[1][3];
-		diameters = new Integer[1];
+//		positions = new Integer[1][3];
+//		diameters = new Integer[1];
+		positions = new Double[1][3];
+		diameters = new Double[1];
 		searchedCells = new boolean[1];
 		searchedMeshes = new boolean[1];
 
@@ -540,6 +549,18 @@ public class Window3DController {
 		this.bringUpInfoProperty = bringUpInfoProperty;
 
 		initializeUpdate3D();
+		
+		// set up the scaling values
+		/**
+		 * to convert from microns to pixel values, we set x,y = 1 and z = ratio of z to original y 
+		 */
+		if (X_SCALE != Y_SCALE) { // note that X_SCALE and Y_SCALE are not the same
+			System.err.println("X_SCALE does not equal Y_SCALE - using ratio of Z to X for Z_SCALE value in pixels" + "\n" + "X, Y should be the same value");
+		}
+		
+		this.X_SCALE = 1;
+		this.Y_SCALE = 1;
+		this.Z_SCALE = Z_SCALE / X_SCALE;
 	}
 
 	public void initializeWithCannonicalOrientation() {
@@ -2551,11 +2572,21 @@ public class Window3DController {
 				hideContextPopups();
 
 				double z = zoom.get();
-				z -= 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
+				
+				/**
+				 * Workaround to avoid JavaFX bug --> stop zoom at 0
+				 * As of July 8, 2016
+				 * Noted by: Braden Katzman
+				 * 
+				 * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of passing through it
+				 * The API does not recognize that the camera orientation has changed and thus the back of back face culled shapes 
+				 * appear, surrounded w/ artifacts.
+				 */
+				if (z >= 0.25) {
+					z -= 0.25;
+				} else if (z < 0) {
+					z = 0;
+				}
 
 				zoom.set(z);
 			}
@@ -2570,11 +2601,6 @@ public class Window3DController {
 
 				double z = zoom.get();
 				z += 0.25;
-				if (z < 0.25)
-					z = 0.25;
-				else if (z > 5)
-					z = 5;
-
 				zoom.set(z);
 			}
 		};
@@ -2825,15 +2851,6 @@ public class Window3DController {
 
 	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
 
-	/**
-	 * The scale of the subscene z-coordinate axis so that the embryo does not
-	 * appear flat and squished.
-	 */
-	private final double Z_SCALE = 5;
-	/** The scale of the subscene x-coordinate axis. */
-	private final double X_SCALE = 1;
-	/** The scale of the subscene y-coordinate axis. */
-	private final double Y_SCALE = 1;
 	/** Text size scale used for the rendering of billboard notes. */
 	private final double BILLBOARD_SCALE = 0.9;
 

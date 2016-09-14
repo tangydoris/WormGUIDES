@@ -6,9 +6,13 @@ public interface LineageData {
 
 	String[] getNames(int time);
 
-	Integer[][] getPositions(int time);
+	Double[][] getPositions(int time);
 
-	Integer[] getDiameters(int time);
+	Double[] getDiameters(int time);
+	
+//	Integer[][] getPositions(int time);
+//
+//	Integer[] getDiameters(int time);
 
 	ArrayList<String> getAllCellNames();
 
@@ -25,4 +29,6 @@ public interface LineageData {
 	public boolean isSulstonMode();
 	
 	public void setIsSulstonModeFlag(boolean isSulston);
+	
+	public double[] getXYZScale();
 }

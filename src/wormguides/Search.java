@@ -668,13 +668,17 @@ public class Search {
 
 		for (int i = firstOccurence; i <= lastOccurence; i++) {
 			String[] names = lineageData.getNames(i);
-			Integer[][] positions = lineageData.getPositions(i);
+//			Integer[][] positions = lineageData.getPositions(i);
+			Double[][] positions = lineageData.getPositions(i);
 
 			// find the coordinates of the query cell
 			int queryIDX = -1;
-			int x = -1;
-			int y = -1;
-			int z = -1;
+//			int x = -1;
+//			int y = -1;
+//			int z = -1;
+			double x = -1;
+			double y = -1;
+			double z = -1;
 			for (int j = 0; j < names.length; j++) {
 				if (names[j].toLowerCase().equals(cellName.toLowerCase())) {
 					queryIDX = j;
@@ -715,10 +719,14 @@ public class Search {
 
 		return results;
 	}
-
-	private static double distance(int x1, int x2, int y1, int y2, int z1, int z2) {
+	
+	private static double distance(double x1, double x2, double y1, double y2, double z1, double z2) {
 		return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
 	}
+
+//	private static double distance(int x1, int x2, int y1, int y2, int z1, int z2) {
+//		return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
+//	}
 
 	public static EventHandler<ActionEvent> getAddButtonListener() {
 		return new EventHandler<ActionEvent>() {

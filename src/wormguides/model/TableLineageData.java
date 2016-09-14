@@ -13,16 +13,22 @@ public class TableLineageData implements LineageData {
 	private ArrayList<Frame> timeFrames;
 	private ArrayList<String> allCellNames;
 	private boolean isSulston;
+	private double[] xyzScale;
 
 	public TableLineageData() {
-		this(new ArrayList<String>());
+		this(new ArrayList<String>(), 1., 1., 1.);
 	}
 
-	public TableLineageData(ArrayList<String> allCellNames) {
+	public TableLineageData(ArrayList<String> allCellNames, double X_SCALE, double Y_SCALE, double Z_SCALE) {
 		timeFrames = new ArrayList<Frame>();
 		this.allCellNames = allCellNames;
+		this.xyzScale = new double[3];
+		xyzScale[0] = X_SCALE;
+		xyzScale[1] = Y_SCALE;
+		xyzScale[2] = Z_SCALE;
 	}
 
+	@Override
 	public void shiftAllPositions(int x, int y, int z) {
 		for (int i = 0; i < timeFrames.size(); i++) {
 			timeFrames.get(i).shiftPositions(x, y, z);
@@ -50,23 +56,42 @@ public class TableLineageData implements LineageData {
 	}
 
 	@Override
-	public Integer[][] getPositions(int time) {
+	public Double[][] getPositions(int time) {
 		time--;
 		if (time >= getTotalTimePoints() || time < 0)
-			return new Integer[1][3];
+			return new Double[1][3];
 
 		return timeFrames.get(time).getPositions();
 	}
-
+	
 	@Override
-	public Integer[] getDiameters(int time) {
+	public Double[] getDiameters(int time) {
 		time--;
 		if (time >= getTotalTimePoints() || time < 0)
-			return new Integer[1];
+			return new Double[1];
 
 		return timeFrames.get(time).getDiameters();
 	}
+	
+//	@Override
+//	public Integer[][] getPositions(int time) {
+//		time--;
+//		if (time >= getTotalTimePoints() || time < 0)
+//			return new Integer[1][3];
+//
+//		return timeFrames.get(time).getPositions();
+//	}
 
+//	@Override
+//	public Integer[] getDiameters(int time) {
+//		time--;
+//		if (time >= getTotalTimePoints() || time < 0)
+//			return new Integer[1];
+//
+//		return timeFrames.get(time).getDiameters();
+//	}
+
+	@Override
 	public int getTotalTimePoints() {
 		return timeFrames.size();
 	}
@@ -75,13 +100,13 @@ public class TableLineageData implements LineageData {
 		Frame frame = new Frame();
 		timeFrames.add(frame);
 	}
-
-	public void addNucleus(int time, String name, int x, int y, int z, int diameter) {
+	
+	public void addNucleus(int time, String name, double x, double y, double z, double diameter) {
 		if (time <= getTotalTimePoints()) {
 			int index = time - 1;
 			Frame frame = timeFrames.get(index);
 			frame.addName(name);
-			Integer[] position = new Integer[] { x, y, z };
+			Double[] position = new Double[] { x, y, z };
 			frame.addPosition(position);
 			frame.addDiameter(diameter);
 
@@ -90,6 +115,21 @@ public class TableLineageData implements LineageData {
 		}
 	}
 
+//	public void addNucleus(int time, String name, int x, int y, int z, int diameter) {
+//		if (time <= getTotalTimePoints()) {
+//			int index = time - 1;
+//			Frame frame = timeFrames.get(index);
+//			frame.addName(name);
+//			Integer[] position = new Integer[] { x, y, z };
+//			frame.addPosition(position);
+//			frame.addDiameter(diameter);
+//
+//			if (!allCellNames.contains(name))
+//				allCellNames.add(name);
+//		}
+//	}
+
+	@Override
 	public int getFirstOccurrenceOf(String name) {
 		int time = Integer.MIN_VALUE;
 		name = name.trim();
@@ -105,6 +145,7 @@ public class TableLineageData implements LineageData {
 		return time;
 	}
 
+	@Override
 	public int getLastOccurrenceOf(String name) {
 		name = name.trim();
 		int time = getFirstOccurrenceOf(name);
@@ -124,6 +165,7 @@ public class TableLineageData implements LineageData {
 		return time + 1;
 	}
 
+	@Override
 	public boolean isCellName(String name) {
 		name = name.trim();
 		for (String cell : allCellNames) {
@@ -133,6 +175,7 @@ public class TableLineageData implements LineageData {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		String out = "";
 		int totalFrames = getTotalTimePoints();
@@ -142,27 +185,35 @@ public class TableLineageData implements LineageData {
 		return out;
 	}
 	
+	@Override
 	public boolean isSulstonMode() {
 		return isSulston; //default embryo
 	}
 	
+	@Override
 	public void setIsSulstonModeFlag(boolean isSulston) {
 		this.isSulston = isSulston;
 	}
 
 	public class Frame {
 		private ArrayList<String> names;
-		private ArrayList<Integer[]> positions;
-		private ArrayList<Integer> diameters;
+//		private ArrayList<Integer[]> positions;
+		private ArrayList<Double[]> positions;
+//		private ArrayList<Integer> diameters;
+		private ArrayList<Double> diameters;
 
 		private String[] namesArray;
-		private Integer[][] positionsArray;
-		private Integer[] diametersArray;
+//		private Integer[][] positionsArray;
+//		private Integer[] diametersArray;
+		private Double[][] positionsArray;
+		private Double[] diametersArray;
 
 		private Frame() {
 			names = new ArrayList<String>();
-			positions = new ArrayList<Integer[]>();
-			diameters = new ArrayList<Integer>();
+//			positions = new ArrayList<Integer[]>();
+			positions = new ArrayList<Double[]>();
+//			diameters = new ArrayList<Integer>();
+			diameters = new ArrayList<Double>();
 		}
 
 		/**
@@ -178,8 +229,10 @@ public class TableLineageData implements LineageData {
 		 */
 		private void shiftPositions(int x, int y, int z) {
 			for (int i = 0; i < positions.size(); i++) {
-				Integer[] pos = positions.get(i);
-				positions.set(i, new Integer[] { pos[0] - x, pos[1] - y, pos[2] - z });
+//				Integer[] pos = positions.get(i);
+				Double[] pos = positions.get(i);
+//				positions.set(i, new Integer[] { pos[0] - x, pos[1] - y, pos[2] - z });
+				positions.set(i, new Double[] { pos[0] - x, pos[1] - y, pos[2] - z });
 			}
 		}
 
@@ -187,13 +240,21 @@ public class TableLineageData implements LineageData {
 			names.add(name);
 		}
 
-		private void addPosition(Integer[] position) {
+		private void addPosition(Double[] position) {
 			positions.add(position);
 		}
-
-		private void addDiameter(Integer diameter) {
+		
+		private void addDiameter(Double diameter) {
 			diameters.add(diameter);
 		}
+		
+//		private void addPosition(Integer[] position) {
+//			positions.add(position);
+//		}
+
+//		private void addDiameter(Integer diameter) {
+//			diameters.add(diameter);
+//		}
 
 		private String[] getNames() {
 			if (namesArray == null)
@@ -201,17 +262,29 @@ public class TableLineageData implements LineageData {
 			return namesArray;
 		}
 
-		private Integer[][] getPositions() {
-			positionsArray = positions.toArray(new Integer[positions.size()][3]);
+//		private Integer[][] getPositions() {
+//			positionsArray = positions.toArray(new Integer[positions.size()][3]);
+//			return positionsArray;
+//		}
+		
+		private Double[][] getPositions() {
+			positionsArray = positions.toArray(new Double[positions.size()][3]);
 			return positionsArray;
 		}
 
-		private Integer[] getDiameters() {
+		private Double[] getDiameters() {
 			if (diametersArray == null)
-				diametersArray = diameters.toArray(new Integer[diameters.size()]);
+				diametersArray = diameters.toArray(new Double[diameters.size()]);
 			return diametersArray;
 		}
+		
+//		private Integer[] getDiameters() {
+//			if (diametersArray == null)
+//				diametersArray = diameters.toArray(new Integer[diameters.size()]);
+//			return diametersArray;
+//		}
 
+		@Override
 		public String toString() {
 			String out = "";
 			String[] names = getNames();
@@ -222,6 +295,11 @@ public class TableLineageData implements LineageData {
 		}
 
 		private final static String NEWLINE = "\n";
+	}
+
+	@Override
+	public double[] getXYZScale() {
+		return this.xyzScale;
 	}
 
 }

@@ -311,6 +311,7 @@ public class InfoWindow {
 				// close tab event handler
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 				tab.setOnClosed(new EventHandler<Event>() {
+					@Override
 					public void handle(Event e) {
 						Tab t = (Tab) e.getSource();
 						String cellName = t.getId();

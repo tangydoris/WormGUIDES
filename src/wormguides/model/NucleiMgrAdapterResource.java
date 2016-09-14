@@ -9,6 +9,7 @@ public class NucleiMgrAdapterResource extends ListResourceBundle {
 		this.lineageData = data;
 	}
 	
+	@Override
 	protected Object[][] getContents() {
 		return new Object[][] {
 			{"lineageData", lineageData}

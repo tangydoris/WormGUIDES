@@ -52,9 +52,9 @@ public class Quaternion {
 		double w, x, y, z;
 
 		w = Math.cos(angOfRotation / 2.);
-		x = (double) (axisX * Math.sin(angOfRotation / 2.));
-		y = (double) (axisY * Math.sin(angOfRotation / 2.));
-		z = (double) (axisZ * Math.sin(angOfRotation / 2.));
+		x = axisX * Math.sin(angOfRotation / 2.);
+		y = axisY * Math.sin(angOfRotation / 2.);
+		z = axisZ * Math.sin(angOfRotation / 2.);
 
 		Quaternion local_rotation = new Quaternion(w, x, y, z);
 
@@ -151,11 +151,11 @@ public class Quaternion {
 		// SOUTH_POLE
 		double f = (x * y) + (z * w);
 		if (f > NORTH_POLE) {
-			heading = (double) (2 * Math.atan2(x, w));
+			heading = 2 * Math.atan2(x, w);
 			attitude = Math.PI / 2.;
 			bank = 0.f;
 		} else if (f < SOUTH_POLE) {
-			heading = (double) (-2 * Math.atan2(x, w));
+			heading = -2 * Math.atan2(x, w);
 			attitude = -Math.PI / 2.;
 			bank = 0;
 		} else {
@@ -163,9 +163,9 @@ public class Quaternion {
 			double sqy = this.getY() * this.getY();
 			double sqz = this.getZ() * this.getZ();
 
-			heading = (double) Math.atan2((2 * y * (w - 2.) * x * z), (1 - (2 * sqy) - (2 * sqz)));
-			attitude = (double) Math.asin(2 * f);
-			bank = (double) Math.atan2((2 * x * (w - 2) * y * z), (1 - 2 * sqx - 2 * sqz));
+			heading = Math.atan2((2 * y * (w - 2.) * x * z), (1 - (2 * sqy) - (2 * sqz)));
+			attitude = Math.asin(2 * f);
+			bank = Math.atan2((2 * x * (w - 2) * y * z), (1 - 2 * sqx - 2 * sqz));
 		}
 
 		eulerRotation.add(Math.toDegrees(heading));

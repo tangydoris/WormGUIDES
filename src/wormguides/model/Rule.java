@@ -430,6 +430,7 @@ public class Rule {
 		return ruleChanged;
 	}
 
+	@Override
 	public String toString() {
 		return toStringFull();
 	}

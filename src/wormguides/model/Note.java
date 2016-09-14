@@ -400,6 +400,7 @@ public class Note {
 		return comments;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Note[").append("@Name='").append(tagName).append("' ");
@@ -531,6 +532,7 @@ public class Note {
 			this.type = type;
 		}
 
+		@Override
 		public String toString() {
 			return type;
 		}
@@ -566,6 +568,7 @@ public class Note {
 			this.display = display;
 		}
 
+		@Override
 		public String toString() {
 			return display;
 		}

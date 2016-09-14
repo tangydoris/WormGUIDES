@@ -686,9 +686,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		// info window
 		bringUpInfoProperty = new SimpleBooleanProperty(false);
 
+		double[] xyzScale = lineageData.getXYZScale();
 		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
 				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag);
+				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag, 
+				xyzScale[0], xyzScale[1], xyzScale[2]);
+		
 		subscene = window3DController.getSubScene();
 
 		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
@@ -1292,7 +1295,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			defaultEmbryoFlag = false;
 			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
 		} else {
-			lineageData = AceTreeLoader.loadNucFiles(productionInfo.getTotalTimePoints());
+			lineageData = AceTreeLoader.loadNucFiles(productionInfo);
 			defaultEmbryoFlag = true;
 			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
 		}
