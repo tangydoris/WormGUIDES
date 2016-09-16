@@ -420,7 +420,8 @@ public class Rule {
         return ruleChanged;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return toStringFull();
     }
 

@@ -211,7 +211,8 @@ public class SceneElementsList {
         return sceneElements;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuilder sb = new StringBuilder("scene elements list:\n");
         for (SceneElement se : elementsList) {
             sb.append(se.getSceneName()).append("\n");

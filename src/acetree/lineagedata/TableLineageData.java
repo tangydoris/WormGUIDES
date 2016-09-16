@@ -32,12 +32,14 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public ArrayList<String> getAllCellNames() {
+    @Override
+	public ArrayList<String> getAllCellNames() {
         return new ArrayList<>(allCellNames);
     }
 
     /** {@inheritDoc} */
-    public String[] getNames(final int time) {
+    @Override
+	public String[] getNames(final int time) {
         final int internalTimeIndex = time - 1;
         if (internalTimeIndex >= getNumberOfTimePoints() || internalTimeIndex < 0) {
             return new String[1];
@@ -46,14 +48,16 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public void shiftAllPositions(final int x, final int y, final int z) {
+    @Override
+	public void shiftAllPositions(final int x, final int y, final int z) {
         for (Frame timeFrame : timeFrames) {
             timeFrame.shiftPositions(x, y, z);
         }
     }
 
     /** {@inheritDoc} */
-    public Double[][] getPositions(final int time) {
+    @Override
+	public Double[][] getPositions(final int time) {
         final int internalTimeIndex = time - 1;
         if (internalTimeIndex >= getNumberOfTimePoints() || internalTimeIndex < 0) {
             return new Double[1][3];
@@ -62,7 +66,8 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public Double[] getDiameters(final int time) {
+    @Override
+	public Double[] getDiameters(final int time) {
         final int internalTimeIndex = time - 1;
         if (internalTimeIndex >= getNumberOfTimePoints() || internalTimeIndex < 0) {
             return new Double[1];
@@ -71,18 +76,21 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public int getNumberOfTimePoints() {
+    @Override
+	public int getNumberOfTimePoints() {
         return timeFrames.size();
     }
 
     /** {@inheritDoc} */
-    public void addTimeFrame() {
+    @Override
+	public void addTimeFrame() {
         final Frame frame = new Frame();
         timeFrames.add(frame);
     }
 
     /** {@inheritDoc} */
-    public void addNucleus(
+    @Override
+	public void addNucleus(
             final int time,
             final String name,
             final double x,
@@ -105,7 +113,8 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public int getFirstOccurrenceOf(final String name) {
+    @Override
+	public int getFirstOccurrenceOf(final String name) {
         final String trimmed = name.trim();
 
         for (int i = 0; i < timeFrames.size(); i++) {
@@ -119,7 +128,8 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public int getLastOccurrenceOf(final String name) {
+    @Override
+	public int getLastOccurrenceOf(final String name) {
         final String trimmed = name.trim();
         int time = getFirstOccurrenceOf(trimmed);
 
@@ -139,7 +149,8 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public boolean isCellName(final String name) {
+    @Override
+	public boolean isCellName(final String name) {
         final String trimmed = name.trim();
         for (String cell : allCellNames) {
             if (cell.equalsIgnoreCase(trimmed)) {
@@ -150,21 +161,25 @@ public class TableLineageData implements LineageData {
     }
 
     /** {@inheritDoc} */
-    public boolean isSulstonMode() {
+    @Override
+	public boolean isSulstonMode() {
         return isSulston; //default embryo
     }
 
     /** {@inheritDoc} */
-    public void setIsSulstonModeFlag(boolean isSulston) {
+    @Override
+	public void setIsSulstonModeFlag(boolean isSulston) {
         this.isSulston = isSulston;
     }
     
     /** {@inheritDoc} */
+	@Override
 	public double[] getXYZScale() {
 		return this.xyzScale;
 	}
 
-    public String toString() {
+    @Override
+	public String toString() {
         String out = "";
         final int totalFrames = getNumberOfTimePoints();
         for (int i = 0; i < totalFrames; i++) {
@@ -219,7 +234,8 @@ public class TableLineageData implements LineageData {
             return diameters.toArray(new Double[diameters.size()]);
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             String out = "";
             String[] names = getNames();
             for (String name : names) {

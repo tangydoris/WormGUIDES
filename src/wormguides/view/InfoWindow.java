@@ -46,14 +46,14 @@ public class InfoWindow {
     private Service<Void> addNameService;
     private Service<Void> showLoadingService;
     private int count; //to show loading in progress
-    private boolean defaultEmbryoFlag;
-    private LineageData lineageData;
+//    private boolean defaultEmbryoFlag;
+//    private LineageData lineageData;
 
     public InfoWindow(
             Stage stage, StringProperty cellNameProperty, CasesLists cases, ProductionInfo info,
             Connectome connectome, boolean defaultEmbryoFlag, LineageData lineageData) {
-        this.defaultEmbryoFlag = defaultEmbryoFlag;
-        this.lineageData = lineageData;
+//        this.defaultEmbryoFlag = defaultEmbryoFlag;
+//        this.lineageData = lineageData;
 
         infoWindowStage = new Stage();
         infoWindowStage.setTitle("Cell Info Window");

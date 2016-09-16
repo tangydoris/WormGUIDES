@@ -93,7 +93,7 @@ public class StoriesLayer {
     private BooleanProperty useInternalRules;
     private Window3DController window3DController;
     private BooleanProperty update3D;
-    private boolean defaultEmbryoFlag;
+//    private boolean defaultEmbryoFlag;
 
     /**
      * Constructure called by {@link wormguides.controllers.RootLayoutController}.
@@ -132,7 +132,7 @@ public class StoriesLayer {
 
         parentStage = parent;
 
-        this.defaultEmbryoFlag = defaultEmbryoFlag;
+//        this.defaultEmbryoFlag = defaultEmbryoFlag;
 
         newStoryButton.setOnAction(event -> {
             Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
@@ -612,7 +612,8 @@ public class StoriesLayer {
      * @return A {@link String} representation of all stories visible in the
      * 'Stories' tab
      */
-    public String toString() {
+    @Override
+	public String toString() {
         StringBuilder sb = new StringBuilder("Stories:\n");
         for (int i = 0; i < stories.size(); i++) {
             Story story = stories.get(i);

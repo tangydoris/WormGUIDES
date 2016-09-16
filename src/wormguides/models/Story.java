@@ -192,7 +192,8 @@ public class Story {
         return notes;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return name + " - contains " + notes.size() + " notes";
     }
 
