@@ -435,112 +435,120 @@ public class Search {
     }
 
     private static ArrayList<String> getCellsList(String searched) {
-        ArrayList<String> cells = new ArrayList<>();
-        searched = searched.toLowerCase();
+		ArrayList<String> cells = new ArrayList<String>();
+		searched = searched.toLowerCase();
 
-        if (type != null) {
-            switch (type) {
-                case LINEAGE:
-                    for (String name : activeLineageNames) {
-                        if (name.equalsIgnoreCase(searched)) {
-                            cells.add(name);
-                        }
-                    }
-                    break;
+		if (type != null) {
+			switch (type) {
+			case LINEAGE:
+				for (String name : activeLineageNames) {
+					if (name.toLowerCase().startsWith(searched))
+						cells.add(name);
+				}
+				break;
 
-                case FUNCTIONAL:
-                    String name;
-                    for (int i = 0; i < functionalNames.size(); i++) {
-                        name = functionalNames.get(i);
-                        if (name.equalsIgnoreCase(searched)) {
-                            cells.add(PartsList.getLineageNameByIndex(i));
-                        }
-                    }
-                    break;
+			case FUNCTIONAL:
+				String name;
+				for (int i = 0; i < functionalNames.size(); i++) {
+					name = functionalNames.get(i);
+					if (name.toLowerCase().startsWith(searched))
+						cells.add(PartsList.getLineageNameByIndex(i));
+				}
+				break;
 
-                case DESCRIPTION:
-                    // for searching with multiple terms, perform individual searches and return the intersection of
-                    // the hits
-                    ArrayList<ArrayList<String>> hits = new ArrayList<>();
-                    String[] keywords = searched.split(" ");
-                    for (String keyword : keywords) {
-                        ArrayList<String> results = new ArrayList<>();
-                        for (int i = 0; i < descriptions.size(); i++) {
-                            String textLowerCase = descriptions.get(i).toLowerCase();
+			case DESCRIPTION:
+				// TODO some cells with the searched term are not showing up in
+				// results list
+				// this is because some cells have the same description and it
+				// gives the first one found
 
-                            // look for match
-                            if (textLowerCase.contains(keyword.toLowerCase())) {
-                                // get cell name that corresponds to matching
-                                // description
-                                String cell = PartsList.getLineageNameByIndex(i);
+				// FIXED ^^ ???
 
-                                // only add new entries
-                                if (!results.contains(cell)) {
-                                    results.add(cell);
-                                }
-                            }
-                        }
-                        // add the results to the hits
-                        hits.add(results);
-                    }
+				// for searching with multiple terms, perform individual
+				// searches
+				// and return the intersection of the hits
+				ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+				String[] keywords = searched.split(" ");
+				for (String keyword : keywords) {
+					ArrayList<String> results = new ArrayList<String>();
+					for (int i = 0; i < descriptions.size(); i++) {
+						String textLowerCase = descriptions.get(i).toLowerCase();
 
-                    // find the intersection among the results --> using the first list to find matches
-                    if (hits.size() > 0) {
-                        ArrayList<String> results = hits.get(0);
-                        for (String cell : results) {
-                            // look for a match in rest of the hits
-                            boolean intersection = true;
-                            for (int i = 1; i < hits.size(); i++) {
-                                if (!hits.get(i).contains(cell)) {
-                                    intersection = false;
-                                }
-                            }
+						// look for match
+						if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+							// get cell name that corresponds to matching
+							// description
+							String cell = PartsList.getLineageNameByIndex(i);
 
-                            if (intersection && !cells.contains(cell)) {
-                                cells.add(cell);
-                            }
-                        }
-                    }
-                    break;
+							// only add new entries
+							if (!results.contains(cell)) {
+								results.add(cell);
+							}
+						}
+					}
+					// add the results to the hits
+					hits.add(results);
+				}
 
-                case GENE:
-                    if (isGeneFormat(getSearchedText())) {
-                        showLoadingService.restart();
-                        WormBaseQuery.doSearch(getSearchedText());
-                        cells = new ArrayList<>(searchResultsList);
-                    }
-                    break;
+				// find the intersection among the results --> using the first
+				// list
+				// to find matches
+				if (hits.size() > 0) {
+					ArrayList<String> results = hits.get(0);
+					for (int k = 0; k < results.size(); k++) {
+						String cell = results.get(k);
 
-                case MULTICELLULAR_CELL_BASED:
-                    if (sceneElementsList != null) {
-                        for (SceneElement se : sceneElementsList.getElementsList()) {
-                            if (se.isMulticellular()) {
-                                if (isNameSearched(se.getSceneName(), searched)) {
-                                    for (String cellName : se.getAllCellNames()) {
-                                        if (!cells.contains(cellName)) {
-                                            cells.add(cellName);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
+						// look for a match in rest of the hits
+						boolean intersection = true;
+						for (int i = 1; i < hits.size(); i++) {
+							if (!hits.get(i).contains(cell))
+								intersection = false;
+						}
 
-                case CONNECTOME:
-                    if (connectome != null) {
-                        cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
-                                electricalTicked, neuromuscularTicked, true));
-                        cells.remove(searched);
-                    }
-                    break;
+						if (intersection && !cells.contains(cell))
+							cells.add(cell);
+					}
+				}
 
-                case NEIGHBOR:
-                    cells.addAll(getNeighbors(searched));
-            }
-        }
-        return cells;
-    }
+				break;
+
+			case GENE:
+				if (isGeneFormat(getSearchedText())) {
+					showLoadingService.restart();
+					WormBaseQuery.doSearch(getSearchedText());
+					cells = new ArrayList<String>(searchResultsList);
+				}
+				break;
+
+			case MULTICELLULAR_CELL_BASED:
+				if (sceneElementsList != null) {
+					for (SceneElement se : sceneElementsList.getElementsList()) {
+						if (se.isMulticellular()) {
+							if (isNameSearched(se.getSceneName(), searched)) {
+								for (String cellName : se.getAllCellNames()) {
+									if (!cells.contains(cellName))
+										cells.add(cellName);
+								}
+							}
+						}
+					}
+				}
+				break;
+
+			case CONNECTOME:
+				if (connectome != null) {
+					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
+							electricalTicked, neuromuscularTicked, true));
+					cells.remove(searched);
+				}
+				break;
+
+			case NEIGHBOR:
+				cells.addAll(getNeighbors(searched));
+			}
+		}
+		return cells;
+	}
 
     /**
      * Tests if a structure name was searched based on its scene name and its comment.
