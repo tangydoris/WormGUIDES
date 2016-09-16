@@ -8,18 +8,25 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import wormguides.model.NeuronalSynapse;
-import wormguides.model.SynapseType;
+import wormguides.models.NeuronalSynapse;
+import wormguides.models.SynapseType;
 
 public class ConnectomeLoader {
-	private String filePath;
+    private static final String s_presynapticV1 = "S";
+    private static final String s_presynapticV2 = "Sp";
+    private static final String r_postsynapticV1 = "R";
+    private static final String r_postsynapticV2 = "Rp";
+    private static final String ej_electrical = "EJ";
+    private static final String nmj_neuromuscular = "NMJ";
+    private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
+    private String filePath;
 
 	public ArrayList<NeuronalSynapse> loadConnectome() {
-		URL url = ConnectomeLoader.class.getResource("/wormguides/model/connectome_config_file/NeuronConnect.csv");
+        URL url = ConnectomeLoader.class.getResource("/wormguides/models/connectome_config_file/NeuronConnect.csv");
 
-		ArrayList<NeuronalSynapse> connectome = new ArrayList<NeuronalSynapse>();
-		try {
-			if (url != null) {
+        ArrayList<NeuronalSynapse> connectome = new ArrayList<>();
+        try {
+            if (url != null) {
 				InputStream stream = url.openStream();
 				InputStreamReader streamReader = new InputStreamReader(stream);
 				BufferedReader reader = new BufferedReader(streamReader);
@@ -60,27 +67,35 @@ public class ConnectomeLoader {
 						Integer numberOfSynapses = Integer.parseInt(numberOfSynapsesStr);
 
 						SynapseType synapseType;
-						if (synapseTypeStr.equals(s_presynapticV1)) {
-							synapseType = SynapseType.S_PRESYNAPTIC;
-							synapseType.setMonadic();
-						} else if (synapseTypeStr.equals(s_presynapticV2)) {
-							synapseType = SynapseType.S_PRESYNAPTIC;
-							synapseType.setPoyadic();
-						} else if (synapseTypeStr.equals(r_postsynapticV1)) {
-							synapseType = SynapseType.R_POSTSYNAPTIC;
-							synapseType.setMonadic();
-						} else if (synapseTypeStr.equals(r_postsynapticV2)) {
-							synapseType = SynapseType.R_POSTSYNAPTIC;
-							synapseType.setPoyadic();
-						} else if (synapseTypeStr.equals(ej_electrical)) {
-							synapseType = SynapseType.EJ_ELECTRICAL;
-						} else if (synapseTypeStr.equals(nmj_neuromuscular)) {
-							synapseType = SynapseType.NMJ_NEUROMUSCULAR;
-						} else {
-							// System.out.println("Unknown synapse type: " +
-							// synapseType);
-							synapseType = null;
-						}
+                        switch (synapseTypeStr) {
+                            case s_presynapticV1:
+                                synapseType = SynapseType.S_PRESYNAPTIC;
+                                synapseType.setMonadic();
+                                break;
+                            case s_presynapticV2:
+                                synapseType = SynapseType.S_PRESYNAPTIC;
+                                synapseType.setPoyadic();
+                                break;
+                            case r_postsynapticV1:
+                                synapseType = SynapseType.R_POSTSYNAPTIC;
+                                synapseType.setMonadic();
+                                break;
+                            case r_postsynapticV2:
+                                synapseType = SynapseType.R_POSTSYNAPTIC;
+                                synapseType.setPoyadic();
+                                break;
+                            case ej_electrical:
+                                synapseType = SynapseType.EJ_ELECTRICAL;
+                                break;
+                            case nmj_neuromuscular:
+                                synapseType = SynapseType.NMJ_NEUROMUSCULAR;
+                                break;
+                            default:
+                                // System.out.println("Unknown synapse type: " +
+                                // synapseType);
+                                synapseType = null;
+                                break;
+                        }
 
 						if (cell_1.length() != 0 && cell_2.length() != 0 && synapseType != null
 								&& numberOfSynapsesStr.length() >= 0) {
@@ -109,12 +124,4 @@ public class ConnectomeLoader {
 
 		return cell;
 	}
-
-	private static final String s_presynapticV1 = "S";
-	private static final String s_presynapticV2 = "Sp";
-	private static final String r_postsynapticV1 = "R";
-	private static final String r_postsynapticV2 = "Rp";
-	private static final String ej_electrical = "EJ";
-	private static final String nmj_neuromuscular = "NMJ";
-	private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
 }

@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.io.File;
@@ -16,14 +20,13 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
@@ -39,7 +42,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -49,11 +51,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+
 import wormguides.MainApp;
 import wormguides.Search;
 import wormguides.StringListCellFactory;
@@ -61,20 +65,17 @@ import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchType;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
-import wormguides.loaders.AceTreeLoader;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
-import wormguides.model.Anatomy;
-import wormguides.model.CasesLists;
-import wormguides.model.Connectome;
-import wormguides.model.LineageData;
-import wormguides.model.LineageTree;
-import wormguides.model.PartsList;
-import wormguides.model.CellDeaths;
-import wormguides.model.ProductionInfo;
-import wormguides.model.Rule;
-import wormguides.model.SceneElementsList;
-import wormguides.model.Story;
+import wormguides.models.Anatomy;
+import wormguides.models.CasesLists;
+import wormguides.models.CellDeaths;
+import wormguides.models.Connectome;
+import wormguides.models.LineageTree;
+import wormguides.models.ProductionInfo;
+import wormguides.models.Rule;
+import wormguides.models.SceneElementsList;
+import wormguides.models.Story;
 import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
 import wormguides.view.InfoWindow;
@@ -83,9 +84,10 @@ import wormguides.view.URLLoadWarningDialog;
 import wormguides.view.URLLoadWindow;
 import wormguides.view.URLWindow;
 import wormguides.view.YesNoCancelDialogPane;
-import javafx.scene.web.WebView;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
+
+import acetree.AceTreeLoader;
+import acetree.lineagedata.LineageData;
+import partslist.PartsList;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -358,70 +360,57 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		}
 	}
 
-	@FXML
-	public void generateURLAction() {
-		if (urlStage == null) {
-			urlStage = new Stage();
+    @FXML
+    public void generateURLAction() {
+        if (urlStage == null) {
+            urlStage = new Stage();
 
-			urlWindow = new URLWindow();
-			urlWindow.setScene(window3DController);
-			urlWindow.getCloseButton().setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					urlStage.hide();
-				}
-			});
+            urlWindow = new URLWindow();
+            urlWindow.setScene(window3DController);
+            urlWindow.getCloseButton().setOnAction(event -> urlStage.hide());
 
-			urlStage.setScene(new Scene(urlWindow));
-			urlStage.setTitle("Share Scene");
-			urlStage.setResizable(false);
-			urlStage.initModality(Modality.NONE);
-		}
+            urlStage.setScene(new Scene(urlWindow));
+            urlStage.setTitle("Share Scene");
+            urlStage.setResizable(false);
+            urlStage.initModality(Modality.NONE);
+        }
 
-		urlWindow.resetURLs();
-		urlStage.show();
-	}
+        urlWindow.resetURLs();
+        urlStage.show();
+    }
 
-	@FXML
-	public void loadURLAction() {
-		if (urlLoadStage == null) {
-			urlLoadStage = new Stage();
+    @FXML
+    public void loadURLAction() {
+        if (urlLoadStage == null) {
+            urlLoadStage = new Stage();
 
-			urlLoadWindow = new URLLoadWindow();
-			urlLoadWindow.getLoadButton().setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					if (warning == null) {
-						warning = new URLLoadWarningDialog();
-					}
-					if (!warning.doNotShowAgain()) {
-						Optional<ButtonType> result = warning.showAndWait();
-						if (result.get() == warning.getButtonTypeOkay()) {
-							urlLoadStage.hide();
-							URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
-						}
-					} else {
-						urlLoadStage.hide();
-						URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
-					}
-				}
-			});
-			urlLoadWindow.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent event) {
-					urlLoadStage.hide();
-				}
-			});
+            urlLoadWindow = new URLLoadWindow();
+            urlLoadWindow.getLoadButton().setOnAction(event -> {
+                if (warning == null) {
+                    warning = new URLLoadWarningDialog();
+                }
+                if (!warning.doNotShowAgain()) {
+                    Optional<ButtonType> result = warning.showAndWait();
+                    if (result.get() == warning.getButtonTypeOkay()) {
+                        urlLoadStage.hide();
+                        URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
+                    }
+                } else {
+                    urlLoadStage.hide();
+                    URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
+                }
+            });
+            urlLoadWindow.getCancelButton().setOnAction(event -> urlLoadStage.hide());
 
-			urlLoadStage.setScene(new Scene(urlLoadWindow));
-			urlLoadStage.setTitle("Load Scene");
-			urlLoadStage.setResizable(false);
-			urlLoadStage.initModality(Modality.NONE);
-		}
+            urlLoadStage.setScene(new Scene(urlLoadWindow));
+            urlLoadStage.setTitle("Load Scene");
+            urlLoadStage.setResizable(false);
+            urlLoadStage.initModality(Modality.NONE);
+        }
 
-		urlLoadWindow.clearField();
-		urlLoadStage.show();
-	}
+        urlLoadWindow.clearField();
+        urlLoadStage.show();
+    }
 	
 	@FXML
 	public void saveSearchResultsAction() {
@@ -522,26 +511,26 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		cellDeathsStage.show();
 	}
 
-	@FXML
-	public void viewPartsList() {
-		if (partsListStage == null) {
-			partsListStage = new Stage();
-			partsListStage.setTitle("Parts List");
+    @FXML
+    public void viewPartsList() {
+        if (partsListStage == null) {
+            partsListStage = new Stage();
+            partsListStage.setTitle("Parts List");
 
-			// build webview scene to render parts list
-			WebView partsListWebView = new WebView();
-			partsListWebView.getEngine().loadContent(PartsList.partsListDOM().DOMtoString());
+            // build webview scene to render parts list
+            WebView partsListWebView = new WebView();
+            partsListWebView.getEngine().loadContent(PartsList.createPartsListDOM().DOMtoString());
 
-			VBox root = new VBox();
-			root.getChildren().addAll(partsListWebView);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
+            VBox root = new VBox();
+            root.getChildren().addAll(partsListWebView);
+            Scene scene = new Scene(new Group());
+            scene.setRoot(root);
 
-			partsListStage.setScene(scene);
-			partsListStage.setResizable(false);
-		}
-		partsListStage.show();
-	}
+            partsListStage.setScene(scene);
+            partsListStage.setResizable(false);
+        }
+        partsListStage.show();
+    }
 
 	@FXML
 	public void viewConnectome() {
@@ -648,29 +637,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
 				exitSavePopup = new Popup();
 				exitSavePopup.getContent().add(saveDialog);
 
-				saveDialog.setYesButtonAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						exitSavePopup.hide();
-						storiesLayer.saveActiveStory();
-						exitApplication();
-					}
-				});
+				 saveDialog.setYesButtonAction(event -> {
+	                    exitSavePopup.hide();
+	                    storiesLayer.saveActiveStory();
+	                    exitApplication();
+	             });
 
-				saveDialog.setNoButtonAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						exitSavePopup.hide();
-						exitApplication();
-					}
-				});
+				 saveDialog.setNoButtonAction(event -> {
+	                    exitSavePopup.hide();
+	                    exitApplication();
+	             });
 
-				saveDialog.setCancelButtonAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent event) {
-						exitSavePopup.hide();
-					}
-				});
+				 saveDialog.setCancelButtonAction(event -> exitSavePopup.hide());
 
 				exitSavePopup.setAutoFix(true);
 			}
@@ -750,117 +728,84 @@ public class RootLayoutController extends BorderPane implements Initializable {
 	}
 
 	private void addListeners() {
-		// time integer property that dictates the current time point
-		time.addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				timeSlider.setValue(time.get());
-				if (time.get() >= window3DController.getEndTime() - 1) {
-					playButton.setGraphic(playIcon);
-					playingMovie.set(false);
-				}
-			}
-		});
+        // time integer property that dictates the current time point
+        time.addListener((observable, oldValue, newValue) -> {
+            timeSlider.setValue(time.get());
+            if (time.get() >= window3DController.getEndTime() - 1) {
+                playButton.setGraphic(playIcon);
+                playingMovie.set(false);
+            }
+        });
 
-		timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				int newTime = newValue.intValue();
-				if (window3DController != null) // removed newTime !=
-												// timeSlider.getValue() && -->
-												// to use arrow keys b/c arrows
-												// automatically update
-												// timeSlider.value
-					window3DController.setTime(newTime);
-			}
-		});
+        timeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int newTime = newValue.intValue();
+            if (window3DController != null) // removed newTime !=
+            // timeSlider.getValue() && -->
+            // to use arrow keys b/c arrows
+            // automatically update
+            // timeSlider.value
+            {
+                window3DController.setTime(newTime);
+            }
+        });
 
-		// search stuff
-		searchResultsListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				selectedName.set(newValue);
-			}
-		});
+        // search stuff
+        searchResultsListView.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> selectedName.set(newValue));
 
-		searchField.textProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (!newValue.isEmpty()) {
-					mainTabPane.getSelectionModel().select(colorAndDisplayTab);
-					colorAndDisplayTabPane.getSelectionModel().select(cellsTab);
-				}
-			}
-		});
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                mainTabPane.getSelectionModel().select(colorAndDisplayTab);
+                colorAndDisplayTabPane.getSelectionModel().select(cellsTab);
+            }
+        });
 
-		// selectedName string property that has the name of the clicked sphere
-		selectedName.addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue != null) {
-					if (!newValue.isEmpty())
-						setSelectedEntityInfo(selectedName.get());
-				}
-			}
-		});
+        // selectedName string property that has the name of the clicked sphere
+        selectedName.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                if (!newValue.isEmpty()) {
+                    setSelectedEntityInfo(selectedName.get());
+                }
+            }
+        });
 
-		// Multicellular structure stuff
-		structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				event.consume();
-			}
-		});
+        // Multicellular structure stuff
+        structuresSearchListView.addEventFilter(MouseEvent.MOUSE_PRESSED, Event::consume);
 
-		// Modify font for ListView's of String's
-		structuresSearchListView.setCellFactory(new StringListCellFactory());
-		allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
-		searchResultsListView.setCellFactory(new StringListCellFactory());
+        // Modify font for ListView's of String's
+        structuresSearchListView.setCellFactory(new StringListCellFactory());
+        allStructuresListView.setCellFactory(structuresLayer.getCellFactory());
+        searchResultsListView.setCellFactory(new StringListCellFactory());
 
-		timeSlider.setValue(0);
+        timeSlider.setValue(0);
 
-		// 'Others' opacity
-		opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
+        // 'Others' opacity
+        opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
 
-		// Uniform nuclei size
-		uniformSizeCheckBox.setSelected(true);
+        // Uniform nuclei size
+        uniformSizeCheckBox.setSelected(true);
 
-		// Cell Nucleus search option
-		cellNucleusTick.setSelected(true);
+        // Cell Nucleus search option
+        cellNucleusTick.setSelected(true);
 
-		// More info clickable text
-		moreInfoClickableText.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				openInfoWindow();
-				infoWindow.addName(selectedName.get());
-			}
-		});
-		moreInfoClickableText.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				moreInfoClickableText.setCursor(Cursor.HAND);
-			}
-		});
-		moreInfoClickableText.setOnMouseExited(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				moreInfoClickableText.setCursor(Cursor.DEFAULT);
-			}
-		});
+        // More info clickable text
+        moreInfoClickableText.setOnMouseClicked(event -> {
+            openInfoWindow();
+            infoWindow.addName(selectedName.get());
+        });
+        moreInfoClickableText.setOnMouseEntered(event -> moreInfoClickableText.setCursor(Cursor.HAND));
+        moreInfoClickableText.setOnMouseExited(event -> moreInfoClickableText.setCursor(Cursor.DEFAULT));
 
-		// More info in context menu
-		bringUpInfoProperty.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (newValue) {
-					openInfoWindow();
-					infoWindow.addName(selectedName.get());
-					infoWindow.showWindow();
-				}
-			}
-		});
-	}
+        // More info in context menu
+        bringUpInfoProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                openInfoWindow();
+                infoWindow.addName(selectedName.get());
+                infoWindow.showWindow();
+            }
+        });
+    }
 
 	private void setSelectedEntityInfo(String name) {
 		if (name == null || name.isEmpty()) {
@@ -931,29 +876,24 @@ public class RootLayoutController extends BorderPane implements Initializable {
 			timeOffset = 0;
 		}
 
-		time.addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				if (defaultEmbryoFlag) {
-					timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
-				} else {
-					timeLabel.setText("~" + (time.get()) + " min");
-				}
-				
-			}
-		});
+		time.addListener((observable, oldValue, newValue) -> {
+            if (defaultEmbryoFlag) {
+                timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+            } else {
+                timeLabel.setText("~" + (time.get()) + " min");
+            }
+
+        });
 		timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
 		timeLabel.toFront();
 
-		totalNuclei.addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				String suffix = " Nuclei";
-				if (newValue.intValue() == 1)
-					suffix = " Nucleus";
-				totalNucleiLabel.setText(newValue.intValue() + suffix);
-			}
-		});
+		totalNuclei.addListener((observable, oldValue, newValue) -> {
+            String suffix = " Nuclei";
+            if (newValue.intValue() == 1) {
+                suffix = " Nucleus";
+            }
+            totalNucleiLabel.setText(newValue.intValue() + suffix);
+        });
 		totalNucleiLabel.setText(totalNuclei.get() + " Nuclei");
 		totalNucleiLabel.toFront();
 	}
@@ -967,17 +907,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		playIcon = ImageLoader.getPlayIcon();
 		pauseIcon = ImageLoader.getPauseIcon();
 		playButton.setGraphic(playIcon);
-		playButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				playingMovie.set(!playingMovie.get());
+		playButton.setOnAction(event -> {
+            playingMovie.set(!playingMovie.get());
 
-				if (playingMovie.get())
-					playButton.setGraphic(pauseIcon);
-				else
-					playButton.setGraphic(playIcon);
-			}
-		});
+            if (playingMovie.get()) {
+                playButton.setGraphic(pauseIcon);
+            } else {
+                playButton.setGraphic(playIcon);
+            }
+        });
 	}
 
 	private void setSlidersProperties() {
@@ -1014,15 +952,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		clearSearchField = new SimpleBooleanProperty(false);
 		Search.setClearSearchFieldProperty(clearSearchField);
-		clearSearchField.addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (newValue) {
-					searchField.clear();
-					clearSearchField.set(false);
-				}
-			}
-		});
+		 clearSearchField.addListener((observable, oldValue, newValue) -> {
+	            if (newValue) {
+	                searchField.clear();
+	                clearSearchField.set(false);
+	            }
+	        });
 
 		searchField.textProperty().addListener(Search.getTextFieldListener());
 	}
@@ -1080,20 +1015,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		multiRadioBtn.setToggleGroup(typeToggleGroup);
 		multiRadioBtn.setUserData(SearchType.MULTICELLULAR_CELL_BASED);
 
-		typeToggleGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-			@Override
-			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-				SearchType type = (SearchType) observable.getValue().getToggleGroup().getSelectedToggle().getUserData();
-				if (type == SearchType.FUNCTIONAL || type == SearchType.DESCRIPTION) {
-					descendantTick.setSelected(false);
-					descendantTick.disableProperty().set(true);
-					descendantLabel.disableProperty().set(true);
-				} else {
-					descendantTick.disableProperty().set(false);
-					descendantLabel.disableProperty().set(false);
-				}
-			}
-		});
+		typeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            SearchType type = (SearchType) observable.getValue().getToggleGroup().getSelectedToggle().getUserData();
+            if (type == SearchType.FUNCTIONAL || type == SearchType.DESCRIPTION) {
+                descendantTick.setSelected(false);
+                descendantTick.disableProperty().set(true);
+                descendantLabel.disableProperty().set(true);
+            } else {
+                descendantTick.disableProperty().set(false);
+                descendantLabel.disableProperty().set(false);
+            }
+        });
 		sysRadioBtn.setSelected(true);
 	}
 
@@ -1176,13 +1108,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
 		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 
-		structuresLayer.addSelectedNameListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (!newValue.isEmpty())
-					selectedName.set(newValue);
-			}
-		});
+		structuresLayer.addSelectedNameListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                selectedName.set(newValue);
+            }
+        });
 		
 	}
 
@@ -1204,18 +1134,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 		window3DController.addListenerToRebuildSceneFlag(storiesLayer.getRebuildSceneFlag());
 
-		storiesLayer.getActiveStoryProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue.isEmpty()) {
-					displayedStory.setText("Active Story: none");
-					displayedStoryDescription.setText("");
-				} else {
-					displayedStory.setText("Active Story: " + newValue);
-					displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
-				}
-			}
-		});
+		storiesLayer.getActiveStoryProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                displayedStory.setText("Active Story: none");
+                displayedStoryDescription.setText("");
+            } else {
+                displayedStory.setText("Active Story: " + newValue);
+                displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
+            }
+        });
 		displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
 		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 	}
@@ -1401,9 +1328,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
 	/** Default transparency of 'other' entities on startup */
 	private final double DEFAULT_OTHERS_OPACITY = 25;
-	/**
-	 * Delay time in seconds before the application updates to the new time on
-	 * the slider
-	 */
+//	/**
+//	 * Delay time in seconds before the application updates to the new time on
+//	 * the slider
+//	 */
 	// private final double TIME_SLIDER_TIME_DELAY = 0.5;
 }

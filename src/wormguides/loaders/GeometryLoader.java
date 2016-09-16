@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
@@ -43,9 +44,9 @@ public class GeometryLoader {
 		// append /
 		URL url = ProductionInfoLoader.class.getResource("/" + fileName);
 
-		coords = new ArrayList<double[]>();
-		faces = new ArrayList<int[]>();
-		mesh = new TriangleMesh();
+        coords = new ArrayList<>();
+        faces = new ArrayList<>();
+        mesh = new TriangleMesh();
 
 		try {
 			if (url != null) {
@@ -62,38 +63,44 @@ public class GeometryLoader {
 
 					// process each line in the obj file
 					String lineType = line.substring(0, 2);
-					if (lineType.equals(vertexLine)) {
-						// process vertex lines
-						String v = line.substring(2);
-						double[] vertices = new double[3];
-						int counter = 0;
+                    switch (lineType) {
+                        case vertexLine: {
+                            // process vertex lines
+                            String v = line.substring(2);
+                            double[] vertices = new double[3];
+                            int counter = 0;
 
-						StringTokenizer tokenizer = new StringTokenizer(v);
-						while (tokenizer.hasMoreTokens()) {
-							vertices[counter++] = Double.parseDouble(tokenizer.nextToken());
-						}
-						// make sure good line
-						if (counter == 3) {
-							coords.add(vertices);
-						}
-					} else if (lineType.equals(faceLine)) {
-						// process face lines
-						String f = line.substring(2);
-						int[] faceCoords = new int[3];
-						int counter = 0;
+                            StringTokenizer tokenizer = new StringTokenizer(v);
+                            while (tokenizer.hasMoreTokens()) {
+                                vertices[counter++] = Double.parseDouble(tokenizer.nextToken());
+                            }
+                            // make sure good line
+                            if (counter == 3) {
+                                coords.add(vertices);
+                            }
+                            break;
+                        }
+                        case faceLine: {
+                            // process face lines
+                            String f = line.substring(2);
+                            int[] faceCoords = new int[3];
+                            int counter = 0;
 
-						StringTokenizer tokenizer = new StringTokenizer(f);
-						while (tokenizer.hasMoreTokens()) {
-							faceCoords[counter++] = Integer.parseInt(tokenizer.nextToken());
-						}
+                            StringTokenizer tokenizer = new StringTokenizer(f);
+                            while (tokenizer.hasMoreTokens()) {
+                                faceCoords[counter++] = Integer.parseInt(tokenizer.nextToken());
+                            }
 
-						if (counter == 3) {
-							faces.add(faceCoords);
-						}
-					} else {
-					} // ignore other cases
-				}
-				createMesh();
+                            if (counter == 3) {
+                                faces.add(faceCoords);
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+                createMesh();
 				reader.close();
 			}
 		} catch (IOException e1) {
@@ -114,13 +121,13 @@ public class GeometryLoader {
 
 		float[] coordinates = new float[(coords.size() * 3)];
 		float[] texCoords = new float[(coords.size() * 2)];
-		for (int i = 0; i < coords.size(); i++) {
-			for (int j = 0; j < 3; j++) {
-				coordinates[counter++] = (float) coords.get(i)[j];
-			}
-			texCoords[texCounter++] = 0;
-			texCoords[texCounter++] = ((float) coords.get(i)[0] / stripeSeparation) * 200;
-		}
+        for (double[] coord : coords) {
+            for (int j = 0; j < 3; j++) {
+                coordinates[counter++] = (float) coord[j];
+            }
+            texCoords[texCounter++] = 0;
+            texCoords[texCounter++] = ((float) coord[0] / stripeSeparation) * 200;
+        }
 
 		mesh.getPoints().addAll(coordinates);
 		mesh.getTexCoords().addAll(texCoords);
@@ -128,16 +135,16 @@ public class GeometryLoader {
 		counter = 0;
 
 		int[] faceCoords = new int[(faces.size() * 3) * 2];
-		for (int i = 0; i < faces.size(); i++) {
-			for (int j = 0; j < 3; j++) {
-				faceCoords[counter++] = faces.get(i)[j] - 1;
-				faceCoords[counter++] = faces.get(i)[j] - 1; // for our texture
-																// coordinate -
-																// face syntax:
-																// p0, t0, p1,
-																// t1, p2, t2
-			}
-		}
+        for (int[] face : faces) {
+            for (int j = 0; j < 3; j++) {
+                faceCoords[counter++] = face[j] - 1;
+                faceCoords[counter++] = face[j] - 1; // for our texture
+                // coordinate -
+                // face syntax:
+                // p0, t0, p1,
+                // t1, p2, t2
+            }
+        }
 
 		mesh.getFaces().addAll(faceCoords);
 	}
@@ -145,23 +152,23 @@ public class GeometryLoader {
 	/*--------------------DEBUGGING------------------------*/
 	public static void printCoords() {
 		System.out.println("-----------VERTICES------------- " + coords.size());
-		for (int i = 0; i < coords.size(); i++) {
-			System.out.print("v ");
-			for (int j = 0; j < 3; j++) {
-				System.out.print(coords.get(i)[j] + ", ");
-			}
-			System.out.println("");
-		}
-	}
+        for (double[] coord : coords) {
+            System.out.print("v ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(coord[j] + ", ");
+            }
+            System.out.println("");
+        }
+    }
 
 	public static void printFaces() {
 		System.out.println("-----------FACES-------------");
-		for (int i = 0; i < faces.size(); i++) {
-			System.out.print("f ");
-			for (int j = 0; j < 3; j++) {
-				System.out.print(faces.get(i)[j] + ", ");
-			}
-			System.out.println("");
-		}
-	}
+        for (int[] face : faces) {
+            System.out.print("f ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(face[j] + ", ");
+            }
+            System.out.println("");
+        }
+    }
 }

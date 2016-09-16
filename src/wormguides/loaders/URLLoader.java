@@ -8,16 +8,16 @@ import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.Window3DController;
 import wormguides.layers.SearchType;
-import wormguides.model.Rule;
+import wormguides.models.Rule;
 
 public class URLLoader {
 
 	/**
 	 * Utility method that processes a url string and sets the correct view
-	 * parameters in the 3d subscene. Called by {@link StoriesLayer} and
-	 * {@link RootLayoutController} for scene sharing/loading and when changing
-	 * active/inactive stories. Documentation for URL (old and new APIs)
-	 * formatting and syntax can be found in URLDocumentation.txt inside the
+     * parameters in the 3d subscene. Called by {@link wormguides.layers.StoriesLayer} and
+     * {@link wormguides.controllers.RootLayoutController} for scene sharing/loading and when changing
+     * active/inactive stories. Documentation for URL (old and new APIs)
+     * formatting and syntax can be found in URLDocumentation.txt inside the
 	 * package wormguides.model.
 	 * 
 	 * @param url
@@ -29,9 +29,9 @@ public class URLLoader {
 	 * @param useInternalScaleFactor
 	 *            Boolean that tells the 3d subscene to use the internal scale
 	 *            factor, without scaling/translating it to match the old API.
-	 *            TRUE when called by {@link StoriesLayer}, FALSE otherwise.
-	 */
-	public static void process(String url, Window3DController window3DController, boolean useInternalScaleFactor) {
+     *            TRUE when called by {@link wormguides.layers.StoriesLayer}, FALSE otherwise.
+     */
+    public static void process(String url, Window3DController window3DController, boolean useInternalScaleFactor) {
 		if (window3DController == null)
 			return;
 
@@ -46,8 +46,8 @@ public class URLLoader {
 		ObservableList<Rule> rulesList = window3DController.getObservableColorRulesList();
 
 		String[] args = url.split("/");
-		ArrayList<String> ruleArgs = new ArrayList<String>();
-		ArrayList<String> viewArgs = new ArrayList<String>();
+        ArrayList<String> ruleArgs = new ArrayList<>();
+        ArrayList<String> viewArgs = new ArrayList<>();
 
 		// add rules and view parameters to their ArrayList's
 		int i = 0;
@@ -82,9 +82,9 @@ public class URLLoader {
 	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
 		rulesList.clear();
 		for (String rule : rules) {
-			ArrayList<String> types = new ArrayList<String>();
-			StringBuilder sb = new StringBuilder(rule);
-			boolean noTypeSpecified = true;
+            ArrayList<String> types = new ArrayList<>();
+            StringBuilder sb = new StringBuilder(rule);
+            boolean noTypeSpecified = true;
 			boolean isMulticellStructureRule = false;
 
 			try {
@@ -122,7 +122,7 @@ public class URLLoader {
 				else if (sb.indexOf("+%23ff") > -1)
 					colorString = sb.substring(sb.indexOf("+%23ff") + 6);
 
-				ArrayList<SearchOption> options = new ArrayList<SearchOption>();
+                ArrayList<SearchOption> options = new ArrayList<>();
 
 				if (noTypeSpecified && sb.indexOf("-M") > -1) {
 					options.add(SearchOption.MULTICELLULAR_NAME_BASED);
@@ -145,9 +145,9 @@ public class URLLoader {
 						int i = sb.indexOf("$");
 						sb.replace(i, i + 1, "");
 					}
-					if (rule.indexOf("%3E") > -1) {
-						options.add(SearchOption.DESCENDANT);
-						int i = sb.indexOf("%3E");
+                    if (rule.contains("%3E")) {
+                        options.add(SearchOption.DESCENDANT);
+                        int i = sb.indexOf("%3E");
 						sb.replace(i, i + 3, "");
 					}
 					if (sb.indexOf("<") > -1) {
@@ -208,8 +208,9 @@ public class URLLoader {
 	}
 
 	private static boolean isGeneFormat(String name) {
-		if (name.indexOf("-") < 0)
-			return false;
+        if (!name.contains("-")) {
+            return false;
+        }
 
 		String[] tokens = name.split("-");
 		if (tokens.length != 2)

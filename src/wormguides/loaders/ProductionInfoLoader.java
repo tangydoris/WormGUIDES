@@ -26,7 +26,7 @@ public class ProductionInfoLoader {
 	 */
 	public static ArrayList<ArrayList<String>> buildProductionInfo() {
 
-		URL url = ProductionInfoLoader.class.getResource("/wormguides/model/production_info_file/Production_Info.csv");
+		URL url = ProductionInfoLoader.class.getResource("/wormguides/models/production_info_file/Production_Info.csv");
 		ArrayList<ArrayList<String>> productionInfo = new ArrayList<ArrayList<String>>();
 		ArrayList<String> cells = new ArrayList<String>();
 		ArrayList<String> imageSeries = new ArrayList<String>();

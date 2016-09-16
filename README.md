@@ -3,8 +3,8 @@ Desktop version of the WormGUIDES iPad and Android apps.
 
 Source code can be found at https://github.com/tangydoris/WormGUIDES.
 
-Version currently uses JRE 1.8 version 60+. Source built using JRE 1.8 version 77 downloaded from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html<br>
-URL feature documentation can be found in src/wormguides/model/URLDocumentation.txt.
+Version currently uses JRE 1.8 version 77+. Source built using JRE 1.8 version 77 downloaded from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html<br>
+The documentation for the shared URL paramters can be found in URLDocumentation.txt.
 <br><br><br>
 
 
@@ -20,9 +20,15 @@ The WormGUIDES app is developed and maintained by the laboratories of Dr. Zhiron
 
 ####Notes on Eclipse Project Setup
 
+#####Intellij Setup:
+Downlaod IntelliJ Community edition at https://www.jetbrains.com/idea/download/<br>
+Create an empty project<br>
+Import the source code as a module in the newly created project<br>
+Set up the git root for version control<br><br>
+
 #####Eclipse Setup:
-Download Eclipse Mars<br>
-Download the latest JDK (currently version 1.8 at http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)<br>
+Download Eclipse for Java at http://www.eclipse.org/downloads/packages/eclipse-ide-java-developers/keplersr1<br>
+Download the latest JDK at http://www.oracle.com/technetwork/java/javase/downloads/index.html<br>
 Make sure environment variables point to the bin directory of the jdk (usually found in C:/Program Files/Java/jdk.../bin)<br>
 If Eclipse cannot open, try to modify the eclipse.ini configuration file in the main eclipse directory<br>
 Change the required java version in the argument -Dosgi.requiredJavaVersion from 1.7 to 1.8<br>

@@ -42,5 +42,4 @@ public class AppFont {
 	public static Font getBoldFont() {
 		return boldFont;
 	}
-
 }
