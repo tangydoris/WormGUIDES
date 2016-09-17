@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.layers;
 
 public enum SearchType {
@@ -58,8 +62,8 @@ public enum SearchType {
         return description;
     }
 
-    public String toString() {
-        return getDescription();
-    }
-
+	@Override
+	public String toString() {
+		return getDescription();
+	}
 }

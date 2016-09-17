@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 /**
@@ -48,6 +52,7 @@ public enum SynapseType {
 		return this.description;
 	}
 
+	@Override
 	public String toString() {
 		return getDescription();
 	}

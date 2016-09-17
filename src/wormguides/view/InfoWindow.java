@@ -35,9 +35,9 @@ import partslist.PartsList;
 
 public class InfoWindow {
 
-    private final static String Nuc = "Nuc";
-    public final String EVENT_TYPE_CLICK = "click";
-    private final long WAIT_TIME_MILLI = 750;
+	private final static String Nuc = "Nuc";
+	public final String EVENT_TYPE_CLICK = "click";
+	private final long WAIT_TIME_MILLI = 750;
     private Stage infoWindowStage;
     private TabPane tabPane;
     private Scene scene;
@@ -46,17 +46,17 @@ public class InfoWindow {
     private InfoWindowLinkController linkController;
     private ProductionInfo productionInfo;
     private String nameToQuery;
+//    private boolean defaultEmbryoFlag;
+//    private LineageData lineageData;
     private Service<Void> addNameService;
     private Service<Void> showLoadingService;
     private int count; //to show loading in progress
-    private boolean defaultEmbryoFlag;
-    private LineageData lineageData;
 
     public InfoWindow(
             Stage stage, StringProperty cellNameProperty, CasesLists cases, ProductionInfo info,
             Connectome connectome, boolean defaultEmbryoFlag, LineageData lineageData) {
-        this.defaultEmbryoFlag = defaultEmbryoFlag;
-        this.lineageData = lineageData;
+//        this.defaultEmbryoFlag = defaultEmbryoFlag;
+//        this.lineageData = lineageData;
 
         infoWindowStage = new Stage();
         infoWindowStage.setTitle("Cell Info Window");
@@ -289,7 +289,7 @@ public class InfoWindow {
         nameToQuery = name;
         addNameService.restart();
     }
-
+    
     public void showWindow() {
         if (infoWindowStage != null) {
             infoWindowStage.show();

@@ -6,3 +6,5 @@ out/
 *.iml
 
 .DS_Store
+.classpath
+WormGUIDES.jar

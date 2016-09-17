@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides;
 
 /*
@@ -295,7 +299,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
     /**
      * Controller Listener.
      */
-    public void controllerUpdate(ControllerEvent evt) {
+    @Override
+	public void controllerUpdate(ControllerEvent evt) {
 
         if (evt instanceof ConfigureCompleteEvent ||
                 evt instanceof RealizeCompleteEvent ||
@@ -334,7 +339,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
     /**
      * Event handler for the file writer.
      */
-    public void dataSinkUpdate(DataSinkEvent evt) {
+    @Override
+	public void dataSinkUpdate(DataSinkEvent evt) {
 
         if (evt instanceof EndOfStreamEvent) {
             synchronized (waitFileSync) {
@@ -369,37 +375,45 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
             streams[0] = new ImageSourceStream(width, height, frameRate, images);
         }
 
-        public MediaLocator getLocator() {
+        @Override
+		public MediaLocator getLocator() {
             return null;
         }
 
-        public void setLocator(MediaLocator source) {
+        @Override
+		public void setLocator(MediaLocator source) {
         }
 
         /**
          * Content type is of RAW since we are sending buffers of video
          * frames without a container format.
          */
-        public String getContentType() {
+        @Override
+		public String getContentType() {
             return ContentDescriptor.RAW;
         }
 
-        public void connect() {
+        @Override
+		public void connect() {
         }
 
-        public void disconnect() {
+        @Override
+		public void disconnect() {
         }
 
-        public void start() {
+        @Override
+		public void start() {
         }
 
-        public void stop() {
+        @Override
+		public void stop() {
         }
 
         /**
          * Return the ImageSourceStreams.
          */
-        public PullBufferStream[] getStreams() {
+        @Override
+		public PullBufferStream[] getStreams() {
             return streams;
         }
 
@@ -408,15 +422,18 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
          * frames and frame rate.  But for the purpose of this program,
          * it's not necessary.
          */
-        public Time getDuration() {
+        @Override
+		public Time getDuration() {
             return DURATION_UNKNOWN;
         }
 
-        public Object[] getControls() {
+        @Override
+		public Object[] getControls() {
             return new Object[0];
         }
 
-        public Object getControl(String type) {
+        @Override
+		public Object getControl(String type) {
             return null;
         }
     }
@@ -450,7 +467,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
         /**
          * We should never need to block assuming data are read from files.
          */
-        public boolean willReadBlock() {
+        @Override
+		public boolean willReadBlock() {
             return false;
         }
 
@@ -458,7 +476,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
          * This is called from the Processor to read a frame worth
          * of video data.
          */
-        public void read(Buffer buf) throws IOException {
+        @Override
+		public void read(Buffer buf) throws IOException {
 
             // Check if we've finished all the frames.
             if (nextImage >= images.size()) {
@@ -520,27 +539,33 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
         /**
          * Return the format of each video frame.  That will be JPEG.
          */
-        public Format getFormat() {
+        @Override
+		public Format getFormat() {
             return format;
         }
 
-        public ContentDescriptor getContentDescriptor() {
+        @Override
+		public ContentDescriptor getContentDescriptor() {
             return new ContentDescriptor(ContentDescriptor.RAW);
         }
 
-        public long getContentLength() {
+        @Override
+		public long getContentLength() {
             return 0;
         }
 
-        public boolean endOfStream() {
+        @Override
+		public boolean endOfStream() {
             return ended;
         }
 
-        public Object[] getControls() {
+        @Override
+		public Object[] getControls() {
             return new Object[0];
         }
 
-        public Object getControl(String type) {
+        @Override
+		public Object getControl(String type) {
             return null;
         }
     }

@@ -19,6 +19,7 @@ import wormguides.view.InfoWindowDOM;
  */
 public class PartsList {
 
+	private final static String resource = "/partslist/partslist.txt";
     private static final ArrayList<String> functionalNames;
     private static final ArrayList<String> lineageNames;
     private static final ArrayList<String> descriptions;
@@ -28,7 +29,7 @@ public class PartsList {
         lineageNames = new ArrayList<>();
         descriptions = new ArrayList<>();
 
-        final URL url = PartsList.class.getResource("/partslist/partslist.txt");
+        final URL url = PartsList.class.getResource(resource);
 
         try (InputStreamReader isr = new InputStreamReader(url.openStream());
              BufferedReader br = new BufferedReader(isr)) {

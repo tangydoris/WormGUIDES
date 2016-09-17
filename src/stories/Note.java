@@ -559,7 +559,8 @@ public class Note {
             return String.join(",", values);
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return type;
         }
 
@@ -593,7 +594,8 @@ public class Note {
             return String.join(",", values);
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return display;
         }
 

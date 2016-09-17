@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -20,11 +24,11 @@ public class LineageTree {
     private TreeItem<String> c;
     private TreeItem<String> d;
 
-    @SuppressWarnings({"unchecked", "static-access"})
+    @SuppressWarnings({"unchecked"})
     public LineageTree(String[] allCellNames, boolean isSulston) {
         this.allCellNames = allCellNames;
 
-        this.isSulston = isSulston;
+        LineageTree.isSulston = isSulston;
         if (isSulston) {
             root = new TreeItem<>("P0");
             // names of the cell added to tree upon initialization

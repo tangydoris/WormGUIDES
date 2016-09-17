@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -250,7 +254,8 @@ public class SceneElement {
         return completeResourceFlag;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         String sb = "SceneElement[" + "@scenename=" + sceneName +
                 "; @startTime=" + startTime +
                 "; @endTime=" + endTime +

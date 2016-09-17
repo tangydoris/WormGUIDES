@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import javafx.scene.text.Font;
@@ -42,5 +46,4 @@ public class AppFont {
 	public static Font getBoldFont() {
 		return boldFont;
 	}
-
 }

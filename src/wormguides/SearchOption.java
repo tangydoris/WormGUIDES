@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides;
 
 public enum SearchOption {
@@ -45,6 +49,7 @@ public enum SearchOption {
 		return description;
 	}
 
+	@Override
 	public String toString() {
 		return getDescription();
 	}

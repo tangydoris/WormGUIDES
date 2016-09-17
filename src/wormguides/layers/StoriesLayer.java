@@ -60,9 +60,8 @@ import stories.Story;
 import stories.StoryFileUtil;
 
 /**
- * This class is the controller of the {@link ListView} in the 'Stories' tab.
- * The Constructor is called by the main application controller
- * {@link wormguides.controllers.RootLayoutController} on initialization.
+ * Controller of the list view in the 'Stories' tab. The Constructor is called by {@link
+ * wormguides.controllers.RootLayoutController} upon initialization
  */
 public class StoriesLayer {
 
@@ -96,7 +95,7 @@ public class StoriesLayer {
     private BooleanProperty useInternalRules;
     private Window3DController window3DController;
     private BooleanProperty update3D;
-    private boolean defaultEmbryoFlag;
+//    private boolean defaultEmbryoFlag;
 
     /**
      * Constructor called by {@link wormguides.controllers.RootLayoutController}
@@ -133,7 +132,7 @@ public class StoriesLayer {
 
         parentStage = parent;
 
-        this.defaultEmbryoFlag = defaultEmbryoFlag;
+//        this.defaultEmbryoFlag = defaultEmbryoFlag;
 
         newStoryButton.setOnAction(event -> {
             Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
@@ -202,7 +201,8 @@ public class StoriesLayer {
             story.sortNotes();
         }
 
-        setActiveStory(stories.get(0)); // makes lim-4 story on default embryo, template otherwise
+        // makes lim-4 story on default embryo, template otherwise
+        setActiveStory(stories.get(0));
     }
 
     /**
@@ -606,6 +606,7 @@ public class StoriesLayer {
      * @return A {@link String} representation of all stories visible in the
      * 'Stories' tab
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Stories:\n");
         for (int i = 0; i < stories.size(); i++) {
@@ -1017,5 +1018,4 @@ public class StoriesLayer {
             }
         }
     }
-
 }

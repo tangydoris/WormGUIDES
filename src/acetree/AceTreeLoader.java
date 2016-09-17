@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import wormguides.models.ProductionInfo;
+
 import acetree.lineagedata.LineageData;
 import acetree.lineagedata.TableLineageData;
 
@@ -41,47 +43,48 @@ public class AceTreeLoader {
     private static int avgY;
     private static int avgZ;
 
-    public static LineageData loadNucFiles(int totalTimePoints) {
-        final LineageData lineageData = new TableLineageData(allCellNames);
+    public static TableLineageData loadNucFiles(ProductionInfo productionInfo) {
+		TableLineageData tld = new TableLineageData(allCellNames,
+				productionInfo.getXScale(), productionInfo.getYScale(), productionInfo.getZScale());
 
-        try {
-            // account for first tld.addFrame() added when reading from JAR --> from dir name first entry match
-            lineageData.addTimeFrame();
-            URL url;
+		try {
+			tld.addTimeFrame(); // accounts for first tld.addFrame() added when
+							// reading from JAR --> from dir name first entry
+							// match
+			URL url;
+			for (int i = 1; i <= productionInfo.getTotalTimePoints(); i++) {
+				if (i < 10) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
+					}
+				} else if (i >= 10 && i < 100) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
+					}
+				} else if (i >= 100) {
+					url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + i + ENTRY_EXT);
+					if (url != null) {
+						process(tld, i, url.openStream());
+					} else {
+						System.out.println("Could not process file: " + ENTRY_PREFIX + t + i + ENTRY_EXT);
+					}
+				}
+			}
 
-            for (int i = 1; i <= totalTimePoints; i++) {
-                if (i < 10) {
-                    url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
-                    if (url != null) {
-                        process(lineageData, i, url.openStream());
-                    } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + t + twoZeroPad + i + ENTRY_EXT);
-                    }
-
-                } else if (i >= 10 && i < 100) {
-                    url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
-                    if (url != null) {
-                        process(lineageData, i, url.openStream());
-                    } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + t + oneZeroPad + i + ENTRY_EXT);
-                    }
-
-                } else if (i >= 100) {
-                    url = AceTreeLoader.class.getResource(ENTRY_PREFIX + t + i + ENTRY_EXT);
-                    if (url != null) {
-                        process(lineageData, i, url.openStream());
-                    } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + t + i + ENTRY_EXT);
-                    }
-                }
-            }
-
-        } catch (IOException ioe) {
+		}catch (IOException ioe) {
             ioe.printStackTrace();
         }
 
-        setOriginToZero(lineageData);
-        return lineageData;
+		// translate all cells to center around (0,0,0)
+		setOriginToZero(tld, true);
+
+		return tld;
     }
 
     public static int getAvgXOffsetFromZero() {
@@ -96,32 +99,44 @@ public class AceTreeLoader {
         return avgZ;
     }
 
-    public static void setOriginToZero(LineageData lineageData) {
-        int totalPositions = 0;
-        double sumX, sumY, sumZ;
-        sumX = 0d;
-        sumY = 0d;
-        sumZ = 0d;
+    public static void setOriginToZero(LineageData lineageData, boolean defaultEmbryoFlag) {
+		int totalPositions = 0;
+		double sumX, sumY, sumZ;
+		sumX = 0d;
+		sumY = 0d;
+		sumZ = 0d;
 
-        // sum up all x-, y- and z-coordinates of nuclei
-        for (int i = 0; i < lineageData.getNumberOfTimePoints(); i++) {
-            Integer[][] positionsArray = lineageData.getPositions(i);
-            for (int j = 1; j < positionsArray.length; j++) {
-                sumX += positionsArray[j][X_POS_INDEX];
-                sumY += positionsArray[j][Y_POS_INDEX];
-                sumZ += positionsArray[j][Z_POS_INDEX];
-                totalPositions++;
-            }
-        }
+		// sum up all x-, y- and z-coordinates of nuclei
+		for (int i = 0; i < lineageData.getNumberOfTimePoints(); i++) {
+			Double[][] positionsArray = lineageData.getPositions(i);
+			for (int j = 1; j < positionsArray.length; j++) {
+				sumX += positionsArray[j][X_POS_INDEX];
+				sumY += positionsArray[j][Y_POS_INDEX];
+				sumZ += positionsArray[j][Z_POS_INDEX];
+				totalPositions++;
+			}
+		}
+//		for (int i = 0; i < lineageData.getTotalTimePoints(); i++) {
+//			Integer[][] positionsArray = lineageData.getPositions(i);
+//			for (int j = 1; j < positionsArray.length; j++) {
+//				sumX += positionsArray[j][X_POS_IND];
+//				sumY += positionsArray[j][Y_POS_IND];
+//				sumZ += positionsArray[j][Z_POS_IND];
+//				totalPositions++;
+//			}
+//		}
 
-        // find average of x-, y- and z-coordinates
-        avgX = (int) sumX / totalPositions;
-        avgY = (int) sumY / totalPositions;
-        avgZ = (int) sumZ / totalPositions;
+		// find average of x-, y- and z-coordinates
+		avgX = (int) sumX / totalPositions;
+		avgY = (int) sumY / totalPositions;
+		avgZ = (int) sumZ / totalPositions;
 
-        lineageData.shiftAllPositions(avgX, avgY, avgZ);
-        System.out.println("Average nuclei position offsets from zero: " + avgX + ", " + avgY + ", " + avgZ);
-    }
+		System.out.println("average nuclei position offsets from zero: " + avgX + ", " + avgY + ", " + avgZ);
+		
+		
+		// offset all nuclei x-, y- and z- positions by x, y and z averages
+		lineageData.shiftAllPositions(avgX, avgY, avgZ);
+	}
 
     private static void process(LineageData lineageData, final int time, final InputStream input) throws IOException {
         lineageData.addTimeFrame();

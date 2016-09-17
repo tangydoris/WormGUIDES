@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -7,146 +11,162 @@ import wormguides.loaders.ProductionInfoLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
+
 /**
  * Class which holds the database of production info defined in
  * model/production_info_file/
- *
+ * 
  * @author bradenkatzman
+ *
  */
 public class ProductionInfo {
 
-    private final static String TRUE = "TRUE";
-    private final int DEFAULT_START_TIME = 1;
-    private ArrayList<ArrayList<String>> productionInfoData;
+	private final static String TRUE = "TRUE";
+	private final int DEFAULT_START_TIME = 1;
+	private ArrayList<ArrayList<String>> productionInfoData;
+	
+	public ProductionInfo() {
+		productionInfoData = ProductionInfoLoader.buildProductionInfo();
+	}
+	
+	public ArrayList<String> getNuclearInfo() {
+		ArrayList<String> nuclearInfo = new ArrayList<String>();
 
-    public ProductionInfo() {
-        productionInfoData = ProductionInfoLoader.buildProductionInfo();
-    }
+		if (productionInfoData.get(0).get(0).equals("all-nuclear positions")) {
+			nuclearInfo.add(productionInfoData.get(3).get(0) + ", " + productionInfoData.get(2).get(0)); // store, strain, marker, data
+			nuclearInfo.add(productionInfoData.get(1).get(0)); // store image, series data
+		}
 
-    public ArrayList<String> getNuclearInfo() {
-        ArrayList<String> nuclearInfo = new ArrayList<>();
+		return nuclearInfo;
+	}
+	
+	public boolean getIsSulstonFlag() {
+		String flag = productionInfoData.get(9).get(0);
 
-        if (productionInfoData.get(0).get(0).equals("all-nuclear positions")) {
-            nuclearInfo.add(productionInfoData.get(3).get(0) + ", " + productionInfoData.get(2)
-                    .get(0)); // store, strain, marker, data
-            nuclearInfo.add(productionInfoData.get(1).get(0)); // store image, series data
-        }
+		if (flag.toLowerCase().equals(TRUE.toLowerCase())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public int getTotalTimePoints() {
+		return Integer.parseInt(productionInfoData.get(10).get(0));
+	}
+	
+	public int getXScale() {
+		return Integer.parseInt(productionInfoData.get(11).get(0));
+	}
+	
+	public int getYScale() {
+		return Integer.parseInt(productionInfoData.get(12).get(0));
+	}
 
-        return nuclearInfo;
-    }
+	public int getZScale() {
+		return Integer.parseInt(productionInfoData.get(13).get(0));
+	}
 
-    public boolean getIsSulstonFlag() {
-        String flag = productionInfoData.get(9).get(0);
+	public int getDefaultStartTime() {
+		return DEFAULT_START_TIME;
+	}
 
-        return flag.toLowerCase().equals(TRUE.toLowerCase());
-    }
+	public int getMovieTimeOffset() {
+		String input = productionInfoData.get(8).get(0);
 
-    public int getTotalTimePoints() {
-        return Integer.parseInt(productionInfoData.get(10).get(0));
-    }
+		try {
+			int startTime = Integer.parseInt(input);
+			return startTime - DEFAULT_START_TIME;
+		} catch (NumberFormatException e) {
+			System.out.println("Input: '" + input + "'");
+			System.out.println("Invalid input for movie start time. Using default start time of " + DEFAULT_START_TIME);
+		}
 
-    public int getDefaultStartTime() {
-        return DEFAULT_START_TIME;
-    }
+		return 0;
+	}
 
-    public int getMovieTimeOffset() {
-        String input = productionInfoData.get(8).get(0);
+	public ArrayList<String> getCellShapeData(String queryCell) {
+		ArrayList<String> cellShapeData = new ArrayList<String>();
 
-        try {
-            int startTime = Integer.parseInt(input);
-            return startTime - DEFAULT_START_TIME;
-        } catch (NumberFormatException e) {
-            System.out.println("Input: '" + input + "'");
-            System.out.println("Invalid input for movie start time. Using default start time of " + DEFAULT_START_TIME);
-        }
+		for (int i = 0; i < productionInfoData.get(0).size(); i++) {
+			String cells = productionInfoData.get(0).get(i);
 
-        return 0;
-    }
+			//delimit cells by ';'
+			StringTokenizer st = new StringTokenizer(cells, ";");
+			while (st.hasMoreTokens()) {
+				String str = st.nextToken().trim();
 
-    public ArrayList<String> getCellShapeData(String queryCell) {
-        ArrayList<String> cellShapeData = new ArrayList<>();
+				if (str.toLowerCase().equals(queryCell.toLowerCase())) {
+					cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2).get(i)); // store strain, marker data
+					cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
+					break;
+				}
+			}
+		}
 
-        for (int i = 0; i < productionInfoData.get(0).size(); i++) {
-            String cells = productionInfoData.get(0).get(i);
+		return cellShapeData;
+	}
 
-            //delimit cells by ';'
-            StringTokenizer st = new StringTokenizer(cells, ";");
-            while (st.hasMoreTokens()) {
-                String str = st.nextToken().trim();
+	public ArrayList<ArrayList<String>> getProductionInfoData() {
+		return productionInfoData;
+	}
 
-                if (str.toLowerCase().equals(queryCell.toLowerCase())) {
-                    cellShapeData.add(productionInfoData.get(3).get(i) + ", " + productionInfoData.get(2)
-                            .get(i)); // store strain, marker data
-                    cellShapeData.add(productionInfoData.get(1).get(i)); // store image series data
-                    break;
-                }
-            }
-        }
+	/**
+	 * Builds the production info as an HTML page with DOM paradigm
+	 *
+	 * @return the dom for the info window
+	 */
+	public InfoWindowDOM getProductionInfoDOM() {
+		HTMLNode html = new HTMLNode("html");
+		HTMLNode head = new HTMLNode("head");
+		HTMLNode body = new HTMLNode("body");
 
-        return cellShapeData;
-    }
+		HTMLNode productionInfoDiv = new HTMLNode("div");
+		HTMLNode productionInfoTable = new HTMLNode("table");
 
-    public ArrayList<ArrayList<String>> getProductionInfoData() {
-        return productionInfoData;
-    }
+		// title row
+		HTMLNode trH = new HTMLNode("tr");
+		HTMLNode th1 = new HTMLNode("th", "", "", "Cells");
+		HTMLNode th2 = new HTMLNode("th", "", "", "Image Series");
+		HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
+		HTMLNode th4 = new HTMLNode("th", "", "", "Strain");
+		HTMLNode th5 = new HTMLNode("th", "", "", "Compressed Embryo?");
+		HTMLNode th6 = new HTMLNode("th", "", "", "Temporal Resolution");
+		HTMLNode th7 = new HTMLNode("th", "", "", "Segmentation");
+		HTMLNode th8 = new HTMLNode("th", "", "", "Cytoshow Link");
+		HTMLNode th9 = new HTMLNode("th", "", "", "Movie Start Time (min)");
+		trH.addChild(th1);
+		trH.addChild(th2);
+		trH.addChild(th3);
+		trH.addChild(th4);
+		trH.addChild(th5);
+		trH.addChild(th6);
+		trH.addChild(th7);
+		trH.addChild(th8);
+		trH.addChild(th9);
 
-    /**
-     * Builds the production info as an HTML page with DOM paradigm
-     *
-     * @return the dom for the info window
-     */
-    public InfoWindowDOM getProductionInfoDOM() {
-        HTMLNode html = new HTMLNode("html");
-        HTMLNode head = new HTMLNode("head");
-        HTMLNode body = new HTMLNode("body");
+		productionInfoTable.addChild(trH);
 
-        HTMLNode productionInfoDiv = new HTMLNode("div");
-        HTMLNode productionInfoTable = new HTMLNode("table");
+		int rows = productionInfoData.get(0).size();
+		for (int i = 0; i < rows; i++) {
+			HTMLNode tr = new HTMLNode("tr");
+			for (int k = 0; k < productionInfoData.size(); k++) {
+				String data = productionInfoData.get(k).get(i);
+				HTMLNode td = new HTMLNode("td", "", "", data);
+				tr.addChild(td);
+			}
+			productionInfoTable.addChild(tr);
+		}
 
-        // title row
-        HTMLNode trH = new HTMLNode("tr");
-        HTMLNode th1 = new HTMLNode("th", "", "", "Cells");
-        HTMLNode th2 = new HTMLNode("th", "", "", "Image Series");
-        HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
-        HTMLNode th4 = new HTMLNode("th", "", "", "Strain");
-        HTMLNode th5 = new HTMLNode("th", "", "", "Compressed Embryo?");
-        HTMLNode th6 = new HTMLNode("th", "", "", "Temporal Resolution");
-        HTMLNode th7 = new HTMLNode("th", "", "", "Segmentation");
-        HTMLNode th8 = new HTMLNode("th", "", "", "Cytoshow Link");
-        HTMLNode th9 = new HTMLNode("th", "", "", "Movie Start Time (min)");
-        trH.addChild(th1);
-        trH.addChild(th2);
-        trH.addChild(th3);
-        trH.addChild(th4);
-        trH.addChild(th5);
-        trH.addChild(th6);
-        trH.addChild(th7);
-        trH.addChild(th8);
-        trH.addChild(th9);
+		productionInfoDiv.addChild(productionInfoTable);
 
-        productionInfoTable.addChild(trH);
+		body.addChild(productionInfoDiv);
 
-        int rows = productionInfoData.get(0).size();
-        for (int i = 0; i < rows; i++) {
-            HTMLNode tr = new HTMLNode("tr");
-            for (ArrayList<String> aProductionInfoData : productionInfoData) {
-                String data = aProductionInfoData.get(i);
-                HTMLNode td = new HTMLNode("td", "", "", data);
-                tr.addChild(td);
-            }
-            productionInfoTable.addChild(tr);
-        }
+		html.addChild(head);
+		html.addChild(body);
 
-        productionInfoDiv.addChild(productionInfoTable);
+		InfoWindowDOM productionInfoDOM = new InfoWindowDOM(html);
+		productionInfoDOM.buildStyleNode();
 
-        body.addChild(productionInfoDiv);
-
-        html.addChild(head);
-        html.addChild(body);
-
-        InfoWindowDOM productionInfoDOM = new InfoWindowDOM(html);
-        productionInfoDOM.buildStyleNode();
-
-        return productionInfoDOM;
-    }
+		return productionInfoDOM;
+	}
 }
