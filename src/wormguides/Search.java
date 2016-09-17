@@ -435,112 +435,120 @@ public class Search {
     }
 
     private static ArrayList<String> getCellsList(String searched) {
-        ArrayList<String> cells = new ArrayList<>();
-        searched = searched.toLowerCase();
+		ArrayList<String> cells = new ArrayList<String>();
+		searched = searched.toLowerCase();
 
-        if (type != null) {
-            switch (type) {
-                case LINEAGE:
-                    for (String name : activeLineageNames) {
-                        if (name.equalsIgnoreCase(searched)) {
-                            cells.add(name);
-                        }
-                    }
-                    break;
+		if (type != null) {
+			switch (type) {
+			case LINEAGE:
+				for (String name : activeLineageNames) {
+					if (name.toLowerCase().startsWith(searched))
+						cells.add(name);
+				}
+				break;
 
-                case FUNCTIONAL:
-                    String name;
-                    for (int i = 0; i < functionalNames.size(); i++) {
-                        name = functionalNames.get(i);
-                        if (name.equalsIgnoreCase(searched)) {
-                            cells.add(PartsList.getLineageNameByIndex(i));
-                        }
-                    }
-                    break;
+			case FUNCTIONAL:
+				String name;
+				for (int i = 0; i < functionalNames.size(); i++) {
+					name = functionalNames.get(i);
+					if (name.toLowerCase().startsWith(searched))
+						cells.add(PartsList.getLineageNameByIndex(i));
+				}
+				break;
 
-                case DESCRIPTION:
-                    // for searching with multiple terms, perform individual searches and return the intersection of
-                    // the hits
-                    ArrayList<ArrayList<String>> hits = new ArrayList<>();
-                    String[] keywords = searched.split(" ");
-                    for (String keyword : keywords) {
-                        ArrayList<String> results = new ArrayList<>();
-                        for (int i = 0; i < descriptions.size(); i++) {
-                            String textLowerCase = descriptions.get(i).toLowerCase();
+			case DESCRIPTION:
+				// TODO some cells with the searched term are not showing up in
+				// results list
+				// this is because some cells have the same description and it
+				// gives the first one found
 
-                            // look for match
-                            if (textLowerCase.contains(keyword.toLowerCase())) {
-                                // get cell name that corresponds to matching
-                                // description
-                                String cell = PartsList.getLineageNameByIndex(i);
+				// FIXED ^^ ???
 
-                                // only add new entries
-                                if (!results.contains(cell)) {
-                                    results.add(cell);
-                                }
-                            }
-                        }
-                        // add the results to the hits
-                        hits.add(results);
-                    }
+				// for searching with multiple terms, perform individual
+				// searches
+				// and return the intersection of the hits
+				ArrayList<ArrayList<String>> hits = new ArrayList<ArrayList<String>>();
+				String[] keywords = searched.split(" ");
+				for (String keyword : keywords) {
+					ArrayList<String> results = new ArrayList<String>();
+					for (int i = 0; i < descriptions.size(); i++) {
+						String textLowerCase = descriptions.get(i).toLowerCase();
 
-                    // find the intersection among the results --> using the first list to find matches
-                    if (hits.size() > 0) {
-                        ArrayList<String> results = hits.get(0);
-                        for (String cell : results) {
-                            // look for a match in rest of the hits
-                            boolean intersection = true;
-                            for (int i = 1; i < hits.size(); i++) {
-                                if (!hits.get(i).contains(cell)) {
-                                    intersection = false;
-                                }
-                            }
+						// look for match
+						if (textLowerCase.indexOf(keyword.toLowerCase()) >= 0) {
+							// get cell name that corresponds to matching
+							// description
+							String cell = PartsList.getLineageNameByIndex(i);
 
-                            if (intersection && !cells.contains(cell)) {
-                                cells.add(cell);
-                            }
-                        }
-                    }
-                    break;
+							// only add new entries
+							if (!results.contains(cell)) {
+								results.add(cell);
+							}
+						}
+					}
+					// add the results to the hits
+					hits.add(results);
+				}
 
-                case GENE:
-                    if (isGeneFormat(getSearchedText())) {
-                        showLoadingService.restart();
-                        WormBaseQuery.doSearch(getSearchedText());
-                        cells = new ArrayList<>(searchResultsList);
-                    }
-                    break;
+				// find the intersection among the results --> using the first
+				// list
+				// to find matches
+				if (hits.size() > 0) {
+					ArrayList<String> results = hits.get(0);
+					for (int k = 0; k < results.size(); k++) {
+						String cell = results.get(k);
 
-                case MULTICELLULAR_CELL_BASED:
-                    if (sceneElementsList != null) {
-                        for (SceneElement se : sceneElementsList.getElementsList()) {
-                            if (se.isMulticellular()) {
-                                if (isNameSearched(se.getSceneName(), searched)) {
-                                    for (String cellName : se.getAllCellNames()) {
-                                        if (!cells.contains(cellName)) {
-                                            cells.add(cellName);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
+						// look for a match in rest of the hits
+						boolean intersection = true;
+						for (int i = 1; i < hits.size(); i++) {
+							if (!hits.get(i).contains(cell))
+								intersection = false;
+						}
 
-                case CONNECTOME:
-                    if (connectome != null) {
-                        cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
-                                electricalTicked, neuromuscularTicked, true));
-                        cells.remove(searched);
-                    }
-                    break;
+						if (intersection && !cells.contains(cell))
+							cells.add(cell);
+					}
+				}
 
-                case NEIGHBOR:
-                    cells.addAll(getNeighbors(searched));
-            }
-        }
-        return cells;
-    }
+				break;
+
+			case GENE:
+				if (isGeneFormat(getSearchedText())) {
+					showLoadingService.restart();
+					WormBaseQuery.doSearch(getSearchedText());
+					cells = new ArrayList<String>(searchResultsList);
+				}
+				break;
+
+			case MULTICELLULAR_CELL_BASED:
+				if (sceneElementsList != null) {
+					for (SceneElement se : sceneElementsList.getElementsList()) {
+						if (se.isMulticellular()) {
+							if (isNameSearched(se.getSceneName(), searched)) {
+								for (String cellName : se.getAllCellNames()) {
+									if (!cells.contains(cellName))
+										cells.add(cellName);
+								}
+							}
+						}
+					}
+				}
+				break;
+
+			case CONNECTOME:
+				if (connectome != null) {
+					cells.addAll(connectome.queryConnectivity(searched, presynapticTicked, postsynapticTicked,
+							electricalTicked, neuromuscularTicked, true));
+					cells.remove(searched);
+				}
+				break;
+
+			case NEIGHBOR:
+				cells.addAll(getNeighbors(searched));
+			}
+		}
+		return cells;
+	}
 
     /**
      * Tests if a structure name was searched based on its scene name and its comment.
@@ -689,72 +697,69 @@ public class Search {
      *
      * @return list containing the cell lineage names of neighboring cells to cell with input cell lineage name
      */
-    public static ArrayList<String> getNeighbors(String cellName) {
-        ArrayList<String> results = new ArrayList<>();
+	  public static ArrayList<String> getNeighbors(String cellName) {
+		ArrayList<String> results = new ArrayList<String>();
+	
+		if (cellName == null || !lineageData.isCellName(cellName))
+			return results;
+	
+		// get time range for cell
+		int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
+		int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
+	
+		for (int i = firstOccurence; i <= lastOccurence; i++) {
+			String[] names = lineageData.getNames(i);
+			Double[][] positions = lineageData.getPositions(i);
+	
+			// find the coordinates of the query cell
+			int queryIDX = -1;
+			double x = -1;
+			double y = -1;
+			double z = -1;
+			for (int j = 0; j < names.length; j++) {
+				if (names[j].toLowerCase().equals(cellName.toLowerCase())) {
+					queryIDX = j;
+					x = positions[j][0];
+					y = positions[j][1];
+					z = positions[j][2];
+					// System.out.println(x + ", " + y + ", " + z);
+				}
+			}
+	
+			// find nearest neighbor
+			if (x != -1 && y != -1 && z != -1) {
+				double distance = Double.MAX_VALUE;
+				for (int k = 0; k < positions.length; k++) {
+					if (k != queryIDX) {
+						double distanceFromQuery = distance(x, positions[k][0], y, positions[k][1], z, positions[k][2]);
+						if (distanceFromQuery < distance)
+							distance = distanceFromQuery;
+					}
+				}
+	
+				// multiple distance by 1.5
+				if (distance != Double.MAX_VALUE) {
+					distance *= 1.5;
+				}
+	
+				// find all cells within d*1.5 range
+				for (int n = 0; n < positions.length; n++) {
+					// compute distance from each cell to query cell
+					if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
+						// only add new entries
+						if (!results.contains(names[n]) && !names[n].equalsIgnoreCase(cellName))
+							results.add(names[n]);
+					}
+				}
+			}
+		}
+	
+		return results;
+	}
 
-        if (cellName == null || !lineageData.isCellName(cellName)) {
-            return results;
-        }
-
-        // get time range for cell
-        int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
-        int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
-
-        for (int i = firstOccurence; i <= lastOccurence; i++) {
-            String[] names = lineageData.getNames(i);
-            Integer[][] positions = lineageData.getPositions(i);
-
-            // find the coordinates of the query cell
-            int queryIDX = -1;
-            int x = -1;
-            int y = -1;
-            int z = -1;
-            for (int j = 0; j < names.length; j++) {
-                if (names[j].toLowerCase().equals(cellName.toLowerCase())) {
-                    queryIDX = j;
-                    x = positions[j][0];
-                    y = positions[j][1];
-                    z = positions[j][2];
-                    // System.out.println(x + ", " + y + ", " + z);
-                }
-            }
-
-            // find nearest neighbor
-            if (x != -1 && y != -1 && z != -1) {
-                double distance = Double.MAX_VALUE;
-                for (int k = 0; k < positions.length; k++) {
-                    if (k != queryIDX) {
-                        double distanceFromQuery = distance(x, positions[k][0], y, positions[k][1], z, positions[k][2]);
-                        if (distanceFromQuery < distance) {
-                            distance = distanceFromQuery;
-                        }
-                    }
-                }
-
-                // multiple distance by 1.5
-                if (distance != Double.MAX_VALUE) {
-                    distance *= 1.5;
-                }
-
-                // find all cells within d*1.5 range
-                for (int n = 0; n < positions.length; n++) {
-                    // compute distance from each cell to query cell
-                    if (distance(x, positions[n][0], y, positions[n][1], z, positions[n][2]) <= distance) {
-                        // only add new entries
-                        if (!results.contains(names[n]) && !names[n].equalsIgnoreCase(cellName)) {
-                            results.add(names[n]);
-                        }
-                    }
-                }
-            }
-        }
-
-        return results;
-    }
-
-    private static double distance(int x1, int x2, int y1, int y2, int z1, int z2) {
-        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
-    }
+  	private static double distance(double x1, double x2, double y1, double y2, double z1, double z2) {
+  		return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
+  	}
 
     public static EventHandler<ActionEvent> getAddButtonListener() {
         return event -> {

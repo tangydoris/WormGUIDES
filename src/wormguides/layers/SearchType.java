@@ -58,8 +58,8 @@ public enum SearchType {
         return description;
     }
 
-    public String toString() {
-        return getDescription();
-    }
-
+	@Override
+	public String toString() {
+		return getDescription();
+	}
 }

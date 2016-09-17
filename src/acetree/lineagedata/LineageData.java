@@ -32,7 +32,7 @@ public interface LineageData {
      * @return size-3 integer arrays that specify the x-, y-, z-coordinates of the cell positions in 3D space. The i-th
      * element of the name, positions and diameter arrays are information on the i-th cell at one timepoint.
      */
-    Integer[][] getPositions(final int time);
+    Double[][] getPositions(final int time);
 
     /**
      * @param time
@@ -41,7 +41,7 @@ public interface LineageData {
      * @return diameters at that time.  The i-th element of the name, positions and diameter arrays are information
      * on the i-th cell at one timepoint.
      */
-    Integer[] getDiameters(final int time);
+    Double[] getDiameters(final int time);
 
     /**
      * @return number of total timepoints in the lineage
@@ -91,7 +91,7 @@ public interface LineageData {
      * @param diameter
      *         diameter of the cell
      */
-    void addNucleus(final int time, final String name, final int x, final int y, final int z, final int diameter);
+    void addNucleus(final int time, final String name, final double x, final double y, final double z, final double diameter);
 
     /**
      * @param name
@@ -125,4 +125,11 @@ public interface LineageData {
      *         false if the lineage is in Sulston mode, false otherwise
      */
     void setIsSulstonModeFlag(final boolean isSulston);
+    
+    /**
+     * Get the x,y,z scaling values for the dataset
+     * 
+     * @return
+     */
+    public double[] getXYZScale();
 }

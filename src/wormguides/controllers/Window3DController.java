@@ -135,2148 +135,2162 @@ import partslist.PartsList;
 
 public class Window3DController {
 
-    private final static double cannonicalOrientationX = 145.0;
-    private final static double cannonicalOrientationY = -166.0;
-    private final static double cannonicalOrientationZ = 24.0;
-    private static Sphere[] spheres;
-    private static MeshView[] meshes;
-    private static String[] cellNames;
-    private static String[] meshNames;
-    // rotation stuff
-    private final Rotate rotateX;
-    private final Rotate rotateY;
-    private final Rotate rotateZ;
-    private final String CS = ", ";
-    private final String FILL_COLOR_HEX = "#272727";
-    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
-            TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-    /**
-     * The wait time (in milliseconds) between consecutive time frames while a
-     * movie is playing.
-     */
-    private final long WAIT_TIME_MILLI = 200;
-    private final double CAMERA_INITIAL_DISTANCE = -220;
-    private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
-    private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
-    /**
-     * The scale of the subscene z-coordinate axis so that the embryo does not
-     * appear flat and squished.
-     */
-    private final double Z_SCALE = 5;
-    /** The scale of the subscene x-coordinate axis. */
-    private final double X_SCALE = 1;
-    /** The scale of the subscene y-coordinate axis. */
-    private final double Y_SCALE = 1;
-    /** Text size scale used for the rendering of billboard notes. */
-    private final double BILLBOARD_SCALE = 0.9;
-    /**
-     * Scale used for the radii of spheres that represent cells, multiplied with
-     * the cell's radius loaded from the nuc files.
-     */
-    private final double SIZE_SCALE = 1;
-    /** The radius of all spheres when 'uniform size' is ticked. */
-    private final double UNIFORM_RADIUS = 4;
-    /**
-     * The default camera zoom of the embryo. On program startup, the embryo is
-     * zoomed in so that the entire embryo is not visible.
-     */
-    private final double INITIAL_ZOOM = 1.5;
-    /**
-     * The number of pixels that a sprite (note or label) can be outside the
-     * sprite pane bounds before being removed from the subscene.
-     */
-    private final int OUT_OF_BOUNDS_THRESHOLD = 5;
-    /**
-     * The int used when calculating the y offset between a sprite and label.
-     */
-    private final int LABEL_SPRITE_Y_OFFSET = 5;
-    Vector<JavaPicture> javaPictures;
-    private Stage parentStage;
-    private LineageData cellData;
-    private SubScene subscene;
-    private TextField searchField;
-    // transformation stuff
-    private Group root;
-    private PerspectiveCamera camera;
-    private Xform xform;
-    private double mousePosX, mousePosY, mousePosZ;
-    private double mouseOldX, mouseOldY, mouseOldZ;
-    private double mouseDeltaX, mouseDeltaY;
-    // average position offsets of nuclei from zero
-    private int offsetX, offsetY, offsetZ;
-    private double angleOfRotation;
-    // housekeeping stuff
-    private IntegerProperty time;
-    private IntegerProperty totalNuclei;
-    private int endTime;
-    private int startTime;
-    private boolean[] searchedCells;
-    private boolean[] searchedMeshes;
-    private Integer[][] positions;
-    private Integer[] diameters;
-    private DoubleProperty zoom;
-    // switching timepoints stuff
-    private BooleanProperty playingMovie;
-    private PlayService playService;
-    private RenderService renderService;
-    // subscene click cell selection stuff
-    private IntegerProperty selectedIndex;
-    private StringProperty selectedName;
-    private StringProperty selectedNameLabeled;
-    private Stage contextMenuStage;
-    private ContextMenuController contextMenuController;
-    private CasesLists cases;
-    private BooleanProperty cellClicked;
-    // searched highlighting stuff
-    private boolean inSearch;
-    private ObservableList<String> searchResultsList;
-    private ArrayList<String> localSearchResults;
-    // color rules stuff
-    private ColorHash colorHash;
-    private ObservableList<Rule> currentRulesList;
-    private Comparator<Color> colorComparator;
-    private Comparator<Shape3D> opacityComparator;
-    // specific boolean listener for gene search results
-    private BooleanProperty geneResultsUpdated;
-    // opacity value for "other" cells (with no rule attached)
-    private DoubleProperty othersOpacity;
-    private ArrayList<String> otherCells;
-    // Scene Elements stuff
-    private boolean defaultEmbryoFlag;
-    private SceneElementsList sceneElementsList;
-    private ArrayList<SceneElement> sceneElementsAtTime;
-    private ArrayList<MeshView> currentSceneElementMeshes;
-    private ArrayList<SceneElement> currentSceneElements;
-    // Uniform nuclei sizef
-    private boolean uniformSize;
-    // Cell body and cell nucleus highlighting in search mode
-    private boolean cellNucleusTicked;
-    private boolean cellBodyTicked;
-    // Story elements stuff
-    private StoriesLayer storiesLayer;
-    // currentNotes contains all notes that are 'active' within a scene
-    // (any note that should be visible in a given frame)
-    private ArrayList<Note> currentNotes;
-    // Map of current note graphics to their note objects
-    private HashMap<Node, Note> currentGraphicNoteMap;
-    // Map of current notes to their scene elements
-    private HashMap<Note, MeshView> currentNoteMeshMap;
-    private VBox overlayVBox;
-    private Pane spritesPane;
-    // maps of sprite/billboard front notes attached to cell, or cell and time
-    private HashMap<Node, VBox> entitySpriteMap;
-    private HashMap<Node, Node> billboardFrontEntityMap;
-    // Label stuff
-    private ArrayList<String> allLabels;
-    private ArrayList<String> currentLabels;
-    private HashMap<Node, Text> entityLabelMap;
-    private Text transientLabelText; // shows up on hover
-    // orientation indicator
-    private Cylinder orientationIndicator;
-    private Rotate indicatorRotation;// this is the time varying component of
-    // rotation
-    // private Group orientationIndicator;//this isn't needed globally really
-    private double[] keyValuesRotate = {0, 45, 100, 100, 145};
-    private double[] keyFramesRotate = {1, 20, 320, 340, 400}; // start
-    private EventHandler<MouseEvent> clickableMouseEnteredHandler;
-    private EventHandler<MouseEvent> clickableMouseExitedHandler;
-    private ProductionInfo productionInfo;
-    private Connectome connectome;
-    private BooleanProperty bringUpInfoProperty;
-    private SubsceneSizeListener subsceneSizeListener;
-    private BooleanProperty captureVideo;
-    private Timer timer;
-    private Vector<File> movieFiles;
-    private int count;
-    private String movieName;
-    private String moviePath;
-    private File frameDir;
-    private BooleanProperty update3D;
-    private DoubleProperty rotateXAngle;
-    private DoubleProperty rotateYAngle;
-    private DoubleProperty rotateZAngle;
-    private Quaternion quaternion;
-
-    /**
-     * Window3DController class constructor called by
-     * {@link RootLayoutController} upon initialization.
-     *
-     * @param parent
-     *         {@link Stage} to which the main application belongs to.
-     *         Reference used for context menu (whether it should appear in
-     *         the sulston tree or the 3D subscene.
-     * @param parentPane
-     *         {@link AnchorPane} to which sprites, labels, and the notes
-     *         info panel are added
-     * @param data
-     *         {@link LineageData} to contains cell information loaded from
-     *         the nuclear files
-     * @param cases
-     *         {@link CasesLists} that contains information about
-     *         terminal/non-terminal cells/anatomy terms
-     * @param info
-     *         {@link ProductionInfo} that contains information about
-     *         segmentation and the movie time offset
-     * @param connectome
-     *         {@link Connectome} that contains information about the
-     *         embryo's connectome
-     * @param bringUpInfoProperty
-     *         {@link BooleanProperty} that should be set to TRUE when the
-     *         info window should be brought up, FALSE otherwise
-     */
-    public Window3DController(
-            Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
-            ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-            int offsetZ, boolean defaultEmbryoFlag) {
-        parentStage = parent;
-
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
-
-        root = new Group();
-        cellData = data;
-        productionInfo = info;
-        this.connectome = connectome;
-
-        this.defaultEmbryoFlag = defaultEmbryoFlag;
-
-        if (defaultEmbryoFlag) {
-            startTime = productionInfo.getDefaultStartTime();
-        } else {
-            startTime = 0;
-        }
-
-        time = new SimpleIntegerProperty(startTime);
-        time.addListener((observable, oldValue, newValue) -> {
-            int t = newValue.intValue();
-            if (t < startTime) {
-                t = startTime;
-            }
-            if (startTime <= t && t <= endTime) {
-                buildScene();
-            }
-        });
-
-        spheres = new Sphere[1];
-        meshes = new MeshView[1];
-        cellNames = new String[1];
-        meshNames = new String[1];
-        positions = new Integer[1][3];
-        diameters = new Integer[1];
-        searchedCells = new boolean[1];
-        searchedMeshes = new boolean[1];
-
-        selectedIndex = new SimpleIntegerProperty(-1);
-
-        selectedName = new SimpleStringProperty("");
-        selectedName.addListener((observable, oldValue, newValue) -> {
-            int selected = getIndexByCellName(newValue);
-            if (selected != -1) {
-                selectedIndex.set(selected);
-            }
-        });
-
-        selectedNameLabeled = new SimpleStringProperty("");
-        selectedNameLabeled.addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty()) {
-                String lineageName = newValue;
-
-                selectedName.set(lineageName);
-
-                if (!allLabels.contains(lineageName)) {
-                    allLabels.add(lineageName);
-                }
-
-                Shape3D entity = getEntityWithName(lineageName);
-
-                // go to labeled name
-                int startTime1;
-                int endTime1;
-
-                startTime1 = Search.getFirstOccurenceOf(lineageName);
-                endTime1 = Search.getLastOccurenceOf(lineageName);
-
-                // do not change scene is entity does not exist at any time
-                if (startTime1 <= 0 || endTime1 <= 0) {
-                    return;
-                }
-
-                if (time.get() < startTime1 || time.get() > endTime1) {
-                    time.set(startTime1);
-                } else {
-                    insertLabelFor(lineageName, entity);
-                }
-
-                highlightActiveCellLabel(entity);
-            }
-        });
-
-        cellClicked = new SimpleBooleanProperty(false);
-
-        inSearch = false;
-
-        totalNuclei = new SimpleIntegerProperty();
-        totalNuclei.set(0);
-
-        endTime = data.getNumberOfTimePoints() - 1;
-
-        createSubScene(parentPane.widthProperty().get(), parentPane.heightProperty().get());
-        parentPane.getChildren().add(subscene);
-
-        subsceneSizeListener = new SubsceneSizeListener();
-        parentPane.widthProperty().addListener(subsceneSizeListener);
-        parentPane.heightProperty().addListener(subsceneSizeListener);
-
-        mousePosX = 0;
-        mousePosY = 0;
-        mousePosZ = 0;
-        mouseOldX = 0;
-        mouseOldY = 0;
-        mouseOldZ = 0.;
-        mouseDeltaX = 0;
-        mouseDeltaY = 0;
-        angleOfRotation = 0.;
-
-        playService = new PlayService();
-        playingMovie = new SimpleBooleanProperty();
-        playingMovie.set(false);
-        playingMovie.addListener((observable, oldValue, newValue) -> {
-            hideContextPopups();
-            if (newValue) {
-                playService.restart();
-            } else {
-                playService.cancel();
-            }
-        });
-
-        renderService = new RenderService();
-
-        zoom = new SimpleDoubleProperty(INITIAL_ZOOM);
-        zoom.addListener((observable, oldValue, newValue) -> {
-            xform.setScale(zoom.get());
-            repositionSprites();
-            repositionNoteBillboardFronts();
-        });
-        xform.setScale(zoom.get());
-
-        localSearchResults = new ArrayList<>();
-
-        geneResultsUpdated = new SimpleBooleanProperty();
-
-        othersOpacity = new SimpleDoubleProperty(1);
-        otherCells = new ArrayList<>();
-
-        rotateX = new Rotate(0, Rotate.X_AXIS);
-        rotateY = new Rotate(0, Rotate.Y_AXIS);
-        rotateZ = new Rotate(0, Rotate.Z_AXIS);
-
-        // initialize
-        rotateXAngle = new SimpleDoubleProperty(0.0);
-        rotateYAngle = new SimpleDoubleProperty(0.0);
-        rotateZAngle = new SimpleDoubleProperty(0.0);
-
-        // set intial values
-        rotateXAngle.set(rotateX.getAngle());
-        rotateYAngle.set(rotateY.getAngle());
-        rotateZAngle.set(rotateZ.getAngle());
-
-        // add listener for control from rotationcontroller
-        rotateXAngle.addListener(getRotateXAngleListener());
-        rotateYAngle.addListener(getRotateYAngleListener());
-        rotateZAngle.addListener(getRotateZAngleListener());
-
-        quaternion = new Quaternion();
-
-        uniformSize = false;
-
-        currentRulesList = FXCollections.observableArrayList();
-
-        colorHash = new ColorHash();
-        colorComparator = new ColorComparator();
-        opacityComparator = new OpacityComparator();
-
-        if (defaultEmbryoFlag) {
-            currentSceneElementMeshes = new ArrayList<>();
-            currentSceneElements = new ArrayList<>();
-        }
-
-        currentNotes = new ArrayList<>();
-        currentGraphicNoteMap = new HashMap<>();
-        currentNoteMeshMap = new HashMap<>();
-        entitySpriteMap = new HashMap<>();
-        billboardFrontEntityMap = new HashMap<>();
-
-        allLabels = new ArrayList<>();
-        currentLabels = new ArrayList<>();
-        entityLabelMap = new HashMap<>();
-
-        EventHandler<MouseEvent> handler = this::handleMouseEvent;
-        subscene.setOnMouseClicked(handler);
-        subscene.setOnMouseDragged(handler);
-        subscene.setOnMouseEntered(handler);
-        subscene.setOnMousePressed(handler);
-        subscene.setOnMouseReleased(handler);
-
-        setNotesPane(parentPane);
-
-        clickableMouseEnteredHandler = event -> spritesPane.setCursor(Cursor.HAND);
-        clickableMouseExitedHandler = event -> spritesPane.setCursor(Cursor.DEFAULT);
-
-        this.cases = cases;
-
-        movieFiles = new Vector<>();
-        javaPictures = new Vector<>();
-        count = -1;
-
-        // set up the orientation indicator in bottom right corner
-        double radius = 5.0;
-        double height = 15.0;
-        PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(Color.RED);
-        orientationIndicator = new Cylinder(radius, height);
-        orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
-        orientationIndicator.setMaterial(material);
-
-        xform.getChildren().add(createOrientationIndicator());
-
-        this.bringUpInfoProperty = bringUpInfoProperty;
-
-        initializeUpdate3D();
-    }
-
-    public void initializeWithCannonicalOrientation() {
-        // set default cannonical orientations
-        rotateXAngle.set(cannonicalOrientationX);
-        rotateYAngle.set(cannonicalOrientationY);
-        rotateZAngle.set(cannonicalOrientationZ);
-    }
-
-    private Group createOrientationIndicator() {
-        indicatorRotation = new Rotate();
-        // top level group
-        // had rotation to make it match main rotation
-        Group orientationIndicator = new Group();
-        // has rotation to make it match biological orientation
-        Group middleTransformGroup = new Group();
-
-        // set up the orientation indicator in bottom right corner
-        Text t = makeNoteBillboardText("P     A");
-        t.setTranslateX(-10);
-        middleTransformGroup.getChildren().add(t);
-
-        t = makeNoteBillboardText("D     V");
-        t.setTranslateX(-42);
-        t.setTranslateY(32);
-        t.setRotate(90);
-        middleTransformGroup.getChildren().add(t);
-
-        t = makeNoteBillboardText("L    R");
-        t.setTranslateX(5);
-        t.setTranslateZ(10);
-        t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
-        middleTransformGroup.getChildren().add(t);
-
-        middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation
-        // to
-        // match
-        // lateral
-        // orientation
-        // in
-        // image
-        middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
-        // xy relocates z shrinks apparent by moving away from camera? improves
-        // resolution?
-        orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
-        orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
-        orientationIndicator.getChildren().add(middleTransformGroup);
-        middleTransformGroup.getTransforms().add(indicatorRotation);
-        return orientationIndicator;
-    }
-
-    private double computeInterpolatedValue(int timevalue, double[] keyFrames, double[] keyValues) {
-        if (timevalue <= keyFrames[0]) {
-            return keyValues[0];
-        }
-
-        if (timevalue >= keyFrames[keyFrames.length - 1]) {
-            return keyValues[keyValues.length - 1];
-        }
-
-        int i;
-        for (i = 0; i < keyFrames.length; i++) {
-            if (keyFrames[i] == timevalue) {
-                return (keyValues[i]);
-            }
-
-            if (keyFrames[i] > timevalue) {
-                break;
-            }
-        }
-
-        // interpolate btw values at i and i-1
-        double alpha = ((timevalue - keyFrames[i - 1]) / (keyFrames[i] - keyFrames[i - 1]));
-        double value = keyValues[i] * alpha + keyValues[i - 1] * (1 - alpha);
-        // System.out.println("alpha "+alpha+keyValues[i-1]+" "+keyValues[i]+"
-        // value "+value);
-        return value;
-    }
-
-    private void initializeUpdate3D() {
-        update3D = new SimpleBooleanProperty(false);
-
-        update3D.addListener((arg0, oldPropertyValue, newPropertyValue) -> {
-            if (newPropertyValue) { // i.e. out of focus, now refresh the
-                // scene
-                buildScene();
-                update3D.set(false);
-            }
-        });
-    }
-
-    public void addListenerToRebuildSceneFlag(BooleanProperty flag) {
-        flag.addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                buildScene();
-            }
-        });
-    }
-
-    public ColorHash getColorHash() {
-        return colorHash;
-    }
-
-    /**
-     * Inserts a transient label into the sprites pane for the specified entity
-     * if the entity is an 'other' entity that is less than 10% opaque.
-     *
-     * @param name
-     *         String containing the name that appears on the transient label
-     * @param entity
-     *         The entity {@link Node} that the label should appear on
-     */
-    private void transientLabel(String name, Node entity) {
-        if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25) {
-
-            if (!currentLabels.contains(name) && entity != null) {
-                Bounds b = entity.getBoundsInParent();
-
-                if (b != null) {
-                    String funcName = PartsList.getFunctionalNameByLineageName(name);
-                    if (funcName != null) {
-                        name = funcName;
-                    }
-
-                    transientLabelText = makeNoteSpriteText(name);
-
-                    transientLabelText.setWrappingWidth(-1);
-                    transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
-                    transientLabelText.setOnMouseEntered(Event::consume);
-                    transientLabelText.setOnMouseClicked(Event::consume);
-
-                    Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-                            (b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
-                    double x = p.getX();
-                    double y = p.getY();
-
-                    double vOffset = b.getHeight() / 2;
-                    double hOffset = b.getWidth() / 2;
-
-                    x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
-
-                    transientLabelText.getTransforms().add(new Translate(x, y));
-
-                    spritesPane.getChildren().add(transientLabelText);
-                }
-            }
-        }
-    }
-
-    /**
-     * Removes transient label from sprites pane.
-     */
-    private void removeTransientLabel() {
-        spritesPane.getChildren().remove(transientLabelText);
-    }
-
-    // Called by RootLayoutController to set the loaded SceneElementsList
-    public void setSceneElementsList(SceneElementsList list) {
-        if (list != null) {
-            sceneElementsList = list;
-        }
-    }
-
-    public void setStoriesLayer(StoriesLayer layer) {
-        if (layer != null) {
-            storiesLayer = layer;
-            if (update3D != null) {
-                initializeUpdate3D();
-            }
-            storiesLayer.setUpdate3DProperty(update3D);
-
-            buildScene();
-        }
-    }
-
-    public BooleanProperty getUpdate3DProperty() {
-        return this.update3D;
-    }
-
-    public IntegerProperty getTimeProperty() {
-        return time;
-    }
-
-    public DoubleProperty getZoomProperty() {
-        return zoom;
-    }
-
-    public IntegerProperty getSelectedIndex() {
-        return selectedIndex;
-    }
-
-    public StringProperty getSelectedNameLabeled() {
-        return selectedNameLabeled;
-    }
-
-    public StringProperty getSelectedName() {
-        return selectedName;
-    }
-
-    public BooleanProperty getCellClicked() {
-        return cellClicked;
-    }
-
-    public IntegerProperty getTotalNucleiProperty() {
-        return totalNuclei;
-    }
-
-    public BooleanProperty getPlayingMovieProperty() {
-        return playingMovie;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void handleMouseEvent(MouseEvent me) {
-        EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
-
-        if (type == MouseEvent.MOUSE_ENTERED_TARGET || type == MouseEvent.MOUSE_ENTERED
-                || type == MouseEvent.MOUSE_RELEASED || type == MouseEvent.MOUSE_MOVED) {
-            handleMouseReleasedOrEntered();
-        } else if (type == MouseEvent.MOUSE_CLICKED && me.isStillSincePress()) {
-            handleMouseClicked(me);
-        } else if (type == MouseEvent.MOUSE_DRAGGED) {
-            handleMouseDragged(me);
-        } else if (type == MouseEvent.MOUSE_PRESSED) {
-            handleMousePressed(me);
-        }
-    }
-
-    private void handleMouseDragged(MouseEvent event) {
-        hideContextPopups();
-
-        spritesPane.setCursor(Cursor.CLOSED_HAND);
-
-        mouseOldX = mousePosX;
-        mouseOldY = mousePosY;
-        mouseOldZ = mousePosZ;
-        mousePosX = event.getSceneX();
-        mousePosY = event.getSceneY();
-        mouseDeltaX = (mousePosX - mouseOldX);
-        mouseDeltaY = (mousePosY - mouseOldY);
-
-        mouseDeltaX /= 2;
-        mouseDeltaY /= 2;
-
-        angleOfRotation = rotationAngleFromMouseMovement();
-        mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
-
-        if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
-
-            xform.setTranslateX(xform.getTranslateX() - mouseDeltaX);
-            xform.setTranslateY(xform.getTranslateY() - mouseDeltaY);
-
-            repositionSprites();
-            repositionNoteBillboardFronts();
-        } else {
-            if (event.isPrimaryButtonDown()) {
-            /*
-             * TODO how to get Z COORDINATE?
-			 */
-                if (quaternion != null) {
-                    // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-                    // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
-
-				/*
-                 * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
-				 * mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
-				 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
-				 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
-				 */
-                    double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
-                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
-
-                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
-                        // ", " + vectorToOldMousePos[2] + ">");
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
-                        // ", " + vectorToNewMousePos[2] + ">");
-                        // System.out.println(" ");
-
-                        // compute cross product
-                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
-                        if (cross.length == 3) {
-                            // System.out.println("cross product: <" + cross[0] + ",
-                            // " + cross[1] + ", " + cross[2] + ">");
-                            quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
-
-                            ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
-
-                            if (eulerAngles.size() == 3) {
-                                // rotateX.setAngle(eulerAngles.get(2));
-                                // rotateY.setAngle(eulerAngles.get(0));
-                            }
-                        }
-                    }
-                }
-
-                double modifier = 10.0;
-                double modifierFactor = 0.1;
-
-                rotateXAngle.set(
-                        ((rotateXAngle.get() + mouseDeltaY * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
-                rotateYAngle.set(
-                        ((rotateYAngle.get() + mouseDeltaX * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
-
-                repositionSprites();
-                repositionNoteBillboardFronts();
-            }
-        }
-    }
-
-    private void handleMouseReleasedOrEntered() {
-        spritesPane.setCursor(Cursor.DEFAULT);
-    }
-
-    private void handleMouseClicked(MouseEvent event) {
-        spritesPane.setCursor(Cursor.HAND);
-
-        hideContextPopups();
-
-        Node node = event.getPickResult().getIntersectedNode();
-
-        // Nucleus
-        if (node instanceof Sphere) {
-            Sphere picked = (Sphere) node;
-            selectedIndex.set(getPickedSphereIndex(picked));
-            String name = normalizeName(cellNames[selectedIndex.get()]);
-            selectedName.set(name);
-            cellClicked.set(true);
-
-            if (event.getButton() == MouseButton.SECONDARY
-                    || (event.getButton() == MouseButton.PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
-                showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
-            } else if (event.getButton() == MouseButton.PRIMARY) {
-                if (allLabels.contains(name)) {
-                    removeLabelFor(name);
-                } else {
-                    if (!allLabels.contains(name)) {
-                        allLabels.add(name);
-                        currentLabels.add(name);
-
-                        Shape3D entity = getEntityWithName(name);
-                        insertLabelFor(name, entity);
-                        highlightActiveCellLabel(entity);
-                    }
-                }
-            }
-
-        }
-
-        // Cell body/structure
-        else if (node instanceof MeshView) {
-            boolean found = false;
-            for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
-                MeshView curr = currentSceneElementMeshes.get(i);
-                if (curr.equals(node)) {
-                    SceneElement clickedSceneElement = currentSceneElements.get(i);
-                    String name = normalizeName(clickedSceneElement.getSceneName());
-                    selectedName.set(name);
-                    found = true;
-
-                    if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
-                            && (event.isMetaDown() || event.isControlDown()))) {
-                        if (sceneElementsList.isMulticellStructureName(name)) {
-                            showContextMenu(name, event.getScreenX(), event.getScreenY(),
-                                    SearchOption.MULTICELLULAR_NAME_BASED);
-                        } else {
-                            showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
-                        }
-                    } else if (event.getButton() == MouseButton.PRIMARY) {
-                        if (allLabels.contains(name)) {
-                            removeLabelFor(name);
-                        } else {
-                            allLabels.add(name);
-                            currentLabels.add(name);
-
-                            Shape3D entity = getEntityWithName(name);
-                            insertLabelFor(name, entity);
-                            highlightActiveCellLabel(entity);
-                        }
-                    }
-
-                    break;
-                }
-            }
-
-            // Note structure
-            if (!found) {
-                currentNoteMeshMap.keySet()
-                        .stream()
-                        .filter(note -> currentNoteMeshMap.get(note).equals(node))
-                        .forEachOrdered(note -> selectedName.set(note.getTagName()));
-            }
-        } else {
-            selectedIndex.set(-1);
-            selectedName.set("");
-        }
-    }
-
-    private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
-        double[] vector = new double[3];
-
-        double vx, vy, vz;
-
-        vx = qx - px;
-        vy = qy - py;
-        vz = qz - pz;
-
-        vector[0] = vx;
-        vector[1] = vy;
-        vector[2] = vz;
-
-        return vector;
-    }
-
-    /*
-     * TODO fix this
-     *
-     */
-    // http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
-    // --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
-    // http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
-    private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
-        return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
-    }
-
-    // http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
-    private double rotationAngleFromMouseMovement() {
-        double rotationAngleRadians = Math
-                .acos(((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
-                        / Math.sqrt((Math.pow(mouseOldX, 2) + Math.pow(mouseOldY, 2) + Math.pow(mouseOldZ, 2))
-                        * (Math.pow(mousePosX, 2) + Math.pow(mousePosY, 2) + Math.pow(mousePosZ, 2))));
-
-        return rotationAngleRadians;
-    }
-
-    // http://mathworld.wolfram.com/CrossProduct.html
-    private double[] crossProduct(double[] u, double[] v) {
-        if (u.length != 3 || v.length != 3) {
-            return null;
-        }
-
-        double[] cross = new double[3];
-
-        double cx, cy, cz;
-        cx = (u[1] * v[2]) - (u[2] * v[1]);
-        cy = (u[2] * v[0]) - (u[0] * v[2]);
-        cz = (u[0] * v[1]) - (u[1] * v[0]);
-
-        cross[0] = cx;
-        cross[1] = cy;
-        cross[2] = cz;
-
-        return cross;
-    }
-
-    private String normalizeName(String name) {
-        if (name.contains("(")) {
-            name = name.substring(0, name.indexOf("("));
-        }
-        name = name.trim();
-        return name;
-    }
-
-    private void handleMousePressed(MouseEvent event) {
-        mousePosX = event.getSceneX();
-        mousePosY = event.getSceneY();
-    }
-
-    private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
-        if (contextMenuStage == null) {
-            initContextMenuStage();
-        }
-
-        contextMenuController.setName(name);
-
-        String funcName = PartsList.getFunctionalNameByLineageName(name);
-        if (funcName == null) {
-            contextMenuController.disableTerminalCaseFunctions(true);
-        } else {
-            contextMenuController.disableTerminalCaseFunctions(false);
-        }
-
-        contextMenuController.setColorButtonListener(event -> {
-            Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
-            rule.showEditStage(parentStage);
-            contextMenuStage.hide();
-        });
-
-        contextMenuController.setColorNeighborsButtonListener(event -> {
-            // color neighboring cell bodies, multicellular structures, as
-            // well as nuclei
-            Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS,
-                    SearchOption.CELLBODY);
-            rule.showEditStage(parentStage);
-            contextMenuStage.hide();
-        });
-
-        contextMenuStage.setX(sceneX);
-        contextMenuStage.setY(sceneY);
-
-        contextMenuStage.show();
-        ((Stage) contextMenuStage.getScene().getWindow()).toFront();
-    }
-
-    private void initContextMenuStage() {
-        if (contextMenuStage == null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases, productionInfo,
-                    connectome);
-
-            contextMenuStage = new Stage();
-            contextMenuStage.initStyle(StageStyle.UNDECORATED);
-
-            contextMenuController.setOwnStage(contextMenuStage);
-
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/layouts/ContextMenuLayout.fxml"));
-
-            loader.setController(contextMenuController);
-            loader.setRoot(contextMenuController);
-
-            try {
-                contextMenuStage.setScene(new Scene(loader.load()));
-                contextMenuStage.initModality(Modality.NONE);
-                contextMenuStage.setResizable(false);
-                contextMenuStage.setTitle("Menu");
-
-                for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
-                    node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
-                }
-
-                contextMenuController.setInfoButtonListener(event -> contextMenuStage.hide());
-
-            } catch (IOException e) {
-                System.out.println("error in initializing context menu.");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void createSubScene(Double width, Double height) {
-        subscene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
-        subscene.setFill(Color.web(FILL_COLOR_HEX));
-
-        buildCamera();
-    }
-
-    public ContextMenuController getContextMenuController() {
-        if (contextMenuStage == null) {
-            initContextMenuStage();
-        }
-
-        return contextMenuController;
-    }
-
-    private void repositionNoteBillboardFronts() {
-        for (Node billboard : billboardFrontEntityMap.keySet()) {
-            Node entity = billboardFrontEntityMap.get(billboard);
-            if (entity != null) {
-                Bounds b = entity.getBoundsInParent();
-
-                if (b != null) {
-                    billboard.getTransforms().clear();
-                    double x = b.getMaxX();
-                    double y = b.getMaxY() + b.getHeight() / 2;
-                    double z = b.getMaxZ();
-
-                    billboard.getTransforms().addAll(
-                            new Translate(x, y, z),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-                }
-            }
-        }
-    }
-
-    /**
-     * Repositions sprites (labels and note sprites) by projecting the sphere's
-     * 3d coordinate onto the front of the subscene
-     */
-    private void repositionSprites() {
-        if (entitySpriteMap != null) {
-            for (Node entity : entitySpriteMap.keySet()) {
-                alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
-            }
-        }
-
-        if (entityLabelMap != null) {
-            for (Node entity : entityLabelMap.keySet()) {
-                alignTextWithEntity(entityLabelMap.get(entity), entity, true);
-            }
-        }
-    }
-
-    /**
-     * Aligns a note graphic to its entity. The graphic is either a {@link Text}
-     * or a {@link VBox}. The graphic is removed if it ends up outside the
-     * bounds of the subscene window after a transformation, and only reinserted
-     * if its bounds are within the window again.
-     *
-     * @param noteOrLabelGraphic
-     *         Graphical representation of a note/notes (can either be a
-     *         {@link Text} or a {@link VBox}
-     * @param node
-     *         Entity that the note graphic should attach to
-     * @param isLabel
-     *         True if a label is being aligned, false otherwise
-     */
-    private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
-        if (node != null) {
-            // graphic could have been previously removed due to
-            // out-of-bounds-ness
-            if (!spritesPane.getChildren().contains(noteOrLabelGraphic)) {
-                spritesPane.getChildren().add(noteOrLabelGraphic);
-            }
-
-            Bounds b = node.getBoundsInParent();
-            if (b != null) {
-                noteOrLabelGraphic.getTransforms().clear();
-                Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-                        (b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
-                double x = p.getX();
-                double y = p.getY();
-
-                double vOffset = b.getHeight() / 2;
-                double hOffset = b.getWidth() / 2;
-
-                if (isLabel) {
-                    x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
-                } else {
-                    x += hOffset;
-                    y += vOffset + LABEL_SPRITE_Y_OFFSET;
-                }
-
-                Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-                Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
-
-                if (graphicBounds != null && paneBounds != null) {
-                    if (x < -OUT_OF_BOUNDS_THRESHOLD || y < -OUT_OF_BOUNDS_THRESHOLD
-                            || ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
-                            - OUT_OF_BOUNDS_THRESHOLD))
-                            || ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
-                        spritesPane.getChildren().remove(noteOrLabelGraphic);
-                    } else { // note graphic is within bounds
-                        noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
-                    }
-                }
-            }
-        }
-    }
-
-    private int getIndexByCellName(String name) {
-        for (int i = 0; i < cellNames.length; i++) {
-            if (cellNames[i].equals(name)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int getPickedSphereIndex(Sphere picked) {
-        for (int i = 0; i < cellNames.length; i++) {
-            if (spheres[i].equals(picked)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Calls the {@link Service} to retrieve subscene data at current time point
-     * then render entities, notes, and labels
-     */
-    private void buildScene() {
-        // Spool thread for actual rendering to subscene
-        renderService.restart();
-    }
-
-    private void getSceneData() {
-        final int requestedTime = time.get();
-        cellNames = cellData.getNames(requestedTime);
-        positions = cellData.getPositions(requestedTime);
-        diameters = cellData.getDiameters(requestedTime);
-        otherCells.clear();
-
-        totalNuclei.set(cellNames.length);
-
-        spheres = new Sphere[cellNames.length];
-        if (defaultEmbryoFlag) {
-            meshes = new MeshView[meshNames.length];
-        }
-
-        if (defaultEmbryoFlag) {
-            // Start scene element list, find scene elements present at time, build
-            // and meshes
-            // empty meshes and scene element references from last rendering. Same
-            // for story elements
-            if (sceneElementsList != null) {
-                meshNames = sceneElementsList.getSceneElementNamesAtTime(requestedTime);
-            }
-
-            if (!currentSceneElementMeshes.isEmpty()) {
-                currentSceneElementMeshes.clear();
-                currentSceneElements.clear();
-            }
-
-            if (sceneElementsList != null) {
-                sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
-                for (SceneElement se : sceneElementsAtTime) {
-                    // add meshes from each scene element
-                    MeshView mesh = se.buildGeometry(requestedTime - 1);
-
-                    if (mesh != null) {
-                        mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                        mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
-
-                        // add rendered mesh to meshes list
-                        currentSceneElementMeshes.add(mesh);
-
-                        // add scene element to rendered scene element reference for
-                        // on click responsiveness
-                        currentSceneElements.add(se);
-                    }
-                }
-            }
-            // End scene element mesh loading/building
-        }
-
-        // Label stuff
-        entityLabelMap.clear();
-        currentLabels.clear();
-
-        for (String label : allLabels) {
-
-            if (defaultEmbryoFlag) {
-                for (SceneElement currentSceneElement : currentSceneElements) {
-                    if (!currentLabels.contains(label)
-                            && label.equalsIgnoreCase(normalizeName(currentSceneElement.getSceneName()))) {
-                        currentLabels.add(label);
-                        break;
-                    }
-                }
-            }
-
-            for (String cell : cellNames) {
-                if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
-                    currentLabels.add(label);
-                    break;
-                }
-            }
-        }
-        // End label stuff
-
-        // Story stuff
-        // Notes are indexed starting from 1 (or 1+offset shown to user)
-        if (storiesLayer != null) {
-            currentNotes.clear();
-
-            currentNoteMeshMap.clear();
-            currentGraphicNoteMap.clear();
-
-            entitySpriteMap.clear();
-            billboardFrontEntityMap.clear();
-
-            currentNotes = storiesLayer.getNotesAtTime(requestedTime);
-
-            for (Note note : currentNotes) {
-                // Revert to overlay display if we have invalid
-                // display/attachment
-                // type combination
-                if (note.hasLocationError() || note.hasEntityNameError()) {
-                    note.setTagDisplay(Display.OVERLAY);
-                }
-
-                if (defaultEmbryoFlag) {
-                    // make mesh views for scene elements from note resources
-                    if (note.hasSceneElements()) {
-                        for (SceneElement se : note.getSceneElements()) {
-                            MeshView mesh = se.buildGeometry(requestedTime);
-
-                            if (mesh != null) {
-                                mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
-                                mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                                mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
-                                currentNoteMeshMap.put(note, mesh);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // End story stuff
-
-        // Search stuff
-        if (localSearchResults.isEmpty()) {
-            searchedCells = new boolean[cellNames.length];
-            searchedMeshes = new boolean[meshNames.length];
-        } else {
-            consultSearchResultsList();
-        }
-        // End search stuff
-    }
-
-    private void updateLocalSearchResults() {
-        if (searchResultsList == null) {
-            return;
-        }
-
-        localSearchResults.clear();
-
-        for (String name : searchResultsList) {
-            if (name.contains("(")) {
-                localSearchResults.add(name.substring(0, name.indexOf("(")).trim());
-            } else {
-                localSearchResults.add(name);
-            }
-        }
-
-        buildScene();
-    }
-
-    private void refreshScene() {
-        // clear note billboards, cell spheres and meshes
-        root.getChildren().clear();
-        root.getChildren().add(xform);
-
-        // clear note sprites and overlays
-        overlayVBox.getChildren().clear();
-
-        Iterator<Node> iter = spritesPane.getChildren().iterator();
-        while (iter.hasNext()) {
-            Node node = iter.next();
-            if (node instanceof Text) {
-                iter.remove();
-            } else if (node instanceof VBox && node != overlayVBox) {
-                iter.remove();
-            }
-        }
-
-        double newrotate = computeInterpolatedValue(time.get(), keyFramesRotate, keyValuesRotate);
-        indicatorRotation.setAngle(-newrotate);
-        indicatorRotation.setAxis(new Point3D(1, 0, 0));
-    }
-
-    private void addEntitiesToScene() {
-        ArrayList<Shape3D> entities = new ArrayList<>();
-        ArrayList<Node> notes = new ArrayList<>();
-
-        // add spheres
-        addCellGeometries(entities);
-
-        if (defaultEmbryoFlag) {
-            // add scene element meshes (from notes and from scene elements list)
-            addSceneElementGeometries(entities);
-        }
-
-        Collections.sort(entities, opacityComparator);
-        root.getChildren().addAll(entities);
-
-        // add notes
-        insertOverlayTitles();
-
-        if (!currentNotes.isEmpty()) {
-            addNoteGeometries(notes);
-        }
-
-        // add labels
-        Shape3D activeEntity = null;
-        for (String name : currentLabels) {
-            insertLabelFor(name, getEntityWithName(name));
-
-            if (name.equalsIgnoreCase(selectedName.get())) {
-                activeEntity = getEntityWithName(name);
-            }
-        }
-        if (activeEntity != null) {
-            highlightActiveCellLabel(activeEntity);
-        }
-
-        if (!notes.isEmpty()) {
-            root.getChildren().addAll(notes);
-        }
-
-        repositionSprites();
-        repositionNoteBillboardFronts();
-
-        removeOutOfBoundsSprites();
-    }
-
-    private void removeOutOfBoundsSprites() {
-        Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-
-        Iterator<Node> iter = spritesPane.getChildren().iterator();
-        while (iter.hasNext()) {
-            Node node = iter.next();
-            if (node != subscene) {
-                Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
-
-                if (spriteBounds.getMinX() < paneBounds.getMinX() - 10
-                        && spriteBounds.getMinY() < paneBounds.getMinY() - 10
-                        && spriteBounds.getMaxX() > paneBounds.getMaxX() + 10
-                        && spriteBounds.getMaxY() > paneBounds.getMaxY() + 10) {
-                    iter.remove();
-                }
-            }
-        }
-    }
-
-    private void addSceneElementGeometries(ArrayList<Shape3D> list) {
-        if (defaultEmbryoFlag) {
-            // add scene elements from note resources
-            list.addAll(currentNoteMeshMap.keySet()
-                    .stream()
-                    .map(note -> currentNoteMeshMap.get(note))
-                    .collect(Collectors.toList()));
-
-            // Consult rules
-            if (!currentSceneElements.isEmpty()) {
-                for (int i = 0; i < currentSceneElements.size(); i++) {
-                    SceneElement se = currentSceneElements.get(i);
-                    MeshView mesh = currentSceneElementMeshes.get(i);
-
-                    // in search mode
-                    if (inSearch) {
-                        if (cellBodyTicked && searchedMeshes[i]) {
-                            mesh.setMaterial(colorHash.getHighlightMaterial());
-                        } else {
-                            mesh.setMaterial(colorHash.getTranslucentMaterial());
-                        }
-                    } else {
-                        // in regular view mode
-                        ArrayList<String> allNames = se.getAllCellNames();
-                        String sceneName = se.getSceneName();
-
-                        // default white meshes
-                        if (allNames.isEmpty()) {
-                            mesh.setMaterial(new PhongMaterial(Color.WHITE));
-                            mesh.setCullFace(CullFace.NONE);
-                        }
-
-                        // If mesh has with name(s), then process rules (cell or
-                        // shape) that apply to it
-                        else {
-                            ArrayList<Color> colors = new ArrayList<>();
-                            for (Rule rule : currentRulesList) {
-                                if (rule.isMulticellularStructureRule()
-                                        && rule.appliesToMulticellularStructure(sceneName)) {
-                                    colors.add(rule.getColor());
-                                } else {
-                                    colors.addAll(allNames.stream()
-                                            .filter(rule::appliesToCellBody)
-                                            .map(name -> rule.getColor())
-                                            .collect(Collectors.toList()));
-                                }
-                            }
-                            Collections.sort(colors, colorComparator);
-
-                            // if any rules applied
-                            if (!colors.isEmpty()) {
-                                mesh.setMaterial(colorHash.getMaterial(colors));
-                            } else {
-                                mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
-                            }
-                        }
-                    }
-
-                    mesh.setOnMouseEntered(event -> {
-                        spritesPane.setCursor(Cursor.HAND);
-
-                        // make label appear
-                        String name = normalizeName(se.getSceneName());
-
-                        if (!currentLabels.contains(name.toLowerCase())) {
-                            transientLabel(name, getEntityWithName(name));
-                        }
-                    });
-                    mesh.setOnMouseExited(event -> {
-                        spritesPane.setCursor(Cursor.DEFAULT);
-
-                        // make label disappear
-                        removeTransientLabel();
-                    });
-
-                    list.add(mesh);
-                }
-            }
-        }
-    }
-
-    private void addCellGeometries(ArrayList<Shape3D> list) {
-        // Sphere stuff
-        for (int i = 0; i < cellNames.length; i++) {
-            double radius;
-            if (!uniformSize) {
-                radius = SIZE_SCALE * diameters[i] / 2;
-            } else {
-                radius = SIZE_SCALE * UNIFORM_RADIUS;
-            }
-            Sphere sphere = new Sphere(radius);
-
-            Material material = new PhongMaterial();
-            // if in search, do highlighting
-            if (inSearch) {
-                if (cellNucleusTicked && searchedCells[i]) {
-                    material = colorHash.getHighlightMaterial();
-                } else {
-                    material = colorHash.getTranslucentMaterial();
-                }
-            }
-            // not in search mode
-            else {
-                ArrayList<Color> colors = new ArrayList<>();
-                for (Rule rule : currentRulesList) {
-                    // just need to consult rule's active list
-                    if (rule.appliesToCellNucleus(cellNames[i])) {
-                        colors.add(Color.web(rule.getColor().toString()));
-                    }
-                }
-                Collections.sort(colors, colorComparator);
-                material = colorHash.getMaterial(colors);
-
-                if (colors.isEmpty()) {
-                    material = colorHash.getOthersMaterial(othersOpacity.get());
-                }
-            }
-
-            sphere.setMaterial(material);
-
-            sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-            sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
-                    positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
-
-            spheres[i] = sphere;
-
-            final int index = i;
-            sphere.setOnMouseEntered(event -> {
-                spritesPane.setCursor(Cursor.HAND);
-
-                // make label appear
-                String name = cellNames[index];
-
-                if (!currentLabels.contains(name.toLowerCase())) {
-                    // get cell body version of sphere, if there is one
-                    transientLabel(name, getEntityWithName(name));
-                }
-            });
-            sphere.setOnMouseExited(event -> {
-                spritesPane.setCursor(Cursor.DEFAULT);
-
-                // make label disappear
-                removeTransientLabel();
-            });
-
-            list.add(sphere);
-        }
-        // End sphere stuff
-    }
-
-    private void removeLabelFor(String name) {
-        allLabels.remove(name);
-        currentLabels.remove(name);
-
-        Node entity = getEntityWithName(name);
-
-        if (entity != null) {
-            removeLabelFrom(entity);
-        }
-    }
-
-    private void removeLabelFrom(Node entity) {
-        if (entity != null) {
-            spritesPane.getChildren().remove(entityLabelMap.get(entity));
-            entityLabelMap.remove(entity);
-        }
-    }
-
-    private void insertLabelFor(String name, Node entity) {
-        // if label is already in scene, make all labels white
-        // and highlight that one
-        Text label = entityLabelMap.get(entity);
-        if (label != null) {
-            for (Node shape : entityLabelMap.keySet()) {
-                entityLabelMap.get(shape).setFill(Color.web(SPRITE_COLOR_HEX));
-            }
-
-            label.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
-            return;
-        }
-
-        // otherwise, create a highlight new label
-        String funcName = PartsList.getFunctionalNameByLineageName(name);
-        Text text;
-        if (funcName != null) {
-            text = makeNoteSpriteText(funcName);
-        } else {
-            text = makeNoteSpriteText(name);
-        }
-
-        final String tempName = name;
-        text.setOnMouseClicked(event -> removeLabelFor(tempName));
-
-        text.setWrappingWidth(-1);
-
-        entityLabelMap.put(entity, text);
-
-        spritesPane.getChildren().add(text);
-        alignTextWithEntity(text, entity, true);
-    }
-
-    private void highlightActiveCellLabel(Shape3D entity) {
-        for (Node shape3D : entityLabelMap.keySet()) {
-            entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
-        }
-
-        if (entity != null && entityLabelMap.get(entity) != null) {
-            entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
-        }
-    }
-
-    /**
-     * @return The {@link Shape3D} entity with input name. Priority is given to
-     * meshes (if a mesh and a cell have the same name, then the mesh is
-     * returned).
-     */
-    private Shape3D getEntityWithName(String name) {
-        if (defaultEmbryoFlag) {
-            // mesh view label
-            for (int i = 0; i < currentSceneElements.size(); i++) {
-                if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
-                        && currentSceneElementMeshes.get(i) != null
-                        && currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
-                    return currentSceneElementMeshes.get(i);
-                }
-            }
-        }
-
-        // sphere label
-        for (int i = 0; i < cellNames.length; i++) {
-            if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name)) {
-                return spheres[i];
-            }
-        }
-
-        return null;
-    }
-
-    // Inserts note geometries to scene
-    // Input list is the list that billboards are added to which are added to
-    // the subscene
-    // Note overlays and sprites are added to the pane that contains the
-    // subscene
-    private void addNoteGeometries(ArrayList<Node> list) {
-        for (Note note : currentNotes) {
-            // map notes to their sphere/mesh view
-            Node text = makeNoteGraphic(note);
-            currentGraphicNoteMap.put(text, note);
-
-            text.setOnMouseEntered(clickableMouseEnteredHandler);
-            text.setOnMouseExited(clickableMouseExitedHandler);
-
-            // SPRITE
-            if (note.isSprite()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    VBox box = new VBox(3);
-                    box.getChildren().add(text);
-                    // add inivisible location marker to scene at location
-                    // specified by note
-                    Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
-                    root.getChildren().add(marker);
-                    entitySpriteMap.put(marker, box);
-                    // add vbox to sprites pane
-                    spritesPane.getChildren().add(box);
-                }
-
-                // cell attachment
-                else if (note.attachedToCell()) {
-                    for (int i = 0; i < cellNames.length; i++) {
-                        if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
-                            // if another note is already attached to the same
-                            // sphere,
-                            // create a vbox for note positioning
-                            if (!entitySpriteMap.containsKey(spheres[i])) {
-                                VBox box = new VBox(3);
-                                box.getChildren().add(text);
-                                entitySpriteMap.put(spheres[i], box);
-                                spritesPane.getChildren().add(box);
-                            } else {
-                                entitySpriteMap.get(spheres[i]).getChildren().add(text);
-                            }
-
-                            break;
-                        }
-                    }
-                } else if (defaultEmbryoFlag) {
-                    // structure attachment
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                MeshView mesh = currentSceneElementMeshes.get(i);
-                                if (!entitySpriteMap.containsKey(mesh)) {
-                                    VBox box = new VBox(3);
-                                    box.getChildren().add(text);
-                                    entitySpriteMap.put(mesh, box);
-                                    spritesPane.getChildren().add(box);
-                                } else {
-                                    entitySpriteMap.get(mesh).getChildren().add(text);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // BILLBOARD_FRONT
-            else if (note.isBillboardFront()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
-                    root.getChildren().add(marker);
-                    billboardFrontEntityMap.put(text, marker);
-                }
-                // cell attachment
-                else if (note.attachedToCell()) {
-                    for (int i = 0; i < cellNames.length; i++) {
-                        if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
-                            billboardFrontEntityMap.put(text, spheres[i]);
-                        }
-                    }
-                }
-                // structure attachment
-                else if (defaultEmbryoFlag) {
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
-                            }
-                        }
-                    }
-                }
-            }
-
-            // BILLBOARD
-            else if (note.isBillboard()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    text.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                    text.getTransforms().addAll(
-                            new Translate(note.getX(), note.getY(), note.getZ()),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-                }
-                // cell attachment
-                else if (note.attachedToCell()) {
-                    for (int i = 0; i < cellNames.length; i++) {
-                        if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
-                            double offset = 5;
-                            if (!uniformSize) {
-                                offset = spheres[i].getRadius() + 2;
-                            }
-
-                            text.getTransforms().addAll(spheres[i].getTransforms());
-                            text.getTransforms().addAll(
-                                    new Translate(offset, offset),
-                                    new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-                        }
-                    }
-                } else if (defaultEmbryoFlag) {
-                    // structure attachment
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
-                                double offset = 5;
-                                text.getTransforms().addAll(
-                                        new Translate(offset, offset),
-                                        new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
-                            }
-                        }
-                    }
-                }
-            }
-
-            // add graphic to appropriate place (scene, overlay box, or on top
-            // of scene)
-            Display display = note.getTagDisplay();
-            if (display != null) {
-                switch (display) {
-                    case SPRITE:
-                        break;
-
-                    case BILLBOARD_FRONT: // fall to billboard case
-
-                    case BILLBOARD:
-                        list.add(text);
-                        break;
-
-                    case OVERLAY: // fall to default case
-
-                    case BLANK: // fall to default case
-
-                    default:
-                        overlayVBox.getChildren().add(text);
-                        break;
-                }
-            }
-        }
-    }
-
-    private void insertOverlayTitles() {
-        if (storiesLayer != null) {
-            Text infoPaneTitle = makeNoteOverlayText("Story Title:");
-
-            if (storiesLayer.getActiveStory() != null) {
-                Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
-                overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
-            } else {
-                Text noStoryTitle = makeNoteOverlayText("none");
-                overlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
-            }
-        }
-    }
-
-    private Text makeNoteOverlayText(String title) {
-        Text text = new Text(title);
-        text.setFill(Color.web(SPRITE_COLOR_HEX));
-        text.setFontSmoothingType(FontSmoothingType.LCD);
-        text.setWrappingWidth(overlayVBox.getWidth());
-        text.setFont(AppFont.getSpriteAndOverlayFont());
-        return text;
-    }
-
-    private Text makeNoteSpriteText(String title) {
-        Text text = makeNoteOverlayText(title);
-        text.setWrappingWidth(160);
-        return text;
-    }
-
-    private Text makeNoteBillboardText(String title) {
-        Text text = new Text(title);
-        text.setWrappingWidth(90);
-        text.setFont(AppFont.getBillboardFont());
-        text.setSmooth(false);
-        text.setStrokeWidth(2);
-        text.setFontSmoothingType(FontSmoothingType.LCD);
-        text.setCacheHint(CacheHint.QUALITY);
-        text.setFill(Color.web(SPRITE_COLOR_HEX));
-        return text;
-    }
-
-    private Sphere createLocationMarker(double x, double y, double z) {
-        Sphere sphere = new Sphere(1);
-        sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-        sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
-        // make marker transparent
-        sphere.setMaterial(colorHash.getOthersMaterial(0));
-        return sphere;
-    }
-
-    // Makes an anchor pane that contains the text to be shown
-    // if isOverlay is true, then the text is larger
-    private Text makeNoteGraphic(Note note) {
-        String title = note.getTagName();
-        if (note.isExpandedInScene()) {
-            title += ": " + note.getTagContents();
-        } else {
-            title += "\n[more...]";
-        }
-
-        Text node = null;
-        if (note.getTagDisplay() != null) {
-            switch (note.getTagDisplay()) {
-                case SPRITE:
-                    node = makeNoteSpriteText(title);
-                    break;
-
-                case BILLBOARD:
-                    node = makeNoteBillboardText(title);
-                    break;
-
-                case BILLBOARD_FRONT:
-                    node = makeNoteBillboardText(title);
-                    break;
-
-                case OVERLAY: // fall to default case
-
-                case BLANK: // fall to default case
-
-                default:
-                    node = makeNoteOverlayText(title);
-                    break;
-
-            }
-        }
-        return node;
-    }
-
-    private void buildCamera() {
-        camera = new PerspectiveCamera(true);
-        xform = new Xform();
-        xform.reset();
-
-        root.getChildren().add(xform);
-        xform.getChildren().add(camera);
-
-        camera.setNearClip(CAMERA_NEAR_CLIP);
-        camera.setFarClip(CAMERA_FAR_CLIP);
-        camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
-
-        subscene.setCamera(camera);
-    }
-
-    public void setSearchResultsList(ObservableList<String> list) {
-        searchResultsList = list;
-    }
-
-    public void setSearchResultsUpdateService(Service<Void> service) {
-        service.setOnSucceeded(event -> updateLocalSearchResults());
-    }
-
-    public void setGeneResultsUpdated(BooleanProperty updated) {
-        geneResultsUpdated = updated;
-        geneResultsUpdated.addListener((observable, oldValue, newValue) -> updateLocalSearchResults());
-    }
-
-    public void consultSearchResultsList() {
-        searchedCells = new boolean[cellNames.length];
-        if (defaultEmbryoFlag) {
-            searchedMeshes = new boolean[meshNames.length];
-        }
-
-        // look for searched cells
-        for (int i = 0; i < cellNames.length; i++) {
-            searchedCells[i] = localSearchResults.contains(cellNames[i]);
-        }
-
-        if (defaultEmbryoFlag) {
-            // look for single celled meshes
-            for (int i = 0; i < meshNames.length; i++) {
-                if (sceneElementsAtTime.get(i).isMulticellular()) {
-                    searchedMeshes[i] = true;
-                    for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
-                        searchedMeshes[i] &= localSearchResults.contains(name);
-                    }
-                } else {
-                    searchedMeshes[i] = localSearchResults.contains(meshNames[i]);
-                }
-            }
-        }
-    }
-
-    public boolean currentRulesApplyTo(String name) {
-        String sceneName = "";
-        ArrayList<String> cells = new ArrayList<>();
-        if (defaultEmbryoFlag) {
-            // get the scene name associated with the cell
-            for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
-                SceneElement currSE = sceneElementsList.getElementsList().get(i);
-
-                // check if multicellular structure --> find match with name in
-                // cells
-                if (currSE.isMulticellular()) {
-                    if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
-                        sceneName = name;
-                        cells = currSE.getAllCellNames(); // save the cells in case
-                        // there isn't an
-                        // explicit structure
-                        // rule but the
-                        // structure is still
-                        // colored
-                    }
-                } else {
-                    String sn = sceneElementsList.getElementsList().get(i).getSceneName();
-
-                    StringTokenizer st = new StringTokenizer(sn);
-                    if (st.countTokens() == 2) {
-                        String sceneNameLineage = st.nextToken();
-                        if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
-                            sceneName = sn;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (sceneName.equals("")) {
-                sceneName = name;
-            }
-        }
-
-        for (Rule rule : currentRulesList) {
-            if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
-                return true;
-            } else if (rule.appliesToCellBody(name)) {
-                return true;
-            } else if (rule.appliesToCellNucleus(name)) {
-                return true;
-            } else { // check if cells corresponding to multicellular structure
-                // have rule - in the case of a non explicit
-                // multicellular rule but a structure that's colored
-                if (cells.size() > 0) {
-                    for (String cell : cells) {
-                        if (rule.appliesToCellBody(cell)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public boolean captureImagesForMovie() {
-
-        movieFiles.clear();
-        count = -1;
-
-        Stage fileChooserStage = new Stage();
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose Save Location");
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
-
-        File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
-
-        if (fakeFile == null) {
-            System.out.println("null file");
-            return false;
-        }
-
-        // save the name from the file chooser for later MOV file
-        movieName = fakeFile.getName();
-        moviePath = fakeFile.getAbsolutePath();
-
-        // make a temp directory for the frames at the given save location
-        String path = fakeFile.getAbsolutePath();
-        if (path.lastIndexOf("/") < 0) {
-            path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
-        } else {
-            path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
-        }
-
-        frameDir = new File(path);
-
-        try {
-            frameDir.mkdir();
-        } catch (SecurityException se) {
-            return false;
-        }
-
-        String frameDirPath = frameDir.getAbsolutePath() + "/";
-
-        captureVideo.set(true);
-        timer = new Timer();
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (captureVideo.get()) {
-                    Platform.runLater(() -> {
-                        WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
-
-                        try {
-                            File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-
-                            if (file != null) {
-                                RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                                ImageIO.write(renderedImage, "JPEG", file);
-                                movieFiles.addElement(file);
-                            }
-                        } catch (Exception e) {
-                            // e.printStackTrace();
-                        }
-                    });
-
-                } else {
-                    timer.cancel();
-                }
-            }
-        }, 0, 1000);
-        return true;
-    }
-
-    public void convertImagesToMovie() {
-
-        // make our files into JavaPicture
-        javaPictures.clear();
-
-        for (File movieFile : movieFiles) {
-            JavaPicture jp = new JavaPicture();
-
-            jp.loadImage(movieFile);
-
-            javaPictures.addElement(jp);
-        }
-
-        if (javaPictures.size() > 0) {
-            new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
-
-            // move the movie to the originally specified location
-            File movJustMade = new File(movieName);
-            movJustMade.renameTo(new File(moviePath));
-
-            // remove the .movtemp.jpg file
-            File movtempjpg = new File(".movtemp.jpg");
-            if (movtempjpg != null) {
-                movtempjpg.delete();
-            }
-        }
-
-        // remove all of the images in the frame directory
-        if (frameDir != null && frameDir.isDirectory()) {
-            File[] frames = frameDir.listFiles();
-            for (File frame : frames) {
-                frame.delete();
-            }
-            frameDir.delete();
-        }
-
-    }
-
-    /*
-     * When called, a snapshot of the screen is saved
-     */
-    public void stillscreenCapture() {
-        Stage fileChooserStage = new Stage();
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose Save Location");
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
-
-        WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
-
-		/*
-         * write the image to a file
+	private final static double cannonicalOrientationX = 145.0;
+	private final static double cannonicalOrientationY = -166.0;
+	private final static double cannonicalOrientationZ = 24.0;
+	private static Sphere[] spheres;
+	private static MeshView[] meshes;
+	private static String[] cellNames;
+	private static String[] meshNames;
+	// rotation stuff
+	private final Rotate rotateX;
+	private final Rotate rotateY;
+	private final Rotate rotateZ;
+	private final String CS = ", ";
+	private final String FILL_COLOR_HEX = "#272727";
+	private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
+			TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
+	/**
+	 * The wait time (in milliseconds) between consecutive time frames while a
+	 * movie is playing.
+	 */
+	private final long WAIT_TIME_MILLI = 200;
+	private final double CAMERA_INITIAL_DISTANCE = -220;
+	private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
+	private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
+
+	/** Text size scale used for the rendering of billboard notes. */
+	private final double BILLBOARD_SCALE = 0.9;
+	/**
+	 * Scale used for the radii of spheres that represent cells, multiplied with
+	 * the cell's radius loaded from the nuc files.
+	 */
+	private final double SIZE_SCALE = 1;
+	/** The radius of all spheres when 'uniform size' is ticked. */
+	private final double UNIFORM_RADIUS = 4;
+	/**
+	 * The default camera zoom of the embryo. On program startup, the embryo is
+	 * zoomed in so that the entire embryo is not visible.
+	 */
+	private final double INITIAL_ZOOM = 1.5;
+	/**
+	 * The number of pixels that a sprite (note or label) can be outside the
+	 * sprite pane bounds before being removed from the subscene.
+	 */
+	private final int OUT_OF_BOUNDS_THRESHOLD = 5;
+	/**
+	 * The int used when calculating the y offset between a sprite and label.
+	 */
+	private final int LABEL_SPRITE_Y_OFFSET = 5;
+	Vector<JavaPicture> javaPictures;
+
+
+
+
+
+	private Stage parentStage;
+	private LineageData cellData;
+	private SubScene subscene;
+	private TextField searchField;
+	// transformation stuff
+	private Group root;
+	private PerspectiveCamera camera;
+	private Xform xform;
+	private double mousePosX, mousePosY, mousePosZ;
+	private double mouseOldX, mouseOldY, mouseOldZ;
+	private double mouseDeltaX, mouseDeltaY;
+	// average position offsets of nuclei from zero
+	private int offsetX, offsetY, offsetZ;
+	private double angleOfRotation;
+	// housekeeping stuff
+	private IntegerProperty time;
+	private IntegerProperty totalNuclei;
+	private int endTime;
+	private int startTime;
+	private boolean[] searchedCells;
+	private boolean[] searchedMeshes;
+	private Double[][] positions;
+	private Double[] diameters;
+	private DoubleProperty zoom;
+	// switching timepoints stuff
+	private BooleanProperty playingMovie;
+	private PlayService playService;
+	private RenderService renderService;
+	// subscene click cell selection stuff
+	private IntegerProperty selectedIndex;
+	private StringProperty selectedName;
+	private StringProperty selectedNameLabeled;
+	private Stage contextMenuStage;
+	private ContextMenuController contextMenuController;
+	private CasesLists cases;
+	private BooleanProperty cellClicked;
+	// searched highlighting stuff
+	private boolean inSearch;
+	private ObservableList<String> searchResultsList;
+	private ArrayList<String> localSearchResults;
+	// color rules stuff
+	private ColorHash colorHash;
+	private ObservableList<Rule> currentRulesList;
+	private Comparator<Color> colorComparator;
+	private Comparator<Shape3D> opacityComparator;
+	// specific boolean listener for gene search results
+	private BooleanProperty geneResultsUpdated;
+	// opacity value for "other" cells (with no rule attached)
+	private DoubleProperty othersOpacity;
+	private ArrayList<String> otherCells;
+	// Scene Elements stuff
+	private boolean defaultEmbryoFlag;
+	private SceneElementsList sceneElementsList;
+	private ArrayList<SceneElement> sceneElementsAtTime;
+	private ArrayList<MeshView> currentSceneElementMeshes;
+	private ArrayList<SceneElement> currentSceneElements;
+	// Uniform nuclei sizef
+	private boolean uniformSize;
+	// Cell body and cell nucleus highlighting in search mode
+	private boolean cellNucleusTicked;
+	private boolean cellBodyTicked;
+	// Story elements stuff
+	private StoriesLayer storiesLayer;
+	// currentNotes contains all notes that are 'active' within a scene
+	// (any note that should be visible in a given frame)
+	private ArrayList<Note> currentNotes;
+	// Map of current note graphics to their note objects
+	private HashMap<Node, Note> currentGraphicNoteMap;
+	// Map of current notes to their scene elements
+	private HashMap<Note, MeshView> currentNoteMeshMap;
+	private VBox overlayVBox;
+	private Pane spritesPane;
+	// maps of sprite/billboard front notes attached to cell, or cell and time
+	private HashMap<Node, VBox> entitySpriteMap;
+	private HashMap<Node, Node> billboardFrontEntityMap;
+	// Label stuff
+	private ArrayList<String> allLabels;
+	private ArrayList<String> currentLabels;
+	private HashMap<Node, Text> entityLabelMap;
+	private Text transientLabelText; // shows up on hover
+	// orientation indicator
+	private Cylinder orientationIndicator;
+	private Rotate indicatorRotation;// this is the time varying component of
+	// rotation
+	// private Group orientationIndicator;//this isn't needed globally really
+	private double[] keyValuesRotate = {0, 45, 100, 100, 145};
+	private double[] keyFramesRotate = {1, 20, 320, 340, 400}; // start
+	private EventHandler<MouseEvent> clickableMouseEnteredHandler;
+	private EventHandler<MouseEvent> clickableMouseExitedHandler;
+	private ProductionInfo productionInfo;
+	private Connectome connectome;
+	private BooleanProperty bringUpInfoProperty;
+	private SubsceneSizeListener subsceneSizeListener;
+	private BooleanProperty captureVideo;
+	private Timer timer;
+	private Vector<File> movieFiles;
+	private int count;
+	private String movieName;
+	private String moviePath;
+	private File frameDir;
+	private BooleanProperty update3D;
+	private DoubleProperty rotateXAngle;
+	private DoubleProperty rotateYAngle;
+	private DoubleProperty rotateZAngle;
+	private Quaternion quaternion;
+	
+	// scales of the subscene coordinate axis --> from ProductionInfo.csv
+	private double X_SCALE;
+	private double Y_SCALE;
+	private double Z_SCALE;
+
+	/**
+	 * Window3DController class constructor called by
+	 * {@link RootLayoutController} upon initialization.
+	 *
+	 * @param parent
+	 *         {@link Stage} to which the main application belongs to.
+	 *         Reference used for context menu (whether it should appear in
+	 *         the sulston tree or the 3D subscene.
+	 * @param parentPane
+	 *         {@link AnchorPane} to which sprites, labels, and the notes
+	 *         info panel are added
+	 * @param data
+	 *         {@link LineageData} to contains cell information loaded from
+	 *         the nuclear files
+	 * @param cases
+	 *         {@link CasesLists} that contains information about
+	 *         terminal/non-terminal cells/anatomy terms
+	 * @param info
+	 *         {@link ProductionInfo} that contains information about
+	 *         segmentation and the movie time offset
+	 * @param connectome
+	 *         {@link Connectome} that contains information about the
+	 *         embryo's connectome
+	 * @param bringUpInfoProperty
+	 *         {@link BooleanProperty} that should be set to TRUE when the
+	 *         info window should be brought up, FALSE otherwise
+	 */
+	public Window3DController(
+			Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
+			ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
+			int offsetZ, boolean defaultEmbryoFlag, double X_SCALE, double Y_SCALE, double Z_SCALE) {
+		parentStage = parent;
+
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		this.offsetZ = offsetZ;
+
+		root = new Group();
+		cellData = data;
+		productionInfo = info;
+		this.connectome = connectome;
+
+		this.defaultEmbryoFlag = defaultEmbryoFlag;
+
+		if (defaultEmbryoFlag) {
+			startTime = productionInfo.getDefaultStartTime();
+		} else {
+			startTime = 0;
+		}
+
+		time = new SimpleIntegerProperty(startTime);
+		time.addListener((observable, oldValue, newValue) -> {
+			int t = newValue.intValue();
+			if (t < startTime) {
+				t = startTime;
+			}
+			if (startTime <= t && t <= endTime) {
+				buildScene();
+			}
+		});
+
+		spheres = new Sphere[1];
+		meshes = new MeshView[1];
+		cellNames = new String[1];
+		meshNames = new String[1];
+		positions = new Double[1][3];
+		diameters = new Double[1];
+		searchedCells = new boolean[1];
+		searchedMeshes = new boolean[1];
+
+		selectedIndex = new SimpleIntegerProperty(-1);
+
+		selectedName = new SimpleStringProperty("");
+		selectedName.addListener((observable, oldValue, newValue) -> {
+			int selected = getIndexByCellName(newValue);
+			if (selected != -1) {
+				selectedIndex.set(selected);
+			}
+		});
+
+		selectedNameLabeled = new SimpleStringProperty("");
+		selectedNameLabeled.addListener((observable, oldValue, newValue) -> {
+			if (!newValue.isEmpty()) {
+				String lineageName = newValue;
+
+				selectedName.set(lineageName);
+
+				if (!allLabels.contains(lineageName)) {
+					allLabels.add(lineageName);
+				}
+
+				Shape3D entity = getEntityWithName(lineageName);
+
+				// go to labeled name
+				int startTime1;
+				int endTime1;
+
+				startTime1 = Search.getFirstOccurenceOf(lineageName);
+				endTime1 = Search.getLastOccurenceOf(lineageName);
+
+				// do not change scene is entity does not exist at any time
+				if (startTime1 <= 0 || endTime1 <= 0) {
+					return;
+				}
+
+				if (time.get() < startTime1 || time.get() > endTime1) {
+					time.set(startTime1);
+				} else {
+					insertLabelFor(lineageName, entity);
+				}
+
+				highlightActiveCellLabel(entity);
+			}
+		});
+
+		cellClicked = new SimpleBooleanProperty(false);
+
+		inSearch = false;
+
+		totalNuclei = new SimpleIntegerProperty();
+		totalNuclei.set(0);
+
+		endTime = data.getNumberOfTimePoints() - 1;
+
+		createSubScene(parentPane.widthProperty().get(), parentPane.heightProperty().get());
+		parentPane.getChildren().add(subscene);
+
+		subsceneSizeListener = new SubsceneSizeListener();
+		parentPane.widthProperty().addListener(subsceneSizeListener);
+		parentPane.heightProperty().addListener(subsceneSizeListener);
+
+		mousePosX = 0;
+		mousePosY = 0;
+		mousePosZ = 0;
+		mouseOldX = 0;
+		mouseOldY = 0;
+		mouseOldZ = 0.;
+		mouseDeltaX = 0;
+		mouseDeltaY = 0;
+		angleOfRotation = 0.;
+
+		playService = new PlayService();
+		playingMovie = new SimpleBooleanProperty();
+		playingMovie.set(false);
+		playingMovie.addListener((observable, oldValue, newValue) -> {
+			hideContextPopups();
+			if (newValue) {
+				playService.restart();
+			} else {
+				playService.cancel();
+			}
+		});
+
+		renderService = new RenderService();
+
+		zoom = new SimpleDoubleProperty(INITIAL_ZOOM);
+		zoom.addListener((observable, oldValue, newValue) -> {
+			xform.setScale(zoom.get());
+			repositionSprites();
+			repositionNoteBillboardFronts();
+		});
+		xform.setScale(zoom.get());
+
+		localSearchResults = new ArrayList<>();
+
+		geneResultsUpdated = new SimpleBooleanProperty();
+
+		othersOpacity = new SimpleDoubleProperty(1);
+		otherCells = new ArrayList<>();
+
+		rotateX = new Rotate(0, Rotate.X_AXIS);
+		rotateY = new Rotate(0, Rotate.Y_AXIS);
+		rotateZ = new Rotate(0, Rotate.Z_AXIS);
+
+		// initialize
+		rotateXAngle = new SimpleDoubleProperty(0.0);
+		rotateYAngle = new SimpleDoubleProperty(0.0);
+		rotateZAngle = new SimpleDoubleProperty(0.0);
+
+		// set intial values
+		rotateXAngle.set(rotateX.getAngle());
+		rotateYAngle.set(rotateY.getAngle());
+		rotateZAngle.set(rotateZ.getAngle());
+
+		// add listener for control from rotationcontroller
+		rotateXAngle.addListener(getRotateXAngleListener());
+		rotateYAngle.addListener(getRotateYAngleListener());
+		rotateZAngle.addListener(getRotateZAngleListener());
+
+		quaternion = new Quaternion();
+
+		uniformSize = false;
+
+		currentRulesList = FXCollections.observableArrayList();
+
+		colorHash = new ColorHash();
+		colorComparator = new ColorComparator();
+		opacityComparator = new OpacityComparator();
+
+		if (defaultEmbryoFlag) {
+			currentSceneElementMeshes = new ArrayList<>();
+			currentSceneElements = new ArrayList<>();
+		}
+
+		currentNotes = new ArrayList<>();
+		currentGraphicNoteMap = new HashMap<>();
+		currentNoteMeshMap = new HashMap<>();
+		entitySpriteMap = new HashMap<>();
+		billboardFrontEntityMap = new HashMap<>();
+
+		allLabels = new ArrayList<>();
+		currentLabels = new ArrayList<>();
+		entityLabelMap = new HashMap<>();
+
+		EventHandler<MouseEvent> handler = this::handleMouseEvent;
+		subscene.setOnMouseClicked(handler);
+		subscene.setOnMouseDragged(handler);
+		subscene.setOnMouseEntered(handler);
+		subscene.setOnMousePressed(handler);
+		subscene.setOnMouseReleased(handler);
+
+		setNotesPane(parentPane);
+
+		clickableMouseEnteredHandler = event -> spritesPane.setCursor(Cursor.HAND);
+		clickableMouseExitedHandler = event -> spritesPane.setCursor(Cursor.DEFAULT);
+
+		this.cases = cases;
+
+		movieFiles = new Vector<>();
+		javaPictures = new Vector<>();
+		count = -1;
+
+		// set up the orientation indicator in bottom right corner
+		double radius = 5.0;
+		double height = 15.0;
+		PhongMaterial material = new PhongMaterial();
+		material.setDiffuseColor(Color.RED);
+		orientationIndicator = new Cylinder(radius, height);
+		orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
+		orientationIndicator.setMaterial(material);
+
+		xform.getChildren().add(createOrientationIndicator());
+
+		this.bringUpInfoProperty = bringUpInfoProperty;
+
+		initializeUpdate3D();
+
+		// set up the scaling values
+		/**
+		 * to convert from microns to pixel values, we set x,y = 1 and z = ratio of z to original y 
 		 */
-        try {
-            File file = fileChooser.showSaveDialog(fileChooserStage);
+		if (X_SCALE != Y_SCALE) { // note that X_SCALE and Y_SCALE are not the same
+			System.err.println("X_SCALE does not equal Y_SCALE - using ratio of Z to X for Z_SCALE value in pixels" + "\n" + "X, Y should be the same value");
+		}
 
-            if (file != null) {
-                RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                ImageIO.write(renderedImage, "png", file);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		this.X_SCALE = 1;
+		this.Y_SCALE = 1;
+		this.Z_SCALE = Z_SCALE / X_SCALE;
+	}
 
-    public void printCellNames() {
-        for (int i = 0; i < cellNames.length; i++) {
-            System.out.println(cellNames[i] + CS + spheres[i]);
-        }
-    }
+	public void initializeWithCannonicalOrientation() {
+		// set default cannonical orientations
+		rotateXAngle.set(cannonicalOrientationX);
+		rotateYAngle.set(cannonicalOrientationY);
+		rotateZAngle.set(cannonicalOrientationZ);
+	}
 
-    public void printMeshNames() {
-        if (defaultEmbryoFlag) {
-            for (int i = 0; i < meshNames.length; i++) {
-                System.out.println(meshNames[i] + CS + meshes[i]);
-            }
-        }
-    }
+	private Group createOrientationIndicator() {
+		indicatorRotation = new Rotate();
+		// top level group
+		// had rotation to make it match main rotation
+		Group orientationIndicator = new Group();
+		// has rotation to make it match biological orientation
+		Group middleTransformGroup = new Group();
 
-    // sets everything associated with color rules
-    public void setRulesList(ObservableList<Rule> list) {
-        if (list == null) {
-            return;
-        }
+		// set up the orientation indicator in bottom right corner
+		Text t = makeNoteBillboardText("P     A");
+		t.setTranslateX(-10);
+		middleTransformGroup.getChildren().add(t);
 
-        currentRulesList = list;
-        currentRulesList.addListener(new ListChangeListener<Rule>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends Rule> change) {
-                while (change.next()) {
-                    if (change.getAddedSize() > 0) {
-                        buildScene();
+		t = makeNoteBillboardText("D     V");
+		t.setTranslateX(-42);
+		t.setTranslateY(32);
+		t.setRotate(90);
+		middleTransformGroup.getChildren().add(t);
 
-                        for (Rule rule : change.getAddedSubList()) {
-                            rule.getRuleChangedProperty().addListener((observable, oldValue, newValue) -> {
-                                if (newValue) {
-                                    buildScene();
-                                }
-                            });
-                        }
-                    }
+		t = makeNoteBillboardText("L    R");
+		t.setTranslateX(5);
+		t.setTranslateZ(10);
+		t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
+		middleTransformGroup.getChildren().add(t);
 
-                    if (!change.getRemoved().isEmpty()) {
-                        buildScene();
-                    }
-                }
-            }
-        });
-    }
+		middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation
+		// to
+		// match
+		// lateral
+		// orientation
+		// in
+		// image
+		middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
+		// xy relocates z shrinks apparent by moving away from camera? improves
+		// resolution?
+		orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
+		orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
+		orientationIndicator.getChildren().add(middleTransformGroup);
+		middleTransformGroup.getTransforms().add(indicatorRotation);
+		return orientationIndicator;
+	}
 
-    /**
-     * Sets transparent anchor pane overlay for sprite notes display
-     *
-     * @param parentPane
-     *         The {@link AnchorPane} in which labels and sprites reside
-     */
-    public void setNotesPane(AnchorPane parentPane) {
-        if (parentPane != null) {
-            spritesPane = parentPane;
+	private double computeInterpolatedValue(int timevalue, double[] keyFrames, double[] keyValues) {
+		if (timevalue <= keyFrames[0]) {
+			return keyValues[0];
+		}
 
-            overlayVBox = new VBox(5);
-            overlayVBox.setPrefWidth(170);
-            overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
-            overlayVBox.setMinWidth(overlayVBox.getPrefWidth());
+		if (timevalue >= keyFrames[keyFrames.length - 1]) {
+			return keyValues[keyValues.length - 1];
+		}
 
-            AnchorPane.setTopAnchor(overlayVBox, 5.0);
-            AnchorPane.setRightAnchor(overlayVBox, 5.0);
+		int i;
+		for (i = 0; i < keyFrames.length; i++) {
+			if (keyFrames[i] == timevalue) {
+				return (keyValues[i]);
+			}
 
-            spritesPane.getChildren().add(overlayVBox);
-        }
-    }
+			if (keyFrames[i] > timevalue) {
+				break;
+			}
+		}
 
-    // Hides cell name label/context menu
-    private void hideContextPopups() {
-        if (contextMenuStage != null) {
-            contextMenuStage.hide();
-        }
-    }
+		// interpolate btw values at i and i-1
+		double alpha = ((timevalue - keyFrames[i - 1]) / (keyFrames[i] - keyFrames[i - 1]));
+		double value = keyValues[i] * alpha + keyValues[i - 1] * (1 - alpha);
+		// System.out.println("alpha "+alpha+keyValues[i-1]+" "+keyValues[i]+"
+		// value "+value);
+		return value;
+	}
 
-    public ArrayList<Rule> getColorRulesList() {
-        ArrayList<Rule> list = new ArrayList<>();
-        list.addAll(currentRulesList);
+	private void initializeUpdate3D() {
+		update3D = new SimpleBooleanProperty(false);
 
-        return list;
-    }
+		update3D.addListener((arg0, oldPropertyValue, newPropertyValue) -> {
+			if (newPropertyValue) { // i.e. out of focus, now refresh the
+				// scene
+				buildScene();
+				update3D.set(false);
+			}
+		});
+	}
+
+	public void addListenerToRebuildSceneFlag(BooleanProperty flag) {
+		flag.addListener((observable, oldValue, newValue) -> {
+			if (newValue) {
+				buildScene();
+			}
+		});
+	}
+
+	public ColorHash getColorHash() {
+		return colorHash;
+	}
+
+	/**
+	 * Inserts a transient label into the sprites pane for the specified entity
+	 * if the entity is an 'other' entity that is less than 10% opaque.
+	 *
+	 * @param name
+	 *         String containing the name that appears on the transient label
+	 * @param entity
+	 *         The entity {@link Node} that the label should appear on
+	 */
+	private void transientLabel(String name, Node entity) {
+		if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25) {
+
+			if (!currentLabels.contains(name) && entity != null) {
+				Bounds b = entity.getBoundsInParent();
+
+				if (b != null) {
+					String funcName = PartsList.getFunctionalNameByLineageName(name);
+					if (funcName != null) {
+						name = funcName;
+					}
+
+					transientLabelText = makeNoteSpriteText(name);
+
+					transientLabelText.setWrappingWidth(-1);
+					transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
+					transientLabelText.setOnMouseEntered(Event::consume);
+					transientLabelText.setOnMouseClicked(Event::consume);
+
+					Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
+							(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+					double x = p.getX();
+					double y = p.getY();
+
+					double vOffset = b.getHeight() / 2;
+					double hOffset = b.getWidth() / 2;
+
+					x += hOffset;
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+
+					transientLabelText.getTransforms().add(new Translate(x, y));
+
+					spritesPane.getChildren().add(transientLabelText);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Removes transient label from sprites pane.
+	 */
+	private void removeTransientLabel() {
+		spritesPane.getChildren().remove(transientLabelText);
+	}
+
+	// Called by RootLayoutController to set the loaded SceneElementsList
+	public void setSceneElementsList(SceneElementsList list) {
+		if (list != null) {
+			sceneElementsList = list;
+		}
+	}
+
+	public void setStoriesLayer(StoriesLayer layer) {
+		if (layer != null) {
+			storiesLayer = layer;
+			if (update3D != null) {
+				initializeUpdate3D();
+			}
+			storiesLayer.setUpdate3DProperty(update3D);
+
+			buildScene();
+		}
+	}
+
+	public BooleanProperty getUpdate3DProperty() {
+		return this.update3D;
+	}
+
+	public IntegerProperty getTimeProperty() {
+		return time;
+	}
+
+	public DoubleProperty getZoomProperty() {
+		return zoom;
+	}
+
+	public IntegerProperty getSelectedIndex() {
+		return selectedIndex;
+	}
+
+	public StringProperty getSelectedNameLabeled() {
+		return selectedNameLabeled;
+	}
+
+	public StringProperty getSelectedName() {
+		return selectedName;
+	}
+
+	public BooleanProperty getCellClicked() {
+		return cellClicked;
+	}
+
+	public IntegerProperty getTotalNucleiProperty() {
+		return totalNuclei;
+	}
+
+	public BooleanProperty getPlayingMovieProperty() {
+		return playingMovie;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void handleMouseEvent(MouseEvent me) {
+		EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
+
+		if (type == MouseEvent.MOUSE_ENTERED_TARGET || type == MouseEvent.MOUSE_ENTERED
+				|| type == MouseEvent.MOUSE_RELEASED || type == MouseEvent.MOUSE_MOVED) {
+			handleMouseReleasedOrEntered();
+		} else if (type == MouseEvent.MOUSE_CLICKED && me.isStillSincePress()) {
+			handleMouseClicked(me);
+		} else if (type == MouseEvent.MOUSE_DRAGGED) {
+			handleMouseDragged(me);
+		} else if (type == MouseEvent.MOUSE_PRESSED) {
+			handleMousePressed(me);
+		}
+	}
+
+	private void handleMouseDragged(MouseEvent event) {
+		hideContextPopups();
+
+		spritesPane.setCursor(Cursor.CLOSED_HAND);
+
+		mouseOldX = mousePosX;
+		mouseOldY = mousePosY;
+		mouseOldZ = mousePosZ;
+		mousePosX = event.getSceneX();
+		mousePosY = event.getSceneY();
+		mouseDeltaX = (mousePosX - mouseOldX);
+		mouseDeltaY = (mousePosY - mouseOldY);
+
+		mouseDeltaX /= 2;
+		mouseDeltaY /= 2;
+
+		angleOfRotation = rotationAngleFromMouseMovement();
+		mousePosZ = computeZCoord(mousePosX, mousePosY, angleOfRotation);
+
+		if (event.isSecondaryButtonDown() || event.isMetaDown() || event.isControlDown()) {
+
+			xform.setTranslateX(xform.getTranslateX() - mouseDeltaX);
+			xform.setTranslateY(xform.getTranslateY() - mouseDeltaY);
+
+			repositionSprites();
+			repositionNoteBillboardFronts();
+		} else {
+			if (event.isPrimaryButtonDown()) {
+				/*
+				 * TODO how to get Z COORDINATE?
+				 */
+				if (quaternion != null) {
+					// double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
+					// newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+					// double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
+					// newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
+
+					/*
+					 * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
+					 * mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
+					 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
+					 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
+					 */
+					double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
+					double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
+
+					if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
+						// System.out.println("from origin to old mouse pos: <" +
+						// vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
+						// ", " + vectorToOldMousePos[2] + ">");
+						// System.out.println("from origin to old mouse pos: <" +
+						// vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
+						// ", " + vectorToNewMousePos[2] + ">");
+						// System.out.println(" ");
+
+						// compute cross product
+						double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
+						if (cross.length == 3) {
+							// System.out.println("cross product: <" + cross[0] + ",
+							// " + cross[1] + ", " + cross[2] + ">");
+							quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+
+							ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+
+							if (eulerAngles.size() == 3) {
+								// rotateX.setAngle(eulerAngles.get(2));
+								// rotateY.setAngle(eulerAngles.get(0));
+							}
+						}
+					}
+				}
+
+				double modifier = 10.0;
+				double modifierFactor = 0.1;
+
+				rotateXAngle.set(
+						((rotateXAngle.get() + mouseDeltaY * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
+				rotateYAngle.set(
+						((rotateYAngle.get() + mouseDeltaX * modifierFactor * modifier * 2.0) % 360 + 540) % 360 - 180);
+
+				repositionSprites();
+				repositionNoteBillboardFronts();
+			}
+		}
+	}
+
+	private void handleMouseReleasedOrEntered() {
+		spritesPane.setCursor(Cursor.DEFAULT);
+	}
+
+	private void handleMouseClicked(MouseEvent event) {
+		spritesPane.setCursor(Cursor.HAND);
+
+		hideContextPopups();
+
+		Node node = event.getPickResult().getIntersectedNode();
+
+		// Nucleus
+		if (node instanceof Sphere) {
+			Sphere picked = (Sphere) node;
+			selectedIndex.set(getPickedSphereIndex(picked));
+			String name = normalizeName(cellNames[selectedIndex.get()]);
+			selectedName.set(name);
+			cellClicked.set(true);
+
+			if (event.getButton() == MouseButton.SECONDARY
+					|| (event.getButton() == MouseButton.PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
+				showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLNUCLEUS);
+			} else if (event.getButton() == MouseButton.PRIMARY) {
+				if (allLabels.contains(name)) {
+					removeLabelFor(name);
+				} else {
+					if (!allLabels.contains(name)) {
+						allLabels.add(name);
+						currentLabels.add(name);
+
+						Shape3D entity = getEntityWithName(name);
+						insertLabelFor(name, entity);
+						highlightActiveCellLabel(entity);
+					}
+				}
+			}
+
+		}
+
+		// Cell body/structure
+		else if (node instanceof MeshView) {
+			boolean found = false;
+			for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
+				MeshView curr = currentSceneElementMeshes.get(i);
+				if (curr.equals(node)) {
+					SceneElement clickedSceneElement = currentSceneElements.get(i);
+					String name = normalizeName(clickedSceneElement.getSceneName());
+					selectedName.set(name);
+					found = true;
+
+					if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
+							&& (event.isMetaDown() || event.isControlDown()))) {
+						if (sceneElementsList.isMulticellStructureName(name)) {
+							showContextMenu(name, event.getScreenX(), event.getScreenY(),
+									SearchOption.MULTICELLULAR_NAME_BASED);
+						} else {
+							showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELLBODY);
+						}
+					} else if (event.getButton() == MouseButton.PRIMARY) {
+						if (allLabels.contains(name)) {
+							removeLabelFor(name);
+						} else {
+							allLabels.add(name);
+							currentLabels.add(name);
+
+							Shape3D entity = getEntityWithName(name);
+							insertLabelFor(name, entity);
+							highlightActiveCellLabel(entity);
+						}
+					}
+
+					break;
+				}
+			}
+
+			// Note structure
+			if (!found) {
+				currentNoteMeshMap.keySet()
+				.stream()
+				.filter(note -> currentNoteMeshMap.get(note).equals(node))
+				.forEachOrdered(note -> selectedName.set(note.getTagName()));
+			}
+		} else {
+			selectedIndex.set(-1);
+			selectedName.set("");
+		}
+	}
+
+	private double[] vectorBWPoints(double px, double py, double pz, double qx, double qy, double qz) {
+		double[] vector = new double[3];
+
+		double vx, vy, vz;
+
+		vx = qx - px;
+		vy = qy - py;
+		vz = qz - pz;
+
+		vector[0] = vx;
+		vector[1] = vy;
+		vector[2] = vz;
+
+		return vector;
+	}
 
 	/*
-     * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+	 * TODO fix this
+	 *
+	 */
+	// http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
+	// --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
+	// http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
+	private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
+		return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
+	}
+
+	// http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
+	private double rotationAngleFromMouseMovement() {
+		double rotationAngleRadians = Math
+				.acos(((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
+						/ Math.sqrt((Math.pow(mouseOldX, 2) + Math.pow(mouseOldY, 2) + Math.pow(mouseOldZ, 2))
+								* (Math.pow(mousePosX, 2) + Math.pow(mousePosY, 2) + Math.pow(mousePosZ, 2))));
+
+		return rotationAngleRadians;
+	}
+
+	// http://mathworld.wolfram.com/CrossProduct.html
+	private double[] crossProduct(double[] u, double[] v) {
+		if (u.length != 3 || v.length != 3) {
+			return null;
+		}
+
+		double[] cross = new double[3];
+
+		double cx, cy, cz;
+		cx = (u[1] * v[2]) - (u[2] * v[1]);
+		cy = (u[2] * v[0]) - (u[0] * v[2]);
+		cz = (u[0] * v[1]) - (u[1] * v[0]);
+
+		cross[0] = cx;
+		cross[1] = cy;
+		cross[2] = cz;
+
+		return cross;
+	}
+
+	private String normalizeName(String name) {
+		if (name.contains("(")) {
+			name = name.substring(0, name.indexOf("("));
+		}
+		name = name.trim();
+		return name;
+	}
+
+	private void handleMousePressed(MouseEvent event) {
+		mousePosX = event.getSceneX();
+		mousePosY = event.getSceneY();
+	}
+
+	private void showContextMenu(String name, double sceneX, double sceneY, SearchOption option) {
+		if (contextMenuStage == null) {
+			initContextMenuStage();
+		}
+
+		contextMenuController.setName(name);
+
+		String funcName = PartsList.getFunctionalNameByLineageName(name);
+		if (funcName == null) {
+			contextMenuController.disableTerminalCaseFunctions(true);
+		} else {
+			contextMenuController.disableTerminalCaseFunctions(false);
+		}
+
+		contextMenuController.setColorButtonListener(event -> {
+			Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
+			rule.showEditStage(parentStage);
+			contextMenuStage.hide();
+		});
+
+		contextMenuController.setColorNeighborsButtonListener(event -> {
+			// color neighboring cell bodies, multicellular structures, as
+			// well as nuclei
+			Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS,
+					SearchOption.CELLBODY);
+			rule.showEditStage(parentStage);
+			contextMenuStage.hide();
+		});
+
+		contextMenuStage.setX(sceneX);
+		contextMenuStage.setY(sceneY);
+
+		contextMenuStage.show();
+		((Stage) contextMenuStage.getScene().getWindow()).toFront();
+	}
+
+	private void initContextMenuStage() {
+		if (contextMenuStage == null) {
+			contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases, productionInfo,
+					connectome);
+
+			contextMenuStage = new Stage();
+			contextMenuStage.initStyle(StageStyle.UNDECORATED);
+
+			contextMenuController.setOwnStage(contextMenuStage);
+
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/layouts/ContextMenuLayout.fxml"));
+
+			loader.setController(contextMenuController);
+			loader.setRoot(contextMenuController);
+
+			try {
+				contextMenuStage.setScene(new Scene(loader.load()));
+				contextMenuStage.initModality(Modality.NONE);
+				contextMenuStage.setResizable(false);
+				contextMenuStage.setTitle("Menu");
+
+				for (Node node : contextMenuStage.getScene().getRoot().getChildrenUnmodifiable()) {
+					node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+				}
+
+				contextMenuController.setInfoButtonListener(event -> contextMenuStage.hide());
+
+			} catch (IOException e) {
+				System.out.println("error in initializing context menu.");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void createSubScene(Double width, Double height) {
+		subscene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
+		subscene.setFill(Color.web(FILL_COLOR_HEX));
+
+		buildCamera();
+	}
+
+	public ContextMenuController getContextMenuController() {
+		if (contextMenuStage == null) {
+			initContextMenuStage();
+		}
+
+		return contextMenuController;
+	}
+
+	private void repositionNoteBillboardFronts() {
+		for (Node billboard : billboardFrontEntityMap.keySet()) {
+			Node entity = billboardFrontEntityMap.get(billboard);
+			if (entity != null) {
+				Bounds b = entity.getBoundsInParent();
+
+				if (b != null) {
+					billboard.getTransforms().clear();
+					double x = b.getMaxX();
+					double y = b.getMaxY() + b.getHeight() / 2;
+					double z = b.getMaxZ();
+
+					billboard.getTransforms().addAll(
+							new Translate(x, y, z),
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Repositions sprites (labels and note sprites) by projecting the sphere's
+	 * 3d coordinate onto the front of the subscene
+	 */
+	private void repositionSprites() {
+		if (entitySpriteMap != null) {
+			for (Node entity : entitySpriteMap.keySet()) {
+				alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+			}
+		}
+
+		if (entityLabelMap != null) {
+			for (Node entity : entityLabelMap.keySet()) {
+				alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+			}
+		}
+	}
+
+	/**
+	 * Aligns a note graphic to its entity. The graphic is either a {@link Text}
+	 * or a {@link VBox}. The graphic is removed if it ends up outside the
+	 * bounds of the subscene window after a transformation, and only reinserted
+	 * if its bounds are within the window again.
+	 *
+	 * @param noteOrLabelGraphic
+	 *         Graphical representation of a note/notes (can either be a
+	 *         {@link Text} or a {@link VBox}
+	 * @param node
+	 *         Entity that the note graphic should attach to
+	 * @param isLabel
+	 *         True if a label is being aligned, false otherwise
+	 */
+	private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
+		if (node != null) {
+			// graphic could have been previously removed due to
+			// out-of-bounds-ness
+			if (!spritesPane.getChildren().contains(noteOrLabelGraphic)) {
+				spritesPane.getChildren().add(noteOrLabelGraphic);
+			}
+
+			Bounds b = node.getBoundsInParent();
+			if (b != null) {
+				noteOrLabelGraphic.getTransforms().clear();
+				Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
+						(b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+				double x = p.getX();
+				double y = p.getY();
+
+				double vOffset = b.getHeight() / 2;
+				double hOffset = b.getWidth() / 2;
+
+				if (isLabel) {
+					x += hOffset;
+					y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+				} else {
+					x += hOffset;
+					y += vOffset + LABEL_SPRITE_Y_OFFSET;
+				}
+
+				Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+				Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
+
+				if (graphicBounds != null && paneBounds != null) {
+					if (x < -OUT_OF_BOUNDS_THRESHOLD || y < -OUT_OF_BOUNDS_THRESHOLD
+							|| ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
+									- OUT_OF_BOUNDS_THRESHOLD))
+							|| ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
+						spritesPane.getChildren().remove(noteOrLabelGraphic);
+					} else { // note graphic is within bounds
+						noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+					}
+				}
+			}
+		}
+	}
+
+	private int getIndexByCellName(String name) {
+		for (int i = 0; i < cellNames.length; i++) {
+			if (cellNames[i].equals(name)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private int getPickedSphereIndex(Sphere picked) {
+		for (int i = 0; i < cellNames.length; i++) {
+			if (spheres[i].equals(picked)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Calls the {@link Service} to retrieve subscene data at current time point
+	 * then render entities, notes, and labels
+	 */
+	private void buildScene() {
+		// Spool thread for actual rendering to subscene
+		renderService.restart();
+	}
+
+	private void getSceneData() {
+		final int requestedTime = time.get();
+		cellNames = cellData.getNames(requestedTime);
+		positions = cellData.getPositions(requestedTime);
+		diameters = cellData.getDiameters(requestedTime);
+		otherCells.clear();
+
+		totalNuclei.set(cellNames.length);
+
+		spheres = new Sphere[cellNames.length];
+		if (defaultEmbryoFlag) {
+			meshes = new MeshView[meshNames.length];
+		}
+
+		if (defaultEmbryoFlag) {
+			// Start scene element list, find scene elements present at time, build
+			// and meshes
+			// empty meshes and scene element references from last rendering. Same
+			// for story elements
+			if (sceneElementsList != null) {
+				meshNames = sceneElementsList.getSceneElementNamesAtTime(requestedTime);
+			}
+
+			if (!currentSceneElementMeshes.isEmpty()) {
+				currentSceneElementMeshes.clear();
+				currentSceneElements.clear();
+			}
+
+			if (sceneElementsList != null) {
+				sceneElementsAtTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
+				for (SceneElement se : sceneElementsAtTime) {
+					// add meshes from each scene element
+					MeshView mesh = se.buildGeometry(requestedTime - 1);
+
+					if (mesh != null) {
+						mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+						mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+
+						// add rendered mesh to meshes list
+						currentSceneElementMeshes.add(mesh);
+
+						// add scene element to rendered scene element reference for
+						// on click responsiveness
+						currentSceneElements.add(se);
+					}
+				}
+			}
+			// End scene element mesh loading/building
+		}
+
+		// Label stuff
+		entityLabelMap.clear();
+		currentLabels.clear();
+
+		for (String label : allLabels) {
+
+			if (defaultEmbryoFlag) {
+				for (SceneElement currentSceneElement : currentSceneElements) {
+					if (!currentLabels.contains(label)
+							&& label.equalsIgnoreCase(normalizeName(currentSceneElement.getSceneName()))) {
+						currentLabels.add(label);
+						break;
+					}
+				}
+			}
+
+			for (String cell : cellNames) {
+				if (!currentLabels.contains(label) && cell.equalsIgnoreCase(label)) {
+					currentLabels.add(label);
+					break;
+				}
+			}
+		}
+		// End label stuff
+
+		// Story stuff
+		// Notes are indexed starting from 1 (or 1+offset shown to user)
+		if (storiesLayer != null) {
+			currentNotes.clear();
+
+			currentNoteMeshMap.clear();
+			currentGraphicNoteMap.clear();
+
+			entitySpriteMap.clear();
+			billboardFrontEntityMap.clear();
+
+			currentNotes = storiesLayer.getNotesAtTime(requestedTime);
+
+			for (Note note : currentNotes) {
+				// Revert to overlay display if we have invalid
+				// display/attachment
+				// type combination
+				if (note.hasLocationError() || note.hasEntityNameError()) {
+					note.setTagDisplay(Display.OVERLAY);
+				}
+
+				if (defaultEmbryoFlag) {
+					// make mesh views for scene elements from note resources
+					if (note.hasSceneElements()) {
+						for (SceneElement se : note.getSceneElements()) {
+							MeshView mesh = se.buildGeometry(requestedTime);
+
+							if (mesh != null) {
+								mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
+								mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
+								mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+								currentNoteMeshMap.put(note, mesh);
+							}
+						}
+					}
+				}
+			}
+		}
+		// End story stuff
+
+		// Search stuff
+		if (localSearchResults.isEmpty()) {
+			searchedCells = new boolean[cellNames.length];
+			searchedMeshes = new boolean[meshNames.length];
+		} else {
+			consultSearchResultsList();
+		}
+		// End search stuff
+	}
+
+	private void updateLocalSearchResults() {
+		if (searchResultsList == null) {
+			return;
+		}
+
+		localSearchResults.clear();
+
+		for (String name : searchResultsList) {
+			if (name.contains("(")) {
+				localSearchResults.add(name.substring(0, name.indexOf("(")).trim());
+			} else {
+				localSearchResults.add(name);
+			}
+		}
+
+		buildScene();
+	}
+
+	private void refreshScene() {
+		// clear note billboards, cell spheres and meshes
+		root.getChildren().clear();
+		root.getChildren().add(xform);
+
+		// clear note sprites and overlays
+		overlayVBox.getChildren().clear();
+
+		Iterator<Node> iter = spritesPane.getChildren().iterator();
+		while (iter.hasNext()) {
+			Node node = iter.next();
+			if (node instanceof Text) {
+				iter.remove();
+			} else if (node instanceof VBox && node != overlayVBox) {
+				iter.remove();
+			}
+		}
+
+		double newrotate = computeInterpolatedValue(time.get(), keyFramesRotate, keyValuesRotate);
+		indicatorRotation.setAngle(-newrotate);
+		indicatorRotation.setAxis(new Point3D(1, 0, 0));
+	}
+
+	private void addEntitiesToScene() {
+		ArrayList<Shape3D> entities = new ArrayList<>();
+		ArrayList<Node> notes = new ArrayList<>();
+
+		// add spheres
+		addCellGeometries(entities);
+
+		if (defaultEmbryoFlag) {
+			// add scene element meshes (from notes and from scene elements list)
+			addSceneElementGeometries(entities);
+		}
+
+		Collections.sort(entities, opacityComparator);
+		root.getChildren().addAll(entities);
+
+		// add notes
+		insertOverlayTitles();
+
+		if (!currentNotes.isEmpty()) {
+			addNoteGeometries(notes);
+		}
+
+		// add labels
+		Shape3D activeEntity = null;
+		for (String name : currentLabels) {
+			insertLabelFor(name, getEntityWithName(name));
+
+			if (name.equalsIgnoreCase(selectedName.get())) {
+				activeEntity = getEntityWithName(name);
+			}
+		}
+		if (activeEntity != null) {
+			highlightActiveCellLabel(activeEntity);
+		}
+
+		if (!notes.isEmpty()) {
+			root.getChildren().addAll(notes);
+		}
+
+		repositionSprites();
+		repositionNoteBillboardFronts();
+
+		removeOutOfBoundsSprites();
+	}
+
+	private void removeOutOfBoundsSprites() {
+		Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+
+		Iterator<Node> iter = spritesPane.getChildren().iterator();
+		while (iter.hasNext()) {
+			Node node = iter.next();
+			if (node != subscene) {
+				Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
+
+				if (spriteBounds.getMinX() < paneBounds.getMinX() - 10
+						&& spriteBounds.getMinY() < paneBounds.getMinY() - 10
+						&& spriteBounds.getMaxX() > paneBounds.getMaxX() + 10
+						&& spriteBounds.getMaxY() > paneBounds.getMaxY() + 10) {
+					iter.remove();
+				}
+			}
+		}
+	}
+
+	private void addSceneElementGeometries(ArrayList<Shape3D> list) {
+		if (defaultEmbryoFlag) {
+			// add scene elements from note resources
+			list.addAll(currentNoteMeshMap.keySet()
+					.stream()
+					.map(note -> currentNoteMeshMap.get(note))
+					.collect(Collectors.toList()));
+
+			// Consult rules
+			if (!currentSceneElements.isEmpty()) {
+				for (int i = 0; i < currentSceneElements.size(); i++) {
+					SceneElement se = currentSceneElements.get(i);
+					MeshView mesh = currentSceneElementMeshes.get(i);
+
+					// in search mode
+					if (inSearch) {
+						if (cellBodyTicked && searchedMeshes[i]) {
+							mesh.setMaterial(colorHash.getHighlightMaterial());
+						} else {
+							mesh.setMaterial(colorHash.getTranslucentMaterial());
+						}
+					} else {
+						// in regular view mode
+						ArrayList<String> allNames = se.getAllCellNames();
+						String sceneName = se.getSceneName();
+
+						// default white meshes
+						if (allNames.isEmpty()) {
+							mesh.setMaterial(new PhongMaterial(Color.WHITE));
+							mesh.setCullFace(CullFace.NONE);
+						}
+
+						// If mesh has with name(s), then process rules (cell or
+						// shape) that apply to it
+						else {
+							ArrayList<Color> colors = new ArrayList<>();
+							for (Rule rule : currentRulesList) {
+								if (rule.isMulticellularStructureRule()
+										&& rule.appliesToMulticellularStructure(sceneName)) {
+									colors.add(rule.getColor());
+								} else {
+									colors.addAll(allNames.stream()
+											.filter(rule::appliesToCellBody)
+											.map(name -> rule.getColor())
+											.collect(Collectors.toList()));
+								}
+							}
+							Collections.sort(colors, colorComparator);
+
+							// if any rules applied
+							if (!colors.isEmpty()) {
+								mesh.setMaterial(colorHash.getMaterial(colors));
+							} else {
+								mesh.setMaterial(colorHash.getOthersMaterial(othersOpacity.get()));
+							}
+						}
+					}
+
+					mesh.setOnMouseEntered(event -> {
+						spritesPane.setCursor(Cursor.HAND);
+
+						// make label appear
+						String name = normalizeName(se.getSceneName());
+
+						if (!currentLabels.contains(name.toLowerCase())) {
+							transientLabel(name, getEntityWithName(name));
+						}
+					});
+					mesh.setOnMouseExited(event -> {
+						spritesPane.setCursor(Cursor.DEFAULT);
+
+						// make label disappear
+						removeTransientLabel();
+					});
+
+					list.add(mesh);
+				}
+			}
+		}
+	}
+
+	private void addCellGeometries(ArrayList<Shape3D> list) {
+		// Sphere stuff
+		for (int i = 0; i < cellNames.length; i++) {
+			double radius;
+			if (!uniformSize) {
+				radius = SIZE_SCALE * diameters[i] / 2;
+			} else {
+				radius = SIZE_SCALE * UNIFORM_RADIUS;
+			}
+			Sphere sphere = new Sphere(radius);
+
+			Material material = new PhongMaterial();
+			// if in search, do highlighting
+			if (inSearch) {
+				if (cellNucleusTicked && searchedCells[i]) {
+					material = colorHash.getHighlightMaterial();
+				} else {
+					material = colorHash.getTranslucentMaterial();
+				}
+			}
+			// not in search mode
+			else {
+				ArrayList<Color> colors = new ArrayList<>();
+				for (Rule rule : currentRulesList) {
+					// just need to consult rule's active list
+					if (rule.appliesToCellNucleus(cellNames[i])) {
+						colors.add(Color.web(rule.getColor().toString()));
+					}
+				}
+				Collections.sort(colors, colorComparator);
+				material = colorHash.getMaterial(colors);
+
+				if (colors.isEmpty()) {
+					material = colorHash.getOthersMaterial(othersOpacity.get());
+				}
+			}
+
+			sphere.setMaterial(material);
+
+			sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+			sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
+					positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
+
+			spheres[i] = sphere;
+
+			final int index = i;
+			sphere.setOnMouseEntered(event -> {
+				spritesPane.setCursor(Cursor.HAND);
+
+				// make label appear
+				String name = cellNames[index];
+
+				if (!currentLabels.contains(name.toLowerCase())) {
+					// get cell body version of sphere, if there is one
+					transientLabel(name, getEntityWithName(name));
+				}
+			});
+			sphere.setOnMouseExited(event -> {
+				spritesPane.setCursor(Cursor.DEFAULT);
+
+				// make label disappear
+				removeTransientLabel();
+			});
+
+			list.add(sphere);
+		}
+		// End sphere stuff
+	}
+
+	private void removeLabelFor(String name) {
+		allLabels.remove(name);
+		currentLabels.remove(name);
+
+		Node entity = getEntityWithName(name);
+
+		if (entity != null) {
+			removeLabelFrom(entity);
+		}
+	}
+
+	private void removeLabelFrom(Node entity) {
+		if (entity != null) {
+			spritesPane.getChildren().remove(entityLabelMap.get(entity));
+			entityLabelMap.remove(entity);
+		}
+	}
+
+	private void insertLabelFor(String name, Node entity) {
+		// if label is already in scene, make all labels white
+		// and highlight that one
+		Text label = entityLabelMap.get(entity);
+		if (label != null) {
+			for (Node shape : entityLabelMap.keySet()) {
+				entityLabelMap.get(shape).setFill(Color.web(SPRITE_COLOR_HEX));
+			}
+
+			label.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+			return;
+		}
+
+		// otherwise, create a highlight new label
+		String funcName = PartsList.getFunctionalNameByLineageName(name);
+		Text text;
+		if (funcName != null) {
+			text = makeNoteSpriteText(funcName);
+		} else {
+			text = makeNoteSpriteText(name);
+		}
+
+		final String tempName = name;
+		text.setOnMouseClicked(event -> removeLabelFor(tempName));
+
+		text.setWrappingWidth(-1);
+
+		entityLabelMap.put(entity, text);
+
+		spritesPane.getChildren().add(text);
+		alignTextWithEntity(text, entity, true);
+	}
+
+	private void highlightActiveCellLabel(Shape3D entity) {
+		for (Node shape3D : entityLabelMap.keySet()) {
+			entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
+		}
+
+		if (entity != null && entityLabelMap.get(entity) != null) {
+			entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+		}
+	}
+
+	/**
+	 * @return The {@link Shape3D} entity with input name. Priority is given to
+	 * meshes (if a mesh and a cell have the same name, then the mesh is
+	 * returned).
+	 */
+	private Shape3D getEntityWithName(String name) {
+		if (defaultEmbryoFlag) {
+			// mesh view label
+			for (int i = 0; i < currentSceneElements.size(); i++) {
+				if (normalizeName(currentSceneElements.get(i).getSceneName()).equalsIgnoreCase(name)
+						&& currentSceneElementMeshes.get(i) != null
+						&& currentSceneElementMeshes.get(i).getBoundsInParent().getMinZ() > 0) {
+					return currentSceneElementMeshes.get(i);
+				}
+			}
+		}
+
+		// sphere label
+		for (int i = 0; i < cellNames.length; i++) {
+			if (spheres[i] != null && cellNames[i].equalsIgnoreCase(name)) {
+				return spheres[i];
+			}
+		}
+
+		return null;
+	}
+
+	// Inserts note geometries to scene
+	// Input list is the list that billboards are added to which are added to
+	// the subscene
+	// Note overlays and sprites are added to the pane that contains the
+	// subscene
+	private void addNoteGeometries(ArrayList<Node> list) {
+		for (Note note : currentNotes) {
+			// map notes to their sphere/mesh view
+			Node text = makeNoteGraphic(note);
+			currentGraphicNoteMap.put(text, note);
+
+			text.setOnMouseEntered(clickableMouseEnteredHandler);
+			text.setOnMouseExited(clickableMouseExitedHandler);
+
+			// SPRITE
+			if (note.isSprite()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					VBox box = new VBox(3);
+					box.getChildren().add(text);
+					// add inivisible location marker to scene at location
+					// specified by note
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					root.getChildren().add(marker);
+					entitySpriteMap.put(marker, box);
+					// add vbox to sprites pane
+					spritesPane.getChildren().add(box);
+				}
+
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i = 0; i < cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
+							// if another note is already attached to the same
+							// sphere,
+							// create a vbox for note positioning
+							if (!entitySpriteMap.containsKey(spheres[i])) {
+								VBox box = new VBox(3);
+								box.getChildren().add(text);
+								entitySpriteMap.put(spheres[i], box);
+								spritesPane.getChildren().add(box);
+							} else {
+								entitySpriteMap.get(spheres[i]).getChildren().add(text);
+							}
+
+							break;
+						}
+					}
+				} else if (defaultEmbryoFlag) {
+					// structure attachment
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								MeshView mesh = currentSceneElementMeshes.get(i);
+								if (!entitySpriteMap.containsKey(mesh)) {
+									VBox box = new VBox(3);
+									box.getChildren().add(text);
+									entitySpriteMap.put(mesh, box);
+									spritesPane.getChildren().add(box);
+								} else {
+									entitySpriteMap.get(mesh).getChildren().add(text);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// BILLBOARD_FRONT
+			else if (note.isBillboardFront()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+					root.getChildren().add(marker);
+					billboardFrontEntityMap.put(text, marker);
+				}
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i = 0; i < cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
+							billboardFrontEntityMap.put(text, spheres[i]);
+						}
+					}
+				}
+				// structure attachment
+				else if (defaultEmbryoFlag) {
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+							}
+						}
+					}
+				}
+			}
+
+			// BILLBOARD
+			else if (note.isBillboard()) {
+				// location attachment
+				if (note.attachedToLocation()) {
+					text.getTransforms().addAll(rotateX, rotateY, rotateZ);
+					text.getTransforms().addAll(
+							new Translate(note.getX(), note.getY(), note.getZ()),
+							new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+				}
+				// cell attachment
+				else if (note.attachedToCell()) {
+					for (int i = 0; i < cellNames.length; i++) {
+						if (cellNames[i].equalsIgnoreCase(note.getCellName()) && spheres[i] != null) {
+							double offset = 5;
+							if (!uniformSize) {
+								offset = spheres[i].getRadius() + 2;
+							}
+
+							text.getTransforms().addAll(spheres[i].getTransforms());
+							text.getTransforms().addAll(
+									new Translate(offset, offset),
+									new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+						}
+					}
+				} else if (defaultEmbryoFlag) {
+					// structure attachment
+					if (note.attachedToStructure()) {
+						for (int i = 0; i < currentSceneElements.size(); i++) {
+							if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+								text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
+								double offset = 5;
+								text.getTransforms().addAll(
+										new Translate(offset, offset),
+										new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+							}
+						}
+					}
+				}
+			}
+
+			// add graphic to appropriate place (scene, overlay box, or on top
+			// of scene)
+			Display display = note.getTagDisplay();
+			if (display != null) {
+				switch (display) {
+				case SPRITE:
+					break;
+
+				case BILLBOARD_FRONT: // fall to billboard case
+
+				case BILLBOARD:
+					list.add(text);
+					break;
+
+				case OVERLAY: // fall to default case
+
+				case BLANK: // fall to default case
+
+				default:
+					overlayVBox.getChildren().add(text);
+					break;
+				}
+			}
+		}
+	}
+
+	private void insertOverlayTitles() {
+		if (storiesLayer != null) {
+			Text infoPaneTitle = makeNoteOverlayText("Story Title:");
+
+			if (storiesLayer.getActiveStory() != null) {
+				Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
+				overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+			} else {
+				Text noStoryTitle = makeNoteOverlayText("none");
+				overlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
+			}
+		}
+	}
+
+	private Text makeNoteOverlayText(String title) {
+		Text text = new Text(title);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
+		text.setFontSmoothingType(FontSmoothingType.LCD);
+		text.setWrappingWidth(overlayVBox.getWidth());
+		text.setFont(AppFont.getSpriteAndOverlayFont());
+		return text;
+	}
+
+	private Text makeNoteSpriteText(String title) {
+		Text text = makeNoteOverlayText(title);
+		text.setWrappingWidth(160);
+		return text;
+	}
+
+	private Text makeNoteBillboardText(String title) {
+		Text text = new Text(title);
+		text.setWrappingWidth(90);
+		text.setFont(AppFont.getBillboardFont());
+		text.setSmooth(false);
+		text.setStrokeWidth(2);
+		text.setFontSmoothingType(FontSmoothingType.LCD);
+		text.setCacheHint(CacheHint.QUALITY);
+		text.setFill(Color.web(SPRITE_COLOR_HEX));
+		return text;
+	}
+
+	private Sphere createLocationMarker(double x, double y, double z) {
+		Sphere sphere = new Sphere(1);
+		sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
+		sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
+		// make marker transparent
+		sphere.setMaterial(colorHash.getOthersMaterial(0));
+		return sphere;
+	}
+
+	// Makes an anchor pane that contains the text to be shown
+	// if isOverlay is true, then the text is larger
+	private Text makeNoteGraphic(Note note) {
+		String title = note.getTagName();
+		if (note.isExpandedInScene()) {
+			title += ": " + note.getTagContents();
+		} else {
+			title += "\n[more...]";
+		}
+
+		Text node = null;
+		if (note.getTagDisplay() != null) {
+			switch (note.getTagDisplay()) {
+			case SPRITE:
+				node = makeNoteSpriteText(title);
+				break;
+
+			case BILLBOARD:
+				node = makeNoteBillboardText(title);
+				break;
+
+			case BILLBOARD_FRONT:
+				node = makeNoteBillboardText(title);
+				break;
+
+			case OVERLAY: // fall to default case
+
+			case BLANK: // fall to default case
+
+			default:
+				node = makeNoteOverlayText(title);
+				break;
+
+			}
+		}
+		return node;
+	}
+
+	private void buildCamera() {
+		camera = new PerspectiveCamera(true);
+		xform = new Xform();
+		xform.reset();
+
+		root.getChildren().add(xform);
+		xform.getChildren().add(camera);
+
+		camera.setNearClip(CAMERA_NEAR_CLIP);
+		camera.setFarClip(CAMERA_FAR_CLIP);
+		camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
+
+		subscene.setCamera(camera);
+	}
+
+	public void setSearchResultsList(ObservableList<String> list) {
+		searchResultsList = list;
+	}
+
+	public void setSearchResultsUpdateService(Service<Void> service) {
+		service.setOnSucceeded(event -> updateLocalSearchResults());
+	}
+
+	public void setGeneResultsUpdated(BooleanProperty updated) {
+		geneResultsUpdated = updated;
+		geneResultsUpdated.addListener((observable, oldValue, newValue) -> updateLocalSearchResults());
+	}
+
+	public void consultSearchResultsList() {
+		searchedCells = new boolean[cellNames.length];
+		if (defaultEmbryoFlag) {
+			searchedMeshes = new boolean[meshNames.length];
+		}
+
+		// look for searched cells
+		for (int i = 0; i < cellNames.length; i++) {
+			searchedCells[i] = localSearchResults.contains(cellNames[i]);
+		}
+
+		if (defaultEmbryoFlag) {
+			// look for single celled meshes
+			for (int i = 0; i < meshNames.length; i++) {
+				if (sceneElementsAtTime.get(i).isMulticellular()) {
+					searchedMeshes[i] = true;
+					for (String name : sceneElementsAtTime.get(i).getAllCellNames()) {
+						searchedMeshes[i] &= localSearchResults.contains(name);
+					}
+				} else {
+					searchedMeshes[i] = localSearchResults.contains(meshNames[i]);
+				}
+			}
+		}
+	}
+
+	public boolean currentRulesApplyTo(String name) {
+		String sceneName = "";
+		ArrayList<String> cells = new ArrayList<>();
+		if (defaultEmbryoFlag) {
+			// get the scene name associated with the cell
+			for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
+				SceneElement currSE = sceneElementsList.getElementsList().get(i);
+
+				// check if multicellular structure --> find match with name in
+				// cells
+				if (currSE.isMulticellular()) {
+					if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
+						sceneName = name;
+						cells = currSE.getAllCellNames(); // save the cells in case
+						// there isn't an
+						// explicit structure
+						// rule but the
+						// structure is still
+						// colored
+					}
+				} else {
+					String sn = sceneElementsList.getElementsList().get(i).getSceneName();
+
+					StringTokenizer st = new StringTokenizer(sn);
+					if (st.countTokens() == 2) {
+						String sceneNameLineage = st.nextToken();
+						if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
+							sceneName = sn;
+							break;
+						}
+					}
+				}
+			}
+
+			if (sceneName.equals("")) {
+				sceneName = name;
+			}
+		}
+
+		for (Rule rule : currentRulesList) {
+			if (rule.isMulticellularStructureRule() && rule.appliesToMulticellularStructure(sceneName)) {
+				return true;
+			} else if (rule.appliesToCellBody(name)) {
+				return true;
+			} else if (rule.appliesToCellNucleus(name)) {
+				return true;
+			} else { // check if cells corresponding to multicellular structure
+				// have rule - in the case of a non explicit
+				// multicellular rule but a structure that's colored
+				if (cells.size() > 0) {
+					for (String cell : cells) {
+						if (rule.appliesToCellBody(cell)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public boolean captureImagesForMovie() {
+
+		movieFiles.clear();
+		count = -1;
+
+		Stage fileChooserStage = new Stage();
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+
+		File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
+
+		if (fakeFile == null) {
+			System.out.println("null file");
+			return false;
+		}
+
+		// save the name from the file chooser for later MOV file
+		movieName = fakeFile.getName();
+		moviePath = fakeFile.getAbsolutePath();
+
+		// make a temp directory for the frames at the given save location
+		String path = fakeFile.getAbsolutePath();
+		if (path.lastIndexOf("/") < 0) {
+			path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
+		} else {
+			path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
+		}
+
+		frameDir = new File(path);
+
+		try {
+			frameDir.mkdir();
+		} catch (SecurityException se) {
+			return false;
+		}
+
+		String frameDirPath = frameDir.getAbsolutePath() + "/";
+
+		captureVideo.set(true);
+		timer = new Timer();
+
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (captureVideo.get()) {
+					Platform.runLater(() -> {
+						WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+
+						try {
+							File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
+
+							if (file != null) {
+								RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+								ImageIO.write(renderedImage, "JPEG", file);
+								movieFiles.addElement(file);
+							}
+						} catch (Exception e) {
+							// e.printStackTrace();
+						}
+					});
+
+				} else {
+					timer.cancel();
+				}
+			}
+		}, 0, 1000);
+		return true;
+	}
+
+	public void convertImagesToMovie() {
+
+		// make our files into JavaPicture
+		javaPictures.clear();
+
+		for (File movieFile : movieFiles) {
+			JavaPicture jp = new JavaPicture();
+
+			jp.loadImage(movieFile);
+
+			javaPictures.addElement(jp);
+		}
+
+		if (javaPictures.size() > 0) {
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
+
+			// move the movie to the originally specified location
+			File movJustMade = new File(movieName);
+			movJustMade.renameTo(new File(moviePath));
+
+			// remove the .movtemp.jpg file
+			File movtempjpg = new File(".movtemp.jpg");
+			if (movtempjpg != null) {
+				movtempjpg.delete();
+			}
+		}
+
+		// remove all of the images in the frame directory
+		if (frameDir != null && frameDir.isDirectory()) {
+			File[] frames = frameDir.listFiles();
+			for (File frame : frames) {
+				frame.delete();
+			}
+			frameDir.delete();
+		}
+
+	}
+
+	/*
+	 * When called, a snapshot of the screen is saved
+	 */
+	public void stillscreenCapture() {
+		Stage fileChooserStage = new Stage();
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
+
+		WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+
+		/*
+		 * write the image to a file
+		 */
+		try {
+			File file = fileChooser.showSaveDialog(fileChooserStage);
+
+			if (file != null) {
+				RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+				ImageIO.write(renderedImage, "png", file);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void printCellNames() {
+		for (int i = 0; i < cellNames.length; i++) {
+			System.out.println(cellNames[i] + CS + spheres[i]);
+		}
+	}
+
+	public void printMeshNames() {
+		if (defaultEmbryoFlag) {
+			for (int i = 0; i < meshNames.length; i++) {
+				System.out.println(meshNames[i] + CS + meshes[i]);
+			}
+		}
+	}
+
+	// sets everything associated with color rules
+	public void setRulesList(ObservableList<Rule> list) {
+		if (list == null) {
+			return;
+		}
+
+		currentRulesList = list;
+		currentRulesList.addListener(new ListChangeListener<Rule>() {
+			@Override
+			public void onChanged(ListChangeListener.Change<? extends Rule> change) {
+				while (change.next()) {
+					if (change.getAddedSize() > 0) {
+						buildScene();
+
+						for (Rule rule : change.getAddedSubList()) {
+							rule.getRuleChangedProperty().addListener((observable, oldValue, newValue) -> {
+								if (newValue) {
+									buildScene();
+								}
+							});
+						}
+					}
+
+					if (!change.getRemoved().isEmpty()) {
+						buildScene();
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Sets transparent anchor pane overlay for sprite notes display
+	 *
+	 * @param parentPane
+	 *         The {@link AnchorPane} in which labels and sprites reside
+	 */
+	public void setNotesPane(AnchorPane parentPane) {
+		if (parentPane != null) {
+			spritesPane = parentPane;
+
+			overlayVBox = new VBox(5);
+			overlayVBox.setPrefWidth(170);
+			overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
+			overlayVBox.setMinWidth(overlayVBox.getPrefWidth());
+
+			AnchorPane.setTopAnchor(overlayVBox, 5.0);
+			AnchorPane.setRightAnchor(overlayVBox, 5.0);
+
+			spritesPane.getChildren().add(overlayVBox);
+		}
+	}
+
+	// Hides cell name label/context menu
+	private void hideContextPopups() {
+		if (contextMenuStage != null) {
+			contextMenuStage.hide();
+		}
+	}
+
+	public ArrayList<Rule> getColorRulesList() {
+		ArrayList<Rule> list = new ArrayList<>();
+		list.addAll(currentRulesList);
+
+		return list;
+	}
+
+	/*
+	 * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
 	 * return new EventHandler<TransformChangedEvent>() {
 	 * 
 	 * @Override public void handle(TransformChangedEvent arg0) {
@@ -2298,434 +2312,434 @@ public class Window3DController {
 	 * repositionNoteBillboardFronts(); } }; }
 	 */
 
-    public void setColorRulesList(ArrayList<Rule> list) {
-        currentRulesList.clear();
-        currentRulesList.setAll(list);
-    }
+	public void setColorRulesList(ArrayList<Rule> list) {
+		currentRulesList.clear();
+		currentRulesList.setAll(list);
+	}
 
-    public ObservableList<Rule> getObservableColorRulesList() {
-        return currentRulesList;
-    }
+	public ObservableList<Rule> getObservableColorRulesList() {
+		return currentRulesList;
+	}
 
-    public int getTime() {
-        return time.get();
-    }
+	public int getTime() {
+		return time.get();
+	}
 
-    public void setTime(int t) {
-        if (startTime <= t && t <= endTime) {
-            hideContextPopups();
-            time.set(t);
-        } else if (t < startTime) {
-            time.set(startTime);
-        } else if (t > endTime) {
-            time.set(endTime);
-        }
-    }
+	public void setTime(int t) {
+		if (startTime <= t && t <= endTime) {
+			hideContextPopups();
+			time.set(t);
+		} else if (t < startTime) {
+			time.set(startTime);
+		} else if (t > endTime) {
+			time.set(endTime);
+		}
+	}
 
-    public void setRotations(double rx, double ry, double rz) {
-        rotateXAngle.set(rx);
-        rotateYAngle.set(ry);
-        rotateZAngle.set(rz);
-        /*
-         * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
+	public void setRotations(double rx, double ry, double rz) {
+		rotateXAngle.set(rx);
+		rotateYAngle.set(ry);
+		rotateZAngle.set(rz);
+		/*
+		 * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
 		 * Math.toDegrees(rz);
 		 */
 
 		/*
 		 * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
 		 */
-    }
+	}
 
-    public void setCaptureVideo(BooleanProperty captureVideo) {
-        this.captureVideo = captureVideo;
-    }
+	public void setCaptureVideo(BooleanProperty captureVideo) {
+		this.captureVideo = captureVideo;
+	}
 
-    public double getRotationX() {
-        return rotateXAngle.get();
-    }
+	public double getRotationX() {
+		return rotateXAngle.get();
+	}
 
-    public double getRotationY() {
-        return rotateYAngle.get();
-    }
+	public double getRotationY() {
+		return rotateYAngle.get();
+	}
 
-    public double getRotationZ() {
-        return rotateZAngle.get();
-    }
+	public double getRotationZ() {
+		return rotateZAngle.get();
+	}
 
-    public double getTranslationX() {
-        return camera.getTranslateX();
-    }
+	public double getTranslationX() {
+		return camera.getTranslateX();
+	}
 
-    public void setTranslationX(double tx) {
-        camera.setTranslateX(tx);
-    }
+	public void setTranslationX(double tx) {
+		camera.setTranslateX(tx);
+	}
 
-    public double getTranslationY() {
-        return camera.getTranslateY();
-    }
+	public double getTranslationY() {
+		return camera.getTranslateY();
+	}
 
-    public void setTranslationY(double ty) {
-        camera.setTranslateY(ty);
-    }
+	public void setTranslationY(double ty) {
+		camera.setTranslateY(ty);
+	}
 
-    /**
-     * Used for internal URL generation of rules associated with stories
-     *
-     * @return The value of the zoom {@link DoubleProperty}
-     */
-    public double getScaleInternal() {
-        return zoom.get();
-    }
+	/**
+	 * Used for internal URL generation of rules associated with stories
+	 *
+	 * @return The value of the zoom {@link DoubleProperty}
+	 */
+	public double getScaleInternal() {
+		return zoom.get();
+	}
 
-    /**
-     * Used for internal URL generation of rules associated with stories. Sets
-     * the value of the zoom {@link DoubleProperty}
-     */
-    public void setScaleInternal(double scale) {
-        zoom.set(scale);
-    }
+	/**
+	 * Used for internal URL generation of rules associated with stories. Sets
+	 * the value of the zoom {@link DoubleProperty}
+	 */
+	public void setScaleInternal(double scale) {
+		zoom.set(scale);
+	}
 
-    public double getScale() {
-        double scale = zoom.get() - 0.5;
-        scale = 1 - (scale / 6.5);
-        return scale;
-    }
+	public double getScale() {
+		double scale = zoom.get() - 0.5;
+		scale = 1 - (scale / 6.5);
+		return scale;
+	}
 
-    public void setScale(double scale) {
-        if (scale > 1) {
-            scale = 1;
-        }
-        scale = 6.5 * (1 - scale);
-        // smaller zoom value means larger picture
-        zoom.set((scale + 0.5));
-    }
+	public void setScale(double scale) {
+		if (scale > 1) {
+			scale = 1;
+		}
+		scale = 6.5 * (1 - scale);
+		// smaller zoom value means larger picture
+		zoom.set((scale + 0.5));
+	}
 
-    public double getOthersVisibility() {
-        return othersOpacity.get();
-    }
+	public double getOthersVisibility() {
+		return othersOpacity.get();
+	}
 
-    public void setOthersVisibility(double dim) {
-        othersOpacity.set(dim);
-    }
+	public void setOthersVisibility(double dim) {
+		othersOpacity.set(dim);
+	}
 
-    private ChangeListener<Number> getRotateXAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            // cameraTransformer.setRotateX(newAngle);
-            rotateX.setAngle(newAngle);
-        };
-    }
+	private ChangeListener<Number> getRotateXAngleListener() {
+		return (observable, oldValue, newValue) -> {
+			double newAngle = newValue.doubleValue();
+			// cameraTransformer.setRotateX(newAngle);
+			rotateX.setAngle(newAngle);
+		};
+	}
 
-    private ChangeListener<Number> getRotateYAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            // cameraTransformer.setRotateY(newAngle);
-            rotateY.setAngle(newAngle);
-        };
-    }
+	private ChangeListener<Number> getRotateYAngleListener() {
+		return (observable, oldValue, newValue) -> {
+			double newAngle = newValue.doubleValue();
+			// cameraTransformer.setRotateY(newAngle);
+			rotateY.setAngle(newAngle);
+		};
+	}
 
-    private ChangeListener<Number> getRotateZAngleListener() {
-        return (observable, oldValue, newValue) -> {
-            double newAngle = newValue.doubleValue();
-            // cameraTransformer.setRotateZ(newAngle);
-            rotateZ.setAngle(newAngle);
-        };
-    }
+	private ChangeListener<Number> getRotateZAngleListener() {
+		return (observable, oldValue, newValue) -> {
+			double newAngle = newValue.doubleValue();
+			// cameraTransformer.setRotateZ(newAngle);
+			rotateZ.setAngle(newAngle);
+		};
+	}
 
-    public DoubleProperty getRotateXAngleProperty() {
-        return rotateXAngle;
-    }
+	public DoubleProperty getRotateXAngleProperty() {
+		return rotateXAngle;
+	}
 
-    public DoubleProperty getRotateYAngleProperty() {
-        return rotateYAngle;
-    }
+	public DoubleProperty getRotateYAngleProperty() {
+		return rotateYAngle;
+	}
 
-    public DoubleProperty getRotateZAngleProperty() {
-        return rotateZAngle;
-    }
+	public DoubleProperty getRotateZAngleProperty() {
+		return rotateZAngle;
+	}
 
-    public SubScene getSubScene() {
-        return subscene;
-    }
+	public SubScene getSubScene() {
+		return subscene;
+	}
 
-    public Group getRoot() {
-        return root;
-    }
+	public Group getRoot() {
+		return root;
+	}
 
-    public ChangeListener<Number> getOthersOpacityListener() {
-        return (observable, oldValue, newValue) -> {
-            othersOpacity.set(Math.round(newValue.doubleValue()) / 100d);
-            buildScene();
-        };
-    }
+	public ChangeListener<Number> getOthersOpacityListener() {
+		return (observable, oldValue, newValue) -> {
+			othersOpacity.set(Math.round(newValue.doubleValue()) / 100d);
+			buildScene();
+		};
+	}
 
-    public void addListenerToOpacitySlider(Slider slider) {
-        othersOpacity.addListener((arg0, arg1, arg2) -> {
-            Double arg = arg0.getValue().doubleValue();
-            if (arg >= 0 && arg <= 1.0) {
-                slider.setValue(arg * 100.0);
-            }
-        });
-    }
+	public void addListenerToOpacitySlider(Slider slider) {
+		othersOpacity.addListener((arg0, arg1, arg2) -> {
+			Double arg = arg0.getValue().doubleValue();
+			if (arg >= 0 && arg <= 1.0) {
+				slider.setValue(arg * 100.0);
+			}
+		});
+	}
 
-    public ChangeListener<String> getSearchFieldListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
-                inSearch = false;
-                buildScene();
-            } else {
-                inSearch = true;
-            }
-        };
-    }
+	public ChangeListener<String> getSearchFieldListener() {
+		return (observable, oldValue, newValue) -> {
+			if (newValue.isEmpty()) {
+				inSearch = false;
+				buildScene();
+			} else {
+				inSearch = true;
+			}
+		};
+	}
 
-    public void setSearchField(TextField field) {
-        searchField = field;
-        searchField.textProperty().addListener(getSearchFieldListener());
-    }
+	public void setSearchField(TextField field) {
+		searchField = field;
+		searchField.textProperty().addListener(getSearchFieldListener());
+	}
 
-    public int getEndTime() {
-        return endTime;
-    }
+	public int getEndTime() {
+		return endTime;
+	}
 
-    public int getStartTime() {
-        return startTime;
-    }
+	public int getStartTime() {
+		return startTime;
+	}
 
-    public EventHandler<ActionEvent> getZoomInButtonListener() {
-        return event -> {
-            hideContextPopups();
+	public EventHandler<ActionEvent> getZoomInButtonListener() {
+		return event -> {
+			hideContextPopups();
 
-            double z = zoom.get();
-            /*
-             * Workaround to avoid JavaFX bug --> stop zoom at 0
-             * As of July 8, 2016
-             * Noted by: Braden Katzman
-             *
-             * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of
-             * passing through it
-             * The API does not recognize that the camera orientation has changed and thus the back of back face
-             * culled shapes
-             * appear, surrounded w/ artifacts.
-             */
-            if (z >= 0.25) {
-                z -= 0.25;
-            } else if (z < 0) {
-                z = 0;
-            }
+			double z = zoom.get();
+			/*
+			 * Workaround to avoid JavaFX bug --> stop zoom at 0
+			 * As of July 8, 2016
+			 * Noted by: Braden Katzman
+			 *
+			 * JavaFX has a bug when zoom gets below 0. The camera flips around and faces the scene instead of
+			 * passing through it
+			 * The API does not recognize that the camera orientation has changed and thus the back of back face
+			 * culled shapes
+			 * appear, surrounded w/ artifacts.
+			 */
+			if (z >= 0.25) {
+				z -= 0.25;
+			} else if (z < 0) {
+				z = 0;
+			}
 
-            zoom.set(z);
-        };
-    }
+			zoom.set(z);
+		};
+	}
 
-    public EventHandler<ActionEvent> getZoomOutButtonListener() {
-        return event -> {
-            hideContextPopups();
+	public EventHandler<ActionEvent> getZoomOutButtonListener() {
+		return event -> {
+			hideContextPopups();
 
-            double z = zoom.get();
-            z += 0.25;
+			double z = zoom.get();
+			z += 0.25;
 
-            zoom.set(z);
-        };
-    }
+			zoom.set(z);
+		};
+	}
 
-    public EventHandler<ActionEvent> getBackwardButtonListener() {
-        return event -> {
-            hideContextPopups();
-            if (!playingMovie.get()) {
-                setTime(time.get() - 1);
-            }
-        };
-    }
+	public EventHandler<ActionEvent> getBackwardButtonListener() {
+		return event -> {
+			hideContextPopups();
+			if (!playingMovie.get()) {
+				setTime(time.get() - 1);
+			}
+		};
+	}
 
-    public EventHandler<ActionEvent> getForwardButtonListener() {
-        return event -> {
-            hideContextPopups();
-            if (!playingMovie.get()) {
-                setTime(time.get() + 1);
-            }
-        };
-    }
+	public EventHandler<ActionEvent> getForwardButtonListener() {
+		return event -> {
+			hideContextPopups();
+			if (!playingMovie.get()) {
+				setTime(time.get() + 1);
+			}
+		};
+	}
 
-    public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
-        return event -> {
-            allLabels.clear();
-            currentLabels.clear();
-            buildScene();
-        };
-    }
+	public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
+		return event -> {
+			allLabels.clear();
+			currentLabels.clear();
+			buildScene();
+		};
+	}
 
-    public EventHandler<ActionEvent> getUpdate3DListener() {
-        return event -> {
+	public EventHandler<ActionEvent> getUpdate3DListener() {
+		return event -> {
 
-        };
-    }
+		};
+	}
 
-    /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'uniform nucleus' is
-     * ticked/unticked in the display tab. On change, the scene refreshes and
-     * cell bodies are highlighted/unhighlighted accordingly.
-     *
-     * @return The listener.
-     */
-    public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
-        return (observable, oldValue, newValue) -> {
-            uniformSize = newValue;
-            buildScene();
-        };
-    }
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'uniform nucleus' is
+	 * ticked/unticked in the display tab. On change, the scene refreshes and
+	 * cell bodies are highlighted/unhighlighted accordingly.
+	 *
+	 * @return The listener.
+	 */
+	public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
+		return (observable, oldValue, newValue) -> {
+			uniformSize = newValue;
+			buildScene();
+		};
+	}
 
-    /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'cell nucleus' is
-     * ticked/unticked in the search tab. On change, the scene refreshes and
-     * cell bodies are highlighted/unhighlighted accordingly.
-     *
-     * @return The listener.
-     */
-    public ChangeListener<Boolean> getCellNucleusTickListener() {
-        return (observable, oldValue, newValue) -> {
-            cellNucleusTicked = newValue;
-            buildScene();
-        };
-    }
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'cell nucleus' is
+	 * ticked/unticked in the search tab. On change, the scene refreshes and
+	 * cell bodies are highlighted/unhighlighted accordingly.
+	 *
+	 * @return The listener.
+	 */
+	public ChangeListener<Boolean> getCellNucleusTickListener() {
+		return (observable, oldValue, newValue) -> {
+			cellNucleusTicked = newValue;
+			buildScene();
+		};
+	}
 
-    /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
-     * in the search tab. On change, the scene refreshes and cell bodies are
-     * highlighted/unhighlighted accordingly.
-     *
-     * @return The listener.
-     */
-    public ChangeListener<Boolean> getCellBodyTickListener() {
-        return (observable, oldValue, newValue) -> {
-            cellBodyTicked = newValue;
-            buildScene();
-        };
-    }
+	/**
+	 * This method returns the {@link ChangeListener} that listens for the
+	 * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
+	 * in the search tab. On change, the scene refreshes and cell bodies are
+	 * highlighted/unhighlighted accordingly.
+	 *
+	 * @return The listener.
+	 */
+	public ChangeListener<Boolean> getCellBodyTickListener() {
+		return (observable, oldValue, newValue) -> {
+			cellBodyTicked = newValue;
+			buildScene();
+		};
+	}
 
-    public ChangeListener<Boolean> getMulticellModeListener() {
-        return (observable, oldValue, newValue) -> {
-        };
-    }
+	public ChangeListener<Boolean> getMulticellModeListener() {
+		return (observable, oldValue, newValue) -> {
+		};
+	}
 
-    /**
-     * The getter for the {@link EventHandler} for the {@link MouseEvent} that
-     * is fired upon clicking on a note. The handler expands the note on click.
-     *
-     * @return The event handler.
-     */
-    public EventHandler<MouseEvent> getNoteClickHandler() {
-        return event -> {
-            if (event.isStillSincePress()) {
-                Node result = event.getPickResult().getIntersectedNode();
-                if (result instanceof Text) {
-                    Text picked = (Text) result;
-                    Note note = currentGraphicNoteMap.get(picked);
-                    if (note != null) {
-                        note.setExpandedInScene(!note.isExpandedInScene());
-                        if (note.isExpandedInScene()) {
-                            picked.setText(note.getTagName() + ": " + note.getTagContents());
-                        } else {
-                            picked.setText(note.getTagName() + "\n[more...]");
-                        }
-                    }
-                }
-            }
-        };
-    }
+	/**
+	 * The getter for the {@link EventHandler} for the {@link MouseEvent} that
+	 * is fired upon clicking on a note. The handler expands the note on click.
+	 *
+	 * @return The event handler.
+	 */
+	public EventHandler<MouseEvent> getNoteClickHandler() {
+		return event -> {
+			if (event.isStillSincePress()) {
+				Node result = event.getPickResult().getIntersectedNode();
+				if (result instanceof Text) {
+					Text picked = (Text) result;
+					Note note = currentGraphicNoteMap.get(picked);
+					if (note != null) {
+						note.setExpandedInScene(!note.isExpandedInScene());
+						if (note.isExpandedInScene()) {
+							picked.setText(note.getTagName() + ": " + note.getTagContents());
+						} else {
+							picked.setText(note.getTagName() + "\n[more...]");
+						}
+					}
+				}
+			}
+		};
+	}
 
-    public Stage getStage() {
-        return this.parentStage;
-    }
+	public Stage getStage() {
+		return this.parentStage;
+	}
 
-    /**
-     * This JavaFX {@link Service} of type Void spools a thread that<br>
-     * 1) retrieves the data for cells, cell bodies, and multicellular
-     * structures for the current time<br>
-     * 2) clears the notes, labels, and entities in the subscene<br>
-     * 3) adds the current notes, labels, and entities to the subscene
-     */
-    private final class RenderService extends Service<Void> {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    Platform.runLater(() -> {
-                        getSceneData();
-                        refreshScene();
-                        addEntitiesToScene();
-                    });
-                    return null;
-                }
-            };
-        }
-    }
+	/**
+	 * This JavaFX {@link Service} of type Void spools a thread that<br>
+	 * 1) retrieves the data for cells, cell bodies, and multicellular
+	 * structures for the current time<br>
+	 * 2) clears the notes, labels, and entities in the subscene<br>
+	 * 3) adds the current notes, labels, and entities to the subscene
+	 */
+	private final class RenderService extends Service<Void> {
+		@Override
+		protected Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					Platform.runLater(() -> {
+						getSceneData();
+						refreshScene();
+						addEntitiesToScene();
+					});
+					return null;
+				}
+			};
+		}
+	}
 
-    /**
-     * This JavaFX {@link Service} of type Void spools a thread to play the
-     * subscene movie. It waits the time in milliseconds defined in the variable
-     * WAIT_TIME_MILLI (defined in the parent class) before rendering the next
-     * time frame.
-     */
-    private final class PlayService extends Service<Void> {
-        @Override
-        protected final Task<Void> createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    while (true) {
-                        if (isCancelled()) {
-                            break;
-                        }
-                        Platform.runLater(() -> setTime(time.get() + 1));
-                        try {
-                            Thread.sleep(WAIT_TIME_MILLI);
-                        } catch (InterruptedException ie) {
-                            break;
-                        }
-                    }
-                    return null;
-                }
-            };
-        }
-    }
+	/**
+	 * This JavaFX {@link Service} of type Void spools a thread to play the
+	 * subscene movie. It waits the time in milliseconds defined in the variable
+	 * WAIT_TIME_MILLI (defined in the parent class) before rendering the next
+	 * time frame.
+	 */
+	private final class PlayService extends Service<Void> {
+		@Override
+		protected final Task<Void> createTask() {
+			return new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
+					while (true) {
+						if (isCancelled()) {
+							break;
+						}
+						Platform.runLater(() -> setTime(time.get() + 1));
+						try {
+							Thread.sleep(WAIT_TIME_MILLI);
+						} catch (InterruptedException ie) {
+							break;
+						}
+					}
+					return null;
+				}
+			};
+		}
+	}
 
-    /**
-     * This class is the {@link ChangeListener} that listens changes in the
-     * height or width of the modelAnchorPane in which the subscene lives. When
-     * the size changes, front-facing billboards and sprites (notes and labels)
-     * are repositioned to align with their appropriate positions (whether it is
-     * a location to an entity).
-     */
-    private final class SubsceneSizeListener implements ChangeListener<Number> {
-        @Override
-        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-            repositionSprites();
-            repositionNoteBillboardFronts();
-        }
-    }
+	/**
+	 * This class is the {@link ChangeListener} that listens changes in the
+	 * height or width of the modelAnchorPane in which the subscene lives. When
+	 * the size changes, front-facing billboards and sprites (notes and labels)
+	 * are repositioned to align with their appropriate positions (whether it is
+	 * a location to an entity).
+	 */
+	private final class SubsceneSizeListener implements ChangeListener<Number> {
+		@Override
+		public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+			repositionSprites();
+			repositionNoteBillboardFronts();
+		}
+	}
 
-    /**
-     * This class is the Comparator for Shape3Ds that compares based on opacity. This is used for z-buffering for
-     * semi-opaque materials. Entities with opaque materials should be rendered last (added first to the root
-     * {@link Group}.
-     */
-    private class OpacityComparator implements Comparator<Shape3D> {
-        @Override
-        public int compare(Shape3D o1, Shape3D o2) {
-            double op1 = colorHash.getMaterialOpacity(o1.getMaterial());
-            double op2 = colorHash.getMaterialOpacity(o2.getMaterial());
-            if (op1 < op2) {
-                return 1;
-            } else if (op1 > op2) {
-                return -1;
-            } else {
-                return 0;
-            }
-        }
-    }
+	/**
+	 * This class is the Comparator for Shape3Ds that compares based on opacity. This is used for z-buffering for
+	 * semi-opaque materials. Entities with opaque materials should be rendered last (added first to the root
+	 * {@link Group}.
+	 */
+	private class OpacityComparator implements Comparator<Shape3D> {
+		@Override
+		public int compare(Shape3D o1, Shape3D o2) {
+			double op1 = colorHash.getMaterialOpacity(o1.getMaterial());
+			double op2 = colorHash.getMaterialOpacity(o2.getMaterial());
+			if (op1 < op2) {
+				return 1;
+			} else if (op1 > op2) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	}
 }

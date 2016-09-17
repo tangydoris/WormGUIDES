@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
-
 import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.Window3DController;

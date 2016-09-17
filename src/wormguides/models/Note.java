@@ -405,7 +405,8 @@ public class Note {
         }
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         String sb = "Note[" + "@Name='" + tagName + "' " +
                 "@Type=" + attachmentType + " " +
                 "@Display=" + tagDisplay + " " +
@@ -547,7 +548,8 @@ public class Note {
             return sb.toString();
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return type;
         }
 
@@ -583,7 +585,8 @@ public class Note {
             return sb.toString();
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return display;
         }
 
