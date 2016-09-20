@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.awt.Desktop;
@@ -9,7 +13,7 @@ import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 
 import wormguides.AnatomyTerm;
-import wormguides.Search;
+import wormguides.layers.SearchLayer;
 
 import partslist.PartsList;
 
@@ -81,9 +85,9 @@ public class InfoWindowLinkController {
         // view in 3D
         viewInCellTheater(cell);
 
-        if (!Search.hasCellCase(cell)) {
+        if (!SearchLayer.hasCellCase(cell)) {
             // generate a new cell case
-            Search.addToInfoWindow(cell);
+            SearchLayer.addToInfoWindow(cell);
         } else {
             /*
              * TODO focus the tab if it already exists
@@ -96,7 +100,7 @@ public class InfoWindowLinkController {
      * "Amphid Sensilla" default info window page for now
      */
     public void handleAmphidClick() {
-        Search.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
+        SearchLayer.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
     }
 
     /**

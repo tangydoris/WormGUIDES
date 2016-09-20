@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.layers;
 
 import java.util.ArrayList;
@@ -12,7 +16,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
-import wormguides.Search;
 import wormguides.models.Rule;
 
 /**
@@ -29,7 +32,7 @@ import wormguides.models.Rule;
  * (whether it is the internal rules or the story's rules).<br>
  * <br>
  * The internal rules are the rules used when no story is active. On startup,
- * the internal rules are the default rules added by the {@link Search} class in
+ * the internal rules are the default rules added by the {@link SearchLayer} class in
  * the static method addDefaultColorRules().
  *
  * @author Doris Tang

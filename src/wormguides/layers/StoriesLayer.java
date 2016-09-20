@@ -36,7 +36,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -59,15 +58,18 @@ import stories.StoriesLoader;
 import stories.Story;
 import stories.StoryFileUtil;
 
+import static javafx.scene.text.FontSmoothingType.LCD;
+
 /**
- * Controller of the list view in the 'Stories' tab. The Constructor is called by {@link
- * wormguides.controllers.RootLayoutController} upon initialization
+ * Controller of the list view in the 'Stories' tab
  */
 public class StoriesLayer {
 
     private final String NEW_STORY_TITLE = "New Story";
     private final String NEW_STORY_DESCRIPTION = "New story description here";
+
     private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
+    private final String TEMPLATE_STORY_DESCRIPTION = "Shows all segmented neurons without further annotation.";
 
     private Stage parentStage;
 
@@ -95,16 +97,15 @@ public class StoriesLayer {
     private BooleanProperty useInternalRules;
     private Window3DController window3DController;
     private BooleanProperty update3D;
-//    private boolean defaultEmbryoFlag;
 
     /**
-     * Constructor called by {@link wormguides.controllers.RootLayoutController}
+     * Class constructor called by {@link wormguides.controllers.RootLayoutController}
      *
      * @param parent
      *         stage that the main application belongs to. This is used for initializing modality of the story editor
      *         popup window.
      * @param elementsList
-     *         list of all {@link wormguides.models.SceneElement}s loaded on application start
+     *         list of all scene elements loaded on application start
      * @param cellNameProperty
      *         the currently active cell, cell body, or multiceulluar structure name
      * @param data
@@ -131,8 +132,6 @@ public class StoriesLayer {
             boolean defaultEmbryoFlag) {
 
         parentStage = parent;
-
-//        this.defaultEmbryoFlag = defaultEmbryoFlag;
 
         newStoryButton.setOnAction(event -> {
             Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
@@ -211,7 +210,7 @@ public class StoriesLayer {
     private void addBlankStory() {
         Story blankStory = new Story(
                 TEMPLATE_STORY_NAME,
-                "Shows all segmented neurons without " + "further annotation.",
+                TEMPLATE_STORY_DESCRIPTION,
                 "http://scene.wormguides.org/wormguides/testurlscript?/set/ash-n$@+#ff8"
                         + "fbc8f/rib-n$@+#ff663366/avg-n$@+#ffb41919/dd-n@+#ff4a24c1/da-"
                         + "n@+#ffc56002/dd-n$+#ffb30a95/da-n$+#ffe6b34d/rivl-n@+#ffffb366/"
@@ -354,17 +353,14 @@ public class StoriesLayer {
     }
 
     /**
-     * Retrieve the effective end time of the input note parameter, whether it
-     * is the one explicitly stated by the 'end time' field or the one
-     * implicitly specified by the cell, cell body, or multicellular structure.
+     * Retrieve the effective end time of the input note parameter, whether it is the one explicitly stated by the
+     * 'end time' field or the one implicitly specified by the cell, cell body, or multicellular structure.
      *
      * @param note
-     *         The {@link Note} whose effective end time is queried
+     *         the note queried
      *
-     * @return {@link Integer} that contains the value of the effective end time
-     * of the input note. An Integer object is returned instead of the
-     * primitive int so that it can be passed into the
-     * {@link Comparator} for notes.
+     * @return the effective end time of the input note. An Integer object is returned instead of the primitive int
+     * so that it can be passed into the note comparator
      */
     private Integer getEffectiveEndTime(Note note) {
         int time = Integer.MIN_VALUE;
@@ -410,17 +406,14 @@ public class StoriesLayer {
     }
 
     /**
-     * Retrieve the effective start time of the input note parameter, whether it
-     * is the one explicitly stated by the 'start time' field or the one
-     * implicitly specified by the cell, cell body, or multicellular structure.
+     * Retrieve the effective start time of the input note parameter, whether it is the one explicitly stated by the
+     * 'start time' field or the one implicitly specified by the cell, cell body, or multicellular structure.
      *
      * @param note
      *         The {@link Note} whose effective start time is queried
      *
-     * @return {@link Integer} that contains the value of the effective start
-     * time of the input note. An Integer object is returned instead of
-     * the primitive int so that it can be passed into the
-     * {@link Comparator} for notes.
+     * @return the effective start time of the input note. An Integer object is returned instead of the primitive int
+     * so that it can be passed into the note comparator
      */
     private Integer getEffectiveStartTime(Note note) {
         int time = Integer.MIN_VALUE;
@@ -466,19 +459,18 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The currently active {@link Story}.
+     * @return the currently active story
      */
     public Story getActiveStory() {
         return activeStory;
     }
 
     /**
-     * Ultimately sets the active story to the input {@link Story} parameter.
-     * Sets the currently active story to be inactive if it is not null, then
-     * sets the input story to active.
+     * Ultimately sets the active story to the input story. Sets the currently active story to be inactive if it is
+     * not null, then sets the input story to active.
      *
      * @param story
-     *         The story that needs to be made active
+     *         story to make active
      */
     public void setActiveStory(Story story) {
         // disable previous active story
@@ -546,11 +538,9 @@ public class StoriesLayer {
 
     /**
      * @param tagName
-     *         The tag name of that note whose comments the user wants to
-     *         retrieve
+     *         tag name of that note whose comments the user wants to retrieve
      *
-     * @return A {@link String} with the comments of the note whose tag name is
-     * specified by the input parameter
+     * @return the comments of the note whose tag name is specified by the input parameter
      */
     public String getNoteComments(String tagName) {
         String comments = "";
@@ -571,7 +561,7 @@ public class StoriesLayer {
 
     /**
      * @param time
-     *         An integer whose value is the queried time
+     *         the queried time
      *
      * @return An {@link ArrayList} of all notes that can exist at the at input
      * time. This includes notes attached to an entity if entity is
@@ -834,12 +824,12 @@ public class StoriesLayer {
             title = new Text(story.getName());
             title.setFont(AppFont.getBolderFont());
             title.setWrappingWidth(width - 15);
-            title.setFontSmoothingType(FontSmoothingType.LCD);
+            title.setFontSmoothingType(LCD);
 
             description = new Text(story.getDescription());
             description.setFont(AppFont.getFont());
             description.setWrappingWidth(width - 15);
-            description.setFontSmoothingType(FontSmoothingType.LCD);
+            description.setFontSmoothingType(LCD);
 
             container.getChildren().addAll(title, description);
             getChildren().addAll(container);
@@ -909,10 +899,10 @@ public class StoriesLayer {
             titleContainer.setMaxWidth(width);
             titleContainer.setMinWidth(width);
 
-            expandIcon = new Text("- ");
+            expandIcon = new Text("▶");
             expandIcon.setPickOnBounds(true);
             expandIcon.setFont(AppFont.getBolderFont());
-            expandIcon.setFontSmoothingType(FontSmoothingType.LCD);
+            expandIcon.setFontSmoothingType(LCD);
             expandIcon.toFront();
             expandIcon.setOnMouseClicked(event -> {
                 note.setListExpanded(!note.isListExpanded());
@@ -925,9 +915,9 @@ public class StoriesLayer {
             r1.setMaxWidth(USE_PREF_SIZE);
 
             title = new Text(note.getTagName());
-            title.setWrappingWidth(width - 15 - r1.prefWidth(-1) - expandIcon.prefWidth(-1));
+            title.setWrappingWidth(width - 50 - r1.prefWidth(-1) - expandIcon.prefWidth(-1));
             title.setFont(AppFont.getBolderFont());
-            title.setFontSmoothingType(FontSmoothingType.LCD);
+            title.setFontSmoothingType(LCD);
 
             titleContainer.getChildren().addAll(expandIcon, r1, title);
             titleContainer.setAlignment(Pos.CENTER_LEFT);
@@ -945,7 +935,7 @@ public class StoriesLayer {
             contents = new Text(note.getTagContents());
             contents.setWrappingWidth(width - 15 - r2.prefWidth(-1));
             contents.setFont(AppFont.getFont());
-            contents.setFontSmoothingType(FontSmoothingType.LCD);
+            contents.setFontSmoothingType(LCD);
 
             contentsContainer.getChildren().addAll(r2, contents);
             expandNote(note.isListExpanded());
@@ -994,6 +984,7 @@ public class StoriesLayer {
                 setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
                         + "-fx-background: -fx-accent;");
                 colorTexts(Color.WHITE, expandIcon, title, contents);
+
             } else {
                 setStyle("-fx-background-color: white;");
                 colorTexts(Color.BLACK, expandIcon, title, contents);
@@ -1004,17 +995,15 @@ public class StoriesLayer {
          * Expands/hides a notes description according to the input parameter.
          *
          * @param expanded
-         *         The boolean whose value is TRUE when this
-         *         {@link NoteListCellGraphic} is to be expanded, FALSE when
-         *         it should only show the note title
+         *         true when the note should be expanded (showing the description), false otherwise
          */
         private void expandNote(boolean expanded) {
             if (expanded) {
                 getChildren().add(contentsContainer);
-                expandIcon.setText(expandIcon.getText().replace("â–¸", "â–¾"));
+                expandIcon.setText(expandIcon.getText().replace("▶", "▼"));
             } else {
                 getChildren().remove(contentsContainer);
-                expandIcon.setText(expandIcon.getText().replace("â–¾", "â–¸"));
+                expandIcon.setText(expandIcon.getText().replace("▼", "▶"));
             }
         }
     }

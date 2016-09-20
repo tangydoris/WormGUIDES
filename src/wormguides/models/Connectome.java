@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -131,7 +135,7 @@ public class Connectome {
     }
 
     /**
-     * Search function which takes cell and filters results based on filter
+     * SearchLayer function which takes cell and filters results based on filter
      * toggles filter toggles = 4 Synapse Types
      *
      * @param queryCell

@@ -1,7 +1,12 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -25,9 +30,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import wormguides.Search;
 import wormguides.SearchOption;
-import wormguides.layers.SearchType;
+import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.Connectome;
 import wormguides.models.ProductionInfo;
@@ -35,6 +39,7 @@ import wormguides.models.Rule;
 import wormguides.models.TerminalCellCase;
 
 import partslist.PartsList;
+import search.SearchType;
 
 /**
  * This class is the controller for the context menu that shows up on right
@@ -46,45 +51,56 @@ import partslist.PartsList;
 
 public class ContextMenuController extends AnchorPane implements Initializable {
 
-    /**
-     * Wait time in miliseconds between showing a different number of periods
-     * after 'loading'
-     */
+    /** Wait time in miliseconds between showing a different number of periods after loading */
     private final long WAIT_TIME_MILLI = 750;
+
     private final double MAX_MENU_HEIGHT = 200;
+
     private final int PRE_SYN_INDEX = 0, POST_SYN_INDEX = 1, ELECTR_INDEX = 2, NEURO_INDEX = 3;
+
     /** Default color of the rules that are created by the context menu */
     private final Color DEFAULT_COLOR = Color.WHITE;
+
     private Stage ownStage;
+
     @FXML
     private VBox mainVBox;
+
     @FXML
     private HBox expressesHBox;
+
     @FXML
     private HBox wiredToHBox;
+
     @FXML
     private Text nameText;
+
     @FXML
     private Button info;
+
     @FXML
     private Button color;
+
     @FXML
     private Button expresses;
+
     @FXML
     private Button wiredTo;
+
     @FXML
     private Button colorNeighbors;
+
     private int count; // to show loading in progress
     private String cellName; // lineage name of cell
     private ContextMenu expressesMenu;
     private MenuItem expressesTitle;
     private MenuItem loadingMenuItem;
-    private Service<ArrayList<String>> expressesQueryService;
+    private Service<List<String>> expressesQueryService;
     private Service<Void> loadingService;
     private ContextMenu wiredToMenu;
     private MenuItem colorAll;
     private Menu preSyn, postSyn, electr, neuro;
-    private Service<ArrayList<ArrayList<String>>> wiredToQueryService;
+    private Service<List<List<String>>> wiredToQueryService;
     private ProductionInfo productionInfo;
     private Stage parentStage;
     private BooleanProperty bringUpInfoProperty;
@@ -160,12 +176,12 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             }
         };
 
-        expressesQueryService = new Service<ArrayList<String>>() {
+        expressesQueryService = new Service<List<String>>() {
             @Override
-            protected Task<ArrayList<String>> createTask() {
-                final Task<ArrayList<String>> task = new Task<ArrayList<String>>() {
+            protected Task<List<String>> createTask() {
+                final Task<List<String>> task = new Task<List<String>>() {
                     @Override
-                    protected ArrayList<String> call() throws Exception {
+                    protected List<String> call() throws Exception {
                         if (cellName != null && !cellName.isEmpty()) {
                             if (cases == null) {
                                 System.out.println("null cell cases");
@@ -187,7 +203,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                                             connectome.queryConnectivity(searchName, false, false, false, true, false),
                                             productionInfo.getNuclearInfo(), productionInfo.getCellShapeData(cellName));
                                 }
-//								return cellCases.getTerminalCellCase(cellName).getExpressesWORMBASE();
                                 return cases.getCellCase(cellName).getExpressesWORMBASE();
                             }
 
@@ -195,7 +210,6 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                                 cases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
                                         productionInfo.getCellShapeData(cellName));
                             }
-                            //return cellCases.getNonTerminalCellCase(searchName).getExpressesWORMBASE();
                             return cases.getCellCase(searchName).getExpressesWORMBASE();
                         }
 
@@ -209,14 +223,14 @@ public class ContextMenuController extends AnchorPane implements Initializable {
         expressesQueryService.setOnSucceeded(event -> {
             loadingService.cancel();
             resetLoadingMenuItem();
-            ArrayList<String> results = expressesQueryService.getValue();
+            List<String> results = expressesQueryService.getValue();
             if (results != null) {
                 for (String result : results) {
                     MenuItem item = new MenuItem(result);
 
                     item.setOnAction(event12 -> {
-                        Rule rule = Search.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
-                                SearchOption.CELLNUCLEUS);
+                        Rule rule = SearchLayer.addColorRule(SearchType.GENE, result, DEFAULT_COLOR,
+                                SearchOption.CELL_NUCLEUS);
                         rule.showEditStage(parentStage);
                     });
 
@@ -235,16 +249,15 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             loadingService.cancel();
         });
 
-        wiredToQueryService = new Service<ArrayList<ArrayList<String>>>() {
+        wiredToQueryService = new Service<List<List<String>>>() {
             @Override
-            protected Task<ArrayList<ArrayList<String>>> createTask() {
-                final Task<ArrayList<ArrayList<String>>> task = new Task<ArrayList<ArrayList<String>>>() {
+            protected Task<List<List<String>>> createTask() {
+                final Task<List<List<String>>> task = new Task<List<List<String>>>() {
                     @Override
-                    protected ArrayList<ArrayList<String>> call() throws Exception {
+                    protected List<List<String>> call() throws Exception {
                         if (cellName != null && !cellName.isEmpty()) {
-                            ArrayList<ArrayList<String>> results = new ArrayList<>();
+                            List<List<String>> results = new ArrayList<>();
                             if (cases.containsCellCase(cellName)) {
-//								TerminalCellCase terminalCase = cellCases.getTerminalCellCase(cellName);
                                 TerminalCellCase terminalCase = (TerminalCellCase) cases.getCellCase(cellName);
                                 results.add(PRE_SYN_INDEX, terminalCase.getPresynapticPartners());
                                 results.add(POST_SYN_INDEX, terminalCase.getPostsynapticPartners());
@@ -275,11 +288,16 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 
         // TODO
         wiredToQueryService.setOnSucceeded(event -> {
-            ArrayList<ArrayList<String>> results = wiredToQueryService.getValue();
+            List<List<String>> results = wiredToQueryService.getValue();
 
             if (results != null) {
                 colorAll.setOnAction(event1 -> {
-                    Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, true, true, true,
+                    final Rule rule = SearchLayer.addGiantConnectomeColorRule(
+                            cellName,
+                            DEFAULT_COLOR,
+                            true,
+                            true,
+                            true,
                             true);
                     rule.showEditStage(parentStage);
                 });
@@ -288,6 +306,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                 populateWiredToMenu(results.get(POST_SYN_INDEX), postSyn, false, true, false, false);
                 populateWiredToMenu(results.get(ELECTR_INDEX), electr, false, false, true, false);
                 populateWiredToMenu(results.get(NEURO_INDEX), neuro, false, false, false, true);
+
             } else {
                 wiredToMenu.getItems().clear();
                 wiredToMenu.getItems().add(new MenuItem("None"));
@@ -501,8 +520,13 @@ public class ContextMenuController extends AnchorPane implements Initializable {
      *         true if a neuromuscular query to the connectome was issued, false otherwise
      */
     private void populateWiredToMenu(
-            ArrayList<String> results, Menu menu, boolean isPresynaptic,
-            boolean isPostsynaptic, boolean isElectrical, boolean isNeuromuscular) {
+            List<String> results,
+            Menu menu,
+            boolean isPresynaptic,
+            boolean isPostsynaptic,
+            boolean isElectrical,
+            boolean isNeuromuscular) {
+
         menu.getItems().clear();
 
         if (results.isEmpty()) {
@@ -514,7 +538,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
         menu.getItems().add(all);
 
         all.setOnAction(event -> {
-            Rule rule = Search.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
+            Rule rule = SearchLayer.addGiantConnectomeColorRule(cellName, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
                     isElectrical, isNeuromuscular);
             rule.showEditStage(parentStage);
         });
@@ -524,7 +548,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
             menu.getItems().add(item);
 
             item.setOnAction(event -> {
-                Rule rule = Search.addConnectomeColorRule(result, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
+                Rule rule = SearchLayer.addConnectomeColorRule(result, DEFAULT_COLOR, isPresynaptic, isPostsynaptic,
                         isElectrical, isNeuromuscular);
                 rule.showEditStage(parentStage);
             });

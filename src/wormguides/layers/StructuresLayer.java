@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.layers;
 
 import java.util.ArrayList;
@@ -23,7 +27,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
-import wormguides.Search;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.view.AppFont;
@@ -149,7 +152,7 @@ public class StructuresLayer {
         // Check for validity of name
         name = name.trim();
         if (allStructuresList.contains(name)) {
-            Search.addMulticellularStructureRule(name, color);
+            SearchLayer.addMulticellularStructureRule(name, color);
         }
     }
 

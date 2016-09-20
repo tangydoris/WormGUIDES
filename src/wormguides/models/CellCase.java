@@ -1,8 +1,13 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import partslist.PartsList;
@@ -29,7 +34,7 @@ public abstract class CellCase {
     private final static String textpressoURLEXT = ";cat1=Select%20category%201%20from%20list%20above;"
             + "cat2=Select%20category%202%20from%20list%20above;cat3=Select%20category%203%20from%20list%20above;"
             + "cat4=Select%20category%204%20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;"
-            + "search=Search!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;"
+            + "search=SearchLayer!;exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;target=body;"
             + "target=title;target=introduction;target=materials;target=results;target=discussion;target=conclusion;"
             + "target=acknowledgments;target=references;sentencerange=sentence;sort=score%20(hits);mode=boolean;"
             + "authorfilter=;journalfilter=;yearfilter=;docidfilter=;";
@@ -39,16 +44,16 @@ public abstract class CellCase {
     private final static String anchorClose = "</a>";
     private final static String href = "href=\"";
     private String lineageName;
-    private ArrayList<String> geneExpression;
-    private ArrayList<String> links;
-    private ArrayList<String> references;
-    private ArrayList<String> nuclearProductionInfo;
-    private ArrayList<String> cellShapeProductionInfo;
+    private List<String> geneExpression;
+    private List<String> links;
+    private List<String> references;
+    private List<String> nuclearProductionInfo;
+    private List<String> cellShapeProductionInfo;
 
     public CellCase(
             String lineageName,
-            ArrayList<String> nuclearProductionInfo,
-            ArrayList<String> cellShapeProductionInfo) {
+            List<String> nuclearProductionInfo,
+            List<String> cellShapeProductionInfo) {
         this.lineageName = lineageName;
 
         //initialize and populate links data structure
@@ -313,7 +318,7 @@ public abstract class CellCase {
     }
 
     protected String updateAnchors(String content) {
-		/*
+        /*
 		 * find the anchor tags and change to:
 		 *  "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
 		 *  paradigm
@@ -382,23 +387,23 @@ public abstract class CellCase {
         return this.lineageName;
     }
 
-    public ArrayList<String> getExpressesWORMBASE() {
+    public List<String> getExpressesWORMBASE() {
         return geneExpression;
     }
 
-    public ArrayList<String> getReferences() {
+    public List<String> getReferences() {
         return references;
     }
 
-    public ArrayList<String> getLinks() {
+    public List<String> getLinks() {
         return this.links;
     }
 
-    public ArrayList<String> getNuclearProductionInfo() {
+    public List<String> getNuclearProductionInfo() {
         return this.nuclearProductionInfo;
     }
 
-    public ArrayList<String> getCellShapeProductionInfo() {
+    public List<String> getCellShapeProductionInfo() {
         return this.cellShapeProductionInfo;
     }
 }

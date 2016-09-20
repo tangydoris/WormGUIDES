@@ -1,7 +1,12 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import wormguides.models.AmphidSensillaTerm;
 import wormguides.models.NonTerminalCellCase;
@@ -201,7 +206,7 @@ public class InfoWindowDOM {
         geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
         geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
         HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
-        ArrayList<String> geneExpressions = terminalCase.getExpressesWORMBASE();
+        List<String> geneExpressions = terminalCase.getExpressesWORMBASE();
         Collections.sort(geneExpressions);
         String geneExpressionStr = geneExpressions.toString();
         geneExpressionStr = geneExpressionStr.substring(
@@ -367,7 +372,7 @@ public class InfoWindowDOM {
         HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
         HTMLNode productionInfoUL = new HTMLNode("ul");
 
-        ArrayList<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
+        List<String> nuclearInfo = terminalCase.getNuclearProductionInfo();
         String markerAndStrainNuc = "<em>Nuclear: </em><br>Strain and Marker name: ";
         if (nuclearInfo.size() == 2) {
             markerAndStrainNuc += nuclearInfo.get(0) + "<br>" + "Image Series: " + nuclearInfo.get(1);
@@ -375,7 +380,7 @@ public class InfoWindowDOM {
         HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
 
         boolean hasCellShapeData;
-        ArrayList<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
+        List<String> cellShapeInfo = terminalCase.getCellShapeProductionInfo();
         String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Strain and Marker name: ";
         if (cellShapeInfo.size() == 2) {
             hasCellShapeData = true;
@@ -677,7 +682,7 @@ public class InfoWindowDOM {
         geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
         geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
         HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
-        ArrayList<String> geneExpressions = nonTerminalCase.getExpressesWORMBASE();
+        List<String> geneExpressions = nonTerminalCase.getExpressesWORMBASE();
         Collections.sort(geneExpressions);
         String geneExpressionStr = geneExpressions.toString();
         geneExpressionStr = geneExpressionStr.substring(1, geneExpressionStr.length() - 1); // remove
@@ -778,7 +783,7 @@ public class InfoWindowDOM {
         HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
         HTMLNode productionInfoUL = new HTMLNode("ul");
 
-        ArrayList<String> nuclearInfo = nonTerminalCase.getNuclearProductionInfo();
+        List<String> nuclearInfo = nonTerminalCase.getNuclearProductionInfo();
         String markerAndStrainNuc = "<em>Nuclear: </em><br>Marker and Strain name: ";
         if (nuclearInfo.size() == 2) {
             markerAndStrainNuc += nuclearInfo.get(0) + "<br>" + "Image Series: " + nuclearInfo.get(1);
@@ -786,7 +791,7 @@ public class InfoWindowDOM {
         HTMLNode nuclearLI = new HTMLNode("li", "", "", markerAndStrainNuc);
 
         boolean hasCellShapeData;
-        ArrayList<String> cellShapeInfo = nonTerminalCase.getCellShapeProductionInfo();
+        List<String> cellShapeInfo = nonTerminalCase.getCellShapeProductionInfo();
         String markerAndStrainCellShape = "<em>Cell Shape: </em><br>Marker and Strain name: ";
         if (cellShapeInfo.size() == 2) {
             hasCellShapeData = true;

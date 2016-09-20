@@ -17,8 +17,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-import wormguides.Search;
 import wormguides.controllers.InfoWindowLinkController;
+import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.Connectome;
 import wormguides.models.ProductionInfo;
@@ -326,7 +326,7 @@ public class InfoWindow {
             tab.setOnClosed(e -> {
                 Tab t = (Tab) e.getSource();
                 String cellName = t.getId();
-                Search.removeCellCase(cellName);
+                SearchLayer.removeCellCase(cellName);
             });
 
             tabPane.setFocusTraversable(true);

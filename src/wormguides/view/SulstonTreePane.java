@@ -61,15 +61,15 @@ import javafx.util.Duration;
 
 import wormguides.ColorComparator;
 import wormguides.ColorHash;
-import wormguides.Search;
 import wormguides.SearchOption;
 import wormguides.controllers.ContextMenuController;
-import wormguides.layers.SearchType;
+import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.models.Rule;
 
 import acetree.lineagedata.LineageData;
 import partslist.PartsList;
+import search.SearchType;
 
 public class SulstonTreePane extends ScrollPane {
 
@@ -365,15 +365,15 @@ public class SulstonTreePane extends ScrollPane {
             }
 
             contextMenuController.setColorButtonListener(event -> {
-                Rule rule = Search.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELLNUCLEUS);
+                Rule rule = SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.WHITE, SearchOption.CELL_NUCLEUS);
                 rule.showEditStage(ownStage);
 
                 contextMenuStage.hide();
             });
 
             contextMenuController.setColorNeighborsButtonListener(event -> {
-                // call distance Search method
-                Rule rule = Search.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELLNUCLEUS);
+                // call distance SearchLayer method
+                Rule rule = SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.WHITE, SearchOption.CELL_NUCLEUS);
                 rule.showEditStage(ownStage);
                 contextMenuStage.hide();
             });

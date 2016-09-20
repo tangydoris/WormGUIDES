@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -79,7 +83,7 @@ public class AmphidSensillaTerm extends AnatomyTermCase {
                         + "cat1=Select%20category"
                         + "%201%20from%20list%20above;cat2=Select%20category%202%20from%20list%20above;"
                         + "cat3=Select%20category%203%20from%20list%20above;cat4=Select%20category%204%"
-                        + "20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=Search!;"
+                        + "20from%20list%20above;cat5=Select%20category%205%20from%20list%20above;search=SearchLayer!;"
                         + "exactmatch=on;searchsynonyms=on;literature=C.%20elegans;target=abstract;"
                         + "target=body;target=title;target=introduction;target=materials;target=results;"
                         + "target=discussion;target=conclusion;"

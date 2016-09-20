@@ -49,7 +49,7 @@ public class MainApp extends Application {
         initRootLayout();
         long end_time = System.nanoTime();
         double difference = (end_time - start_time) / 1e6;
-        System.out.println("Root layout init " + difference + "ms");
+        System.out.println("Root layout initialized in " + difference + "ms");
 
         primaryStage.setResizable(true);
         primaryStage.show();
@@ -92,7 +92,7 @@ public class MainApp extends Application {
             }
 
         } catch (IOException e) {
-            System.out.println("could not initialize root layout.");
+            System.out.println("Could not initialize root layout");
             e.printStackTrace();
         }
     }

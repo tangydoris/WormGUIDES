@@ -7,6 +7,7 @@ package wormguides.models;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -34,19 +35,23 @@ import javafx.stage.Stage;
 import wormguides.MainApp;
 import wormguides.SearchOption;
 import wormguides.controllers.RuleEditorController;
-import wormguides.layers.SearchType;
+import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.view.AppFont;
 
+import search.SearchType;
+
+import static wormguides.SearchOption.ANCESTOR;
+import static wormguides.SearchOption.CELL_BODY;
+import static wormguides.SearchOption.CELL_NUCLEUS;
+import static wormguides.SearchOption.DESCENDANT;
+
 /**
- * This class is the color rule that determines the coloring/striping of cell,
- * cell bodies, and multicellular structures. It is instantiated by the
- * {@link wormguides.Search} class and added to an {@link javafx.collections.ObservableList} of Rules that are
- * displayed in the 'Display Options' tab. This class also contains the JavaFX
- * nodes that make up its graphical representation, which are used to display
- * the rule in the {@link javafx.scene.control.ListView} in the tab.
- *
- * @author Doris Tang
+ * This class is the color rule that determines the coloring/striping of cell, cell bodies, and multicellular
+ * structures. It is instantiated by the {@link SearchLayer} class and added to an {@link
+ * javafx.collections.ObservableList} of Rules that are displayed in the 'Display Options' tab. This class also
+ * contains the JavaFX nodes that make up its graphical representation, which are used to display the rule in the
+ * {@link javafx.scene.control.ListView} in the tab.
  */
 
 public class Rule {
@@ -59,12 +64,12 @@ public class Rule {
     private String text;
     private String textLowerCase;
 
-    private ArrayList<SearchOption> options;
+    private List<SearchOption> options;
     private BooleanProperty ruleChanged;
     private boolean visible;
     private Color color;
 
-    private ArrayList<String> cells;
+    private List<String> cells;
     private boolean cellsSet;
 
     private RuleEditorController editController;
@@ -84,7 +89,7 @@ public class Rule {
     private ImageView eyeInvertIcon;
 
     /**
-     * Rule class constructor called by the {@link wormguides.Search} class
+     * Rule class constructor called by the {@link SearchLayer} class
      *
      * @param searched
      *         text that user searched
@@ -101,7 +106,7 @@ public class Rule {
     }
 
     /**
-     * Rule class constructor called by the {@link wormguides.Search} class
+     * Rule class constructor called by the {@link SearchLayer} class
      *
      * @param searched
      *         text that user searched
@@ -113,7 +118,7 @@ public class Rule {
      * @param options
      *         options that the rule should be extended to
      */
-    public Rule(String searched, Color color, SearchType type, ArrayList<SearchOption> options) {
+    public Rule(String searched, Color color, SearchType type, List<SearchOption> options) {
         hbox = new HBox();
         label = new Label();
         colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
@@ -130,7 +135,7 @@ public class Rule {
         handler = new SubmitHandler();
 
         cells = new ArrayList<>();
-        // if the cells list from Search is set for this rule, cellsSet is true
+        // if the cells list from SearchLayer is set for this rule, cellsSet is true
         // is false before the list is set
         cellsSet = false;
 
@@ -289,7 +294,7 @@ public class Rule {
     }
 
     /**
-     * @return TRUE if the list of baseline cells are set by the {@link wormguides.Search}
+     * @return TRUE if the list of baseline cells are set by the {@link SearchLayer}
      * class, FALSE otherwise
      */
     public boolean areCellsSet() {
@@ -300,32 +305,29 @@ public class Rule {
      * @return the list of baseline cells that this rule affects, not including
      * decsendant or ancestor cells.
      */
-    public ArrayList<String> getCells() {
+    public List<String> getCells() {
         return cells;
     }
 
     /**
-     * Called by the {@link wormguides.Search} class to set the baseline list of cells that
-     * the rule affects. Multicellular structure rule cells are never set since
-     * they are queried by name only.
+     * Called by the {@link SearchLayer} class to set the baseline list of cells that the rule affects.
+     * Multicellular structure rule cells are never set since they are queried by name only.
      *
      * @param list
      *         ArrayList of baseline cell names that should be affected by
      *         this rule. The list only contains immediate cells, not the
      *         ancestor or descendant cells.
      */
-    public void setCells(ArrayList<String> list) {
+    public void setCells(List<String> list) {
         cells = list;
         cellsSet = true;
     }
 
     /**
-     * Changes the color of the rectangle displayed next to the rule name in the
-     * rule's graphical representation.
+     * Changes the color of the rectangle displayed next to the rule name in the rule's graphical representation.
      *
      * @param color
-     *         The {@link Color} that the rectangle in the graphical
-     *         representation of the rule should be changed to
+     *         color that the rectangle in the graphical representation of the rule should be changed to
      */
     private void setColorButton(Color color) {
         colorRectangle.setFill(color);
@@ -335,7 +337,7 @@ public class Rule {
      * Resets the label in the graphical representation of the rule.
      *
      * @param labelString
-     *         The String that contains the contents for the new labels
+     *         text for the new label
      */
     public void resetLabel(String labelString) {
         label.setText(labelString);
@@ -353,8 +355,7 @@ public class Rule {
      * Sets the searched term entered by the user when the rule was added.
      *
      * @param name
-     *         The String containing the search term entered by the user when
-     *         the rule was added
+     *         user-searched name
      */
     public void setSearchedText(String name) {
         text = name;
@@ -375,8 +376,8 @@ public class Rule {
      * Sets the color of the rule.
      *
      * @param color
-     *         The {@link Color} that the rule should apply to the cell(s),
-     *         cell body(ies), and/or multicellular structures it affects
+     *         color that the rule should apply to the cell(s), cell body(ies), and/or multicellular structures it
+     *         affects
      */
     public void setColor(Color color) {
         this.color = color;
@@ -392,26 +393,26 @@ public class Rule {
     }
 
     public boolean isCellSelected() {
-        return options.contains(SearchOption.CELLNUCLEUS);
+        return options.contains(CELL_NUCLEUS);
     }
 
     public boolean isCellBodySelected() {
-        return options.contains(SearchOption.CELLBODY);
+        return options.contains(CELL_BODY);
     }
 
     public boolean isAncestorSelected() {
-        return options.contains(SearchOption.ANCESTOR);
+        return options.contains(ANCESTOR);
     }
 
     public boolean isDescendantSelected() {
-        return options.contains(SearchOption.DESCENDANT);
+        return options.contains(DESCENDANT);
     }
 
     public SearchOption[] getOptions() {
         return options.toArray(new SearchOption[options.size()]);
     }
 
-    public void setOptions(ArrayList<SearchOption> options) {
+    public void setOptions(List<SearchOption> options) {
         this.options = new ArrayList<>();
         this.options.addAll(options.stream().filter(option -> option != null).collect(Collectors.toList()));
     }
@@ -421,24 +422,23 @@ public class Rule {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return toStringFull();
     }
 
     /**
      * @param other
-     *         The other rule to compare this rule to
+     *         rule to compare to
      *
-     * @return TRUE if the rules contain the same searched text; FALSE otherwise
+     * @return true if the rules contain the same searched text, false otherwise
      */
-    public boolean equals(Rule other) {
+    public boolean equals(final Rule other) {
         return text.equalsIgnoreCase(other.getSearchedText());
     }
 
     /**
-     * @return Full string description of the rule used in the tooltip and the
-     * label in the heading of the rule editor popup. The return string
-     * contains the rule's name and options.
+     * @return full description of the rule used in the tooltip and the label in the heading of the rule editor popup.
+     * The return string contains the rule's name and options.
      */
     public String toStringFull() {
         StringBuilder sb = new StringBuilder(text);
@@ -462,8 +462,7 @@ public class Rule {
      * @param name
      *         lineage name of queried cell
      *
-     * @return TRUE if the rule is visible and applies to cell nucleus with
-     * specified name; FALSE otherwise
+     * @return true if the rule is visible and applies to cell nucleus with specified name, false otherwise
      */
     public boolean appliesToCellNucleus(String name) {
         if (!visible) {
@@ -471,16 +470,16 @@ public class Rule {
         }
 
         if (cells != null) {
-            if (options.contains(SearchOption.CELLNUCLEUS) && cells.contains(name)) {
+            if (options.contains(CELL_NUCLEUS) && cells.contains(name)) {
                 return true;
             }
 
             for (String cell : cells) {
-                if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell)) {
+                if (options.contains(ANCESTOR) && LineageTree.isAncestor(name, cell)) {
                     return true;
                 }
 
-                if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell)) {
+                if (options.contains(DESCENDANT) && LineageTree.isDescendant(name, cell)) {
                     return true;
                 }
             }
@@ -492,8 +491,8 @@ public class Rule {
      * @param name
      *         scene name of multicellular structure
      *
-     * @return TRUE if the rule is visible and it applies to multicellcular
-     * structure with specified name; FALSE otherwise
+     * @return true if the rule is visible and it applies to multicellcular structure with specified name, false
+     * otherwise
      */
     public boolean appliesToMulticellularStructure(String name) {
         return visible
@@ -504,10 +503,9 @@ public class Rule {
 
     /**
      * @param name
-     *         lineage name of cellbody
+     *         lineage name of a cell body
      *
-     * @return TRUE if the rule is visible and applies to cell body with
-     * specified name; FALSE otherwise
+     * @return true if the rule is visible and applies to cell body with specified name, false otherwise
      */
     public boolean appliesToCellBody(String name) {
         if (!visible) {
@@ -515,16 +513,16 @@ public class Rule {
         }
 
         if (cells != null) {
-            if (options.contains(SearchOption.CELLBODY) && cells.contains(name)) {
+            if (options.contains(CELL_BODY) && cells.contains(name)) {
                 return true;
             }
 
             for (String cell : cells) {
-                if (options.contains(SearchOption.ANCESTOR) && LineageTree.isAncestor(name, cell)) {
+                if (options.contains(ANCESTOR) && LineageTree.isAncestor(name, cell)) {
                     return true;
                 }
 
-                if (options.contains(SearchOption.DESCENDANT) && LineageTree.isDescendant(name, cell)) {
+                if (options.contains(DESCENDANT) && LineageTree.isDescendant(name, cell)) {
                     return true;
                 }
             }
@@ -533,19 +531,18 @@ public class Rule {
     }
 
     /**
-     * Returns the {@link SearchType} of the rule. If the rule has the option
-     * SearchOption.MULTICELLULAR, the return value is null and the rule is a
-     * rule specific to multicellular structures (meaning the rule is defined by
-     * its name instead of by its cells).
+     * Retrieves the {@link SearchType} of the rule. If the rule has the option {@link
+     * SearchOption#MULTICELLULAR_NAME_BASED}, the return value is null and the rule is a rule specific to
+     * multicellular structures (meaning the rule is defined by its name instead of by its cells).
      *
-     * @return The SearchType of the rule
+     * @return search type of the rule
      */
     public SearchType getSearchType() {
         return searchType;
     }
 
     /**
-     * @return TRUE if rule is visible; FALSE otherwise
+     * @return true if rule is visible; false otherwise
      */
     public boolean isVisible() {
         return visible;
@@ -563,8 +560,7 @@ public class Rule {
     }
 
     /**
-     * This private class is an {@link EventHandler} of {@link ActionEvent} that
-     * handles a click on the 'Submit' button in the rule editor popup.
+     * Action event handler for a click on the 'Submit' button in the rule editor popup.
      */
     private class SubmitHandler implements EventHandler<ActionEvent> {
         @Override
@@ -587,5 +583,4 @@ public class Rule {
             }
         }
     }
-
 }

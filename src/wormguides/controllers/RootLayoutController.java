@@ -59,10 +59,9 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import wormguides.MainApp;
-import wormguides.Search;
 import wormguides.StringListCellFactory;
 import wormguides.layers.DisplayLayer;
-import wormguides.layers.SearchType;
+import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
 import wormguides.loaders.ImageLoader;
@@ -87,258 +86,256 @@ import wormguides.view.YesNoCancelDialogPane;
 import acetree.AceTreeLoader;
 import acetree.lineagedata.LineageData;
 import partslist.PartsList;
+import search.SearchType;
+import search.SearchUtil;
 import stories.Story;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
-	private final static String unLineagedStart = "Nuc";
-	private final static String ROOT = "ROOT";
-	/** Default transparency of 'other' entities on startup */
-	private final double DEFAULT_OTHERS_OPACITY = 25;
-	RotationController rotationController;
-	// Root layout's own stage
-	private Stage mainStage;
-	// Popup windows
-	private Stage aboutStage;
-	private Stage treeStage;
-	private Stage urlStage;
-	private Stage urlLoadStage;
-	private Stage connectomeStage;
-	private Stage partsListStage;
-	private Stage cellShapesIndexStage;
-	private Stage cellDeathsStage;
-	private Stage productionInfoStage;
-	// URL generation/loading
-	private URLWindow urlWindow;
-	private URLLoadWindow urlLoadWindow;
-	private URLLoadWarningDialog warning;
-	// 3D subscene stuff
-	private Window3DController window3DController;
-	private SubScene subscene;
-	private DoubleProperty subsceneWidth;
-	private DoubleProperty subsceneHeight;
-	// Panels stuff
-	@FXML
-	private BorderPane rootBorderPane;
-	@FXML
-	private VBox displayVBox;
-	@FXML
-	private AnchorPane modelAnchorPane;
-	@FXML
-	private ScrollPane infoPane;
-	@FXML
-	private HBox sceneControlsBox;
-	// Subscene controls
-	@FXML
-	private Button backwardButton, forwardButton, playButton;
-	@FXML
-	private Label timeLabel, totalNucleiLabel;
-	@FXML
-	private Slider timeSlider;
-	@FXML
-	private Button zoomInButton, zoomOutButton;
-	// Tab
-	@FXML
-	private TabPane mainTabPane;
-	@FXML
-	private Tab storiesTab;
-	@FXML
-	private Tab colorAndDisplayTab;
-	@FXML
-	private TabPane colorAndDisplayTabPane;
-	@FXML
-	private Tab cellsTab;
-	@FXML
-	private Tab structuresTab;
-	@FXML
-	private Tab displayTab;
-	// Cells tab
-	private Search search;
-	@FXML
-	private TextField searchField;
-	private BooleanProperty clearSearchField;
-	@FXML
-	private ListView<String> searchResultsListView;
-	@FXML
-	private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
-	private ToggleGroup typeToggleGroup;
-	@FXML
-	private CheckBox cellNucleusTick, cellBodyTick, ancestorTick, descendantTick;
-	@FXML
-	private Label descendantLabel;
-	@FXML
-	private AnchorPane colorPickerPane;
-	@FXML
-	private ColorPicker colorPicker;
-	@FXML
-	private Button addSearchBtn;
-	// Connectome stuff
-	private Connectome connectome;
-	@FXML
-	private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
-	// Cell selection
-	private StringProperty selectedName;
-	// Display Layer stuff
-	private DisplayLayer displayLayer;
-	private BooleanProperty useInternalRules;
-	@FXML
-	private ListView<Rule> rulesListView;
-	@FXML
-	private CheckBox uniformSizeCheckBox;
-	@FXML
-	private Button clearAllLabelsButton;
-	@FXML
-	private Slider opacitySlider;
-	// Structures tab
-	private StructuresLayer structuresLayer;
-	@FXML
-	private TextField structuresSearchField;
-	@FXML
-	private ListView<String> structuresSearchListView;
-	@FXML
-	private ListView<String> allStructuresListView;
-	@FXML
-	private Button addStructureRuleBtn;
-	@FXML
-	private ColorPicker structureRuleColorPicker;
-	// Cell information
-	@FXML
-	private Text displayedName;
-	@FXML
-	private Text moreInfoClickableText;
-	@FXML
-	private Text displayedDescription;
-	// scene elements stuff
-	// average x-, y- and z-coordinate offsets of nuclei from zero
-	private SceneElementsList elementsList;
-	// Story stuff
-	@FXML
-	private Text displayedStory;
-	@FXML
-	private Text displayedStoryDescription;
-	private StoriesLayer storiesLayer;
-	@FXML
-	private ListView<Story> storiesListView;
-	@FXML
-	private Button noteEditorBtn;
-	@FXML
-	private Button newStory;
-	@FXML
-	private Button deleteStory;
-	private Popup exitSavePopup;
-	// production information
-	private ProductionInfo productionInfo;
-	// info window Stuff
-	private CasesLists cases;
-	private InfoWindow infoWindow;
-	private BooleanProperty bringUpInfoProperty;
-	private ImageView playIcon, pauseIcon;
-	private IntegerProperty time;
-	private IntegerProperty totalNuclei;
-	private BooleanProperty playingMovie;
-	// Lineage tree
-	private TreeItem<String> lineageTreeRoot;
-	private LineageData lineageData;
-	// rotation controller
-	private Stage rotationControllerStage;
-	// movie capture
-	@FXML
-	private MenuItem captureVideoMenuItem;
-	@FXML
-	private MenuItem stopCaptureVideoMenuItem;
-	private BooleanProperty captureVideo;
-	private boolean defaultEmbryoFlag;
+    private final static String unLineagedStart = "Nuc";
+    private final static String ROOT = "ROOT";
+    /** Default transparency of 'other' entities on startup */
+    private final double DEFAULT_OTHERS_OPACITY = 25;
+    RotationController rotationController;
+    // Root layout's own stage
+    private Stage mainStage;
+    // Popup windows
+    private Stage aboutStage;
+    private Stage treeStage;
+    private Stage urlStage;
+    private Stage urlLoadStage;
+    private Stage connectomeStage;
+    private Stage partsListStage;
+    private Stage cellShapesIndexStage;
+    private Stage cellDeathsStage;
+    private Stage productionInfoStage;
+    // URL generation/loading
+    private URLWindow urlWindow;
+    private URLLoadWindow urlLoadWindow;
+    private URLLoadWarningDialog warning;
+    // 3D subscene stuff
+    private Window3DController window3DController;
+    private SubScene subscene;
+    private DoubleProperty subsceneWidth;
+    private DoubleProperty subsceneHeight;
+    // Panels stuff
+    @FXML
+    private BorderPane rootBorderPane;
+    @FXML
+    private VBox displayVBox;
+    @FXML
+    private AnchorPane modelAnchorPane;
+    @FXML
+    private ScrollPane infoPane;
+    @FXML
+    private HBox sceneControlsBox;
+    // Subscene controls
+    @FXML
+    private Button backwardButton, forwardButton, playButton;
+    @FXML
+    private Label timeLabel, totalNucleiLabel;
+    @FXML
+    private Slider timeSlider;
+    @FXML
+    private Button zoomInButton, zoomOutButton;
+    // Tab
+    @FXML
+    private TabPane mainTabPane;
+    @FXML
+    private Tab storiesTab;
+    @FXML
+    private Tab colorAndDisplayTab;
+    @FXML
+    private TabPane colorAndDisplayTabPane;
+    @FXML
+    private Tab cellsTab;
+    @FXML
+    private Tab structuresTab;
+    @FXML
+    private Tab displayTab;
+    // Cells tab
+    private SearchLayer searchLayer;
+    @FXML
+    private TextField searchField;
+    private BooleanProperty clearSearchField;
+    @FXML
+    private ListView<String> searchResultsListView;
+    @FXML
+    private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
+    private ToggleGroup typeToggleGroup;
+    @FXML
+    private CheckBox cellNucleusTick, cellBodyTick, ancestorTick, descendantTick;
+    @FXML
+    private Label descendantLabel;
+    @FXML
+    private AnchorPane colorPickerPane;
+    @FXML
+    private ColorPicker colorPicker;
+    @FXML
+    private Button addSearchBtn;
+    // Connectome stuff
+    private Connectome connectome;
+    @FXML
+    private CheckBox presynapticTick, postsynapticTick, electricalTick, neuromuscularTick;
+    // Cell selection
+    private StringProperty selectedName;
+    // Display Layer stuff
+    private DisplayLayer displayLayer;
+    private BooleanProperty useInternalRules;
+    @FXML
+    private ListView<Rule> rulesListView;
+    @FXML
+    private CheckBox uniformSizeCheckBox;
+    @FXML
+    private Button clearAllLabelsButton;
+    @FXML
+    private Slider opacitySlider;
+    // Structures tab
+    private StructuresLayer structuresLayer;
+    @FXML
+    private TextField structuresSearchField;
+    @FXML
+    private ListView<String> structuresSearchListView;
+    @FXML
+    private ListView<String> allStructuresListView;
+    @FXML
+    private Button addStructureRuleBtn;
+    @FXML
+    private ColorPicker structureRuleColorPicker;
+    // Cell information
+    @FXML
+    private Text displayedName;
+    @FXML
+    private Text moreInfoClickableText;
+    @FXML
+    private Text displayedDescription;
+    // scene elements stuff
+    // average x-, y- and z-coordinate offsets of nuclei from zero
+    private SceneElementsList sceneElementsList;
+    // Story stuff
+    @FXML
+    private Text displayedStory;
+    @FXML
+    private Text displayedStoryDescription;
+    private StoriesLayer storiesLayer;
+    @FXML
+    private ListView<Story> storiesListView;
+    @FXML
+    private Button noteEditorBtn;
+    @FXML
+    private Button newStory;
+    @FXML
+    private Button deleteStory;
+    private Popup exitSavePopup;
+    // production information
+    private ProductionInfo productionInfo;
+    // info window Stuff
+    private CasesLists cases;
+    private InfoWindow infoWindow;
+    private BooleanProperty bringUpInfoProperty;
+    private ImageView playIcon, pauseIcon;
+    private IntegerProperty time;
+    private IntegerProperty totalNuclei;
+    private BooleanProperty playingMovie;
+    // Lineage tree
+    private TreeItem<String> lineageTreeRoot;
+    private LineageData lineageData;
+    // rotation controller
+    private Stage rotationControllerStage;
+    // movie capture
+    @FXML
+    private MenuItem captureVideoMenuItem;
+    @FXML
+    private MenuItem stopCaptureVideoMenuItem;
+    private BooleanProperty captureVideo;
+    private boolean defaultEmbryoFlag;
 
-	// ----- Begin menu items and buttons listeners -----
-	@FXML
-	public void productionInfoAction() {
-		if (productionInfoStage == null) {
-			productionInfoStage = new Stage();
-			productionInfoStage.setTitle("Experimental Data");
+    // ----- Begin menu items and buttons listeners -----
+    @FXML
+    public void productionInfoAction() {
+        if (productionInfoStage == null) {
+            productionInfoStage = new Stage();
+            productionInfoStage.setTitle("Experimental Data");
 
-			if (productionInfo == null) {
-				initProductionInfo();
-			}
+            if (productionInfo == null) {
+                initProductionInfo();
+            }
 
-			WebView productionInfoWebView = new WebView();
-			productionInfoWebView.getEngine().loadContent(productionInfo.getProductionInfoDOM().DOMtoString());
-			productionInfoWebView.setContextMenuEnabled(false);
+            WebView productionInfoWebView = new WebView();
+            productionInfoWebView.getEngine().loadContent(productionInfo.getProductionInfoDOM().DOMtoString());
+            productionInfoWebView.setContextMenuEnabled(false);
 
-			VBox root = new VBox();
-			root.getChildren().addAll(productionInfoWebView);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
+            VBox root = new VBox();
+            root.getChildren().addAll(productionInfoWebView);
+            Scene scene = new Scene(new Group());
+            scene.setRoot(root);
 
-			productionInfoStage.setScene(scene);
-			productionInfoStage.setResizable(false);
-		}
-		productionInfoStage.show();
-	}
+            productionInfoStage.setScene(scene);
+            productionInfoStage.setResizable(false);
+        }
+        productionInfoStage.show();
+    }
 
-	@FXML
-	public void menuLoadStory() {
-		if (storiesLayer != null) {
-			storiesLayer.loadStory();
-		}
-	}
+    @FXML
+    public void menuLoadStory() {
+        if (storiesLayer != null) {
+            storiesLayer.loadStory();
+        }
+    }
 
-	@FXML
-	public void menuSaveStory() {
-		if (storiesLayer != null)
-			storiesLayer.saveActiveStory();
-	}
+    @FXML
+    public void menuSaveStory() {
+        if (storiesLayer != null) {
+            storiesLayer.saveActiveStory();
+        }
+    }
 
-	@FXML
-	public void menuSaveImageAction() {
-		if (window3DController != null) {
-			window3DController.stillscreenCapture();
-		}
-	}
+    @FXML
+    public void menuSaveImageAction() {
+        if (window3DController != null) {
+            window3DController.stillscreenCapture();
+        }
+    }
 
-	@FXML
-	public void menuCloseAction() {
-		initCloseApplication();
-	}
+    @FXML
+    public void menuCloseAction() {
+        initCloseApplication();
+    }
 
-	@FXML
-	public void menuAboutAction() {
-		if (aboutStage == null) {
-			aboutStage = new Stage();
-			aboutStage.setScene(new Scene(new AboutPane()));
-			aboutStage.setTitle("About WormGUIDES");
-			aboutStage.initModality(Modality.NONE);
+    @FXML
+    public void menuAboutAction() {
+        if (aboutStage == null) {
+            aboutStage = new Stage();
+            aboutStage.setScene(new Scene(new AboutPane()));
+            aboutStage.setTitle("About WormGUIDES");
+            aboutStage.initModality(Modality.NONE);
 
-			aboutStage.setHeight(400.0);
-			aboutStage.setWidth(300.0);
-			aboutStage.setResizable(false);
-		}
-		aboutStage.show();
-	}
-	
-	@FXML
-	public void viewTreeAction() {
-		if (treeStage == null) {
-			treeStage = new Stage();
-			SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
-				displayLayer.getRulesList(), window3DController.getColorHash(),
-				window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-				window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
+            aboutStage.setHeight(400.0);
+            aboutStage.setWidth(300.0);
+            aboutStage.setResizable(false);
+        }
+        aboutStage.show();
+    }
 
-			treeStage.setScene(new Scene(sp));
-			treeStage.setTitle("LineageTree");
-			treeStage.initModality(Modality.NONE);
-			treeStage.show();
-			mainStage.show();
-		} else {
-			treeStage.show();
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					((Stage) treeStage.getScene().getWindow()).toFront();
-				}
-			});
-		}
-	}
+    @FXML
+    public void viewTreeAction() {
+        if (treeStage == null) {
+            treeStage = new Stage();
+            SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
+                    displayLayer.getRulesList(), window3DController.getColorHash(),
+                    window3DController.getTimeProperty(), window3DController.getContextMenuController(),
+                    window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
+
+            treeStage.setScene(new Scene(sp));
+            treeStage.setTitle("LineageTree");
+            treeStage.initModality(Modality.NONE);
+            treeStage.show();
+            mainStage.show();
+        } else {
+            treeStage.show();
+            Platform.runLater(() -> ((Stage) treeStage.getScene().getWindow()).toFront());
+        }
+    }
 
     @FXML
     public void generateURLAction() {
@@ -392,104 +389,106 @@ public class RootLayoutController extends BorderPane implements Initializable {
         urlLoadStage.show();
     }
 
-	@FXML
-	public void saveSearchResultsAction() {
-		ObservableList<String> items = searchResultsListView.getItems();
-		if (!(items.size() > 0)) {
-			System.out.println("no search results to write to file");
-		}
+    @FXML
+    public void saveSearchResultsAction() {
+        ObservableList<String> items = searchResultsListView.getItems();
+        if (!(items.size() > 0)) {
+            System.out.println("no searchLayer results to write to file");
+        }
 
-		Stage fileChooserStage = new Stage();
+        Stage fileChooserStage = new Stage();
 
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Choose Save Location");
-		fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Save Location");
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
 
-		try  {
-			File output = fileChooser.showSaveDialog(fileChooserStage);
+        try {
+            File output = fileChooser.showSaveDialog(fileChooserStage);
 
-			// check
-			if (output == null) {
-				System.out.println("error creating file to write search results");
-				return;
-			}
+            // check
+            if (output == null) {
+                System.out.println("error creating file to write searchLayer results");
+                return;
+            }
 
-			FileWriter writer = new FileWriter(output);
+            FileWriter writer = new FileWriter(output);
 
-			for (String s : items) {
-				writer.write(s);
-				writer.write(System.lineSeparator());
-			}
+            for (String s : items) {
+                writer.write(s);
+                writer.write(System.lineSeparator());
+            }
 
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			System.out.println("IOException thrown writing search results to file");
-			return;
-		}
-	}
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("IOException thrown writing searchLayer results to file");
+        }
+    }
 
-	@FXML
-	public void openInfoWindow() {
-		if (infoWindow == null) {
-			initInfoWindow();
+    @FXML
+    public void openInfoWindow() {
+        if (infoWindow == null) {
+            initInfoWindow();
 
-			if (cases == null)
-				initCases();
-			else
-				cases.setInfoWindow(infoWindow);
-		}
+            if (cases == null) {
+                initCases();
+            } else {
+                cases.setInfoWindow(infoWindow);
+            }
+        }
 
-		infoWindow.showWindow();
-	}
+        infoWindow.showWindow();
+    }
 
-	@FXML
-	public void viewCellShapesIndex() {
-		if (elementsList == null)
-			return;
+    @FXML
+    public void viewCellShapesIndex() {
+        if (sceneElementsList == null) {
+            return;
+        }
 
-		if (cellShapesIndexStage == null) {
-			cellShapesIndexStage = new Stage();
-			cellShapesIndexStage.setTitle("Cell Shapes Index");
+        if (cellShapesIndexStage == null) {
+            cellShapesIndexStage = new Stage();
+            cellShapesIndexStage.setTitle("Cell Shapes Index");
 
-			if (elementsList == null)
-				initSceneElementsList();
+            if (sceneElementsList == null) {
+                initSceneElementsList();
+            }
 
-			// webview to render cell shapes list i.e. elementsList
-			WebView cellShapesIndexWebView = new WebView();
-			cellShapesIndexWebView.getEngine().loadContent(elementsList.sceneElementsListDOM().DOMtoString());
+            // webview to render cell shapes list i.e. sceneElementsList
+            WebView cellShapesIndexWebView = new WebView();
+            cellShapesIndexWebView.getEngine().loadContent(sceneElementsList.sceneElementsListDOM().DOMtoString());
 
-			VBox root = new VBox();
-			root.getChildren().addAll(cellShapesIndexWebView);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
+            VBox root = new VBox();
+            root.getChildren().addAll(cellShapesIndexWebView);
+            Scene scene = new Scene(new Group());
+            scene.setRoot(root);
 
-			cellShapesIndexStage.setScene(scene);
-			cellShapesIndexStage.setResizable(false);
-		}
-		cellShapesIndexStage.show();
-	}
+            cellShapesIndexStage.setScene(scene);
+            cellShapesIndexStage.setResizable(false);
+        }
+        cellShapesIndexStage.show();
+    }
 
-	@FXML
-	public void viewCellDeaths() {
-		if (cellDeathsStage == null) {
-			cellDeathsStage = new Stage();
-			cellDeathsStage.setWidth(400.);
-			cellDeathsStage.setTitle("Cell Deaths");
+    @FXML
+    public void viewCellDeaths() {
+        if (cellDeathsStage == null) {
+            cellDeathsStage = new Stage();
+            cellDeathsStage.setWidth(400.);
+            cellDeathsStage.setTitle("Cell Deaths");
 
-			WebView cellDeathsWebView = new WebView();
-			cellDeathsWebView.getEngine().loadContent(CellDeaths.getCellDeathsDOMAsString());
+            WebView cellDeathsWebView = new WebView();
+            cellDeathsWebView.getEngine().loadContent(CellDeaths.getCellDeathsDOMAsString());
 
-			VBox root = new VBox();
-			root.getChildren().addAll(cellDeathsWebView);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
+            VBox root = new VBox();
+            root.getChildren().addAll(cellDeathsWebView);
+            Scene scene = new Scene(new Group());
+            scene.setRoot(root);
 
-			cellDeathsStage.setScene(scene);
-			cellDeathsStage.setResizable(false);
-		}
-		cellDeathsStage.show();
-	}
+            cellDeathsStage.setScene(scene);
+            cellDeathsStage.setResizable(false);
+        }
+        cellDeathsStage.show();
+    }
 
     @FXML
     public void viewPartsList() {
@@ -512,202 +511,205 @@ public class RootLayoutController extends BorderPane implements Initializable {
         partsListStage.show();
     }
 
-	@FXML
-	public void viewConnectome() {
-		if (connectomeStage == null) {
-			connectomeStage = new Stage();
-			connectomeStage.setTitle("Connectome");
+    @FXML
+    public void viewConnectome() {
+        if (connectomeStage == null) {
+            connectomeStage = new Stage();
+            connectomeStage.setTitle("Connectome");
 
-			// build webview scene to render html
-			WebView connectomeHTML = new WebView();
-			connectomeHTML.getEngine().loadContent(connectome.connectomeDOM().DOMtoString());
+            // build webview scene to render html
+            WebView connectomeHTML = new WebView();
+            connectomeHTML.getEngine().loadContent(connectome.connectomeDOM().DOMtoString());
 
-			VBox root = new VBox();
-			root.getChildren().addAll(connectomeHTML);
-			Scene scene = new Scene(new Group());
-			scene.setRoot(root);
+            VBox root = new VBox();
+            root.getChildren().addAll(connectomeHTML);
+            Scene scene = new Scene(new Group());
+            scene.setRoot(root);
 
-			connectomeStage.setScene(scene);
-			connectomeStage.setResizable(false);
-		}
-		connectomeStage.show();
-	}
-	// ----- End menu items and buttons listeners -----
-	
-	@FXML
-	public void openRotationController() {
-		if (rotationControllerStage == null) {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/layouts/RotationControllerLayout.fxml"));
+            connectomeStage.setScene(scene);
+            connectomeStage.setResizable(false);
+        }
+        connectomeStage.show();
+    }
+    // ----- End menu items and buttons listeners -----
 
-			if (rotationController == null) {
-				rotationController = new RotationController(window3DController.getRotateXAngleProperty(),
-						window3DController.getRotateYAngleProperty(), window3DController.getRotateZAngleProperty());
-			}
+    @FXML
+    public void openRotationController() {
+        if (rotationControllerStage == null) {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/layouts/RotationControllerLayout.fxml"));
 
-			rotationControllerStage = new Stage();
+            if (rotationController == null) {
+                rotationController = new RotationController(window3DController.getRotateXAngleProperty(),
+                        window3DController.getRotateYAngleProperty(), window3DController.getRotateZAngleProperty());
+            }
 
-			loader.setController(rotationController);
+            rotationControllerStage = new Stage();
 
-			try {
-				rotationControllerStage.setScene(new Scene((AnchorPane) loader.load()));
+            loader.setController(rotationController);
 
-				rotationControllerStage.setTitle("Rotation Controller");
-				rotationControllerStage.initOwner(mainStage);
-				rotationControllerStage.initModality(Modality.NONE);
-				rotationControllerStage.setResizable(true);
+            try {
+                rotationControllerStage.setScene(new Scene(loader.load()));
 
-			} catch (IOException e) {
-				System.out.println("error in initializing note editor.");
-				e.printStackTrace();
-			}
-		}
+                rotationControllerStage.setTitle("Rotation Controller");
+                rotationControllerStage.initOwner(mainStage);
+                rotationControllerStage.initModality(Modality.NONE);
+                rotationControllerStage.setResizable(true);
 
-		rotationControllerStage.show();
-		rotationControllerStage.toFront();
-	}
+            } catch (IOException e) {
+                System.out.println("error in initializing note editor.");
+                e.printStackTrace();
+            }
+        }
 
-	@FXML
-	public void captureVideo() {
-		captureVideoMenuItem.setDisable(true);
-		stopCaptureVideoMenuItem.setDisable(false);
+        rotationControllerStage.show();
+        rotationControllerStage.toFront();
+    }
 
-		// start the image capture
-		if (window3DController != null) {
-			if (!window3DController.captureImagesForMovie()) {
-				// error saving movie, update UI
-				captureVideoMenuItem.setDisable(false);
-				stopCaptureVideoMenuItem.setDisable(true);
-				captureVideo.set(false);
-			}
-		}
-	}
+    @FXML
+    public void captureVideo() {
+        captureVideoMenuItem.setDisable(true);
+        stopCaptureVideoMenuItem.setDisable(false);
 
-	@FXML
-	public void stopCaptureAndSave() {
-		captureVideoMenuItem.setDisable(false);
-		stopCaptureVideoMenuItem.setDisable(true);
-		captureVideo.set(false);
+        // start the image capture
+        if (window3DController != null) {
+            if (!window3DController.captureImagesForMovie()) {
+                // error saving movie, update UI
+                captureVideoMenuItem.setDisable(false);
+                stopCaptureVideoMenuItem.setDisable(true);
+                captureVideo.set(false);
+            }
+        }
+    }
 
-		// convert captured images to movie
-		if (window3DController != null) {
-			window3DController.convertImagesToMovie();
-		}
+    @FXML
+    public void stopCaptureAndSave() {
+        captureVideoMenuItem.setDisable(false);
+        stopCaptureVideoMenuItem.setDisable(true);
+        captureVideo.set(false);
 
-	}
+        // convert captured images to movie
+        if (window3DController != null) {
+            window3DController.convertImagesToMovie();
+        }
 
-	public void initCloseApplication() {
-		// check if there is an active story to prompt save dialog
-		if (storiesLayer.getActiveStory() != null) {
-			promptStorySave();
-		} else {
-			exitApplication();
-		}
+    }
 
-	}
+    public void initCloseApplication() {
+        // check if there is an active story to prompt save dialog
+        if (storiesLayer.getActiveStory() != null) {
+            promptStorySave();
+        } else {
+            exitApplication();
+        }
 
-	public void promptStorySave() {
-		if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
-			if (exitSavePopup == null) {
+    }
 
-				YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
-						"Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
-						"Cancel");
+    public void promptStorySave() {
+        if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
+            if (exitSavePopup == null) {
 
-				exitSavePopup = new Popup();
-				exitSavePopup.getContent().add(saveDialog);
+                YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
+                        "Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
+                        "Cancel");
 
-				 saveDialog.setYesButtonAction(event -> {
-	                    exitSavePopup.hide();
-	                    storiesLayer.saveActiveStory();
-	                    exitApplication();
-	             });
+                exitSavePopup = new Popup();
+                exitSavePopup.getContent().add(saveDialog);
 
-				 saveDialog.setNoButtonAction(event -> {
-	                    exitSavePopup.hide();
-	                    exitApplication();
-	             });
+                saveDialog.setYesButtonAction(event -> {
+                    exitSavePopup.hide();
+                    storiesLayer.saveActiveStory();
+                    exitApplication();
+                });
 
-				 saveDialog.setCancelButtonAction(event -> exitSavePopup.hide());
+                saveDialog.setNoButtonAction(event -> {
+                    exitSavePopup.hide();
+                    exitApplication();
+                });
 
-				exitSavePopup.setAutoFix(true);
-			}
+                saveDialog.setCancelButtonAction(event -> exitSavePopup.hide());
 
-			exitSavePopup.show(mainStage);
-			exitSavePopup.centerOnScreen();
-		}
-	}
+                exitSavePopup.setAutoFix(true);
+            }
 
-	/*
-	 * TODO
-	 * refactor defaultEmbryoFlag --> default model, not where application was opened from
-	 */
-	private void exitApplication() {
-		System.out.println("exiting...");
-		if (!defaultEmbryoFlag) {
-			treeStage.hide();
-			mainStage.hide();
-			return;
-		}
-		System.exit(0);
-	}
+            exitSavePopup.show(mainStage);
+            exitSavePopup.centerOnScreen();
+        }
+    }
 
-	public void init3DWindow(LineageData data) {
-		if (cases == null)
-			initCases();
-		if (productionInfo == null)
-			initProductionInfo();
-		if (connectome == null)
-			initConnectome();
+    /*
+     * TODO
+     * refactor defaultEmbryoFlag --> default model, not where application was opened from
+     */
+    private void exitApplication() {
+        System.out.println("Exiting...");
+        if (!defaultEmbryoFlag) {
+            treeStage.hide();
+            mainStage.hide();
+            return;
+        }
+        System.exit(0);
+    }
 
-		// for context menu
-		// info window
-		bringUpInfoProperty = new SimpleBooleanProperty(false);
+    public void init3DWindow(LineageData data) {
+        if (cases == null) {
+            initCases();
+        }
+        if (productionInfo == null) {
+            initProductionInfo();
+        }
+        if (connectome == null) {
+            initConnectome();
+        }
 
-		double[] xyzScale = lineageData.getXYZScale();
-		window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
-				bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-				AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag,
-				xyzScale[0], xyzScale[1], xyzScale[2]);
+        // for context menu
+        // info window
+        bringUpInfoProperty = new SimpleBooleanProperty(false);
 
-		subscene = window3DController.getSubScene();
+        double[] xyzScale = lineageData.getXYZScale();
+        window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
+                bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
+                AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag,
+                xyzScale[0], xyzScale[1], xyzScale[2]);
 
-		modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
+        subscene = window3DController.getSubScene();
 
-		backwardButton.setOnAction(window3DController.getBackwardButtonListener());
-		forwardButton.setOnAction(window3DController.getForwardButtonListener());
-		zoomOutButton.setOnAction(window3DController.getZoomOutButtonListener());
-		zoomInButton.setOnAction(window3DController.getZoomInButtonListener());
+        modelAnchorPane.setOnMouseClicked(window3DController.getNoteClickHandler());
 
-		window3DController.setSearchField(searchField);
+        backwardButton.setOnAction(window3DController.getBackwardButtonListener());
+        forwardButton.setOnAction(window3DController.getForwardButtonListener());
+        zoomOutButton.setOnAction(window3DController.getZoomOutButtonListener());
+        zoomInButton.setOnAction(window3DController.getZoomInButtonListener());
 
-		// slider has to listen to 3D window's opacity value
-		// 3d window's opacity value has to listen to opacity slider's value
-		opacitySlider.valueProperty().addListener(window3DController.getOthersOpacityListener());
-		window3DController.addListenerToOpacitySlider(opacitySlider);
+        window3DController.setSearchField(searchField);
 
-		uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
-		clearAllLabelsButton.setOnAction(window3DController.getClearAllLabelsButtonListener());
+        // slider has to listen to 3D window's opacity value
+        // 3d window's opacity value has to listen to opacity slider's value
+        opacitySlider.valueProperty().addListener(window3DController.getOthersOpacityListener());
+        window3DController.addListenerToOpacitySlider(opacitySlider);
 
-		cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
-		cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
+        uniformSizeCheckBox.selectedProperty().addListener(window3DController.getUniformSizeCheckBoxListener());
+        clearAllLabelsButton.setOnAction(window3DController.getClearAllLabelsButtonListener());
 
-		multiRadioBtn.selectedProperty().addListener(window3DController.getMulticellModeListener());
-	}
+        cellNucleusTick.selectedProperty().addListener(window3DController.getCellNucleusTickListener());
+        cellBodyTick.selectedProperty().addListener(window3DController.getCellBodyTickListener());
 
-	private void setPropertiesFrom3DWindow() {
-		time = window3DController.getTimeProperty();
-		window3DController.getZoomProperty();
-		totalNuclei = window3DController.getTotalNucleiProperty();
-		playingMovie = window3DController.getPlayingMovieProperty();
-		selectedName = window3DController.getSelectedName();
-	}
+        multiRadioBtn.selectedProperty().addListener(window3DController.getMulticellModeListener());
+    }
 
-	public void setStage(Stage stage) {
-		mainStage = stage;
-	}
+    private void setPropertiesFrom3DWindow() {
+        time = window3DController.getTimeProperty();
+        window3DController.getZoomProperty();
+        totalNuclei = window3DController.getTotalNucleiProperty();
+        playingMovie = window3DController.getPlayingMovieProperty();
+        selectedName = window3DController.getSelectedName();
+    }
 
-	private void addListeners() {
+    public void setStage(Stage stage) {
+        mainStage = stage;
+    }
+
+    private void addListeners() {
         // time integer property that dictates the current time point
         time.addListener((observable, oldValue, newValue) -> {
             timeSlider.setValue(time.get());
@@ -729,7 +731,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             }
         });
 
-        // search stuff
+        // searchLayer stuff
         searchResultsListView.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> selectedName.set(newValue));
@@ -766,7 +768,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         // Uniform nuclei size
         uniformSizeCheckBox.setSelected(true);
 
-        // Cell Nucleus search option
+        // Cell Nucleus searchLayer option
         cellNucleusTick.setSelected(true);
 
         // More info clickable text
@@ -787,76 +789,79 @@ public class RootLayoutController extends BorderPane implements Initializable {
         });
     }
 
-	private void setSelectedEntityInfo(String name) {
-		if (name == null || name.isEmpty()) {
-			displayedName.setText("Active Cell: none");
-			moreInfoClickableText.setVisible(false);
-			displayedDescription.setText("");
-			return;
-		}
+    private void setSelectedEntityInfo(String name) {
+        if (name == null || name.isEmpty()) {
+            displayedName.setText("Active Cell: none");
+            moreInfoClickableText.setVisible(false);
+            displayedDescription.setText("");
+            return;
+        }
 
-		if (name.indexOf("(") > -1)
-			name = name.substring(0, name.indexOf("("));
-		name = name.trim();
+        if (name.contains("(")) {
+            name = name.substring(0, name.indexOf("("));
+        }
+        name = name.trim();
 
-		displayedName.setText("Active Cell: " + name);
-		moreInfoClickableText.setVisible(true);
-		displayedDescription.setText("");
+        displayedName.setText("Active Cell: " + name);
+        moreInfoClickableText.setVisible(true);
+        displayedDescription.setText("");
 
-		// Note
-		if (storiesLayer != null)
-			displayedDescription.setText(storiesLayer.getNoteComments(name));
+        // Note
+        if (storiesLayer != null) {
+            displayedDescription.setText(storiesLayer.getNoteComments(name));
+        }
 
-		// Cell body/structue
-		if (Search.isStructureWithComment(name))
-			displayedDescription.setText(Search.getStructureComment(name));
+        // Cell body/structue
+        if (SearchUtil.isStructureWithComment(name)) {
+            displayedDescription.setText(SearchUtil.getStructureComment(name));
+        }
 
-		// Cell lineage name
-		else {
-			String functionalName = PartsList.getFunctionalNameByLineageName(name);
+        // Cell lineage name
+        else {
+            String functionalName = PartsList.getFunctionalNameByLineageName(name);
 
-			if (functionalName != null) {
-				displayedName.setText("Active Cell: " + name + " (" + functionalName + ")");
-				displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
-			} else if (CellDeaths.containsCell(name)) {
-				displayedName.setText("Active Cell: " + name);
-				displayedDescription.setText("Cell Death");
-			}
-		}
-	}
+            if (functionalName != null) {
+                displayedName.setText("Active Cell: " + name + " (" + functionalName + ")");
+                displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
+            } else if (CellDeaths.containsCell(name)) {
+                displayedName.setText("Active Cell: " + name);
+                displayedDescription.setText("Cell Death");
+            }
+        }
+    }
 
-	private void sizeSubscene() {
-		this.subsceneWidth = new SimpleDoubleProperty();
-		subsceneWidth.bind(modelAnchorPane.widthProperty());
-		this.subsceneHeight = new SimpleDoubleProperty();
-		subsceneHeight.bind(modelAnchorPane.heightProperty());
+    private void sizeSubscene() {
+        this.subsceneWidth = new SimpleDoubleProperty();
+        subsceneWidth.bind(modelAnchorPane.widthProperty());
+        this.subsceneHeight = new SimpleDoubleProperty();
+        subsceneHeight.bind(modelAnchorPane.heightProperty());
 
-		AnchorPane.setTopAnchor(subscene, 0.0);
-		AnchorPane.setLeftAnchor(subscene, 0.0);
-		AnchorPane.setRightAnchor(subscene, 0.0);
-		AnchorPane.setBottomAnchor(subscene, 0.0);
+        AnchorPane.setTopAnchor(subscene, 0.0);
+        AnchorPane.setLeftAnchor(subscene, 0.0);
+        AnchorPane.setRightAnchor(subscene, 0.0);
+        AnchorPane.setBottomAnchor(subscene, 0.0);
 
-		subscene.widthProperty().bind(subsceneWidth);
-		subscene.heightProperty().bind(subsceneHeight);
-		subscene.setManaged(false);
-	}
+        subscene.widthProperty().bind(subsceneWidth);
+        subscene.heightProperty().bind(subsceneHeight);
+        subscene.setManaged(false);
+    }
 
-	private void sizeInfoPane() {
-		infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(6.5));
-		displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-		displayedStory.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-		displayedStoryDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
-	}
+    private void sizeInfoPane() {
+        infoPane.prefHeightProperty().bind(displayVBox.heightProperty().divide(6.5));
+        displayedDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+        displayedStory.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+        displayedStoryDescription.wrappingWidthProperty().bind(infoPane.widthProperty().subtract(15));
+    }
 
-	private void setLabels() {
-		int timeOffset;
-		if (defaultEmbryoFlag) {
-			timeOffset = productionInfo.getMovieTimeOffset();
-		} else {
-			timeOffset = 0;
-		}
+    private void setLabels() {
+        int timeOffset;
+        if (defaultEmbryoFlag) {
+            timeOffset = productionInfo.getMovieTimeOffset();
+        } else {
+            timeOffset = 0;
+        }
 
-		time.addListener((observable, oldValue, newValue) -> {
+        time.addListener((observable, oldValue, newValue) -> {
             if (defaultEmbryoFlag) {
                 timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
             } else {
@@ -864,30 +869,30 @@ public class RootLayoutController extends BorderPane implements Initializable {
             }
 
         });
-		timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
-		timeLabel.toFront();
+        timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+        timeLabel.toFront();
 
-		totalNuclei.addListener((observable, oldValue, newValue) -> {
+        totalNuclei.addListener((observable, oldValue, newValue) -> {
             String suffix = " Nuclei";
             if (newValue.intValue() == 1) {
                 suffix = " Nucleus";
             }
             totalNucleiLabel.setText(newValue.intValue() + suffix);
         });
-		totalNucleiLabel.setText(totalNuclei.get() + " Nuclei");
-		totalNucleiLabel.toFront();
-	}
+        totalNucleiLabel.setText(totalNuclei.get() + " Nuclei");
+        totalNucleiLabel.toFront();
+    }
 
-	public void setIcons() {
-		backwardButton.setGraphic(ImageLoader.getBackwardIcon());
-		forwardButton.setGraphic(ImageLoader.getForwardIcon());
-		zoomInButton.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
-		zoomOutButton.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
+    public void setIcons() {
+        backwardButton.setGraphic(ImageLoader.getBackwardIcon());
+        forwardButton.setGraphic(ImageLoader.getForwardIcon());
+        zoomInButton.setGraphic(new ImageView(ImageLoader.getPlusIcon()));
+        zoomOutButton.setGraphic(new ImageView(ImageLoader.getMinusIcon()));
 
-		playIcon = ImageLoader.getPlayIcon();
-		pauseIcon = ImageLoader.getPauseIcon();
-		playButton.setGraphic(playIcon);
-		playButton.setOnAction(event -> {
+        playIcon = ImageLoader.getPlayIcon();
+        pauseIcon = ImageLoader.getPauseIcon();
+        playButton.setGraphic(playIcon);
+        playButton.setOnAction(event -> {
             playingMovie.set(!playingMovie.get());
 
             if (playingMovie.get()) {
@@ -896,106 +901,106 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 playButton.setGraphic(playIcon);
             }
         });
-	}
+    }
 
-	private void setSlidersProperties() {
-		if (defaultEmbryoFlag) {
-			timeSlider.setMin(1);
-		} else {
-			timeSlider.setMin(0);
-		}
+    private void setSlidersProperties() {
+        if (defaultEmbryoFlag) {
+            timeSlider.setMin(1);
+        } else {
+            timeSlider.setMin(0);
+        }
 
-		timeSlider.setMax(window3DController.getEndTime());
+        timeSlider.setMax(window3DController.getEndTime());
 
-		opacitySlider.setMin(0);
-		opacitySlider.setMax(100);
-		opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
-	}
+        opacitySlider.setMin(0);
+        opacitySlider.setMax(100);
+        opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
+    }
 
-	private void initSearch() {
-		search = new Search();
+    private void initSearch() {
+        searchLayer = new SearchLayer();
 
-		typeToggleGroup.selectedToggleProperty().addListener(Search.getTypeToggleListener());
+        typeToggleGroup.selectedToggleProperty().addListener(SearchLayer.getTypeToggleListener());
 
-		// connectome checkboxes
-		presynapticTick.selectedProperty().addListener(Search.getPresynapticTickListener());
-		postsynapticTick.selectedProperty().addListener(Search.getPostsynapticTickListener());
-		electricalTick.selectedProperty().addListener(Search.getElectricalTickListener());
-		neuromuscularTick.selectedProperty().addListener(Search.getNeuromuscularTickListener());
+        // connectome checkboxes
+        presynapticTick.selectedProperty().addListener(SearchLayer.getPresynapticTickListener());
+        postsynapticTick.selectedProperty().addListener(SearchLayer.getPostsynapticTickListener());
+        electricalTick.selectedProperty().addListener(SearchLayer.getElectricalTickListener());
+        neuromuscularTick.selectedProperty().addListener(SearchLayer.getNeuromuscularTickListener());
 
-		cellNucleusTick.selectedProperty().addListener(Search.getCellNucleusTickListener());
-		cellBodyTick.selectedProperty().addListener(Search.getCellBodyTickListener());
-		ancestorTick.selectedProperty().addListener(Search.getAncestorTickListner());
-		descendantTick.selectedProperty().addListener(Search.getDescendantTickListner());
-		colorPicker.setOnAction(search.getColorPickerListener());
-		addSearchBtn.setOnAction(Search.getAddButtonListener());
+        cellNucleusTick.selectedProperty().addListener(SearchLayer.getCellNucleusTickListener());
+        cellBodyTick.selectedProperty().addListener(SearchLayer.getCellBodyTickListener());
+        ancestorTick.selectedProperty().addListener(SearchLayer.getAncestorTickListner());
+        descendantTick.selectedProperty().addListener(SearchLayer.getDescendantTickListner());
+        colorPicker.setOnAction(searchLayer.getColorPickerListener());
+        addSearchBtn.setOnAction(SearchLayer.getAddButtonListener());
 
-		clearSearchField = new SimpleBooleanProperty(false);
-		Search.setClearSearchFieldProperty(clearSearchField);
-		 clearSearchField.addListener((observable, oldValue, newValue) -> {
-	            if (newValue) {
-	                searchField.clear();
-	                clearSearchField.set(false);
-	            }
-	        });
+        clearSearchField = new SimpleBooleanProperty(false);
+        SearchLayer.setClearSearchFieldProperty(clearSearchField);
+        clearSearchField.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                searchField.clear();
+                clearSearchField.set(false);
+            }
+        });
 
-		searchField.textProperty().addListener(Search.getTextFieldListener());
-	}
+        searchField.textProperty().addListener(SearchLayer.getTextFieldListener());
+    }
 
-	private void initDisplayLayer() {
-		useInternalRules = new SimpleBooleanProperty(true);
-		displayLayer = new DisplayLayer(useInternalRules);
+    private void initDisplayLayer() {
+        useInternalRules = new SimpleBooleanProperty(true);
+        displayLayer = new DisplayLayer(useInternalRules);
 
-		rulesListView.setItems(displayLayer.getRulesList());
-		rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
-	}
+        rulesListView.setItems(displayLayer.getRulesList());
+        rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
+    }
 
-	private void initPartsList() {
-		new PartsList();
-	}
+    private void initPartsList() {
+        new PartsList();
+    }
 
-	private void initCellDeaths() {
-		new CellDeaths();
-	}
+    private void initCellDeaths() {
+        new CellDeaths();
+    }
 
-	private void initAnatomy() {
-		new Anatomy();
-	}
+    private void initAnatomy() {
+        new Anatomy();
+    }
 
-	private void initLineageTree(ArrayList<String> allCellNames) {
-		if (!defaultEmbryoFlag) {
-			// remove unlineaged cells
-			for (int i = 0; i < allCellNames.size(); i++) {
-				if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase()) ||
-						allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
-					allCellNames.remove(i--);
-				}
-			}
+    private void initLineageTree(ArrayList<String> allCellNames) {
+        if (!defaultEmbryoFlag) {
+            // remove unlineaged cells
+            for (int i = 0; i < allCellNames.size(); i++) {
+                if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase())
+                        || allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
+                    allCellNames.remove(i--);
+                }
+            }
 
-			//sort the lineage names that remain
-			Collections.sort(allCellNames);
-		}
+            //sort the lineage names that remain
+            Collections.sort(allCellNames);
+        }
 
-		new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
-		lineageTreeRoot = LineageTree.getRoot();
-	}
+        new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
+        lineageTreeRoot = LineageTree.getRoot();
+    }
 
-	private void initToggleGroup() {
-		typeToggleGroup = new ToggleGroup();
-		sysRadioBtn.setToggleGroup(typeToggleGroup);
-		sysRadioBtn.setUserData(SearchType.LINEAGE);
-		funRadioBtn.setToggleGroup(typeToggleGroup);
-		funRadioBtn.setUserData(SearchType.FUNCTIONAL);
-		desRadioBtn.setToggleGroup(typeToggleGroup);
-		desRadioBtn.setUserData(SearchType.DESCRIPTION);
-		genRadioBtn.setToggleGroup(typeToggleGroup);
-		genRadioBtn.setUserData(SearchType.GENE);
-		conRadioBtn.setToggleGroup(typeToggleGroup);
-		conRadioBtn.setUserData(SearchType.CONNECTOME);
-		multiRadioBtn.setToggleGroup(typeToggleGroup);
-		multiRadioBtn.setUserData(SearchType.MULTICELLULAR_CELL_BASED);
+    private void initToggleGroup() {
+        typeToggleGroup = new ToggleGroup();
+        sysRadioBtn.setToggleGroup(typeToggleGroup);
+        sysRadioBtn.setUserData(SearchType.LINEAGE);
+        funRadioBtn.setToggleGroup(typeToggleGroup);
+        funRadioBtn.setUserData(SearchType.FUNCTIONAL);
+        desRadioBtn.setToggleGroup(typeToggleGroup);
+        desRadioBtn.setUserData(SearchType.DESCRIPTION);
+        genRadioBtn.setToggleGroup(typeToggleGroup);
+        genRadioBtn.setUserData(SearchType.GENE);
+        conRadioBtn.setToggleGroup(typeToggleGroup);
+        conRadioBtn.setUserData(SearchType.CONNECTOME);
+        multiRadioBtn.setToggleGroup(typeToggleGroup);
+        multiRadioBtn.setUserData(SearchType.MULTICELLULAR_CELL_BASED);
 
-		typeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+        typeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             SearchType type = (SearchType) observable.getValue().getToggleGroup().getSelectedToggle().getUserData();
             if (type == SearchType.FUNCTIONAL || type == SearchType.DESCRIPTION) {
                 descendantTick.setSelected(false);
@@ -1006,115 +1011,53 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 descendantLabel.disableProperty().set(false);
             }
         });
-		sysRadioBtn.setSelected(true);
-	}
+        sysRadioBtn.setSelected(true);
+    }
 
-	private void assertFXMLNodes() {
-		assert (rootBorderPane != null);
-		assert (modelAnchorPane != null);
-		assert (sceneControlsBox != null);
-		assert (displayVBox != null);
-		assert (infoPane != null);
+    private void initStructuresLayer() {
+        structuresLayer = new StructuresLayer(sceneElementsList, structuresSearchField);
+        structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
+        allStructuresListView.setItems(structuresLayer.getAllStructuresList());
+        structuresLayer.setRulesList(displayLayer.getRulesList());
 
-		assert (timeSlider != null);
-		assert (backwardButton != null);
-		assert (forwardButton != null);
-		assert (playButton != null);
-		assert (timeLabel != null);
-		assert (totalNucleiLabel != null);
-		assert (zoomInButton != null);
-		assert (zoomOutButton != null);
+        addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
+        structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
 
-		assert (mainTabPane != null);
-		assert (colorAndDisplayTab != null);
-		assert (colorAndDisplayTabPane != null);
-		assert (cellsTab != null);
-		assert (structuresTab != null);
-		assert (displayTab != null);
-		assert (storiesTab != null);
-
-		assert (searchField != null);
-		assert (searchResultsListView != null);
-		assert (sysRadioBtn != null);
-		assert (desRadioBtn != null);
-		assert (genRadioBtn != null);
-		assert (conRadioBtn != null);
-		assert (multiRadioBtn != null);
-
-		assert (cellNucleusTick != null);
-		assert (cellBodyTick != null);
-		assert (ancestorTick != null);
-		assert (descendantTick != null);
-		assert (descendantLabel != null);
-		assert (colorPickerPane != null);
-		assert (colorPicker != null);
-
-		assert (presynapticTick != null);
-		assert (postsynapticTick != null);
-		assert (electricalTick != null);
-		assert (neuromuscularTick != null);
-
-		assert (rulesListView != null);
-		assert (addSearchBtn != null);
-
-		assert (displayedName != null);
-		assert (moreInfoClickableText != null);
-		assert (displayedDescription != null);
-
-		assert (displayedStory != null);
-		assert (displayedStoryDescription != null);
-
-		assert (uniformSizeCheckBox != null);
-		assert (clearAllLabelsButton != null);
-		assert (opacitySlider != null);
-
-		assert (addStructureRuleBtn != null);
-		assert (structureRuleColorPicker != null);
-		assert (structuresSearchListView != null);
-		assert (allStructuresListView != null);
-
-		assert (storiesListView != null);
-		assert (noteEditorBtn != null);
-		assert (newStory != null);
-		assert (deleteStory != null);
-	}
-
-	private void initStructuresLayer() {
-		structuresLayer = new StructuresLayer(elementsList, structuresSearchField);
-		structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
-		allStructuresListView.setItems(structuresLayer.getAllStructuresList());
-		structuresLayer.setRulesList(displayLayer.getRulesList());
-
-		addStructureRuleBtn.setOnAction(structuresLayer.getAddStructureRuleButtonListener());
-		structureRuleColorPicker.setOnAction(structuresLayer.getColorPickerListener());
-
-		structuresLayer.addSelectedNameListener((observable, oldValue, newValue) -> {
+        structuresLayer.addSelectedNameListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
                 selectedName.set(newValue);
             }
         });
+    }
 
-	}
+    private void initStoriesLayer() {
+        if (structuresLayer == null) {
+            initStructuresLayer();
+        }
 
-	private void initStoriesLayer() {
-		if (structuresLayer == null)
-			initStructuresLayer();
+        storiesLayer = new StoriesLayer(
+                mainStage,
+                sceneElementsList,
+                selectedName,
+                lineageData,
+                window3DController,
+                useInternalRules,
+                productionInfo.getMovieTimeOffset(),
+                newStory,
+                deleteStory,
+                defaultEmbryoFlag);
 
-		storiesLayer = new StoriesLayer(mainStage, elementsList, selectedName, lineageData, window3DController,
-				useInternalRules, productionInfo.getMovieTimeOffset(), newStory, deleteStory, defaultEmbryoFlag);
+        window3DController.setStoriesLayer(storiesLayer);
 
+        storiesListView.setItems(storiesLayer.getStories());
+        storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
+        storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
 
-		window3DController.setStoriesLayer(storiesLayer);
+        noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
 
-		storiesListView.setItems(storiesLayer.getStories());
-		storiesListView.setCellFactory(storiesLayer.getStoryCellFactory());
-		storiesListView.widthProperty().addListener(storiesLayer.getListViewWidthListener());
+        window3DController.addListenerToRebuildSceneFlag(storiesLayer.getRebuildSceneFlag());
 
-		noteEditorBtn.setOnAction(storiesLayer.getEditButtonListener());
-
-		window3DController.addListenerToRebuildSceneFlag(storiesLayer.getRebuildSceneFlag());
-
-		storiesLayer.getActiveStoryProperty().addListener((observable, oldValue, newValue) -> {
+        storiesLayer.getActiveStoryProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
                 displayedStory.setText("Active Story: none");
                 displayedStoryDescription.setText("");
@@ -1123,188 +1066,169 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
             }
         });
-		displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
-		displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
-	}
+        displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
+        displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
+    }
 
-	/**
-	 * Initializes the {@link SceneElementsList} that contains all the
-	 * {@link SceneElement} objects visible in all time frames.
-	 *
-	 * @param offsetX
-	 *            Average x-coordinate offset of nuclei from zero
-	 * @param offsetY
-	 *            Average y-coordinate offset of nuclei from zero
-	 * @param offsetZ
-	 *            Average a-coordinate offset of nuclei from zero
-	 */
-	private void initSceneElementsList() {
-		elementsList = new SceneElementsList();
+    /**
+     * Initializes the {@link SceneElementsList} that contains all the {@link wormguides.models.SceneElement} objects
+     * visible in all time frames.
+     */
+    private void initSceneElementsList() {
+        sceneElementsList = new SceneElementsList();
 
-		if (window3DController != null)
-			window3DController.setSceneElementsList(elementsList);
+        if (window3DController != null) {
+            window3DController.setSceneElementsList(sceneElementsList);
+        }
+    }
 
-		Search.setSceneElementsList(elementsList);
-	}
+    private void initConnectome() {
+        connectome = new Connectome();
+    }
 
-	private void initConnectome() {
-		connectome = new Connectome();
-		Search.setConnectome(connectome);
-	}
+    private void initInfoWindow() {
+        if (window3DController != null) {
 
-	private void initInfoWindow() {
-		if (window3DController != null) {
+            if (connectome == null) {
+                initConnectome();
+            }
+            if (productionInfo == null) {
+                initProductionInfo();
+            }
+            if (cases == null) {
+                initCases();
+            }
 
-			if (connectome == null)
-				initConnectome();
-			if (productionInfo == null)
-				initProductionInfo();
-			if (cases == null)
-				initCases();
+            infoWindow = new InfoWindow(
+                    window3DController.getStage(),
+                    window3DController.getSelectedNameLabeled(),
+                    cases,
+                    productionInfo,
+                    connectome,
+                    defaultEmbryoFlag,
+                    lineageData);
+        }
+    }
 
-			infoWindow = new InfoWindow(window3DController.getStage(), window3DController.getSelectedNameLabeled(),
-					cases, productionInfo, connectome, defaultEmbryoFlag, lineageData);
-		}
-	}
+    private void initCases() {
+        cases = new CasesLists(infoWindow);
+    }
 
-	private void initCases() {
-		cases = new CasesLists(infoWindow);
-		Search.setCases(cases);
-	}
+    private void initProductionInfo() {
+        productionInfo = new ProductionInfo();
+    }
 
-	private void initProductionInfo() {
-		productionInfo = new ProductionInfo();
-		Search.setProductionInfo(productionInfo);
-	}
-	
-	/**
-	 * Replaces all application tabs with dockable ones ({@link DraggableTab})
-	 */
-	private void replaceTabsWithDraggableTabs() {
-		DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
-		cellsDragTab.setCloseable(false);
-		cellsDragTab.setContent(cellsTab.getContent());
+    /**
+     * Replaces all application tabs with dockable ones ({@link DraggableTab})
+     */
+    private void replaceTabsWithDraggableTabs() {
+        DraggableTab cellsDragTab = new DraggableTab(cellsTab.getText());
+        cellsDragTab.setCloseable(false);
+        cellsDragTab.setContent(cellsTab.getContent());
 
-		DraggableTab structuresDragTab = new DraggableTab(structuresTab.getText());
-		structuresDragTab.setCloseable(false);
-		structuresDragTab.setContent(structuresTab.getContent());
+        DraggableTab structuresDragTab = new DraggableTab(structuresTab.getText());
+        structuresDragTab.setCloseable(false);
+        structuresDragTab.setContent(structuresTab.getContent());
 
-		DraggableTab displayDragTab = new DraggableTab(displayTab.getText());
-		displayDragTab.setCloseable(false);
-		displayDragTab.setContent(displayTab.getContent());
+        DraggableTab displayDragTab = new DraggableTab(displayTab.getText());
+        displayDragTab.setCloseable(false);
+        displayDragTab.setContent(displayTab.getContent());
 
-		colorAndDisplayTabPane.getTabs().clear();
-		cellsTab = cellsDragTab;
-		structuresTab = structuresDragTab;
-		displayTab = displayDragTab;
+        colorAndDisplayTabPane.getTabs().clear();
+        cellsTab = cellsDragTab;
+        structuresTab = structuresDragTab;
+        displayTab = displayDragTab;
 
-		colorAndDisplayTabPane.getTabs().addAll(cellsTab, structuresTab, displayTab);
+        colorAndDisplayTabPane.getTabs().addAll(cellsTab, structuresTab, displayTab);
 
-		DraggableTab storiesDragTab = new DraggableTab(storiesTab.getText());
-		storiesDragTab.setCloseable(false);
-		storiesDragTab.setContent(storiesTab.getContent());
+        DraggableTab storiesDragTab = new DraggableTab(storiesTab.getText());
+        storiesDragTab.setCloseable(false);
+        storiesDragTab.setContent(storiesTab.getContent());
 
-		DraggableTab colorAndDisplayDragTab = new DraggableTab(colorAndDisplayTab.getText());
-		colorAndDisplayDragTab.setCloseable(false);
-		colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
+        DraggableTab colorAndDisplayDragTab = new DraggableTab(colorAndDisplayTab.getText());
+        colorAndDisplayDragTab.setCloseable(false);
+        colorAndDisplayDragTab.setContent(colorAndDisplayTab.getContent());
 
-		mainTabPane.getTabs().clear();
-		storiesTab = storiesDragTab;
-		colorAndDisplayTab = colorAndDisplayDragTab;
+        mainTabPane.getTabs().clear();
+        storiesTab = storiesDragTab;
+        colorAndDisplayTab = colorAndDisplayDragTab;
 
-		mainTabPane.getTabs().addAll(storiesTab, colorAndDisplayTab);
-	}
+        mainTabPane.getTabs().addAll(storiesTab, colorAndDisplayTab);
+    }
 
-	@Override
-	public void initialize(URL url, ResourceBundle bundle) {
-		initProductionInfo();
+    @Override
+    public void initialize(URL url, ResourceBundle bundle) {
+        initProductionInfo();
 
-		if (bundle != null) {
-			lineageData = (LineageData) bundle.getObject("lineageData");
-			defaultEmbryoFlag = false;
-			AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
-		} else {
-			lineageData = AceTreeLoader.loadNucFiles(productionInfo);
-			defaultEmbryoFlag = true;
-			lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
-		}
+        if (bundle != null) {
+            lineageData = (LineageData) bundle.getObject("lineageData");
+            defaultEmbryoFlag = false;
+            AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
 
-		replaceTabsWithDraggableTabs();
+        } else {
+            lineageData = AceTreeLoader.loadNucFiles(productionInfo);
+            defaultEmbryoFlag = true;
+            lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
+        }
 
-		initPartsList();
-		initCellDeaths();
-		initAnatomy();
+        replaceTabsWithDraggableTabs();
 
-		assertFXMLNodes();
+        initPartsList();
+        initCellDeaths();
+        initAnatomy();
 
-		initToggleGroup();
-		initDisplayLayer();
+        initToggleGroup();
+        initDisplayLayer();
 
-		initializeWithLineageData();
+        initializeWithLineageData();
 
-		mainTabPane.getSelectionModel().select(storiesTab);
-	}
+        mainTabPane.getSelectionModel().select(storiesTab);
+    }
 
-	public void initializeWithLineageData() {
+    public void initializeWithLineageData() {
 
-		initLineageTree(lineageData.getAllCellNames());
+        initLineageTree(lineageData.getAllCellNames());
 
-		init3DWindow(lineageData);
-		setPropertiesFrom3DWindow();
+        init3DWindow(lineageData);
+        setPropertiesFrom3DWindow();
 
-		setSlidersProperties();
+        setSlidersProperties();
 
-		initSearch();
-		ObservableList<Rule> list = displayLayer.getRulesList();
-		Search.setRulesList(list);
-		Search.addDefaultColorRules();
-		Search.setActiveLineageNames(lineageData.getAllCellNames());
-		Search.setLineageData(lineageData);
+        initSearch();
+        ObservableList<Rule> list = displayLayer.getRulesList();
+        SearchLayer.setRulesList(list);
+        SearchLayer.addDefaultColorRules();
+        window3DController.setRulesList(list);
 
-		window3DController.setRulesList(list);
+        initSceneElementsList();
+        initConnectome();
+        initStructuresLayer();
+        initStoriesLayer();
 
-		initSceneElementsList();
+        SearchLayer.initDatabases(lineageData, sceneElementsList, connectome, cases, productionInfo);
 
+        window3DController.setSearchResultsList(SearchLayer.getSearchResultsList());
+        searchResultsListView.setItems(SearchLayer.getSearchResultsList());
 
-		// connectome
-		initConnectome();
+        window3DController.setSearchResultsUpdateService(searchLayer.getResultsUpdateService());
+        window3DController.setGeneResultsUpdated(SearchLayer.getGeneResultsUpdated());
 
-		// structures layer
-		initStructuresLayer();
+        addListeners();
 
-		// stories layer
-		initStoriesLayer();
+        setIcons();
+        setLabels();
 
-		window3DController.setSearchResultsList(Search.getSearchResultsList());
-		searchResultsListView.setItems(Search.getSearchResultsList());
+        sizeSubscene();
+        sizeInfoPane();
 
-		window3DController.setSearchResultsUpdateService(search.getResultsUpdateService());
-		window3DController.setGeneResultsUpdated(Search.getGeneResultsUpdated());
+        timeSlider.setValue(window3DController.getEndTime());
 
-		addListeners();
+        viewTreeAction();
 
-		setIcons();
-		setLabels();
+        captureVideo = new SimpleBooleanProperty(false);
+        if (window3DController != null) {
+            window3DController.setCaptureVideo(captureVideo);
+        }
 
-		sizeSubscene();
-		sizeInfoPane();
-
-		timeSlider.setValue(window3DController.getEndTime());
-
-		//window3DController.initializeWithCannonicalOrientation();
-
-		viewTreeAction();
-
-		captureVideo = new SimpleBooleanProperty(false);
-		if (window3DController != null) {
-			window3DController.setCaptureVideo(captureVideo);
-		}
-
-
-	}
-//	/**
-//	 * Delay time in seconds before the application updates to the new time on
-//	 * the slider
-//	 */
-	// private final double TIME_SLIDER_TIME_DELAY = 0.5;
+    }
 }
