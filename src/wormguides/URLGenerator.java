@@ -246,15 +246,15 @@ public class URLGenerator {
                 }
 
                 // ancestry modifiers
-                // descendant <
+                // descendant (<)
                 if (rule.isDescendantSelected()) {
                     builder.append("<");
                 }
-                // cell $
+                // cell ($)
                 if (rule.isCellSelected()) {
                     builder.append("$");
                 }
-                // ancestor >
+                // ancestor (>)
                 if (rule.isAncestorSelected()) {
                     builder.append(">");
                 }

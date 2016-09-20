@@ -363,10 +363,10 @@ public class SearchLayer {
     }
 
     public static Rule addColorRule(
-            SearchType searchType,
+            final SearchType searchType,
             String searched,
-            Color color,
-            ArrayList<SearchOption> options) {
+            final Color color,
+            final List<SearchOption> options) {
 
         SearchType tempType = type;
         type = searchType;
@@ -375,7 +375,7 @@ public class SearchLayer {
         return rule;
     }
 
-    private static Rule addColorRule(String searched, Color color, ArrayList<SearchOption> options) {
+    private static Rule addColorRule(String searched, final Color color, List<SearchOption> options) {
         // default search options is cell
         if (options == null) {
             options = new ArrayList<>();
@@ -386,7 +386,6 @@ public class SearchLayer {
         searched = searched.trim().toLowerCase();
 
         if (type != null) {
-
             switch (type) {
                 case LINEAGE:
                     label = LineageTree.getCaseSensitiveName(searched);
