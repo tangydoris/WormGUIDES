@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package wormguides.view;
+package wormguides.view.infowindow;
 
 import java.util.ArrayList;
 
@@ -22,6 +22,7 @@ import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.ProductionInfo;
 import wormguides.models.connectome.Connectome;
+import wormguides.view.DraggableTab;
 
 import acetree.lineagedata.LineageData;
 import netscape.javascript.JSObject;

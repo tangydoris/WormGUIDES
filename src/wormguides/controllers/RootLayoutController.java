@@ -76,12 +76,12 @@ import wormguides.stories.Story;
 import wormguides.util.StringListCellFactory;
 import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
-import wormguides.view.InfoWindow;
 import wormguides.view.SulstonTreePane;
-import wormguides.view.URLLoadWarningDialog;
-import wormguides.view.URLLoadWindow;
-import wormguides.view.URLWindow;
 import wormguides.view.YesNoCancelDialogPane;
+import wormguides.view.infowindow.InfoWindow;
+import wormguides.view.urlwindow.URLLoadWarningDialog;
+import wormguides.view.urlwindow.URLLoadWindow;
+import wormguides.view.urlwindow.URLWindow;
 
 import acetree.AceTreeLoader;
 import acetree.lineagedata.LineageData;

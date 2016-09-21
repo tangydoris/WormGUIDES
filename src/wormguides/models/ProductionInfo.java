@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import wormguides.view.HTMLNode;
-import wormguides.view.InfoWindowDOM;
+import wormguides.view.infowindow.HTMLNode;
+import wormguides.view.infowindow.InfoWindowDOM;
 
 import static java.lang.Integer.parseInt;
 import static wormguides.loaders.ProductionInfoLoader.buildProductionInfo;

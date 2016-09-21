@@ -7,8 +7,8 @@ package wormguides.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import wormguides.view.InfoWindow;
-import wormguides.view.InfoWindowDOM;
+import wormguides.view.infowindow.InfoWindow;
+import wormguides.view.infowindow.InfoWindowDOM;
 
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static wormguides.models.AnatomyTerm.AMPHID_SENSILLA;

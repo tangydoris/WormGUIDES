@@ -11,8 +11,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import wormguides.view.HTMLNode;
-import wormguides.view.InfoWindowDOM;
+import wormguides.view.infowindow.HTMLNode;
+import wormguides.view.infowindow.InfoWindowDOM;
 
 import partslist.PartsList;
 

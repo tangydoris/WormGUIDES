@@ -10,8 +10,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 
-import wormguides.view.HTMLNode;
-import wormguides.view.InfoWindowDOM;
+import wormguides.view.infowindow.HTMLNode;
+import wormguides.view.infowindow.InfoWindowDOM;
 
 /**
  * Contains static methods that query the parts list for functional names, lineage names, and descriptions. Content

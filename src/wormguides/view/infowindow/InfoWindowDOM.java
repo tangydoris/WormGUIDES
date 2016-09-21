@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package wormguides.view;
+package wormguides.view.infowindow;
 
 import java.util.ArrayList;
 import java.util.Collections;

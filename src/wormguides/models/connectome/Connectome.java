@@ -7,8 +7,8 @@ package wormguides.models.connectome;
 import java.util.ArrayList;
 import java.util.List;
 
-import wormguides.view.HTMLNode;
-import wormguides.view.InfoWindowDOM;
+import wormguides.view.infowindow.HTMLNode;
+import wormguides.view.infowindow.InfoWindowDOM;
 
 import static java.util.Collections.sort;
 import static partslist.PartsList.getFunctionalNameByLineageName;
