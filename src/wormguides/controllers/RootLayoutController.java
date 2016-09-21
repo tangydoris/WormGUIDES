@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -89,17 +88,26 @@ import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
 
+import static acetree.AceTreeLoader.getAvgXOffsetFromZero;
+import static acetree.AceTreeLoader.getAvgYOffsetFromZero;
+import static acetree.AceTreeLoader.getAvgZOffsetFromZero;
 import static acetree.AceTreeLoader.setOriginToZero;
+import static javafx.application.Platform.runLater;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
     private final static String unLineagedStart = "Nuc";
+
     private final static String ROOT = "ROOT";
+
     /** Default transparency of 'other' entities on startup */
     private final double DEFAULT_OTHERS_OPACITY = 25;
-    RotationController rotationController;
+
+    private RotationController rotationController;
+
     // Root layout's own stage
     private Stage mainStage;
+
     // Popup windows
     private Stage aboutStage;
     private Stage treeStage;
@@ -110,15 +118,18 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private Stage cellShapesIndexStage;
     private Stage cellDeathsStage;
     private Stage productionInfoStage;
+
     // URL generation/loading
     private URLWindow urlWindow;
     private URLLoadWindow urlLoadWindow;
     private URLLoadWarningDialog warning;
+
     // 3D subscene stuff
     private Window3DController window3DController;
     private SubScene subscene;
     private DoubleProperty subsceneWidth;
     private DoubleProperty subsceneHeight;
+
     // Panels stuff
     @FXML
     private BorderPane rootBorderPane;
@@ -228,8 +239,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private Button deleteStory;
     private Popup exitSavePopup;
+
     // production information
     private ProductionInfo productionInfo;
+    private int movieTimeOffset;
+
     // info window Stuff
     private CasesLists cases;
     private InfoWindow infoWindow;
@@ -322,9 +336,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void viewTreeAction() {
         if (treeStage == null) {
             treeStage = new Stage();
-            SulstonTreePane sp = new SulstonTreePane(
+            final SulstonTreePane sp = new SulstonTreePane(
                     treeStage,
                     lineageData,
+                    movieTimeOffset,
                     lineageTreeRoot,
                     displayLayer.getRulesList(),
                     window3DController.getColorHash(),
@@ -338,9 +353,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
             treeStage.initModality(Modality.NONE);
             treeStage.show();
             mainStage.show();
+
         } else {
             treeStage.show();
-            Platform.runLater(() -> ((Stage) treeStage.getScene().getWindow()).toFront());
+            runLater(() -> ((Stage) treeStage.getScene().getWindow()).toFront());
         }
     }
 
@@ -674,10 +690,21 @@ public class RootLayoutController extends BorderPane implements Initializable {
         bringUpInfoProperty = new SimpleBooleanProperty(false);
 
         double[] xyzScale = lineageData.getXYZScale();
-        window3DController = new Window3DController(mainStage, modelAnchorPane, data, cases, productionInfo, connectome,
-                bringUpInfoProperty, AceTreeLoader.getAvgXOffsetFromZero(), AceTreeLoader.getAvgYOffsetFromZero(),
-                AceTreeLoader.getAvgZOffsetFromZero(), defaultEmbryoFlag,
-                xyzScale[0], xyzScale[1], xyzScale[2]);
+        window3DController = new Window3DController(
+                mainStage,
+                modelAnchorPane,
+                data,
+                cases,
+                productionInfo,
+                connectome,
+                bringUpInfoProperty,
+                getAvgXOffsetFromZero(),
+                getAvgYOffsetFromZero(),
+                getAvgZOffsetFromZero(),
+                defaultEmbryoFlag,
+                xyzScale[0],
+                xyzScale[1],
+                xyzScale[2]);
 
         subscene = window3DController.getSubScene();
 
@@ -861,22 +888,15 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     private void setLabels() {
-        int timeOffset;
-        if (defaultEmbryoFlag) {
-            timeOffset = productionInfo.getMovieTimeOffset();
-        } else {
-            timeOffset = 0;
-        }
-
         time.addListener((observable, oldValue, newValue) -> {
             if (defaultEmbryoFlag) {
-                timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+                timeLabel.setText("~" + (time.get() + movieTimeOffset) + " min p.f.c.");
             } else {
                 timeLabel.setText("~" + (time.get()) + " min");
             }
 
         });
-        timeLabel.setText("~" + (time.get() + timeOffset) + " min p.f.c.");
+        timeLabel.setText("~" + (time.get() + movieTimeOffset) + " min p.f.c.");
         timeLabel.toFront();
 
         totalNuclei.addListener((observable, oldValue, newValue) -> {
@@ -1121,6 +1141,12 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     private void initProductionInfo() {
         productionInfo = new ProductionInfo();
+
+        if (defaultEmbryoFlag) {
+            movieTimeOffset = productionInfo.getMovieTimeOffset();
+        } else {
+            movieTimeOffset = 0;
+        }
     }
 
     /**
