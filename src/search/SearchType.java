@@ -11,10 +11,10 @@ package search;
 public enum SearchType {
 
     /** Systematic search for the cells with the lineage name specified in the search field */
-    LINEAGE("Lineage Name"),
+    LINEAGE("Lineage"),
 
     /** SearchLayer for cells with the functional name specified in the search field */
-    FUNCTIONAL("Functional Name"),
+    FUNCTIONAL("Functional"),
 
     /** SearchLayer for cells with the PartsList description specified in the search field */
     DESCRIPTION("\"PartsList\" Description"),

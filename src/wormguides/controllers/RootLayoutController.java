@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -59,21 +59,21 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import wormguides.MainApp;
-import wormguides.StringListCellFactory;
 import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.loaders.URLLoader;
-import wormguides.models.Anatomy;
 import wormguides.models.CasesLists;
 import wormguides.models.CellDeaths;
-import wormguides.models.Connectome;
 import wormguides.models.LineageTree;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
+import wormguides.models.connectome.Connectome;
+import wormguides.stories.Story;
+import wormguides.util.StringListCellFactory;
 import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
 import wormguides.view.InfoWindow;
@@ -88,7 +88,6 @@ import acetree.lineagedata.LineageData;
 import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
-import stories.Story;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -321,10 +320,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void viewTreeAction() {
         if (treeStage == null) {
             treeStage = new Stage();
-            SulstonTreePane sp = new SulstonTreePane(treeStage, lineageData, lineageTreeRoot,
-                    displayLayer.getRulesList(), window3DController.getColorHash(),
-                    window3DController.getTimeProperty(), window3DController.getContextMenuController(),
-                    window3DController.getSelectedNameLabeled(), defaultEmbryoFlag);
+            SulstonTreePane sp = new SulstonTreePane(
+                    treeStage,
+                    lineageData,
+                    lineageTreeRoot,
+                    displayLayer.getRulesList(),
+                    window3DController.getColorHash(),
+                    window3DController.getTimeProperty(),
+                    window3DController.getContextMenuController(),
+                    window3DController.getSelectedNameLabeled(),
+                    defaultEmbryoFlag);
 
             treeStage.setScene(new Scene(sp));
             treeStage.setTitle("LineageTree");
@@ -963,11 +968,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         new CellDeaths();
     }
 
-    private void initAnatomy() {
-        new Anatomy();
-    }
-
-    private void initLineageTree(ArrayList<String> allCellNames) {
+    private void initLineageTree(List<String> allCellNames) {
         if (!defaultEmbryoFlag) {
             // remove unlineaged cells
             for (int i = 0; i < allCellNames.size(); i++) {
@@ -981,8 +982,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
             Collections.sort(allCellNames);
         }
 
-        new LineageTree(allCellNames.toArray(new String[allCellNames.size()]), lineageData.isSulstonMode());
-        lineageTreeRoot = LineageTree.getRoot();
+        final LineageTree lineageTree = new LineageTree(
+                allCellNames.toArray(new String[allCellNames.size()]),
+                lineageData.isSulstonMode());
+        lineageTreeRoot = lineageTree.getRoot();
     }
 
     private void initToggleGroup() {
@@ -1175,7 +1178,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         initPartsList();
         initCellDeaths();
-        initAnatomy();
 
         initToggleGroup();
         initDisplayLayer();

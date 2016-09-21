@@ -1,4 +1,8 @@
-package wormguides;
+/*
+ * Bao Lab 2016
+ */
+
+package wormguides.util;
 
 import java.util.ArrayList;
 import java.util.Collections;

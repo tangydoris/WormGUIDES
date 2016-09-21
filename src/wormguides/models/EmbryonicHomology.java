@@ -1,35 +1,37 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 /**
  * Defines a single homology between two cells
- * 
- * @author bradenkatzman
- *
  */
 public class EmbryonicHomology {
-	private String cell_1;
-	private String cell_2;
 
-	public EmbryonicHomology(String cell_1, String cell_2) {
-		this.cell_1 = cell_1;
-		this.cell_2 = cell_2;
-	}
+    private final String cell1;
+    private final String cell2;
 
-	public String getCell1() {
-		if (this.cell_1 != null) {
-			return this.cell_1;
-		}
-		return "";
-	}
+    public EmbryonicHomology(final String cell1, final String cell2) {
+        this.cell1 = cell1;
+        this.cell2 = cell2;
+    }
 
-	public String getCell2() {
-		if (this.cell_2 != null) {
-			return this.cell_2;
-		}
-		return "";
-	}
+    public String getCell1() {
+        if (this.cell1 != null) {
+            return this.cell1;
+        }
+        return "";
+    }
 
-	public String getHomology() {
-		return this.getCell1() + ":" + this.getCell2();
-	}
+    public String getCell2() {
+        if (this.cell2 != null) {
+            return this.cell2;
+        }
+        return "";
+    }
+
+    public String getHomology() {
+        return getCell1() + ":" + getCell2();
+    }
 }

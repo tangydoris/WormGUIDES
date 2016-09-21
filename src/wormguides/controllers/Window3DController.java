@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -81,22 +82,24 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import wormguides.ColorComparator;
-import wormguides.ColorHash;
-import wormguides.JavaPicture;
-import wormguides.JpegImagesToMovie;
 import wormguides.MainApp;
-import wormguides.SearchOption;
-import wormguides.Xform;
 import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
 import wormguides.models.CasesLists;
-import wormguides.models.Connectome;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Quaternion;
 import wormguides.models.Rule;
 import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
+import wormguides.models.SearchOption;
+import wormguides.models.Xform;
+import wormguides.models.connectome.Connectome;
+import wormguides.stories.Note;
+import wormguides.stories.Note.Display;
+import wormguides.util.ColorComparator;
+import wormguides.util.ColorHash;
+import wormguides.util.subscenesaving.JavaPicture;
+import wormguides.util.subscenesaving.JpegImagesToMovie;
 import wormguides.view.AppFont;
 
 import acetree.lineagedata.LineageData;
@@ -104,14 +107,12 @@ import com.sun.javafx.scene.CameraHelper;
 import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
-import stories.Note;
-import stories.Note.Display;
 
 /**
  * The controller for the 3D subscene inside the root layout. This class
  * contains the subscene itself, and places it into the AnchorPane called
  * modelAnchorPane inside the root layout. It is also responsible for refreshing
- * the scene on time, search, stories, notes, and rules change. This class
+ * the scene on time, search, wormguides.stories, notes, and rules change. This class
  * contains observable properties that are passed to other classes so that a
  * subscene refresh can be trigger from that other class. <br>
  * <br>
@@ -206,8 +207,8 @@ public class Window3DController {
     private int startTime;
     private boolean[] searchedCells;
     private boolean[] searchedMeshes;
-    private Double[][] positions;
-    private Double[] diameters;
+    private double[][] positions;
+    private double[] diameters;
     private DoubleProperty zoom;
     // switching timepoints stuff
     private BooleanProperty playingMovie;
@@ -224,7 +225,7 @@ public class Window3DController {
     // searched highlighting stuff
     private boolean inSearch;
     private ObservableList<String> searchResultsList;
-    private ArrayList<String> localSearchResults;
+    private List<String> localSearchResults;
     // color rules stuff
     private ColorHash colorHash;
     private ObservableList<Rule> currentRulesList;
@@ -234,13 +235,13 @@ public class Window3DController {
     private BooleanProperty geneResultsUpdated;
     // opacity value for "other" cells (with no rule attached)
     private DoubleProperty othersOpacity;
-    private ArrayList<String> otherCells;
+    private List<String> otherCells;
     // Scene Elements stuff
     private boolean defaultEmbryoFlag;
     private SceneElementsList sceneElementsList;
-    private ArrayList<SceneElement> sceneElementsAtTime;
-    private ArrayList<MeshView> currentSceneElementMeshes;
-    private ArrayList<SceneElement> currentSceneElements;
+    private List<SceneElement> sceneElementsAtTime;
+    private List<MeshView> currentSceneElementMeshes;
+    private List<SceneElement> currentSceneElements;
     // Uniform nuclei sizef
     private boolean uniformSize;
     // Cell body and cell nucleus highlighting in search mode
@@ -250,7 +251,7 @@ public class Window3DController {
     private StoriesLayer storiesLayer;
     // currentNotes contains all notes that are 'active' within a scene
     // (any note that should be visible in a given frame)
-    private ArrayList<Note> currentNotes;
+    private List<Note> currentNotes;
     // Map of current note graphics to their note objects
     private HashMap<Node, Note> currentGraphicNoteMap;
     // Map of current notes to their scene elements
@@ -261,8 +262,8 @@ public class Window3DController {
     private HashMap<Node, VBox> entitySpriteMap;
     private HashMap<Node, Node> billboardFrontEntityMap;
     // Label stuff
-    private ArrayList<String> allLabels;
-    private ArrayList<String> currentLabels;
+    private List<String> allLabels;
+    private List<String> currentLabels;
     private HashMap<Node, Text> entityLabelMap;
     private Text transientLabelText; // shows up on hover
     // orientation indicator
@@ -361,8 +362,8 @@ public class Window3DController {
         meshes = new MeshView[1];
         cellNames = new String[1];
         meshNames = new String[1];
-        positions = new Double[1][3];
-        diameters = new Double[1];
+        positions = new double[1][3];
+        diameters = new double[1];
         searchedCells = new boolean[1];
         searchedMeshes = new boolean[1];
 
@@ -2388,7 +2389,7 @@ public class Window3DController {
     }
 
     /**
-     * Used for internal URL generation of rules associated with stories
+     * Used for internal URL generation of rules associated with wormguides.stories
      *
      * @return The value of the zoom {@link DoubleProperty}
      */
@@ -2397,7 +2398,7 @@ public class Window3DController {
     }
 
     /**
-     * Used for internal URL generation of rules associated with stories. Sets
+     * Used for internal URL generation of rules associated with wormguides.stories. Sets
      * the value of the zoom {@link DoubleProperty}
      */
     public void setScaleInternal(double scale) {

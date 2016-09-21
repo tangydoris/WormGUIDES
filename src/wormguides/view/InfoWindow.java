@@ -20,43 +20,46 @@ import javafx.stage.Stage;
 import wormguides.controllers.InfoWindowLinkController;
 import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
-import wormguides.models.Connectome;
 import wormguides.models.ProductionInfo;
+import wormguides.models.connectome.Connectome;
 
 import acetree.lineagedata.LineageData;
 import netscape.javascript.JSObject;
 import partslist.PartsList;
 
-/**
- * The top level container for the list of Info Window cell cases pages. This holds the tabpane of cases
- *
- * @author katzmanb
- */
+import static javafx.scene.control.TabPane.TabClosingPolicy.ALL_TABS;
 
+/**
+ * Top level container for the list of info window cell cases pages. This holds the tabpane of cases.
+ */
 public class InfoWindow {
 
-	private final static String Nuc = "Nuc";
-	public final String EVENT_TYPE_CLICK = "click";
-	private final long WAIT_TIME_MILLI = 750;
+    /** Wait time between the changing the number of ellipses shown during loading */
+    private final long WAIT_TIME_MILLI = 750;
+
     private Stage infoWindowStage;
     private TabPane tabPane;
     private Scene scene;
-    private Stage parentStage; // update scenes on links
-    //	private IntegerProperty time;
+    private Stage parentStage;
+
     private InfoWindowLinkController linkController;
     private ProductionInfo productionInfo;
     private String nameToQuery;
-//    private boolean defaultEmbryoFlag;
-//    private LineageData lineageData;
+
     private Service<Void> addNameService;
     private Service<Void> showLoadingService;
-    private int count; //to show loading in progress
+
+    /** Used to show that loading is in progress */
+    private int count;
 
     public InfoWindow(
-            Stage stage, StringProperty cellNameProperty, CasesLists cases, ProductionInfo info,
-            Connectome connectome, boolean defaultEmbryoFlag, LineageData lineageData) {
-//        this.defaultEmbryoFlag = defaultEmbryoFlag;
-//        this.lineageData = lineageData;
+            Stage stage,
+            StringProperty cellNameProperty,
+            CasesLists cases,
+            ProductionInfo info,
+            Connectome connectome,
+            boolean defaultEmbryoFlag,
+            LineageData lineageData) {
 
         infoWindowStage = new Stage();
         infoWindowStage.setTitle("Cell Info Window");
@@ -139,10 +142,13 @@ public class InfoWindow {
                         // GENERATE CELL TAB ON CLICK
                         final String lineageName = nameToQuery;
 
-                        if (!defaultEmbryoFlag && !lineageData.isSulstonMode()) {
+                        if (!defaultEmbryoFlag
+                                && !lineageData.isSulstonMode()) {
                             System.out.println("first one");
                             return null;
-                        } else if (!defaultEmbryoFlag && lineageData.isSulstonMode() && nameToQuery.startsWith(Nuc)) {
+                        } else if (!defaultEmbryoFlag
+                                && lineageData.isSulstonMode()
+                                && nameToQuery.startsWith("Nuc")) {
                             System.out.println("second one");
                             return null;
                         }
@@ -204,7 +210,9 @@ public class InfoWindow {
                                     } else {
                                         System.out.println("here");
                                         String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
-                                        cases.makeTerminalCase(lineageName, funcName,
+                                        cases.makeTerminalCase(
+                                                lineageName,
+                                                funcName,
                                                 connectome.queryConnectivity(
                                                         funcName,
                                                         true,
@@ -245,7 +253,9 @@ public class InfoWindow {
                                 } else {
                                     // add a non terminal case
                                     if (defaultEmbryoFlag) {
-                                        cases.makeNonTerminalCase(lineageName, productionInfo.getNuclearInfo(),
+                                        cases.makeNonTerminalCase(
+                                                lineageName,
+                                                productionInfo.getNuclearInfo(),
                                                 productionInfo.getCellShapeData(lineageName));
                                     } else {
                                         System.out.println("third one");
@@ -289,7 +299,7 @@ public class InfoWindow {
         nameToQuery = name;
         addNameService.restart();
     }
-    
+
     public void showWindow() {
         if (infoWindowStage != null) {
             infoWindowStage.show();
@@ -322,7 +332,7 @@ public class InfoWindow {
             tabPane.getSelectionModel().select(tab); // show the new tab
 
             // close tab event handler
-            tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+            tabPane.setTabClosingPolicy(ALL_TABS);
             tab.setOnClosed(e -> {
                 Tab t = (Tab) e.getSource();
                 String cellName = t.getId();

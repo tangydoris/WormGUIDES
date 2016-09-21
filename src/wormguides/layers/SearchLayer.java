@@ -6,7 +6,6 @@ package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -26,14 +25,13 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 
-import wormguides.AnatomyTerm;
-import wormguides.SearchOption;
+import wormguides.models.AnatomyTerm;
 import wormguides.models.CasesLists;
-import wormguides.models.Connectome;
-import wormguides.models.LineageTree;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
+import wormguides.models.SearchOption;
+import wormguides.models.connectome.Connectome;
 
 import acetree.lineagedata.LineageData;
 import partslist.PartsList;
@@ -41,12 +39,24 @@ import search.SearchType;
 import search.SearchUtil;
 import search.WormBaseQuery;
 
+import static java.util.Collections.sort;
+import static partslist.PartsList.getFunctionalNameByLineageName;
 import static search.SearchType.CONNECTOME;
-import static wormguides.SearchOption.ANCESTOR;
-import static wormguides.SearchOption.CELL_BODY;
-import static wormguides.SearchOption.CELL_NUCLEUS;
-import static wormguides.SearchOption.DESCENDANT;
-import static wormguides.SearchOption.MULTICELLULAR_NAME_BASED;
+import static search.SearchType.GENE;
+import static search.SearchType.LINEAGE;
+import static search.SearchUtil.getCellsInMulticellularStructure;
+import static search.SearchUtil.getCellsWithConnectivity;
+import static search.SearchUtil.getCellsWithFunctionalDescription;
+import static search.SearchUtil.getCellsWithFunctionalName;
+import static search.SearchUtil.getCellsWithGene;
+import static search.SearchUtil.getCellsWithLineageName;
+import static search.SearchUtil.getNeighboringCells;
+import static wormguides.models.LineageTree.getCaseSensitiveName;
+import static wormguides.models.SearchOption.ANCESTOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.MULTICELLULAR_NAME_BASED;
 
 public class SearchLayer {
 
@@ -60,13 +70,7 @@ public class SearchLayer {
     /** Changing number of ellipses periods to display during loading */
     private static int count;
 
-    private static List<String> activeLineageNames;
-    private static List<String> functionalNames;
-    private static List<String> descriptions;
-
     private static ObservableList<String> searchResultsList;
-
-    private static Comparator<String> nameComparator;
 
     private static String searchedText;
     private static BooleanProperty clearSearchFieldProperty;
@@ -101,16 +105,11 @@ public class SearchLayer {
     private static WiringService wiringService;
 
     static {
-        activeLineageNames = new ArrayList<>();
-        functionalNames = PartsList.getFunctionalNames();
-        descriptions = PartsList.getDescriptions();
-
-        type = SearchType.LINEAGE;
+        type = LINEAGE;
 
         selectedColor = Color.WHITE;
 
         searchResultsList = FXCollections.observableArrayList();
-        nameComparator = new CellNameComparator();
         searchedText = "";
 
         // cell nucleus search type default to true
@@ -158,10 +157,12 @@ public class SearchLayer {
                     searchResultsList.clear();
                     updateGeneResults();
 
-                    String searched = WormBaseQuery.getSearchedText();
+                    final String searched = WormBaseQuery.getSearchedText();
                     geneSearchQueue.remove(searched);
+
+                    final String searchedQuoted = "'" + searched + "'";
                     rulesList.stream()
-                            .filter(rule -> rule.getSearchedText().contains("'" + searched + "'"))
+                            .filter(rule -> rule.getSearchedText().contains(searchedQuoted))
                             .forEachOrdered(rule -> rule.setCells(geneSearchService.getValue()));
                     geneResultsUpdated.set(!geneResultsUpdated.get());
 
@@ -203,7 +204,7 @@ public class SearchLayer {
             final boolean isElectricalTicked,
             final boolean isNeuromuscularTicked) {
 
-        StringBuilder sb = new StringBuilder("'");
+        final StringBuilder sb = new StringBuilder("'");
         sb.append(linegeName.toLowerCase()).append("' Connectome");
 
         ArrayList<String> types = new ArrayList<>();
@@ -240,30 +241,29 @@ public class SearchLayer {
                 true));
         rule.setSearchedText(sb.toString());
         rule.resetLabel(sb.toString());
-
         rulesList.add(rule);
         return rule;
     }
 
     public static Rule addConnectomeColorRule(
-            String searched,
-            Color color,
-            boolean isPresynaptic,
-            boolean isPostsynaptic,
-            boolean isElectrical,
-            boolean isNeuromuscular) {
+            final String searched,
+            final Color color,
+            final boolean isPresynaptic,
+            final boolean isPostsynaptic,
+            final boolean isElectrical,
+            final boolean isNeuromuscular) {
 
-        boolean tempPresyn = presynapticTicked;
-        boolean tempPostsyn = postsynapticTicked;
-        boolean tempElectr = electricalTicked;
-        boolean tempNeuro = neuromuscularTicked;
+        final boolean tempPresyn = presynapticTicked;
+        final boolean tempPostsyn = postsynapticTicked;
+        final boolean tempElectr = electricalTicked;
+        final boolean tempNeuro = neuromuscularTicked;
 
         presynapticTicked = isPresynaptic;
         postsynapticTicked = isPostsynaptic;
         electricalTicked = isElectrical;
         neuromuscularTicked = isNeuromuscular;
 
-        Rule rule = addColorRule(CONNECTOME, searched, color, CELL_NUCLEUS);
+        final Rule rule = addColorRule(CONNECTOME, searched, color, CELL_NUCLEUS);
 
         presynapticTicked = tempPresyn;
         postsynapticTicked = tempPostsyn;
@@ -271,10 +271,6 @@ public class SearchLayer {
         neuromuscularTicked = tempNeuro;
 
         return rule;
-    }
-
-    public static void setActiveLineageNames(ArrayList<String> names) {
-        activeLineageNames = names;
     }
 
     private static void updateGeneResults() {
@@ -299,7 +295,7 @@ public class SearchLayer {
                     .forEachOrdered(cellsForListView::add);
         }
 
-        searchResultsList.sort(nameComparator);
+        sort(searchResultsList);
         appendFunctionalToLineageNames(cellsForListView);
         geneResultsUpdated.set(!geneResultsUpdated.get());
     }
@@ -307,8 +303,8 @@ public class SearchLayer {
     private static void appendFunctionalToLineageNames(List<String> list) {
         searchResultsList.clear();
         for (String result : list) {
-            if (PartsList.getFunctionalNameByLineageName(result) != null) {
-                result += " (" + PartsList.getFunctionalNameByLineageName(result) + ")";
+            if (getFunctionalNameByLineageName(result) != null) {
+                result += " (" + getFunctionalNameByLineageName(result) + ")";
             }
             searchResultsList.add(result);
         }
@@ -357,8 +353,12 @@ public class SearchLayer {
         return addColorRule(null, searched, color, MULTICELLULAR_NAME_BASED);
     }
 
-    public static Rule addColorRule(SearchType type, String searched, Color color, SearchOption... options) {
-        final ArrayList<SearchOption> optionsArray = new ArrayList<>(Arrays.asList(options));
+    public static Rule addColorRule(
+            final SearchType type,
+            String searched,
+            final Color color,
+            final SearchOption... options) {
+        final List<SearchOption> optionsArray = new ArrayList<>(Arrays.asList(options));
         return addColorRule(type, searched, color, optionsArray);
     }
 
@@ -366,11 +366,11 @@ public class SearchLayer {
             final SearchType searchType,
             String searched,
             final Color color,
-            final List<SearchOption> options) {
+            List<SearchOption> options) {
 
-        SearchType tempType = type;
+        final SearchType tempType = type;
         type = searchType;
-        Rule rule = addColorRule(searched, color, options);
+        final Rule rule = addColorRule(searched, color, options);
         type = tempType;
         return rule;
     }
@@ -382,53 +382,22 @@ public class SearchLayer {
             options.add(CELL_NUCLEUS);
         }
 
-        String label = "";
         searched = searched.trim().toLowerCase();
-
+        final StringBuilder label = new StringBuilder();
         if (type != null) {
-            switch (type) {
-                case LINEAGE:
-                    label = LineageTree.getCaseSensitiveName(searched);
-                    if (label.isEmpty()) {
-                        label = searched;
-                    }
-                    break;
-
-                case FUNCTIONAL:
-                    label = "'" + searched + "' Functional";
-                    break;
-
-                case DESCRIPTION:
-                    label = "'" + searched + "' \"PartsList\" Description";
-                    break;
-
-                case GENE:
-                    geneSearchQueue.add(searched);
-                    label = "'" + searched + "' Gene";
-                    break;
-
-                case CONNECTOME:
-                    label = "'" + searched + "' Connectome";
-                    break;
-
-                case MULTICELLULAR_CELL_BASED:
-                    label = "'" + searched + "' Multicellular Structure";
-                    break;
-
-                case NEIGHBOR:
-                    label = "'" + searched + "' Neighbors";
-                    break;
-
-                default:
-                    label = searched;
-                    break;
+            if (type == LINEAGE) {
+                label.append(getCaseSensitiveName(searched));
+                if (label.toString().isEmpty()) {
+                    label.append(searched);
+                }
+            } else {
+                label.append("'").append(searched).append("' ").append(type.toString());
             }
         } else {
-            // if search type is null, then rule was a multicellular structure rule
-            label = searched;
+            label.append(searched);
         }
 
-        final Rule rule = new Rule(label, color, type, options);
+        final Rule rule = new Rule(label.toString(), color, type, options);
         rule.setCells(getCellsList(searched));
 
         rulesList.add(rule);
@@ -443,28 +412,28 @@ public class SearchLayer {
         if (type != null) {
             switch (type) {
                 case LINEAGE:
-                    cells = SearchUtil.getCellsWithLineageName(searched);
+                    cells = getCellsWithLineageName(searched);
                     break;
 
                 case FUNCTIONAL:
-                    cells = SearchUtil.getCellsWithFunctionalName(searched);
+                    cells = getCellsWithFunctionalName(searched);
                     break;
 
                 case DESCRIPTION:
-                    cells = SearchUtil.getCellsWithFunctionalDescription(searched);
+                    cells = getCellsWithFunctionalDescription(searched);
                     break;
 
                 case GENE:
                     showLoadingService.restart();
-                    cells = SearchUtil.getCellsWithGene(getSearchedText());
+                    cells = getCellsWithGene(getSearchedText());
                     break;
 
                 case MULTICELLULAR_CELL_BASED:
-                    cells = SearchUtil.getCellsInMulticellularStructure(searched);
+                    cells = getCellsInMulticellularStructure(searched);
                     break;
 
                 case CONNECTOME:
-                    cells = SearchUtil.getCellsWithConnectivity(
+                    cells = getCellsWithConnectivity(
                             searched,
                             presynapticTicked,
                             postsynapticTicked,
@@ -473,7 +442,7 @@ public class SearchLayer {
                     break;
 
                 case NEIGHBOR:
-                    cells = SearchUtil.getNeighboringCells(searched);
+                    cells = getNeighboringCells(searched);
             }
         }
         return cells;
@@ -486,7 +455,7 @@ public class SearchLayer {
                 return;
             }
 
-            ArrayList<SearchOption> options = new ArrayList<>();
+            final List<SearchOption> options = new ArrayList<>();
             if (cellNucleusTicked) {
                 options.add(CELL_NUCLEUS);
             }
@@ -521,7 +490,7 @@ public class SearchLayer {
     public static ChangeListener<Boolean> getAncestorTickListner() {
         return (observable, oldValue, newValue) -> {
             ancestorTicked = newValue;
-            if (type == SearchType.GENE) {
+            if (type == GENE) {
                 updateGeneResults();
             } else {
                 resultsUpdateService.restart();
@@ -532,7 +501,7 @@ public class SearchLayer {
     public static ChangeListener<Boolean> getDescendantTickListner() {
         return (observable, oldValue, newValue) -> {
             descendantTicked = newValue;
-            if (type == SearchType.GENE) {
+            if (type == GENE) {
                 updateGeneResults();
             } else {
                 resultsUpdateService.restart();
@@ -595,7 +564,7 @@ public class SearchLayer {
                         .forEachOrdered(cellsForListView::add);
             }
 
-            cellsForListView.sort(nameComparator);
+            sort(cellsForListView);
             appendFunctionalToLineageNames(cellsForListView);
         }
     }
@@ -614,9 +583,6 @@ public class SearchLayer {
 
         SearchUtil.initDatabases(inputLineageData, inputSceneElementsList, inputConnectome, inputCasesLists);
 
-        if (inputLineageData != null) {
-            activeLineageNames = inputLineageData.getAllCellNames();
-        }
         if (inputConnectome != null) {
             connectome = inputConnectome;
         }
@@ -710,13 +676,6 @@ public class SearchLayer {
 
     public Service<Void> getResultsUpdateService() {
         return resultsUpdateService;
-    }
-
-    private static final class CellNameComparator implements Comparator<String> {
-        @Override
-        public int compare(String s1, String s2) {
-            return s1.compareTo(s2);
-        }
     }
 
     private static final class WiringService extends Service<Void> {

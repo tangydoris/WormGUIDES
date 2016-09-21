@@ -215,7 +215,8 @@ public class SceneElementsList {
 	public String toString() {
         StringBuilder sb = new StringBuilder("scene elements list:\n");
         for (SceneElement se : elementsList) {
-            sb.append(se.getSceneName()).append("\n");
+            sb.append(se.getSceneName())
+                    .append("\n");
         }
         return sb.toString();
     }

@@ -33,7 +33,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import wormguides.MainApp;
-import wormguides.SearchOption;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
@@ -41,10 +40,10 @@ import wormguides.view.AppFont;
 
 import search.SearchType;
 
-import static wormguides.SearchOption.ANCESTOR;
-import static wormguides.SearchOption.CELL_BODY;
-import static wormguides.SearchOption.CELL_NUCLEUS;
-import static wormguides.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.ANCESTOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.DESCENDANT;
 
 /**
  * This class is the color rule that determines the coloring/striping of cell, cell bodies, and multicellular
@@ -188,7 +187,6 @@ public class Rule {
             } else {
                 visibleBtn.setGraphic(eyeInvertIcon);
             }
-
             ruleChanged.set(true);
             ruleChanged.set(false);
         });

@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package stories;
+package wormguides.stories;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import javafx.collections.ObservableList;
 
 /*
- * Used for loading/saving stories
+ * Used for loading/saving wormguides.stories
  */
 public class StoryFileUtil {
 

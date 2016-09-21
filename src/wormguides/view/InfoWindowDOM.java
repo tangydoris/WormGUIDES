@@ -16,20 +16,20 @@ import wormguides.models.TerminalDescendant;
 import partslist.PartsList;
 
 /**
- * The document object model for WormGUIDES external information windows
- *
- * @author katzmanb
+ * Document object model for the external info windows. Future DOM uses include connectome, parts list, and cell
+ * shapes index.
  */
 public class InfoWindowDOM {
-    //private final static String terminalCellClassName = "wormguides.model.TerminalCellCase";
-    //private final static String nonTerminalCellClassName = "wormguides.model.NonTerminalCellCase";
-    private final static String AMPHID = "amphid";
-    private final static String amphidAnchor = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
 
-    // other future dom uses: connectome, parts list, cell shapes index
-    private final static String doctypeTag = "<!DOCTYPE html>";
-    private final static String newLine = "\n";
+    private final static String AMPHID = "amphid";
+    private final static String AMPHID_ANCHOR = "<a href=\"#\" onclick=\"handleAmphidClick()\">Amphid</a>";
+
+    private final static String DOCTYPE_TAG = "<!DOCTYPE html>";
+
+    private final static String NL = "\n";
+
     private HTMLNode html;
+
     private String name;
 
     /*
@@ -67,7 +67,8 @@ public class InfoWindowDOM {
         // external info
         HTMLNode cellNameDiv = new HTMLNode("div", "cellName", "");
         String cellName = "<strong>" + terminalCase.getExternalInfo() + "</strong>";
-        String viewInCellTheaterLink = "<a href=\"#\" name=\"" + terminalCase.getLineageName()
+        String viewInCellTheaterLink = "<a href=\"#\" name=\""
+                + terminalCase.getLineageName()
                 + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
         HTMLNode cellNameP = new HTMLNode("p", "", "", cellName + "<br>" + viewInCellTheaterLink);
         cellNameDiv.addChild(cellNameP);
@@ -86,10 +87,18 @@ public class InfoWindowDOM {
 
         // wormatlas function
         HTMLNode functionWORMATLASTopContainerDiv = new HTMLNode("div", "functionTopContainer", "");
-        HTMLNode collapseFunctionButton = new HTMLNode("button", "functionWORMATLASCollapse", "functionCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode functionWORMATLASTitle = new HTMLNode("p", "functionWORMATLASTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Wormatlas Function: </strong>");
+        HTMLNode collapseFunctionButton = new HTMLNode(
+                "button",
+                "functionWORMATLASCollapse",
+                "functionCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode functionWORMATLASTitle = new HTMLNode(
+                "p",
+                "functionWORMATLASTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Wormatlas Function: </strong>");
         functionWORMATLASTopContainerDiv.addChild(collapseFunctionButton);
         functionWORMATLASTopContainerDiv.addChild(functionWORMATLASTitle);
         HTMLNode functionWORMATLASDiv = new HTMLNode("div", "functionWORMATLAS", "height: 0px; visibility: hidden;");
@@ -103,32 +112,44 @@ public class InfoWindowDOM {
 
         // wiring
         HTMLNode wiringPartnersTopContainerDiv = new HTMLNode("div", "wiringPartnersTopContainer", "");
-        HTMLNode collapseWiringPartnersButton = new HTMLNode("button", "wiringPartnersCollapse",
-                "wiringPartnersCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode wiringPartnersTitle = new HTMLNode("p", "wiringPartnersTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Wiring Partners: </strong>");
+        HTMLNode collapseWiringPartnersButton = new HTMLNode(
+                "button",
+                "wiringPartnersCollapse",
+                "wiringPartnersCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode wiringPartnersTitle = new HTMLNode(
+                "p",
+                "wiringPartnersTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Wiring Partners: </strong>");
         wiringPartnersTopContainerDiv.addChild(collapseWiringPartnersButton);
         wiringPartnersTopContainerDiv.addChild(wiringPartnersTitle);
         HTMLNode wiringPartnersDiv = new HTMLNode("div", "wiringPartners", "height: 0px; visibility: hidden;");
         // view in wiring diagram
         HTMLNode viewWDDiv = new HTMLNode("div", "viewWD", "");
-        HTMLNode viewWDP = new HTMLNode("p", "viewWDTitle", "",
+        HTMLNode viewWDP = new HTMLNode(
+                "p",
+                "viewWDTitle",
+                "",
                 "<em> Image is placeholder for interactive wiring diagram rendering</em>");
         HTMLNode viewWDImg = new HTMLNode("http://www.wormatlas.org/images/connectome.jpg", true);
         viewWDDiv.addChild(viewWDP);
         viewWDDiv.addChild(viewWDImg);
         // wiring partners UL
         HTMLNode wiringPartnersUL = new HTMLNode("ul");
-        ArrayList<String> presynapticPartners = terminalCase.getPresynapticPartners();
-        ArrayList<String> postsynapticPartners = terminalCase.getPresynapticPartners();
-        ArrayList<String> electricalPartners = terminalCase.getElectricalPartners();
-        ArrayList<String> neuromuscularPartners = terminalCase.getNeuromuscularPartners();
+        List<String> presynapticPartners = terminalCase.getPresynapticPartners();
+        List<String> postsynapticPartners = terminalCase.getPresynapticPartners();
+        List<String> electricalPartners = terminalCase.getElectricalPartners();
+        List<String> neuromuscularPartners = terminalCase.getNeuromuscularPartners();
         if (presynapticPartners.size() > 0) {
             Collections.sort(presynapticPartners);
 
-            ArrayList<String> presynapticPartnerAnchors = new ArrayList<>();
+            List<String> presynapticPartnerAnchors = new ArrayList<>();
             for (String presynapticPartner : presynapticPartners) {
-                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + presynapticPartner
+                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">"
+                        + presynapticPartner
                         + "</a>";
                 presynapticPartnerAnchors.add(anchor);
             }
@@ -142,9 +163,10 @@ public class InfoWindowDOM {
         if (postsynapticPartners.size() > 0) {
             Collections.sort(postsynapticPartners);
 
-            ArrayList<String> postsynapticPartnersAnchors = new ArrayList<>();
+            List<String> postsynapticPartnersAnchors = new ArrayList<>();
             for (String postsynapticPartner : postsynapticPartners) {
-                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + postsynapticPartner
+                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">"
+                        + postsynapticPartner
                         + "</a>";
                 postsynapticPartnersAnchors.add(anchor);
             }
@@ -158,9 +180,10 @@ public class InfoWindowDOM {
         if (electricalPartners.size() > 0) {
             Collections.sort(electricalPartners);
 
-            ArrayList<String> electricalPartnersAnchors = new ArrayList<>();
+            List<String> electricalPartnersAnchors = new ArrayList<>();
             for (String electricalPartner : electricalPartners) {
-                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + electricalPartner
+                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">"
+                        + electricalPartner
                         + "</a>";
                 electricalPartnersAnchors.add(anchor);
             }
@@ -174,9 +197,10 @@ public class InfoWindowDOM {
         if (neuromuscularPartners.size() > 0) {
             Collections.sort(neuromuscularPartners);
 
-            ArrayList<String> neuromuscularPartnersAnchors = new ArrayList<>();
+            List<String> neuromuscularPartnersAnchors = new ArrayList<>();
             for (String neuromuscularPartner : neuromuscularPartners) {
-                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">" + neuromuscularPartner
+                String anchor = "<a href=\"#\" onclick=\"handleWiringPartnerClick(this);\">"
+                        + neuromuscularPartner
                         + "</a>";
                 neuromuscularPartnersAnchors.add(anchor);
             }
@@ -199,10 +223,18 @@ public class InfoWindowDOM {
 
         // expresses
         HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
-        HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse",
-                "geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Gene Expression: </strong>");
+        HTMLNode collapseGeneExpressionButton = new HTMLNode(
+                "button",
+                "geneExpressionCollapse",
+                "geneExpressionCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode geneExpressionTitle = new HTMLNode(
+                "p",
+                "geneExpressionTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Gene Expression: </strong>");
         geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
         geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
         HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
@@ -221,11 +253,19 @@ public class InfoWindowDOM {
 
         // homologues
         boolean hasHomologues = false;
-        ArrayList<ArrayList<String>> terminalHomologues = terminalCase.getHomologues();
+        List<List<String>> terminalHomologues = terminalCase.getHomologues();
         HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "");
-        HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseHomologuesButton = new HTMLNode(
+                "button",
+                "homologuesCollapse",
+                "homologuesCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode homologuesTitle = new HTMLNode(
+                "p",
+                "homologuesTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong> Homologues: </strong>");
         homologuesTopContainerDiv.addChild(collapseHomologuesButton);
         homologuesTopContainerDiv.addChild(homologuesTitle);
@@ -263,9 +303,17 @@ public class InfoWindowDOM {
 
         // links
         HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
-        HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseLinksButton = new HTMLNode(
+                "button",
+                "linksCollapse",
+                "linksCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode linksTitle = new HTMLNode(
+                "p",
+                "linksTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong>External Links: </strong>");
         linksTopContainerDiv.addChild(collapseLinksButton);
         linksTopContainerDiv.addChild(linksTitle);
@@ -279,8 +327,11 @@ public class InfoWindowDOM {
             if (startIDX > 0) {
                 // check if textpresso link i.e. '-' before www
                 if (link.charAt(startIDX - 1) == '-') {
-                    anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                            + terminalCase.getCellName() + " on Textpresso</a>";
+                    anchor = "<a href=\"#\" name=\""
+                            + link
+                            + "\" onclick=\"handleLink(this)\">"
+                            + terminalCase.getCellName()
+                            + " on Textpresso</a>";
                 } else {
 
                     // move past www.
@@ -300,16 +351,27 @@ public class InfoWindowDOM {
                         if (placeholder.equals("Google")) {
                             // check if wormatlas specific search
                             if (link.contains("site:wormatlas.org")) {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + terminalCase.getCellName() + " on Google (searching Wormatlas)" + "</a>";
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + terminalCase.getCellName()
+                                        + " on Google (searching Wormatlas)" + "</a>";
                             } else {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + terminalCase.getCellName() + " on Google</a>";
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + terminalCase.getCellName()
+                                        + " on Google</a>";
                             }
                         } else {
                             // make anchor tag
-                            anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                    + terminalCase.getCellName() + " on " + placeholder + "</a>";
+                            anchor = "<a href=\"#\" name=\""
+                                    + link
+                                    + "\" onclick=\"handleLink(this)\">"
+                                    + terminalCase.getCellName()
+                                    + " on "
+                                    + placeholder
+                                    + "</a>";
 
                             // add wormbase link to end of gene expression section
                             if (placeholder.equals("Wormbase")) {
@@ -322,8 +384,11 @@ public class InfoWindowDOM {
                     }
                 }
             } else if (link.startsWith("http://wormwiring.hpc.einstein.yu.edu/data/neuronData.php?name=")) {
-                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                        + terminalCase.getCellName() + " on Wormwiring</a>";
+                anchor = "<a href=\"#\" name=\""
+                        + link
+                        + "\" onclick=\"handleLink(this)\">"
+                        + terminalCase.getCellName()
+                        + " on Wormwiring</a>";
             }
 
             // make sure anchor has been built
@@ -343,9 +408,17 @@ public class InfoWindowDOM {
 
         // references
         HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
-        HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseReferencesButton = new HTMLNode(
+                "button",
+                "referencesCollapse",
+                "referencesCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode referencesTitle = new HTMLNode(
+                "p",
+                "referencesTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong> References: </strong>");
         referencesTopContainerDiv.addChild(collapseReferencesButton);
         referencesTopContainerDiv.addChild(referencesTitle);
@@ -363,10 +436,18 @@ public class InfoWindowDOM {
 
         // production info
         HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
-        HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
-                "productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
+        HTMLNode collapseProductionInfoButton = new HTMLNode(
+                "button",
+                "productionInfoCollapse",
+                "productionInfoCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode productionInfoTitle = new HTMLNode(
+                "p",
+                "productionInfoTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Primary Data: </strong>");
         productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
         productionInfoTopContainerDiv.addChild(productionInfoTitle);
         HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
@@ -390,7 +471,10 @@ public class InfoWindowDOM {
         }
         HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
 
-        HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "",
+        HTMLNode additionalEmbryosLI = new HTMLNode(
+                "li",
+                "",
+                "",
                 "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
         productionInfoUL.addChild(nuclearLI);
         if (hasCellShapeData) {
@@ -422,15 +506,23 @@ public class InfoWindowDOM {
         // anatomy --> only build if anatomy info present
         if (terminalCase.getHasAnatomyFlag()) {
             HTMLNode anatomyTopContainerDiv = new HTMLNode("div", "anatomyTopContainer", "");
-            HTMLNode collapseAnatomyButton = new HTMLNode("button", "anatomyCollapse", "anatomyCollapseButton",
-                    "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-            HTMLNode anatomyTitle = new HTMLNode("p", "anatomyTitle", "width: 95%; margin-top: 2%; float: left;",
+            HTMLNode collapseAnatomyButton = new HTMLNode(
+                    "button",
+                    "anatomyCollapse",
+                    "anatomyCollapseButton",
+                    "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                    "+",
+                    true);
+            HTMLNode anatomyTitle = new HTMLNode(
+                    "p",
+                    "anatomyTitle",
+                    "width: 95%; margin-top: 2%; float: left;",
                     "<strong> Anatomy: </strong>");
             anatomyTopContainerDiv.addChild(collapseAnatomyButton);
             anatomyTopContainerDiv.addChild(anatomyTitle);
             HTMLNode anatomyDiv = new HTMLNode("div", "anatomy", "height: 0px; visibility: hidden;");
             HTMLNode anatomyUL = new HTMLNode("ul");
-            ArrayList<String> anatomy = terminalCase.getAnatomy();
+            List<String> anatomy = terminalCase.getAnatomies();
             /*
              * there are 5 fields: name, type, location, function,
 			 * neurotransmitter we'll add labels to the data based on
@@ -451,7 +543,6 @@ public class InfoWindowDOM {
                     // check for keyword: 'amphid'
                     if (type.toLowerCase().contains(AMPHID)) {
                         hasAmphidLink = true;
-
                         // update occurences of 'amphid' with link
                         type = findAndUpdateOccurencesOfAmphid(type);
                     }
@@ -463,7 +554,6 @@ public class InfoWindowDOM {
                         hasAmphidLink = true;
 
                         somaLocation = findAndUpdateOccurencesOfAmphid(somaLocation);
-
                     }
                     anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Soma Location: </em>" + somaLocation));
                 }
@@ -472,7 +562,6 @@ public class InfoWindowDOM {
                     // check for keyword: 'amphid'
                     if (neuriteLocation.toLowerCase().contains(AMPHID)) {
                         hasAmphidLink = true;
-
                         neuriteLocation = findAndUpdateOccurencesOfAmphid(neuriteLocation);
                     }
                     anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurite Location: </em>" + neuriteLocation));
@@ -481,9 +570,7 @@ public class InfoWindowDOM {
                 if (!morphologicalFeature.equals("*")) {
                     if (morphologicalFeature.toLowerCase().contains(AMPHID)) {
                         hasAmphidLink = true;
-
                         morphologicalFeature = findAndUpdateOccurencesOfAmphid(morphologicalFeature);
-
                     }
                     anatomyUL.addChild(
                             new HTMLNode("li", "", "", "<em>Morphological Feature: </em>" + morphologicalFeature));
@@ -492,9 +579,7 @@ public class InfoWindowDOM {
                 if (!function.equals("*")) {
                     if (function.toLowerCase().contains(AMPHID)) {
                         hasAmphidLink = true;
-
                         function = findAndUpdateOccurencesOfAmphid(function);
-
                     }
                     anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Function: </em>" + function));
                 }
@@ -502,7 +587,6 @@ public class InfoWindowDOM {
                 if (!neurotransmitter.equals("*")) {
                     if (neurotransmitter.toLowerCase().contains(AMPHID)) {
                         hasAmphidLink = true;
-
                         neurotransmitter = findAndUpdateOccurencesOfAmphid(neurotransmitter);
                     }
                     anatomyUL.addChild(new HTMLNode("li", "", "", "<em>Neurotransmitter: </em>" + neurotransmitter));
@@ -597,7 +681,8 @@ public class InfoWindowDOM {
         // cell name
         HTMLNode cellNameDiv = new HTMLNode("div", "externalInfo", "");
         String externalInfo = "<strong>" + nonTerminalCase.getLineageName() + "</strong>";
-        String viewInCellTheaterLink = "<a href=\"#\" name=\"" + nonTerminalCase.getLineageName()
+        String viewInCellTheaterLink = "<a href=\"#\" name=\""
+                + nonTerminalCase.getLineageName()
                 + "\" onclick=\"viewInCellTheater(this)\"> View in 3D</a>";
         HTMLNode cellNameP = new HTMLNode("p", "", "", externalInfo + "<br>" + viewInCellTheaterLink);
         cellNameDiv.addChild(cellNameP);
@@ -605,9 +690,17 @@ public class InfoWindowDOM {
         // homologues
         boolean hasHomologues = false;
         HTMLNode homologuesTopContainerDiv = new HTMLNode("div", "homologuesTopContainer", "TEST TEST TEST");
-        HTMLNode collapseHomologuesButton = new HTMLNode("button", "homologuesCollapse", "homologuesCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode homologuesTitle = new HTMLNode("p", "homologuesTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseHomologuesButton = new HTMLNode(
+                "button",
+                "homologuesCollapse",
+                "homologuesCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode homologuesTitle = new HTMLNode(
+                "p",
+                "homologuesTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong> Homologues: </strong>");
         homologuesTopContainerDiv.addChild(collapseHomologuesButton);
         homologuesTopContainerDiv.addChild(homologuesTitle);
@@ -633,14 +726,20 @@ public class InfoWindowDOM {
 
         // terminal descendants
         HTMLNode terminalDescendantsTopContainerDiv = new HTMLNode("div", "terminalDescendantsTopContainer", "");
-        HTMLNode collapseTerminalDescendantsButton = new HTMLNode("button", "terminalDescendantsCollapse",
-                "terminalDescendantsCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+        HTMLNode collapseTerminalDescendantsButton = new HTMLNode(
+                "button",
+                "terminalDescendantsCollapse",
+                "terminalDescendantsCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 1%; float: left;",
+                "+",
                 true);
         HTMLNode terminalDescendantsTitle = new HTMLNode("p", "terminalDescendantsTitle",
                 "width: 95%; margin-top: 2%; float: left;", "<strong> Terminal Descendants: </strong>");
         terminalDescendantsTopContainerDiv.addChild(collapseTerminalDescendantsButton);
         terminalDescendantsTopContainerDiv.addChild(terminalDescendantsTitle);
-        HTMLNode terminalDescendantsDiv = new HTMLNode("div", "terminalDescendants",
+        HTMLNode terminalDescendantsDiv = new HTMLNode(
+                "div",
+                "terminalDescendants",
                 "height: 0px; visibility: hidden;");
         HTMLNode terminalDescendantsUL = new HTMLNode("ul");
         for (TerminalDescendant terminalDescendant : nonTerminalCase.getTerminalDescendants()) {
@@ -648,7 +747,10 @@ public class InfoWindowDOM {
             String functionalName = PartsList.getFunctionalNameByLineageName(terminalDescendant.getCellName());
 
             if (functionalName != null) {
-                descendant += "<strong>" + functionalName.toUpperCase() + " (" + terminalDescendant.getCellName()
+                descendant += "<strong>"
+                        + functionalName.toUpperCase()
+                        + " ("
+                        + terminalDescendant.getCellName()
                         + ")</strong>";
             } else {
                 descendant = "<strong>" + terminalDescendant.getCellName() + "</strong>";
@@ -675,10 +777,18 @@ public class InfoWindowDOM {
 
         // expresses
         HTMLNode geneExpressionTopContainerDiv = new HTMLNode("div", "expressesTopContainer", "");
-        HTMLNode collapseGeneExpressionButton = new HTMLNode("button", "geneExpressionCollapse",
-                "geneExpressionCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode geneExpressionTitle = new HTMLNode("p", "geneExpressionTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Gene Expression: </strong>");
+        HTMLNode collapseGeneExpressionButton = new HTMLNode(
+                "button",
+                "geneExpressionCollapse",
+                "geneExpressionCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode geneExpressionTitle = new HTMLNode(
+                "p",
+                "geneExpressionTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Gene Expression: </strong>");
         geneExpressionTopContainerDiv.addChild(collapseGeneExpressionButton);
         geneExpressionTopContainerDiv.addChild(geneExpressionTitle);
         HTMLNode geneExpressionDiv = new HTMLNode("div", "geneExpression", "height: 0px; visibility: hidden;");
@@ -696,9 +806,17 @@ public class InfoWindowDOM {
 
         // links
         HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
-        HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseLinksButton = new HTMLNode(
+                "button",
+                "linksCollapse",
+                "linksCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode linksTitle = new HTMLNode(
+                "p",
+                "linksTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong>External Links: </strong>");
         linksTopContainerDiv.addChild(collapseLinksButton);
         linksTopContainerDiv.addChild(linksTitle);
@@ -722,19 +840,30 @@ public class InfoWindowDOM {
                         if (placeholder.equals("google")) {
                             // check if wormatlas specific search
                             if (link.contains("site:wormatlas.org")) {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + nonTerminalCase.getLineageName() + " on Google (searching Wormatlas)"
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + nonTerminalCase.getLineageName()
+                                        + " on Google (searching Wormatlas)"
                                         + "</a>";
                             } else {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + nonTerminalCase.getLineageName() + " on Google</a>";
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + nonTerminalCase.getLineageName()
+                                        + " on Google</a>";
                             }
                         } else {
                             if (placeholder.toLowerCase().equals("cacr")) {
                                 placeholder = "Textpresso";
                             }
-                            anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                    + nonTerminalCase.getLineageName() + " on " + placeholder + "</a>";
+                            anchor = "<a href=\"#\" name=\""
+                                    + link
+                                    + "\" onclick=\"handleLink(this)\">"
+                                    + nonTerminalCase.getLineageName()
+                                    + " on "
+                                    + placeholder
+                                    + "</a>";
 
                             // add wormbase link to end of gene expression section
                             if (placeholder.equals("wormbase")) {
@@ -754,9 +883,17 @@ public class InfoWindowDOM {
 
         // references
         HTMLNode referencesTopContainerDiv = new HTMLNode("div", "referencesTopContainer", "");
-        HTMLNode collapseReferencesButton = new HTMLNode("button", "referencesCollapse", "referencesCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode referencesTitle = new HTMLNode("p", "referencesTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseReferencesButton = new HTMLNode(
+                "button",
+                "referencesCollapse",
+                "referencesCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode referencesTitle = new HTMLNode(
+                "p",
+                "referencesTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong> References: </strong>");
         referencesTopContainerDiv.addChild(collapseReferencesButton);
         referencesTopContainerDiv.addChild(referencesTitle);
@@ -774,10 +911,18 @@ public class InfoWindowDOM {
 
         // production info
         HTMLNode productionInfoTopContainerDiv = new HTMLNode("div", "productionInfoTopContainer", "");
-        HTMLNode collapseProductionInfoButton = new HTMLNode("button", "productionInfoCollapse",
-                "productionInfoCollapseButton", "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode productionInfoTitle = new HTMLNode("p", "productionInfoTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Primary Data: </strong>");
+        HTMLNode collapseProductionInfoButton = new HTMLNode(
+                "button",
+                "productionInfoCollapse",
+                "productionInfoCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode productionInfoTitle = new HTMLNode(
+                "p",
+                "productionInfoTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Primary Data: </strong>");
         productionInfoTopContainerDiv.addChild(collapseProductionInfoButton);
         productionInfoTopContainerDiv.addChild(productionInfoTitle);
         HTMLNode productionInfoDiv = new HTMLNode("div", "productionInfo", "height: 0px; visibility: hidden;");
@@ -801,7 +946,10 @@ public class InfoWindowDOM {
         }
         HTMLNode cellShapeLI = new HTMLNode("li", "", "", markerAndStrainCellShape);
 
-        HTMLNode additionalEmbryosLI = new HTMLNode("li", "", "",
+        HTMLNode additionalEmbryosLI = new HTMLNode(
+                "li",
+                "",
+                "",
                 "<em>Additional Embryos: </em><br>[other equivalent data sets info]");
         productionInfoUL.addChild(nuclearLI);
         if (hasCellShapeData) {
@@ -884,21 +1032,34 @@ public class InfoWindowDOM {
 
         // wormatlas anatomy
         HTMLNode wormatlasAnatomyTopContainerDiv = new HTMLNode("div", "wormatlasAnatomyTopContainer", "");
-        HTMLNode collapseWormatlasAnatomyButton = new HTMLNode("button", "wormatlasAnatomyCollapse",
-                "wormatlasAnatomyCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+        HTMLNode collapseWormatlasAnatomyButton = new HTMLNode(
+                "button",
+                "wormatlasAnatomyCollapse",
+                "wormatlasAnatomyCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 1%; float: left;",
+                "+",
                 true);
-        HTMLNode wormatlasAnatomyTitle = new HTMLNode("p", "wormatlasAnatomyTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Wormatlas Anatomy: </strong>");
+        HTMLNode wormatlasAnatomyTitle = new HTMLNode(
+                "p",
+                "wormatlasAnatomyTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Wormatlas Anatomy: </strong>");
         wormatlasAnatomyTopContainerDiv.addChild(collapseWormatlasAnatomyButton);
         wormatlasAnatomyTopContainerDiv.addChild(wormatlasAnatomyTitle);
         HTMLNode wormatlasAnatomyDiv = new HTMLNode("div", "wormatlasAnatomy", "height: 0px; visibility: hidden;");
         HTMLNode wormatlasAnatomyUL = new HTMLNode("ul");
 
-        String wormatlastAnchor1 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink1()
-                + "\" onclick=\"handleLink(this)\">" + termCase.getWormatlasLink1() + "</a>";
+        String wormatlastAnchor1 = "<a href=\"#\" name=\""
+                + termCase.getWormatlasLink1()
+                + "\" onclick=\"handleLink(this)\">"
+                + termCase.getWormatlasLink1()
+                + "</a>";
 
-        String wormatlastAnchor2 = "<a href=\"#\" name=\"" + termCase.getWormatlasLink2()
-                + "\" onclick=\"handleLink(this)\">" + termCase.getWormatlasLink2() + "</a>";
+        String wormatlastAnchor2 = "<a href=\"#\" name=\""
+                + termCase.getWormatlasLink2()
+                + "\" onclick=\"handleLink(this)\">"
+                + termCase.getWormatlasLink2()
+                + "</a>";
 
         HTMLNode li1 = new HTMLNode("li", "", "", wormatlastAnchor1);
         HTMLNode li2 = new HTMLNode("li", "", "", wormatlastAnchor2);
@@ -908,11 +1069,18 @@ public class InfoWindowDOM {
 
         // amphid cells
         HTMLNode amphidCellsTopContainerDiv = new HTMLNode("div", "amphidCellsTopContainer", "");
-        HTMLNode collapseAmphidCellsButton = new HTMLNode("button", "amphidCellsCollapse",
-                "amphidCellsCollapseButton", "width: 3%; margin-top: 2%; margin-right: 1%; float: left;", "+",
+        HTMLNode collapseAmphidCellsButton = new HTMLNode(
+                "button",
+                "amphidCellsCollapse",
+                "amphidCellsCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 1%; float: left;",
+                "+",
                 true);
-        HTMLNode amphidCellsTitle = new HTMLNode("p", "amphidCellsTitle",
-                "width: 95%; margin-top: 2%; float: left;", "<strong> Amphid Cells: </strong>");
+        HTMLNode amphidCellsTitle = new HTMLNode(
+                "p",
+                "amphidCellsTitle",
+                "width: 95%; margin-top: 2%; float: left;",
+                "<strong> Amphid Cells: </strong>");
         amphidCellsTopContainerDiv.addChild(collapseAmphidCellsButton);
         amphidCellsTopContainerDiv.addChild(amphidCellsTitle);
         HTMLNode amphidCellsDiv = new HTMLNode("div", "amphidCells", "height: 0px; visibility: hidden;");
@@ -946,9 +1114,17 @@ public class InfoWindowDOM {
 
         // links
         HTMLNode linksTopContainerDiv = new HTMLNode("div", "linksTopContainer", "width: 100%;");
-        HTMLNode collapseLinksButton = new HTMLNode("button", "linksCollapse", "linksCollapseButton",
-                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;", "+", true);
-        HTMLNode linksTitle = new HTMLNode("p", "linksTitle", "width: 95%; margin-top: 2%; float: left;",
+        HTMLNode collapseLinksButton = new HTMLNode(
+                "button",
+                "linksCollapse",
+                "linksCollapseButton",
+                "width: 3%; margin-top: 2%; margin-right: 2%; float: left;",
+                "+",
+                true);
+        HTMLNode linksTitle = new HTMLNode(
+                "p",
+                "linksTitle",
+                "width: 95%; margin-top: 2%; float: left;",
                 "<strong>External Links: </strong>");
         linksTopContainerDiv.addChild(collapseLinksButton);
         linksTopContainerDiv.addChild(linksTitle);
@@ -972,18 +1148,29 @@ public class InfoWindowDOM {
                         if (placeholder.equals("google")) {
                             // check if wormatlas specific search
                             if (link.contains("site:wormatlas.org")) {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + termCase.getName() + " on Google (searching Wormatlas)" + "</a>";
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + termCase.getName()
+                                        + " on Google (searching Wormatlas)</a>";
                             } else {
-                                anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                        + termCase.getName() + " on Google</a>";
+                                anchor = "<a href=\"#\" name=\""
+                                        + link
+                                        + "\" onclick=\"handleLink(this)\">"
+                                        + termCase.getName()
+                                        + " on Google</a>";
                             }
                         } else {
                             if (placeholder.toLowerCase().equals("cacr")) {
                                 placeholder = "Textpresso";
                             }
-                            anchor = "<a href=\"#\" name=\"" + link + "\" onclick=\"handleLink(this)\">"
-                                    + termCase.getName() + " on " + placeholder + "</a>";
+                            anchor = "<a href=\"#\" name=\""
+                                    + link
+                                    + "\" onclick=\"handleLink(this)\">"
+                                    + termCase.getName()
+                                    + " on "
+                                    + placeholder
+                                    + "</a>";
                         }
                     }
                 }
@@ -1022,13 +1209,7 @@ public class InfoWindowDOM {
      * @return the dom as a string to be set to the content of a WebView
      */
     public String DOMtoString() {
-        String domAsString = doctypeTag;
-
-        // String str = domAsString += html.formatNode();
-        // System.out.println(str);
-        // return str;
-        return domAsString += html.formatNode();
-
+        return DOCTYPE_TAG + html.formatNode();
     }
 
     /**
@@ -1042,11 +1223,10 @@ public class InfoWindowDOM {
         }
 
         // default style rules
-        String style = newLine + "ul {" + newLine + "list-style-type: none;" + newLine + "display: block;" + newLine
-                + "width: 100%;" + newLine + "}" + newLine + newLine + "li {" + newLine + "margin-bottom: 2%;" + newLine
-                + "}" + newLine + newLine + "div {" + newLine + "width: 100%;" + newLine + "overflow: hidden;" + newLine
-                + "}" + newLine + "table, th, td {" + newLine + "border: 1px solid black;" + newLine
-                + "border-collapse: collapse;" + newLine + "}" + newLine;
+        String style = NL + "ul {" + NL + "list-style-type: none;" + NL + "display: block;" + NL + "width: 100%;"
+                + NL + "}" + NL + NL + "li {" + NL + "margin-bottom: 2%;" + NL + "}" + NL + NL + "div {" + NL
+                + "width: 100%;" + NL + "overflow: hidden;" + NL + "}" + NL + "table, th, td {" + NL
+                + "border: 1px solid black;" + NL + "border-collapse: collapse;" + NL + "}" + NL;
         HTMLNode head = null; // saved to add style node as child of head
         if (html.hasChildren()) {
             for (HTMLNode node : html.getChildren()) {
@@ -1076,15 +1256,13 @@ public class InfoWindowDOM {
     }
 
     /**
-     * called by buildStyleNode to scan the body node and extract style
-     * attributes from children - only called if node is body tag and if body
+     * Scans the body node and extract style attributes from children - only called if node is body tag and if body
      * has children
      *
      * @param node
      *         the body node in which to search for nodes with style
      *
-     * @return all of the styles formatted as a string to go into a node in the
-     * head
+     * @return all of the styles formatted as a string to go into a node in the head
      */
     private String findStyleInSubTree(HTMLNode node) {
         String style = "";
@@ -1121,12 +1299,18 @@ public class InfoWindowDOM {
      * @return a string representation of the style for the style node
      */
     private String styleAsStr(HTMLNode node) {
-        return (newLine + "#" + node.getID() + " {" + newLine + node.getStyle() + newLine + "}");
+        return NL
+                + "#"
+                + node.getID()
+                + " {"
+                + NL
+                + node.getStyle()
+                + NL
+                + "}";
     }
 
     /**
-     * Finds all occurences of 'amphid' and replaces with a link using
-     * addAmphidLink()
+     * Finds all occurences of 'amphid' and replaces with a link using {@link InfoWindowDOM#addAmphidLink(String, int)}
      *
      * @param str
      *         the string to be searched
@@ -1138,16 +1322,15 @@ public class InfoWindowDOM {
         int idx = str.toLowerCase().indexOf(AMPHID);
         while (idx != -1) {
             str = addAmphidLink(str, idx);
-            idx += amphidAnchor.length();
+            idx += AMPHID_ANCHOR.length();
             idx = str.toLowerCase().indexOf(AMPHID, idx);
         }
-
         return str;
     }
 
     /**
-     * Adds an <a> to an anatomy section which contains the keyword "Amphid"
-     * These links will generate a new info window page of the Amphid type
+     * Adds an <a> to an anatomy section which contains the keyword "Amphid" These links will generate a new info
+     * window page of the Amphid type
      *
      * @param anatomyInfo
      *         the section which the link will be added to
@@ -1158,21 +1341,16 @@ public class InfoWindowDOM {
         if (idx == -1) {
             return anatomyInfo;
         }
-
-        String updated = anatomyInfo.substring(0, idx) + amphidAnchor + anatomyInfo.substring(idx + AMPHID.length());
-
-        return updated;
+        return anatomyInfo.substring(0, idx)
+                + AMPHID_ANCHOR
+                + anatomyInfo.substring(idx + AMPHID.length());
     }
 
     public HTMLNode getHTML() {
-        return this.html;
+        return html;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
-    // private final static String meta_charset = "<meta charset=\"utf-8\">";
-    // private final static String meta_httpequiv_content = "<meta
-    // http-equiv=\"X-UA-Compatible\" content=\"WormGUIDES, MSKCC, Zhirong
-    // Bao\">";
 }

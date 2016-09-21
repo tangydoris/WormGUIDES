@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.io.BufferedReader;
@@ -5,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
@@ -13,12 +18,10 @@ import partslist.PartsList;
 
 /**
  * The list of cell deaths represented in internal memory and a DOM for external window viewing
- *
- * @author katzmanb
  */
 public class CellDeaths {
     private final static String CellDeathsFile = "/wormguides/models/cell_deaths/CellDeaths.csv";
-    private static ArrayList<String> cellDeaths;
+    private static List<String> cellDeaths;
     private static InfoWindowDOM dom;
 
     static {
@@ -32,12 +35,10 @@ public class CellDeaths {
         HTMLNode deathsDiv = new HTMLNode("div");
         HTMLNode deathsTable = new HTMLNode("table");
 
-        try {
-            URL url = PartsList.class.getResource(CellDeathsFile);
-
-            InputStream input = url.openStream();
-            InputStreamReader isr = new InputStreamReader(input);
-            BufferedReader br = new BufferedReader(isr);
+        URL url = PartsList.class.getResource(CellDeathsFile);
+        try (InputStream input = url.openStream();
+             InputStreamReader isr = new InputStreamReader(input);
+             BufferedReader br = new BufferedReader(isr)) {
 
             String line;
             while ((line = br.readLine()) != null) {

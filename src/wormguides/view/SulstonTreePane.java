@@ -59,13 +59,13 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import wormguides.ColorComparator;
-import wormguides.ColorHash;
-import wormguides.SearchOption;
 import wormguides.controllers.ContextMenuController;
 import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.models.Rule;
+import wormguides.models.SearchOption;
+import wormguides.util.ColorComparator;
+import wormguides.util.ColorHash;
 
 import acetree.lineagedata.LineageData;
 import partslist.PartsList;

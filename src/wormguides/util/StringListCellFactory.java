@@ -1,4 +1,8 @@
-package wormguides;
+/*
+ * Bao Lab 2016
+ */
+
+package wormguides.util;
 
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -7,12 +11,15 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+
 import wormguides.view.AppFont;
 
 /*
  * Callback for ListCell<String> so that fonts are uniform
  */
 public class StringListCellFactory implements Callback<ListView<String>, ListCell<String>> {
+
+	private final double UI_HEIGHT = 26.0;
 
 	@Override
 	public ListCell<String> call(ListView<String> param) {
@@ -50,6 +57,4 @@ public class StringListCellFactory implements Callback<ListView<String>, ListCel
 				setGraphic(null);
 		}
 	}
-
-	private final double UI_HEIGHT = 26.0;
 }

@@ -44,19 +44,19 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import wormguides.MainApp;
-import wormguides.URLGenerator;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.URLLoader;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
+import wormguides.stories.Note;
+import wormguides.stories.StoriesLoader;
+import wormguides.stories.Story;
+import wormguides.stories.StoryFileUtil;
+import wormguides.util.URLGenerator;
 import wormguides.view.AppFont;
 
 import acetree.lineagedata.LineageData;
-import stories.Note;
-import stories.StoriesLoader;
-import stories.Story;
-import stories.StoryFileUtil;
 
 import static javafx.scene.text.FontSmoothingType.LCD;
 
@@ -593,18 +593,26 @@ public class StoriesLayer {
     }
 
     /**
-     * @return A {@link String} representation of all stories visible in the
-     * 'Stories' tab
+     * @return string of all stories visible in the 'Stories' tab
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Stories:\n");
         for (int i = 0; i < stories.size(); i++) {
             Story story = stories.get(i);
-            sb.append(story.getName()).append(": ").append(story.getNumberOfNotes()).append(" notes\n");
+            sb.append(story.getName())
+                    .append(": ")
+                    .append(story.getNumberOfNotes())
+                    .append(" notes\n");
+
             for (Note note : story.getNotes()) {
-                sb.append("\t").append(note.getTagName()).append(": times ").append(note.getStartTime()).append(" ")
-                        .append(note.getEndTime()).append("\n");
+                sb.append("\t")
+                        .append(note.getTagName())
+                        .append(": times ")
+                        .append(note.getStartTime())
+                        .append(" ")
+                        .append(note.getEndTime())
+                        .append("\n");
             }
             if (i < stories.size() - 1) {
                 sb.append("\n");
@@ -615,8 +623,7 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link ObservableList} containing all stories that are
-     * visible in the 'Stories' tab
+     * @return list of stories that are visible in the 'Stories' tab
      */
     public ObservableList<Story> getStories() {
         return stories;
@@ -637,31 +644,31 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link EventHandler} for 'Edit Story' button's clicked
-     * {@link ActionEvent} in the 'Stories' tab
+     * @return click handler for the 'Edit Story' button in the 'Stories' tab
      */
     public EventHandler<ActionEvent> getEditButtonListener() {
         return event -> bringUpEditor();
     }
 
     /**
-     * Brings up the story/notes editor window, controlled by the
-     * {@link StoryEditorController}. Upon the editor's initialization/fxml
-     * load, listenable properties are passed to the editor so that the it can
-     * rename labels/change the UI according to changes in time and active cell
-     * name.<br>
-     * <br>
-     * The editor is initialized so that it always lives on top of the main
-     * application window and moves when the main window is moved. This is to
-     * ensure that the user can always edit a story when the window is opened
-     * even when he/she is clicking around in the 3D subscene to change the
-     * time/active cell.
+     * Brings up the story/notes editor window, controlled by the {@link StoryEditorController}. Upon the editor's
+     * initialization/fxml load, listenable properties are passed to the editor so that the it can rename
+     * labels/change the UI according to changes in time and active cell name.
+     * <p>
+     * The editor is initialized so that it always lives on top of the main application window and moves when the
+     * main window is moved. This is to ensure that the user can always edit a story when the window is opened even
+     * when he/she is clicking around in the 3D subscene to change the time/active cell.
      */
     private void bringUpEditor() {
         if (editStage == null) {
-            editController = new StoryEditorController(timeOffset, cellData,
-                    sceneElementsList.getAllMulticellSceneNames(), activeCellProperty, cellClickedProperty,
-                    timeProperty, update3D);
+            editController = new StoryEditorController(
+                    timeOffset,
+                    cellData,
+                    sceneElementsList.getAllMulticellSceneNames(),
+                    activeCellProperty,
+                    cellClickedProperty,
+                    timeProperty,
+                    update3D);
 
             editController.setUpdate3DProperty(update3D);
 
@@ -724,8 +731,7 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link BooleanProperty} whose value is TRUE when the
-     * {@link Window3DController} should rebuild the subscene, and FALSE
+     * @return boolean property that is true if the {@link Window3DController} should rebuild the subscene, and false
      * otherwise
      */
     public BooleanProperty getRebuildSceneFlag() {
@@ -733,10 +739,9 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link Callback} that is the renderer for a {@link Story}
-     * item. It graphically renders an active story with black text and
-     * an inactive one with grey text. For an active story, its notes
-     * are also rendered beneath the story title and description.
+     * @return the callback that is the renderer for a {@link Story} item. It graphically renders an active story
+     * with black text and an inactive one with grey text. For an active story, its notes are also rendered beneath
+     * the story title and description.
      */
     public Callback<ListView<Story>, ListCell<Story>> getStoryCellFactory() {
         return new Callback<ListView<Story>, ListCell<Story>>() {

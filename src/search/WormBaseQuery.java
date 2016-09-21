@@ -101,8 +101,9 @@ public class WormBaseQuery {
         resultsHash = new HashMap<>();
     }
 
-    private static BufferedReader openUrl(String target) {
+    private static BufferedReader openUrl(final String target) {
         HttpURLConnection connection = null;
+
 
         try {
             URL url = new URL(target);
@@ -117,12 +118,11 @@ public class WormBaseQuery {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
-    public static void doSearch(String text) {
-        System.out.println("searching " + text);
+    public static void doSearch(final String text) {
         searched = text;
         searchService.restart();
     }

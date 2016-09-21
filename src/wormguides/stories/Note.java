@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package stories;
+package wormguides.stories;
 
 import java.util.ArrayList;
 
@@ -44,7 +44,7 @@ public class Note {
     private Story parent;
     // True when any field value changes, false otherwise
     private BooleanProperty changedProperty;
-    // True when graphic in stories list view is expanded, false otherwise
+    // True when graphic in wormguides.stories list view is expanded, false otherwise
     private BooleanProperty listExpandedProperty;
     // True when graphic in 3d subscene is expanded, false otherwise
     private BooleanProperty sceneExpandedProperty;

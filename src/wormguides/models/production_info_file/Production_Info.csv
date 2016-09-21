@@ -1,5 +1,5 @@
 Production Information,,,,,,,,,,,,,
-Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link,Movie start time (min),isSulston?,Total Time Points,X_SCALE,Y_SCALE,Z_SCALE
+Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal Resolution,Segmentation,cytoshow link,Movie start time (min),isSulstonMode?,Total Time Points,X_SCALE,Y_SCALE,Z_SCALE
 all-nuclear positions,20140407_JIM113_SiO-0.15_1_s1,-,JIM113,Y,60 seconds,Starrynite,'-,20,TRUE,400,1,1,5
 AVG,20141022_JIM113_UNC-86myrGFP_1_S1,UNC-86,BV190,Y,75 seconds,Imaris Manual,'-,0,0,0,0,0,0
 SABD; DD1; DD2; DD3; DD4; DD5; DD6; DA2; DA3; DA4; DA5,OU415_4_w1GFP-RFP 561_s3,CND-1,OU415,Y,90 seconds,Imaris Manual,'-,0,0,0,0,0,0

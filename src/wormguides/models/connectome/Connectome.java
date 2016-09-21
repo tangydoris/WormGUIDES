@@ -2,22 +2,24 @@
  * Bao Lab 2016
  */
 
-package wormguides.models;
+package wormguides.models.connectome;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
-import wormguides.loaders.ConnectomeLoader;
 import wormguides.view.HTMLNode;
 import wormguides.view.InfoWindowDOM;
 
-import partslist.PartsList;
+import static java.util.Collections.sort;
+import static partslist.PartsList.getFunctionalNameByLineageName;
+import static partslist.PartsList.getLineageNameByFunctionalName;
+import static partslist.PartsList.isFunctionalName;
+import static partslist.PartsList.isLineageName;
+import static wormguides.loaders.ConnectomeLoader.loadConnectome;
 
 /**
- * This class is the underlying model of the all neuronal connections. It holds
- * a list of NeuronalSynapses which define two terminal cells which are wired.
- *
- * @author katzmanb
+ * Underlying model of the all neuronal connections. It holds a list of {@link NeuronalSynapse}s that define the
+ * wiring between two terminal cells
  */
 public class Connectome {
 
@@ -26,77 +28,46 @@ public class Connectome {
     private final static String r_postsynapticDescription = "R postsynaptic";
     private final static String ej_electricalDescription = "EJ electrical";
     private final static String nmj_neuromuscularDescrpition = "Nmj neuromuscular";
+
     private final String presynapticPartnersTitle = "Presynaptic: ";
     private final String postsynapticPartnersTitle = "Postsynaptic: ";
     private final String electricalPartnersTitle = "Electrical: ";
     private final String neuromusclarPartnersTitle = "Neuromusclar: ";
-    private ArrayList<NeuronalSynapse> connectome;
-    private ConnectomeLoader connectomeLoader;
+
+    private List<NeuronalSynapse> synapses;
 
     public Connectome() {
-        connectome = new ArrayList<>();
-        connectomeLoader = new ConnectomeLoader();
-
-        buildConnectome();
+        synapses = loadConnectome();
     }
 
-    private void buildConnectome() {
-        connectome = connectomeLoader.loadConnectome();
+    public List<NeuronalSynapse> getConnectomeList() {
+        return synapses;
     }
 
-    public ArrayList<NeuronalSynapse> getConnectomeList() {
-        return this.connectome;
-    }
-
-    // public void debug() {
-    // System.out.println("Connectome size: " + connectome.size());
-    //
-    // ArrayList<String> allConnectomeCellNames = getAllConnectomeCellNames();
-    // System.out.println("All connectome cells size: " +
-    // allConnectomeCellNames.size());
-    //
-    // String centralCell = "ADAL";
-    // ArrayList<String> connectedCells = getConnectedCells(centralCell);
-    // System.out.println("Connected cells to '" + centralCell + "' size: " +
-    // connectedCells.size());
-    //
-    // String queryCell = "AIZL";
-    // queryConnectivity(queryCell, true, true, true, true, true);
-    // }
-
-    // static vars
-
-    // connectome config file location
-    // private final static String connectomeFilePath =
-    // "src/wormguides/model/connectome_file/NeuronConnect.csv";
-
-    public ArrayList<String> getAllConnectomeCellNames() {
-        // iterate through connectome arraylist and add all cell names
-        ArrayList<String> allConnectomeCellNames = new ArrayList<>();
-        for (NeuronalSynapse ns : connectome) {
-            allConnectomeCellNames.add(PartsList.getLineageNameByFunctionalName(ns.getCell1()));
-            allConnectomeCellNames.add(PartsList.getLineageNameByFunctionalName(ns.getCell2()));
+    public List<String> getAllConnectomeCellNames() {
+        // iterate through synapses arraylist and add all cell names
+        List<String> allConnectomeCellNames = new ArrayList<>();
+        for (NeuronalSynapse ns : synapses) {
+            allConnectomeCellNames.add(getLineageNameByFunctionalName(ns.getCell1()));
+            allConnectomeCellNames.add(getLineageNameByFunctionalName(ns.getCell2()));
         }
-
         return allConnectomeCellNames;
     }
 
-    public ArrayList<String> getConnectedCells(String centralCell) {
+    public List<String> getConnectedCells(String centralCell) {
         // find all cells that are connected to the central cell
-        ArrayList<String> connectedCells = new ArrayList<>();
-        for (NeuronalSynapse ns : connectome) {
+        List<String> connectedCells = new ArrayList<>();
+        for (NeuronalSynapse ns : synapses) {
             if (ns.getCell1().equals(centralCell)) {
                 connectedCells.add(ns.getCell2());
             } else if (ns.getCell2().equals(centralCell)) {
                 connectedCells.add(ns.getCell1());
             }
         }
-
         //make sure self isn't in list
         if (connectedCells.contains(centralCell)) {
             connectedCells.remove(centralCell);
         }
-
         return connectedCells;
     }
 
@@ -109,25 +80,24 @@ public class Connectome {
      * @return the resultant translated or untranslated cell name
      */
     public String checkQueryCell(String queryCell) {
-        if (PartsList.isLineageName(queryCell)) {
-            queryCell = PartsList.getFunctionalNameByLineageName(queryCell).toLowerCase();
+        if (isLineageName(queryCell)) {
+            queryCell = getFunctionalNameByLineageName(queryCell).toLowerCase();
         }
-
         return queryCell;
     }
 
     /**
      * @param queryCell
-     *         the cell to query in the connectome
+     *         the cell to query in the synapses
      *
-     * @return boolean corresponding to whether the query is in the connectome
+     * @return boolean corresponding to whether the query is in the synapses
      * or not
      */
     public boolean containsCell(String queryCell) {
         queryCell = checkQueryCell(queryCell);
-
-        for (NeuronalSynapse ns : connectome) {
-            if (ns.getCell1().toLowerCase().equals(queryCell) || ns.getCell2().toLowerCase().equals(queryCell)) {
+        for (NeuronalSynapse ns : synapses) {
+            if (ns.getCell1().toLowerCase().equals(queryCell)
+                    || ns.getCell2().toLowerCase().equals(queryCell)) {
                 return true;
             }
         }
@@ -135,8 +105,7 @@ public class Connectome {
     }
 
     /**
-     * SearchLayer function which takes cell and filters results based on filter
-     * toggles filter toggles = 4 Synapse Types
+     * Search function which takes cell and filters results based on filter toggles filter toggles = 4 SynapseTypes
      *
      * @param queryCell
      *         lineage name of the cell to be searched for
@@ -153,7 +122,7 @@ public class Connectome {
      *
      * @return the list of connections to the query cell
      */
-    public ArrayList<String> queryConnectivity(
+    public List<String> queryConnectivity(
             String queryCell,
             boolean isPresynapticTicked,
             boolean isPostsynapticTicked,
@@ -162,25 +131,27 @@ public class Connectome {
             boolean areLineageNamesReturned) {
 
         // query only works for lineage names
-        if (PartsList.isFunctionalName(queryCell)) {
-            queryCell = PartsList.getLineageNameByFunctionalName(queryCell);
+        if (isFunctionalName(queryCell)) {
+            queryCell = getLineageNameByFunctionalName(queryCell);
         }
 
         queryCell = checkQueryCell(queryCell);
 
-        ArrayList<String> searchResults = new ArrayList<>();
+        List<String> searchResults = new ArrayList<>();
 
         // error check
         if (queryCell == null) {
             return searchResults;
         }
 
-        // //iterate over connectome
-        for (NeuronalSynapse ns : connectome) {
+        // //iterate over synapses
+        for (NeuronalSynapse ns : synapses) {
             // check if synapse contains query cell
-            if (ns.getCell1().toLowerCase().contains(queryCell) || ns.getCell2().toLowerCase().contains(queryCell)) {
-                String cell_1 = ns.getCell1();
-                String cell_2 = ns.getCell2();
+            if (ns.getCell1().toLowerCase().contains(queryCell)
+                    || ns.getCell2().toLowerCase().contains(queryCell)) {
+
+                String cell1 = ns.getCell1();
+                String cell2 = ns.getCell2();
 
                 // process type code
                 String synapseTypeDescription = ns.getSynapseType().getDescription();
@@ -191,48 +162,48 @@ public class Connectome {
                     case s_presynapticDescription:
                         if (isPresynapticTicked) {
                             // don't add duplicates
-                            if (!searchResults.contains(cell_1)) {
-                                searchResults.add(cell_1);
+                            if (!searchResults.contains(cell1)) {
+                                searchResults.add(cell1);
                             }
 
-                            if (!searchResults.contains(cell_2)) {
-                                searchResults.add(cell_2);
+                            if (!searchResults.contains(cell2)) {
+                                searchResults.add(cell2);
                             }
                         }
                         break;
                     case r_postsynapticDescription:
                         if (isPostsynapticTicked) {
                             // don't add duplicates
-                            if (!searchResults.contains(cell_1)) {
-                                searchResults.add(cell_1);
+                            if (!searchResults.contains(cell1)) {
+                                searchResults.add(cell1);
                             }
 
-                            if (!searchResults.contains(cell_2)) {
-                                searchResults.add(cell_2);
+                            if (!searchResults.contains(cell2)) {
+                                searchResults.add(cell2);
                             }
                         }
                         break;
                     case ej_electricalDescription:
                         if (isElectricalTicked) {
                             // don't add duplicates
-                            if (!searchResults.contains(cell_1)) {
-                                searchResults.add(cell_1);
+                            if (!searchResults.contains(cell1)) {
+                                searchResults.add(cell1);
                             }
 
-                            if (!searchResults.contains(cell_2)) {
-                                searchResults.add(cell_2);
+                            if (!searchResults.contains(cell2)) {
+                                searchResults.add(cell2);
                             }
                         }
                         break;
                     case nmj_neuromuscularDescrpition:
                         if (isNeuromuscularTicked) {
                             // don't add duplicates
-                            if (!searchResults.contains(cell_1)) {
-                                searchResults.add(cell_1);
+                            if (!searchResults.contains(cell1)) {
+                                searchResults.add(cell1);
                             }
 
-                            if (!searchResults.contains(cell_2)) {
-                                searchResults.add(cell_2);
+                            if (!searchResults.contains(cell2)) {
+                                searchResults.add(cell2);
                             }
                         }
                         break;
@@ -242,9 +213,9 @@ public class Connectome {
 
         // Return lineage names instead of functional names if flag is true
         if (areLineageNamesReturned) {
-            ArrayList<String> lineageNameResults = new ArrayList<>();
+            List<String> lineageNameResults = new ArrayList<>();
             for (String result : searchResults) {
-                String lineageName = PartsList.getLineageNameByFunctionalName(result);
+                String lineageName = getLineageNameByFunctionalName(result);
 
                 if (lineageName != null) {
                     lineageNameResults.add(lineageName);
@@ -262,10 +233,9 @@ public class Connectome {
     }
 
     /**
-     * Builds the connectome as a DOM to be displayed in an external popup
-     * window
+     * Builds the synapses as a DOM to be displayed in an external popup window
      *
-     * @return the DOM of the connectome
+     * @return the DOM of the synapses
      */
     public InfoWindowDOM connectomeDOM() {
         HTMLNode html = new HTMLNode("html");
@@ -274,11 +244,11 @@ public class Connectome {
 
         HTMLNode connectomeTablesDiv = new HTMLNode("div");
 
-        // add formatted wiring partners for each cell in connectome
+        // add formatted wiring partners for each cell in synapses
 
         // collect all unique cells
-        ArrayList<String> cells = new ArrayList<>();
-        for (NeuronalSynapse ns : connectome) {
+        List<String> cells = new ArrayList<>();
+        for (NeuronalSynapse ns : synapses) {
             String cell_1 = ns.getCell1();
             String cell_2 = ns.getCell2();
 
@@ -292,8 +262,8 @@ public class Connectome {
             }
         }
 
-        // alphabetize the connectome cells
-        Collections.sort(cells);
+        // alphabetize the synapses cells
+        sort(cells);
 
         // add tables of wiring partners for each unique entry
         for (String cell : cells) {
@@ -321,18 +291,14 @@ public class Connectome {
      * @return the table HTML node for the DOM
      */
     public HTMLNode queryWiringPartnersAsHTMLTable(String queryCell) {
-        /*
-         * FORMAT Cell Name presynaptic: cellname (numconnections), cellname
-		 * (numconnections) postsynaptic: ...
-		 */
-
-        ArrayList<String> presynapticPartners = new ArrayList<>();
-        ArrayList<String> postsynapticPartners = new ArrayList<>();
-        ArrayList<String> electricalPartners = new ArrayList<>();
-        ArrayList<String> neuromuscularPartners = new ArrayList<>();
+        // FORMAT Cell Name presynaptic: cellname (numconnections), cellname (numconnections) postsynaptic: ...
+        List<String> presynapticPartners = new ArrayList<>();
+        List<String> postsynapticPartners = new ArrayList<>();
+        List<String> electricalPartners = new ArrayList<>();
+        List<String> neuromuscularPartners = new ArrayList<>();
 
         // get wiring partners
-        for (NeuronalSynapse ns : connectome) {
+        for (NeuronalSynapse ns : synapses) {
             String cell_1 = ns.getCell1();
             String cell_2 = ns.getCell2();
 
@@ -404,7 +370,7 @@ public class Connectome {
         HTMLNode trNeuro;
         HTMLNode trElec;
 
-        Collections.sort(presynapticPartners); // alphabetize
+        sort(presynapticPartners); // alphabetize
         if (presynapticPartners.size() > 0) {
             trPre = new HTMLNode("tr");
 
@@ -418,7 +384,7 @@ public class Connectome {
             table.addChild(trPre);
         }
 
-        Collections.sort(postsynapticPartners); // alphabetize
+        sort(postsynapticPartners); // alphabetize
         if (postsynapticPartners.size() > 0) {
             trPost = new HTMLNode("tr");
 
@@ -432,7 +398,7 @@ public class Connectome {
             table.addChild(trPost);
         }
 
-        Collections.sort(electricalPartners); // alphabetize
+        sort(electricalPartners); // alphabetize
         if (electricalPartners.size() > 0) {
             trElec = new HTMLNode("tr");
 
@@ -446,7 +412,7 @@ public class Connectome {
             table.addChild(trElec);
         }
 
-        Collections.sort(neuromuscularPartners); // alphabetize
+        sort(neuromuscularPartners); // alphabetize
         if (neuromuscularPartners.size() > 0) {
             trNeuro = new HTMLNode("tr");
 
@@ -461,7 +427,6 @@ public class Connectome {
         }
 
         return table;
-
     }
 
     private String formatNumberOfSynapses(String numberOfSynapses) {

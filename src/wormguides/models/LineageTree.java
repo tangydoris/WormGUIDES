@@ -4,166 +4,214 @@
 
 package wormguides.models;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javafx.scene.control.TreeItem;
 
+/**
+ * Tree containing the lineage of the underlying embryo.
+ */
 public class LineageTree {
 
-    // maps a lower case cell name to its tree node
-    private static HashMap<String, TreeItem<String>> nameNodeHash = new HashMap<>();
-    private static TreeItem<String> root;
-    private static boolean isSulston;
-    private ArrayList<String> treeBaseNames;
+    /** Maps a lower case cell name to its tree node */
+    private static final Map<String, TreeItem<String>> nameNodeHash = new HashMap<>();
+
+    private static boolean isSulstonMode;
+
+    private List<String> treeBaseNames;
+
     private String[] allCellNames;
+
+    private TreeItem<String> root;
     private TreeItem<String> ab;
     private TreeItem<String> ms;
     private TreeItem<String> e;
     private TreeItem<String> c;
     private TreeItem<String> d;
 
-    @SuppressWarnings({"unchecked"})
-    public LineageTree(String[] allCellNames, boolean isSulston) {
-        this.allCellNames = allCellNames;
+    public LineageTree(final String[] allCellNames, final boolean isSulstonMode) {
+        if (allCellNames != null) {
+            this.allCellNames = allCellNames;
+        } else {
+            this.allCellNames = new String[1];
+        }
 
-        LineageTree.isSulston = isSulston;
-        if (isSulston) {
+        LineageTree.isSulstonMode = isSulstonMode;
+        if (isSulstonMode) {
             root = new TreeItem<>("P0");
             // names of the cell added to tree upon initialization
-            String[] baseNames = {
-                    "p0", "ab", "aba", "abal", "abar", "abp", "abpl", "abpr", "p1", "ems", "ms", "e", "p2",
-                    "c", "p3", "d", "p4", "z2", "z3"};
-            treeBaseNames = new ArrayList<>(Arrays.asList(baseNames));
+            treeBaseNames = Arrays.asList(
+                    "p0",
+                    "ab",
+                    "aba",
+                    "abal",
+                    "abar",
+                    "abp",
+                    "abpl",
+                    "abpr",
+                    "p1",
+                    "ems",
+                    "ms",
+                    "e",
+                    "p2",
+                    "c",
+                    "p3",
+                    "d",
+                    "p4",
+                    "z2",
+                    "z3");
 
             // zero-th root layer
             nameNodeHash.put("p0", root);
 
             // first layer
             ab = makeTreeItem("AB");
-            TreeItem<String> p1 = makeTreeItem("P1");
-            root.getChildren().addAll(ab, p1);
+            final TreeItem<String> p1 = makeTreeItem("P1");
+            root.getChildren().add(ab);
+            root.getChildren().add(p1);
 
             // second layer
-            TreeItem<String> aba = makeTreeItem("ABa");
-            TreeItem<String> abp = makeTreeItem("ABp");
-            ab.getChildren().addAll(aba, abp);
+            final TreeItem<String> aba = makeTreeItem("ABa");
+            final TreeItem<String> abp = makeTreeItem("ABp");
+            ab.getChildren().add(aba);
+            ab.getChildren().add(abp);
 
-            TreeItem<String> ems = makeTreeItem("EMS");
-            TreeItem<String> p2 = makeTreeItem("P2");
-            p1.getChildren().addAll(ems, p2);
+            final TreeItem<String> ems = makeTreeItem("EMS");
+            final TreeItem<String> p2 = makeTreeItem("P2");
+            p1.getChildren().add(ems);
+            p1.getChildren().add(p2);
 
             // third layer
-            TreeItem<String> abal = makeTreeItem("ABal");
-            TreeItem<String> abar = makeTreeItem("ABar");
-            aba.getChildren().addAll(abal, abar);
+            final TreeItem<String> abal = makeTreeItem("ABal");
+            final TreeItem<String> abar = makeTreeItem("ABar");
+            aba.getChildren().add(abal);
+            aba.getChildren().add(abar);
 
-            TreeItem<String> abpl = makeTreeItem("ABpl");
-            TreeItem<String> abpr = makeTreeItem("ABpr");
-            abp.getChildren().addAll(abpl, abpr);
+            final TreeItem<String> abpl = makeTreeItem("ABpl");
+            final TreeItem<String> abpr = makeTreeItem("ABpr");
+            abp.getChildren().add(abpl);
+            abp.getChildren().add(abpr);
 
             ms = makeTreeItem("MS");
             e = makeTreeItem("E");
-            ems.getChildren().addAll(ms, e);
+            ems.getChildren().add(ms);
+            ems.getChildren().add(e);
 
             c = makeTreeItem("C");
-            TreeItem<String> p3 = makeTreeItem("P3");
-            p2.getChildren().addAll(c, p3);
+            final TreeItem<String> p3 = makeTreeItem("P3");
+            p2.getChildren().add(c);
+            p2.getChildren().add(p3);
 
             // fourth layer (rightmost branch)
             d = makeTreeItem("D");
-            TreeItem<String> p4 = makeTreeItem("P4");
-            p3.getChildren().addAll(d, p4);
+            final TreeItem<String> p4 = makeTreeItem("P4");
+            p3.getChildren().add(d);
+            p3.getChildren().add(p4);
 
             // fifth layer (rightmost branch)
-            TreeItem<String> z2 = makeTreeItem("Z2");
-            TreeItem<String> z3 = makeTreeItem("Z3");
-            p4.getChildren().addAll(z2, z3);
+            final TreeItem<String> z2 = makeTreeItem("Z2");
+            final TreeItem<String> z3 = makeTreeItem("Z3");
+            p4.getChildren().add(z2);
+            p4.getChildren().add(z3);
         }
-
         addAllCells();
     }
 
-    // returns true if desc is a descendant of ances
-    public static boolean isDescendant(String desc, String ances) {
-        desc = desc.toLowerCase();
-        ances = ances.toLowerCase();
-
-        if (!nameNodeHash.containsKey(desc) || !nameNodeHash.containsKey(ances)) {
-            return false;
-        }
-
-        if (isSulston) {
-            // root is not a descendant
-            if (desc.equals("p0")) {
-                return false;
-            }
-
-            // root is always an ancestor
-            if (ances.equals("p0")) {
-                return true;
-            }
-
-            // for the p cells, test number after the 'p'
-            if (desc.startsWith("p") && ances.startsWith("p")) {
-                return desc.compareTo(ances) > 0;
-            }
-
-            // try to decipher lineage from names
-            if (desc.startsWith(ances) && desc.length() > ances.length() && !desc.equals("e")) {
-                return true;
-            }
-
-            if (desc.startsWith("z")) {
-                return ances.startsWith("p");
-            }
-
-            if (desc.startsWith("d")) {
-                return ances.equals("p3") || isDescendant("p3", ances);
-            }
-
-            if (desc.startsWith("c")) {
-                return ances.equals("p2") || isDescendant("p2", ances);
-            }
-
-            if (desc.equals("ems")) {
-                return ances.equals("p1") || isDescendant("p1", ances);
-            }
-
-            if (desc.startsWith("ms") || desc.startsWith("e")) {
-                return ances.equals("ems") || isDescendant("ems", ances);
-            }
-
-            if (desc.startsWith("ab")) {
-                return ances.equals("p0");
-            }
-        }
-
-        return false;
+    /**
+     * @param ancestor
+     *         the cell name to check
+     * @param descendant
+     *         the potential descendant
+     *
+     * @return true if ances is the ancestor of desc, false otherwise
+     */
+    public static boolean isAncestor(String ancestor, String descendant) {
+        return isDescendant(descendant, ancestor);
     }
 
-    // returns true if ances is the ancestor of desc
-    public static boolean isAncestor(String ances, String desc) {
-        return isDescendant(desc, ances);
-    }
-
+    /**
+     * @param name
+     *         the name to check
+     *
+     * @return the case-sensitive name of that name
+     */
     public static String getCaseSensitiveName(String name) {
         name = name.toLowerCase();
         if (nameNodeHash.get(name) == null) {
             return "'" + name + "' Systematic";
         }
-
         return nameNodeHash.get(name).getValue();
     }
 
-    public static TreeItem<String> getRoot() {
+    /**
+     * @param descendant
+     *         the cell name to check
+     * @param ancestor
+     *         the potential ancestor
+     *
+     * @return true if desc is a descendant of ances, false otherwise
+     */
+    public static boolean isDescendant(String descendant, String ancestor) {
+        descendant = descendant.toLowerCase();
+        ancestor = ancestor.toLowerCase();
+
+        if (!nameNodeHash.containsKey(descendant) || !nameNodeHash.containsKey(ancestor)) {
+            return false;
+        }
+
+        if (isSulstonMode) {
+            // root is not a descendant
+            if (descendant.equals("p0")) {
+                return false;
+            }
+            // root is always an ancestor
+            if (ancestor.equals("p0")) {
+                return true;
+            }
+            // for the p cells, test number after the 'p'
+            if (descendant.startsWith("p") && ancestor.startsWith("p")) {
+                return descendant.compareTo(ancestor) > 0;
+            }
+            // try to decipher lineage from names
+            if (descendant.startsWith(ancestor) && descendant.length() > ancestor.length() && !descendant.equals("e")) {
+                return true;
+            }
+            if (descendant.startsWith("z")) {
+                return ancestor.startsWith("p");
+            }
+            if (descendant.startsWith("d")) {
+                return ancestor.equals("p3") || isDescendant("p3", ancestor);
+            }
+            if (descendant.startsWith("c")) {
+                return ancestor.equals("p2") || isDescendant("p2", ancestor);
+            }
+            if (descendant.equals("ems")) {
+                return ancestor.equals("p1") || isDescendant("p1", ancestor);
+            }
+            if (descendant.startsWith("ms") || descendant.startsWith("e")) {
+                return ancestor.equals("ems") || isDescendant("ems", ancestor);
+            }
+
+            if (descendant.startsWith("ab")) {
+                return ancestor.equals("p0");
+            }
+        }
+        return false;
+    }
+
+    public TreeItem<String> getRoot() {
         return root;
     }
 
+    /**
+     * Adds tree nodes for all cells in 'allCellNames'
+     */
     private void addAllCells() {
         for (String name : allCellNames) {
-            if (isSulston) {
+            if (isSulstonMode) {
                 if (treeBaseNames.contains(name.toLowerCase())) {
                     continue;
                 }
@@ -175,8 +223,14 @@ public class LineageTree {
         }
     }
 
-    private void addCell(String newName) {
-        String startingLetter = newName.substring(0, 1).toLowerCase();
+    /**
+     * Adds a node to the tree speficied by a cell name
+     *
+     * @param cellName
+     *         the cell name
+     */
+    private void addCell(String cellName) {
+        String startingLetter = cellName.substring(0, 1).toLowerCase();
         TreeItem<String> startingNode = null;
         TreeItem<String> parent = null;
         switch (startingLetter) {
@@ -198,26 +252,33 @@ public class LineageTree {
         }
 
         if (startingNode != null) {
-            parent = addCellHelper(newName, startingNode);
+            parent = addCellHelper(cellName, startingNode);
             if (parent != null) {
-                parent.getChildren().add(makeTreeItem(newName));
+                parent.getChildren().add(makeTreeItem(cellName));
             }
         }
     }
 
-    // returns prent node of cell to be added (specified by newName)
-    private TreeItem<String> addCellHelper(String newName, TreeItem<String> node) {
+    /**
+     * @param cellName
+     *         name of the node we want to fetch the parent for
+     * @param node
+     *         the node to check, may be the parent node
+     *
+     * @return parent of the node specified by the name
+     */
+    private TreeItem<String> addCellHelper(String cellName, TreeItem<String> node) {
         String currName = node.getValue().toLowerCase();
-        newName = newName.toLowerCase();
+        cellName = cellName.toLowerCase();
 
-        if (newName.length() == currName.length() + 1 && newName.startsWith(currName)) {
+        if (cellName.length() == currName.length() + 1 && cellName.startsWith(currName)) {
             return node;
         }
 
         for (TreeItem<String> child : node.getChildren()) {
             String childName = child.getValue().toLowerCase();
-            if (newName.startsWith(childName)) {
-                return addCellHelper(newName, child);
+            if (cellName.startsWith(childName)) {
+                return addCellHelper(cellName, child);
             }
         }
 
@@ -225,9 +286,8 @@ public class LineageTree {
     }
 
     private TreeItem<String> makeTreeItem(String name) {
-        TreeItem<String> node = new TreeItem<>(name);
+        final TreeItem<String> node = new TreeItem<>(name);
         nameNodeHash.put(name.toLowerCase(), node);
         return node;
     }
-
 }

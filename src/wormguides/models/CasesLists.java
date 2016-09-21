@@ -1,36 +1,33 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
+import java.util.List;
 
-import wormguides.AnatomyTerm;
 import wormguides.view.InfoWindow;
 import wormguides.view.InfoWindowDOM;
 
-import partslist.PartsList;
+import static partslist.PartsList.getLineageNameByFunctionalName;
+import static wormguides.models.AnatomyTerm.AMPHID_SENSILLA;
 
 /**
- * Class which contains the internal structure for the InfoWindow TabPane
- * <p>
- * Cells are either terminal cases (neurons) or non-terminal cases
- * --> as these cases are generated for view in InfoWindow, they are stored here
- * <p>
- * MVC:
- * - Model representation of InfoWindow TabPane
- *
- * @author katzmanb
+ * List of terminal cell cases (neurons) or non-terminal cell cases. These cases generated for view in the info
+ * window are stored here.
  */
 public class CasesLists {
 
-    private ArrayList<CellCase> cellCases;
-    private ArrayList<AnatomyTermCase> anatomyTermCases;
+    private List<CellCase> cellCases;
+    private List<AnatomyTermCase> anatomyTermCases;
 
     private InfoWindow infoWindow;
 
-    public CasesLists(InfoWindow window) {
-        cellCases = new ArrayList<>();
-        anatomyTermCases = new ArrayList<>();
-        infoWindow = window;
+    public CasesLists(InfoWindow infoWindow) {
+        this.cellCases = new ArrayList<>();
+        this.anatomyTermCases = new ArrayList<>();
+        this.infoWindow = infoWindow;
     }
 
     public void setInfoWindow(InfoWindow window) {
@@ -60,14 +57,14 @@ public class CasesLists {
     public void makeTerminalCase(
             String lineageName,
             String cellName,
-            ArrayList<String> presynapticPartners,
-            ArrayList<String> postsynapticPartners,
-            ArrayList<String> electricalPartners,
-            ArrayList<String> neuromuscularPartners,
-            ArrayList<String> nuclearProductionInfo,
-            ArrayList<String> cellShapeProductionInfo) {
+            List<String> presynapticPartners,
+            List<String> postsynapticPartners,
+            List<String> electricalPartners,
+            List<String> neuromuscularPartners,
+            List<String> nuclearProductionInfo,
+            List<String> cellShapeProductionInfo) {
 
-        TerminalCellCase tCase = new TerminalCellCase(
+        addTerminalCase(new TerminalCellCase(
                 lineageName,
                 cellName,
                 presynapticPartners,
@@ -75,9 +72,7 @@ public class CasesLists {
                 electricalPartners,
                 neuromuscularPartners,
                 nuclearProductionInfo,
-                cellShapeProductionInfo);
-
-        addTerminalCase(tCase);
+                cellShapeProductionInfo));
     }
 
     /**
@@ -87,16 +82,10 @@ public class CasesLists {
      *         the case to be added
      */
     private void addTerminalCase(TerminalCellCase terminalCase) {
-        if (cellCases != null) {
-            //terminalCases.add(terminalCase);
-            cellCases.add(terminalCase);
-
-            if (infoWindow != null) {
-                // create dom(tab)
-                InfoWindowDOM tcDOM = new InfoWindowDOM(terminalCase);
-                // add dom(tab) to InfoWindow
-                infoWindow.addTab(tcDOM);
-            }
+        cellCases.add(terminalCase);
+        if (infoWindow != null) {
+            // add dom(tab) to InfoWindow
+            infoWindow.addTab(new InfoWindowDOM(terminalCase));
         }
     }
 
@@ -112,11 +101,9 @@ public class CasesLists {
      */
     public void makeNonTerminalCase(
             String cellName,
-            ArrayList<String> nuclearProductionInfo,
-            ArrayList<String> cellShapeProductionInfo) {
-
-        NonTerminalCellCase ntCase = new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo);
-        addNonTerminalCase(ntCase);
+            List<String> nuclearProductionInfo,
+            List<String> cellShapeProductionInfo) {
+        addNonTerminalCase(new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo));
     }
 
     /**
@@ -126,22 +113,15 @@ public class CasesLists {
      *         the case to be added
      */
     private void addNonTerminalCase(NonTerminalCellCase nonTerminalCase) {
-        if (cellCases != null) {
-            //nonTerminalCases.add(nonTerminalCase);
-            cellCases.add(nonTerminalCase);
-
-            // create dom(tab)
-            InfoWindowDOM ntcDOM = new InfoWindowDOM(nonTerminalCase);
-
-            // add dom(tab) to InfoWindow
-            if (infoWindow != null) {
-                infoWindow.addTab(ntcDOM);
-            }
+        cellCases.add(nonTerminalCase);
+        // add dom(tab) to InfoWindow
+        if (infoWindow != null) {
+            infoWindow.addTab(new InfoWindowDOM(nonTerminalCase));
         }
     }
 
     public void makeAnatomyTermCase(AnatomyTerm term) {
-        if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
+        if (term.equals(AMPHID_SENSILLA)) {
             AmphidSensillaTerm amphidSensillaCase = new AmphidSensillaTerm(term);
             addAmphidSensillaTermCase(amphidSensillaCase);
         }
@@ -166,7 +146,7 @@ public class CasesLists {
         String cell = cellName;
 
         //translate name to lineage if passed as function
-        String lineage = PartsList.getLineageNameByFunctionalName(cellName);
+        String lineage = getLineageNameByFunctionalName(cellName);
         if (lineage != null) {
             cell = lineage;
         }
@@ -184,7 +164,7 @@ public class CasesLists {
         String cell = cellName;
 
         //translate name to lineage if passed as function
-        String lineage = PartsList.getLineageNameByFunctionalName(cellName);
+        String lineage = getLineageNameByFunctionalName(cellName);
         if (lineage != null) {
             cell = lineage;
         }
@@ -232,20 +212,16 @@ public class CasesLists {
         String cell = cellName;
 
         //translate name to lineage if passed as function
-        String lineage = PartsList.getLineageNameByFunctionalName(cellName);
+        String lineage = getLineageNameByFunctionalName(cellName);
         if (lineage != null) {
             cell = lineage;
         }
 
         if (containsCellCase(cell)) {
-            try {
-                for (CellCase cellCase : cellCases) {
-                    if (cellCase.getLineageName().toLowerCase().equals(cell.toLowerCase())) {
-                        cellCases.remove(cellCase);
-                    }
+            for (CellCase cellCase : cellCases) {
+                if (cellCase.getLineageName().toLowerCase().equals(cell.toLowerCase())) {
+                    cellCases.remove(cellCase);
                 }
-            } catch (ConcurrentModificationException e) {
-                //e.printStackTrace();
             }
         }
 

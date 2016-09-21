@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.io.BufferedReader;
@@ -6,23 +10,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import partslist.PartsList;
 
 /**
  * Contains anatomy information for a select number of cells
- *
- * @author katzmanb
  */
 public class Anatomy {
-    private static ArrayList<String> functionalNames;
-    private static ArrayList<String> types;
-    private static ArrayList<String> somaLocations;
-    private static ArrayList<String> neuriteLocations;
-    private static ArrayList<String> morphologicalFeatures;
-    private static ArrayList<String> functions;
-    private static ArrayList<String> neurotransmitters;
+
+    private static final List<String> functionalNames;
+    private static final List<String> types;
+    private static final List<String> somaLocations;
+    private static final List<String> neuriteLocations;
+    private static final List<String> morphologicalFeatures;
+    private static final List<String> functions;
+    private static final List<String> neurotransmitters;
 
     static {
         functionalNames = new ArrayList<>();
@@ -33,17 +37,14 @@ public class Anatomy {
         functions = new ArrayList<>();
         neurotransmitters = new ArrayList<>();
 
-        try {
-
-            URL url = PartsList.class.getResource("/wormguides/models/anatomy_file/anatomy.csv");
-            InputStream input = url.openStream();
-            InputStreamReader isr = new InputStreamReader(input);
-            BufferedReader br = new BufferedReader(isr);
+        final URL url = PartsList.class.getResource("/wormguides/models/anatomy_file/anatomy.csv");
+        try (InputStream input = url.openStream();
+             InputStreamReader isr = new InputStreamReader(input);
+             BufferedReader br = new BufferedReader(isr)) {
 
             String line;
             while ((line = br.readLine()) != null) {
                 StringTokenizer tokenizer = new StringTokenizer(line, ",");
-
                 //valid line has 7 entires
                 if (tokenizer.countTokens() == 7) {
                     functionalNames.add(tokenizer.nextToken());
@@ -55,7 +56,6 @@ public class Anatomy {
                     neurotransmitters.add(tokenizer.nextToken());
                 }
             }
-
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -79,9 +79,7 @@ public class Anatomy {
                 return true;
             }
         }
-
         cellName = findRootOfCell(cellName);
-
         //check for match with updated cell name
         for (String funcName : functionalNames) {
             if (funcName.equals(cellName)) {

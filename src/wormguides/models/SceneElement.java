@@ -6,10 +6,12 @@ package wormguides.models;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javafx.scene.shape.MeshView;
 
-import wormguides.loaders.GeometryLoader;
+import static java.lang.Character.isLetter;
+import static wormguides.loaders.GeometryLoader.loadOBJ;
 
 /*
  * A SceneElement represents a cell body structure (uni or multicellular)
@@ -19,7 +21,7 @@ public class SceneElement {
 
     private final String OBJ_EXT = ".obj";
     private String sceneName; // descriptor or display of object
-    private ArrayList<String> cellNames; // cell names at time point i.e. cells
+    private List<String> cellNames; // cell names at time point i.e. cells
     // involved in this scene
     private String markerName; // used when neuron is separated from marker
     private String embryoName; // used when based on specific embryo
@@ -34,8 +36,14 @@ public class SceneElement {
     private int x, y, z; // coordinates used when element belongs to a note
 
     public SceneElement(
-            String sceneName, ArrayList<String> cellNames, String markerName, String imagingSource,
-            String resourceLocation, int startTime, int endTime, String comments) {
+            final String sceneName,
+            final List<String> cellNames,
+            final String markerName,
+            final String imagingSource,
+            final String resourceLocation,
+            final int startTime,
+            final int endTime,
+            final String comments) {
 
         this.sceneName = sceneName;
         this.cellNames = cellNames;
@@ -46,11 +54,11 @@ public class SceneElement {
         this.startTime = startTime;
         this.endTime = endTime;
         this.comments = comments;
-        completeResourceFlag = isResourceComplete();
+        this.completeResourceFlag = isResourceComplete();
 
         // make sure there is proper capitalization in cell names
         // specificially "Ab" instead of "AB"
-        ArrayList<String> editedNames = new ArrayList<>();
+        List<String> editedNames = new ArrayList<>();
         Iterator<String> iter = cellNames.iterator();
         String name;
         while (iter.hasNext()) {
@@ -63,13 +71,19 @@ public class SceneElement {
         cellNames.addAll(editedNames);
     }
 
-    // Geometry used for notes in stories
+    // Geometry used for notes in wormguides.stories
     public SceneElement(
-            String sceneName, String cellName, String markerName, String imagingSource,
-            String resourceLocation, int startTime, int endTime, String comments) {
+            final String sceneName,
+            final String cellName,
+            final String markerName,
+            final String imagingSource,
+            final String resourceLocation,
+            final int startTime,
+            final int endTime,
+            final String comments) {
         this.sceneName = sceneName;
         this.cellNames = new ArrayList<>();
-        cellNames.add(cellName);
+        this.cellNames.add(cellName);
         this.markerName = markerName;
         this.embryoName = ""; // will fill this field in later?
         this.imagingSource = imagingSource;
@@ -77,8 +91,7 @@ public class SceneElement {
         this.startTime = startTime;
         this.endTime = endTime;
         this.comments = comments;
-
-        completeResourceFlag = isResourceComplete();
+        this.completeResourceFlag = isResourceComplete();
     }
 
     private boolean isResourceComplete() {
@@ -86,11 +99,10 @@ public class SceneElement {
         if (resourceLocation != null) {
             int idx = resourceLocation.lastIndexOf(".");
             if (idx != -1) {
-                String extCheck = resourceLocation.substring(++idx); // substring
-                // after
-                // "."
+                // substring after "."
+                String extCheck = resourceLocation.substring(++idx);
                 for (int i = 0; i < extCheck.length(); i++) {
-                    if (!Character.isLetter(extCheck.charAt(i))) {
+                    if (!isLetter(extCheck.charAt(i))) {
                         complete = false;
                     }
                 }
@@ -108,12 +120,11 @@ public class SceneElement {
 
         // check if complete resource
         if (completeResourceFlag) {
-            return GeometryLoader.loadOBJ(resourceLocation);
+            return loadOBJ(resourceLocation);
         }
 
         // append time and ext to resource location
-        String objFile = resourceLocation + "_t" + time + OBJ_EXT;
-        return GeometryLoader.loadOBJ(objFile);
+        return loadOBJ(resourceLocation + "_t" + time + OBJ_EXT);
     }
 
     public void setNewCellNames(ArrayList<String> cells) {
@@ -255,7 +266,7 @@ public class SceneElement {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         String sb = "SceneElement[" + "@scenename=" + sceneName +
                 "; @startTime=" + startTime +
                 "; @endTime=" + endTime +

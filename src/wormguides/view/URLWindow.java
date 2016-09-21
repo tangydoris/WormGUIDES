@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.view;
 
 import java.awt.Toolkit;
@@ -15,10 +19,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import wormguides.URLGenerator;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.ImageLoader;
 import wormguides.models.Rule;
+import wormguides.util.URLGenerator;
 
 public class URLWindow extends AnchorPane {
 
