@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -56,7 +57,7 @@ import wormguides.models.Rule;
 import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 
 import static java.util.Collections.sort;
 import static java.util.stream.Collectors.toList;
@@ -79,6 +80,10 @@ import static wormguides.loaders.ImageLoader.getMinusIcon;
 import static wormguides.loaders.ImageLoader.getPlusIcon;
 import static wormguides.models.SearchOption.CELL_NUCLEUS;
 
+/**
+ * Scroll pane that displays a clickable sulston tree. The tree contains visualization of the lineage data that is
+ * passed into the constructor.
+ */
 public class SulstonTreePane extends ScrollPane {
 
     // gui stuff
@@ -92,9 +97,9 @@ public class SulstonTreePane extends ScrollPane {
 
     private final int movieTimeOffset;
 
-    private HashMap<String, Integer> nameXUseMap;
-    private HashMap<String, Integer> nameYStartUseMap;
-    private ArrayList<String> hiddenNodes;
+    private Map<String, Integer> nameXUseMap;
+    private Map<String, Integer> nameYStartUseMap;
+    private List<String> hiddenNodes;
     private TreeItem<String> lineageTreeRoot;
     private ColorHash colorHash;
 
@@ -155,7 +160,6 @@ public class SulstonTreePane extends ScrollPane {
             // left click
             else if (event.getButton() == PRIMARY) {
                 contextMenuStage.hide();
-
                 resetSelectedNameLabeled(sourceName);
 
                 if (hiddenNodes.contains(sourceName)) {
@@ -229,7 +233,8 @@ public class SulstonTreePane extends ScrollPane {
         final Button minusButton = new Button();
         minusButton.setContentDisplay(GRAPHIC_ONLY);
         minusButton.setGraphic(new ImageView(getMinusIcon()));
-        minusButton.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;"
+        minusButton.setStyle("-fx-focus-color: -fx-outer-border; "
+                + "-fx-faint-focus-color: transparent;"
                 + "-fx-background-color: transparent;");
         minusButton.setPrefSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
         minusButton.setMaxSize(ZOOM_BUTTON_SIZE, ZOOM_BUTTON_SIZE);
@@ -272,8 +277,7 @@ public class SulstonTreePane extends ScrollPane {
                 fileChooser.setTitle("Choose Save Location");
                 fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
 
-                WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
-
+                final WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
                 // write the image to a file
                 try {
                     final File file = fileChooser.showSaveDialog(fileChooserStage);

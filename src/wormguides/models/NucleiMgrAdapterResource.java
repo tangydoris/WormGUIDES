@@ -6,7 +6,7 @@ package wormguides.models;
 
 import java.util.ListResourceBundle;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 
 public class NucleiMgrAdapterResource extends ListResourceBundle {
 

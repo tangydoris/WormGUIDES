@@ -56,7 +56,7 @@ import wormguides.stories.StoryFileUtil;
 import wormguides.util.URLGenerator;
 import wormguides.view.AppFont;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 
 import static javafx.scene.text.FontSmoothingType.LCD;
 

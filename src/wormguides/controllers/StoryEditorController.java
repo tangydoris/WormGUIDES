@@ -38,7 +38,7 @@ import wormguides.stories.Note.Type;
 import wormguides.stories.Story;
 import wormguides.util.StringListCellFactory;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 

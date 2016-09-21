@@ -23,7 +23,7 @@ import wormguides.models.CasesLists;
 import wormguides.models.ProductionInfo;
 import wormguides.view.DraggableTab;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 import connectome.Connectome;
 import netscape.javascript.JSObject;
 import partslist.PartsList;

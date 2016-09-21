@@ -81,17 +81,17 @@ import wormguides.view.urlwindow.URLLoadWarningDialog;
 import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLWindow;
 
-import acetree.AceTreeLoader;
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
+import acetree.tablelineagedata.AceTreeLineageTableLoader;
 import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
 
-import static acetree.AceTreeLoader.getAvgXOffsetFromZero;
-import static acetree.AceTreeLoader.getAvgYOffsetFromZero;
-import static acetree.AceTreeLoader.getAvgZOffsetFromZero;
-import static acetree.AceTreeLoader.setOriginToZero;
+import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgXOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgYOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgZOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeLineageTableLoader.setOriginToZero;
 import static javafx.application.Platform.runLater;
 
 public class RootLayoutController extends BorderPane implements Initializable {
@@ -1197,7 +1197,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             setOriginToZero(lineageData, defaultEmbryoFlag);
 
         } else {
-            lineageData = AceTreeLoader.loadNucFiles(productionInfo);
+            lineageData = AceTreeLineageTableLoader.loadNucFiles(productionInfo);
             defaultEmbryoFlag = true;
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }

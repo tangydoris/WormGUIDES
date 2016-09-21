@@ -32,7 +32,7 @@ import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.models.SearchOption;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;

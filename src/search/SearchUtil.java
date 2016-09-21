@@ -12,7 +12,7 @@ import wormguides.models.CasesLists;
 import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
 

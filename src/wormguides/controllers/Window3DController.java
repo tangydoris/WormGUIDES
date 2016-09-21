@@ -101,7 +101,7 @@ import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
 import wormguides.view.AppFont;
 
-import acetree.lineagedata.LineageData;
+import acetree.LineageData;
 import com.sun.javafx.scene.CameraHelper;
 import connectome.Connectome;
 import partslist.PartsList;

@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package acetree.lineagedata;
+package acetree;
 
 import java.util.List;
 
@@ -72,37 +72,6 @@ public interface LineageData {
      * @return final point in time for which the cell exists
      */
     int getLastOccurrenceOf(final String name);
-
-    /**
-     * Adds a time frame to the lineage data. A time frame is be represented by whatever data structure an
-     * implementing class chooses to use, and should contain information on all the cells, their positions and their
-     * diameters at one point in time.
-     */
-    void addTimeFrame();
-
-    /**
-     * Adds nucleus data for a cell for the specified case-sensitive name
-     *
-     * @param time
-     *         time at which this cell exists, starting from 1
-     * @param name
-     *         name of the cell
-     * @param x
-     *         x-coordinate of the cell in 3D space
-     * @param y
-     *         y-coordinate of the cell in 3D space
-     * @param z
-     *         z-coordinate of the cell in 3D space
-     * @param diameter
-     *         diameter of the cell
-     */
-    void addNucleus(
-            final int time,
-            final String name,
-            final double x,
-            final double y,
-            final double z,
-            final double diameter);
 
     /**
      * @param name
