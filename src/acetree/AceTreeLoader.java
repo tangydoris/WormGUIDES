@@ -18,6 +18,10 @@ import wormguides.models.ProductionInfo;
 import acetree.lineagedata.LineageData;
 import acetree.lineagedata.TableLineageData;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+import static java.lang.Math.round;
+
 /**
  * Loader that reads the nuclei files located in the same package and creates a {@link LineageData} from the data
  */
@@ -46,51 +50,59 @@ public class AceTreeLoader {
     private static int avgY;
     private static int avgZ;
 
-    public static LineageData loadNucFiles(ProductionInfo productionInfo) {
-        LineageData tld = new TableLineageData(
+    public static LineageData loadNucFiles(final ProductionInfo productionInfo) {
+        final TableLineageData tableLineageData = new TableLineageData(
                 allCellNames,
                 productionInfo.getXScale(),
                 productionInfo.getYScale(),
                 productionInfo.getZScale());
 
         try {
-            tld.addTimeFrame(); // accounts for first tld.addFrame() added when
-            // reading from JAR --> from dir name first entry
-            // match
+            // accounts for first tld.addFrame() added when reading from JAR --> from dir name first entry match
+            tableLineageData.addTimeFrame();
             URL url;
             for (int i = 1; i <= productionInfo.getTotalTimePoints(); i++) {
                 if (i < 10) {
                     url = AceTreeLoader.class.getResource(ENTRY_PREFIX + T + TWO_ZERO_PAD + i + ENTRY_EXT);
                     if (url != null) {
-                        process(tld, i, url.openStream());
+                        process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + T + TWO_ZERO_PAD + i + ENTRY_EXT);
+                        System.out.println("Could not process file: "
+                                + ENTRY_PREFIX
+                                + T
+                                + TWO_ZERO_PAD
+                                + i
+                                + ENTRY_EXT);
                     }
                 } else if (i >= 10 && i < 100) {
                     url = AceTreeLoader.class.getResource(ENTRY_PREFIX + T + ONE_ZERO_PAD + i + ENTRY_EXT);
                     if (url != null) {
-                        process(tld, i, url.openStream());
+                        process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + T + ONE_ZERO_PAD + i + ENTRY_EXT);
+                        System.out.println("Could not process file: "
+                                + ENTRY_PREFIX
+                                + T
+                                + ONE_ZERO_PAD
+                                + i
+                                + ENTRY_EXT);
                     }
                 } else if (i >= 100) {
                     url = AceTreeLoader.class.getResource(ENTRY_PREFIX + T + i + ENTRY_EXT);
                     if (url != null) {
-                        process(tld, i, url.openStream());
+                        process(tableLineageData, i, url.openStream());
                     } else {
                         System.out.println("Could not process file: " + ENTRY_PREFIX + T + i + ENTRY_EXT);
                     }
                 }
             }
-
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
 
         // translate all cells to center around (0,0,0)
-        setOriginToZero(tld, true);
+        setOriginToZero(tableLineageData, true);
 
-        return tld;
+        return tableLineageData;
     }
 
     public static int getAvgXOffsetFromZero() {
@@ -105,16 +117,15 @@ public class AceTreeLoader {
         return avgZ;
     }
 
-    public static void setOriginToZero(LineageData lineageData, boolean defaultEmbryoFlag) {
+    public static void setOriginToZero(final TableLineageData tableLineageData, final boolean defaultEmbryoFlag) {
         int totalPositions = 0;
-        double sumX, sumY, sumZ;
-        sumX = 0d;
-        sumY = 0d;
-        sumZ = 0d;
+        double sumX = 0d;
+        double sumY = 0d;
+        double sumZ = 0d;
 
         // sum up all x-, y- and z-coordinates of nuclei
-        for (int i = 0; i < lineageData.getNumberOfTimePoints(); i++) {
-            double[][] positionsArray = lineageData.getPositions(i);
+        for (int i = 0; i < tableLineageData.getNumberOfTimePoints(); i++) {
+            double[][] positionsArray = tableLineageData.getPositions(i);
             for (int j = 1; j < positionsArray.length; j++) {
                 sumX += positionsArray[j][X_POS_INDEX];
                 sumY += positionsArray[j][Y_POS_INDEX];
@@ -136,41 +147,43 @@ public class AceTreeLoader {
                 + avgZ);
 
         // offset all nuclei x-, y- and z- positions by x, y and z averages
-        lineageData.shiftAllPositions(avgX, avgY, avgZ);
+        tableLineageData.shiftAllPositions(avgX, avgY, avgZ);
     }
 
-    private static void process(LineageData lineageData, final int time, final InputStream input) throws IOException {
-        lineageData.addTimeFrame();
+    private static void process(final TableLineageData tableLineageData, final int time, final InputStream input) {
+        tableLineageData.addTimeFrame();
 
-        InputStreamReader isr = new InputStreamReader(input);
-        BufferedReader reader = new BufferedReader(isr);
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String[] tokens = new String[TOKEN_ARRAY_SIZE];
-            StringTokenizer tokenizer = new StringTokenizer(line, ",");
-            int k = 0;
-            while (tokenizer.hasMoreTokens()) {
-                tokens[k++] = tokenizer.nextToken().trim();
-            }
+        try (InputStreamReader isr = new InputStreamReader(input);
+             BufferedReader reader = new BufferedReader(isr)) {
 
-            int valid = Integer.parseInt(tokens[VALID]);
-            if (valid == 1) {
-                makeNucleus(lineageData, time, tokens);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = new String[TOKEN_ARRAY_SIZE];
+                StringTokenizer tokenizer = new StringTokenizer(line, ",");
+                int k = 0;
+                while (tokenizer.hasMoreTokens()) {
+                    tokens[k++] = tokenizer.nextToken().trim();
+                }
+
+                int valid = parseInt(tokens[VALID]);
+                if (valid == 1) {
+                    makeNucleus(tableLineageData, time, tokens);
+                }
             }
+        } catch (IOException e) {
+            System.out.println("Error in processing input stream");
         }
-
-        reader.close();
     }
 
-    private static void makeNucleus(LineageData lineageData, final int time, final String[] tokens) {
+    private static void makeNucleus(final TableLineageData tableLineageData, final int time, final String[] tokens) {
         try {
-            lineageData.addNucleus(
+            tableLineageData.addNucleus(
                     time,
                     tokens[IDENTITY],
-                    Integer.parseInt(tokens[XCOR]),
-                    Integer.parseInt(tokens[YCOR]),
-                    (int) Math.round(Double.parseDouble(tokens[ZCOR])),
-                    Integer.parseInt(tokens[DIAMETER]));
+                    parseInt(tokens[XCOR]),
+                    parseInt(tokens[YCOR]),
+                    round(parseDouble(tokens[ZCOR])),
+                    parseInt(tokens[DIAMETER]));
 
         } catch (NumberFormatException nfe) {
             System.out.println("Incorrect format in nucleus file for time " + time + ".");

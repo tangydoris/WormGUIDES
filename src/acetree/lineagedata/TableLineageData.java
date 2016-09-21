@@ -17,14 +17,17 @@ public class TableLineageData implements LineageData {
 
     private final List<Frame> timeFrames;
     private final List<String> allCellNames;
+    private final double[] xyzScale;
     private boolean isSulston;
-    private double[] xyzScale;
 
-    public TableLineageData(final List<String> allCellNames, double X_SCALE, double Y_SCALE, double Z_SCALE) {
+    public TableLineageData(
+            final List<String> allCellNames,
+            final double X_SCALE,
+            final double Y_SCALE,
+            final double Z_SCALE) {
         this.allCellNames = requireNonNull(allCellNames);
         this.allCellNames.sort(String::compareTo);
         this.timeFrames = new ArrayList<>();
-
         this.xyzScale = new double[]{X_SCALE, Y_SCALE, Z_SCALE};
     }
 
@@ -78,15 +81,32 @@ public class TableLineageData implements LineageData {
         return timeFrames.size();
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /**
+     * Adds a time frame to the lineage data. A time frame is be represented by whatever data structure an
+     * implementing class chooses to use, and should contain information on all the cells, their positions and their
+     * diameters at one point in time.
+     */
     public void addTimeFrame() {
         final Frame frame = new Frame();
         timeFrames.add(frame);
     }
 
-    /** {@inheritDoc} */
-    @Override
+    /**
+     * Adds nucleus data for a cell for the specified case-sensitive name
+     *
+     * @param time
+     *         time at which this cell exists, starting from 1
+     * @param name
+     *         name of the cell
+     * @param x
+     *         x-coordinate of the cell in 3D space
+     * @param y
+     *         y-coordinate of the cell in 3D space
+     * @param z
+     *         z-coordinate of the cell in 3D space
+     * @param diameter
+     *         diameter of the cell
+     */
     public void addNucleus(
             final int time,
             final String name,
@@ -98,7 +118,7 @@ public class TableLineageData implements LineageData {
         if (time <= getNumberOfTimePoints()) {
             final int index = time - 1;
 
-            Frame frame = timeFrames.get(index);
+            final Frame frame = timeFrames.get(index);
             frame.addName(name);
             frame.addPosition(new Double[]{x, y, z});
             frame.addDiameter(diameter);
