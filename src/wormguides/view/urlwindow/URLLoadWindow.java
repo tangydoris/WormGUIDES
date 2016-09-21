@@ -24,7 +24,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import wormguides.loaders.ImageLoader;
-import wormguides.view.AppFont;
+import wormguides.util.AppFont;
 
 public class URLLoadWindow extends AnchorPane {
 

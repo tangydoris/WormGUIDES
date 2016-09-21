@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import wormguides.models.ProductionInfo;
-
 import acetree.LineageData;
+import wormguides.models.ProductionInfo;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.round;
 
 /**
- * Loader that reads the nuclei files located in the same package and creates a {@link LineageData} from the data
+ * Loader that reads the nuclei files located in the same package and creates a {@link LineageData} from the data.
+ * This class instantiates a {@link TableLineageData} and creates a lineage using Frame objects defined as an private
+ * inner class.
  */
 public class AceTreeLineageTableLoader {
 
@@ -127,15 +128,15 @@ public class AceTreeLineageTableLoader {
         return avgZ;
     }
 
-    public static void setOriginToZero(final TableLineageData tableLineageData, final boolean defaultEmbryoFlag) {
+    public static void setOriginToZero(final LineageData lineageData, final boolean defaultEmbryoFlag) {
         int totalPositions = 0;
         double sumX = 0d;
         double sumY = 0d;
         double sumZ = 0d;
 
         // sum up all x-, y- and z-coordinates of nuclei
-        for (int i = 0; i < tableLineageData.getNumberOfTimePoints(); i++) {
-            double[][] positionsArray = tableLineageData.getPositions(i);
+        for (int i = 0; i < lineageData.getNumberOfTimePoints(); i++) {
+            double[][] positionsArray = lineageData.getPositions(i);
             for (int j = 1; j < positionsArray.length; j++) {
                 sumX += positionsArray[j][X_POS_INDEX];
                 sumY += positionsArray[j][Y_POS_INDEX];
@@ -157,7 +158,7 @@ public class AceTreeLineageTableLoader {
                 + avgZ);
 
         // offset all nuclei x-, y- and z- positions by x, y and z averages
-        tableLineageData.shiftAllPositions(avgX, avgY, avgZ);
+        lineageData.shiftAllPositions(avgX, avgY, avgZ);
     }
 
     private static void process(final TableLineageData tableLineageData, final int time, final InputStream input) {

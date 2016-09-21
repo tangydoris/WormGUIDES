@@ -14,11 +14,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
+import wormguides.view.popups.SulstonTreePane;
+
 import static java.util.Collections.sort;
 
 /**
  * ColorHash is a number of combinations of Colors mapped to a {@link Material}. {@link
- * wormguides.controllers.Window3DController} and {@link wormguides.view.SulstonTreePane} query this class to
+ * wormguides.controllers.Window3DController} and {@link SulstonTreePane} query this class to
  * find the appropriate color striping to apply to a cell/its lineage. This class also contains a map of the material
  * to the opacity (0.0->1.0) of the least opaque color in a Material. This is used so that the "most opaque"
  * materials can be rendered first, followed by sheerer ones.

@@ -21,8 +21,8 @@ import javafx.scene.layout.VBox;
 import wormguides.controllers.Window3DController;
 import wormguides.loaders.ImageLoader;
 import wormguides.models.Rule;
+import wormguides.util.AppFont;
 import wormguides.util.URLGenerator;
-import wormguides.view.AppFont;
 
 import static java.awt.Toolkit.getDefaultToolkit;
 import static javafx.scene.layout.HBox.setHgrow;

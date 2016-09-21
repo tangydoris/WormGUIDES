@@ -95,11 +95,11 @@ import wormguides.models.SearchOption;
 import wormguides.models.Xform;
 import wormguides.stories.Note;
 import wormguides.stories.Note.Display;
+import wormguides.util.AppFont;
 import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
-import wormguides.view.AppFont;
 
 import acetree.LineageData;
 import com.sun.javafx.scene.CameraHelper;

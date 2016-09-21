@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import wormguides.view.AppFont;
+import wormguides.util.AppFont;
 
 public class URLLoadWarningDialog extends Dialog<ButtonType> {
 

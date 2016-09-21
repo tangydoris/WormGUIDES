@@ -53,8 +53,8 @@ import wormguides.stories.Note;
 import wormguides.stories.StoriesLoader;
 import wormguides.stories.Story;
 import wormguides.stories.StoryFileUtil;
+import wormguides.util.AppFont;
 import wormguides.util.URLGenerator;
-import wormguides.view.AppFont;
 
 import acetree.LineageData;
 

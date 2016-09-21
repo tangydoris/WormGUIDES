@@ -57,6 +57,11 @@ import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
+import acetree.LineageData;
+import connectome.Connectome;
+import partslist.PartsList;
+import search.SearchType;
+import search.SearchUtil;
 import wormguides.MainApp;
 import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchLayer;
@@ -72,27 +77,25 @@ import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.stories.Story;
 import wormguides.util.StringListCellFactory;
-import wormguides.view.AboutPane;
 import wormguides.view.DraggableTab;
-import wormguides.view.SulstonTreePane;
-import wormguides.view.YesNoCancelDialogPane;
 import wormguides.view.infowindow.InfoWindow;
+import wormguides.view.popups.AboutPane;
+import wormguides.view.popups.StorySavePane;
+import wormguides.view.popups.SulstonTreePane;
 import wormguides.view.urlwindow.URLLoadWarningDialog;
 import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLWindow;
 
-import acetree.LineageData;
-import acetree.tablelineagedata.AceTreeLineageTableLoader;
-import connectome.Connectome;
-import partslist.PartsList;
-import search.SearchType;
-import search.SearchUtil;
+import static javafx.application.Platform.runLater;
 
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgXOffsetFromZero;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgYOffsetFromZero;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgZOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeLineageTableLoader.loadNucFiles;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.setOriginToZero;
-import static javafx.application.Platform.runLater;
+import static wormguides.layers.SearchLayer.addDefaultColorRules;
+import static wormguides.layers.SearchLayer.initDatabases;
+import static wormguides.layers.SearchLayer.setRulesList;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -628,12 +631,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     }
 
-    public void promptStorySave() {
+    private void promptStorySave() {
         if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
             if (exitSavePopup == null) {
-
-                YesNoCancelDialogPane saveDialog = new YesNoCancelDialogPane(
-                        "Would you like to save the current active story before exiting WormGUIDES?", "Yes", "No",
+                final StorySavePane saveDialog = new StorySavePane(
+                        "Would you like to save the current active story before exiting WormGUIDES?",
+                        "Yes",
+                        "No",
                         "Cancel");
 
                 exitSavePopup = new Popup();
@@ -1197,7 +1201,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             setOriginToZero(lineageData, defaultEmbryoFlag);
 
         } else {
-            lineageData = AceTreeLineageTableLoader.loadNucFiles(productionInfo);
+            lineageData = loadNucFiles(productionInfo);
             defaultEmbryoFlag = true;
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }
@@ -1225,8 +1229,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         initSearch();
         ObservableList<Rule> list = displayLayer.getRulesList();
-        SearchLayer.setRulesList(list);
-        SearchLayer.addDefaultColorRules();
+        setRulesList(list);
+        addDefaultColorRules();
         window3DController.setRulesList(list);
 
         initSceneElementsList();
@@ -1234,7 +1238,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         initStructuresLayer();
         initStoriesLayer();
 
-        SearchLayer.initDatabases(lineageData, sceneElementsList, connectome, cases, productionInfo);
+        initDatabases(lineageData, sceneElementsList, connectome, cases, productionInfo);
 
         window3DController.setSearchResultsList(SearchLayer.getSearchResultsList());
         searchResultsListView.setItems(SearchLayer.getSearchResultsList());

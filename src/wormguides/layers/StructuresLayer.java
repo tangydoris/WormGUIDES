@@ -29,7 +29,7 @@ import javafx.util.Callback;
 
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
-import wormguides.view.AppFont;
+import wormguides.util.AppFont;
 
 import partslist.PartsList;
 

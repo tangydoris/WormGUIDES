@@ -36,7 +36,7 @@ import wormguides.MainApp;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
-import wormguides.view.AppFont;
+import wormguides.util.AppFont;
 
 import search.SearchType;
 

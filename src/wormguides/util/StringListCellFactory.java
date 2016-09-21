@@ -12,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
-import wormguides.view.AppFont;
-
 /*
  * Callback for ListCell<String> so that fonts are uniform
  */
