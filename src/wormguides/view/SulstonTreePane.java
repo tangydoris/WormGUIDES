@@ -88,9 +88,9 @@ public class SulstonTreePane extends ScrollPane {
     private final double DEFAULT_WINDOW_WIDTH = 775;
     private final Color ZOOM_BUTTONS_SHADOW_COLOR = web("AAAAAA");
 
-    private LineageData lineageData;
+    private final LineageData lineageData;
 
-    private int movieTimeOffset;
+    private final int movieTimeOffset;
 
     private HashMap<String, Integer> nameXUseMap;
     private HashMap<String, Integer> nameYStartUseMap;
