@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package wormguides.models.connectome;
+package connectome;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,12 @@ import java.util.List;
 import wormguides.view.infowindow.HTMLNode;
 import wormguides.view.infowindow.InfoWindowDOM;
 
+import static connectome.ConnectomeLoader.loadConnectome;
 import static java.util.Collections.sort;
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static partslist.PartsList.isFunctionalName;
 import static partslist.PartsList.isLineageName;
-import static wormguides.loaders.ConnectomeLoader.loadConnectome;
 
 /**
  * Underlying model of the all neuronal connections. It holds a list of {@link NeuronalSynapse}s that define the

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import wormguides.models.CasesLists;
 import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
-import wormguides.models.connectome.Connectome;
 
 import acetree.lineagedata.LineageData;
+import connectome.Connectome;
 import partslist.PartsList;
 
 import static java.lang.Math.pow;

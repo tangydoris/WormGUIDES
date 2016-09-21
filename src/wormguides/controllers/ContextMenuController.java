@@ -36,8 +36,8 @@ import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
 import wormguides.models.SearchOption;
 import wormguides.models.TerminalCellCase;
-import wormguides.models.connectome.Connectome;
 
+import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;
 

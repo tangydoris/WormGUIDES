@@ -93,7 +93,6 @@ import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
 import wormguides.models.SearchOption;
 import wormguides.models.Xform;
-import wormguides.models.connectome.Connectome;
 import wormguides.stories.Note;
 import wormguides.stories.Note.Display;
 import wormguides.util.ColorComparator;
@@ -104,6 +103,7 @@ import wormguides.view.AppFont;
 
 import acetree.lineagedata.LineageData;
 import com.sun.javafx.scene.CameraHelper;
+import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;

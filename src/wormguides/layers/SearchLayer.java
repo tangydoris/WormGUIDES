@@ -31,9 +31,9 @@ import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.models.SearchOption;
-import wormguides.models.connectome.Connectome;
 
 import acetree.lineagedata.LineageData;
+import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;

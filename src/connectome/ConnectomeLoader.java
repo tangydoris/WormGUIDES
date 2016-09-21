@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package wormguides.loaders;
+package connectome;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +14,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import wormguides.models.SynapseType;
-import wormguides.models.connectome.NeuronalSynapse;
 
+/**
+ * Loader to read NeuronConnect.csv and create a connectome object.
+ * @see Connectome
+ */
 public class ConnectomeLoader {
 
     private static final String s_presynapticV1 = "S";
@@ -32,13 +35,12 @@ public class ConnectomeLoader {
 
     private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
 
-    private static String filePath = "/wormguides/models/connectome_config_file/NeuronConnect.csv";
+    private static final String filePath = "/connectome/NeuronConnect.csv";
 
     public static List<NeuronalSynapse> loadConnectome() {
         final List<NeuronalSynapse> connectome = new ArrayList<>();
 
-        final URL url = ConnectomeLoader.class
-                .getResource(filePath);
+        final URL url = ConnectomeLoader.class.getResource(filePath);
         try (InputStream stream = url.openStream();
              InputStreamReader streamReader = new InputStreamReader(stream);
              BufferedReader reader = new BufferedReader(streamReader)) {

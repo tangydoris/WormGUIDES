@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package wormguides.models.connectome;
+package connectome;
 
 import wormguides.models.SynapseType;
 

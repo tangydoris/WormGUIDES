@@ -21,10 +21,10 @@ import wormguides.controllers.InfoWindowLinkController;
 import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.ProductionInfo;
-import wormguides.models.connectome.Connectome;
 import wormguides.view.DraggableTab;
 
 import acetree.lineagedata.LineageData;
+import connectome.Connectome;
 import netscape.javascript.JSObject;
 import partslist.PartsList;
 
