@@ -89,6 +89,8 @@ import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
 
+import static acetree.AceTreeLoader.setOriginToZero;
+
 public class RootLayoutController extends BorderPane implements Initializable {
 
     private final static String unLineagedStart = "Nuc";
@@ -1166,7 +1168,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         if (bundle != null) {
             lineageData = (LineageData) bundle.getObject("lineageData");
             defaultEmbryoFlag = false;
-            AceTreeLoader.setOriginToZero(lineageData, defaultEmbryoFlag);
+            setOriginToZero(lineageData, defaultEmbryoFlag);
 
         } else {
             lineageData = AceTreeLoader.loadNucFiles(productionInfo);
@@ -1188,7 +1190,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     public void initializeWithLineageData() {
-
         initLineageTree(lineageData.getAllCellNames());
 
         init3DWindow(lineageData);
