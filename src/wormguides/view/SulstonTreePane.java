@@ -4,6 +4,7 @@
 
 package wormguides.view;
 
+import java.awt.Toolkit;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,15 +12,20 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -117,28 +123,32 @@ public class SulstonTreePane extends ScrollPane {
 
         this.defaultEmbryoFlag = defaultEmbryoFlag;
 
+        
         clickHandler = event -> {
             String sourceName = ((Node) event.getSource()).getId();
-
+            
             // right click
             if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
                     && (event.isControlDown() || event.isMetaDown()))) {
+            	
+            	
                 showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
             }
-
+            
             // left click
-            else if (event.getButton() == MouseButton.PRIMARY) {
-                contextMenuStage.hide();
-
-                resetSelectedNameLabeled(sourceName);
-
+            else if (event.getButton() == MouseButton.PRIMARY) {            	
+                // reset the name to activate navigate3d in 3d cell window
+            	resetSelectedNameLabeled(sourceName);
+            }
+            
+            // on a double click, also expand the clicked node
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 if (hiddenNodes.contains(sourceName)) {
                     hiddenNodes.remove(sourceName);
                 } else {
                     hiddenNodes.add(sourceName);
-                }
-
-                updateDrawing();
+                }     
+            	updateDrawing();
             }
         };
 
@@ -356,9 +366,7 @@ public class SulstonTreePane extends ScrollPane {
 
             String funcName = PartsList.getFunctionalNameByLineageName(name);
 
-            if (funcName == null)
-
-            {
+            if (funcName == null) {
                 contextMenuController.disableTerminalCaseFunctions(true);
             } else {
                 contextMenuController.disableTerminalCaseFunctions(false);
@@ -687,5 +695,9 @@ public class SulstonTreePane extends ScrollPane {
         protected double computeValue() {
             return root.getViewportBounds().getWidth();
         }
+    }
+    
+    private class Task extends TimerTask {
+    	public void run() {}
     }
 }
