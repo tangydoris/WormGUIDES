@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public class SceneElementsList {
 
     private void processStreamString(InputStream stream) {
         try (InputStreamReader streamReader = new InputStreamReader(stream);
-                BufferedReader reader = new BufferedReader(streamReader)) {
+             BufferedReader reader = new BufferedReader(streamReader)) {
 
             // skip csv file heading
             reader.readLine();
@@ -110,7 +111,7 @@ public class SceneElementsList {
         }
 
         for (SceneElement se : elementsList) {
-            ArrayList<String> cells = se.getAllCellNames();
+            List<String> cells = se.getAllCellNames();
             for (int i = 0; i < cells.size(); i++) {
                 if (cells.get(i).startsWith(asterisk)) {
                     se.setNewCellNames(unpackCells(cells));
@@ -119,14 +120,13 @@ public class SceneElementsList {
         }
     }
 
-    private ArrayList<String> unpackCells(ArrayList<String> cells) {
-        ArrayList<String> unpackedCells = new ArrayList<>();
+    private List<String> unpackCells(final List<String> cells) {
+        final List<String> unpackedCells = new ArrayList<>();
 
         for (String cell : cells) {
-            // if cell starts with asterisk, recurse. else, add cel
+            // if cell starts with asterisk, recurse. else, add cell
             if (cell.startsWith(asterisk)) {
                 // find the matching resource location
-// recursively unpack matching location's cell list
                 elementsList.stream()
                         .filter(se -> se.getResourceLocation().endsWith(cell.substring(1)))
                         .forEachOrdered(se -> {
@@ -212,7 +212,7 @@ public class SceneElementsList {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         StringBuilder sb = new StringBuilder("scene elements list:\n");
         for (SceneElement se : elementsList) {
             sb.append(se.getSceneName())

@@ -127,7 +127,7 @@ public class SceneElement {
         return loadOBJ(resourceLocation + "_t" + time + OBJ_EXT);
     }
 
-    public void setNewCellNames(ArrayList<String> cells) {
+    public void setNewCellNames(List<String> cells) {
         this.cellNames.clear();
         this.cellNames = cells;
     }
@@ -184,7 +184,7 @@ public class SceneElement {
         }
     }
 
-    public ArrayList<String> getAllCellNames() {
+    public List<String> getAllCellNames() {
         return cellNames;
     }
 

@@ -589,16 +589,12 @@ public class Window3DController {
         t.getTransforms().add(new Rotate(90, new Point3D(0, 1, 0)));
         middleTransformGroup.getChildren().add(t);
 
-        middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));// rotation
-        // to
-        // match
-        // lateral
-        // orientation
-        // in
-        // image
+        // rotation to match lateral orientation in image
+        middleTransformGroup.getTransforms().add(new Rotate(-30, 0, 0));
+
+        // xy relocates z shrinks apparent by moving away from camera? improves resolution?
         middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
-        // xy relocates z shrinks apparent by moving away from camera? improves
-        // resolution?
+
         orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
         orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
         orientationIndicator.getChildren().add(middleTransformGroup);
@@ -1497,7 +1493,7 @@ public class Window3DController {
                         }
                     } else {
                         // in regular view mode
-                        ArrayList<String> allNames = se.getAllCellNames();
+                        List<String> allNames = se.getAllCellNames();
                         String sceneName = se.getSceneName();
 
                         // default white meshes
@@ -1509,7 +1505,7 @@ public class Window3DController {
                         // If mesh has with name(s), then process rules (cell or
                         // shape) that apply to it
                         else {
-                            ArrayList<Color> colors = new ArrayList<>();
+                            List<Color> colors = new ArrayList<>();
                             for (Rule rule : currentRulesList) {
                                 if (rule.isMulticellularStructureRule()
                                         && rule.appliesToMulticellularStructure(sceneName)) {
@@ -2018,7 +2014,7 @@ public class Window3DController {
 
     public boolean currentRulesApplyTo(String name) {
         String sceneName = "";
-        ArrayList<String> cells = new ArrayList<>();
+        List<String> cells = new ArrayList<>();
         if (defaultEmbryoFlag) {
             // get the scene name associated with the cell
             for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
@@ -2037,12 +2033,14 @@ public class Window3DController {
                         // colored
                     }
                 } else {
-                    String sn = sceneElementsList.getElementsList().get(i).getSceneName();
+                    String sn = sceneElementsList.getElementsList()
+                            .get(i)
+                            .getSceneName();
 
                     StringTokenizer st = new StringTokenizer(sn);
                     if (st.countTokens() == 2) {
                         String sceneNameLineage = st.nextToken();
-                        if (sceneNameLineage.toLowerCase().equals(name.toLowerCase())) {
+                        if (sceneNameLineage.equalsIgnoreCase(name)) {
                             sceneName = sn;
                             break;
                         }
