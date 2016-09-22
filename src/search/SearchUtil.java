@@ -9,24 +9,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import wormguides.models.CasesLists;
-import wormguides.models.Connectome;
-import wormguides.models.LineageTree;
 import wormguides.models.SceneElement;
 import wormguides.models.SceneElementsList;
 
 import acetree.lineagedata.LineageData;
+import connectome.Connectome;
 import partslist.PartsList;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static partslist.PartsList.getLineageNameByIndex;
+import static wormguides.models.LineageTree.isAncestor;
+import static wormguides.models.LineageTree.isDescendant;
 
 /**
  * Utility to search databases for cells that fit a certain criteria. Underlying databases queried include the
  * lineage data, parts list data, scene elements list, connectome, and list of cell cases.
  * <p>
- * See: {@link LineageData}, {@link PartsList}, {@link SceneElementsList}, {@link Connectome}, {@link CasesLists}
+ * See {@link LineageData}, {@link PartsList}, {@link SceneElementsList}, {@link Connectome}, {@link CasesLists}
  */
 public class SearchUtil {
 
@@ -299,19 +302,19 @@ public class SearchUtil {
      * @return lineage names of all neighboring cells
      */
     public static List<String> getNeighboringCells(final String cellName) {
-        final List<String> cells = new ArrayList<>();
+        List<String> cells = new ArrayList<>();
 
         if (cellName == null || !lineageData.isCellName(cellName)) {
             return cells;
         }
 
         // get time range for cell
-        final int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
-        final int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
+        int firstOccurence = lineageData.getFirstOccurrenceOf(cellName);
+        int lastOccurence = lineageData.getLastOccurrenceOf(cellName);
 
         for (int i = firstOccurence; i <= lastOccurence; i++) {
-            final String[] names = lineageData.getNames(i);
-            final Double[][] positions = lineageData.getPositions(i);
+            String[] names = lineageData.getNames(i);
+            double[][] positions = lineageData.getPositions(i);
 
             // find the coordinates of the query cell
             int queryIDX = -1;
@@ -384,7 +387,7 @@ public class SearchUtil {
      * @return the distance between the two elements
      */
     private static double distance(double x1, double x2, double y1, double y2, double z1, double z2) {
-        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
+        return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2) + pow((z2 - z1), 2));
     }
 
     /**
@@ -392,7 +395,7 @@ public class SearchUtil {
      *
      * @param queryCell
      *         the cell queried
-     *
+     *ß
      * @return list of terminal descendants for the query cell
      */
     public static List<String> getDescendantsList(final String queryCell) {
@@ -400,7 +403,7 @@ public class SearchUtil {
         if (queryCell != null) {
             PartsList.getLineageNames()
                     .stream()
-                    .filter(name -> !descendants.contains(name) && LineageTree.isDescendant(name, queryCell))
+                    .filter(name -> !descendants.contains(name) && isDescendant(name, queryCell))
                     .forEachOrdered(descendants::add);
         }
         return descendants;
@@ -425,13 +428,13 @@ public class SearchUtil {
         String searched = searchedText.toLowerCase();
         if (searched.equals("ab") || searched.equals("p0")) {
             activeLineageNames.stream()
-                    .filter(name -> !descendants.contains(name) && LineageTree.isDescendant(name, searched))
+                    .filter(name -> !descendants.contains(name) && isDescendant(name, searched))
                     .forEachOrdered(descendants::add);
         }
 
         for (String cell : cells) {
             activeLineageNames.stream()
-                    .filter(name -> !descendants.contains(name) && LineageTree.isDescendant(name, cell))
+                    .filter(name -> !descendants.contains(name) && isDescendant(name, cell))
                     .forEachOrdered(descendants::add);
         }
 
@@ -447,14 +450,13 @@ public class SearchUtil {
      * @return list of ancestors of all the cells, with no repeats
      */
     public static List<String> getAncestorsList(final List<String> cells) {
-        List<String> ancestors = new ArrayList<>();
+        final List<String> ancestors = new ArrayList<>();
         if (cells == null) {
             return ancestors;
         }
-
         for (String cell : cells) {
             activeLineageNames.stream()
-                    .filter(name -> !ancestors.contains(name) && LineageTree.isAncestor(name, cell))
+                    .filter(name -> !ancestors.contains(name) && isAncestor(name, cell))
                     .forEachOrdered(ancestors::add);
         }
 

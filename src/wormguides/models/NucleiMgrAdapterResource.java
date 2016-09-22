@@ -9,16 +9,15 @@ import java.util.ListResourceBundle;
 import acetree.lineagedata.LineageData;
 
 public class NucleiMgrAdapterResource extends ListResourceBundle {
-    private LineageData lineageData;
 
-    public NucleiMgrAdapterResource(LineageData data) {
-        this.lineageData = data;
+    private final LineageData lineageData;
+
+    public NucleiMgrAdapterResource(final LineageData lineageData) {
+        this.lineageData = lineageData;
     }
 
     @Override
-	protected Object[][] getContents() {
-        return new Object[][]{
-                {"lineageData", lineageData}
-        };
+    protected Object[][] getContents() {
+        return new Object[][]{{"lineageData", lineageData}};
     }
 }

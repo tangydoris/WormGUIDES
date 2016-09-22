@@ -1,3 +1,7 @@
+/*
+ * Bao Lab 2016
+ */
+
 package wormguides.models;
 
 import java.util.ArrayList;
@@ -5,6 +9,7 @@ import java.util.ArrayList;
 public class Quaternion {
 
     private final static double SOUTH_POLE = -0.499;
+
     private final static double NORTH_POLE = 0.4999;
 
     private double w, x, y, z;
@@ -183,43 +188,4 @@ public class Quaternion {
 
         return eulerRotation;
     }
-
-    // public ArrayList<Double> toEulerRotation() {
-    // ArrayList<Double> eulerRotation = new ArrayList<Double>();
-    //
-    // double heading, attitude, bank;
-    // heading = 0.;
-    // attitude = 0.;
-    // bank = 0.;
-    //
-    // double sqw = this.getW()*this.getW();
-    // double sqx = this.getX()*this.getX();
-    // double sqy = this.getY()*this.getY();
-    // double sqz = this.getZ()*this.getZ();
-    //
-    // double unit = sqx + sqy + sqz + sqw;
-    // double test = this.getX()*this.getY() + this.getZ()*this.getW();
-    //
-    // if (test > NORTH_POLE*unit) {
-    // heading = 2*Math.atan2(this.getX(), this.getW());
-    // attitude = Math.PI/2;
-    // bank = 0;
-    // } else if (test < SOUTH_POLE*unit) {
-    // heading = -2*Math.atan2(this.getX(), this.getW());
-    // attitude = -Math.PI/2;
-    // bank = 0;
-    // } else {
-    // heading = Math.atan2(2*this.getY()*this.getW() -
-    // 2*this.getX()*this.getZ(), sqx-sqy-sqz+sqw);
-    // attitude = Math.asin(2*(test/unit));
-    // bank = Math.atan2(2*this.getX()*this.getW() - 2*this.getY()*this.getZ(),
-    // -sqx+sqy-sqz+sqw);
-    // }
-    //
-    // eulerRotation.add(heading);
-    // eulerRotation.add(attitude);
-    // eulerRotation.add(bank);
-    //
-    // return eulerRotation;
-    // }
 }

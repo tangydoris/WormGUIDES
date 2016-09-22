@@ -13,18 +13,19 @@ import partslist.PartsList;
 import search.SearchUtil;
 
 /**
- * A non-terminal cell object which contains the information for the Information Window feature.
+ * A non-terminal cell object which contains the information for the info window
  */
 public class NonTerminalCellCase extends CellCase {
 
-    private final static String wormatlasURLEXT = "mainframe.htm";
+    private final static String WORMATLAS_URL_EXT = "mainframe.htm";
 
     private String embryonicHomology;
 
     private List<TerminalDescendant> terminalDescendants;
 
     /**
-     * Class constructor.
+     * Class constructor
+     *
      * @param lineageName
      *         name of the non-terminal cell case
      * @param nuclearProductionInfo
@@ -33,9 +34,9 @@ public class NonTerminalCellCase extends CellCase {
      *         the production information under Cell Shape
      */
     public NonTerminalCellCase(
-            String lineageName,
-            List<String> nuclearProductionInfo,
-            List<String> cellShapeProductionInfo) {
+            final String lineageName,
+            final List<String> nuclearProductionInfo,
+            final List<String> cellShapeProductionInfo) {
 
         super(lineageName, nuclearProductionInfo, cellShapeProductionInfo);
 
@@ -78,10 +79,12 @@ public class NonTerminalCellCase extends CellCase {
             return "";
         }
 
-        String URL = wormatlasURL + getLineageName().toUpperCase() + wormatlasURLEXT;
+        final String urlString = WORMATLAS_URL
+                + getLineageName().toUpperCase()
+                + WORMATLAS_URL_EXT;
 
         try {
-            URL url = new URL(URL);
+            URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
@@ -89,22 +92,22 @@ public class NonTerminalCellCase extends CellCase {
             if (connection.getResponseCode() == 404) {
                 return "";
             } else if (connection.getResponseCode() == 200) {
-                return URL;
+                return urlString;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(getLineageName() + " page not found on Wormatlas");
-            return "";
         }
 
         return "";
     }
 
     public String getEmbryonicHomology() {
-        return this.embryonicHomology;
+        return embryonicHomology;
     }
 
     public List<TerminalDescendant> getTerminalDescendants() {
-        return this.terminalDescendants;
+        return terminalDescendants;
     }
 }

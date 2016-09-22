@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package stories;
+package wormguides.stories;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.net.URL;
 import javafx.collections.ObservableList;
 
 /**
- * Loader for stories specified in the internal stories config file
+ * Loader for wormguides.stories specified in the internal wormguides.stories config file
  */
 public class StoriesLoader {
 
@@ -40,7 +40,7 @@ public class StoriesLoader {
             END_TIME_INDEX = 10,
             COMMENTS_INDEX = 11;
 
-    private static final String STORY_LIST_CONFIG = "/stories/StoryListConfig.csv";
+    private static final String STORY_LIST_CONFIG = "/wormguides/stories/StoryListConfig.csv";
 
     public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
         if (file != null) {

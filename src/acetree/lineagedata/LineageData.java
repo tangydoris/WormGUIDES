@@ -4,7 +4,7 @@
 
 package acetree.lineagedata;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data structure interface with methods to query the underlying cell lineage data.
@@ -14,7 +14,7 @@ public interface LineageData {
     /**
      * @return all cell names in the lineage, case-sensitive
      */
-    ArrayList<String> getAllCellNames();
+    List<String> getAllCellNames();
 
     /**
      * @param time
@@ -32,7 +32,7 @@ public interface LineageData {
      * @return size-3 integer arrays that specify the x-, y-, z-coordinates of the cell positions in 3D space. The i-th
      * element of the name, positions and diameter arrays are information on the i-th cell at one timepoint.
      */
-    Double[][] getPositions(final int time);
+    double[][] getPositions(final int time);
 
     /**
      * @param time
@@ -41,7 +41,12 @@ public interface LineageData {
      * @return diameters at that time.  The i-th element of the name, positions and diameter arrays are information
      * on the i-th cell at one timepoint.
      */
-    Double[] getDiameters(final int time);
+    double[] getDiameters(final int time);
+
+    /**
+     * @return the x,y,z scaling values for the dataset
+     */
+    double[] getXYZScale();
 
     /**
      * @return number of total timepoints in the lineage
@@ -67,31 +72,6 @@ public interface LineageData {
      * @return final point in time for which the cell exists
      */
     int getLastOccurrenceOf(final String name);
-
-    /**
-     * Adds a time frame to the lineage data. A time frame is be represented by whatever data structure an
-     * implementing class chooses to use, and should contain information on all the cells, their positions and their
-     * diameters at one point in time.
-     */
-    void addTimeFrame();
-
-    /**
-     * Adds nucleus data for a cell for the specified case-sensitive name
-     *
-     * @param time
-     *         time at which this cell exists, starting from 1
-     * @param name
-     *         name of the cell
-     * @param x
-     *         x-coordinate of the cell in 3D space
-     * @param y
-     *         y-coordinate of the cell in 3D space
-     * @param z
-     *         z-coordinate of the cell in 3D space
-     * @param diameter
-     *         diameter of the cell
-     */
-    void addNucleus(final int time, final String name, final double x, final double y, final double z, final double diameter);
 
     /**
      * @param name
@@ -125,11 +105,4 @@ public interface LineageData {
      *         false if the lineage is in Sulston mode, false otherwise
      */
     void setIsSulstonModeFlag(final boolean isSulston);
-    
-    /**
-     * Get the x,y,z scaling values for the dataset
-     * 
-     * @return
-     */
-    public double[] getXYZScale();
 }

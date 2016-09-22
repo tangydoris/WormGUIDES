@@ -30,14 +30,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import wormguides.SearchOption;
 import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
-import wormguides.models.Connectome;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
+import wormguides.models.SearchOption;
 import wormguides.models.TerminalCellCase;
 
+import connectome.Connectome;
 import partslist.PartsList;
 import search.SearchType;
 
@@ -196,7 +196,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                             }
                             if (isTerminalCase) {
                                 if (!cases.containsCellCase(searchName)) {
-                                    cases.makeTerminalCase(cellName, searchName,
+                                    cases.makeTerminalCase(
+                                            cellName,
+                                            searchName,
                                             connectome.queryConnectivity(searchName, true, false, false, false, false),
                                             connectome.queryConnectivity(searchName, false, true, false, false, false),
                                             connectome.queryConnectivity(searchName, false, false, true, false, false),
@@ -207,7 +209,9 @@ public class ContextMenuController extends AnchorPane implements Initializable {
                             }
 
                             if (!cases.containsCellCase(searchName)) {
-                                cases.makeNonTerminalCase(searchName, productionInfo.getNuclearInfo(),
+                                cases.makeNonTerminalCase(
+                                        searchName,
+                                        productionInfo.getNuclearInfo(),
                                         productionInfo.getCellShapeData(cellName));
                             }
                             return cases.getCellCase(searchName).getExpressesWORMBASE();

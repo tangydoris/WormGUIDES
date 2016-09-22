@@ -35,7 +35,6 @@ import wormguides.models.Rule;
  * the internal rules are the default rules added by the {@link SearchLayer} class in
  * the static method addDefaultColorRules().
  *
- * @author Doris Tang
  * @see Rule
  */
 

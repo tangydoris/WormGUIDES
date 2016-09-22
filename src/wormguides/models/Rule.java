@@ -33,7 +33,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import wormguides.MainApp;
-import wormguides.SearchOption;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
@@ -41,10 +40,10 @@ import wormguides.view.AppFont;
 
 import search.SearchType;
 
-import static wormguides.SearchOption.ANCESTOR;
-import static wormguides.SearchOption.CELL_BODY;
-import static wormguides.SearchOption.CELL_NUCLEUS;
-import static wormguides.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.ANCESTOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.DESCENDANT;
 
 /**
  * This class is the color rule that determines the coloring/striping of cell, cell bodies, and multicellular
@@ -188,7 +187,6 @@ public class Rule {
             } else {
                 visibleBtn.setGraphic(eyeInvertIcon);
             }
-
             ruleChanged.set(true);
             ruleChanged.set(false);
         });
@@ -217,12 +215,12 @@ public class Rule {
     }
 
     /**
-     * Shows the editor for the rule.
+     * Shows the editor for the rule
      *
      * @param stage
-     *         The {@link Stage} to which the rule editor window belongs to
+     *         the stage that the rule editor window belongs to
      */
-    public void showEditStage(Stage stage) {
+    public void showEditStage(final Stage stage) {
         if (editStage == null) {
             initEditStage(stage);
         }
@@ -234,15 +232,15 @@ public class Rule {
     }
 
     /**
-     * Initializes the edit stage by loading the layout RuleEditorLayout.fxml.
+     * Initializes the edit stage by loading the layout RuleEditorLayout.fxml
      *
      * @param stage
      *         The {@link Stage} to which the rule editor window belongs to
      */
-    private void initEditStage(Stage stage) {
+    private void initEditStage(final Stage stage) {
         editController = new RuleEditorController();
 
-        FXMLLoader loader = new FXMLLoader();
+        final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("view/layouts/RuleEditorLayout.fxml"));
 
         loader.setController(editController);
@@ -276,9 +274,10 @@ public class Rule {
                 editController.disableOptionsForStructureRule();
             }
 
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             System.out.println("error in instantiating rule editor - input/output exception");
-            e.printStackTrace();
+            ioe.printStackTrace();
+
         } catch (NullPointerException npe) {
             System.out.println("error in instantiating rule editor - null pointer exception");
             npe.printStackTrace();

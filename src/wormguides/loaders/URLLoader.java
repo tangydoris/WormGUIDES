@@ -5,302 +5,332 @@
 package wormguides.loaders;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
-import wormguides.SearchOption;
 import wormguides.controllers.Window3DController;
-import wormguides.layers.SearchLayer;
 import wormguides.models.Rule;
+import wormguides.models.SearchOption;
 
 import search.SearchType;
 import search.SearchUtil;
 
-import static wormguides.SearchOption.ANCESTOR;
-import static wormguides.SearchOption.CELL_BODY;
-import static wormguides.SearchOption.CELL_NUCLEUS;
-import static wormguides.SearchOption.DESCENDANT;
-import static wormguides.SearchOption.MULTICELLULAR_NAME_BASED;
+import static wormguides.layers.SearchLayer.addColorRule;
+import static wormguides.layers.SearchLayer.addMulticellularStructureRule;
+import static wormguides.models.SearchOption.ANCESTOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.MULTICELLULAR_NAME_BASED;
 
 public class URLLoader {
 
-	/**
-	 * Utility method that processes a url string and sets the correct view
-     * parameters in the 3d subscene. Called by {@link wormguides.layers.StoriesLayer} and
-     * {@link wormguides.controllers.RootLayoutController} for scene sharing/loading and when changing
-     * active/inactive stories. Documentation for URL (old and new APIs)
-     * formatting and syntax can be found in URLDocumentation.txt inside the
-	 * package wormguides.model.
-	 * 
-	 * @param url
-	 *            String to be parsed (consisting of a prefix url, rules to be
-	 *            parsed, and view arguments)
-	 * @param window3DController
-	 *            Reference to the 3d subscene so that view arguments can be set
-	 *            accordingly
-	 * @param useInternalScaleFactor
-	 *            Boolean that tells the 3d subscene to use the internal scale
-	 *            factor, without scaling/translating it to match the old API.
-     *            TRUE when called by {@link wormguides.layers.StoriesLayer}, FALSE otherwise.
+    /**
+     * Processes a url string and sets the correct view parameters in the 3D subscene. Called by
+     * {@link wormguides.layers.StoriesLayer} and {@link wormguides.controllers.RootLayoutController} for scene
+     * sharing/loading and when changing active/inactive wormguides.stories. Documentation for URL (old and new APIs)
+     * formatting and syntax can be found in URLDocumentation.txt inside the package wormguides.model.
+     *
+     * @param url
+     *         subscene parameters and rules URL consisting of a prefix url, rules to be parsed, and view arguments
+     * @param window3DController
+     *         the controller for the 3D subscene
+     * @param useInternalScaleFactor
+     *         true when called by the {@link wormguides.layers.StoriesLayer} telling the 3D subscene to use the
+     *         internal scale factor, false otherwise
      */
-    public static void process(String url, Window3DController window3DController, boolean useInternalScaleFactor) {
-		if (window3DController == null)
-			return;
+    public static void process(
+            final String url,
+            final Window3DController window3DController,
+            final boolean useInternalScaleFactor) {
 
-		if (!url.contains("testurlscript?/"))
-			return;
+        if (window3DController == null) {
+            return;
+        }
 
-		// if no URL is given, revert to internal color rules
-		if (url.isEmpty()) {
-			return;
-		}
+        if (!url.contains("testurlscript?/")) {
+            return;
+        }
 
-		ObservableList<Rule> rulesList = window3DController.getObservableColorRulesList();
+        // if no URL is given, revert to internal color rules
+        if (url.isEmpty()) {
+            return;
+        }
 
-		String[] args = url.split("/");
-        ArrayList<String> ruleArgs = new ArrayList<>();
-        ArrayList<String> viewArgs = new ArrayList<>();
+        ObservableList<Rule> rulesList = window3DController.getObservableColorRulesList();
 
-		// add rules and view parameters to their ArrayList's
-		int i = 0;
-		while (i < args.length) {
-			if (args[i].equals("set")) {
-				// do not need the 'set' String
-				i++;
-				// iterate through set parameters until we hit the view
-				// parameters
-				while (!args[i].equals("view")) {
-					ruleArgs.add(args[i].trim());
-					i++;
-				}
+        String[] args = url.split("/");
+        List<String> ruleArgs = new ArrayList<>();
+        List<String> viewArgs = new ArrayList<>();
 
-				// iterate through view parameters
-				// do not need the 'view' String
-				i++;
-				while (!args[i].equals("iOS") && !args[i].equals("Android") && !args[i].equals("browser")) {
-					viewArgs.add(args[i]);
-					i++;
-				}
-			} else
-				i++;
-		}
+        // add rules and view parameters to their ArrayList's
+        int i = 0;
+        while (i < args.length) {
+            if (args[i].equals("set")) {
+                // do not need the 'set' String
+                i++;
+                // iterate through set parameters until we hit the view parameters
+                while (!args[i].equals("view")) {
+                    ruleArgs.add(args[i].trim());
+                    i++;
+                }
 
-		// process rules, add to current rules list
-		parseRules(ruleArgs, rulesList);
-		// process view arguments
-		parseViewArgs(viewArgs, window3DController, useInternalScaleFactor);
-	}
+                // iterate through view parameters do not need the 'view' String
+                i++;
+                while (!args[i].equals("iOS") && !args[i].equals("Android") && !args[i].equals("browser")) {
+                    viewArgs.add(args[i]);
+                    i++;
+                }
+            } else {
+                i++;
+            }
+        }
 
-	private static void parseRules(ArrayList<String> rules, ObservableList<Rule> rulesList) {
-		rulesList.clear();
-		for (String rule : rules) {
-            ArrayList<String> types = new ArrayList<>();
-            StringBuilder sb = new StringBuilder(rule);
+        // process rules, add to current rules list
+        parseRules(ruleArgs, rulesList);
+        // process view arguments
+        parseViewArgs(viewArgs, window3DController, useInternalScaleFactor);
+    }
+
+    private static void parseRules(List<String> rules, ObservableList<Rule> rulesList) {
+        rulesList.clear();
+        for (String rule : rules) {
+            final List<String> types = new ArrayList<>();
+            final StringBuilder sb = new StringBuilder(rule);
             boolean noTypeSpecified = true;
-			boolean isMulticellStructureRule = false;
+            boolean isMulticellStructureRule = false;
 
-			try {
-				// determine if rule is a cell/cellbody rule, or a multicelllar
-				// structure rule
+            // determine if rule is a cell/cellbody rule, or a multicelllar structure rule
+            try {
+                // multicellular structure rules have a null SearchType parse SearchType args
+                // systematic/functional
+                if (sb.indexOf("-s") > -1) {
+                    types.add("-s");
+                }
+                // lineage
+                if (sb.indexOf("-n") > -1) {
+                    types.add("-n");
+                }
+                // description
+                if (sb.indexOf("-d") > -1) {
+                    types.add("-d");
+                }
+                // gene
+                if (sb.indexOf("-g") > -1) {
+                    types.add("-g");
+                }
+                // multicell
+                if (sb.indexOf("-m") > -1) {
+                    types.add("-m");
+                }
+                // connectome
+                if (sb.indexOf("-c") > -1) {
+                    types.add("-c");
+                }
+                // neighbor
+                if (sb.indexOf("-b") > -1) {
+                    types.add("-b");
+                }
 
-				// multicellular structure rules have a null SearchType
-				// parse SearchType args
-				if (sb.indexOf("-s") > -1) // systematic/functional
-					types.add("-s");
-				if (sb.indexOf("-n") > -1) // lineage
-					types.add("-n");
-				if (sb.indexOf("-d") > -1) // description
-					types.add("-d");
-				if (sb.indexOf("-g") > -1) // gene
-					types.add("-g");
-				if (sb.indexOf("-m") > -1) // multicell
-					types.add("-m");
-				if (sb.indexOf("-c") > -1) // connectome
-					types.add("-c");
-				if (sb.indexOf("-b") > -1) // neighbor
-					types.add("-b");
-				
-				if (!types.isEmpty()) {
-					noTypeSpecified = false;
-					for (String arg : types) {
-						int i = sb.indexOf(arg);
-						sb.replace(i, i + 2, "");
-					}
-				}
+                if (!types.isEmpty()) {
+                    noTypeSpecified = false;
+                    for (String arg : types) {
+                        int i = sb.indexOf(arg);
+                        sb.replace(i, i + 2, "");
+                    }
+                }
 
-				String colorString = "";
-				if (sb.indexOf("+#ff") > -1)
-					colorString = sb.substring(sb.indexOf("+#ff") + 4);
-				else if (sb.indexOf("+%23ff") > -1)
-					colorString = sb.substring(sb.indexOf("+%23ff") + 6);
+                String colorString = "";
+                if (sb.indexOf("+#ff") > -1) {
+                    colorString = sb.substring(sb.indexOf("+#ff") + 4);
+                } else if (sb.indexOf("+%23ff") > -1) {
+                    colorString = sb.substring(sb.indexOf("+%23ff") + 6);
+                }
 
-                ArrayList<SearchOption> options = new ArrayList<>();
+                List<SearchOption> options = new ArrayList<>();
 
-				if (noTypeSpecified && sb.indexOf("-M") > -1) {
-					options.add(MULTICELLULAR_NAME_BASED);
-					int i = sb.indexOf("-M");
-					sb.replace(i, i + 2, "");
+                if (noTypeSpecified && sb.indexOf("-M") > -1) {
+                    options.add(MULTICELLULAR_NAME_BASED);
+                    int i = sb.indexOf("-M");
+                    sb.replace(i, i + 2, "");
 
-				} else {
-					if (sb.indexOf("%3C") > -1) {
-						options.add(ANCESTOR);
-						int i = sb.indexOf("%3C");
-						sb.replace(i, i + 3, "");
-					}
-					if (sb.indexOf(">") > -1) {
-						options.add(ANCESTOR);
-						int i = sb.indexOf(">");
-						sb.replace(i, i + 1, "");
-					}
-					if (sb.indexOf("$") > -1) {
-						options.add(CELL_NUCLEUS);
-						int i = sb.indexOf("$");
-						sb.replace(i, i + 1, "");
-					}
+                } else {
+                    if (sb.indexOf("%3C") > -1) {
+                        options.add(ANCESTOR);
+                        int i = sb.indexOf("%3C");
+                        sb.replace(i, i + 3, "");
+                    }
+                    if (sb.indexOf(">") > -1) {
+                        options.add(ANCESTOR);
+                        int i = sb.indexOf(">");
+                        sb.replace(i, i + 1, "");
+                    }
+                    if (sb.indexOf("$") > -1) {
+                        options.add(CELL_NUCLEUS);
+                        int i = sb.indexOf("$");
+                        sb.replace(i, i + 1, "");
+                    }
                     if (rule.contains("%3E")) {
                         options.add(DESCENDANT);
                         int i = sb.indexOf("%3E");
-						sb.replace(i, i + 3, "");
-					}
-					if (sb.indexOf("<") > -1) {
-						options.add(DESCENDANT);
-						int i = sb.indexOf("<");
-						sb.replace(i, i + 1, "");
-					}
-					if (sb.indexOf("@") > -1) {
-						options.add(CELL_BODY);
-						int i = sb.indexOf("@");
-						sb.replace(i, i + 1, "");
-					}
-				}
+                        sb.replace(i, i + 3, "");
+                    }
+                    if (sb.indexOf("<") > -1) {
+                        options.add(DESCENDANT);
+                        int i = sb.indexOf("<");
+                        sb.replace(i, i + 1, "");
+                    }
+                    if (sb.indexOf("@") > -1) {
+                        options.add(CELL_BODY);
+                        int i = sb.indexOf("@");
+                        sb.replace(i, i + 1, "");
+                    }
+                }
 
-				// extract name from what's left of rule
-				String name = sb.substring(0, sb.indexOf("+"));
+                // extract name from what's left of rule
+                String name = sb.substring(0, sb.indexOf("+"));
 
-				// add regular ColorRule
-				if (!isMulticellStructureRule) {
-					if (types.contains("-s"))
-						SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
+                // add regular ColorRule
+                if (!isMulticellStructureRule) {
+                    if (types.contains("-s")) {
+                        addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
+                    }
 
-					if (types.contains("-n"))
-						SearchLayer.addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+                    if (types.contains("-n")) {
+                        addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+                    }
 
-					if (types.contains("-d"))
-						SearchLayer.addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+                    if (types.contains("-d")) {
+                        addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+                    }
 
-					if (types.contains("-g"))
-						SearchLayer.addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+                    if (types.contains("-g")) {
+                        addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+                    }
 
-					if (types.contains("-m"))
-						SearchLayer.addColorRule(SearchType.MULTICELLULAR_CELL_BASED, name, Color.web(colorString), options);
-					
-					if (types.contains("-c"))
-						SearchLayer.addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
-					
-					if (types.contains("-b"))
-						SearchLayer.addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+                    if (types.contains("-m")) {
+                        addColorRule(
+                                SearchType.MULTICELLULAR_CELL_BASED,
+                                name,
+                                Color.web(colorString),
+                                options);
+                    }
 
-					// if no type present, default is systematic
-					if (noTypeSpecified) {
-						SearchType type = SearchType.LINEAGE;
-						if (SearchUtil.isGeneFormat(name))
-							type = SearchType.GENE;
-						SearchLayer.addColorRule(type, name, Color.web(colorString), options);
-					}
+                    if (types.contains("-c")) {
+                        addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+                    }
 
-				} else { // add multicellular structure rule
-					SearchLayer.addMulticellularStructureRule(name, Color.web(colorString));
-				}
+                    if (types.contains("-b")) {
+                        addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+                    }
 
-			} catch (StringIndexOutOfBoundsException e) {
-				System.out.println("Invalid color rule format");
-				e.printStackTrace();
-			}
-		}
-	}
+                    // if no type present, default is systematic
+                    if (noTypeSpecified) {
+                        SearchType type = SearchType.LINEAGE;
+                        if (SearchUtil.isGeneFormat(name)) {
+                            type = SearchType.GENE;
+                        }
+                        addColorRule(type, name, Color.web(colorString), options);
+                    }
 
-	private static void parseViewArgs(ArrayList<String> viewArgs, Window3DController window3DController,
-			boolean useInternalScaleFactor) {
-		// manipulate viewArgs arraylist so that rx ry and rz are grouped
-		// together
-		// to facilitate loading rotations in x and y
-		for (int i = 0; i < viewArgs.size(); i++) {
-			if (viewArgs.get(i).startsWith("rX")) {
-				String ry = viewArgs.get(i + 1);
-				String rz = viewArgs.get(i + 2);
-				viewArgs.set(i, viewArgs.get(i) + "," + ry + "," + rz);
-				break;
-			}
-		}
+                } else { // add multicellular structure rule
+                    addMulticellularStructureRule(name, Color.web(colorString));
+                }
 
-		for (String arg : viewArgs) {
-			if (arg.startsWith("rX")) {
-				String[] tokens = arg.split(",");
-				try {
-					double rx = Double.parseDouble(tokens[0].split("=")[1]);
-					double ry = Double.parseDouble(tokens[1].split("=")[1]);
-					double rz = Double.parseDouble(tokens[2].split("=")[1]);
-					window3DController.setRotations(rx, ry, rz);
-				} catch (NumberFormatException nfe) {
-					System.out.println("error in parsing time variable");
-					nfe.printStackTrace();
-				}
+            } catch (StringIndexOutOfBoundsException e) {
+                System.out.println("Invalid color rule format");
+                e.printStackTrace();
+            }
+        }
+    }
 
-				continue;
-			}
-			String[] tokens = arg.split("=");
-			if (tokens.length != 0) {
-				switch (tokens[0]) {
-				case "time":
-					try {
-						window3DController.setTime(Integer.parseInt(tokens[1]));
-					} catch (NumberFormatException nfe) {
-						System.out.println("error in parsing time variable");
-						nfe.printStackTrace();
-					}
-					break;
+    private static void parseViewArgs(
+            final List<String> viewArgs,
+            final Window3DController window3DController,
+            final boolean useInternalScaleFactor) {
 
-				case "tX":
-					try {
-						window3DController.setTranslationX(Double.parseDouble(tokens[1]));
-					} catch (NumberFormatException nfe) {
-						System.out.println("error in parsing translation variable");
-						nfe.printStackTrace();
-					}
-					break;
+        // manipulate viewArgs arraylist so that rx ry and rz are grouped together to facilitate loading rotations in
+        // x and y
+        for (int i = 0; i < viewArgs.size(); i++) {
+            if (viewArgs.get(i).startsWith("rX")) {
+                String ry = viewArgs.get(i + 1);
+                String rz = viewArgs.get(i + 2);
+                viewArgs.set(i, viewArgs.get(i) + "," + ry + "," + rz);
+                break;
+            }
+        }
 
-				case "tY":
-					try {
-						window3DController.setTranslationY(Double.parseDouble(tokens[1]));
-					} catch (NumberFormatException nfe) {
-						System.out.println("error in parsing translation variable");
-						nfe.printStackTrace();
-					}
-					break;
+        for (String arg : viewArgs) {
+            if (arg.startsWith("rX")) {
+                final String[] tokens = arg.split(",");
 
-				case "scale":
-					try {
-						if (useInternalScaleFactor)
-							window3DController.setScaleInternal(Double.parseDouble(tokens[1]));
-						else
-							window3DController.setScale(Double.parseDouble(tokens[1]));
-					} catch (NumberFormatException nfe) {
-						System.out.println("error in parsing scale variable");
-						nfe.printStackTrace();
-					}
-					break;
+                try {
+                    double rx = Double.parseDouble(tokens[0].split("=")[1]);
+                    double ry = Double.parseDouble(tokens[1].split("=")[1]);
+                    double rz = Double.parseDouble(tokens[2].split("=")[1]);
+                    window3DController.setRotations(rx, ry, rz);
+                } catch (NumberFormatException nfe) {
+                    System.out.println("error in parsing time variable");
+                    nfe.printStackTrace();
+                }
 
-				case "dim":
-					try {
-						window3DController.setOthersVisibility(Double.parseDouble(tokens[1]));
-					} catch (NumberFormatException nfe) {
-						System.out.println("error in parsing dim variable");
-						nfe.printStackTrace();
-					}
-					break;
-				}
-			}
-		}
-	}
+                continue;
+            }
+            String[] tokens = arg.split("=");
+            if (tokens.length != 0) {
+                switch (tokens[0]) {
+                    case "time":
+                        try {
+                            window3DController.setTime(Integer.parseInt(tokens[1]));
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("error in parsing time variable");
+                            nfe.printStackTrace();
+                        }
+                        break;
+
+                    case "tX":
+                        try {
+                            window3DController.setTranslationX(Double.parseDouble(tokens[1]));
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("error in parsing translation variable");
+                            nfe.printStackTrace();
+                        }
+                        break;
+
+                    case "tY":
+                        try {
+                            window3DController.setTranslationY(Double.parseDouble(tokens[1]));
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("error in parsing translation variable");
+                            nfe.printStackTrace();
+                        }
+                        break;
+
+                    case "scale":
+                        try {
+                            if (useInternalScaleFactor) {
+                                window3DController.setScaleInternal(Double.parseDouble(tokens[1]));
+                            } else {
+                                window3DController.setScale(Double.parseDouble(tokens[1]));
+                            }
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("error in parsing scale variable");
+                            nfe.printStackTrace();
+                        }
+                        break;
+
+                    case "dim":
+                        try {
+                            window3DController.setOthersVisibility(Double.parseDouble(tokens[1]));
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("error in parsing dim variable");
+                            nfe.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
+    }
 }

@@ -2,7 +2,7 @@
  * Bao Lab 2016
  */
 
-package stories;
+package wormguides.stories;
 
 import java.util.ArrayList;
 import java.util.Collections;

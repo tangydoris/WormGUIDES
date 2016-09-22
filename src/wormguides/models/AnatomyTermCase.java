@@ -1,6 +1,8 @@
-package wormguides.models;
+/*
+ * Bao Lab 2016
+ */
 
-import wormguides.AnatomyTerm;
+package wormguides.models;
 
 /**
  * Defines a case i.e. an info window page type corresponding to an AnatomyTerm enum
@@ -29,10 +31,10 @@ public abstract class AnatomyTermCase {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public String getDescription() {
-        return this.description;
+        return description;
     }
 }

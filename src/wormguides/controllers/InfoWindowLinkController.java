@@ -12,8 +12,8 @@ import java.net.URISyntaxException;
 import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 
-import wormguides.AnatomyTerm;
 import wormguides.layers.SearchLayer;
+import wormguides.models.AnatomyTerm;
 
 import partslist.PartsList;
 

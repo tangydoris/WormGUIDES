@@ -20,12 +20,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-import wormguides.SearchOption;
+import wormguides.models.SearchOption;
 
-import static wormguides.SearchOption.ANCESTOR;
-import static wormguides.SearchOption.CELL_BODY;
-import static wormguides.SearchOption.CELL_NUCLEUS;
-import static wormguides.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.ANCESTOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.DESCENDANT;
 
 public class RuleEditorController extends AnchorPane implements Initializable {
 
@@ -91,7 +91,7 @@ public class RuleEditorController extends AnchorPane implements Initializable {
         heading.setText(name);
     }
 
-    public void setSubmitHandler(EventHandler<ActionEvent> handler) {
+    public void setSubmitHandler(final EventHandler<ActionEvent> handler) {
         submitButton.setOnAction(handler);
     }
 
