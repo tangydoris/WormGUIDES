@@ -6,22 +6,23 @@ package search;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import wormguides.models.CasesLists;
-import wormguides.models.SceneElement;
-import wormguides.models.SceneElementsList;
 
 import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
+import wormguides.models.CasesLists;
+import wormguides.models.SceneElement;
+import wormguides.models.SceneElementsList;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
+
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static partslist.PartsList.getLineageNameByIndex;
+import static partslist.PartsList.getLineageNames;
+import static search.WormBaseQuery.doSearch;
 import static wormguides.models.LineageTree.isAncestor;
 import static wormguides.models.LineageTree.isDescendant;
 
@@ -78,20 +79,20 @@ public class SearchUtil {
 
     /**
      * @param searched
-     *         searched term, prefix of the lineage names
+     *         searched term
      *
-     * @return lineage names with the searched prefix, in alphabetical order
+     * @return lineage name that is searched
      */
-    public static List<String> getCellsWithLineageName(final String searched) {
+    public static List<String> getCellsWithLineageName(String searched) {
         final List<String> cells = new ArrayList<>();
-        final String searchedLower = searched.toLowerCase();
-        activeLineageNames.forEach(name -> {
-            if (name.toLowerCase().startsWith(searchedLower)) {
+        searched = searched.toLowerCase();
+        for (String name : activeLineageNames) {
+            if (name.equalsIgnoreCase(searched)) {
                 cells.add(name);
+                break;
             }
-        });
-        sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        }
+        return cells;
     }
 
     /**
@@ -100,16 +101,16 @@ public class SearchUtil {
      *
      * @return lineage names whose functional name has the searched prefix, in alphabetical order
      */
-    public static List<String> getCellsWithFunctionalName(final String searched) {
+    public static List<String> getCellsWithFunctionalName(String searched) {
         final List<String> cells = new ArrayList<>();
-        final String searchedLower = searched.toLowerCase();
-        functionalNames.forEach(name -> {
-            if (name.toLowerCase().startsWith(searchedLower)) {
+        searched = searched.toLowerCase();
+        for (String name : functionalNames) {
+            if (name.toLowerCase().startsWith(searched)) {
                 cells.add(getLineageNameByFunctionalName(name));
             }
-        });
+        }
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -142,7 +143,7 @@ public class SearchUtil {
             }
         }
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -165,7 +166,7 @@ public class SearchUtil {
                     );
         }
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -204,6 +205,7 @@ public class SearchUtil {
             final String comment = sceneElementsList.getNameToCommentsMap()
                     .get(structureNameLower)
                     .toLowerCase();
+
             for (String term : terms) {
                 if (!comment.contains(term)) {
                     appliesToComment = false;
@@ -253,7 +255,7 @@ public class SearchUtil {
             cells.remove(searched);
         }
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -265,11 +267,10 @@ public class SearchUtil {
     public static List<String> getCellsWithGene(final String searched) {
         final List<String> cells = new ArrayList<>();
         if (isGeneFormat(searched)) {
-            WormBaseQuery.doSearch(searched);
-
+            doSearch(searched);
         }
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -367,7 +368,7 @@ public class SearchUtil {
         }
 
         sort(cells);
-        return cells.parallelStream().distinct().collect(Collectors.toList());
+        return cells;
     }
 
     /**
@@ -399,9 +400,9 @@ public class SearchUtil {
      * @return list of terminal descendants for the query cell
      */
     public static List<String> getDescendantsList(final String queryCell) {
-        List<String> descendants = new ArrayList<>();
+        final List<String> descendants = new ArrayList<>();
         if (queryCell != null) {
-            PartsList.getLineageNames()
+            getLineageNames()
                     .stream()
                     .filter(name -> !descendants.contains(name) && isDescendant(name, queryCell))
                     .forEachOrdered(descendants::add);
@@ -418,7 +419,7 @@ public class SearchUtil {
      * @return list of descendants of all the cells, with no repeats
      */
     public static List<String> getDescendantsList(final List<String> cells, final String searchedText) {
-        List<String> descendants = new ArrayList<>();
+        final List<String> descendants = new ArrayList<>();
 
         if (cells == null) {
             return descendants;
@@ -429,13 +430,13 @@ public class SearchUtil {
         if (searched.equals("ab") || searched.equals("p0")) {
             activeLineageNames.stream()
                     .filter(name -> !descendants.contains(name) && isDescendant(name, searched))
-                    .forEachOrdered(descendants::add);
+                    .forEach(descendants::add);
         }
 
         for (String cell : cells) {
             activeLineageNames.stream()
                     .filter(name -> !descendants.contains(name) && isDescendant(name, cell))
-                    .forEachOrdered(descendants::add);
+                    .forEach(descendants::add);
         }
 
         return descendants;
@@ -457,7 +458,7 @@ public class SearchUtil {
         for (String cell : cells) {
             activeLineageNames.stream()
                     .filter(name -> !ancestors.contains(name) && isAncestor(name, cell))
-                    .forEachOrdered(ancestors::add);
+                    .forEach(ancestors::add);
         }
 
         return ancestors;
@@ -472,9 +473,11 @@ public class SearchUtil {
     public static int getFirstOccurenceOf(final String cellName) {
         if (lineageData != null && lineageData.isCellName(cellName)) {
             return lineageData.getFirstOccurrenceOf(cellName);
+
         } else if (sceneElementsList != null && sceneElementsList.isSceneElementName(cellName)) {
             return sceneElementsList.getFirstOccurrenceOf(cellName);
         }
+
         return -1;
     }
 
@@ -487,9 +490,11 @@ public class SearchUtil {
     public static int getLastOccurenceOf(final String cellName) {
         if (lineageData != null && lineageData.isCellName(cellName)) {
             return lineageData.getLastOccurrenceOf(cellName);
+
         } else if (sceneElementsList != null && sceneElementsList.isSceneElementName(cellName)) {
             return sceneElementsList.getLastOccurrenceOf(cellName);
         }
+
         return -1;
     }
 

@@ -5,9 +5,9 @@
 package wormguides;
 
 import java.io.IOException;
+import java.time.Instant;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -16,15 +16,28 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import wormguides.controllers.RootLayoutController;
-import wormguides.loaders.ImageLoader;
 import wormguides.models.NucleiMgrAdapterResource;
 
+import static java.time.Duration.between;
+import static java.time.Instant.now;
+
+import static javafx.application.Platform.setImplicitExit;
+
+import static wormguides.loaders.ImageLoader.loadImages;
+
+/**
+ * Driver class for the WormGUIDES desktop application
+ */
 public class MainApp extends Application {
 
     private static Stage primaryStage;
+
     private static NucleiMgrAdapterResource nucleiMgrAdapterResource;
+
     private Scene scene;
+
     private BorderPane rootLayout;
+
     private RootLayoutController controller;
 
     public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
@@ -40,23 +53,23 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         System.out.println("Starting WormGUIDES JavaFX application");
 
-        ImageLoader.loadImages();
+        loadImages();
 
         MainApp.primaryStage = primaryStage;
         MainApp.primaryStage.setTitle("WormGUIDES");
 
-        long start_time = System.nanoTime();
+        final Instant start = now();
         initRootLayout();
-        long end_time = System.nanoTime();
-        double difference = (end_time - start_time) / 1e6;
-        System.out.println("Root layout initialized in " + difference + "ms");
+        final Instant end = now();
+        System.out.println("Root layout initialized in "
+                + between(start, end).toMillis()
+                + "ms");
 
         primaryStage.setResizable(true);
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(event -> {
             event.consume();
-
             if (controller != null) {
                 controller.initCloseApplication();
             }
@@ -65,12 +78,12 @@ public class MainApp extends Application {
 
     public void initRootLayout() {
         // Load root layout from FXML file.
-        FXMLLoader loader = new FXMLLoader();
+        final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("view/layouts/RootLayout.fxml"));
 
         if (nucleiMgrAdapterResource != null) {
             loader.setResources(nucleiMgrAdapterResource);
-            Platform.setImplicitExit(false);
+            setImplicitExit(false);
         }
 
         controller = new RootLayoutController();
@@ -86,7 +99,7 @@ public class MainApp extends Application {
             primaryStage.setResizable(true);
             primaryStage.centerOnScreen();
 
-            Parent root = scene.getRoot();
+            final Parent root = scene.getRoot();
             for (Node node : root.getChildrenUnmodifiable()) {
                 node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
             }

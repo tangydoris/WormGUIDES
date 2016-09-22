@@ -10,11 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -25,6 +23,12 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 
+import acetree.LineageData;
+import connectome.Connectome;
+import partslist.PartsList;
+import search.SearchType;
+import search.SearchUtil;
+import search.WormBaseQuery;
 import wormguides.models.AnatomyTerm;
 import wormguides.models.CasesLists;
 import wormguides.models.ProductionInfo;
@@ -32,14 +36,12 @@ import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.models.SearchOption;
 
-import acetree.LineageData;
-import connectome.Connectome;
-import partslist.PartsList;
-import search.SearchType;
-import search.SearchUtil;
-import search.WormBaseQuery;
-
 import static java.util.Collections.sort;
+
+import static javafx.application.Platform.runLater;
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.paint.Color.WHITE;
+
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static search.SearchType.CONNECTOME;
 import static search.SearchType.GENE;
@@ -51,6 +53,7 @@ import static search.SearchUtil.getCellsWithFunctionalName;
 import static search.SearchUtil.getCellsWithGene;
 import static search.SearchUtil.getCellsWithLineageName;
 import static search.SearchUtil.getNeighboringCells;
+import static search.WormBaseQuery.getSearchService;
 import static wormguides.models.LineageTree.getCaseSensitiveName;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
@@ -107,9 +110,9 @@ public class SearchLayer {
     static {
         type = LINEAGE;
 
-        selectedColor = Color.WHITE;
+        selectedColor = WHITE;
 
-        searchResultsList = FXCollections.observableArrayList();
+        searchResultsList = observableArrayList();
         searchedText = "";
 
         // cell nucleus search type default to true
@@ -130,7 +133,7 @@ public class SearchLayer {
                 Task<Void> task = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        Platform.runLater(() -> refreshSearchResultsList(getSearchedText()));
+                        runLater(() -> refreshSearchResultsList(getSearchedText()));
                         return null;
                     }
                 };
@@ -139,7 +142,7 @@ public class SearchLayer {
         };
 
         showLoadingService = new ShowLoadingService();
-        geneSearchService = WormBaseQuery.getSearchService();
+        geneSearchService = getSearchService();
 
         if (geneSearchService != null) {
             geneSearchService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
@@ -207,7 +210,7 @@ public class SearchLayer {
         final StringBuilder sb = new StringBuilder("'");
         sb.append(linegeName.toLowerCase()).append("' Connectome");
 
-        ArrayList<String> types = new ArrayList<>();
+        final List<String> types = new ArrayList<>();
         if (isPresynapticTicked) {
             types.add("presynaptic");
         }
@@ -744,7 +747,7 @@ public class SearchLayer {
                         if (isCancelled()) {
                             break;
                         }
-                        Platform.runLater(() -> {
+                        runLater(() -> {
                             searchResultsList.clear();
                             String loading = "Fetching data from WormBase";
                             int num = getCountFinal(count) % modulus;
