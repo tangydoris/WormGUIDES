@@ -176,8 +176,7 @@ public class AceTreeLineageTableLoader {
                     tokens[k++] = tokenizer.nextToken().trim();
                 }
 
-                int valid = parseInt(tokens[VALID]);
-                if (valid == 1) {
+                if (parseInt(tokens[VALID]) == 1) {
                     makeNucleus(tableLineageData, time, tokens);
                 }
             }
@@ -195,7 +194,6 @@ public class AceTreeLineageTableLoader {
                     parseInt(tokens[YCOR]),
                     round(parseDouble(tokens[ZCOR])),
                     parseInt(tokens[DIAMETER]));
-
         } catch (NumberFormatException nfe) {
             System.out.println("Incorrect format in nucleus file for time " + time + ".");
         }

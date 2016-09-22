@@ -1206,15 +1206,41 @@ public class RootLayoutController extends BorderPane implements Initializable {
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }
 
+//        Instant start = Instant.now();
+        // takes about 58ms
         replaceTabsWithDraggableTabs();
+//        Instant end = Instant.now();
+//        System.out.println("replaceable tabs replace: " + Duration.between(start, end).toMillis() + "ms");
 
+//        start = Instant.now();
+        // takes about 10ms
         initPartsList();
+//        end = Instant.now();
+//        System.out.println("parts list init: " + Duration.between(start, end).toMillis() + "ms");
+
+//        start = Instant.now();
+        // takes about 6ms
         initCellDeaths();
+//        end = Instant.now();
+//        System.out.println("cell deaths init: " + Duration.between(start, end).toMillis() + "ms");
 
+//        start = Instant.now();
+        // takes about 5ms
         initToggleGroup();
-        initDisplayLayer();
+//        end = Instant.now();
+//        System.out.println("toggle group init: " + Duration.between(start, end).toMillis() + "ms");
 
+//        start = Instant.now();
+        // takes about 3ms
+        initDisplayLayer();
+//        end = Instant.now();
+//        System.out.println("display layer init: " + Duration.between(start, end).toMillis() + "ms");
+
+//        start = Instant.now();
+        // takes about 1050ms
         initializeWithLineageData();
+//        end = Instant.now();
+//        System.out.println("lineage data init: " + Duration.between(start, end).toMillis() + "ms");
 
         mainTabPane.getSelectionModel().select(storiesTab);
     }
