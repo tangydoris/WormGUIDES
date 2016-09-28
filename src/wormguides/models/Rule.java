@@ -32,14 +32,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import search.SearchType;
 import wormguides.MainApp;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.util.AppFont;
 
-import search.SearchType;
-
+import static wormguides.models.LineageTree.isAncestor;
+import static wormguides.models.LineageTree.isDescendant;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
 import static wormguides.models.SearchOption.CELL_NUCLEUS;
@@ -468,17 +469,16 @@ public class Rule {
             return false;
         }
 
+        name = name.trim();
         if (cells != null) {
             if (options.contains(CELL_NUCLEUS) && cells.contains(name)) {
                 return true;
             }
-
             for (String cell : cells) {
-                if (options.contains(ANCESTOR) && LineageTree.isAncestor(name, cell)) {
+                if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
                     return true;
                 }
-
-                if (options.contains(DESCENDANT) && LineageTree.isDescendant(name, cell)) {
+                if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
                     return true;
                 }
             }
@@ -517,11 +517,11 @@ public class Rule {
             }
 
             for (String cell : cells) {
-                if (options.contains(ANCESTOR) && LineageTree.isAncestor(name, cell)) {
+                if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
                     return true;
                 }
 
-                if (options.contains(DESCENDANT) && LineageTree.isDescendant(name, cell)) {
+                if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
                     return true;
                 }
             }

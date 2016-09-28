@@ -5,7 +5,7 @@
 package wormguides.controllers;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -32,13 +32,12 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 
+import acetree.LineageData;
 import wormguides.stories.Note;
 import wormguides.stories.Note.Display;
 import wormguides.stories.Note.Type;
 import wormguides.stories.Story;
 import wormguides.util.StringListCellFactory;
-
-import acetree.LineageData;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 
@@ -131,8 +130,12 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     // Input nameProperty is the string property that changes with clicking
     // on an entity in the 3d window
     public StoryEditorController(
-            int timeOffset, LineageData data, ArrayList<String> multiCellStructuresList,
-            StringProperty nameProperty, BooleanProperty cellClickedProperty, IntegerProperty sceneTimeProperty,
+            int timeOffset,
+            LineageData data,
+            List<String> multiCellStructuresList,
+            StringProperty nameProperty,
+            BooleanProperty cellClickedProperty,
+            IntegerProperty sceneTimeProperty,
             BooleanProperty update3D) {
 
         super();

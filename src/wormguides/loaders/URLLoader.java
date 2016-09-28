@@ -8,17 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.ObservableList;
-import javafx.scene.paint.Color;
-
-import wormguides.controllers.Window3DController;
-import wormguides.models.Rule;
-import wormguides.models.SearchOption;
 
 import search.SearchType;
 import search.SearchUtil;
+import wormguides.controllers.Window3DController;
+import wormguides.layers.SearchLayer;
+import wormguides.models.Rule;
+import wormguides.models.SearchOption;
 
-import static wormguides.layers.SearchLayer.addColorRule;
-import static wormguides.layers.SearchLayer.addMulticellularStructureRule;
+import static javafx.scene.paint.Color.web;
+
+import static search.SearchType.CONNECTOME;
+import static search.SearchType.DESCRIPTION;
+import static search.SearchType.FUNCTIONAL;
+import static search.SearchType.GENE;
+import static search.SearchType.LINEAGE;
+import static search.SearchType.MULTICELLULAR_CELL_BASED;
+import static search.SearchType.NEIGHBOR;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
 import static wormguides.models.SearchOption.CELL_NUCLEUS;
@@ -44,7 +50,8 @@ public class URLLoader {
     public static void process(
             final String url,
             final Window3DController window3DController,
-            final boolean useInternalScaleFactor) {
+            final boolean useInternalScaleFactor,
+            final SearchLayer searchLayer) {
 
         if (window3DController == null) {
             return;
@@ -89,12 +96,16 @@ public class URLLoader {
         }
 
         // process rules, add to current rules list
-        parseRules(ruleArgs, rulesList);
+        parseRules(ruleArgs, rulesList, searchLayer);
         // process view arguments
         parseViewArgs(viewArgs, window3DController, useInternalScaleFactor);
     }
 
-    private static void parseRules(List<String> rules, ObservableList<Rule> rulesList) {
+    private static void parseRules(
+            final List<String> rules,
+            final ObservableList<Rule> rulesList,
+            final SearchLayer searchLayer) {
+
         rulesList.clear();
         for (String rule : rules) {
             final List<String> types = new ArrayList<>();
@@ -149,13 +160,11 @@ public class URLLoader {
                     colorString = sb.substring(sb.indexOf("+%23ff") + 6);
                 }
 
-                List<SearchOption> options = new ArrayList<>();
-
+                final List<SearchOption> options = new ArrayList<>();
                 if (noTypeSpecified && sb.indexOf("-M") > -1) {
                     options.add(MULTICELLULAR_NAME_BASED);
                     int i = sb.indexOf("-M");
                     sb.replace(i, i + 2, "");
-
                 } else {
                     if (sb.indexOf("%3C") > -1) {
                         options.add(ANCESTOR);
@@ -190,53 +199,46 @@ public class URLLoader {
                 }
 
                 // extract name from what's left of rule
-                String name = sb.substring(0, sb.indexOf("+"));
-
+                final String name = sb.substring(0, sb.indexOf("+"));
                 // add regular ColorRule
                 if (!isMulticellStructureRule) {
                     if (types.contains("-s")) {
-                        addColorRule(SearchType.LINEAGE, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(LINEAGE, name, web(colorString), options);
                     }
-
                     if (types.contains("-n")) {
-                        addColorRule(SearchType.FUNCTIONAL, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(FUNCTIONAL, name, web(colorString), options);
                     }
-
                     if (types.contains("-d")) {
-                        addColorRule(SearchType.DESCRIPTION, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(DESCRIPTION, name, web(colorString), options);
                     }
-
                     if (types.contains("-g")) {
-                        addColorRule(SearchType.GENE, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(GENE, name, web(colorString), options);
                     }
-
                     if (types.contains("-m")) {
-                        addColorRule(
-                                SearchType.MULTICELLULAR_CELL_BASED,
+                        searchLayer.addColorRule(
+                                MULTICELLULAR_CELL_BASED,
                                 name,
-                                Color.web(colorString),
+                                web(colorString),
                                 options);
                     }
-
                     if (types.contains("-c")) {
-                        addColorRule(SearchType.CONNECTOME, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(CONNECTOME, name, web(colorString), options);
                     }
-
                     if (types.contains("-b")) {
-                        addColorRule(SearchType.NEIGHBOR, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(NEIGHBOR, name, web(colorString), options);
                     }
 
                     // if no type present, default is systematic
                     if (noTypeSpecified) {
-                        SearchType type = SearchType.LINEAGE;
+                        SearchType type = LINEAGE;
                         if (SearchUtil.isGeneFormat(name)) {
-                            type = SearchType.GENE;
+                            type = GENE;
                         }
-                        addColorRule(type, name, Color.web(colorString), options);
+                        searchLayer.addColorRule(type, name, web(colorString), options);
                     }
 
                 } else { // add multicellular structure rule
-                    addMulticellularStructureRule(name, Color.web(colorString));
+                    searchLayer.addMulticellularStructureRule(name, web(colorString));
                 }
 
             } catch (StringIndexOutOfBoundsException e) {
@@ -255,9 +257,7 @@ public class URLLoader {
         // x and y
         for (int i = 0; i < viewArgs.size(); i++) {
             if (viewArgs.get(i).startsWith("rX")) {
-                String ry = viewArgs.get(i + 1);
-                String rz = viewArgs.get(i + 2);
-                viewArgs.set(i, viewArgs.get(i) + "," + ry + "," + rz);
+                viewArgs.set(i, viewArgs.get(i) + "," + viewArgs.get(i + 1) + "," + viewArgs.get(i + 2));
                 break;
             }
         }
@@ -275,10 +275,10 @@ public class URLLoader {
                     System.out.println("error in parsing time variable");
                     nfe.printStackTrace();
                 }
-
                 continue;
             }
-            String[] tokens = arg.split("=");
+
+            final String[] tokens = arg.split("=");
             if (tokens.length != 0) {
                 switch (tokens[0]) {
                     case "time":

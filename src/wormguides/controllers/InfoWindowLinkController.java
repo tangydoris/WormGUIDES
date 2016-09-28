@@ -4,7 +4,6 @@
 
 package wormguides.controllers;
 
-import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,31 +11,39 @@ import java.net.URISyntaxException;
 import javafx.beans.property.StringProperty;
 import javafx.stage.Stage;
 
-import wormguides.layers.SearchLayer;
-import wormguides.models.AnatomyTerm;
-
 import partslist.PartsList;
+import wormguides.layers.SearchLayer;
+
+import static java.awt.Desktop.getDesktop;
+import static java.awt.Desktop.isDesktopSupported;
+import static java.util.Objects.requireNonNull;
+
+import static wormguides.models.AnatomyTerm.AMPHID_SENSILLA;
 
 /**
- * Callback class for HTML pages HTML pages generated for Info Window contain
- * links which when clicked fire a JS function that allows us to call back to
- * our java code
+ * Callback class for HTML pages HTML pages generated for Info Window contain links which when clicked fire a JS
+ * function that allows us to call back to our java code.
  * <p>
- * This class implements functionality for targeting the user's default broswer
- * for linked websites, handles the clicking of a wiring partner to both
- * generate a new cell case page and view the partner in 3D, and controls the
- * generation of AnatomyTerm pages in the info window
- *
- * @author bradenkatzman
+ * This class implements functionality for targeting the user's default broswer for linked websites, handles the
+ * clicking of a wiring partner to both generate a new cell case page and view the partner in 3D, and controls the
+ * generation of AnatomyTerm pages in the info window.
  */
 public class InfoWindowLinkController {
 
-    private Stage parentStage; // update scenes on links
-    private StringProperty labeledCellProperty;
+    private final Stage parentStage;
 
-    public InfoWindowLinkController(Stage stage, StringProperty cellNameProperty) {
-        parentStage = stage;
-        labeledCellProperty = cellNameProperty;
+    private final SearchLayer searchLayer;
+
+    private final StringProperty labeledCellProperty;
+
+    public InfoWindowLinkController(
+            final Stage parentStage,
+            final SearchLayer searchLayer,
+            final StringProperty labeledCellProperty) {
+
+        this.parentStage = requireNonNull(parentStage);
+        this.searchLayer = requireNonNull(searchLayer);
+        this.labeledCellProperty = requireNonNull(labeledCellProperty);
     }
 
     /**
@@ -51,14 +58,14 @@ public class InfoWindowLinkController {
      *         when a URI cannot be created from the input url
      */
     public void handleLink(String url) throws IOException, URISyntaxException {
-        if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().browse(new URI(url));
+        if (isDesktopSupported()) {
+            getDesktop().browse(new URI(url));
         }
     }
 
     /**
-     * Callback controller for wiring partner. When a wiring partner is clicked,
-     * it is shown in 3D and an info window page is generated for the cell
+     * Callback controller for wiring partner. When a wiring partner is clicked, it is shown in 3D and an info window
+     * page is generated for the cell.
      *
      * @param cellName
      *         the name of the clicked wiring partner
@@ -85,9 +92,9 @@ public class InfoWindowLinkController {
         // view in 3D
         viewInCellTheater(cell);
 
-        if (!SearchLayer.hasCellCase(cell)) {
+        if (!searchLayer.hasCellCase(cell)) {
             // generate a new cell case
-            SearchLayer.addToInfoWindow(cell);
+            searchLayer.addToInfoWindow(cell);
         } else {
             /*
              * TODO focus the tab if it already exists
@@ -96,11 +103,10 @@ public class InfoWindowLinkController {
     }
 
     /**
-     * Call back controller for keyword "amphid" click Generates the
-     * "Amphid Sensilla" default info window page for now
+     * Call back controller for keyword "amphid" click Generates the "Amphid Sensilla" default info window page for now
      */
     public void handleAmphidClick() {
-        SearchLayer.addToInfoWindow(AnatomyTerm.AMPHID_SENSILLA);
+        searchLayer.addToInfoWindow(AMPHID_SENSILLA);
     }
 
     /**
@@ -117,8 +123,7 @@ public class InfoWindowLinkController {
     }
 
     /**
-     * Changes the StringProperty labeledCellProperty to navigate to the cell in
-     * 3D
+     * Changes the StringProperty labeledCellProperty to navigate to the cell in 3D
      *
      * @param cellName
      *         the cell to navigate to

@@ -16,11 +16,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -31,7 +27,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -45,19 +40,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
-import javafx.scene.CacheHint;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.SceneAntialiasing;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -70,22 +61,17 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
-import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import acetree.LineageData;
 import com.sun.javafx.scene.CameraHelper;
 import connectome.Connectome;
-import partslist.PartsList;
-import search.SearchType;
 import search.SearchUtil;
 import wormguides.MainApp;
 import wormguides.layers.SearchLayer;
@@ -100,13 +86,52 @@ import wormguides.models.SearchOption;
 import wormguides.models.Xform;
 import wormguides.stories.Note;
 import wormguides.stories.Note.Display;
-import wormguides.util.AppFont;
 import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 import static java.util.Collections.sort;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+
+import static javafx.application.Platform.runLater;
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.CacheHint.QUALITY;
+import static javafx.scene.Cursor.CLOSED_HAND;
+import static javafx.scene.Cursor.DEFAULT;
+import static javafx.scene.Cursor.HAND;
+import static javafx.scene.SceneAntialiasing.BALANCED;
+import static javafx.scene.input.MouseButton.PRIMARY;
+import static javafx.scene.input.MouseButton.SECONDARY;
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
+import static javafx.scene.input.MouseEvent.MOUSE_DRAGGED;
+import static javafx.scene.input.MouseEvent.MOUSE_ENTERED;
+import static javafx.scene.input.MouseEvent.MOUSE_ENTERED_TARGET;
+import static javafx.scene.input.MouseEvent.MOUSE_MOVED;
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
+import static javafx.scene.paint.Color.WHITE;
+import static javafx.scene.paint.Color.web;
+import static javafx.scene.text.FontSmoothingType.LCD;
+import static javafx.scene.transform.Rotate.X_AXIS;
+import static javafx.scene.transform.Rotate.Y_AXIS;
+import static javafx.scene.transform.Rotate.Z_AXIS;
+import static javafx.stage.Modality.NONE;
+import static javafx.stage.StageStyle.UNDECORATED;
+
+import static javax.imageio.ImageIO.write;
+import static partslist.PartsList.getFunctionalNameByLineageName;
+import static search.SearchType.LINEAGE;
+import static search.SearchType.NEIGHBOR;
+import static wormguides.models.SearchOption.CELL_BODY;
+import static wormguides.models.SearchOption.CELL_NUCLEUS;
+import static wormguides.models.SearchOption.MULTICELLULAR_NAME_BASED;
+import static wormguides.stories.Note.Display.OVERLAY;
+import static wormguides.util.AppFont.getBillboardFont;
+import static wormguides.util.AppFont.getSpriteAndOverlayFont;
 
 /**
  * The controller for the 3D subscene inside the root layout. This class contains the subscene itself, and places it
@@ -169,14 +194,16 @@ public class Window3DController {
     private final Rotate rotateY;
     private final Rotate rotateZ;
     Vector<JavaPicture> javaPictures;
+    private SearchLayer searchLayer;
     private Sphere[] spheres;
     private MeshView[] meshes;
     private String[] cellNames;
     private String[] meshNames;
     private Stage parentStage;
-    private LineageData cellData;
+    private LineageData lineageData;
     private SubScene subscene;
     private TextField searchField;
+
     // transformation stuff
     private Group root;
     private PerspectiveCamera camera;
@@ -184,9 +211,11 @@ public class Window3DController {
     private double mousePosX, mousePosY, mousePosZ;
     private double mouseOldX, mouseOldY, mouseOldZ;
     private double mouseDeltaX, mouseDeltaY;
+
     // average position offsets of nuclei from zero
     private int offsetX, offsetY, offsetZ;
     private double angleOfRotation;
+
     // housekeeping stuff
     private IntegerProperty time;
     private IntegerProperty totalNuclei;
@@ -197,10 +226,12 @@ public class Window3DController {
     private double[][] positions;
     private double[] diameters;
     private DoubleProperty zoom;
+
     // switching timepoints stuff
     private BooleanProperty playingMovie;
     private PlayService playService;
     private RenderService renderService;
+
     // subscene click cell selection stuff
     private IntegerProperty selectedIndex;
     private StringProperty selectedName;
@@ -209,31 +240,39 @@ public class Window3DController {
     private ContextMenuController contextMenuController;
     private CasesLists cases;
     private BooleanProperty cellClicked;
+
     // searched highlighting stuff
-    private boolean inSearch;
+    private boolean inSearchMode;
     private ObservableList<String> searchResultsList;
     private List<String> localSearchResults;
+
     // color rules stuff
     private ColorHash colorHash;
     private ObservableList<Rule> currentRulesList;
     private Comparator<Color> colorComparator;
     private Comparator<Shape3D> opacityComparator;
+
     // specific boolean listener for gene search results
     private BooleanProperty geneResultsUpdated;
+
     // opacity value for "other" cells (with no rule attached)
     private DoubleProperty othersOpacity;
     private List<String> otherCells;
+
     // Scene Elements stuff
     private boolean defaultEmbryoFlag;
     private SceneElementsList sceneElementsList;
     private List<SceneElement> sceneElementsAtTime;
     private List<MeshView> currentSceneElementMeshes;
     private List<SceneElement> currentSceneElements;
+
     // Uniform nuclei sizef
     private boolean uniformSize;
+
     // Cell body and cell nucleus highlighting in search mode
     private boolean cellNucleusTicked;
     private boolean cellBodyTicked;
+
     // Story elements stuff
     private StoriesLayer storiesLayer;
     // currentNotes contains all notes that are 'active' within a scene
@@ -248,18 +287,20 @@ public class Window3DController {
     // maps of sprite/billboard front notes attached to cell, or cell and time
     private HashMap<Node, VBox> entitySpriteMap;
     private HashMap<Node, Node> billboardFrontEntityMap;
+
     // Label stuff
     private List<String> allLabels;
     private List<String> currentLabels;
     private HashMap<Node, Text> entityLabelMap;
     private Text transientLabelText; // shows up on hover
+
     // orientation indicator
     private Cylinder orientationIndicator;
     private Rotate indicatorRotation;// this is the time varying component of
+
     // rotation
-    // private Group orientationIndicator;//this isn't needed globally really
     private double[] keyValuesRotate = {0, 45, 100, 100, 145};
-    private double[] keyFramesRotate = {1, 20, 320, 340, 400}; // start
+    private double[] keyFramesRotate = {1, 20, 320, 340, 400};
     private EventHandler<MouseEvent> clickableMouseEnteredHandler;
     private EventHandler<MouseEvent> clickableMouseExitedHandler;
     private ProductionInfo productionInfo;
@@ -287,7 +328,7 @@ public class Window3DController {
     /**
      * Class constructor
      *
-     * @param parent
+     * @param parentStage
      *         {@link Stage} to which the main application belongs to. Reference used for context menu (whether it
      *         should appear in the sulston tree or the 3D subscene.
      * @param parentPane
@@ -296,7 +337,7 @@ public class Window3DController {
      *         {@link LineageData} to contains cell information loaded from the nuclear files
      * @param cases
      *         {@link CasesLists} that contains information about terminal/non-terminal cells/anatomy terms
-     * @param info
+     * @param productionInfo
      *         {@link ProductionInfo} that contains information about segmentation and the movie time offset
      * @param connectome
      *         {@link Connectome} that contains information about the embryo's connectome
@@ -305,36 +346,36 @@ public class Window3DController {
      *         otherwise
      */
     public Window3DController(
-            Stage parent,
-            AnchorPane parentPane,
-            LineageData data,
-            CasesLists cases,
-            ProductionInfo info,
-            Connectome connectome,
-            BooleanProperty bringUpInfoProperty,
-            int offsetX,
-            int offsetY,
-            int offsetZ,
-            boolean defaultEmbryoFlag,
-            double X_SCALE,
-            double Y_SCALE,
-            double Z_SCALE) {
+            final Stage parentStage,
+            final AnchorPane parentPane,
+            final LineageData data,
+            final CasesLists cases,
+            final ProductionInfo productionInfo,
+            final Connectome connectome,
+            final BooleanProperty bringUpInfoProperty,
+            final int offsetX,
+            final int offsetY,
+            final int offsetZ,
+            final boolean defaultEmbryoFlag,
+            final double X_SCALE,
+            final double Y_SCALE,
+            final double Z_SCALE) {
 
-        parentStage = parent;
+        this.parentStage = requireNonNull(parentStage);
 
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
 
         root = new Group();
-        cellData = data;
-        productionInfo = info;
-        this.connectome = connectome;
+        lineageData = data;
+        this.productionInfo = requireNonNull(productionInfo);
+        this.connectome = requireNonNull(connectome);
 
         this.defaultEmbryoFlag = defaultEmbryoFlag;
 
         if (defaultEmbryoFlag) {
-            startTime = productionInfo.getDefaultStartTime();
+            startTime = this.productionInfo.getDefaultStartTime();
         } else {
             startTime = 0;
         }
@@ -406,7 +447,7 @@ public class Window3DController {
 
         cellClicked = new SimpleBooleanProperty(false);
 
-        inSearch = false;
+        inSearchMode = false;
 
         totalNuclei = new SimpleIntegerProperty();
         totalNuclei.set(0);
@@ -459,9 +500,9 @@ public class Window3DController {
         othersOpacity = new SimpleDoubleProperty(1);
         otherCells = new ArrayList<>();
 
-        rotateX = new Rotate(0, Rotate.X_AXIS);
-        rotateY = new Rotate(0, Rotate.Y_AXIS);
-        rotateZ = new Rotate(0, Rotate.Z_AXIS);
+        rotateX = new Rotate(0, X_AXIS);
+        rotateY = new Rotate(0, Y_AXIS);
+        rotateZ = new Rotate(0, Z_AXIS);
 
         // initialize
         rotateXAngle = new SimpleDoubleProperty(0.0);
@@ -482,7 +523,7 @@ public class Window3DController {
 
         uniformSize = false;
 
-        currentRulesList = FXCollections.observableArrayList();
+        currentRulesList = observableArrayList();
 
         colorHash = new ColorHash();
         colorComparator = new ColorComparator();
@@ -512,8 +553,8 @@ public class Window3DController {
 
         setNotesPane(parentPane);
 
-        clickableMouseEnteredHandler = event -> spritesPane.setCursor(Cursor.HAND);
-        clickableMouseExitedHandler = event -> spritesPane.setCursor(Cursor.DEFAULT);
+        clickableMouseEnteredHandler = event -> spritesPane.setCursor(HAND);
+        clickableMouseExitedHandler = event -> spritesPane.setCursor(DEFAULT);
 
         this.cases = cases;
 
@@ -547,6 +588,10 @@ public class Window3DController {
         this.X_SCALE = 1;
         this.Y_SCALE = 1;
         this.Z_SCALE = Z_SCALE / X_SCALE;
+    }
+
+    public void setSearchLayer(final SearchLayer searchLayer) {
+        this.searchLayer = requireNonNull(searchLayer);
     }
 
     public void initializeWithCannonicalOrientation() {
@@ -662,7 +707,7 @@ public class Window3DController {
                 Bounds b = entity.getBoundsInParent();
 
                 if (b != null) {
-                    String funcName = PartsList.getFunctionalNameByLineageName(name);
+                    String funcName = getFunctionalNameByLineageName(name);
                     if (funcName != null) {
                         name = funcName;
                     }
@@ -670,7 +715,7 @@ public class Window3DController {
                     transientLabelText = makeNoteSpriteText(name);
 
                     transientLabelText.setWrappingWidth(-1);
-                    transientLabelText.setFill(Color.web(TRANSIENT_LABEL_COLOR_HEX));
+                    transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
 
@@ -678,15 +723,12 @@ public class Window3DController {
                             (b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
                     double x = p.getX();
                     double y = p.getY();
-
                     double vOffset = b.getHeight() / 2;
                     double hOffset = b.getWidth() / 2;
-
                     x += hOffset;
                     y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
 
                     transientLabelText.getTransforms().add(new Translate(x, y));
-
                     spritesPane.getChildren().add(transientLabelText);
                 }
             }
@@ -759,14 +801,14 @@ public class Window3DController {
     public void handleMouseEvent(MouseEvent me) {
         EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
 
-        if (type == MouseEvent.MOUSE_ENTERED_TARGET || type == MouseEvent.MOUSE_ENTERED
-                || type == MouseEvent.MOUSE_RELEASED || type == MouseEvent.MOUSE_MOVED) {
+        if (type == MOUSE_ENTERED_TARGET || type == MOUSE_ENTERED
+                || type == MOUSE_RELEASED || type == MOUSE_MOVED) {
             handleMouseReleasedOrEntered();
-        } else if (type == MouseEvent.MOUSE_CLICKED && me.isStillSincePress()) {
+        } else if (type == MOUSE_CLICKED && me.isStillSincePress()) {
             handleMouseClicked(me);
-        } else if (type == MouseEvent.MOUSE_DRAGGED) {
+        } else if (type == MOUSE_DRAGGED) {
             handleMouseDragged(me);
-        } else if (type == MouseEvent.MOUSE_PRESSED) {
+        } else if (type == MOUSE_PRESSED) {
             handleMousePressed(me);
         }
     }
@@ -774,7 +816,7 @@ public class Window3DController {
     private void handleMouseDragged(MouseEvent event) {
         hideContextPopups();
 
-        spritesPane.setCursor(Cursor.CLOSED_HAND);
+        spritesPane.setCursor(CLOSED_HAND);
 
         mouseOldX = mousePosX;
         mouseOldY = mousePosY;
@@ -857,11 +899,11 @@ public class Window3DController {
     }
 
     private void handleMouseReleasedOrEntered() {
-        spritesPane.setCursor(Cursor.DEFAULT);
+        spritesPane.setCursor(DEFAULT);
     }
 
     private void handleMouseClicked(MouseEvent event) {
-        spritesPane.setCursor(Cursor.HAND);
+        spritesPane.setCursor(HAND);
 
         hideContextPopups();
 
@@ -875,10 +917,10 @@ public class Window3DController {
             selectedName.set(name);
             cellClicked.set(true);
 
-            if (event.getButton() == MouseButton.SECONDARY
-                    || (event.getButton() == MouseButton.PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
-                showContextMenu(name, event.getScreenX(), event.getScreenY(), SearchOption.CELL_NUCLEUS);
-            } else if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == SECONDARY
+                    || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
+                showContextMenu(name, event.getScreenX(), event.getScreenY(), CELL_NUCLEUS);
+            } else if (event.getButton() == PRIMARY) {
                 if (allLabels.contains(name)) {
                     removeLabelFor(name);
                 } else {
@@ -906,19 +948,19 @@ public class Window3DController {
                     selectedName.set(name);
                     found = true;
 
-                    if (event.getButton() == MouseButton.SECONDARY || (event.getButton() == MouseButton.PRIMARY
+                    if (event.getButton() == SECONDARY || (event.getButton() == PRIMARY
                             && (event.isMetaDown() || event.isControlDown()))) {
                         if (sceneElementsList.isMulticellStructureName(name)) {
                             showContextMenu(name, event.getScreenX(), event.getScreenY(),
-                                    SearchOption.MULTICELLULAR_NAME_BASED);
+                                    MULTICELLULAR_NAME_BASED);
                         } else {
                             showContextMenu(
                                     name,
                                     event.getScreenX(),
                                     event.getScreenY(),
-                                    SearchOption.CELL_BODY);
+                                    CELL_BODY);
                         }
-                    } else if (event.getButton() == MouseButton.PRIMARY) {
+                    } else if (event.getButton() == PRIMARY) {
                         if (allLabels.contains(name)) {
                             removeLabelFor(name);
                         } else {
@@ -968,15 +1010,15 @@ public class Window3DController {
         // http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
         // --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
         // http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
-        return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
+        return sqrt(pow(xCoord, 2) + pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
     }
 
     private double rotationAngleFromMouseMovement() {
         // http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
-        double rotationAngleRadians = Math
-                .acos(((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
-                        / Math.sqrt((Math.pow(mouseOldX, 2) + Math.pow(mouseOldY, 2) + Math.pow(mouseOldZ, 2))
-                        * (Math.pow(mousePosX, 2) + Math.pow(mousePosY, 2) + Math.pow(mousePosZ, 2))));
+        double rotationAngleRadians = Math.acos(
+                ((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
+                        / sqrt((pow(mouseOldX, 2) + pow(mouseOldY, 2) + pow(mouseOldZ, 2))
+                        * (pow(mousePosX, 2) + pow(mousePosY, 2) + pow(mousePosZ, 2))));
 
         return rotationAngleRadians;
     }
@@ -1021,7 +1063,7 @@ public class Window3DController {
 
         contextMenuController.setName(name);
 
-        String funcName = PartsList.getFunctionalNameByLineageName(name);
+        String funcName = getFunctionalNameByLineageName(name);
         if (funcName == null) {
             contextMenuController.disableTerminalCaseFunctions(true);
         } else {
@@ -1029,21 +1071,20 @@ public class Window3DController {
         }
 
         contextMenuController.setColorButtonListener(event -> {
-            final Rule rule = SearchLayer.addColorRule(SearchType.LINEAGE, name, Color.WHITE, option);
-            rule.showEditStage(parentStage);
+            if (searchLayer != null) {
+                searchLayer.addColorRule(LINEAGE, name, WHITE, option)
+                        .showEditStage(parentStage);
+            }
             contextMenuStage.hide();
         });
 
         contextMenuController.setColorNeighborsButtonListener(event -> {
             // color neighboring cell bodies, multicellular structures, as
             // well as nuclei
-            final Rule rule = SearchLayer.addColorRule(
-                    SearchType.NEIGHBOR,
-                    name,
-                    Color.WHITE,
-                    SearchOption.CELL_NUCLEUS,
-                    SearchOption.CELL_BODY);
-            rule.showEditStage(parentStage);
+            if (searchLayer != null) {
+                searchLayer.addColorRule(NEIGHBOR, name, WHITE, CELL_NUCLEUS, CELL_BODY)
+                        .showEditStage(parentStage);
+            }
             contextMenuStage.hide();
         });
 
@@ -1056,11 +1097,16 @@ public class Window3DController {
 
     private void initContextMenuStage() {
         if (contextMenuStage == null) {
-            contextMenuController = new ContextMenuController(parentStage, bringUpInfoProperty, cases, productionInfo,
+            contextMenuController = new ContextMenuController(
+                    parentStage,
+                    searchLayer,
+                    bringUpInfoProperty,
+                    cases,
+                    productionInfo,
                     connectome);
 
             contextMenuStage = new Stage();
-            contextMenuStage.initStyle(StageStyle.UNDECORATED);
+            contextMenuStage.initStyle(UNDECORATED);
 
             contextMenuController.setOwnStage(contextMenuStage);
 
@@ -1072,7 +1118,7 @@ public class Window3DController {
 
             try {
                 contextMenuStage.setScene(new Scene(loader.load()));
-                contextMenuStage.initModality(Modality.NONE);
+                contextMenuStage.initModality(NONE);
                 contextMenuStage.setResizable(false);
                 contextMenuStage.setTitle("Menu");
 
@@ -1090,8 +1136,8 @@ public class Window3DController {
     }
 
     private void createSubScene(Double width, Double height) {
-        subscene = new SubScene(root, width, height, true, SceneAntialiasing.BALANCED);
-        subscene.setFill(Color.web(FILL_COLOR_HEX));
+        subscene = new SubScene(root, width, height, true, BALANCED);
+        subscene.setFill(web(FILL_COLOR_HEX));
 
         buildCamera();
     }
@@ -1218,10 +1264,7 @@ public class Window3DController {
         return -1;
     }
 
-    /**
-     * Calls the {@link Service} to retrieve subscene data at current time point
-     * then render entities, notes, and labels
-     */
+    /** Calls the service to retrieve subscene data at current time point then render entities, notes, and labels */
     private void buildScene() {
         // Spool thread for actual rendering to subscene
         renderService.restart();
@@ -1229,9 +1272,9 @@ public class Window3DController {
 
     private void getSceneData() {
         final int requestedTime = time.get();
-        cellNames = cellData.getNames(requestedTime);
-        positions = cellData.getPositions(requestedTime);
-        diameters = cellData.getDiameters(requestedTime);
+        cellNames = lineageData.getNames(requestedTime);
+        positions = lineageData.getPositions(requestedTime);
+        diameters = lineageData.getDiameters(requestedTime);
         otherCells.clear();
 
         totalNuclei.set(cellNames.length);
@@ -1320,7 +1363,7 @@ public class Window3DController {
                 // display/attachment
                 // type combination
                 if (note.hasLocationError() || note.hasEntityNameError()) {
-                    note.setTagDisplay(Display.OVERLAY);
+                    note.setTagDisplay(OVERLAY);
                 }
 
                 if (defaultEmbryoFlag) {
@@ -1378,7 +1421,7 @@ public class Window3DController {
         // clear note sprites and overlays
         overlayVBox.getChildren().clear();
 
-        Iterator<Node> iter = spritesPane.getChildren().iterator();
+        final Iterator<Node> iter = spritesPane.getChildren().iterator();
         while (iter.hasNext()) {
             Node node = iter.next();
             if (node instanceof Text) {
@@ -1394,14 +1437,14 @@ public class Window3DController {
     }
 
     private void addEntitiesToScene() {
-        List<Shape3D> entities = new ArrayList<>();
-        List<Node> notes = new ArrayList<>();
+        final List<Shape3D> entities = new ArrayList<>();
+        final List<Node> notes = new ArrayList<>();
 
         // add spheres
         addCellGeometries(entities);
 
+        // add scene element meshes (from notes and from scene elements list)
         if (defaultEmbryoFlag) {
-            // add scene element meshes (from notes and from scene elements list)
             addSceneElementGeometries(entities);
         }
 
@@ -1439,14 +1482,12 @@ public class Window3DController {
     }
 
     private void removeOutOfBoundsSprites() {
-        Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-
-        Iterator<Node> iter = spritesPane.getChildren().iterator();
+        final Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+        final Iterator<Node> iter = spritesPane.getChildren().iterator();
         while (iter.hasNext()) {
             Node node = iter.next();
             if (node != subscene) {
-                Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
-
+                final Bounds spriteBounds = node.localToScreen(node.getBoundsInLocal());
                 if (spriteBounds.getMinX() < paneBounds.getMinX() - 10
                         && spriteBounds.getMinY() < paneBounds.getMinY() - 10
                         && spriteBounds.getMaxX() > paneBounds.getMaxX() + 10
@@ -1463,7 +1504,7 @@ public class Window3DController {
             list.addAll(currentNoteMeshMap.keySet()
                     .stream()
                     .map(note -> currentNoteMeshMap.get(note))
-                    .collect(Collectors.toList()));
+                    .collect(toList()));
 
             // Consult rules
             if (!currentSceneElements.isEmpty()) {
@@ -1471,8 +1512,7 @@ public class Window3DController {
                     SceneElement se = currentSceneElements.get(i);
                     MeshView mesh = currentSceneElementMeshes.get(i);
 
-                    // in search mode
-                    if (inSearch) {
+                    if (inSearchMode) {
                         if (cellBodyTicked && searchedMeshes[i]) {
                             mesh.setMaterial(colorHash.getHighlightMaterial());
                         } else {
@@ -1485,7 +1525,7 @@ public class Window3DController {
 
                         // default white meshes
                         if (allNames.isEmpty()) {
-                            mesh.setMaterial(new PhongMaterial(Color.WHITE));
+                            mesh.setMaterial(new PhongMaterial(WHITE));
                             mesh.setCullFace(CullFace.NONE);
                         }
 
@@ -1501,7 +1541,7 @@ public class Window3DController {
                                     colors.addAll(allNames.stream()
                                             .filter(rule::appliesToCellBody)
                                             .map(name -> rule.getColor())
-                                            .collect(Collectors.toList()));
+                                            .collect(toList()));
                                 }
                             }
                             sort(colors, colorComparator);
@@ -1516,18 +1556,15 @@ public class Window3DController {
                     }
 
                     mesh.setOnMouseEntered(event -> {
-                        spritesPane.setCursor(Cursor.HAND);
-
+                        spritesPane.setCursor(HAND);
                         // make label appear
-                        String name = normalizeName(se.getSceneName());
-
+                        final String name = normalizeName(se.getSceneName());
                         if (!currentLabels.contains(name.toLowerCase())) {
                             transientLabel(name, getEntityWithName(name));
                         }
                     });
                     mesh.setOnMouseExited(event -> {
-                        spritesPane.setCursor(Cursor.DEFAULT);
-
+                        spritesPane.setCursor(DEFAULT);
                         // make label disappear
                         removeTransientLabel();
                     });
@@ -1538,8 +1575,7 @@ public class Window3DController {
         }
     }
 
-    private void addCellGeometries(List<Shape3D> list) {
-        // Sphere stuff
+    private void addCellGeometries(final List<Shape3D> list) {
         for (int i = 0; i < cellNames.length; i++) {
             double radius;
             if (!uniformSize) {
@@ -1547,29 +1583,24 @@ public class Window3DController {
             } else {
                 radius = SIZE_SCALE * UNIFORM_RADIUS;
             }
-            Sphere sphere = new Sphere(radius);
-
+            final Sphere sphere = new Sphere(radius);
             Material material = new PhongMaterial();
             // if in search, do highlighting
-            if (inSearch) {
-                if (cellNucleusTicked && searchedCells[i]) {
+            if (inSearchMode) {
+                if (searchedCells[i]) {
                     material = colorHash.getHighlightMaterial();
                 } else {
                     material = colorHash.getTranslucentMaterial();
                 }
-            }
-            // not in search mode
-            else {
-                ArrayList<Color> colors = new ArrayList<>();
+            } else {
+                List<Color> colors = new ArrayList<>();
                 for (Rule rule : currentRulesList) {
                     // just need to consult rule's active list
                     if (rule.appliesToCellNucleus(cellNames[i])) {
-                        colors.add(Color.web(rule.getColor().toString()));
+                        colors.add(web(rule.getColor().toString()));
                     }
                 }
-                sort(colors, colorComparator);
                 material = colorHash.getMaterial(colors);
-
                 if (colors.isEmpty()) {
                     material = colorHash.getOthersMaterial(othersOpacity.get());
                 }
@@ -1585,7 +1616,7 @@ public class Window3DController {
 
             final int index = i;
             sphere.setOnMouseEntered(event -> {
-                spritesPane.setCursor(Cursor.HAND);
+                spritesPane.setCursor(HAND);
 
                 // make label appear
                 String name = cellNames[index];
@@ -1596,7 +1627,7 @@ public class Window3DController {
                 }
             });
             sphere.setOnMouseExited(event -> {
-                spritesPane.setCursor(Cursor.DEFAULT);
+                spritesPane.setCursor(DEFAULT);
 
                 // make label disappear
                 removeTransientLabel();
@@ -1604,7 +1635,6 @@ public class Window3DController {
 
             list.add(sphere);
         }
-        // End sphere stuff
     }
 
     private void removeLabelFor(String name) {
@@ -1631,15 +1661,15 @@ public class Window3DController {
         Text label = entityLabelMap.get(entity);
         if (label != null) {
             for (Node shape : entityLabelMap.keySet()) {
-                entityLabelMap.get(shape).setFill(Color.web(SPRITE_COLOR_HEX));
+                entityLabelMap.get(shape).setFill(web(SPRITE_COLOR_HEX));
             }
 
-            label.setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+            label.setFill(web(ACTIVE_LABEL_COLOR_HEX));
             return;
         }
 
         // otherwise, create a highlight new label
-        String funcName = PartsList.getFunctionalNameByLineageName(name);
+        String funcName = getFunctionalNameByLineageName(name);
         Text text;
         if (funcName != null) {
             text = makeNoteSpriteText(funcName);
@@ -1660,11 +1690,11 @@ public class Window3DController {
 
     private void highlightActiveCellLabel(Shape3D entity) {
         for (Node shape3D : entityLabelMap.keySet()) {
-            entityLabelMap.get(shape3D).setFill(Color.web(SPRITE_COLOR_HEX));
+            entityLabelMap.get(shape3D).setFill(web(SPRITE_COLOR_HEX));
         }
 
         if (entity != null && entityLabelMap.get(entity) != null) {
-            entityLabelMap.get(entity).setFill(Color.web(ACTIVE_LABEL_COLOR_HEX));
+            entityLabelMap.get(entity).setFill(web(ACTIVE_LABEL_COLOR_HEX));
         }
     }
 
@@ -1835,7 +1865,7 @@ public class Window3DController {
 
             // add graphic to appropriate place (scene, overlay box, or on top
             // of scene)
-            Display display = note.getTagDisplay();
+            final Display display = note.getTagDisplay();
             if (display != null) {
                 switch (display) {
                     case SPRITE:
@@ -1873,12 +1903,12 @@ public class Window3DController {
         }
     }
 
-    private Text makeNoteOverlayText(String title) {
-        Text text = new Text(title);
-        text.setFill(Color.web(SPRITE_COLOR_HEX));
-        text.setFontSmoothingType(FontSmoothingType.LCD);
+    private Text makeNoteOverlayText(final String title) {
+        final Text text = new Text(title);
+        text.setFill(web(SPRITE_COLOR_HEX));
+        text.setFontSmoothingType(LCD);
         text.setWrappingWidth(overlayVBox.getWidth());
-        text.setFont(AppFont.getSpriteAndOverlayFont());
+        text.setFont(getSpriteAndOverlayFont());
         return text;
     }
 
@@ -1891,12 +1921,12 @@ public class Window3DController {
     private Text makeNoteBillboardText(String title) {
         Text text = new Text(title);
         text.setWrappingWidth(90);
-        text.setFont(AppFont.getBillboardFont());
+        text.setFont(getBillboardFont());
         text.setSmooth(false);
         text.setStrokeWidth(2);
-        text.setFontSmoothingType(FontSmoothingType.LCD);
-        text.setCacheHint(CacheHint.QUALITY);
-        text.setFill(Color.web(SPRITE_COLOR_HEX));
+        text.setFontSmoothingType(LCD);
+        text.setCacheHint(QUALITY);
+        text.setFill(web(SPRITE_COLOR_HEX));
         return text;
     }
 
@@ -1962,20 +1992,20 @@ public class Window3DController {
         subscene.setCamera(camera);
     }
 
-    public void setSearchResultsList(ObservableList<String> list) {
-        searchResultsList = list;
+    public void setSearchResultsList(final ObservableList<String> searchResultsList) {
+        this.searchResultsList = requireNonNull(searchResultsList);
     }
 
-    public void setSearchResultsUpdateService(Service<Void> service) {
+    public void setSearchResultsUpdateService(final Service<Void> service) {
         service.setOnSucceeded(event -> updateLocalSearchResults());
     }
 
-    public void setGeneResultsUpdated(BooleanProperty updated) {
-        geneResultsUpdated = updated;
-        geneResultsUpdated.addListener((observable, oldValue, newValue) -> updateLocalSearchResults());
+    public void setGeneResultsUpdated(final BooleanProperty geneResultsUpdated) {
+        this.geneResultsUpdated = requireNonNull(geneResultsUpdated);
+        this.geneResultsUpdated.addListener((observable, oldValue, newValue) -> updateLocalSearchResults());
     }
 
-    public void consultSearchResultsList() {
+    private void consultSearchResultsList() {
         searchedCells = new boolean[cellNames.length];
         if (defaultEmbryoFlag) {
             searchedMeshes = new boolean[meshNames.length];
@@ -2004,6 +2034,7 @@ public class Window3DController {
     public boolean currentRulesApplyTo(String name) {
         String sceneName = "";
         List<String> cells = new ArrayList<>();
+
         if (defaultEmbryoFlag) {
             // get the scene name associated with the cell
             for (int i = 0; i < sceneElementsList.getElementsList().size(); i++) {
@@ -2014,23 +2045,20 @@ public class Window3DController {
                 if (currSE.isMulticellular()) {
                     if (currSE.getSceneName().toLowerCase().equals(name.toLowerCase())) {
                         sceneName = name;
-                        cells = currSE.getAllCellNames(); // save the cells in case
-                        // there isn't an
-                        // explicit structure
-                        // rule but the
-                        // structure is still
+                        // save the cells in case there isn't an explicit structure rule but the structure is still
                         // colored
+                        cells = currSE.getAllCellNames();
                     }
                 } else {
-                    String sn = sceneElementsList.getElementsList()
+                    String ithSceneName = sceneElementsList.getElementsList()
                             .get(i)
                             .getSceneName();
 
-                    StringTokenizer st = new StringTokenizer(sn);
+                    StringTokenizer st = new StringTokenizer(ithSceneName);
                     if (st.countTokens() == 2) {
                         String sceneNameLineage = st.nextToken();
                         if (sceneNameLineage.equalsIgnoreCase(name)) {
-                            sceneName = sn;
+                            sceneName = ithSceneName;
                             break;
                         }
                     }
@@ -2061,12 +2089,10 @@ public class Window3DController {
                 }
             }
         }
-
         return false;
     }
 
     public boolean captureImagesForMovie() {
-
         movieFiles.clear();
         count = -1;
 
@@ -2108,36 +2134,37 @@ public class Window3DController {
         captureVideo.set(true);
         timer = new Timer();
 
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (captureVideo.get()) {
-                    Platform.runLater(() -> {
-                        WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (captureVideo.get()) {
+                            runLater(() -> {
+                                final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+                                try {
+                                    final File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
+                                    if (file != null) {
+                                        RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+                                        write(renderedImage, "JPEG", file);
+                                        movieFiles.addElement(file);
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Could not write frame of movie to file.");
+                                    e.printStackTrace();
+                                }
+                            });
 
-                        try {
-                            File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-
-                            if (file != null) {
-                                RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                                ImageIO.write(renderedImage, "JPEG", file);
-                                movieFiles.addElement(file);
-                            }
-                        } catch (Exception e) {
-                            // e.printStackTrace();
+                        } else {
+                            timer.cancel();
                         }
-                    });
-
-                } else {
-                    timer.cancel();
-                }
-            }
-        }, 0, 1000);
+                    }
+                },
+                0,
+                1000);
         return true;
     }
 
     public void convertImagesToMovie() {
-
         // make our files into JavaPicture
         javaPictures.clear();
 
@@ -2174,27 +2201,24 @@ public class Window3DController {
 
     }
 
-    /*
-     * When called, a snapshot of the screen is saved
+    /**
+     * Saves a snapshot of the screen
      */
     public void stillscreenCapture() {
-        Stage fileChooserStage = new Stage();
-
-        FileChooser fileChooser = new FileChooser();
+        final Stage fileChooserStage = new Stage();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
 
-        WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+        final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
-		/*
-         * write the image to a file
-		 */
+        //write the image to a file
         try {
-            File file = fileChooser.showSaveDialog(fileChooserStage);
+            final File file = fileChooser.showSaveDialog(fileChooserStage);
 
             if (file != null) {
-                RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                ImageIO.write(renderedImage, "png", file);
+                final RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+                write(renderedImage, "png", file);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -2275,10 +2299,9 @@ public class Window3DController {
         }
     }
 
-    public ArrayList<Rule> getColorRulesList() {
-        ArrayList<Rule> list = new ArrayList<>();
+    public List<Rule> getColorRulesList() {
+        List<Rule> list = new ArrayList<>();
         list.addAll(currentRulesList);
-
         return list;
     }
 
@@ -2305,7 +2328,7 @@ public class Window3DController {
 	 * repositionNoteBillboardFronts(); } }; }
 	 */
 
-    public void setColorRulesList(ArrayList<Rule> list) {
+    public void setColorRulesList(List<Rule> list) {
         currentRulesList.clear();
         currentRulesList.setAll(list);
     }
@@ -2333,14 +2356,6 @@ public class Window3DController {
         rotateXAngle.set(rx);
         rotateYAngle.set(ry);
         rotateZAngle.set(rz);
-        /*
-         * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
-		 * Math.toDegrees(rz);
-		 */
-
-		/*
-         * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
-		 */
     }
 
     public void setCaptureVideo(BooleanProperty captureVideo) {
@@ -2376,17 +2391,16 @@ public class Window3DController {
     }
 
     /**
-     * Used for internal URL generation of rules associated with wormguides.stories
+     * Used for internal URL generation of rules associated with stories
      *
-     * @return The value of the zoom {@link DoubleProperty}
+     * @return value of the zoom factor
      */
     public double getScaleInternal() {
         return zoom.get();
     }
 
     /**
-     * Used for internal URL generation of rules associated with wormguides.stories. Sets
-     * the value of the zoom {@link DoubleProperty}
+     * Used for internal URL generation of rules associated with stories. Sets the value of the zoom factor
      */
     public void setScaleInternal(double scale) {
         zoom.set(scale);
@@ -2478,10 +2492,10 @@ public class Window3DController {
     public ChangeListener<String> getSearchFieldListener() {
         return (observable, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
-                inSearch = false;
+                inSearchMode = false;
                 buildScene();
             } else {
-                inSearch = true;
+                inSearchMode = true;
             }
         };
     }
@@ -2504,8 +2518,8 @@ public class Window3DController {
             hideContextPopups();
 
             double z = zoom.get();
-			/*
-			 * Workaround to avoid JavaFX bug --> stop zoom at 0
+            /*
+             * Workaround to avoid JavaFX bug --> stop zoom at 0
 			 * As of July 8, 2016
 			 * Noted by: Braden Katzman
 			 *
@@ -2649,10 +2663,13 @@ public class Window3DController {
     }
 
     /**
-     * This JavaFX {@link Service} of type Void spools a thread that<br>
+     * This service spools a thread that
+     * <p>
      * 1) retrieves the data for cells, cell bodies, and multicellular
-     * structures for the current time<br>
-     * 2) clears the notes, labels, and entities in the subscene<br>
+     * structures for the current time
+     * <p>
+     * 2) clears the notes, labels, and entities in the subscene
+     * <p>
      * 3) adds the current notes, labels, and entities to the subscene
      */
     private final class RenderService extends Service<Void> {
@@ -2661,7 +2678,7 @@ public class Window3DController {
             return new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    Platform.runLater(() -> {
+                    runLater(() -> {
                         getSceneData();
                         refreshScene();
                         addEntitiesToScene();
@@ -2688,7 +2705,7 @@ public class Window3DController {
                         if (isCancelled()) {
                             break;
                         }
-                        Platform.runLater(() -> setTime(time.get() + 1));
+                        runLater(() -> setTime(time.get() + 1));
                         try {
                             Thread.sleep(WAIT_TIME_MILLI);
                         } catch (InterruptedException ie) {

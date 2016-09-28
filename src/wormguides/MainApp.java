@@ -40,7 +40,7 @@ public class MainApp extends Application {
 
     private RootLayoutController controller;
 
-    public static void startProgramatically(String[] args, NucleiMgrAdapterResource nmar) {
+    public static void startProgramatically(final String[] args, final NucleiMgrAdapterResource nmar) {
         nucleiMgrAdapterResource = nmar;
         launch(args);
     }
@@ -50,7 +50,7 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(final Stage primaryStage) {
         System.out.println("Starting WormGUIDES JavaFX application");
 
         loadImages();

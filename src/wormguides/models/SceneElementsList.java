@@ -12,22 +12,26 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import wormguides.view.infowindow.HTMLNode;
 import wormguides.view.infowindow.InfoWindowDOM;
 
+import static java.lang.Integer.MIN_VALUE;
+
 /**
  * Record of {@link SceneElement}s over the life of embryo
  */
 public class SceneElementsList {
 
-    private final static String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
-    private final static String asterisk = "*";
-    private ArrayList<SceneElement> elementsList;
-    private HashMap<String, ArrayList<String>> nameCellsMap;
-    private HashMap<String, String> nameCommentsMap;
+    private final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
+    private final String ASTERISK = "*";
+
+    private final List<SceneElement> elementsList;
+    private final Map<String, List<String>> nameCellsMap;
+    private final Map<String, String> nameCommentsMap;
 
     // this will eventually be constructed using a .txt file that contains the
     // Scene Element information for the embryo
@@ -35,11 +39,10 @@ public class SceneElementsList {
         elementsList = new ArrayList<>();
         nameCellsMap = new HashMap<>();
         nameCommentsMap = new HashMap<>();
-
         buildListFromConfig();
     }
 
-    public boolean isSceneElementName(String name) {
+    public boolean isSceneElementName(final String name) {
         for (SceneElement se : elementsList) {
             if (se.getSceneName().equalsIgnoreCase(name)) {
                 return true;
@@ -49,19 +52,18 @@ public class SceneElementsList {
     }
 
     private void buildListFromConfig() {
-        URL url = SceneElementsList.class.getResource("/wormguides/models/shapes_file/" + CELL_CONFIG_FILE_NAME);
+        final URL url = SceneElementsList.class.getResource("/wormguides/models/shapes_file/" + CELL_CONFIG_FILE_NAME);
         if (url != null) {
             try (InputStream stream = url.openStream()) {
                 processStreamString(stream);
                 processCells();
-
             } catch (IOException e) {
                 System.out.println("The config file '" + CELL_CONFIG_FILE_NAME + "' wasn't found on the system.");
             }
         }
     }
 
-    private void processStreamString(InputStream stream) {
+    private void processStreamString(final InputStream stream) {
         try (InputStreamReader streamReader = new InputStreamReader(stream);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
@@ -113,7 +115,7 @@ public class SceneElementsList {
         for (SceneElement se : elementsList) {
             List<String> cells = se.getAllCellNames();
             for (int i = 0; i < cells.size(); i++) {
-                if (cells.get(i).startsWith(asterisk)) {
+                if (cells.get(i).startsWith(ASTERISK)) {
                     se.setNewCellNames(unpackCells(cells));
                 }
             }
@@ -122,10 +124,9 @@ public class SceneElementsList {
 
     private List<String> unpackCells(final List<String> cells) {
         final List<String> unpackedCells = new ArrayList<>();
-
         for (String cell : cells) {
-            // if cell starts with asterisk, recurse. else, add cell
-            if (cell.startsWith(asterisk)) {
+            // if cell starts with ASTERISK, recurse. else, add cell
+            if (cell.startsWith(ASTERISK)) {
                 // find the matching resource location
                 elementsList.stream()
                         .filter(se -> se.getResourceLocation().endsWith(cell.substring(1)))
@@ -140,39 +141,32 @@ public class SceneElementsList {
                 }
             }
         }
-
         return unpackedCells;
     }
 
-    /*
-     * Returns the biological time (without frame offset) of the first
-     * occurrence of element with scene name, name
+    /**
+     * Returns the biological time (without frame offset) of the first occurrence of element with scene name, name
      */
     public int getFirstOccurrenceOf(String name) {
-        int time = Integer.MIN_VALUE;
-
+        int time = MIN_VALUE;
         for (SceneElement element : elementsList) {
             if (element.getSceneName().equalsIgnoreCase(name)) {
                 time = element.getStartTime();
             }
         }
-
         return time + 1;
     }
 
-    /*
-     * Returns the biological time (without frame offset) of the last occurrence
-     * of element with scene name, name
+    /**
+     * Returns the biological time (without frame offset) of the last occurrence of element with scene name, name
      */
     public int getLastOccurrenceOf(String name) {
-        int time = Integer.MIN_VALUE;
-
+        int time = MIN_VALUE;
         for (SceneElement element : elementsList) {
             if (element.getSceneName().equalsIgnoreCase(name)) {
                 time = element.getEndTime();
             }
         }
-
         return time + 1;
     }
 
@@ -182,17 +176,16 @@ public class SceneElementsList {
         }
     }
 
-    public void addSceneElement(SceneElement element) {
+    public void addSceneElement(final SceneElement element) {
         if (element != null) {
             elementsList.add(element);
         }
-
         addComments(element);
     }
 
-    public String[] getSceneElementNamesAtTime(int time) {
+    public String[] getSceneElementNamesAtTime(final int time) {
         // Add lineage names of all structures at time
-        ArrayList<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         elementsList.stream().filter(se -> se.existsAtTime(time)).forEachOrdered(se -> {
             if (se.isMulticellular()) {
                 list.add(se.getSceneName());
@@ -200,12 +193,11 @@ public class SceneElementsList {
                 list.add(se.getAllCellNames().get(0));
             }
         });
-
         return list.toArray(new String[list.size()]);
     }
 
-    public ArrayList<SceneElement> getSceneElementsAtTime(int time) {
-        ArrayList<SceneElement> sceneElements = elementsList.stream()
+    public List<SceneElement> getSceneElementsAtTime(final int time) {
+        List<SceneElement> sceneElements = elementsList.stream()
                 .filter(se -> se.existsAtTime(time))
                 .collect(Collectors.toCollection(ArrayList::new));
         return sceneElements;
@@ -221,16 +213,16 @@ public class SceneElementsList {
         return sb.toString();
     }
 
-    public ArrayList<String> getAllMulticellSceneNames() {
-        ArrayList<String> names = new ArrayList<>();
+    public List<String> getAllMulticellSceneNames() {
+        List<String> names = new ArrayList<>();
         elementsList.stream()
                 .filter(se -> se.isMulticellular() && !names.contains(se))
                 .forEachOrdered(se -> names.add(se.getSceneName()));
         return names;
     }
 
-    public ArrayList<SceneElement> getMulticellSceneElements() {
-        ArrayList<SceneElement> elements = new ArrayList<>();
+    public List<SceneElement> getMulticellSceneElements() {
+        List<SceneElement> elements = new ArrayList<>();
         elementsList.stream()
                 .filter(se -> se.isMulticellular() && !elements.contains(se))
                 .forEachOrdered(elements::add);
@@ -238,8 +230,9 @@ public class SceneElementsList {
     }
 
     public boolean isMulticellStructureName(String name) {
+        name = name.trim();
         for (String cellName : getAllMulticellSceneNames()) {
-            if (cellName.equalsIgnoreCase(name.trim())) {
+            if (cellName.equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -247,41 +240,41 @@ public class SceneElementsList {
     }
 
     public String getCommentByName(String name) {
-        String comment = nameCommentsMap.get(name.trim().toLowerCase());
+        final String comment = nameCommentsMap.get(name.trim().toLowerCase());
         if (comment == null) {
             return "";
         }
         return comment;
     }
 
-    public HashMap<String, String> getNameToCommentsMap() {
+    public Map<String, String> getNameToCommentsMap() {
         return nameCommentsMap;
     }
 
-    public HashMap<String, ArrayList<String>> getNameToCellsMap() {
-        return this.nameCellsMap;
+    public Map<String, List<String>> getNameToCellsMap() {
+        return nameCellsMap;
     }
 
     public InfoWindowDOM sceneElementsListDOM() {
-        HTMLNode html = new HTMLNode("html");
-        HTMLNode head = new HTMLNode("head");
-        HTMLNode body = new HTMLNode("body");
+        final HTMLNode html = new HTMLNode("html");
+        final HTMLNode head = new HTMLNode("head");
+        final HTMLNode body = new HTMLNode("body");
 
         // add nodes to html
         html.addChild(head);
         html.addChild(body);
 
-        HTMLNode sceneElementsListDiv = new HTMLNode("div");
-        HTMLNode sceneElementsListTable = new HTMLNode("table");
+        final HTMLNode sceneElementsListDiv = new HTMLNode("div");
+        final HTMLNode sceneElementsListTable = new HTMLNode("table");
 
         // title row
-        HTMLNode trH = new HTMLNode("tr");
-        HTMLNode th1 = new HTMLNode("th", "", "", "Scene Name");
-        HTMLNode th2 = new HTMLNode("th", "", "", "Cell Names");
-        HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
-        HTMLNode th4 = new HTMLNode("th", "", "", "Start Time");
-        HTMLNode th5 = new HTMLNode("th", "", "", "End Time");
-        HTMLNode th6 = new HTMLNode("th", "", "", "Comments");
+        final HTMLNode trH = new HTMLNode("tr");
+        final HTMLNode th1 = new HTMLNode("th", "", "", "Scene Name");
+        final HTMLNode th2 = new HTMLNode("th", "", "", "Cell Names");
+        final HTMLNode th3 = new HTMLNode("th", "", "", "Marker");
+        final HTMLNode th4 = new HTMLNode("th", "", "", "Start Time");
+        final HTMLNode th5 = new HTMLNode("th", "", "", "End Time");
+        final HTMLNode th6 = new HTMLNode("th", "", "", "Comments");
 
         trH.addChild(th1);
         trH.addChild(th2);
@@ -293,7 +286,7 @@ public class SceneElementsList {
         sceneElementsListTable.addChild(trH);
 
         for (SceneElement se : elementsList) {
-            HTMLNode tr = new HTMLNode("tr");
+            final HTMLNode tr = new HTMLNode("tr");
             tr.addChild(new HTMLNode("td", "", "", se.getSceneName()));
             tr.addChild(new HTMLNode("td", "", "", se.getAllCellNames().toString()));
             tr.addChild(new HTMLNode("td", "", "", se.getMarkerName()));
@@ -307,13 +300,12 @@ public class SceneElementsList {
 
         body.addChild(sceneElementsListDiv);
 
-        InfoWindowDOM dom = new InfoWindowDOM(html);
+        final InfoWindowDOM dom = new InfoWindowDOM(html);
         dom.buildStyleNode();
-
         return dom;
     }
 
-    public ArrayList<SceneElement> getElementsList() {
+    public List<SceneElement> getElementsList() {
         return elementsList;
     }
 }

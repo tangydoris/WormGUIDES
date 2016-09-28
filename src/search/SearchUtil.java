@@ -19,6 +19,8 @@ import static java.lang.Math.sqrt;
 import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
 
+import static partslist.PartsList.getDescriptions;
+import static partslist.PartsList.getFunctionalNames;
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static partslist.PartsList.getLineageNameByIndex;
 import static partslist.PartsList.getLineageNames;
@@ -47,8 +49,8 @@ public class SearchUtil {
     private static LineageData lineageData;
 
     static {
-        functionalNames = PartsList.getFunctionalNames();
-        functionalDescriptions = PartsList.getDescriptions();
+        functionalNames = getFunctionalNames();
+        functionalDescriptions = getDescriptions();
     }
 
     /**
@@ -142,6 +144,7 @@ public class SearchUtil {
                 }
             }
         }
+
         sort(cells);
         return cells;
     }
@@ -396,7 +399,8 @@ public class SearchUtil {
      *
      * @param queryCell
      *         the cell queried
-     *ß
+     *         ß
+     *
      * @return list of terminal descendants for the query cell
      */
     public static List<String> getDescendantsList(final String queryCell) {
@@ -426,11 +430,13 @@ public class SearchUtil {
         }
 
         // special cases for 'ab' and 'p0' because the input list of cells would be empty
-        String searched = searchedText.toLowerCase();
-        if (searched.equals("ab") || searched.equals("p0")) {
-            activeLineageNames.stream()
-                    .filter(name -> !descendants.contains(name) && isDescendant(name, searched))
-                    .forEach(descendants::add);
+        final String searched = searchedText.trim().toLowerCase();
+        if (cells.isEmpty()) {
+            if (searched.equals("ab")) {
+                cells.add("ab");
+            } else if (searched.equals("p0")) {
+                cells.add("p0");
+            }
         }
 
         for (String cell : cells) {
@@ -438,7 +444,6 @@ public class SearchUtil {
                     .filter(name -> !descendants.contains(name) && isDescendant(name, cell))
                     .forEach(descendants::add);
         }
-
         return descendants;
     }
 
@@ -450,11 +455,23 @@ public class SearchUtil {
      *
      * @return list of ancestors of all the cells, with no repeats
      */
-    public static List<String> getAncestorsList(final List<String> cells) {
+    public static List<String> getAncestorsList(final List<String> cells, final String searchedText) {
         final List<String> ancestors = new ArrayList<>();
+
         if (cells == null) {
             return ancestors;
         }
+
+        // special cases for 'ab' and 'p0' because the input list of cells would be empty
+        final String searched = searchedText.trim().toLowerCase();
+        if (cells.isEmpty()) {
+            if (searched.equals("ab")) {
+                cells.add("ab");
+            } else if (searched.equals("p0")) {
+                cells.add("p0");
+            }
+        }
+
         for (String cell : cells) {
             activeLineageNames.stream()
                     .filter(name -> !ancestors.contains(name) && isAncestor(name, cell))
@@ -519,7 +536,9 @@ public class SearchUtil {
     }
 
     /**
-     * @param cellName queried cell name
+     * @param cellName
+     *         queried cell name
+     *
      * @return true if the name is a lineage name, false otherwise
      */
     public static boolean isLineageName(String cellName) {

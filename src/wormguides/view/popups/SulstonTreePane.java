@@ -56,6 +56,7 @@ import wormguides.layers.SearchLayer;
 import wormguides.models.Rule;
 import wormguides.util.ColorHash;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import static javafx.application.Platform.runLater;
@@ -88,6 +89,8 @@ public class SulstonTreePane extends ScrollPane {
     private final Color ZOOM_BUTTONS_SHADOW_COLOR = web("AAAAAA");
 
     private final LineageData lineageData;
+
+    private final SearchLayer searchLayer;
 
     private final int movieTimeOffset;
 
@@ -126,6 +129,7 @@ public class SulstonTreePane extends ScrollPane {
 
     public SulstonTreePane(
             final Stage ownStage,
+            final SearchLayer searchLayer,
             final LineageData lineageData,
             final int movieTimeOffset,
             final TreeItem<String> lineageTreeRoot,
@@ -138,6 +142,7 @@ public class SulstonTreePane extends ScrollPane {
 
         super();
 
+        this.searchLayer = requireNonNull(searchLayer);
         this.defaultEmbryoFlag = defaultEmbryoFlag;
 
         this.clickHandler = event -> {
@@ -389,7 +394,7 @@ public class SulstonTreePane extends ScrollPane {
             }
 
             contextMenuController.setColorButtonListener(event -> {
-                final Rule rule = SearchLayer.addColorRule(
+                final Rule rule = searchLayer.addColorRule(
                         LINEAGE,
                         name,
                         WHITE,
@@ -400,7 +405,7 @@ public class SulstonTreePane extends ScrollPane {
 
             contextMenuController.setColorNeighborsButtonListener(event -> {
                 // call distance SearchLayer method
-                final Rule rule = SearchLayer.addColorRule(NEIGHBOR, name, WHITE, CELL_NUCLEUS);
+                final Rule rule = searchLayer.addColorRule(NEIGHBOR, name, WHITE, CELL_NUCLEUS);
                 rule.showEditStage(ownStage);
                 contextMenuStage.hide();
             });

@@ -4,15 +4,15 @@
 
 package wormguides.layers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,9 +31,16 @@ import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.util.AppFont;
 
-import partslist.PartsList;
+import static java.util.Objects.requireNonNull;
+
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.paint.Color.WHITE;
+
+import static partslist.PartsList.getLineageNameByFunctionalName;
 
 public class StructuresLayer {
+
+    private final SearchLayer searchLayer;
 
     private ObservableList<String> allStructuresList;
     private ObservableList<String> searchResultsList;
@@ -41,19 +48,25 @@ public class StructuresLayer {
     private Color selectedColor;
     private String searchText;
 
-    private HashMap<String, ArrayList<String>> nameToCellsMap;
-    private HashMap<String, String> nameToCommentsMap;
-    private HashMap<String, StructureListCellGraphic> nameListCellMap;
+    private Map<String, List<String>> nameToCellsMap;
+    private Map<String, String> nameToCommentsMap;
+    private Map<String, StructureListCellGraphic> nameListCellMap;
 
     private StringProperty selectedNameProperty;
 
     private TextField searchField;
 
-    public StructuresLayer(SceneElementsList sceneElementsList, TextField searchField) {
-        selectedColor = Color.WHITE; // default color
+    public StructuresLayer(
+            final SearchLayer searchLayer,
+            final SceneElementsList sceneElementsList,
+            final TextField searchField) {
 
-        allStructuresList = FXCollections.observableArrayList();
-        searchResultsList = FXCollections.observableArrayList();
+        this.searchLayer = requireNonNull(searchLayer);
+
+        selectedColor = WHITE;
+
+        allStructuresList = observableArrayList();
+        searchResultsList = observableArrayList();
 
         nameListCellMap = new HashMap<>();
         selectedNameProperty = new SimpleStringProperty("");
@@ -72,11 +85,12 @@ public class StructuresLayer {
             }
         });
 
+        requireNonNull(sceneElementsList);
         allStructuresList.addAll(sceneElementsList.getAllMulticellSceneNames());
         nameToCellsMap = sceneElementsList.getNameToCellsMap();
         nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 
-        setSearchField(searchField);
+        setSearchField(requireNonNull(searchField));
     }
 
     public ObservableList<String> getAllStructuresList() {
@@ -101,22 +115,19 @@ public class StructuresLayer {
         selectedColor = color;
     }
 
-    private void setSearchField(TextField field) {
-        if (field != null) {
-            searchField = field;
+    private void setSearchField(final TextField searchField) {
+        this.searchField = searchField;
 
-            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-                searchText = newValue.toLowerCase();
-
-                if (searchText.isEmpty()) {
-                    searchResultsList.clear();
-                } else {
-                    setSelectedStructure("");
-                    deselectAllStructures();
-                    searchAndUpdateResults(newValue.toLowerCase());
-                }
-            });
-        }
+        this.searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            searchText = newValue.toLowerCase();
+            if (searchText.isEmpty()) {
+                searchResultsList.clear();
+            } else {
+                setSelectedStructure("");
+                deselectAllStructures();
+                searchAndUpdateResults(newValue.toLowerCase());
+            }
+        });
     }
 
     private void deselectAllStructures() {
@@ -152,7 +163,7 @@ public class StructuresLayer {
         // Check for validity of name
         name = name.trim();
         if (allStructuresList.contains(name)) {
-            SearchLayer.addMulticellularStructureRule(name, color);
+            searchLayer.addMulticellularStructureRule(name, color);
         }
     }
 
@@ -187,13 +198,13 @@ public class StructuresLayer {
                 }
 
                 // search in cells
-                ArrayList<String> cells = nameToCellsMap.get(nameLower);
+                List<String> cells = nameToCellsMap.get(nameLower);
                 if (cells != null) {
                     for (String cell : cells) {
                         // we'll use the first term
                         if (terms.length > 0) {
                             // check if search term is a functional name
-                            String lineageName = PartsList.getLineageNameByFunctionalName((terms[0].toUpperCase()));
+                            final String lineageName = getLineageNameByFunctionalName(terms[0]);
                             if (lineageName != null) {
                                 if (cell.toLowerCase().startsWith(lineageName.toLowerCase())) {
                                     appliesToCell = true;
@@ -336,7 +347,7 @@ public class StructuresLayer {
             if (highlight) {
                 setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;"
                         + "-fx-background: -fx-accent;");
-                label.setTextFill(Color.WHITE);
+                label.setTextFill(WHITE);
             } else {
                 setStyle("-fx-background-color: white;");
                 label.setTextFill(Color.BLACK);

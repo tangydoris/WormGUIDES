@@ -68,7 +68,6 @@ import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
 import wormguides.loaders.ImageLoader;
-import wormguides.loaders.URLLoader;
 import wormguides.models.CasesLists;
 import wormguides.models.CellDeaths;
 import wormguides.models.LineageTree;
@@ -93,9 +92,7 @@ import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgYOffsetFr
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgZOffsetFromZero;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.loadNucFiles;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.setOriginToZero;
-import static wormguides.layers.SearchLayer.addDefaultColorRules;
-import static wormguides.layers.SearchLayer.initDatabases;
-import static wormguides.layers.SearchLayer.setRulesList;
+import static wormguides.loaders.URLLoader.process;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
@@ -172,7 +169,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private SearchLayer searchLayer;
     @FXML
     private TextField searchField;
-    private BooleanProperty clearSearchField;
     @FXML
     private ListView<String> searchResultsListView;
     @FXML
@@ -341,6 +337,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             treeStage = new Stage();
             final SulstonTreePane sp = new SulstonTreePane(
                     treeStage,
+                    searchLayer,
                     lineageData,
                     movieTimeOffset,
                     lineageTreeRoot,
@@ -393,14 +390,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     warning = new URLLoadWarningDialog();
                 }
                 if (!warning.doNotShowAgain()) {
-                    Optional<ButtonType> result = warning.showAndWait();
+                    final Optional<ButtonType> result = warning.showAndWait();
                     if (result.get() == warning.getButtonTypeOkay()) {
                         urlLoadStage.hide();
-                        URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
+                        process(urlLoadWindow.getInputURL(), window3DController, false, searchLayer);
                     }
                 } else {
                     urlLoadStage.hide();
-                    URLLoader.process(urlLoadWindow.getInputURL(), window3DController, false);
+                    process(urlLoadWindow.getInputURL(), window3DController, false, searchLayer);
                 }
             });
             urlLoadWindow.getCancelButton().setOnAction(event -> urlLoadStage.hide());
@@ -948,34 +945,22 @@ public class RootLayoutController extends BorderPane implements Initializable {
         opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
     }
 
-    private void initSearch() {
-        searchLayer = new SearchLayer();
-
-        typeToggleGroup.selectedToggleProperty().addListener(SearchLayer.getTypeToggleListener());
-
-        // connectome checkboxes
-        presynapticTick.selectedProperty().addListener(SearchLayer.getPresynapticTickListener());
-        postsynapticTick.selectedProperty().addListener(SearchLayer.getPostsynapticTickListener());
-        electricalTick.selectedProperty().addListener(SearchLayer.getElectricalTickListener());
-        neuromuscularTick.selectedProperty().addListener(SearchLayer.getNeuromuscularTickListener());
-
-        cellNucleusTick.selectedProperty().addListener(SearchLayer.getCellNucleusTickListener());
-        cellBodyTick.selectedProperty().addListener(SearchLayer.getCellBodyTickListener());
-        ancestorTick.selectedProperty().addListener(SearchLayer.getAncestorTickListner());
-        descendantTick.selectedProperty().addListener(SearchLayer.getDescendantTickListner());
-        colorPicker.setOnAction(searchLayer.getColorPickerListener());
-        addSearchBtn.setOnAction(SearchLayer.getAddButtonListener());
-
-        clearSearchField = new SimpleBooleanProperty(false);
-        SearchLayer.setClearSearchFieldProperty(clearSearchField);
-        clearSearchField.addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                searchField.clear();
-                clearSearchField.set(false);
-            }
-        });
-
-        searchField.textProperty().addListener(SearchLayer.getTextFieldListener());
+    private void initSearch(final ObservableList<Rule> rulesList) {
+        searchLayer = new SearchLayer(
+                rulesList,
+                searchField,
+                typeToggleGroup,
+                presynapticTick,
+                postsynapticTick,
+                neuromuscularTick,
+                electricalTick,
+                cellNucleusTick,
+                cellBodyTick,
+                ancestorTick,
+                descendantTick,
+                colorPicker,
+                addSearchBtn);
+        searchLayer.addDefaultColorRules();
     }
 
     private void initDisplayLayer() {
@@ -1044,7 +1029,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     private void initStructuresLayer() {
-        structuresLayer = new StructuresLayer(sceneElementsList, structuresSearchField);
+        structuresLayer = new StructuresLayer(searchLayer, sceneElementsList, structuresSearchField);
         structuresSearchListView.setItems(structuresLayer.getStructuresSearchResultsList());
         allStructuresListView.setItems(structuresLayer.getAllStructuresList());
         structuresLayer.setRulesList(displayLayer.getRulesList());
@@ -1066,6 +1051,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         storiesLayer = new StoriesLayer(
                 mainStage,
+                searchLayer,
                 sceneElementsList,
                 selectedName,
                 lineageData,
@@ -1130,6 +1116,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
             infoWindow = new InfoWindow(
                     window3DController.getStage(),
+                    searchLayer,
                     window3DController.getSelectedNameLabeled(),
                     cases,
                     productionInfo,
@@ -1253,10 +1240,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         setSlidersProperties();
 
-        initSearch();
         ObservableList<Rule> list = displayLayer.getRulesList();
-        setRulesList(list);
-        addDefaultColorRules();
+        initSearch(list);
+        window3DController.setSearchLayer(searchLayer);
         window3DController.setRulesList(list);
 
         initSceneElementsList();
@@ -1264,13 +1250,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
         initStructuresLayer();
         initStoriesLayer();
 
-        initDatabases(lineageData, sceneElementsList, connectome, cases, productionInfo);
+        searchLayer.initDatabases(lineageData, sceneElementsList, connectome, cases, productionInfo);
 
-        window3DController.setSearchResultsList(SearchLayer.getSearchResultsList());
-        searchResultsListView.setItems(SearchLayer.getSearchResultsList());
+        window3DController.setSearchResultsList(searchLayer.getSearchResultsList());
+        searchResultsListView.setItems(searchLayer.getSearchResultsList());
 
         window3DController.setSearchResultsUpdateService(searchLayer.getResultsUpdateService());
-        window3DController.setGeneResultsUpdated(SearchLayer.getGeneResultsUpdated());
+        window3DController.setGeneResultsUpdated(searchLayer.getGeneResultsUpdated());
 
         addListeners();
 

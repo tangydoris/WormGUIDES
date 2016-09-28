@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -43,10 +42,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import acetree.LineageData;
 import wormguides.MainApp;
 import wormguides.controllers.StoryEditorController;
 import wormguides.controllers.Window3DController;
-import wormguides.loaders.URLLoader;
 import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.stories.Note;
@@ -56,9 +55,12 @@ import wormguides.stories.StoryFileUtil;
 import wormguides.util.AppFont;
 import wormguides.util.URLGenerator;
 
-import acetree.LineageData;
+import static java.util.Objects.requireNonNull;
 
+import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.text.FontSmoothingType.LCD;
+
+import static wormguides.loaders.URLLoader.process;
 
 /**
  * Controller of the list view in the 'Stories' tab
@@ -70,9 +72,8 @@ public class StoriesLayer {
 
     private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
     private final String TEMPLATE_STORY_DESCRIPTION = "Shows all segmented neurons without further annotation.";
-
+    private final SearchLayer searchLayer;
     private Stage parentStage;
-
     private Stage editStage;
     private StoryEditorController editController;
     private Story activeStory;
@@ -101,7 +102,7 @@ public class StoriesLayer {
     /**
      * Class constructor called by {@link wormguides.controllers.RootLayoutController}
      *
-     * @param parent
+     * @param parentStage
      *         stage that the main application belongs to. This is used for initializing modality of the story editor
      *         popup window.
      * @param elementsList
@@ -120,18 +121,20 @@ public class StoriesLayer {
      *         the 'New Story' button in the Stories tab
      */
     public StoriesLayer(
-            Stage parent,
-            SceneElementsList elementsList,
-            StringProperty cellNameProperty,
-            LineageData data,
-            Window3DController sceneController,
-            BooleanProperty useInternalRulesFlag,
-            int movieTimeOffset,
-            Button newStoryButton,
-            Button deleteStoryButton,
-            boolean defaultEmbryoFlag) {
+            final Stage parentStage,
+            final SearchLayer searchLayer,
+            final SceneElementsList elementsList,
+            final StringProperty cellNameProperty,
+            final LineageData data,
+            final Window3DController sceneController,
+            final BooleanProperty useInternalRulesFlag,
+            final int movieTimeOffset,
+            final Button newStoryButton,
+            final Button deleteStoryButton,
+            final boolean defaultEmbryoFlag) {
 
-        parentStage = parent;
+        this.parentStage = requireNonNull(parentStage);
+        this.searchLayer = requireNonNull(searchLayer);
 
         newStoryButton.setOnAction(event -> {
             Story story = new Story(NEW_STORY_TITLE, NEW_STORY_DESCRIPTION, "");
@@ -153,12 +156,13 @@ public class StoriesLayer {
         this.useInternalRules = useInternalRulesFlag;
         this.currentRules = window3DController.getObservableColorRulesList();
 
-        this.sceneElementsList = elementsList;
+        this.sceneElementsList = requireNonNull(elementsList);
 
         this.timeOffset = movieTimeOffset;
 
-        this.stories = FXCollections.observableArrayList(
-                story -> new Observable[]{story.getChangedProperty(), story.getActiveProperty()});
+        this.stories = observableArrayList(story -> new Observable[]{
+                story.getChangedProperty(),
+                story.getActiveProperty()});
         this.stories.addListener(new ListChangeListener<Story>() {
             @Override
             public void onChanged(ListChangeListener.Change<? extends Story> c) {
@@ -205,18 +209,17 @@ public class StoriesLayer {
     }
 
     /**
-     * Adds a blank story upon initialization.
+     * Adds a blank story
      */
     private void addBlankStory() {
-        Story blankStory = new Story(
+        stories.add(new Story(
                 TEMPLATE_STORY_NAME,
                 TEMPLATE_STORY_DESCRIPTION,
                 "http://scene.wormguides.org/wormguides/testurlscript?/set/ash-n$@+#ff8"
                         + "fbc8f/rib-n$@+#ff663366/avg-n$@+#ffb41919/dd-n@+#ff4a24c1/da-"
                         + "n@+#ffc56002/dd-n$+#ffb30a95/da-n$+#ffe6b34d/rivl-n@+#ffffb366/"
                         + "rivr-n@+#ffffe6b3/sibd-n@+#ffe6ccff/siav-n@+#ff8099ff/view/"
-                        + "time=393/rX=51.625/rY=-2.125/rZ=0.0/tX=0.0/tY=0.0/scale=2.25/dim=0.25/browser/");
-        stories.add(blankStory);
+                        + "time=393/rX=51.625/rY=-2.125/rZ=0.0/tX=0.0/tY=0.0/scale=2.25/dim=0.25/browser/"));
     }
 
     /**
@@ -511,7 +514,7 @@ public class StoriesLayer {
             } else { // if story does come with url, use it
                 useInternalRules.set(false);
             }
-            URLLoader.process(activeStory.getColorURL(), window3DController, true);
+            process(activeStory.getColorURL(), window3DController, true, searchLayer);
 
             if (activeStory.hasNotes()) {
                 startTime = getEffectiveStartTime(activeStory.getNotes().get(0));
@@ -677,7 +680,7 @@ public class StoriesLayer {
 
             editStage = new Stage();
 
-            FXMLLoader loader = new FXMLLoader();
+            final FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("view/layouts/StoryEditorLayout.fxml"));
 
             loader.setController(editController);

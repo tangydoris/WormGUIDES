@@ -5,7 +5,7 @@
 package wormguides.layers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -16,11 +16,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Toggle;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
 
 import acetree.LineageData;
@@ -36,24 +38,30 @@ import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.models.SearchOption;
 
+import static java.lang.Thread.sleep;
+import static java.util.Arrays.asList;
 import static java.util.Collections.sort;
+import static java.util.Objects.requireNonNull;
 
 import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.scene.paint.Color.WHITE;
 
 import static partslist.PartsList.getFunctionalNameByLineageName;
+import static partslist.PartsList.getLineageNameByFunctionalName;
 import static search.SearchType.CONNECTOME;
 import static search.SearchType.GENE;
 import static search.SearchType.LINEAGE;
+import static search.SearchUtil.getAncestorsList;
 import static search.SearchUtil.getCellsInMulticellularStructure;
 import static search.SearchUtil.getCellsWithConnectivity;
 import static search.SearchUtil.getCellsWithFunctionalDescription;
 import static search.SearchUtil.getCellsWithFunctionalName;
 import static search.SearchUtil.getCellsWithGene;
 import static search.SearchUtil.getCellsWithLineageName;
+import static search.SearchUtil.getDescendantsList;
 import static search.SearchUtil.getNeighboringCells;
 import static search.WormBaseQuery.getSearchService;
+import static wormguides.models.AnatomyTerm.AMPHID_SENSILLA;
 import static wormguides.models.LineageTree.getCaseSensitiveName;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
@@ -63,77 +71,111 @@ import static wormguides.models.SearchOption.MULTICELLULAR_NAME_BASED;
 
 public class SearchLayer {
 
-    private static final Service<Void> resultsUpdateService;
-    private static final Service<List<String>> geneSearchService;
-    private static final Service<Void> showLoadingService;
+    private final Service<Void> resultsUpdateService;
+    private final Service<List<String>> geneSearchService;
+    private final Service<Void> showLoadingService;
 
-    /** Time between changes in the number of ellipses periods during loading */
-    private static final long WAIT_TIME_MS = 750;
+    private final ObservableList<Rule> rulesList;
 
-    /** Changing number of ellipses periods to display during loading */
-    private static int count;
+    private final ObservableList<String> searchResultsList;
 
-    private static ObservableList<String> searchResultsList;
+    // GUI components
+    private final TextField searchTextField;
+    private final ToggleGroup searchTypeToggleGroup;
+    private final CheckBox presynapticCheckBox;
+    private final CheckBox postsynapticCheckBox;
+    private final CheckBox neuromuscularCheckBox;
+    private final CheckBox electricalCheckBox;
+    private final CheckBox cellNucleusCheckBox;
+    private final CheckBox cellBodyCheckBox;
+    private final CheckBox ancestorCheckBox;
+    private final CheckBox descendantCheckBox;
+    private final ColorPicker colorPicker;
+    private final Button addRuleButton;
 
-    private static String searchedText;
-    private static BooleanProperty clearSearchFieldProperty;
+    private BooleanProperty geneResultsUpdated;
+    private Queue<String> geneSearchQueue;
 
-    private static SearchType type;
+    // queried databases
+    private Connectome connectome;
+    private CasesLists casesLists;
+    private ProductionInfo productionInfo;
+    private WiringService wiringService;
 
-    private static Color selectedColor;
+    public SearchLayer(
+            final ObservableList<Rule> rulesList,
+            final TextField searchTextField,
+            final ToggleGroup searchTypeToggleGroup,
+            final CheckBox presynapticCheckBox,
+            final CheckBox postsynapticCheckBox,
+            final CheckBox neuromuscularCheckBox,
+            final CheckBox electricalCheckBox,
+            final CheckBox cellNucleusCheckBox,
+            final CheckBox cellBodyCheckBox,
+            final CheckBox ancestorCheckBox,
+            final CheckBox descendantCheckBox,
+            final ColorPicker colorPicker,
+            final Button addRuleButton) {
 
-    private static boolean cellNucleusTicked;
-    private static boolean cellBodyTicked;
-    private static boolean ancestorTicked;
-    private static boolean descendantTicked;
+        this.rulesList = requireNonNull(rulesList);
 
-    private static ObservableList<Rule> rulesList;
+        // text field
+        this.searchTextField = requireNonNull(searchTextField);
+        this.searchTextField.textProperty().addListener(getTextFieldListener());
 
-    private static BooleanProperty geneResultsUpdated;
-    private static Queue<String> geneSearchQueue;
+        // search type
+        this.searchTypeToggleGroup = requireNonNull(searchTypeToggleGroup);
 
-    // for connectome searching
-    private static Connectome connectome;
-    private static boolean presynapticTicked;
-    private static boolean postsynapticTicked;
-    private static boolean electricalTicked;
-    private static boolean neuromuscularTicked;
+        final ChangeListener<Boolean> connectomeCheckBoxListener = getConnectomeCheckBoxListener();
 
-    // for cell cases searching
-    private static CasesLists casesLists;
+        this.presynapticCheckBox = requireNonNull(presynapticCheckBox);
+        this.presynapticCheckBox.selectedProperty().addListener(connectomeCheckBoxListener);
 
-    // for wiring partner click handling
-    private static ProductionInfo productionInfo;
+        this.postsynapticCheckBox = requireNonNull(postsynapticCheckBox);
+        this.postsynapticCheckBox.selectedProperty().addListener(connectomeCheckBoxListener);
 
-    private static WiringService wiringService;
+        this.neuromuscularCheckBox = requireNonNull(neuromuscularCheckBox);
+        this.neuromuscularCheckBox.selectedProperty().addListener(connectomeCheckBoxListener);
 
-    static {
-        type = LINEAGE;
+        this.electricalCheckBox = requireNonNull(electricalCheckBox);
+        this.electricalCheckBox.selectedProperty().addListener(connectomeCheckBoxListener);
 
-        selectedColor = WHITE;
+        // search options
+        final ChangeListener<Boolean> optionsCheckBoxListener = getOptionsCheckBoxListener();
 
-        searchResultsList = observableArrayList();
-        searchedText = "";
+        this.cellNucleusCheckBox = requireNonNull(cellNucleusCheckBox);
+        this.cellNucleusCheckBox.selectedProperty().addListener(optionsCheckBoxListener);
 
-        // cell nucleus search type default to true
-        cellNucleusTicked = true;
-        cellBodyTicked = false;
-        ancestorTicked = false;
-        descendantTicked = false;
+        this.cellBodyCheckBox = requireNonNull(cellBodyCheckBox);
+        this.cellBodyCheckBox.selectedProperty().addListener(optionsCheckBoxListener);
 
-        // connectome synapse types all unchecked at init
-        presynapticTicked = false;
-        postsynapticTicked = false;
-        electricalTicked = false;
-        neuromuscularTicked = false;
+        this.ancestorCheckBox = requireNonNull(ancestorCheckBox);
+        this.ancestorCheckBox.selectedProperty().addListener(optionsCheckBoxListener);
 
-        resultsUpdateService = new Service<Void>() {
+        this.descendantCheckBox = requireNonNull(descendantCheckBox);
+        this.descendantCheckBox.selectedProperty().addListener(optionsCheckBoxListener);
+
+        // color
+        this.colorPicker = requireNonNull(colorPicker);
+
+        // add rule button
+        this.addRuleButton = requireNonNull(addRuleButton);
+        this.addRuleButton.setOnAction(getAddButtonClickHandler());
+
+        this.searchResultsList = observableArrayList();
+
+        this.resultsUpdateService = new Service<Void>() {
             @Override
             protected final Task<Void> createTask() {
-                Task<Void> task = new Task<Void>() {
+                final Task<Void> task = new Task<Void>() {
                     @Override
                     protected Void call() throws Exception {
-                        runLater(() -> refreshSearchResultsList(getSearchedText()));
+                        runLater(() -> refreshSearchResultsList(
+                                (SearchType) searchTypeToggleGroup.getSelectedToggle().getUserData(),
+                                getSearchedText(),
+                                cellNucleusCheckBox.isSelected(),
+                                descendantCheckBox.isSelected(),
+                                ancestorCheckBox.isSelected()));
                         return null;
                     }
                 };
@@ -142,42 +184,32 @@ public class SearchLayer {
         };
 
         showLoadingService = new ShowLoadingService();
+
         geneSearchService = getSearchService();
+        geneSearchService.setOnCancelled(event -> {
+            showLoadingService.cancel();
+            searchResultsList.clear();
+        });
+        geneSearchService.setOnSucceeded(event -> {
+            showLoadingService.cancel();
+            searchResultsList.clear();
+            updateGeneResults();
 
-        if (geneSearchService != null) {
-            geneSearchService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-                @Override
-                public void handle(WorkerStateEvent event) {
-                    showLoadingService.cancel();
-                    searchResultsList.clear();
-                }
-            });
+            final String searched = WormBaseQuery.getSearchedText();
+            geneSearchQueue.remove(searched);
 
-            geneSearchService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-                @Override
-                public void handle(WorkerStateEvent event) {
-                    showLoadingService.cancel();
-                    searchResultsList.clear();
-                    updateGeneResults();
+            final String searchedQuoted = "'" + searched + "'";
+            rulesList.stream()
+                    .filter(rule -> rule.getSearchedText().contains(searchedQuoted))
+                    .forEachOrdered(rule -> rule.setCells(geneSearchService.getValue()));
+            geneResultsUpdated.set(!geneResultsUpdated.get());
 
-                    final String searched = WormBaseQuery.getSearchedText();
-                    geneSearchQueue.remove(searched);
-
-                    final String searchedQuoted = "'" + searched + "'";
-                    rulesList.stream()
-                            .filter(rule -> rule.getSearchedText().contains(searchedQuoted))
-                            .forEachOrdered(rule -> rule.setCells(geneSearchService.getValue()));
-                    geneResultsUpdated.set(!geneResultsUpdated.get());
-
-                    if (!geneSearchQueue.isEmpty()) {
-                        WormBaseQuery.doSearch(geneSearchQueue.remove());
-                    }
-                }
-            });
-        }
+            if (!geneSearchQueue.isEmpty()) {
+                WormBaseQuery.doSearch(geneSearchQueue.remove());
+            }
+        });
 
         geneSearchQueue = new LinkedList<>();
-        count = 0;
         geneResultsUpdated = new SimpleBooleanProperty(false);
     }
 
@@ -199,7 +231,7 @@ public class SearchLayer {
      *
      * @return the rule that was added to the internal list
      */
-    public static Rule addGiantConnectomeColorRule(
+    public Rule addGiantConnectomeColorRule(
             final String linegeName,
             final Color color,
             final boolean isPresynapticTicked,
@@ -248,51 +280,34 @@ public class SearchLayer {
         return rule;
     }
 
-    public static Rule addConnectomeColorRule(
+    public Rule addConnectomeColorRule(
             final String searched,
             final Color color,
             final boolean isPresynaptic,
             final boolean isPostsynaptic,
             final boolean isElectrical,
             final boolean isNeuromuscular) {
-
-        final boolean tempPresyn = presynapticTicked;
-        final boolean tempPostsyn = postsynapticTicked;
-        final boolean tempElectr = electricalTicked;
-        final boolean tempNeuro = neuromuscularTicked;
-
-        presynapticTicked = isPresynaptic;
-        postsynapticTicked = isPostsynaptic;
-        electricalTicked = isElectrical;
-        neuromuscularTicked = isNeuromuscular;
-
-        final Rule rule = addColorRule(CONNECTOME, searched, color, CELL_NUCLEUS);
-
-        presynapticTicked = tempPresyn;
-        postsynapticTicked = tempPostsyn;
-        electricalTicked = tempElectr;
-        neuromuscularTicked = tempNeuro;
-
-        return rule;
+        return addColorRule(CONNECTOME, searched, color, CELL_NUCLEUS);
     }
 
-    private static void updateGeneResults() {
-        List<String> results = geneSearchService.getValue();
-        List<String> cellsForListView = new ArrayList<>();
+    private void updateGeneResults() {
+        final List<String> results = geneSearchService.getValue();
+        final List<String> cellsForListView = new ArrayList<>();
 
         if (results == null || results.isEmpty()) {
             return;
         }
 
         cellsForListView.addAll(results);
-        if (ancestorTicked) {
-            List<String> ancestors = SearchUtil.getAncestorsList(results);
+        final String searchedText = getSearchedText();
+        if (ancestorCheckBox.isSelected()) {
+            List<String> ancestors = getAncestorsList(results, searchedText);
             ancestors.stream()
                     .filter(name -> !cellsForListView.contains(name))
                     .forEachOrdered(cellsForListView::add);
         }
-        if (descendantTicked) {
-            List<String> descendants = SearchUtil.getDescendantsList(results, getSearchedText());
+        if (descendantCheckBox.isSelected()) {
+            List<String> descendants = getDescendantsList(results, searchedText);
             descendants.stream()
                     .filter(name -> !cellsForListView.contains(name))
                     .forEachOrdered(cellsForListView::add);
@@ -303,7 +318,7 @@ public class SearchLayer {
         geneResultsUpdated.set(!geneResultsUpdated.get());
     }
 
-    private static void appendFunctionalToLineageNames(List<String> list) {
+    private void appendFunctionalToLineageNames(final List<String> list) {
         searchResultsList.clear();
         for (String result : list) {
             if (getFunctionalNameByLineageName(result) != null) {
@@ -313,16 +328,12 @@ public class SearchLayer {
         }
     }
 
-    private static String getSearchedText() {
-        final String searched = searchedText;
+    private String getSearchedText() {
+        final String searched = searchTextField.getText().toLowerCase();
         return searched;
     }
 
-    public static void setRulesList(ObservableList<Rule> list) {
-        rulesList = list;
-    }
-
-    public static void addDefaultColorRules() {
+    public void addDefaultColorRules() {
         addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, CELL_BODY);
         addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), CELL_BODY);
         addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), CELL_BODY);
@@ -348,37 +359,29 @@ public class SearchLayer {
         addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), CELL_NUCLEUS);
     }
 
-    public static ObservableList<Rule> getRules() {
+    public ObservableList<Rule> getRules() {
         return rulesList;
     }
 
-    public static Rule addMulticellularStructureRule(String searched, Color color) {
+    public Rule addMulticellularStructureRule(String searched, Color color) {
         return addColorRule(null, searched, color, MULTICELLULAR_NAME_BASED);
     }
 
-    public static Rule addColorRule(
+    public Rule addColorRule(
             final SearchType type,
             String searched,
             final Color color,
             final SearchOption... options) {
-        final List<SearchOption> optionsArray = new ArrayList<>(Arrays.asList(options));
+        final List<SearchOption> optionsArray = new ArrayList<>(asList(options));
         return addColorRule(type, searched, color, optionsArray);
     }
 
-    public static Rule addColorRule(
-            final SearchType searchType,
+    public Rule addColorRule(
+            final SearchType searchTykpe,
             String searched,
             final Color color,
             List<SearchOption> options) {
 
-        final SearchType tempType = type;
-        type = searchType;
-        final Rule rule = addColorRule(searched, color, options);
-        type = tempType;
-        return rule;
-    }
-
-    private static Rule addColorRule(String searched, final Color color, List<SearchOption> options) {
         // default search options is cell
         if (options == null) {
             options = new ArrayList<>();
@@ -387,29 +390,29 @@ public class SearchLayer {
 
         searched = searched.trim().toLowerCase();
         final StringBuilder label = new StringBuilder();
-        if (type != null) {
-            if (type == LINEAGE) {
+        if (searchTykpe != null) {
+            if (searchTykpe == LINEAGE) {
                 label.append(getCaseSensitiveName(searched));
                 if (label.toString().isEmpty()) {
                     label.append(searched);
                 }
             } else {
-                label.append("'").append(searched).append("' ").append(type.toString());
+                label.append("'").append(searched).append("' ").append(searchTykpe.toString());
             }
         } else {
             label.append(searched);
         }
 
-        final Rule rule = new Rule(label.toString(), color, type, options);
-        rule.setCells(getCellsList(searched));
-
+        final Rule rule = new Rule(label.toString(), color, searchTykpe, options);
+        rule.setCells(getCellsList(searchTykpe, searched));
         rulesList.add(rule);
+
         searchResultsList.clear();
 
         return rule;
     }
 
-    private static List<String> getCellsList(final String searched) {
+    private List<String> getCellsList(final SearchType type, final String searched) {
         List<String> cells = new ArrayList<>();
 
         if (type != null) {
@@ -438,10 +441,10 @@ public class SearchLayer {
                 case CONNECTOME:
                     cells = getCellsWithConnectivity(
                             searched,
-                            presynapticTicked,
-                            postsynapticTicked,
-                            neuromuscularTicked,
-                            electricalTicked);
+                            presynapticCheckBox.isSelected(),
+                            postsynapticCheckBox.isSelected(),
+                            neuromuscularCheckBox.isSelected(),
+                            electricalCheckBox.isSelected());
                     break;
 
                 case NEIGHBOR:
@@ -451,7 +454,7 @@ public class SearchLayer {
         return cells;
     }
 
-    public static EventHandler<ActionEvent> getAddButtonListener() {
+    public EventHandler<ActionEvent> getAddButtonClickHandler() {
         return event -> {
             // do not add new ColorRule if search has no matches
             if (searchResultsList.isEmpty()) {
@@ -459,41 +462,33 @@ public class SearchLayer {
             }
 
             final List<SearchOption> options = new ArrayList<>();
-            if (cellNucleusTicked) {
+            if (cellNucleusCheckBox.isSelected()) {
                 options.add(CELL_NUCLEUS);
             }
-            if (cellBodyTicked) {
+            if (cellBodyCheckBox.isSelected()) {
                 options.add(CELL_BODY);
             }
-            if (ancestorTicked) {
+            if (ancestorCheckBox.isSelected()) {
                 options.add(ANCESTOR);
             }
-            if (descendantTicked) {
+            if (descendantCheckBox.isSelected()) {
                 options.add(DESCENDANT);
             }
 
-            addColorRule(getSearchedText(), selectedColor, options);
+            addColorRule(
+                    (SearchType) searchTypeToggleGroup.getSelectedToggle().getUserData(),
+                    getSearchedText(),
+                    colorPicker.getValue(),
+                    options);
 
             searchResultsList.clear();
-
-            if (clearSearchFieldProperty != null) {
-                clearSearchFieldProperty.set(true);
-            }
+            searchTextField.clear();
         };
     }
 
-    public static ChangeListener<Boolean> getCellNucleusTickListener() {
-        return (observable, oldValue, newValue) -> cellNucleusTicked = newValue;
-    }
-
-    public static ChangeListener<Boolean> getCellBodyTickListener() {
-        return (observable, oldValue, newValue) -> cellBodyTicked = newValue;
-    }
-
-    public static ChangeListener<Boolean> getAncestorTickListner() {
-        return (observable, oldValue, newValue) -> {
-            ancestorTicked = newValue;
-            if (type == GENE) {
+    public ChangeListener<Boolean> getOptionsCheckBoxListener() {
+        return (observableValue, oldValud, newValue) -> {
+            if (searchTypeToggleGroup.getSelectedToggle().getUserData() == GENE) {
                 updateGeneResults();
             } else {
                 resultsUpdateService.restart();
@@ -501,40 +496,17 @@ public class SearchLayer {
         };
     }
 
-    public static ChangeListener<Boolean> getDescendantTickListner() {
-        return (observable, oldValue, newValue) -> {
-            descendantTicked = newValue;
-            if (type == GENE) {
-                updateGeneResults();
-            } else {
-                resultsUpdateService.restart();
-            }
-        };
-    }
-
-    public static void setClearSearchFieldProperty(BooleanProperty property) {
-        clearSearchFieldProperty = property;
-    }
-
-    public static ChangeListener<Toggle> getTypeToggleListener() {
-        return (observable, oldValue, newValue) -> {
-            type = (SearchType) newValue.getUserData();
-            resultsUpdateService.restart();
-        };
-    }
-
-    public static BooleanProperty getGeneResultsUpdated() {
+    public BooleanProperty getGeneResultsUpdated() {
         return geneResultsUpdated;
     }
 
-    public static ObservableList<String> getSearchResultsList() {
+    public ObservableList<String> getSearchResultsList() {
         return searchResultsList;
     }
 
-    public static ChangeListener<String> getTextFieldListener() {
+    private ChangeListener<String> getTextFieldListener() {
         return (observable, oldValue, newValue) -> {
-            searchedText = newValue.toLowerCase();
-            if (searchedText.isEmpty()) {
+            if (searchTextField.getText().isEmpty()) {
                 searchResultsList.clear();
             } else {
                 resultsUpdateService.restart();
@@ -542,29 +514,42 @@ public class SearchLayer {
         };
     }
 
-    private static void refreshSearchResultsList(final String newSearchedTerm) {
-        String searched = newSearchedTerm.toLowerCase();
-        if (!searched.isEmpty()) {
-            List<String> cells = getCellsList(searched);
+    private void refreshSearchResultsList(
+            final SearchType searchType,
+            final String newSearchedTerm,
+            final boolean isCellNucleusFetched,
+            final boolean areDescendantsFetched,
+            final boolean areAncestorsFetched) {
 
+        final String searched = newSearchedTerm.trim().toLowerCase();
+        if (!searched.isEmpty()) {
+            final List<String> cells = getCellsList(searchType, searched);
             if (cells == null) {
                 return;
             }
 
-            List<String> cellsForListView = new ArrayList<>();
-            cellsForListView.addAll(cells);
-
-            if (descendantTicked) {
-                List<String> descendants = SearchUtil.getDescendantsList(cells, getSearchedText());
-                descendants.stream()
+            final String searchedText = getSearchedText();
+            final List<String> cellsForListView = new ArrayList<>(cells);
+            if (areDescendantsFetched) {
+                getDescendantsList(cells, searchedText)
+                        .stream()
                         .filter(name -> !cellsForListView.contains(name))
                         .forEachOrdered(cellsForListView::add);
             }
-            if (ancestorTicked) {
-                List<String> ancestors = SearchUtil.getAncestorsList(cells);
-                ancestors.stream()
+            if (areAncestorsFetched) {
+                getAncestorsList(cells, searchedText)
+                        .stream()
                         .filter(name -> !cellsForListView.contains(name))
                         .forEachOrdered(cellsForListView::add);
+            }
+            if (!isCellNucleusFetched) {
+                final Iterator<String> iterator = cellsForListView.iterator();
+                while (iterator.hasNext()) {
+                    if (iterator.next().equalsIgnoreCase(searched)) {
+                        iterator.remove();
+                        break;
+                    }
+                }
             }
 
             sort(cellsForListView);
@@ -572,12 +557,7 @@ public class SearchLayer {
         }
     }
 
-    private static int getCountFinal(int count) {
-        final int out = count;
-        return out;
-    }
-
-    public static void initDatabases(
+    public void initDatabases(
             final LineageData inputLineageData,
             final SceneElementsList inputSceneElementsList,
             final Connectome inputConnectome,
@@ -598,21 +578,18 @@ public class SearchLayer {
 
     }
 
-    public static boolean hasCellCase(String cellName) {
+    public boolean hasCellCase(String cellName) {
         return casesLists != null && casesLists.hasCellCase(cellName);
     }
 
-    /*
-     * TODO WHERE ELSE CAN WE PUT THIS --> ONLY PLACE TO REFERENCE CELL CASES IN STATIC WAY
-     */
-    public static void removeCellCase(String cellName) {
+    public void removeCellCase(final String cellName) {
         if (casesLists != null && cellName != null) {
             casesLists.removeCellCase(cellName);
         }
     }
 
-    public static void addToInfoWindow(AnatomyTerm term) {
-        if (term.equals(AnatomyTerm.AMPHID_SENSILLA)) {
+    public void addToInfoWindow(final AnatomyTerm term) {
+        if (term.equals(AMPHID_SENSILLA)) {
             if (!casesLists.containsAnatomyTermCase(term.getTerm())) {
                 casesLists.makeAnatomyTermCase(term);
             }
@@ -623,73 +600,47 @@ public class SearchLayer {
      * Method taken from RootLayoutController --> how can InfoWindowLinkController generate page without pointer to
      * RootLayoutController?
      */
-    public static void addToInfoWindow(String name) {
+    public void addToInfoWindow(final String name) {
         if (wiringService == null) {
             wiringService = new WiringService();
         }
-        searchedText = name;
+        wiringService.setSearchString(name);
         wiringService.restart();
-    }
-
-    // connectome checkbox listeners
-    public static ChangeListener<Boolean> getPresynapticTickListener() {
-        return (observable, oldValue, newValue) -> {
-            presynapticTicked = newValue;
-            resultsUpdateService.restart();
-        };
-    }
-
-    public static ChangeListener<Boolean> getPostsynapticTickListener() {
-        return (observable, oldValue, newValue) -> {
-            postsynapticTicked = newValue;
-            resultsUpdateService.restart();
-        };
-    }
-
-    public static ChangeListener<Boolean> getElectricalTickListener() {
-        return (observable, oldValue, newValue) -> {
-            electricalTicked = newValue;
-            resultsUpdateService.restart();
-        };
-    }
-
-    public static ChangeListener<Boolean> getNeuromuscularTickListener() {
-        return (observable, oldValue, newValue) -> {
-            neuromuscularTicked = newValue;
-            resultsUpdateService.restart();
-        };
-    }
-
-    public boolean containsColorRule(Rule other) {
-        for (Rule rule : rulesList) {
-            if (rule.equals(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public EventHandler<ActionEvent> getColorPickerListener() {
-        return event -> selectedColor = ((ColorPicker) event.getSource()).getValue();
     }
 
     public void clearRules() {
         rulesList.clear();
     }
 
+    private ChangeListener<Boolean> getConnectomeCheckBoxListener() {
+        return (observable, oldValue, newValue) -> resultsUpdateService.restart();
+    }
+
     public Service<Void> getResultsUpdateService() {
         return resultsUpdateService;
     }
 
-    private static final class WiringService extends Service<Void> {
+    private final class WiringService extends Service<Void> {
+
+        private String searchString;
+
+        public String getSearchString() {
+            final String searched = searchString;
+            return searched;
+        }
+
+        public void setSearchString(final String searchString) {
+            this.searchString = searchString;
+        }
+
         @Override
         protected Task<Void> createTask() {
             return new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    String searched = searchedText;
+                    String searched = getSearchString();
                     // update to lineage name if function
-                    String lineage = PartsList.getLineageNameByFunctionalName(searched);
+                    String lineage = getLineageNameByFunctionalName(searched);
                     if (lineage != null) {
                         searched = lineage;
                     }
@@ -736,7 +687,14 @@ public class SearchLayer {
         }
     }
 
-    private static final class ShowLoadingService extends Service<Void> {
+    private final class ShowLoadingService extends Service<Void> {
+
+        /** Time between changes in the number of ellipses periods during loading */
+        private final long WAIT_TIME_MS = 750;
+
+        /** Changing number of ellipses periods to display during loading */
+        private int count = 0;
+
         @Override
         protected final Task<Void> createTask() {
             return new Task<Void>() {
@@ -750,7 +708,7 @@ public class SearchLayer {
                         runLater(() -> {
                             searchResultsList.clear();
                             String loading = "Fetching data from WormBase";
-                            int num = getCountFinal(count) % modulus;
+                            int num = count % modulus;
                             switch (num) {
                                 case 1:
                                     loading += ".";
@@ -770,7 +728,7 @@ public class SearchLayer {
                             searchResultsList.add(loading);
                         });
                         try {
-                            Thread.sleep(WAIT_TIME_MS);
+                            sleep(WAIT_TIME_MS);
                             count++;
                             if (count < 0) {
                                 count = 0;

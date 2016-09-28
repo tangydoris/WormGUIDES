@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javafx.scene.control.TreeItem;
 
+import static java.lang.Integer.parseInt;
+
 /**
  * Tree containing the lineage of the underlying embryo.
  */
@@ -126,7 +128,7 @@ public class LineageTree {
      * @param descendant
      *         the potential descendant
      *
-     * @return true if ances is the ancestor of desc, false otherwise
+     * @return true if 'ancestor' is the ancestor of 'descendant', false otherwise
      */
     public static boolean isAncestor(String ancestor, String descendant) {
         return isDescendant(descendant, ancestor);
@@ -152,51 +154,54 @@ public class LineageTree {
      * @param ancestor
      *         the potential ancestor
      *
-     * @return true if desc is a descendant of ances, false otherwise
+     * @return true if 'descendant' is a descendant of 'ancestor', false otherwise
      */
     public static boolean isDescendant(String descendant, String ancestor) {
-        descendant = descendant.toLowerCase();
-        ancestor = ancestor.toLowerCase();
+        descendant = descendant.trim().toLowerCase();
+        ancestor = ancestor.trim().toLowerCase();
 
         if (!nameNodeHash.containsKey(descendant) || !nameNodeHash.containsKey(ancestor)) {
             return false;
         }
 
         if (isSulstonMode) {
-            // root is not a descendant
-            if (descendant.equals("p0")) {
-                return false;
-            }
+            final String p0 = "p0";
+            final String p = "p";
+
             // root is always an ancestor
-            if (ancestor.equals("p0")) {
+            if (ancestor.equals(p0)) {
                 return true;
             }
+            // root is not a descendant
+            if (descendant.equals(p0)) {
+                return false;
+            }
             // for the p cells, test number after the 'p'
-            if (descendant.startsWith("p") && ancestor.startsWith("p")) {
+            if (descendant.startsWith(p) && ancestor.startsWith(p)) {
                 return descendant.compareTo(ancestor) > 0;
             }
             // try to decipher lineage from names
-            if (descendant.startsWith(ancestor) && descendant.length() > ancestor.length() && !descendant.equals("e")) {
+            if (descendant.startsWith(ancestor)
+                    && descendant.length() > ancestor.length()) {
                 return true;
             }
+            if (descendant.startsWith("ab")) {
+                return ancestor.equals(p0);
+            }
             if (descendant.startsWith("z")) {
-                return ancestor.startsWith("p");
+                return ancestor.startsWith(p);
             }
             if (descendant.startsWith("d")) {
-                return ancestor.equals("p3") || isDescendant("p3", ancestor);
+                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 3;
             }
             if (descendant.startsWith("c")) {
-                return ancestor.equals("p2") || isDescendant("p2", ancestor);
+                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 2;
             }
             if (descendant.equals("ems")) {
-                return ancestor.equals("p1") || isDescendant("p1", ancestor);
+                return ancestor.equals("p1");
             }
             if (descendant.startsWith("ms") || descendant.startsWith("e")) {
-                return ancestor.equals("ems") || isDescendant("ems", ancestor);
-            }
-
-            if (descendant.startsWith("ab")) {
-                return ancestor.equals("p0");
+                return ancestor.equals("ems") || ancestor.equals("p1");
             }
         }
         return false;

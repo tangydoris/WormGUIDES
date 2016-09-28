@@ -6,7 +6,6 @@ package wormguides.view.infowindow;
 
 import java.util.ArrayList;
 
-import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -17,17 +16,19 @@ import javafx.scene.control.TabPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import acetree.LineageData;
+import connectome.Connectome;
+import netscape.javascript.JSObject;
+import partslist.PartsList;
 import wormguides.controllers.InfoWindowLinkController;
 import wormguides.layers.SearchLayer;
 import wormguides.models.CasesLists;
 import wormguides.models.ProductionInfo;
 import wormguides.view.DraggableTab;
 
-import acetree.LineageData;
-import connectome.Connectome;
-import netscape.javascript.JSObject;
-import partslist.PartsList;
+import static java.util.Objects.requireNonNull;
 
+import static javafx.application.Platform.runLater;
 import static javafx.scene.control.TabPane.TabClosingPolicy.ALL_TABS;
 
 /**
@@ -38,10 +39,12 @@ public class InfoWindow {
     /** Wait time between the changing the number of ellipses shown during loading */
     private final long WAIT_TIME_MILLI = 750;
 
-    private Stage infoWindowStage;
-    private TabPane tabPane;
-    private Scene scene;
-    private Stage parentStage;
+    private final Stage infoWindowStage;
+    private final TabPane tabPane;
+    private final Scene scene;
+    private final Stage parentStage;
+
+    private final SearchLayer searchLayer;
 
     private InfoWindowLinkController linkController;
     private ProductionInfo productionInfo;
@@ -54,18 +57,22 @@ public class InfoWindow {
     private int count;
 
     public InfoWindow(
-            Stage stage,
-            StringProperty cellNameProperty,
-            CasesLists cases,
-            ProductionInfo info,
-            Connectome connectome,
-            boolean defaultEmbryoFlag,
-            LineageData lineageData) {
+            final Stage parentStage,
+            final SearchLayer searchLayer,
+            final StringProperty cellNameProperty,
+            final CasesLists casesLists,
+            final ProductionInfo productionInfo,
+            final Connectome connectome,
+            final boolean defaultEmbryoFlag,
+            final LineageData lineageData) {
+
+        this.parentStage = requireNonNull(parentStage);
+        this.searchLayer = requireNonNull(searchLayer);
 
         infoWindowStage = new Stage();
         infoWindowStage.setTitle("Cell Info Window");
 
-        productionInfo = info;
+        this.productionInfo = requireNonNull(productionInfo);
         tabPane = new TabPane();
 
         scene = new Scene(new Group());
@@ -80,8 +87,10 @@ public class InfoWindow {
 
         infoWindowStage.setResizable(true);
 
-        parentStage = stage;
-        linkController = new InfoWindowLinkController(parentStage, cellNameProperty);
+        linkController = new InfoWindowLinkController(
+                this.parentStage,
+                this.searchLayer,
+                requireNonNull(cellNameProperty));
 
         count = 0;
         showLoadingService = new Service<Void>() {
@@ -96,7 +105,7 @@ public class InfoWindow {
                                 infoWindowStage.setTitle("Cell Info Window");
                                 break;
                             }
-                            Platform.runLater(() -> {
+                            runLater(() -> {
                                 String loading = "Loading";
                                 int num = count % modulus;
                                 switch (num) {
@@ -113,7 +122,6 @@ public class InfoWindow {
                                         loading += "....";
                                         break;
                                     default:
-                                        //loading = "Cell Info Window";
                                         break;
                                 }
                                 infoWindowStage.setTitle(loading);
@@ -134,6 +142,10 @@ public class InfoWindow {
             }
         };
 
+        requireNonNull(productionInfo);
+        requireNonNull(casesLists);
+        requireNonNull(connectome);
+        requireNonNull(lineageData);
         addNameService = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -155,13 +167,13 @@ public class InfoWindow {
                         }
 
                         if (lineageName != null && !lineageName.isEmpty()) {
-                            if (cases == null) {
+                            if (casesLists == null) {
                                 System.out.println("null cell cases");
                                 return null; // error check
                             }
 
                             if (PartsList.isLineageName(lineageName)) {
-                                if (cases.containsCellCase(lineageName)) {
+                                if (casesLists.containsCellCase(lineageName)) {
 
                                     // show the tab
                                 } else {
@@ -175,7 +187,7 @@ public class InfoWindow {
                                     // check default flag for image series info validation
                                     if (defaultEmbryoFlag) {
                                         String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
-                                        cases.makeTerminalCase(
+                                        casesLists.makeTerminalCase(
                                                 lineageName,
                                                 funcName,
                                                 connectome.queryConnectivity(
@@ -211,7 +223,7 @@ public class InfoWindow {
                                     } else {
                                         System.out.println("here");
                                         String funcName = connectome.checkQueryCell(lineageName).toUpperCase();
-                                        cases.makeTerminalCase(
+                                        casesLists.makeTerminalCase(
                                                 lineageName,
                                                 funcName,
                                                 connectome.queryConnectivity(
@@ -248,19 +260,19 @@ public class InfoWindow {
 
                                 }
                             } else { // not in connectome --> non terminal case
-                                if (cases.containsCellCase(lineageName)) {
+                                if (casesLists.containsCellCase(lineageName)) {
 
                                     // show tab
                                 } else {
                                     // add a non terminal case
                                     if (defaultEmbryoFlag) {
-                                        cases.makeNonTerminalCase(
+                                        casesLists.makeNonTerminalCase(
                                                 lineageName,
-                                                productionInfo.getNuclearInfo(),
-                                                productionInfo.getCellShapeData(lineageName));
+                                                InfoWindow.this.productionInfo.getNuclearInfo(),
+                                                InfoWindow.this.productionInfo.getCellShapeData(lineageName));
                                     } else {
                                         System.out.println("third one");
-                                        cases.makeNonTerminalCase(
+                                        casesLists.makeNonTerminalCase(
                                                 lineageName,
                                                 new ArrayList<>(),
                                                 new ArrayList<>());
@@ -293,7 +305,7 @@ public class InfoWindow {
     }
 
     private void setInfoWindowTitle() {
-        Platform.runLater(() -> infoWindowStage.setTitle("Cell Info Window"));
+        runLater(() -> infoWindowStage.setTitle("Cell Info Window"));
     }
 
     public void addName(String name) {
@@ -315,7 +327,7 @@ public class InfoWindow {
      *         the dom to be added as a tab
      */
     public void addTab(InfoWindowDOM dom) {
-        Platform.runLater(() -> {
+        runLater(() -> {
             WebView webview = new WebView();
             webview.getEngine().loadContent(dom.DOMtoString());
             webview.setContextMenuEnabled(false);
@@ -337,7 +349,7 @@ public class InfoWindow {
             tab.setOnClosed(e -> {
                 Tab t = (Tab) e.getSource();
                 String cellName = t.getId();
-                SearchLayer.removeCellCase(cellName);
+                searchLayer.removeCellCase(cellName);
             });
 
             tabPane.setFocusTraversable(true);
