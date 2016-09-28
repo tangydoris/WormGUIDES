@@ -692,20 +692,19 @@ public class Window3DController {
     }
 
     /**
-     * Inserts a transient label into the sprites pane for the specified entity
-     * if the entity is an 'other' entity that is less than 10% opaque.
+     * Inserts a transient label into the sprites pane for the specified entity if the entity is an 'other' entity
+     * that is less than 10% opaque.
      *
      * @param name
-     *         String containing the name that appears on the transient label
+     *         the name that appears on the transient label
      * @param entity
-     *         The entity {@link Node} that the label should appear on
+     *         The entity that the label should appear on
      */
     private void transientLabel(String name, Node entity) {
         if (currentRulesApplyTo(name) || othersOpacity.get() > 0.25) {
 
             if (!currentLabels.contains(name) && entity != null) {
-                Bounds b = entity.getBoundsInParent();
-
+                final Bounds b = entity.getBoundsInParent();
                 if (b != null) {
                     String funcName = getFunctionalNameByLineageName(name);
                     if (funcName != null) {
@@ -713,14 +712,17 @@ public class Window3DController {
                     }
 
                     transientLabelText = makeNoteSpriteText(name);
-
                     transientLabelText.setWrappingWidth(-1);
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
 
-                    Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-                            (b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+                    final Point2D p = CameraHelper.project(
+                            camera,
+                            new Point3D(
+                                    (b.getMinX() + b.getMaxX()) / 2,
+                                    (b.getMinY() + b.getMaxY()) / 2,
+                                    (b.getMaxZ() + b.getMinZ()) / 2));
                     double x = p.getX();
                     double y = p.getY();
                     double vOffset = b.getHeight() / 2;
@@ -743,26 +745,21 @@ public class Window3DController {
     }
 
     // Called by RootLayoutController to set the loaded SceneElementsList
-    public void setSceneElementsList(SceneElementsList list) {
-        if (list != null) {
-            sceneElementsList = list;
-        }
+    public void setSceneElementsList(final SceneElementsList sceneElementsList) {
+        this.sceneElementsList = requireNonNull(sceneElementsList);
     }
 
-    public void setStoriesLayer(StoriesLayer layer) {
-        if (layer != null) {
-            storiesLayer = layer;
-            if (update3D != null) {
-                initializeUpdate3D();
-            }
-            storiesLayer.setUpdate3DProperty(update3D);
-
-            buildScene();
+    public void setStoriesLayer(final StoriesLayer storiesLayer) {
+        this.storiesLayer = requireNonNull(storiesLayer);
+        if (update3D != null) {
+            initializeUpdate3D();
         }
+        this.storiesLayer.setUpdate3DProperty(update3D);
+        buildScene();
     }
 
     public BooleanProperty getUpdate3DProperty() {
-        return this.update3D;
+        return update3D;
     }
 
     public IntegerProperty getTimeProperty() {
@@ -799,21 +796,27 @@ public class Window3DController {
 
     @SuppressWarnings("unchecked")
     public void handleMouseEvent(MouseEvent me) {
-        EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
+        final EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
 
-        if (type == MOUSE_ENTERED_TARGET || type == MOUSE_ENTERED
-                || type == MOUSE_RELEASED || type == MOUSE_MOVED) {
+        if (type == MOUSE_ENTERED_TARGET
+                || type == MOUSE_ENTERED
+                || type == MOUSE_RELEASED
+                || type == MOUSE_MOVED) {
             handleMouseReleasedOrEntered();
-        } else if (type == MOUSE_CLICKED && me.isStillSincePress()) {
+
+        } else if (type == MOUSE_CLICKED
+                && me.isStillSincePress()) {
             handleMouseClicked(me);
+
         } else if (type == MOUSE_DRAGGED) {
             handleMouseDragged(me);
+
         } else if (type == MOUSE_PRESSED) {
             handleMousePressed(me);
         }
     }
 
-    private void handleMouseDragged(MouseEvent event) {
+    private void handleMouseDragged(final MouseEvent event) {
         hideContextPopups();
 
         spritesPane.setCursor(CLOSED_HAND);
@@ -902,7 +905,7 @@ public class Window3DController {
         spritesPane.setCursor(DEFAULT);
     }
 
-    private void handleMouseClicked(MouseEvent event) {
+    private void handleMouseClicked(final MouseEvent event) {
         spritesPane.setCursor(HAND);
 
         hideContextPopups();
@@ -1028,18 +1031,10 @@ public class Window3DController {
         if (u.length != 3 || v.length != 3) {
             return null;
         }
-
         double[] cross = new double[3];
-
-        double cx, cy, cz;
-        cx = (u[1] * v[2]) - (u[2] * v[1]);
-        cy = (u[2] * v[0]) - (u[0] * v[2]);
-        cz = (u[0] * v[1]) - (u[1] * v[0]);
-
-        cross[0] = cx;
-        cross[1] = cy;
-        cross[2] = cz;
-
+        cross[0] = (u[1] * v[2]) - (u[2] * v[1]);
+        cross[1] = (u[2] * v[0]) - (u[0] * v[2]);
+        cross[2] = (u[0] * v[1]) - (u[1] * v[0]);
         return cross;
     }
 
@@ -1047,8 +1042,7 @@ public class Window3DController {
         if (name.contains("(")) {
             name = name.substring(0, name.indexOf("("));
         }
-        name = name.trim();
-        return name;
+        return name.trim();
     }
 
     private void handleMousePressed(MouseEvent event) {
@@ -1171,8 +1165,8 @@ public class Window3DController {
     }
 
     /**
-     * Repositions sprites (labels and note sprites) by projecting the sphere's
-     * 3d coordinate onto the front of the subscene
+     * Repositions sprites (labels and note sprites) by projecting the sphere's 3D coordinate onto the front of the
+     * subscene
      */
     private void repositionSprites() {
         if (entitySpriteMap != null) {
@@ -1189,20 +1183,18 @@ public class Window3DController {
     }
 
     /**
-     * Aligns a note graphic to its entity. The graphic is either a {@link Text}
-     * or a {@link VBox}. The graphic is removed if it ends up outside the
-     * bounds of the subscene window after a transformation, and only reinserted
-     * if its bounds are within the window again.
+     * Aligns a note graphic to its entity. The graphic is either a {@link Text} or a {@link VBox}. The graphic is
+     * removed if it ends up outside the bounds of the subscene window after a transformation, and only reinserted if
+     * its bounds are within the window again.
      *
      * @param noteOrLabelGraphic
-     *         Graphical representation of a note/notes (can either be a
-     *         {@link Text} or a {@link VBox}
+     *         graphical representation of a note/notes (can either be a {@link Text} or a {@link VBox}
      * @param node
-     *         Entity that the note graphic should attach to
+     *         entity that the note graphic should attach to
      * @param isLabel
-     *         True if a label is being aligned, false otherwise
+     *         true if a label is being aligned, false otherwise
      */
-    private void alignTextWithEntity(Node noteOrLabelGraphic, Node node, boolean isLabel) {
+    private void alignTextWithEntity(final Node noteOrLabelGraphic, final Node node, final boolean isLabel) {
         if (node != null) {
             // graphic could have been previously removed due to
             // out-of-bounds-ness
@@ -1246,7 +1238,7 @@ public class Window3DController {
         }
     }
 
-    private int getIndexByCellName(String name) {
+    private int getIndexByCellName(final String name) {
         for (int i = 0; i < cellNames.length; i++) {
             if (cellNames[i].equals(name)) {
                 return i;
@@ -1255,7 +1247,7 @@ public class Window3DController {
         return -1;
     }
 
-    private int getPickedSphereIndex(Sphere picked) {
+    private int getPickedSphereIndex(final Sphere picked) {
         for (int i = 0; i < cellNames.length; i++) {
             if (spheres[i].equals(picked)) {
                 return i;
@@ -1448,7 +1440,7 @@ public class Window3DController {
             addSceneElementGeometries(entities);
         }
 
-        //sort(entities, opacityComparator);
+        sort(entities, opacityComparator);
         root.getChildren().addAll(entities);
 
         // add notes

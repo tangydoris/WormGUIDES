@@ -38,14 +38,14 @@ public class ColorHash {
 
     private final Color othersColor = WHITE;
 
-    private Map<Set<Color>, Material> materialHash;
-    private Map<Set<Color>, Double> opacityHash;
-    private Material highlightMaterial;
-    private Material translucentMaterial;
-    private Material noteMaterial;
+    private final Map<Set<Color>, Material> materialHash;
+    private final Map<Material, Double> opacityHash;
+    private final Material highlightMaterial;
+    private final Material translucentMaterial;
+    private final Material noteMaterial;
 
     // Used for 'others' opacity
-    private HashMap<Double, Material> opacityMaterialHash;
+    private final HashMap<Double, Material> opacityMaterialHash;
 
     public ColorHash() {
         materialHash = new HashMap<>();
@@ -70,7 +70,7 @@ public class ColorHash {
             opacityMaterialHash.put(opacity, material);
             final Set<Color> othersSet = new HashSet<>();
             othersSet.add(web(othersColor.toString(), opacity));
-            opacityHash.put(othersSet, opacity);
+            opacityHash.put(material, opacity);
         }
 
         return opacityMaterialHash.get(opacity);
@@ -139,7 +139,7 @@ public class ColorHash {
 
         final PhongMaterial material = new PhongMaterial();
         material.setDiffuseMap(wImage);
-        opacityHash.put(colors, opacity);
+        opacityHash.put(material, opacity);
         return material;
     }
 
