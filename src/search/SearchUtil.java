@@ -179,13 +179,13 @@ public class SearchUtil {
      *
      * @return true if structure's scene name or comment contains all searched terms, false otherwise
      */
-    private static boolean isMulticellularStructureSearched(final String structureName, final String searched) {
+    private static boolean isMulticellularStructureSearched(String structureName, final String searched) {
         if (structureName == null || searched == null) {
             return false;
         }
 
         // search in structure scene names
-        final String structureNameLower = structureName.trim()
+        structureName = structureName.trim()
                 .toLowerCase();
         final String[] terms = searched.trim()
                 .toLowerCase()
@@ -193,7 +193,7 @@ public class SearchUtil {
 
         boolean appliesToName = true;
         for (String term : terms) {
-            if (!structureNameLower.contains(term)) {
+            if (!structureName.contains(term)) {
                 appliesToName = false;
                 break;
             }
@@ -203,7 +203,7 @@ public class SearchUtil {
         if (!appliesToName) {
             boolean appliesToComment = true;
             final String comment = sceneElementsList.getNameToCommentsMap()
-                    .get(structureNameLower)
+                    .get(structureName)
                     .toLowerCase();
 
             for (String term : terms) {

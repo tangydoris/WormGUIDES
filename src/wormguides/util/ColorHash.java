@@ -4,9 +4,11 @@
 
 package wormguides.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -16,20 +18,28 @@ import javafx.scene.paint.PhongMaterial;
 
 import wormguides.view.popups.SulstonTreePane;
 
-import static java.util.Collections.sort;
+import static java.lang.Integer.toHexString;
+import static java.lang.System.arraycopy;
+
+import static javafx.scene.paint.Color.BLACK;
+import static javafx.scene.paint.Color.GOLD;
+import static javafx.scene.paint.Color.WHITE;
+import static javafx.scene.paint.Color.web;
 
 /**
  * ColorHash is a number of combinations of Colors mapped to a {@link Material}. {@link
- * wormguides.controllers.Window3DController} and {@link SulstonTreePane} query this class to
- * find the appropriate color striping to apply to a cell/its lineage. This class also contains a map of the material
- * to the opacity (0.0->1.0) of the least opaque color in a Material. This is used so that the "most opaque"
- * materials can be rendered first, followed by sheerer ones.
+ * wormguides.controllers.Window3DController} and {@link SulstonTreePane} query this class to find the appropriate
+ * color striping to apply to a cell/its lineage. This class also contains a map of the material to the opacity
+ * (0.0->1.0) of the least opaque color in a Material. This is used so that the "most opaque" materials can be
+ * rendered first, followed by sheerer ones.
  */
 
 public class ColorHash {
 
-    private HashMap<List<Color>, Material> materialHash;
-    private HashMap<Material, Double> opacityHash;
+    private final Color othersColor = WHITE;
+
+    private Map<Set<Color>, Material> materialHash;
+    private Map<Set<Color>, Double> opacityHash;
     private Material highlightMaterial;
     private Material translucentMaterial;
     private Material noteMaterial;
@@ -44,10 +54,10 @@ public class ColorHash {
         opacityMaterialHash = new HashMap<>();
         makeOthersMaterial(1.0);
 
-        highlightMaterial = makeMaterial(Color.GOLD);
-        translucentMaterial = makeMaterial(Color.web("#555555", 0.40));
-        makeMaterial(Color.WHITE);
-        noteMaterial = makeMaterial(Color.web("#749bc9"));
+        highlightMaterial = makeMaterial(GOLD);
+        translucentMaterial = makeMaterial(web("#555555", 0.40));
+        makeMaterial(WHITE);
+        noteMaterial = makeMaterial(web("#749bc9"));
     }
 
     public Material getNoteSceneElementMaterial() {
@@ -56,9 +66,11 @@ public class ColorHash {
 
     public Material getOthersMaterial(double opacity) {
         if (opacityMaterialHash.get(opacity) == null) {
-            Material material = makeOthersMaterial(opacity);
+            final Material material = makeOthersMaterial(opacity);
             opacityMaterialHash.put(opacity, material);
-            opacityHash.put(material, opacity);
+            final Set<Color> othersSet = new HashSet<>();
+            othersSet.add(web(othersColor.toString(), opacity));
+            opacityHash.put(othersSet, opacity);
         }
 
         return opacityMaterialHash.get(opacity);
@@ -68,49 +80,40 @@ public class ColorHash {
     public Material makeOthersMaterial(double opacity) {
         int darkness = (int) (Math.round(opacity * 255));
         String colorString = "#";
-        StringBuilder sb = new StringBuilder();
-        sb.append(Integer.toHexString(darkness));
-
-        if (sb.length() < 2) {
-            sb.insert(0, "0");
+        final StringBuilder builder = new StringBuilder();
+        builder.append(toHexString(darkness));
+        if (builder.length() < 2) {
+            builder.insert(0, "0");
         }
-
         for (int i = 0; i < 3; i++) {
-            colorString += sb.toString();
+            colorString += builder.toString();
         }
-
-        Material material = new PhongMaterial(Color.web(colorString, opacity));
-
-        return material;
+        return new PhongMaterial(web(colorString, opacity));
     }
 
-    public Material makeMaterial(Color color) {
-        List<Color> colors = new ArrayList<>();
+    private Material makeMaterial(Color color) {
+        final Set<Color> colors = new HashSet<>();
         colors.add(color);
         return makeMaterial(colors);
     }
 
-    public Material makeMaterial(List<Color> colors) {
-        sort(colors, new ColorComparator());
-
-        // TODO exception here?
-        WritableImage wImage = new WritableImage(90, 90);
-        PixelWriter writer = wImage.getPixelWriter();
-        Color[] temp = colors.toArray(new Color[colors.size()]);
+    private Material makeMaterial(Set<Color> colors) {
+        final WritableImage wImage = new WritableImage(90, 90);
+        final PixelWriter writer = wImage.getPixelWriter();
+        final Color[] temp = colors.toArray(new Color[colors.size()]);
         double opacity = 1.0;
 
         Color[] copy;
         if (colors.isEmpty()) {
             copy = new Color[1];
-            copy[0] = Color.WHITE;
+            copy[0] = WHITE;
         } else if (colors.size() == 1) {
-            copy = new Color[1];
-            copy[0] = colors.get(0);
+            copy = temp;
         } else {
             // we want first and last color to be the same because of JavaFX
             // material wrapping bug
             copy = new Color[colors.size() + 1];
-            System.arraycopy(temp, 0, copy, 0, colors.size());
+            arraycopy(temp, 0, copy, 0, colors.size());
             copy[colors.size()] = temp[0];
         }
 
@@ -123,7 +126,7 @@ public class ColorHash {
 
         // for more than two colors, we want segments
         int segmentLength = (int) (wImage.getHeight() / copy.length);
-        Color color = Color.BLACK;
+        Color color = BLACK;
 
         for (int i = 0; i < copy.length; i++) {
             color = copy[i];
@@ -134,10 +137,9 @@ public class ColorHash {
             }
         }
 
-        PhongMaterial material = new PhongMaterial();
+        final PhongMaterial material = new PhongMaterial();
         material.setDiffuseMap(wImage);
-        opacityHash.put(material, opacity);
-
+        opacityHash.put(colors, opacity);
         return material;
     }
 
@@ -145,8 +147,7 @@ public class ColorHash {
         if (material != null) {
             return opacityHash.get(material);
         }
-
-        return 0;
+        return 0.0;
     }
 
     public Material getHighlightMaterial() {
@@ -157,14 +158,13 @@ public class ColorHash {
         return translucentMaterial;
     }
 
-    public Material getMaterial(List<Color> colors) {
-        if (colors == null) {
-            colors = new ArrayList<>();
+    public Material getMaterial(final List<Color> colors) {
+        final Set<Color> colorSet = new HashSet<>();
+        if (colors != null) {
+            colorSet.addAll(colors);
         }
-
-        materialHash.putIfAbsent(colors, makeMaterial(colors));
-
-        return materialHash.get(colors);
+        materialHash.putIfAbsent(colorSet, makeMaterial(colorSet));
+        return materialHash.get(colorSet);
     }
 
 }

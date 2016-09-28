@@ -8,7 +8,6 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,6 +81,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import acetree.LineageData;
+import com.sun.javafx.scene.CameraHelper;
+import connectome.Connectome;
+import partslist.PartsList;
+import search.SearchType;
+import search.SearchUtil;
 import wormguides.MainApp;
 import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
@@ -101,61 +106,36 @@ import wormguides.util.ColorHash;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
 
-import acetree.LineageData;
-import com.sun.javafx.scene.CameraHelper;
-import connectome.Connectome;
-import partslist.PartsList;
-import search.SearchType;
-import search.SearchUtil;
+import static java.util.Collections.sort;
 
 /**
- * The controller for the 3D subscene inside the root layout. This class
- * contains the subscene itself, and places it into the AnchorPane called
- * modelAnchorPane inside the root layout. It is also responsible for refreshing
- * the scene on time, search, wormguides.stories, notes, and rules change. This class
- * contains observable properties that are passed to other classes so that a
- * subscene refresh can be trigger from that other class. <br>
- * <br>
+ * The controller for the 3D subscene inside the root layout. This class contains the subscene itself, and places it
+ * into the AnchorPane called modelAnchorPane inside the root layout. It is also responsible for refreshing the scene
+ * on time, search, wormguides.stories, notes, and rules change. This class contains observable properties that are
+ * passed to other classes so that a subscene refresh can be trigger from that other class.
  * <p>
- * An "entity" in the subscene is either a cell, cell body, or multicellular
- * structure. These are graphically represented by the Shape3Ds Sphere and
- * MeshView available in JavaFX. Sphere's represent cells and MeshView's
- * represent cell bodies and multicellular structures (see {@link Sphere} and
- * {@link MeshView}). Notes and labels are rendered as Texts (see {@link Text}).
- * This class queries the lineage data ({@link LineageData}) and list of scene
- * elements ({@link SceneElementsList}) for a certain time and renders the
- * entities, notes, story, and labels present in that time frame. <br>
- * <br>
+ * An "entity" in the subscene is either a cell, cell body, or multicellular structure. These are graphically
+ * represented by the Shape3Ds Sphere and MeshView available in JavaFX. {@link Sphere}s represent cells, and
+ * {@link MeshView}s represent cell bodies and multicellular structures. Notes and labels are rendered as
+ * {@link Text}s. This class queries the {@link LineageData} and {@link SceneElementsList} for a certain time and
+ * renders the entities, notes, story, and labels present in that time point.
  * <p>
- * For coloring of entities, this class queries an observable list of rules (
- * {@link Rule}) to see which ones apply to a particular entity, then queries
- * the color hash ({@link ColorHash}) for the material ({@link PhongMaterial})
- * to use for the entity.
- *
- * @author Doris Tang
+ * For the coloring of entities, an observable list of {@link Rule}s is queried to see which ones apply to a
+ * particular entity, then queries the {@link ColorHash} for the {@link Material} to use for the entity.
  */
-
 public class Window3DController {
 
-    private final static double cannonicalOrientationX = 145.0;
-    private final static double cannonicalOrientationY = -166.0;
-    private final static double cannonicalOrientationZ = 24.0;
-    private static Sphere[] spheres;
-    private static MeshView[] meshes;
-    private static String[] cellNames;
-    private static String[] meshNames;
-    // rotation stuff
-    private final Rotate rotateX;
-    private final Rotate rotateY;
-    private final Rotate rotateZ;
+    private final double cannonicalOrientationX = 145.0;
+    private final double cannonicalOrientationY = -166.0;
+    private final double cannonicalOrientationZ = 24.0;
+
     private final String CS = ", ";
     private final String FILL_COLOR_HEX = "#272727";
-    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66", SPRITE_COLOR_HEX = "#ffffff",
+    private final String ACTIVE_LABEL_COLOR_HEX = "#ffff66",
+            SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-    /**
-     * The wait time (in milliseconds) between consecutive time frames while a
-     * movie is playing.
-     */
+
+    /** The wait time (in milliseconds) between consecutive time frames while a movie is playing. */
     private final long WAIT_TIME_MILLI = 200;
     private final double CAMERA_INITIAL_DISTANCE = -220;
     private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
@@ -164,8 +144,8 @@ public class Window3DController {
     /** Text size scale used for the rendering of billboard notes. */
     private final double BILLBOARD_SCALE = 0.9;
     /**
-     * Scale used for the radii of spheres that represent cells, multiplied with
-     * the cell's radius loaded from the nuc files.
+     * Scale used for the radii of spheres that represent cells, multiplied with the cell's radius loaded from the
+     * nuc files.
      */
     private final double SIZE_SCALE = 1;
     /** The radius of all spheres when 'uniform size' is ticked. */
@@ -184,8 +164,15 @@ public class Window3DController {
      * The int used when calculating the y offset between a sprite and label.
      */
     private final int LABEL_SPRITE_Y_OFFSET = 5;
+    // rotation stuff
+    private final Rotate rotateX;
+    private final Rotate rotateY;
+    private final Rotate rotateZ;
     Vector<JavaPicture> javaPictures;
-
+    private Sphere[] spheres;
+    private MeshView[] meshes;
+    private String[] cellNames;
+    private String[] meshNames;
     private Stage parentStage;
     private LineageData cellData;
     private SubScene subscene;
@@ -298,36 +285,41 @@ public class Window3DController {
     private double Z_SCALE;
 
     /**
-     * Window3DController class constructor called by
-     * {@link RootLayoutController} upon initialization.
+     * Class constructor
      *
      * @param parent
-     *         {@link Stage} to which the main application belongs to.
-     *         Reference used for context menu (whether it should appear in
-     *         the sulston tree or the 3D subscene.
+     *         {@link Stage} to which the main application belongs to. Reference used for context menu (whether it
+     *         should appear in the sulston tree or the 3D subscene.
      * @param parentPane
-     *         {@link AnchorPane} to which sprites, labels, and the notes
-     *         info panel are added
+     *         {@link AnchorPane} to which sprites, labels, and the notes info panel are added
      * @param data
-     *         {@link LineageData} to contains cell information loaded from
-     *         the nuclear files
+     *         {@link LineageData} to contains cell information loaded from the nuclear files
      * @param cases
-     *         {@link CasesLists} that contains information about
-     *         terminal/non-terminal cells/anatomy terms
+     *         {@link CasesLists} that contains information about terminal/non-terminal cells/anatomy terms
      * @param info
-     *         {@link ProductionInfo} that contains information about
-     *         segmentation and the movie time offset
+     *         {@link ProductionInfo} that contains information about segmentation and the movie time offset
      * @param connectome
-     *         {@link Connectome} that contains information about the
-     *         embryo's connectome
+     *         {@link Connectome} that contains information about the embryo's connectome
      * @param bringUpInfoProperty
-     *         {@link BooleanProperty} that should be set to TRUE when the
-     *         info window should be brought up, FALSE otherwise
+     *         {@link BooleanProperty} that should be set to TRUE when the info window should be brought up, FALSE
+     *         otherwise
      */
     public Window3DController(
-            Stage parent, AnchorPane parentPane, LineageData data, CasesLists cases,
-            ProductionInfo info, Connectome connectome, BooleanProperty bringUpInfoProperty, int offsetX, int offsetY,
-            int offsetZ, boolean defaultEmbryoFlag, double X_SCALE, double Y_SCALE, double Z_SCALE) {
+            Stage parent,
+            AnchorPane parentPane,
+            LineageData data,
+            CasesLists cases,
+            ProductionInfo info,
+            Connectome connectome,
+            BooleanProperty bringUpInfoProperty,
+            int offsetX,
+            int offsetY,
+            int offsetZ,
+            boolean defaultEmbryoFlag,
+            double X_SCALE,
+            double Y_SCALE,
+            double Z_SCALE) {
+
         parentStage = parent;
 
         this.offsetX = offsetX;
@@ -807,9 +799,8 @@ public class Window3DController {
             repositionNoteBillboardFronts();
         } else {
             if (event.isPrimaryButtonDown()) {
-                /*
-                 * TODO how to get Z COORDINATE?
-				 */
+                // how to get Z COORDINATE??
+
                 if (quaternion != null) {
                     // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
                     // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
@@ -973,19 +964,15 @@ public class Window3DController {
         return vector;
     }
 
-    /*
-     * TODO fix this
-     *
-     */
-    // http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
-    // --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
-    // http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
     private double computeZCoord(double xCoord, double yCoord, double angleOfRotation) {
+        // http://stackoverflow.com/questions/14954317/know-coordinate-of-z-from-xy-value-and-angle
+        // --> law of cosines: https://en.wikipedia.org/wiki/Law_of_cosines
+        // http://answers.ros.org/question/42803/convert-coordinates-2d-to-3d-point-theoretical-question/
         return Math.sqrt(Math.pow(xCoord, 2) + Math.pow(yCoord, 2) - (2 * xCoord * yCoord * Math.cos(angleOfRotation)));
     }
 
-    // http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
     private double rotationAngleFromMouseMovement() {
+        // http://math.stackexchange.com/questions/59/calculating-an-angle-from-2-points-in-space
         double rotationAngleRadians = Math
                 .acos(((mouseOldX * mousePosX) + (mouseOldY * mousePosY) + (mouseOldZ * mousePosZ))
                         / Math.sqrt((Math.pow(mouseOldX, 2) + Math.pow(mouseOldY, 2) + Math.pow(mouseOldZ, 2))
@@ -1407,8 +1394,8 @@ public class Window3DController {
     }
 
     private void addEntitiesToScene() {
-        ArrayList<Shape3D> entities = new ArrayList<>();
-        ArrayList<Node> notes = new ArrayList<>();
+        List<Shape3D> entities = new ArrayList<>();
+        List<Node> notes = new ArrayList<>();
 
         // add spheres
         addCellGeometries(entities);
@@ -1418,7 +1405,7 @@ public class Window3DController {
             addSceneElementGeometries(entities);
         }
 
-        Collections.sort(entities, opacityComparator);
+        //sort(entities, opacityComparator);
         root.getChildren().addAll(entities);
 
         // add notes
@@ -1470,7 +1457,7 @@ public class Window3DController {
         }
     }
 
-    private void addSceneElementGeometries(ArrayList<Shape3D> list) {
+    private void addSceneElementGeometries(List<Shape3D> list) {
         if (defaultEmbryoFlag) {
             // add scene elements from note resources
             list.addAll(currentNoteMeshMap.keySet()
@@ -1517,7 +1504,7 @@ public class Window3DController {
                                             .collect(Collectors.toList()));
                                 }
                             }
-                            Collections.sort(colors, colorComparator);
+                            sort(colors, colorComparator);
 
                             // if any rules applied
                             if (!colors.isEmpty()) {
@@ -1551,7 +1538,7 @@ public class Window3DController {
         }
     }
 
-    private void addCellGeometries(ArrayList<Shape3D> list) {
+    private void addCellGeometries(List<Shape3D> list) {
         // Sphere stuff
         for (int i = 0; i < cellNames.length; i++) {
             double radius;
@@ -1580,7 +1567,7 @@ public class Window3DController {
                         colors.add(Color.web(rule.getColor().toString()));
                     }
                 }
-                Collections.sort(colors, colorComparator);
+                sort(colors, colorComparator);
                 material = colorHash.getMaterial(colors);
 
                 if (colors.isEmpty()) {
@@ -1708,12 +1695,14 @@ public class Window3DController {
         return null;
     }
 
-    // Inserts note geometries to scene
-    // Input list is the list that billboards are added to which are added to
-    // the subscene
-    // Note overlays and sprites are added to the pane that contains the
-    // subscene
-    private void addNoteGeometries(ArrayList<Node> list) {
+    /**
+     * Inserts note geometries into the subscene.
+     *
+     * @param list
+     *         the list of nodes that billboards are added to, which are added to to the subscene. Note overlays
+     *         and sprites are added to the pane that contains the subscene.
+     */
+    private void addNoteGeometries(List<Node> list) {
         for (Note note : currentNotes) {
             // map notes to their sphere/mesh view
             Node text = makeNoteGraphic(note);
@@ -2198,7 +2187,7 @@ public class Window3DController {
         WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
 
 		/*
-		 * write the image to a file
+         * write the image to a file
 		 */
         try {
             File file = fileChooser.showSaveDialog(fileChooserStage);
@@ -2294,7 +2283,7 @@ public class Window3DController {
     }
 
 	/*
-	 * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
+     * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
 	 * return new EventHandler<TransformChangedEvent>() {
 	 * 
 	 * @Override public void handle(TransformChangedEvent arg0) {
@@ -2344,13 +2333,13 @@ public class Window3DController {
         rotateXAngle.set(rx);
         rotateYAngle.set(ry);
         rotateZAngle.set(rz);
-		/*
-		 * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
+        /*
+         * rx = Math.toDegrees(rx); ry = Math.toDegrees(ry); rx =
 		 * Math.toDegrees(rz);
 		 */
 
 		/*
-		 * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
+         * rotateX.setAngle(rx); rotateY.setAngle(ry); rotateZ.setAngle(rz);
 		 */
     }
 
@@ -2729,8 +2718,7 @@ public class Window3DController {
 
     /**
      * This class is the Comparator for Shape3Ds that compares based on opacity. This is used for z-buffering for
-     * semi-opaque materials. Entities with opaque materials should be rendered last (added first to the root
-     * {@link Group}.
+     * semi-opaque materials. Entities with opaque materials should be rendered last (added first to the root group.
      */
     private class OpacityComparator implements Comparator<Shape3D> {
         @Override
