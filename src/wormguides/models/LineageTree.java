@@ -168,13 +168,32 @@ public class LineageTree {
             final String p0 = "p0";
             final String p = "p";
 
-            // root is always an ancestor
+            // root p0 is always an ancestor
             if (ancestor.equalsIgnoreCase(p0)) {
                 return true;
             }
-            // root is not a descendant
+            // root p0 is never a descendant
             if (descendant.equalsIgnoreCase(p0)) {
                 return false;
+            }
+            if (descendant.equals("ab")) {
+                return ancestor.equals(p0);
+            }
+            if (descendant.startsWith("z")) {
+                return ancestor.startsWith(p);
+            }
+            if (descendant.equals("d")) {
+                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 3;
+            }
+            if (descendant.equals("c")) {
+                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 2;
+            }
+            if (descendant.equals("ems")) {
+                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 1;
+            }
+            if (descendant.equals("ms") || descendant.equals("e")) {
+                return ancestor.equals("ems")
+                        || (ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 1);
             }
             // for the p cells, test number after the 'p'
             if (descendant.startsWith(p) && ancestor.startsWith(p)) {
@@ -184,24 +203,6 @@ public class LineageTree {
             if (descendant.startsWith(ancestor)
                     && descendant.length() > ancestor.length()) {
                 return true;
-            }
-            if (descendant.startsWith("ab")) {
-                return ancestor.equals(p0);
-            }
-            if (descendant.startsWith("z")) {
-                return ancestor.startsWith(p);
-            }
-            if (descendant.startsWith("d")) {
-                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 3;
-            }
-            if (descendant.startsWith("c")) {
-                return ancestor.startsWith(p) && parseInt(ancestor.substring(1, 2)) <= 2;
-            }
-            if (descendant.equals("ems")) {
-                return ancestor.equals("p1");
-            }
-            if (descendant.startsWith("ms") || descendant.startsWith("e")) {
-                return ancestor.equals("ems") || ancestor.equals("p1");
             }
         }
         return false;

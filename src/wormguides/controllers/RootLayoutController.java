@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -85,6 +84,8 @@ import wormguides.view.urlwindow.URLLoadWarningDialog;
 import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLWindow;
 
+import static java.util.Collections.sort;
+
 import static javafx.application.Platform.runLater;
 
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgXOffsetFromZero;
@@ -92,11 +93,17 @@ import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgYOffsetFr
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgZOffsetFromZero;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.loadNucFiles;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.setOriginToZero;
+import static search.SearchType.CONNECTOME;
+import static search.SearchType.DESCRIPTION;
+import static search.SearchType.FUNCTIONAL;
+import static search.SearchType.GENE;
+import static search.SearchType.LINEAGE;
+import static search.SearchType.MULTICELLULAR_CELL_BASED;
 import static wormguides.loaders.URLLoader.process;
 
 public class RootLayoutController extends BorderPane implements Initializable {
 
-    private final static String unLineagedStart = "Nuc";
+    private final static String UNLINEAGED_START = "Nuc";
 
     private final static String ROOT = "ROOT";
 
@@ -275,13 +282,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 initProductionInfo();
             }
 
-            WebView productionInfoWebView = new WebView();
+            final WebView productionInfoWebView = new WebView();
             productionInfoWebView.getEngine().loadContent(productionInfo.getProductionInfoDOM().DOMtoString());
             productionInfoWebView.setContextMenuEnabled(false);
 
-            VBox root = new VBox();
+            final VBox root = new VBox();
             root.getChildren().addAll(productionInfoWebView);
-            Scene scene = new Scene(new Group());
+            final Scene scene = new Scene(new Group());
             scene.setRoot(root);
 
             productionInfoStage.setScene(scene);
@@ -661,10 +668,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
         }
     }
 
-    /*
-     * TODO
-     * refactor defaultEmbryoFlag --> default model, not where application was opened from
-     */
     private void exitApplication() {
         System.out.println("Exiting...");
         if (!defaultEmbryoFlag) {
@@ -940,7 +943,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         opacitySlider.setValue(DEFAULT_OTHERS_OPACITY);
     }
 
-    private void initSearch(final ObservableList<Rule> rulesList) {
+    private void initSearchLayer(final ObservableList<Rule> rulesList) {
         searchLayer = new SearchLayer(
                 rulesList,
                 searchField,
@@ -956,6 +959,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 colorPicker,
                 addSearchBtn);
         searchLayer.addDefaultColorRules();
+        window3DController.setSearchLayer(searchLayer);
     }
 
     private void initDisplayLayer() {
@@ -977,14 +981,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
         if (!defaultEmbryoFlag) {
             // remove unlineaged cells
             for (int i = 0; i < allCellNames.size(); i++) {
-                if (allCellNames.get(i).toLowerCase().startsWith(unLineagedStart.toLowerCase())
+                if (allCellNames.get(i).toLowerCase().startsWith(UNLINEAGED_START.toLowerCase())
                         || allCellNames.get(i).toLowerCase().startsWith(ROOT.toLowerCase())) {
                     allCellNames.remove(i--);
                 }
             }
 
             //sort the lineage names that remain
-            Collections.sort(allCellNames);
+            sort(allCellNames);
         }
 
         final LineageTree lineageTree = new LineageTree(
@@ -996,21 +1000,21 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private void initToggleGroup() {
         typeToggleGroup = new ToggleGroup();
         sysRadioBtn.setToggleGroup(typeToggleGroup);
-        sysRadioBtn.setUserData(SearchType.LINEAGE);
+        sysRadioBtn.setUserData(LINEAGE);
         funRadioBtn.setToggleGroup(typeToggleGroup);
-        funRadioBtn.setUserData(SearchType.FUNCTIONAL);
+        funRadioBtn.setUserData(FUNCTIONAL);
         desRadioBtn.setToggleGroup(typeToggleGroup);
-        desRadioBtn.setUserData(SearchType.DESCRIPTION);
+        desRadioBtn.setUserData(DESCRIPTION);
         genRadioBtn.setToggleGroup(typeToggleGroup);
-        genRadioBtn.setUserData(SearchType.GENE);
+        genRadioBtn.setUserData(GENE);
         conRadioBtn.setToggleGroup(typeToggleGroup);
-        conRadioBtn.setUserData(SearchType.CONNECTOME);
+        conRadioBtn.setUserData(CONNECTOME);
         multiRadioBtn.setToggleGroup(typeToggleGroup);
-        multiRadioBtn.setUserData(SearchType.MULTICELLULAR_CELL_BASED);
+        multiRadioBtn.setUserData(MULTICELLULAR_CELL_BASED);
 
         typeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             SearchType type = (SearchType) observable.getValue().getToggleGroup().getSelectedToggle().getUserData();
-            if (type == SearchType.FUNCTIONAL || type == SearchType.DESCRIPTION) {
+            if (type == FUNCTIONAL || type == DESCRIPTION) {
                 descendantTick.setSelected(false);
                 descendantTick.disableProperty().set(true);
                 descendantLabel.disableProperty().set(true);
@@ -1217,8 +1221,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         setSlidersProperties();
 
         ObservableList<Rule> list = displayLayer.getRulesList();
-        initSearch(list);
-        window3DController.setSearchLayer(searchLayer);
+        initSearchLayer(list);
         window3DController.setRulesList(list);
 
         initSceneElementsList();

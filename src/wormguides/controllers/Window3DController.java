@@ -1132,7 +1132,6 @@ public class Window3DController {
     private void createSubScene(Double width, Double height) {
         subscene = new SubScene(root, width, height, true, BALANCED);
         subscene.setFill(web(FILL_COLOR_HEX));
-
         buildCamera();
     }
 
@@ -1140,15 +1139,14 @@ public class Window3DController {
         if (contextMenuStage == null) {
             initContextMenuStage();
         }
-
         return contextMenuController;
     }
 
     private void repositionNoteBillboardFronts() {
         for (Node billboard : billboardFrontEntityMap.keySet()) {
-            Node entity = billboardFrontEntityMap.get(billboard);
+            final Node entity = billboardFrontEntityMap.get(billboard);
             if (entity != null) {
-                Bounds b = entity.getBoundsInParent();
+                final Bounds b = entity.getBoundsInParent();
 
                 if (b != null) {
                     billboard.getTransforms().clear();
@@ -1174,7 +1172,6 @@ public class Window3DController {
                 alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
             }
         }
-
         if (entityLabelMap != null) {
             for (Node entity : entityLabelMap.keySet()) {
                 alignTextWithEntity(entityLabelMap.get(entity), entity, true);
@@ -1188,7 +1185,7 @@ public class Window3DController {
      * its bounds are within the window again.
      *
      * @param noteOrLabelGraphic
-     *         graphical representation of a note/notes (can either be a {@link Text} or a {@link VBox}
+     *         graphical representation of a note/notes
      * @param node
      *         entity that the note graphic should attach to
      * @param isLabel
@@ -1196,17 +1193,21 @@ public class Window3DController {
      */
     private void alignTextWithEntity(final Node noteOrLabelGraphic, final Node node, final boolean isLabel) {
         if (node != null) {
-            // graphic could have been previously removed due to
-            // out-of-bounds-ness
-            if (!spritesPane.getChildren().contains(noteOrLabelGraphic)) {
-                spritesPane.getChildren().add(noteOrLabelGraphic);
+            // graphic could have been previously removed due to out-of-bounds-ness
+            final ObservableList<Node> children = spritesPane.getChildren();
+            if (!children.contains(noteOrLabelGraphic)) {
+                children.add(noteOrLabelGraphic);
             }
 
-            Bounds b = node.getBoundsInParent();
+            final Bounds b = node.getBoundsInParent();
             if (b != null) {
                 noteOrLabelGraphic.getTransforms().clear();
-                Point2D p = CameraHelper.project(camera, new Point3D((b.getMinX() + b.getMaxX()) / 2,
-                        (b.getMinY() + b.getMaxY()) / 2, (b.getMaxZ() + b.getMinZ()) / 2));
+                final Point2D p = CameraHelper.project(
+                        camera,
+                        new Point3D(
+                                (b.getMinX() + b.getMaxX()) / 2,
+                                (b.getMinY() + b.getMaxY()) / 2,
+                                (b.getMaxZ() + b.getMinZ()) / 2));
                 double x = p.getX();
                 double y = p.getY();
 
@@ -1221,16 +1222,19 @@ public class Window3DController {
                     y += vOffset + LABEL_SPRITE_Y_OFFSET;
                 }
 
-                Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
-                Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
+                final Bounds paneBounds = spritesPane.localToScreen(spritesPane.getBoundsInLocal());
+                final Bounds graphicBounds = noteOrLabelGraphic.localToScreen(noteOrLabelGraphic.getBoundsInLocal());
 
                 if (graphicBounds != null && paneBounds != null) {
-                    if (x < -OUT_OF_BOUNDS_THRESHOLD || y < -OUT_OF_BOUNDS_THRESHOLD
-                            || ((paneBounds.getMaxY() - y - graphicBounds.getHeight()) < (paneBounds.getMinY()
-                            - OUT_OF_BOUNDS_THRESHOLD))
-                            || ((x + graphicBounds.getWidth()) > paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
+                    if (x < -OUT_OF_BOUNDS_THRESHOLD
+                            || y < -OUT_OF_BOUNDS_THRESHOLD
+                            || (paneBounds.getMaxY() - y - graphicBounds.getHeight())
+                            < (paneBounds.getMinY() - OUT_OF_BOUNDS_THRESHOLD)
+                            || (x + graphicBounds.getWidth()) > (paneBounds.getMaxX() + OUT_OF_BOUNDS_THRESHOLD)) {
                         spritesPane.getChildren().remove(noteOrLabelGraphic);
-                    } else { // note graphic is within bounds
+
+                    } else {
+                        // note graphic is within bounds
                         noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
                     }
                 }
