@@ -13,22 +13,22 @@ public enum SearchOption {
      * SearchLayer for cells associated with the searched name. The {@link SearchOption#ANCESTOR} and {@link
      * SearchOption#DESCENDANT} searches are based off the list returned when this search is made.
      */
-    CELL_NUCLEUS("Cell Nucleus"),
+    CELL_NUCLEUS("cell nucleus"),
 
     /** Search for cell bodies that contain the cells in the search results list */
-    CELL_BODY("Cell Body"),
+    CELL_BODY("cell body"),
 
     /**
      * Used to distinguish multicellular structures from cell bodies when scene element meshes query the rules to see
      * if the rule applies to it.
      */
-    MULTICELLULAR_NAME_BASED("Multicellular Structure"),
+    MULTICELLULAR_NAME_BASED("multicellular structure"),
 
     /** SearchLayer for ancestors of cells in the search results list */
-    ANCESTOR("Its Ancestors"),
+    ANCESTOR("its ancestors"),
 
     /** SearchLayer for descendants of cells in the search results list */
-    DESCENDANT("Its Descendants");
+    DESCENDANT("its descendants");
 
     private final String description;
 

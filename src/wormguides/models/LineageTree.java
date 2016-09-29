@@ -169,11 +169,11 @@ public class LineageTree {
             final String p = "p";
 
             // root is always an ancestor
-            if (ancestor.equals(p0)) {
+            if (ancestor.equalsIgnoreCase(p0)) {
                 return true;
             }
             // root is not a descendant
-            if (descendant.equals(p0)) {
+            if (descendant.equalsIgnoreCase(p0)) {
                 return false;
             }
             // for the p cells, test number after the 'p'

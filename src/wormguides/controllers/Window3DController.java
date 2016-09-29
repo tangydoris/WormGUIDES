@@ -1576,7 +1576,7 @@ public class Window3DController {
                 radius = SIZE_SCALE * UNIFORM_RADIUS;
             }
             final Sphere sphere = new Sphere(radius);
-            Material material = new PhongMaterial();
+            Material material;
             // if in search, do highlighting
             if (inSearchMode) {
                 if (searchedCells[i]) {
@@ -1585,9 +1585,9 @@ public class Window3DController {
                     material = colorHash.getTranslucentMaterial();
                 }
             } else {
-                List<Color> colors = new ArrayList<>();
+                final List<Color> colors = new ArrayList<>();
+                // consult active list of rules
                 for (Rule rule : currentRulesList) {
-                    // just need to consult rule's active list
                     if (rule.appliesToCellNucleus(cellNames[i])) {
                         colors.add(web(rule.getColor().toString()));
                     }

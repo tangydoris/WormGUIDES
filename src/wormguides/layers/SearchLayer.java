@@ -377,7 +377,7 @@ public class SearchLayer {
     }
 
     public Rule addColorRule(
-            final SearchType searchTykpe,
+            final SearchType searchType,
             String searched,
             final Color color,
             List<SearchOption> options) {
@@ -390,21 +390,21 @@ public class SearchLayer {
 
         searched = searched.trim().toLowerCase();
         final StringBuilder label = new StringBuilder();
-        if (searchTykpe != null) {
-            if (searchTykpe == LINEAGE) {
+        if (searchType != null) {
+            if (searchType == LINEAGE) {
                 label.append(getCaseSensitiveName(searched));
                 if (label.toString().isEmpty()) {
                     label.append(searched);
                 }
             } else {
-                label.append("'").append(searched).append("' ").append(searchTykpe.toString());
+                label.append("'").append(searched).append("' ").append(searchType.toString());
             }
         } else {
             label.append(searched);
         }
 
-        final Rule rule = new Rule(label.toString(), color, searchTykpe, options);
-        rule.setCells(getCellsList(searchTykpe, searched));
+        final Rule rule = new Rule(label.toString(), color, searchType, options);
+        rule.setCells(getCellsList(searchType, searched));
         rulesList.add(rule);
 
         searchResultsList.clear();
@@ -414,7 +414,6 @@ public class SearchLayer {
 
     private List<String> getCellsList(final SearchType type, final String searched) {
         List<String> cells = new ArrayList<>();
-
         if (type != null) {
             switch (type) {
                 case LINEAGE:

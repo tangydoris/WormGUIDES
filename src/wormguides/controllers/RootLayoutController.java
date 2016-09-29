@@ -756,12 +756,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         timeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int newTime = newValue.intValue();
-            if (window3DController != null) // removed newTime !=
-            // timeSlider.getValue() && -->
-            // to use arrow keys b/c arrows
-            // automatically update
-            // timeSlider.value
-            {
+            if (window3DController != null) {
                 window3DController.setTime(newTime);
             }
         });
@@ -966,7 +961,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private void initDisplayLayer() {
         useInternalRules = new SimpleBooleanProperty(true);
         displayLayer = new DisplayLayer(useInternalRules);
-
         rulesListView.setItems(displayLayer.getRulesList());
         rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
     }
@@ -1193,41 +1187,23 @@ public class RootLayoutController extends BorderPane implements Initializable {
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }
 
-//        Instant start = Instant.now();
         // takes about 58ms
         replaceTabsWithDraggableTabs();
-//        Instant end = Instant.now();
-//        System.out.println("replaceable tabs replace: " + Duration.between(start, end).toMillis() + "ms");
 
-//        start = Instant.now();
         // takes about 10ms
         initPartsList();
-//        end = Instant.now();
-//        System.out.println("parts list init: " + Duration.between(start, end).toMillis() + "ms");
 
-//        start = Instant.now();
         // takes about 6ms
         initCellDeaths();
-//        end = Instant.now();
-//        System.out.println("cell deaths init: " + Duration.between(start, end).toMillis() + "ms");
 
-//        start = Instant.now();
         // takes about 5ms
         initToggleGroup();
-//        end = Instant.now();
-//        System.out.println("toggle group init: " + Duration.between(start, end).toMillis() + "ms");
 
-//        start = Instant.now();
         // takes about 3ms
         initDisplayLayer();
-//        end = Instant.now();
-//        System.out.println("display layer init: " + Duration.between(start, end).toMillis() + "ms");
 
-//        start = Instant.now();
         // takes about 1050ms
         initializeWithLineageData();
-//        end = Instant.now();
-//        System.out.println("lineage data init: " + Duration.between(start, end).toMillis() + "ms");
 
         mainTabPane.getSelectionModel().select(storiesTab);
     }
@@ -1271,9 +1247,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
         viewTreeAction();
 
         captureVideo = new SimpleBooleanProperty(false);
-        if (window3DController != null) {
-            window3DController.setCaptureVideo(captureVideo);
-        }
+        window3DController.setCaptureVideo(captureVideo);
 
+        window3DController.setTime(15);
     }
 }

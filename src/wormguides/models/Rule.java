@@ -6,9 +6,7 @@ package wormguides.models;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,17 +17,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import search.SearchType;
@@ -39,12 +34,21 @@ import wormguides.layers.SearchLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.util.AppFont;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
+import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
+import static javafx.scene.layout.HBox.setHgrow;
+import static javafx.scene.layout.Priority.ALWAYS;
+import static javafx.stage.Modality.NONE;
+
 import static wormguides.models.LineageTree.isAncestor;
 import static wormguides.models.LineageTree.isDescendant;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
 import static wormguides.models.SearchOption.CELL_NUCLEUS;
 import static wormguides.models.SearchOption.DESCENDANT;
+import static wormguides.models.SearchOption.MULTICELLULAR_NAME_BASED;
 
 /**
  * This class is the color rule that determines the coloring/striping of cell, cell bodies, and multicellular
@@ -102,7 +106,7 @@ public class Rule {
      *         options that the rule should be extended to
      */
     public Rule(String searched, Color color, SearchType type, SearchOption... options) {
-        this(searched, color, type, new ArrayList<>(Arrays.asList(options)));
+        this(searched, color, type, new ArrayList<>(asList(options)));
     }
 
     /**
@@ -154,8 +158,8 @@ public class Rule {
         label.textOverrunProperty().set(OverrunStyle.ELLIPSIS);
         label.setFont(AppFont.getFont());
 
-        Region r = new Region();
-        HBox.setHgrow(r, Priority.ALWAYS);
+        final Region r = new Region();
+        setHgrow(r, ALWAYS);
 
         colorRectangle.setHeight(UI_SIDE_LENGTH);
         colorRectangle.setWidth(UI_SIDE_LENGTH);
@@ -165,7 +169,7 @@ public class Rule {
         editBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         editBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         editBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        editBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        editBtn.setContentDisplay(GRAPHIC_ONLY);
         editBtn.setPadding(Insets.EMPTY);
         editBtn.setGraphic(ImageLoader.getEditIcon());
         editBtn.setGraphicTextGap(0);
@@ -178,7 +182,7 @@ public class Rule {
         visibleBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         visibleBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         visibleBtn.setPadding(Insets.EMPTY);
-        visibleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        visibleBtn.setContentDisplay(GRAPHIC_ONLY);
         visibleBtn.setGraphic(eyeIcon);
         visibleBtn.setGraphicTextGap(0);
         visibleBtn.setOnAction(event -> {
@@ -196,7 +200,7 @@ public class Rule {
         deleteBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         deleteBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         deleteBtn.setPadding(Insets.EMPTY);
-        deleteBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        deleteBtn.setContentDisplay(GRAPHIC_ONLY);
         deleteBtn.setGraphic(ImageLoader.getCloseIcon());
 
         toolTip.setText(toStringFull());
@@ -259,7 +263,7 @@ public class Rule {
             if (stage != null) {
                 editStage.initOwner(stage);
             }
-            editStage.initModality(Modality.NONE);
+            editStage.initModality(NONE);
 
             editController.setHeading(text);
             editController.setSubmitHandler(handler);
@@ -290,7 +294,7 @@ public class Rule {
      * otherwise.
      */
     public boolean isMulticellularStructureRule() {
-        return options.contains(SearchOption.MULTICELLULAR_NAME_BASED);
+        return options.contains(MULTICELLULAR_NAME_BASED);
     }
 
     /**
@@ -344,7 +348,7 @@ public class Rule {
     }
 
     public void setOptions(SearchOption... options) {
-        setOptions(new ArrayList<>(Arrays.asList(options)));
+        setOptions(new ArrayList<>(asList(options)));
     }
 
     public String getSearchedText() {
@@ -414,16 +418,11 @@ public class Rule {
 
     public void setOptions(List<SearchOption> options) {
         this.options = new ArrayList<>();
-        this.options.addAll(options.stream().filter(option -> option != null).collect(Collectors.toList()));
+        this.options.addAll(options.stream().filter(option -> option != null).collect(toList()));
     }
 
     public BooleanProperty getRuleChangedProperty() {
         return ruleChanged;
-    }
-
-    @Override
-    public String toString() {
-        return toStringFull();
     }
 
     /**
@@ -436,14 +435,18 @@ public class Rule {
         return text.equalsIgnoreCase(other.getSearchedText());
     }
 
+    @Override
+    public String toString() {
+        return toStringFull();
+    }
+
     /**
      * @return full description of the rule used in the tooltip and the label in the heading of the rule editor popup.
      * The return string contains the rule's name and options.
      */
     public String toStringFull() {
-        StringBuilder sb = new StringBuilder(text);
+        final StringBuilder sb = new StringBuilder(text);
         sb.append(" ");
-
         if (!options.isEmpty()) {
             sb.append("(");
             for (int i = 0; i < options.size(); i++) {
@@ -454,7 +457,6 @@ public class Rule {
             }
             sb.append(")");
         }
-
         return sb.toString();
     }
 
@@ -468,19 +470,16 @@ public class Rule {
         if (!visible) {
             return false;
         }
-
         name = name.trim();
-        if (cells != null) {
-            if (options.contains(CELL_NUCLEUS) && cells.contains(name)) {
+        if (options.contains(CELL_NUCLEUS) && cells.contains(name)) {
+            return true;
+        }
+        for (String cell : cells) {
+            if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
                 return true;
             }
-            for (String cell : cells) {
-                if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
-                    return true;
-                }
-                if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
-                    return true;
-                }
+            if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
+                return true;
             }
         }
         return false;
@@ -495,7 +494,7 @@ public class Rule {
      */
     public boolean appliesToMulticellularStructure(String name) {
         return visible
-                && options.contains(SearchOption.MULTICELLULAR_NAME_BASED)
+                && options.contains(MULTICELLULAR_NAME_BASED)
                 && text.equalsIgnoreCase(name);
 
     }
@@ -510,31 +509,26 @@ public class Rule {
         if (!visible) {
             return false;
         }
-
-        if (cells != null) {
-            if (options.contains(CELL_BODY) && cells.contains(name)) {
+        if (options.contains(CELL_BODY) && cells.contains(name)) {
+            return true;
+        }
+        for (String cell : cells) {
+            if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
                 return true;
             }
-
-            for (String cell : cells) {
-                if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
-                    return true;
-                }
-
-                if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
-                    return true;
-                }
+            if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
+                return true;
             }
         }
         return false;
     }
 
     /**
-     * Retrieves the {@link SearchType} of the rule. If the rule has the option {@link
+     * Retrieves the search type of the rule. If the rule has the option {@link
      * SearchOption#MULTICELLULAR_NAME_BASED}, the return value is null and the rule is a rule specific to
      * multicellular structures (meaning the rule is defined by its name instead of by its cells).
      *
-     * @return search type of the rule
+     * @return the search type of the rule
      */
     public SearchType getSearchType() {
         return searchType;
@@ -548,13 +542,12 @@ public class Rule {
     }
 
     /**
-     * Sets the ruleChanged {@link BooleanProperty} to the value defined by the
-     * input parameter.
+     * Sets 'ruleChanged' to the input value
      *
      * @param changed
-     *         boolean stating whether the rule was changed
+     *         true if rule was modified, false otherwise.
      */
-    public void setChanged(boolean changed) {
+    public void setChanged(final boolean changed) {
         ruleChanged.set(changed);
     }
 
@@ -570,7 +563,7 @@ public class Rule {
 
                 // because the multicellular name based rule is not a check option, we need to override this function
                 // to avoid overwriting the multicellular search option
-                if (!options.contains(SearchOption.MULTICELLULAR_NAME_BASED)) {
+                if (!options.contains(MULTICELLULAR_NAME_BASED)) {
                     setOptions(editController.getOptions());
                 }
 

@@ -87,11 +87,24 @@ public class SearchUtil {
      */
     public static List<String> getCellsWithLineageName(String searched) {
         final List<String> cells = new ArrayList<>();
-        searched = searched.toLowerCase();
-        for (String name : activeLineageNames) {
-            if (name.equalsIgnoreCase(searched)) {
-                cells.add(name);
-                break;
+        searched = searched.trim();
+
+        final String ab = "AB";
+        final String p0 = "P0";
+
+        if (searched.equalsIgnoreCase(ab)) {
+            cells.add(ab);
+
+        } else if (searched.equalsIgnoreCase(p0)) {
+            cells.add(p0);
+
+        } else {
+            searched = searched.toLowerCase();
+            for (String name : activeLineageNames) {
+                if (name.equalsIgnoreCase(searched)) {
+                    cells.add(name);
+                    break;
+                }
             }
         }
         return cells;

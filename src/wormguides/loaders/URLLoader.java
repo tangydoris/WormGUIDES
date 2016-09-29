@@ -16,6 +16,9 @@ import wormguides.layers.SearchLayer;
 import wormguides.models.Rule;
 import wormguides.models.SearchOption;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+
 import static javafx.scene.paint.Color.web;
 
 import static search.SearchType.CONNECTOME;
@@ -267,9 +270,9 @@ public class URLLoader {
                 final String[] tokens = arg.split(",");
 
                 try {
-                    double rx = Double.parseDouble(tokens[0].split("=")[1]);
-                    double ry = Double.parseDouble(tokens[1].split("=")[1]);
-                    double rz = Double.parseDouble(tokens[2].split("=")[1]);
+                    double rx = parseDouble(tokens[0].split("=")[1]);
+                    double ry = parseDouble(tokens[1].split("=")[1]);
+                    double rz = parseDouble(tokens[2].split("=")[1]);
                     window3DController.setRotations(rx, ry, rz);
                 } catch (NumberFormatException nfe) {
                     System.out.println("error in parsing time variable");
@@ -283,7 +286,7 @@ public class URLLoader {
                 switch (tokens[0]) {
                     case "time":
                         try {
-                            window3DController.setTime(Integer.parseInt(tokens[1]));
+                            window3DController.setTime(parseInt(tokens[1]));
                         } catch (NumberFormatException nfe) {
                             System.out.println("error in parsing time variable");
                             nfe.printStackTrace();
@@ -292,7 +295,7 @@ public class URLLoader {
 
                     case "tX":
                         try {
-                            window3DController.setTranslationX(Double.parseDouble(tokens[1]));
+                            window3DController.setTranslationX(parseDouble(tokens[1]));
                         } catch (NumberFormatException nfe) {
                             System.out.println("error in parsing translation variable");
                             nfe.printStackTrace();
@@ -301,7 +304,7 @@ public class URLLoader {
 
                     case "tY":
                         try {
-                            window3DController.setTranslationY(Double.parseDouble(tokens[1]));
+                            window3DController.setTranslationY(parseDouble(tokens[1]));
                         } catch (NumberFormatException nfe) {
                             System.out.println("error in parsing translation variable");
                             nfe.printStackTrace();
@@ -311,9 +314,9 @@ public class URLLoader {
                     case "scale":
                         try {
                             if (useInternalScaleFactor) {
-                                window3DController.setScaleInternal(Double.parseDouble(tokens[1]));
+                                window3DController.setScaleInternal(parseDouble(tokens[1]));
                             } else {
-                                window3DController.setScale(Double.parseDouble(tokens[1]));
+                                window3DController.setScale(parseDouble(tokens[1]));
                             }
                         } catch (NumberFormatException nfe) {
                             System.out.println("error in parsing scale variable");
@@ -323,7 +326,7 @@ public class URLLoader {
 
                     case "dim":
                         try {
-                            window3DController.setOthersVisibility(Double.parseDouble(tokens[1]));
+                            window3DController.setOthersVisibility(parseDouble(tokens[1]));
                         } catch (NumberFormatException nfe) {
                             System.out.println("error in parsing dim variable");
                             nfe.printStackTrace();
