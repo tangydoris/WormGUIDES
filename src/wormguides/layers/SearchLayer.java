@@ -27,7 +27,6 @@ import javafx.scene.paint.Color;
 
 import acetree.LineageData;
 import connectome.Connectome;
-import partslist.PartsList;
 import search.SearchType;
 import search.SearchUtil;
 import search.WormBaseQuery;
@@ -45,10 +44,14 @@ import static java.util.Objects.requireNonNull;
 
 import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.paint.Color.DARKSEAGREEN;
+import static javafx.scene.paint.Color.web;
 
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static partslist.PartsList.getLineageNameByFunctionalName;
+import static partslist.PartsList.isLineageName;
 import static search.SearchType.CONNECTOME;
+import static search.SearchType.FUNCTIONAL;
 import static search.SearchType.GENE;
 import static search.SearchType.LINEAGE;
 import static search.SearchUtil.getAncestorsList;
@@ -334,29 +337,29 @@ public class SearchLayer {
     }
 
     public void addDefaultColorRules() {
-        addColorRule(SearchType.FUNCTIONAL, "ash", Color.DARKSEAGREEN, CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "rib", Color.web("0x663366"), CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "avg", Color.web("0xb41919"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "ash", DARKSEAGREEN, CELL_BODY);
+        addColorRule(FUNCTIONAL, "rib", web("0x663366"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "avg", web("0xb41919"), CELL_BODY);
 
-        addColorRule(SearchType.FUNCTIONAL, "dd", Color.web("0x4a24c1", 0.60), CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "da", Color.web("0xc56002"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "dd", web("0x4a24c1", 0.60), CELL_BODY);
+        addColorRule(FUNCTIONAL, "da", web("0xc56002"), CELL_BODY);
 
-        addColorRule(SearchType.FUNCTIONAL, "rivl", Color.web("0xff9966"), CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "rivr", Color.web("0xffe6b4"), CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "sibd", Color.web("0xe6ccff"), CELL_BODY);
-        addColorRule(SearchType.FUNCTIONAL, "siav", Color.web("0x99b3ff"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "rivl", web("0xff9966"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "rivr", web("0xffe6b4"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "sibd", web("0xe6ccff"), CELL_BODY);
+        addColorRule(FUNCTIONAL, "siav", web("0x99b3ff"), CELL_BODY);
 
-        addColorRule(SearchType.FUNCTIONAL, "dd1", Color.web("0xb30a95"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "dd2", Color.web("0xb30a95"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "dd3", Color.web("0xb30a95"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "dd4", Color.web("0xb30a95"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "dd5", Color.web("0xb30a95"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "dd6", Color.web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd1", web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd2", web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd3", web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd4", web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd5", web("0xb30a95"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "dd6", web("0xb30a95"), CELL_NUCLEUS);
 
-        addColorRule(SearchType.FUNCTIONAL, "da2", Color.web("0xe6b34d"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "da3", Color.web("0xe6b34d"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "da4", Color.web("0xe6b34d"), CELL_NUCLEUS);
-        addColorRule(SearchType.FUNCTIONAL, "da5", Color.web("0xe6b34d"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "da2", web("0xe6b34d"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "da3", web("0xe6b34d"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "da4", web("0xe6b34d"), CELL_NUCLEUS);
+        addColorRule(FUNCTIONAL, "da5", web("0xe6b34d"), CELL_NUCLEUS);
     }
 
     public ObservableList<Rule> getRules() {
@@ -372,8 +375,7 @@ public class SearchLayer {
             String searched,
             final Color color,
             final SearchOption... options) {
-        final List<SearchOption> optionsArray = new ArrayList<>(asList(options));
-        return addColorRule(type, searched, color, optionsArray);
+        return addColorRule(type, searched, color, new ArrayList<>(asList(options)));
     }
 
     public Rule addColorRule(
@@ -639,7 +641,7 @@ public class SearchLayer {
                 protected Void call() throws Exception {
                     String searched = getSearchString();
                     // update to lineage name if function
-                    String lineage = getLineageNameByFunctionalName(searched);
+                    final String lineage = getLineageNameByFunctionalName(searched);
                     if (lineage != null) {
                         searched = lineage;
                     }
@@ -650,7 +652,7 @@ public class SearchLayer {
                             return null; // error check
                         }
 
-                        if (PartsList.isLineageName(searched)) {
+                        if (isLineageName(searched)) {
                             if (casesLists.containsCellCase(searched)) {
                                 // show the tab
                             } else {

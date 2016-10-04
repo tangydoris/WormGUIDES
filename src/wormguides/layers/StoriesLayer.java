@@ -19,8 +19,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -131,6 +129,7 @@ public class StoriesLayer {
             final int movieTimeOffset,
             final Button newStoryButton,
             final Button deleteStoryButton,
+            final Button editNoteButton,
             final boolean defaultEmbryoFlag) {
 
         this.parentStage = requireNonNull(parentStage);
@@ -151,6 +150,8 @@ public class StoriesLayer {
                 setActiveNote(null);
             }
         });
+
+        editNoteButton.setOnAction(event -> bringUpEditor());
 
         this.window3DController = sceneController;
         this.useInternalRules = useInternalRulesFlag;
@@ -644,13 +645,6 @@ public class StoriesLayer {
             // subtract off list view border and/or padding
             width = observable.getValue().doubleValue() - 2;
         };
-    }
-
-    /**
-     * @return click handler for the 'Edit Story' button in the 'Stories' tab
-     */
-    public EventHandler<ActionEvent> getEditButtonListener() {
-        return event -> bringUpEditor();
     }
 
     /**

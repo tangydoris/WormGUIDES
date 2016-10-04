@@ -15,9 +15,8 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -27,7 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
-import wormguides.models.Rule;
 import wormguides.models.SceneElementsList;
 import wormguides.util.AppFont;
 
@@ -59,7 +57,11 @@ public class StructuresLayer {
     public StructuresLayer(
             final SearchLayer searchLayer,
             final SceneElementsList sceneElementsList,
-            final TextField searchField) {
+            final TextField searchField,
+            final ListView<String> structureSearchListView,
+            final ListView<String> allStructuresListView,
+            final Button addStructureRuleButton,
+            final ColorPicker colorPicker) {
 
         this.searchLayer = requireNonNull(searchLayer);
 
@@ -73,7 +75,7 @@ public class StructuresLayer {
 
         allStructuresList.addListener(new ListChangeListener<String>() {
             @Override
-            public void onChanged(ListChangeListener.Change<? extends String> change) {
+            public void onChanged(Change<? extends String> change) {
                 while (change.next()) {
                     if (!change.wasUpdated()) {
                         for (String string : change.getAddedSubList()) {
@@ -91,10 +93,26 @@ public class StructuresLayer {
         nameToCommentsMap = sceneElementsList.getNameToCommentsMap();
 
         setSearchField(requireNonNull(searchField));
-    }
 
-    public ObservableList<String> getAllStructuresList() {
-        return allStructuresList;
+        requireNonNull(structureSearchListView).setItems(searchResultsList);
+        requireNonNull(allStructuresListView).setItems(allStructuresList);
+
+        requireNonNull(addStructureRuleButton).setOnAction(event -> {
+            final String name = selectedNameProperty.get();
+            if (!name.isEmpty()) {
+                addStructureRule(name, selectedColor);
+                deselectAllStructures();
+            }
+            // if no name is selected, add all results from search
+            else {
+                for (String string : searchResultsList) {
+                    addStructureRule(string, selectedColor);
+                }
+                searchField.clear();
+            }
+        });
+
+        requireNonNull(colorPicker).setOnAction(event -> selectedColor = ((ColorPicker) event.getSource()).getValue());
     }
 
     public void setSelectedStructure(String structure) {
@@ -136,25 +154,6 @@ public class StructuresLayer {
         }
     }
 
-    public EventHandler<ActionEvent> getAddStructureRuleButtonListener() {
-        return event -> {
-            String name = selectedNameProperty.get();
-
-            if (!name.isEmpty()) {
-                addStructureRule(name, selectedColor);
-                deselectAllStructures();
-            }
-
-            // if no name is selected, add all results from search
-            else {
-                for (String string : searchResultsList) {
-                    addStructureRule(string, selectedColor);
-                }
-                searchField.clear();
-            }
-        };
-    }
-
     public void addStructureRule(String name, Color color) {
         if (name == null || color == null) {
             return;
@@ -165,10 +164,6 @@ public class StructuresLayer {
         if (allStructuresList.contains(name)) {
             searchLayer.addMulticellularStructureRule(name, color);
         }
-    }
-
-    public EventHandler<ActionEvent> getColorPickerListener() {
-        return event -> selectedColor = ((ColorPicker) event.getSource()).getValue();
     }
 
     // Only searches names for now
@@ -237,33 +232,12 @@ public class StructuresLayer {
         }
     }
 
-    // search in cells
-    // for (SceneElement se : sceneElementsList.elementsList) {
-    // if (se.getSceneName().toLowerCase().equals(nameLower)) {
-    // for (String cell : se.getAllCellNames()) {
-    // if (cell.toLowerCase().contains(searched.toLowerCase())) {
-    // appliesToCell = true;
-    // }
-    // }
-    // }
-    // }
-
     public StringProperty getSelectedNameProperty() {
         return selectedNameProperty;
     }
 
-    // Called by RootLayourController to set reference to global rules list
-    public void setRulesList(ObservableList<Rule> list) {
-        if (list != null) {
-        }
-    }
-
     public String getSearchText() {
         return searchText;
-    }
-
-    public ObservableList<String> getStructuresSearchResultsList() {
-        return searchResultsList;
     }
 
     public void addSelectedNameListener(ChangeListener<String> listener) {

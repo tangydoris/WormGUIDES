@@ -46,6 +46,9 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.SubScene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
@@ -92,6 +95,7 @@ import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
 
 import static java.lang.Math.pow;
+import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
 import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
@@ -113,6 +117,7 @@ import static javafx.scene.input.MouseEvent.MOUSE_ENTERED_TARGET;
 import static javafx.scene.input.MouseEvent.MOUSE_MOVED;
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
+import static javafx.scene.paint.Color.RED;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.paint.Color.web;
 import static javafx.scene.text.FontSmoothingType.LCD;
@@ -321,9 +326,9 @@ public class Window3DController {
     private Quaternion quaternion;
 
     // scales of the subscene coordinate axis --> from ProductionInfo.csv
-    private double X_SCALE;
-    private double Y_SCALE;
-    private double Z_SCALE;
+    private double xScale;
+    private double yScale;
+    private double zScale;
 
     /**
      * Class constructor
@@ -357,9 +362,21 @@ public class Window3DController {
             final int offsetY,
             final int offsetZ,
             final boolean defaultEmbryoFlag,
-            final double X_SCALE,
-            final double Y_SCALE,
-            final double Z_SCALE) {
+            final double xScale,
+            final double yScale,
+            final double zScale,
+            final AnchorPane modelAnchorPane,
+            final Button backwardButton,
+            final Button forwardButton,
+            final Button zoomOutButton,
+            final Button zoomInButton,
+            final Button clearAllLabelsButton,
+            final TextField searchField,
+            final Slider opacitySlider,
+            final CheckBox uniformSizeCheckBox,
+            final CheckBox cellNucleusCheckBox,
+            final CheckBox cellBodyCheckBox,
+            final RadioButton multiRadioBtn) {
 
         this.parentStage = requireNonNull(parentStage);
 
@@ -566,7 +583,7 @@ public class Window3DController {
         double radius = 5.0;
         double height = 15.0;
         PhongMaterial material = new PhongMaterial();
-        material.setDiffuseColor(Color.RED);
+        material.setDiffuseColor(RED);
         orientationIndicator = new Cylinder(radius, height);
         orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
         orientationIndicator.setMaterial(material);
@@ -579,15 +596,42 @@ public class Window3DController {
 
         // set up the scaling values
         //to convert from microns to pixel values, we set x,y = 1 and z = ratio of z to original y
-        // note that X_SCALE and Y_SCALE are not the same
-        if (X_SCALE != Y_SCALE) {
-            System.err.println("X_SCALE does not equal Y_SCALE - using ratio of Z to X for Z_SCALE value in pixels"
-                    + "\n"
+        // note that xScale and yScale are not the same
+        if (xScale != yScale) {
+            System.err.println("xScale does not equal yScale - using ratio of Z to X for zScale value in pixels\n"
                     + "X, Y should be the same value");
         }
-        this.X_SCALE = 1;
-        this.Y_SCALE = 1;
-        this.Z_SCALE = Z_SCALE / X_SCALE;
+        this.xScale = 1;
+        this.yScale = 1;
+        this.zScale = zScale / xScale;
+
+        setSearchField(requireNonNull(searchField));
+
+        requireNonNull(modelAnchorPane).setOnMouseClicked(getNoteClickHandler());
+
+        requireNonNull(backwardButton).setOnAction(getBackwardButtonListener());
+        requireNonNull(forwardButton).setOnAction(getForwardButtonListener());
+        requireNonNull(zoomOutButton).setOnAction(getZoomOutButtonListener());
+        requireNonNull(zoomInButton).setOnAction(getZoomInButtonListener());
+
+        // slider has to listen to 3D window's opacity value 3d window's opacity value has to listen to opacity
+        // slider's value
+        requireNonNull(opacitySlider).valueProperty().addListener((arg0, arg1, arg2) -> {
+            final Double arg = arg0.getValue().doubleValue();
+            if (arg >= 0 && arg <= 1.0) {
+                opacitySlider.setValue(arg * 100.0);
+            }
+            othersOpacity.set(round(arg) / 100.0);
+            buildScene();
+        });
+
+        requireNonNull(uniformSizeCheckBox).selectedProperty().addListener(getUniformSizeCheckBoxListener());
+        requireNonNull(clearAllLabelsButton).setOnAction(getClearAllLabelsButtonListener());
+
+        requireNonNull(cellNucleusCheckBox).selectedProperty().addListener(getCellNucleusTickListener());
+        requireNonNull(cellBodyCheckBox).selectedProperty().addListener(getCellBodyTickListener());
+
+        requireNonNull(multiRadioBtn).selectedProperty().addListener(getMulticellModeListener());
     }
 
     public void setSearchLayer(final SearchLayer searchLayer) {
@@ -1302,7 +1346,7 @@ public class Window3DController {
 
                     if (mesh != null) {
                         mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                        mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+                        mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * zScale));
 
                         // add rendered mesh to meshes list
                         currentSceneElementMeshes.add(mesh);
@@ -1371,7 +1415,7 @@ public class Window3DController {
                             if (mesh != null) {
                                 mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
                                 mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                                mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * Z_SCALE));
+                                mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * zScale));
                                 currentNoteMeshMap.put(note, mesh);
                             }
                         }
@@ -1505,8 +1549,8 @@ public class Window3DController {
             // Consult rules
             if (!currentSceneElements.isEmpty()) {
                 for (int i = 0; i < currentSceneElements.size(); i++) {
-                    SceneElement se = currentSceneElements.get(i);
-                    MeshView mesh = currentSceneElementMeshes.get(i);
+                    final SceneElement se = currentSceneElements.get(i);
+                    final MeshView mesh = currentSceneElementMeshes.get(i);
 
                     if (inSearchMode) {
                         if (cellBodyTicked && searchedMeshes[i]) {
@@ -1528,7 +1572,7 @@ public class Window3DController {
                         // If mesh has with name(s), then process rules (cell or
                         // shape) that apply to it
                         else {
-                            List<Color> colors = new ArrayList<>();
+                            final List<Color> colors = new ArrayList<>();
                             for (Rule rule : currentRulesList) {
                                 if (rule.isMulticellularStructureRule()
                                         && rule.appliesToMulticellularStructure(sceneName)) {
@@ -1605,8 +1649,8 @@ public class Window3DController {
             sphere.setMaterial(material);
 
             sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-            sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * X_SCALE,
-                    positions[i][Y_COR_INDEX] * Y_SCALE, positions[i][Z_COR_INDEX] * Z_SCALE));
+            sphere.getTransforms().add(new Translate(positions[i][X_COR_INDEX] * xScale,
+                    positions[i][Y_COR_INDEX] * yScale, positions[i][Z_COR_INDEX] * zScale));
 
             spheres[i] = sphere;
 
@@ -1929,7 +1973,7 @@ public class Window3DController {
     private Sphere createLocationMarker(double x, double y, double z) {
         Sphere sphere = new Sphere(1);
         sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-        sphere.getTransforms().add(new Translate(x * X_SCALE, y * Y_SCALE, z * Z_SCALE));
+        sphere.getTransforms().add(new Translate(x * xScale, y * yScale, z * zScale));
         // make marker transparent
         sphere.setMaterial(colorHash.getOthersMaterial(0));
         return sphere;
@@ -2469,36 +2513,16 @@ public class Window3DController {
         return root;
     }
 
-    public ChangeListener<Number> getOthersOpacityListener() {
-        return (observable, oldValue, newValue) -> {
-            othersOpacity.set(Math.round(newValue.doubleValue()) / 100d);
-            buildScene();
-        };
-    }
-
-    public void addListenerToOpacitySlider(Slider slider) {
-        othersOpacity.addListener((arg0, arg1, arg2) -> {
-            Double arg = arg0.getValue().doubleValue();
-            if (arg >= 0 && arg <= 1.0) {
-                slider.setValue(arg * 100.0);
-            }
-        });
-    }
-
-    public ChangeListener<String> getSearchFieldListener() {
-        return (observable, oldValue, newValue) -> {
+    private void setSearchField(final TextField searchField) {
+        this.searchField = searchField;
+        this.searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
                 inSearchMode = false;
                 buildScene();
             } else {
                 inSearchMode = true;
             }
-        };
-    }
-
-    public void setSearchField(TextField field) {
-        searchField = field;
-        searchField.textProperty().addListener(getSearchFieldListener());
+        });
     }
 
     public int getEndTime() {
@@ -2509,10 +2533,9 @@ public class Window3DController {
         return startTime;
     }
 
-    public EventHandler<ActionEvent> getZoomInButtonListener() {
+    private EventHandler<ActionEvent> getZoomInButtonListener() {
         return event -> {
             hideContextPopups();
-
             double z = zoom.get();
             /*
              * Workaround to avoid JavaFX bug --> stop zoom at 0
@@ -2530,12 +2553,11 @@ public class Window3DController {
             } else if (z < 0) {
                 z = 0;
             }
-
             zoom.set(z);
         };
     }
 
-    public EventHandler<ActionEvent> getZoomOutButtonListener() {
+    private EventHandler<ActionEvent> getZoomOutButtonListener() {
         return event -> {
             hideContextPopups();
 
@@ -2546,7 +2568,7 @@ public class Window3DController {
         };
     }
 
-    public EventHandler<ActionEvent> getBackwardButtonListener() {
+    private EventHandler<ActionEvent> getBackwardButtonListener() {
         return event -> {
             hideContextPopups();
             if (!playingMovie.get()) {
@@ -2555,7 +2577,7 @@ public class Window3DController {
         };
     }
 
-    public EventHandler<ActionEvent> getForwardButtonListener() {
+    private EventHandler<ActionEvent> getForwardButtonListener() {
         return event -> {
             hideContextPopups();
             if (!playingMovie.get()) {
@@ -2564,7 +2586,7 @@ public class Window3DController {
         };
     }
 
-    public EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
+    private EventHandler<ActionEvent> getClearAllLabelsButtonListener() {
         return event -> {
             allLabels.clear();
             currentLabels.clear();
@@ -2572,21 +2594,13 @@ public class Window3DController {
         };
     }
 
-    public EventHandler<ActionEvent> getUpdate3DListener() {
-        return event -> {
-
-        };
-    }
-
     /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'uniform nucleus' is
-     * ticked/unticked in the display tab. On change, the scene refreshes and
-     * cell bodies are highlighted/unhighlighted accordingly.
+     * Returns the listener for 'Uniform Nucleus' in the 'Display' tab when it is ticked/unticked in the display tab.
+     * On change, the scene refreshes and cell bodies are highlighted/unhighlighted accordingly.
      *
-     * @return The listener.
+     * @return the listener.
      */
-    public ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
+    private ChangeListener<Boolean> getUniformSizeCheckBoxListener() {
         return (observable, oldValue, newValue) -> {
             uniformSize = newValue;
             buildScene();
@@ -2594,14 +2608,13 @@ public class Window3DController {
     }
 
     /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'cell nucleus' is
-     * ticked/unticked in the search tab. On change, the scene refreshes and
-     * cell bodies are highlighted/unhighlighted accordingly.
+     * This method returns the {@link ChangeListener} that listens for the {@link BooleanProperty} that changes when
+     * 'cell nucleus' is ticked/unticked in the search tab. On change, the scene refreshes and cell bodies are
+     * highlighted/unhighlighted accordingly.
      *
      * @return The listener.
      */
-    public ChangeListener<Boolean> getCellNucleusTickListener() {
+    private ChangeListener<Boolean> getCellNucleusTickListener() {
         return (observable, oldValue, newValue) -> {
             cellNucleusTicked = newValue;
             buildScene();
@@ -2609,38 +2622,37 @@ public class Window3DController {
     }
 
     /**
-     * This method returns the {@link ChangeListener} that listens for the
-     * {@link BooleanProperty} that changes when 'cell body' is ticked/unticked
-     * in the search tab. On change, the scene refreshes and cell bodies are
+     * This method returns the {@link ChangeListener} that listens for the {@link BooleanProperty} that changes when
+     * 'cell body' is ticked/unticked in the search tab. On change, the scene refreshes and cell bodies are
      * highlighted/unhighlighted accordingly.
      *
      * @return The listener.
      */
-    public ChangeListener<Boolean> getCellBodyTickListener() {
+    private ChangeListener<Boolean> getCellBodyTickListener() {
         return (observable, oldValue, newValue) -> {
             cellBodyTicked = newValue;
             buildScene();
         };
     }
 
-    public ChangeListener<Boolean> getMulticellModeListener() {
+    private ChangeListener<Boolean> getMulticellModeListener() {
         return (observable, oldValue, newValue) -> {
         };
     }
 
     /**
-     * The getter for the {@link EventHandler} for the {@link MouseEvent} that
-     * is fired upon clicking on a note. The handler expands the note on click.
+     * The getter for the {@link EventHandler} for the {@link MouseEvent} that is fired upon clicking on a note. The
+     * handler expands the note on click.
      *
      * @return The event handler.
      */
-    public EventHandler<MouseEvent> getNoteClickHandler() {
+    private EventHandler<MouseEvent> getNoteClickHandler() {
         return event -> {
             if (event.isStillSincePress()) {
-                Node result = event.getPickResult().getIntersectedNode();
+                final Node result = event.getPickResult().getIntersectedNode();
                 if (result instanceof Text) {
-                    Text picked = (Text) result;
-                    Note note = currentGraphicNoteMap.get(picked);
+                    final Text picked = (Text) result;
+                    final Note note = currentGraphicNoteMap.get(picked);
                     if (note != null) {
                         note.setExpandedInScene(!note.isExpandedInScene());
                         if (note.isExpandedInScene()) {
@@ -2655,7 +2667,7 @@ public class Window3DController {
     }
 
     public Stage getStage() {
-        return this.parentStage;
+        return parentStage;
     }
 
     /**

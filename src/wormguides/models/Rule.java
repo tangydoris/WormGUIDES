@@ -492,7 +492,7 @@ public class Rule {
      * @return true if the rule is visible and it applies to multicellcular structure with specified name, false
      * otherwise
      */
-    public boolean appliesToMulticellularStructure(String name) {
+    public boolean appliesToMulticellularStructure(final String name) {
         return visible
                 && options.contains(MULTICELLULAR_NAME_BASED)
                 && text.equalsIgnoreCase(name);
@@ -505,21 +505,25 @@ public class Rule {
      *
      * @return true if the rule is visible and applies to cell body with specified name, false otherwise
      */
-    public boolean appliesToCellBody(String name) {
+    public boolean appliesToCellBody(final String name) {
         if (!visible) {
             return false;
         }
-        if (options.contains(CELL_BODY) && cells.contains(name)) {
-            return true;
-        }
-        for (String cell : cells) {
-            if (options.contains(ANCESTOR) && isAncestor(name, cell)) {
-                return true;
+
+        final boolean containsDescendantOption = options.contains(DESCENDANT);
+        final boolean containsCellNucleusOption = options.contains(CELL_NUCLEUS);
+        if (options.contains(CELL_BODY)) {
+            for (String cell : cells) {
+                if (containsCellNucleusOption && cell.equalsIgnoreCase(name)) {
+                    return true;
+                }
+                // no need to check the ancestor option since cell bodies only apply to terminal cells
+                if (containsDescendantOption && isDescendant(name, cell)) {
+                    return true;
+                }
             }
-            if (options.contains(DESCENDANT) && isDescendant(name, cell)) {
-                return true;
-            }
         }
+        
         return false;
     }
 

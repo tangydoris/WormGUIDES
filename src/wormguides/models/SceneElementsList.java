@@ -197,7 +197,7 @@ public class SceneElementsList {
     }
 
     public List<SceneElement> getSceneElementsAtTime(final int time) {
-        List<SceneElement> sceneElements = elementsList.stream()
+        final List<SceneElement> sceneElements = elementsList.stream()
                 .filter(se -> se.existsAtTime(time))
                 .collect(Collectors.toCollection(ArrayList::new));
         return sceneElements;
@@ -205,16 +205,15 @@ public class SceneElementsList {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("scene elements list:\n");
+        final StringBuilder sb = new StringBuilder("Scene elements list:\n");
         for (SceneElement se : elementsList) {
-            sb.append(se.getSceneName())
-                    .append("\n");
+            sb.append(se.getSceneName()).append("\n");
         }
         return sb.toString();
     }
 
     public List<String> getAllMulticellSceneNames() {
-        List<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
         elementsList.stream()
                 .filter(se -> se.isMulticellular() && !names.contains(se))
                 .forEachOrdered(se -> names.add(se.getSceneName()));
@@ -222,7 +221,7 @@ public class SceneElementsList {
     }
 
     public List<SceneElement> getMulticellSceneElements() {
-        List<SceneElement> elements = new ArrayList<>();
+        final List<SceneElement> elements = new ArrayList<>();
         elementsList.stream()
                 .filter(se -> se.isMulticellular() && !elements.contains(se))
                 .forEachOrdered(elements::add);
@@ -239,7 +238,7 @@ public class SceneElementsList {
         return false;
     }
 
-    public String getCommentByName(String name) {
+    public String getCommentByName(final String name) {
         final String comment = nameCommentsMap.get(name.trim().toLowerCase());
         if (comment == null) {
             return "";
