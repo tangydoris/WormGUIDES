@@ -24,7 +24,7 @@ import static partslist.PartsList.getFunctionalNames;
 import static partslist.PartsList.getLineageNameByFunctionalName;
 import static partslist.PartsList.getLineageNameByIndex;
 import static partslist.PartsList.getLineageNames;
-import static search.WormBaseQuery.doSearch;
+import static search.WormBaseQuery.issueWormBaseQuery;
 import static wormguides.models.LineageTree.isAncestor;
 import static wormguides.models.LineageTree.isDescendant;
 
@@ -36,9 +36,14 @@ import static wormguides.models.LineageTree.isDescendant;
  */
 public class SearchUtil {
 
+    /** Functional names taken from the {@link PartsList} */
+    private static final List<String> functionalNames;
+
+    /** Functional descriptions taken from the {@link PartsList} */
+    private static final List<String> functionalDescriptions;
+
+    /** Lineage names of cells that appear in the {@link LineageData} */
     private static List<String> activeLineageNames;
-    private static List<String> functionalNames;
-    private static List<String> functionalDescriptions;
 
     private static SceneElementsList sceneElementsList;
 
@@ -77,6 +82,8 @@ public class SearchUtil {
         SearchUtil.sceneElementsList = requireNonNull(sceneElementsList);
         SearchUtil.connectome = requireNonNull(connectome);
         SearchUtil.casesList = requireNonNull(casesList);
+
+        //WormBaseQuery.initTestDB();
     }
 
     /**
@@ -186,6 +193,20 @@ public class SearchUtil {
     }
 
     /**
+     * Calls the {@link WormBaseQuery} method to issue a web search to WormBase
+     *
+     * @param searched
+     *         the searched gene
+     *
+     * @return cells with the searched gene expression
+     *
+     * @see WormBaseQuery#issueWormBaseQuery(String)
+     */
+    public static List<String> getCellsWithGeneExpression(final String searched) {
+        return issueWormBaseQuery(searched);
+    }
+
+    /**
      * Tests if a structure was searched based on its scene name and comment
      *
      * @param structureName
@@ -275,25 +296,10 @@ public class SearchUtil {
     }
 
     /**
-     * @param searched
-     *         the search string containing the gene name
-     *
-     * @return lineage names of cells containing that gene
-     */
-    public static List<String> getCellsWithGene(final String searched) {
-        final List<String> cells = new ArrayList<>();
-        if (isGeneFormat(searched)) {
-            doSearch(searched);
-        }
-        sort(cells);
-        return cells;
-    }
-
-    /**
-     * Checks whether a name is a gene name with the format {SOME_STRING}-{SOME_NUMBER}.
+     * Checks whether a name is a gene name with the format SOME_STRING-SOME_NUMBER.
      *
      * @param name
-     *         the name checked
+     *         the name to check
      *
      * @return true if the name is a gene name, false otherwise
      */
@@ -301,7 +307,7 @@ public class SearchUtil {
         name = name.trim();
         final int hyphenIndex = name.indexOf("-");
         // check that there is a hyphen and there is a string preceeding it
-        return hyphenIndex > 1 && name.substring(hyphenIndex + 1).matches("\\d+");
+        return hyphenIndex > 1 && name.substring(hyphenIndex + 1).matches("^-?\\d+$");
     }
 
     /**

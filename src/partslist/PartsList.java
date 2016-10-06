@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import wormguides.view.infowindow.HTMLNode;
 import wormguides.view.infowindow.InfoWindowDOM;
@@ -19,20 +20,20 @@ import wormguides.view.infowindow.InfoWindowDOM;
  */
 public class PartsList {
 
-	private final static String resource = "/partslist/partslist.txt";
-    private static final ArrayList<String> functionalNames;
-    private static final ArrayList<String> lineageNames;
-    private static final ArrayList<String> descriptions;
+    private static final String RESOURCE = "/partslist/partslist.txt";
 
-    static {
-        functionalNames = new ArrayList<>();
-        lineageNames = new ArrayList<>();
-        descriptions = new ArrayList<>();
+    private static final List<String> functionalNames = new ArrayList<>();
+    private static final List<String> lineageNames = new ArrayList<>();
+    private static final List<String> descriptions = new ArrayList<>();
 
-        final URL url = PartsList.class.getResource(resource);
+    /**
+     * Initializes the lists of names according to the parts list file
+     */
+    public static void init() {
+        final URL url = PartsList.class.getResource(RESOURCE);
 
-        try (InputStreamReader isr = new InputStreamReader(url.openStream());
-             BufferedReader br = new BufferedReader(isr)) {
+        try (final InputStreamReader isr = new InputStreamReader(url.openStream());
+             final BufferedReader br = new BufferedReader(isr)) {
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -41,6 +42,7 @@ public class PartsList {
                 lineageNames.add(lineArray[1].trim());
                 descriptions.add(lineArray[2].trim());
             }
+
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

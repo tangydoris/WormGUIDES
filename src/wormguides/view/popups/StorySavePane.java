@@ -29,9 +29,9 @@ import static wormguides.util.AppFont.getFont;
  */
 public class StorySavePane extends AnchorPane {
 
-    private Button yesBtn;
-    private Button noBtn;
-    private Button cancelBtn;
+    private final Button yesBtn;
+    private final Button noBtn;
+    private final Button cancelBtn;
 
     private Text promptText;
 
@@ -39,7 +39,10 @@ public class StorySavePane extends AnchorPane {
             final String prompt,
             final String yesButtonText,
             final String noButtonText,
-            final String cancelButtonText) {
+            final String cancelButtonText,
+            final EventHandler<ActionEvent> yesHandler,
+            final EventHandler<ActionEvent> noHandler,
+            final EventHandler<ActionEvent> cancelHandler) {
 
         super();
 
@@ -66,18 +69,21 @@ public class StorySavePane extends AnchorPane {
         yesBtn.setFont(getFont());
         yesBtn.setPrefWidth(70);
         yesBtn.setMaxHeight(MAX_VALUE);
+        yesBtn.setOnAction(yesHandler);
 
         noBtn = new Button();
         noBtn.setText(noButtonText);
         noBtn.setFont(getFont());
         noBtn.setPrefWidth(70);
         noBtn.setMaxHeight(MAX_VALUE);
+        noBtn.setOnAction(noHandler);
 
         cancelBtn = new Button();
         cancelBtn.setText(cancelButtonText);
         cancelBtn.setFont(getFont());
         cancelBtn.setPrefWidth(70);
         cancelBtn.setMaxHeight(MAX_VALUE);
+        cancelBtn.setOnAction(cancelHandler);
 
         final Region r1 = new Region();
         sizeRegion(r1);
@@ -88,7 +94,7 @@ public class StorySavePane extends AnchorPane {
         final Region r4 = new Region();
         sizeRegion(r4);
 
-        HBox btnHBox = new HBox(10);
+        final HBox btnHBox = new HBox(10);
         btnHBox.getChildren().addAll(r1, yesBtn, r2, noBtn, r3, cancelBtn, r4);
         for (Node child : btnHBox.getChildrenUnmodifiable()) {
             child.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
@@ -97,23 +103,12 @@ public class StorySavePane extends AnchorPane {
         mainVBox.getChildren().add(btnHBox);
 
         mainVBox.setPadding(new Insets(10, 0, 10, 0));
+        mainVBox.setMinHeight(115.0);
 
         getChildren().add(mainVBox);
     }
 
     private void sizeRegion(final Region r) {
         setHgrow(r, ALWAYS);
-    }
-
-    public void setYesButtonAction(final EventHandler<ActionEvent> handler) {
-        yesBtn.setOnAction(handler);
-    }
-
-    public void setNoButtonAction(final EventHandler<ActionEvent> handler) {
-        noBtn.setOnAction(handler);
-    }
-
-    public void setCancelButtonAction(final EventHandler<ActionEvent> handler) {
-        cancelBtn.setOnAction(handler);
     }
 }

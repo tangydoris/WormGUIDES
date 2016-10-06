@@ -19,7 +19,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -40,7 +42,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -59,7 +60,7 @@ import javafx.stage.Stage;
 import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
-import search.SearchType;
+import partslist.celldeaths.CellDeaths;
 import search.SearchUtil;
 import wormguides.MainApp;
 import wormguides.layers.DisplayLayer;
@@ -68,7 +69,6 @@ import wormguides.layers.StoriesLayer;
 import wormguides.layers.StructuresLayer;
 import wormguides.loaders.ImageLoader;
 import wormguides.models.CasesLists;
-import wormguides.models.CellDeaths;
 import wormguides.models.LineageTree;
 import wormguides.models.ProductionInfo;
 import wormguides.models.Rule;
@@ -93,12 +93,6 @@ import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgYOffsetFr
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.getAvgZOffsetFromZero;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.loadNucFiles;
 import static acetree.tablelineagedata.AceTreeLineageTableLoader.setOriginToZero;
-import static search.SearchType.CONNECTOME;
-import static search.SearchType.DESCRIPTION;
-import static search.SearchType.FUNCTIONAL;
-import static search.SearchType.GENE;
-import static search.SearchType.LINEAGE;
-import static search.SearchType.MULTICELLULAR_CELL_BASED;
 import static wormguides.loaders.URLLoader.process;
 
 public class RootLayoutController extends BorderPane implements Initializable {
@@ -150,13 +144,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private HBox sceneControlsBox;
     // Subscene controls
     @FXML
-    private Button backwardButton, forwardButton, playButton;
+    private Button backwardButton,
+            forwardButton,
+            playButton;
     @FXML
-    private Label timeLabel, totalNucleiLabel;
+    private Label timeLabel,
+            totalNucleiLabel;
     @FXML
     private Slider timeSlider;
     @FXML
-    private Button zoomInButton, zoomOutButton;
+    private Button zoomInButton,
+            zoomOutButton;
     // Tab
     @FXML
     private TabPane mainTabPane;
@@ -180,10 +178,17 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @FXML
     private ListView<String> searchResultsListView;
     @FXML
-    private RadioButton sysRadioBtn, funRadioBtn, desRadioBtn, genRadioBtn, conRadioBtn, multiRadioBtn;
-    private ToggleGroup typeToggleGroup;
+    private RadioButton sysRadioBtn,
+            funRadioBtn,
+            desRadioBtn,
+            genRadioBtn,
+            conRadioBtn,
+            multiRadioBtn;
     @FXML
-    private CheckBox cellNucleusCheckBox, cellBodyCheckBox, ancestorCheckBox, descendantCheckBox;
+    private CheckBox cellNucleusCheckBox,
+            cellBodyCheckBox,
+            ancestorCheckBox,
+            descendantCheckBox;
     @FXML
     private Label descendantLabel;
     @FXML
@@ -196,7 +201,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
     // Connectome stuff
     private Connectome connectome;
     @FXML
-    private CheckBox presynapticCheckBox, postsynapticCheckBox, electricalCheckBox, neuromuscularCheckBox;
+    private CheckBox presynapticCheckBox,
+            postsynapticCheckBox,
+            electricalCheckBox,
+            neuromuscularCheckBox;
 
     // Cell selection
     private StringProperty selectedName;
@@ -641,28 +649,31 @@ public class RootLayoutController extends BorderPane implements Initializable {
     private void promptStorySave() {
         if (storiesLayer != null && storiesLayer.getActiveStory() != null) {
             if (exitSavePopup == null) {
-                final StorySavePane saveDialog = new StorySavePane(
-                        "Would you like to save the current active story before exiting WormGUIDES?",
-                        "Yes",
-                        "No",
-                        "Cancel");
-
-                exitSavePopup = new Popup();
-                exitSavePopup.getContent().add(saveDialog);
-
-                saveDialog.setYesButtonAction(event -> {
+                // create handlers for yes, no and cancel buttons
+                final EventHandler<ActionEvent> yesHandler = event -> {
                     exitSavePopup.hide();
                     storiesLayer.saveActiveStory();
                     exitApplication();
-                });
-
-                saveDialog.setNoButtonAction(event -> {
+                };
+                final EventHandler<ActionEvent> noHandler = event -> {
                     exitSavePopup.hide();
                     exitApplication();
-                });
+                };
+                final EventHandler<ActionEvent> cancelHandler = event -> exitSavePopup.hide();
 
-                saveDialog.setCancelButtonAction(event -> exitSavePopup.hide());
+                final StorySavePane storySaveDialog = new StorySavePane(
+                        "Would you like to save the current active story before exiting WormGUIDES?",
+                        "Yes",
+                        "No",
+                        "Cancel",
+                        yesHandler,
+                        noHandler,
+                        cancelHandler);
 
+                exitSavePopup = new Popup();
+                exitSavePopup.getContent().add(storySaveDialog);
+
+                // position dialog on screen
                 exitSavePopup.setAutoFix(true);
             }
 
@@ -681,7 +692,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         System.exit(0);
     }
 
-    public void init3DWindow(LineageData data) {
+    private void init3DWindow(final LineageData data, final ObservableList<Rule> rulesList) {
         if (cases == null) {
             initCases();
         }
@@ -727,6 +738,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         subscene = window3DController.getSubScene();
         setPropertiesFrom3DWindow();
+
+        window3DController.setRulesList(rulesList);
     }
 
     private void setPropertiesFrom3DWindow() {
@@ -737,7 +750,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         selectedName = window3DController.getSelectedName();
     }
 
-    public void setStage(Stage stage) {
+    public void setStage(final Stage stage) {
         mainStage = stage;
     }
 
@@ -850,7 +863,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             if (functionalName != null) {
                 displayedName.setText("Active Cell: " + name + " (" + functionalName + ")");
                 displayedDescription.setText(PartsList.getDescriptionByFunctionalName(functionalName));
-            } else if (CellDeaths.containsCell(name)) {
+            } else if (CellDeaths.isInCellDeaths(name)) {
                 displayedName.setText("Active Cell: " + name);
                 displayedDescription.setText("Cell Death");
             }
@@ -941,7 +954,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
         searchLayer = new SearchLayer(
                 rulesList,
                 searchField,
-                typeToggleGroup,
+                sysRadioBtn,
+                funRadioBtn,
+                desRadioBtn,
+                genRadioBtn,
+                conRadioBtn,
+                multiRadioBtn,
+                descendantLabel,
                 presynapticCheckBox,
                 postsynapticCheckBox,
                 neuromuscularCheckBox,
@@ -963,14 +982,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
         rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
     }
 
-    private void initPartsList() {
-        new PartsList();
-    }
-
-    private void initCellDeaths() {
-        new CellDeaths();
-    }
-
     private void initLineageTree(List<String> allCellNames) {
         if (!defaultEmbryoFlag) {
             // remove unlineaged cells
@@ -989,35 +1000,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 allCellNames.toArray(new String[allCellNames.size()]),
                 lineageData.isSulstonMode());
         lineageTreeRoot = lineageTree.getRoot();
-    }
-
-    private void initToggleGroup() {
-        typeToggleGroup = new ToggleGroup();
-        sysRadioBtn.setToggleGroup(typeToggleGroup);
-        sysRadioBtn.setUserData(LINEAGE);
-        funRadioBtn.setToggleGroup(typeToggleGroup);
-        funRadioBtn.setUserData(FUNCTIONAL);
-        desRadioBtn.setToggleGroup(typeToggleGroup);
-        desRadioBtn.setUserData(DESCRIPTION);
-        genRadioBtn.setToggleGroup(typeToggleGroup);
-        genRadioBtn.setUserData(GENE);
-        conRadioBtn.setToggleGroup(typeToggleGroup);
-        conRadioBtn.setUserData(CONNECTOME);
-        multiRadioBtn.setToggleGroup(typeToggleGroup);
-        multiRadioBtn.setUserData(MULTICELLULAR_CELL_BASED);
-
-        typeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            SearchType type = (SearchType) observable.getValue().getToggleGroup().getSelectedToggle().getUserData();
-            if (type == FUNCTIONAL || type == DESCRIPTION) {
-                descendantCheckBox.setSelected(false);
-                descendantCheckBox.disableProperty().set(true);
-                descendantLabel.disableProperty().set(true);
-            } else {
-                descendantCheckBox.disableProperty().set(false);
-                descendantLabel.disableProperty().set(false);
-            }
-        });
-        sysRadioBtn.setSelected(true);
     }
 
     private void initStructuresLayer(final ObservableList<Rule> rulesList) {
@@ -1189,13 +1171,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
         replaceTabsWithDraggableTabs();
 
         // takes about 10ms
-        initPartsList();
+        PartsList.init();
 
         // takes about 6ms
-        initCellDeaths();
-
-        // takes about 5ms
-        initToggleGroup();
+        CellDeaths.init();
 
         // takes about 3ms
         initDisplayLayer();
@@ -1209,13 +1188,13 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void initializeWithLineageData() {
         initLineageTree(lineageData.getAllCellNames());
 
-        init3DWindow(lineageData);
+        final ObservableList<Rule> rulesList = displayLayer.getRulesList();
+
+        init3DWindow(lineageData, rulesList);
 
         setSlidersProperties();
 
-        ObservableList<Rule> rulesList = displayLayer.getRulesList();
         initSearchLayer(rulesList);
-        window3DController.setRulesList(rulesList);
 
         initSceneElementsList();
         initConnectome();

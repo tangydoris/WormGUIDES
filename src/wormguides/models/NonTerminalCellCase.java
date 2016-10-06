@@ -9,8 +9,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import partslist.PartsList;
-import search.SearchUtil;
+import static partslist.PartsList.getDescriptionByLineageName;
+import static partslist.celldeaths.CellDeaths.isInCellDeaths;
+import static search.SearchUtil.getDescendantsList;
+import static wormguides.models.EmbryonicAnalogousCells.findEmbryonicHomology;
 
 /**
  * A non-terminal cell object which contains the information for the info window
@@ -41,7 +43,7 @@ public class NonTerminalCellCase extends CellCase {
         super(lineageName, nuclearProductionInfo, cellShapeProductionInfo);
 
         // reference embryonic analogues cells db for homology
-        this.embryonicHomology = EmbryonicAnalogousCells.findEmbryonicHomology(getLineageName());
+        this.embryonicHomology = findEmbryonicHomology(getLineageName());
 
         this.terminalDescendants = buildTerminalDescendants();
 
@@ -54,15 +56,15 @@ public class NonTerminalCellCase extends CellCase {
      * @return the list of terminal descendants
      */
     private List<TerminalDescendant> buildTerminalDescendants() {
-        List<TerminalDescendant> terminalDescendants = new ArrayList<>();
+        final List<TerminalDescendant> terminalDescendants = new ArrayList<>();
 
-        List<String> descendantsList = SearchUtil.getDescendantsList(getLineageName());
+        final List<String> descendantsList = getDescendantsList(getLineageName());
 
         // add each descendant as terminal descendant object
         for (String descendant : descendantsList) {
-            String partsListDescription = PartsList.getDescriptionByLineageName(descendant);
+            String partsListDescription = getDescriptionByLineageName(descendant);
             if (partsListDescription == null) {
-                if (CellDeaths.containsCell(descendant)) {
+                if (isInCellDeaths(descendant)) {
                     partsListDescription = "Cell Death";
                 } else {
                     partsListDescription = "";

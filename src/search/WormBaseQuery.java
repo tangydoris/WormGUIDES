@@ -9,130 +9,124 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
+import static java.util.Collections.sort;
+import static java.util.Objects.requireNonNull;
+import static java.util.regex.Pattern.compile;
 
+import static search.SearchUtil.isLineageName;
+
+/**
+ * Utility that queries the WormBase http://www.wormbase.org.
+ */
 public class WormBaseQuery {
 
-    private static Service<List<String>> searchService;
-    private static String searched;
-    private static HashMap<String, List<String>> resultsHash;
+    /** The WormBase URL */
+    private static final String WORMBASE_URL = "http://www.wormbase.org";
 
-    static {
-        searched = "";
+    /** Time to wait, in millis, for WormBase to respond */
+    private static final int CONNECTION_TIMEOUT_MILLIS = 15000;
 
-        searchService = new Service<List<String>>() {
-            @Override
-            protected final Task<List<String>> createTask() {
-                Task<List<String>> task = new Task<List<String>>() {
-                    @Override
-                    protected List<String> call() throws Exception {
-                        final String[] tokens = searched.trim().split(" ");
-                        if (tokens.length != 0) {
-                            searched = tokens[0];
-                        }
-                        final String searchText = searched.trim();
-                        searched = searchText;
+    /** The HTTP protocol issued to WormBase */
+    private static final String GET_PROTOCOL = "GET";
 
-                        // try to get result if previously searched
-                        if (resultsHash.containsKey(searched)) {
-                            return resultsHash.get(searched);
-                        }
+    /**
+     * Issues a query to WormBase with the searched gene
+     *
+     * @param searchedGene
+     *         the searched term, non null, non-empty, and in the gene format SOME_STRING-SOME_NUMBER
+     *
+     * @return cells with that gene
+     */
+    public static List<String> issueWormBaseQuery(String searchedGene) {
+        final List<String> results = new ArrayList<>();
 
-                        // do actual search if result was not cached
-                        final List<String> out = new ArrayList<>();
-
-                        final BufferedReader pageStream = openUrl(
-                                "http://www.wormbase.org/db/get?name=" + searchText + ";class=gene");
-                        if (pageStream != null) {
-                            String firstQueryLine = "";
-                            String restString = "";
-                            try {
-                                while ((firstQueryLine = pageStream.readLine()) != null && restString.isEmpty()) {
-                                    if (firstQueryLine.contains("wname=\"expression\"")) {
-                                        String[] restChunks = pageStream.readLine().split("\"");
-                                        restString = restChunks[1];
-                                    }
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            BufferedReader restPageStream = openUrl("http://www.wormbase.org" + restString);
-                            String wbGeneLine = "";
-                            try {
-                                while ((wbGeneLine = restPageStream.readLine()) != null) {
-                                    final Pattern p = Pattern
-                                            .compile("class=\"anatomy_term-link\"" + " title=\"\">(\\S+)</a>");
-                                    final Matcher m = p.matcher(wbGeneLine);
-                                    while (m.find()) {
-                                        final String name = m.group(1);
-                                        if (SearchUtil.isLineageName(name) && !out.contains(name)) {
-                                            out.add(name);
-                                        }
-                                    }
-                                }
-
-                                pageStream.close();
-                                restPageStream.close();
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        Collections.sort(out);
-                        resultsHash.put(searched, out);
-                        return out;
-                    }
-                };
-                return task;
+        if (!requireNonNull(searchedGene).isEmpty()) {
+            searchedGene = searchedGene.trim().toLowerCase();
+            // only process the first searched term
+            final String[] tokens = searchedGene.split(" ");
+            if (tokens.length != 0) {
+                searchedGene = tokens[0];
             }
-        };
 
-        resultsHash = new HashMap<>();
+            // do actual search if result was not cached
+            try (final BufferedReader pageStream = openUrl("/db/get?name=" + searchedGene + ";class=gene")) {
+                if (pageStream != null) {
+                    String restString = "";
+                    String firstQueryLine = "";
+                    while ((firstQueryLine = pageStream.readLine()) != null && restString.isEmpty()) {
+                        if (firstQueryLine.contains("wname=\"expression\"")) {
+                            final String[] restChunks = pageStream.readLine().split("\"");
+                            restString = restChunks[1];
+                        }
+                    }
+
+                    try (final BufferedReader restPageStream = openUrl(restString)) {
+                        if (restPageStream != null) {
+                            String wbGeneLine;
+
+                            while ((wbGeneLine = restPageStream.readLine()) != null) {
+                                final Matcher m = compile("class=\"anatomy_term-link\" title=\"\">(\\S+)</a>")
+                                        .matcher(wbGeneLine);
+                                while (m.find()) {
+                                    final String name = m.group(1);
+                                    // TODO remove comment
+                                    if (isLineageName(name)) {
+                                        results.add(name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        sort(results);
+        return new ArrayList<>(new HashSet<>(results));
     }
 
-    private static BufferedReader openUrl(final String target) {
+    /**
+     * Eastablishes a connection to the WormBase and returns a reader for the results
+     *
+     * @param target
+     *         the wormbase target link without the http://www.wormbase.org prefix
+     *
+     * @return reader for the results fetched, null if there was an error in reaching WormBase
+     */
+    private static BufferedReader openUrl(String target) {
+        target = WORMBASE_URL + target;
         HttpURLConnection connection = null;
-
-
         try {
-            URL url = new URL(target);
+            final URL url = new URL(target);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(CONNECTION_TIMEOUT_MILLIS);
+            connection.setRequestMethod(GET_PROTOCOL);
 
-            // Get Response
-            InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            final InputStream is = connection.getInputStream();
+            final BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
             return rd;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SocketTimeoutException ste) {
+            System.out.println("HTTP connection timed out for " + target);
+        } catch (MalformedURLException mue) {
+            System.out.println("Invalid URL " + target);
+        } catch (ProtocolException pe) {
+            System.out.println("Invalid protocol " + GET_PROTOCOL);
+        } catch (IOException ioe) {
+            System.out.println("Error in connecting to " + target);
         }
         return null;
     }
-
-    public static void doSearch(final String text) {
-        searched = text;
-        searchService.restart();
-    }
-
-    public static String getSearchedText() {
-        return searched;
-    }
-
-    public static Service<List<String>> getSearchService() {
-        return searchService;
-    }
-
 }

@@ -10,7 +10,6 @@ import java.util.List;
 import javafx.collections.ObservableList;
 
 import search.SearchType;
-import search.SearchUtil;
 import wormguides.controllers.Window3DController;
 import wormguides.layers.SearchLayer;
 import wormguides.models.Rule;
@@ -28,6 +27,7 @@ import static search.SearchType.GENE;
 import static search.SearchType.LINEAGE;
 import static search.SearchType.MULTICELLULAR_CELL_BASED;
 import static search.SearchType.NEIGHBOR;
+import static search.SearchUtil.isGeneFormat;
 import static wormguides.models.SearchOption.ANCESTOR;
 import static wormguides.models.SearchOption.CELL_BODY;
 import static wormguides.models.SearchOption.CELL_NUCLEUS;
@@ -234,7 +234,7 @@ public class URLLoader {
                     // if no type present, default is systematic
                     if (noTypeSpecified) {
                         SearchType type = LINEAGE;
-                        if (SearchUtil.isGeneFormat(name)) {
+                        if (isGeneFormat(name)) {
                             type = GENE;
                         }
                         searchLayer.addColorRule(type, name, web(colorString), options);

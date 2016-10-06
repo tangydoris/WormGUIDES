@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -165,11 +166,14 @@ public class Window3DController {
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
 
-    /** The wait time (in milliseconds) between consecutive time frames while a movie is playing. */
+    /** The wait time (in millis) between consecutive time frames while a movie is playing. */
     private final long WAIT_TIME_MILLI = 200;
     private final double CAMERA_INITIAL_DISTANCE = -220;
-    private final double CAMERA_NEAR_CLIP = 1, CAMERA_FAR_CLIP = 2000;
-    private final int X_COR_INDEX = 0, Y_COR_INDEX = 1, Z_COR_INDEX = 2;
+    private final double CAMERA_NEAR_CLIP = 1,
+            CAMERA_FAR_CLIP = 2000;
+    private final int X_COR_INDEX = 0,
+            Y_COR_INDEX = 1,
+            Z_COR_INDEX = 2;
 
     /** Text size scale used for the rendering of billboard notes. */
     private final double BILLBOARD_SCALE = 0.9;
@@ -186,19 +190,32 @@ public class Window3DController {
      */
     private final double INITIAL_ZOOM = 1.5;
     /**
-     * The number of pixels that a sprite (note or label) can be outside the
-     * sprite pane bounds before being removed from the subscene.
+     * The number of pixels that a sprite (note or label) can be outside the sprite pane bounds before being removed
+     * from the subscene.
      */
     private final int OUT_OF_BOUNDS_THRESHOLD = 5;
-    /**
-     * The int used when calculating the y offset between a sprite and label.
-     */
+    /** The y-offset from a sprite to a label label for one cell entity. */
     private final int LABEL_SPRITE_Y_OFFSET = 5;
+
     // rotation stuff
     private final Rotate rotateX;
     private final Rotate rotateY;
     private final Rotate rotateZ;
-    Vector<JavaPicture> javaPictures;
+    // transformation stuff
+    private final Group root;
+    // switching timepoints stuff
+    private final BooleanProperty playingMovie;
+    private final PlayService playService;
+    private final RenderService renderService;
+    private final List<String> localSearchResults;
+    // color rules stuff
+    private final ColorHash colorHash;
+    private final Comparator<Color> colorComparator;
+    private final Comparator<Shape3D> opacityComparator;
+    // opacity value for "other" cells (with no rule attached)
+    private final DoubleProperty othersOpacity;
+    private final List<String> otherCells;
+    private Vector<JavaPicture> javaPictures;
     private SearchLayer searchLayer;
     private Sphere[] spheres;
     private MeshView[] meshes;
@@ -208,19 +225,14 @@ public class Window3DController {
     private LineageData lineageData;
     private SubScene subscene;
     private TextField searchField;
-
-    // transformation stuff
-    private Group root;
     private PerspectiveCamera camera;
     private Xform xform;
     private double mousePosX, mousePosY, mousePosZ;
     private double mouseOldX, mouseOldY, mouseOldZ;
     private double mouseDeltaX, mouseDeltaY;
-
     // average position offsets of nuclei from zero
     private int offsetX, offsetY, offsetZ;
     private double angleOfRotation;
-
     // housekeeping stuff
     private IntegerProperty time;
     private IntegerProperty totalNuclei;
@@ -231,12 +243,6 @@ public class Window3DController {
     private double[][] positions;
     private double[] diameters;
     private DoubleProperty zoom;
-
-    // switching timepoints stuff
-    private BooleanProperty playingMovie;
-    private PlayService playService;
-    private RenderService renderService;
-
     // subscene click cell selection stuff
     private IntegerProperty selectedIndex;
     private StringProperty selectedName;
@@ -245,25 +251,12 @@ public class Window3DController {
     private ContextMenuController contextMenuController;
     private CasesLists cases;
     private BooleanProperty cellClicked;
-
     // searched highlighting stuff
     private boolean inSearchMode;
     private ObservableList<String> searchResultsList;
-    private List<String> localSearchResults;
-
-    // color rules stuff
-    private ColorHash colorHash;
     private ObservableList<Rule> currentRulesList;
-    private Comparator<Color> colorComparator;
-    private Comparator<Shape3D> opacityComparator;
-
     // specific boolean listener for gene search results
     private BooleanProperty geneResultsUpdated;
-
-    // opacity value for "other" cells (with no rule attached)
-    private DoubleProperty othersOpacity;
-    private List<String> otherCells;
-
     // Scene Elements stuff
     private boolean defaultEmbryoFlag;
     private SceneElementsList sceneElementsList;
@@ -280,24 +273,33 @@ public class Window3DController {
 
     // Story elements stuff
     private StoriesLayer storiesLayer;
-    // currentNotes contains all notes that are 'active' within a scene
-    // (any note that should be visible in a given frame)
+    /** All notes that are active, or visible, in a frame */
     private List<Note> currentNotes;
-    // Map of current note graphics to their note objects
+    /** Map of current note graphics to their note objects */
     private HashMap<Node, Note> currentGraphicNoteMap;
-    // Map of current notes to their scene elements
+    /** Map of current notes to their scene elements */
     private HashMap<Note, MeshView> currentNoteMeshMap;
+    /**
+     * Rectangular box that resides in the upper-right-hand corner of the subscene. The active story title and
+     * description are shown here.
+     */
     private VBox overlayVBox;
+    /** Overlay of the subscene. Note sprites are inserted into this overlay. */
     private Pane spritesPane;
-    // maps of sprite/billboard front notes attached to cell, or cell and time
+    /** Map of note sprites attached to cell, or cell and time */
     private HashMap<Node, VBox> entitySpriteMap;
+    /** Map of front-facing billboards attached to cell, or cell and time */
     private HashMap<Node, Node> billboardFrontEntityMap;
 
     // Label stuff
+    /** Labels that exist in any of the time frames */
     private List<String> allLabels;
+    /** Labels currently visible in the frame */
     private List<String> currentLabels;
-    private HashMap<Node, Text> entityLabelMap;
-    private Text transientLabelText; // shows up on hover
+    /** Map of a cell entity to its label */
+    private Map<Node, Text> entityLabelMap;
+    /** Label that shows up on hover */
+    private Text transientLabelText;
 
     // orientation indicator
     private Cylinder orientationIndicator;
@@ -325,9 +327,11 @@ public class Window3DController {
     private DoubleProperty rotateZAngle;
     private Quaternion quaternion;
 
-    // scales of the subscene coordinate axis --> from ProductionInfo.csv
+    /** X-scale of the subscene coordinate axis read from ProductionInfo.csv */
     private double xScale;
+    /** Y-scale of the subscene coordinate axis read from ProductionInfo.csv */
     private double yScale;
+    /** Z-scale of the subscene coordinate axis read from ProductionInfo.csv */
     private double zScale;
 
     /**
@@ -2280,7 +2284,7 @@ public class Window3DController {
     }
 
     // sets everything associated with color rules
-    public void setRulesList(ObservableList<Rule> list) {
+    public void setRulesList(final ObservableList<Rule> list) {
         if (list == null) {
             return;
         }
@@ -2344,29 +2348,6 @@ public class Window3DController {
         list.addAll(currentRulesList);
         return list;
     }
-
-	/*
-     * private EventHandler<TransformChangedEvent> getRotateXChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateXAngle.set(rotateX.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 * 
-	 * private EventHandler<TransformChangedEvent> getRotateYChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateYAngle.set(rotateY.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 * 
-	 * private EventHandler<TransformChangedEvent> getRotateZChangeHandler() {
-	 * return new EventHandler<TransformChangedEvent>() {
-	 * 
-	 * @Override public void handle(TransformChangedEvent arg0) {
-	 * rotateZAngle.set(rotateZ.getAngle()); repositionSprites();
-	 * repositionNoteBillboardFronts(); } }; }
-	 */
 
     public void setColorRulesList(List<Rule> list) {
         currentRulesList.clear();

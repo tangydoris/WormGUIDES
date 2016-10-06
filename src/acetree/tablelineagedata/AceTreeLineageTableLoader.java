@@ -150,12 +150,13 @@ public class AceTreeLineageTableLoader {
         avgY = (int) sumY / totalPositions;
         avgZ = (int) sumZ / totalPositions;
 
-        System.out.println("Average nuclei position offsets from origin (0, 0, 0): "
+        System.out.println("Average nuclei position offsets from origin (0, 0, 0): ("
                 + avgX
                 + ", "
                 + avgY
                 + ", "
-                + avgZ);
+                + avgZ
+                + ")");
 
         // offset all nuclei x-, y- and z- positions by x, y and z averages
         lineageData.shiftAllPositions(avgX, avgY, avgZ);
