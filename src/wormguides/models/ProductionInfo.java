@@ -19,11 +19,11 @@ import static wormguides.loaders.ProductionInfoLoader.buildProductionInfo;
  */
 public class ProductionInfo {
 
-    private final static String TRUE = "TRUE";
+    private final String TRUE = "TRUE";
 
     private final int DEFAULT_START_TIME = 1;
 
-    private List<List<String>> productionInfoData;
+    private final List<List<String>> productionInfoData;
 
     public ProductionInfo() {
         productionInfoData = buildProductionInfo();
