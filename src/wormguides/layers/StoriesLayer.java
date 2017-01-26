@@ -304,7 +304,7 @@ public class StoriesLayer {
      * Saves active story to a file. {@link FileChooser} is used to allow the user to specify a save location and
      * file name.
      *
-     * @return true if story is successfully saved, false otherwise
+     * @return true when the file has been saved, false otherwise.
      */
     public boolean saveActiveStory() {
         final FileChooser chooser = new FileChooser();
@@ -312,15 +312,16 @@ public class StoriesLayer {
         chooser.setInitialFileName("WormGUIDES Story.csv");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
         final File file = chooser.showSaveDialog(parentStage);
+
         // if user clicks save
         if (file != null) {
             if (activeStory != null) {
                 updateColorURL();
                 saveToCSVFile(activeStory, file, movieTimeOffset);
-                System.out.println("File saved to " + file.getAbsolutePath());
             } else {
                 System.out.println("No active story to save");
             }
+            System.out.println("File saved");
             return true;
         }
         return false;

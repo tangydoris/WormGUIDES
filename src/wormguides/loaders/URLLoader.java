@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.loaders;
@@ -134,13 +130,14 @@ public class URLLoader {
             final List<String> ruleStrings,
             final ObservableList<Rule> rulesList,
             final SearchLayer searchLayer) {
+
         rulesList.clear();
 
         final List<String> types = new ArrayList<>();
         final List<SearchOption> options = new ArrayList<>();
         StringBuilder sb;
         boolean noTypeSpecified;
-        String colorString;
+        String wholeColorString = "";
         String name;
         for (String ruleString : ruleStrings) {
             types.clear();
@@ -193,11 +190,15 @@ public class URLLoader {
                     noTypeSpecified = true;
                 }
 
-                colorString = "";
-                if (sb.indexOf("+#ff") > -1) {
-                    colorString = sb.substring(sb.indexOf("+#ff") + 4);
-                } else if (sb.indexOf("+%23ff") > -1) {
-                    colorString = sb.substring(sb.indexOf("+%23ff") + 6);
+                String colorHex = "";
+                double alpha = 1.0;
+                if (sb.indexOf("+#") > -1) {
+                    // ff112233
+                    wholeColorString = sb.substring(sb.indexOf("+#") + 2);
+                    // whole color string format: alpha, red, green, blue
+                    colorHex = wholeColorString.substring(2, 8);
+                    String alphaHex = wholeColorString.substring(0, 2);
+                    alpha = (parseInt(alphaHex, 16) + 1) / 256.0;
                 }
 
                 options.clear();
@@ -234,51 +235,51 @@ public class URLLoader {
 
                 // extract name from what's left of rule
                 name = sb.substring(0, sb.indexOf("+"));
+
                 // add regular ColorRule
                 if (types.contains("-s")) {
-                    searchLayer.addColorRule(LINEAGE, name, web(colorString), options);
+                    searchLayer.addColorRule(LINEAGE, name, web(colorHex, alpha), options);
                 }
                 if (types.contains("-n")) {
-                    searchLayer.addColorRule(FUNCTIONAL, name, web(colorString), options);
+                    searchLayer.addColorRule(FUNCTIONAL, name, web(colorHex, alpha), options);
                 }
                 if (types.contains("-d")) {
-                    searchLayer.addColorRule(DESCRIPTION, name, web(colorString), options);
+                    searchLayer.addColorRule(DESCRIPTION, name, web(colorHex, alpha), options);
                 }
                 if (types.contains("-g")) {
-                    searchLayer.addGeneColorRuleFromUrl(name, web(colorString), options);
+                    searchLayer.addGeneColorRuleFromUrl(name, web(colorHex, alpha), options);
                 }
                 if (types.contains("-m")) {
                     searchLayer.addColorRule(
                             MULTICELLULAR_STRUCTURE_BY_CELLS,
                             name,
-                            web(colorString),
+                            web(wholeColorString),
                             options);
                 }
                 if (types.contains("-M")) {
-                    searchLayer.addStructureRuleBySceneName(name.replace("=", " "), web(colorString));
+                    searchLayer.addStructureRuleBySceneName(name.replace("=", " "), web(colorHex, alpha));
                 }
                 if (types.contains("-c")) {
-                    searchLayer.addColorRule(CONNECTOME, name, web(colorString), options);
+                    searchLayer.addColorRule(CONNECTOME, name, web(colorHex, alpha), options);
                 }
                 if (types.contains("-b")) {
-                    searchLayer.addColorRule(NEIGHBOR, name, web(colorString), options);
+                    searchLayer.addColorRule(NEIGHBOR, name, web(colorHex, alpha), options);
                 }
 
                 // if no type present, default is systematic or gene
                 if (noTypeSpecified) {
                     if (isGeneFormat(name)) {
-                        searchLayer.addGeneColorRuleFromUrl(name, web(colorString), options);
+                        searchLayer.addGeneColorRuleFromUrl(name, web(colorHex, alpha), options);
                     } else {
-                        searchLayer.addColorRule(LINEAGE, name, web(colorString), options);
+                        searchLayer.addColorRule(LINEAGE, name, web(colorHex, alpha), options);
                     }
                 }
+
             } catch (StringIndexOutOfBoundsException e) {
                 System.out.println("Invalid color rule format");
                 e.printStackTrace();
             }
         }
-
-        // after all rules have been added, see if any gene rules need to have their
     }
 
     private static void parseViewArgs(

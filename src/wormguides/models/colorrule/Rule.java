@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.models.colorrule;
@@ -11,6 +7,7 @@ package wormguides.models.colorrule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -451,9 +448,9 @@ public class Rule {
         return options.toArray(new SearchOption[options.size()]);
     }
 
-    public void setOptions(List<SearchOption> options) {
+    public void setOptions(final List<SearchOption> options) {
         this.options = new ArrayList<>();
-        this.options.addAll(options.stream().filter(option -> option != null).collect(toList()));
+        this.options.addAll(options.stream().filter(Objects::nonNull).collect(toList()));
     }
 
     /**

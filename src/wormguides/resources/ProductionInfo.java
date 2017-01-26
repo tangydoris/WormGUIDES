@@ -99,6 +99,54 @@ public class ProductionInfo {
         return cellShapeData;
     }
 
+    public double[] getKeyFramesRotate() {
+        // idx 14
+        String keyFramesRotateStr = productionInfoData.get(14).get(0);
+        StringTokenizer st = new StringTokenizer(keyFramesRotateStr, " ");
+
+        double[] keyFramesRotate = new double[st.countTokens()];
+        int numTokens = st.countTokens();
+        for (int i = 0; i < numTokens; i++) {
+            keyFramesRotate[i] = Double.parseDouble(st.nextToken());
+        }
+
+        return keyFramesRotate;
+    }
+
+    public double[] getKeyValuesRotate() {
+        // idx 15
+        String keyValuesRotateStr = productionInfoData.get(15).get(0);
+        StringTokenizer st = new StringTokenizer(keyValuesRotateStr, " ");
+
+        double[] keyValuesRotate = new double[st.countTokens()];
+        int numTokens = st.countTokens();
+        for (int i = 0; i < numTokens; i++) {
+            keyValuesRotate[i] = Double.parseDouble(st.nextToken());
+        }
+
+        return keyValuesRotate;
+    }
+
+    public double[] getInitialRotation() {
+        // idx 16
+        String initialRotationStr = productionInfoData.get(16).get(0);
+        StringTokenizer st = new StringTokenizer(initialRotationStr, " ");
+
+        if (st.countTokens() != 3) {
+            System.err.println("Incorrect number of values specified in"
+                    + " ProductionInfo for initial rotation. Should be 3 i.e. x,y,z");
+            double[] noRot = {0., 0., 0.};
+            return noRot;
+        }
+
+        double[] initialRotation = new double[3];
+        for (int i = 0; i < 3; i++) {
+            initialRotation[i] = Double.parseDouble(st.nextToken());
+        }
+
+        return initialRotation;
+    }
+
     public List<List<String>> getProductionInfoData() {
         return productionInfoData;
     }
