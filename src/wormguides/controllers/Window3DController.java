@@ -182,7 +182,7 @@ public class Window3DController {
     /** Default transparency of 'other' entities on startup */
     private final double DEFAULT_OTHERS_OPACITY = 0.25;
     /** Visibility (in range [0, 1]) under which "other" entities are not rendered */
-    private final double VISIBILITY_CUTOFF = 0.01;
+    private final double VISIBILITY_CUTOFF = 0.03;
     /** Visibility (in range [0, 1]) under which "other" entities are not selectable/labeled */
     private final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
 
@@ -256,15 +256,15 @@ public class Window3DController {
     private final Map<Node, Text> entityLabelMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
-    // rotation
-    private final double[] keyValuesRotate = {90, 30, 30, 90};
-    //  private final double[] keyValuesRotate = {60, 1, 1, 60};
-    private final double[] keyFramesRotate = {1, 16, 321, 359};
-
     private final ProductionInfo productionInfo;
     private final Connectome connectome;
     private final BooleanProperty bringUpInfoFlag;
     private final SubsceneSizeListener subsceneSizeListener;
+    
+    // rotation - AP
+    private double[] keyValuesRotate;
+    private double[] keyFramesRotate;
+    
     // subscene state parameters
     private LinkedList<Sphere> spheres;
     private LinkedList<MeshView> meshes;
@@ -415,6 +415,11 @@ public class Window3DController {
             }
         });
 
+        // set orientation indicator frames and rotation from production info
+        keyFramesRotate = productionInfo.getKeyFramesRotate();
+        keyValuesRotate = productionInfo.getKeyValuesRotate();
+        // double[] initialRotation = productionInfo.getInitialRotation();
+
         spheres = new LinkedList<>();
         meshes = new LinkedList<>();
         cellNames = new LinkedList<>();
@@ -453,16 +458,18 @@ public class Window3DController {
                 startTime1 = getFirstOccurenceOf(lineageName);
                 endTime1 = getLastOccurenceOf(lineageName);
 
-                // do not change scene is entity does not exist at any timeProperty
+                // do not change scene if entity does not exist at any timeProperty
                 if (startTime1 <= 0 || endTime1 <= 0) {
                     return;
                 }
 
                 if (timeProperty.get() < startTime1 || timeProperty.get() > endTime1) {
-                    timeProperty.set(startTime1);
+                    this.timeProperty.set(startTime1);
                 } else {
                     insertLabelFor(lineageName, entity);
                 }
+                
+                insertLabelFor(lineageName, entity);
                 highlightActiveCellLabel(entity);
             }
         });
@@ -897,8 +904,8 @@ public class Window3DController {
                 double modifier = 10.0;
                 double modifierFactor = 0.1;
 
-                rotateXAngleProperty.set((
-                        (rotateXAngleProperty.get() + mouseDeltaY * modifierFactor * modifier * 2.0)
+                rotateXAngleProperty.set(
+                        ((rotateXAngleProperty.get() + mouseDeltaY * modifierFactor * modifier * 2.0)
                                 % 360 + 540) % 360 - 180);
                 rotateYAngleProperty.set((
                         (rotateYAngleProperty.get() + mouseDeltaX * modifierFactor * modifier * 2.0)

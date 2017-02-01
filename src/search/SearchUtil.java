@@ -153,6 +153,17 @@ public class SearchUtil {
         sort(cells);
         return cells;
     }
+    
+    public static boolean isMulticellularStructureByName(final String name) {
+    	for (SceneElement se : sceneElementsList.getElementsList()) {
+    		if (se.getSceneName().toLowerCase().equals(name.toLowerCase())
+    				&& se.isMulticellular()) {
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
 
     /**
      * @param searched

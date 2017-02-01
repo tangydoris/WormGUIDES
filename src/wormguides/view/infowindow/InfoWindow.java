@@ -32,6 +32,7 @@ import wormguides.models.cellcase.TerminalCellCase;
 import wormguides.models.subscenegeometry.SceneElement;
 import wormguides.resources.ProductionInfo;
 import wormguides.view.DraggableTab;
+import static search.SearchUtil.isMulticellularStructureByName;
 
 import static java.util.Objects.requireNonNull;
 
@@ -173,7 +174,6 @@ public class InfoWindow {
 
                         if (lineageName != null && !lineageName.isEmpty()) {
                             if (casesLists == null) {
-                                System.out.println("null cell cases");
                                 return null; // error check
                             }
 
@@ -278,7 +278,6 @@ public class InfoWindow {
                         }
                         return null;
                     }
-
                 };
                 return task;
             }
@@ -303,9 +302,14 @@ public class InfoWindow {
         runLater(() -> infoWindowStage.setTitle("Cell Info Window"));
     }
 
-    public void addName(String name) {
-        nameToQuery = name;
-        addNameService.restart();
+    public boolean addName(String name) {
+    	if (name != null && !isMulticellularStructureByName(name)) {
+    		nameToQuery = name;
+    		addNameService.restart();
+    		return true;
+    	}
+
+    	return false;
     }
 
     public void showWindow() {

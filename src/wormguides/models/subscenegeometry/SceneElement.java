@@ -203,7 +203,7 @@ public class SceneElement {
     }
 
     public boolean isMulticellular() {
-        return cellNames.size() > 1;
+        return cellNames.size() > 1 || cellNames.get(0).toLowerCase().equals(MCS.toLowerCase());
     }
     
     public boolean isNoCellStructure() {
@@ -294,4 +294,6 @@ public class SceneElement {
                 "]";
         return sb;
     }
+    
+    private final static String MCS = "MCS";
 }

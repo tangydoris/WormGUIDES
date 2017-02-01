@@ -21,16 +21,16 @@ import wormguides.MainApp;
  */
 public class ProductionInfoLoader {
 
-    private static final int NUMBER_OF_FIELDS = 14;
+    private static final int NUMBER_OF_FIELDS = 17;
 
     private static final String PRODUCTION_INFO_FILE_PATH = "/wormguides/model/production_info_file/"
             + "Production_Info.csv";
 
-    private static final String PRODUCT_INFO_LINE = "Production Information,,,,,,,,,,,,,";
+    private static final String PRODUCT_INFO_LINE = "Production Information,,,,,,,,,,,,,,,,";
 
     private static final String HEADER_LINE = "Cells,Image Series,Marker,Strain,Compressed Embryo?,Temporal "
             + "Resolution,Segmentation,cytoshow link,Movie start timeProperty (min),isSulstonMode?,Total Time Points,"
-            + "X_SCALE,Y_SCALE,Z_SCALE";
+            + "X_SCALE,Y_SCALE,Z_SCALE,Key_Frames_Rotate,Key_Values_Rotate,Initial_Rotation";
 
     /**
      * Tokenizes each line in the config file and creates a 2D array of the file
@@ -55,6 +55,9 @@ public class ProductionInfoLoader {
         final List<String> xScale = new ArrayList<>();
         final List<String> yScale = new ArrayList<>();
         final List<String> zScale = new ArrayList<>();
+        final List<String> keyFramesRotate = new ArrayList<>();
+        final List<String> keyValuesRotate = new ArrayList<>();
+        final List<String> initialRotation = new ArrayList<>();
 
         try (final InputStreamReader streamReader = new InputStreamReader(url.openStream());
              final BufferedReader reader = new BufferedReader(streamReader)) {
@@ -90,6 +93,9 @@ public class ProductionInfoLoader {
                     xScale.add(tokenizer.nextToken());
                     yScale.add(tokenizer.nextToken());
                     zScale.add(tokenizer.nextToken());
+                    keyFramesRotate.add(tokenizer.nextToken());
+                    keyValuesRotate.add(tokenizer.nextToken());
+                    initialRotation.add(tokenizer.nextToken());
                 }
             }
 
@@ -108,6 +114,9 @@ public class ProductionInfoLoader {
             productionInfo.add(xScale);
             productionInfo.add(yScale);
             productionInfo.add(zScale);
+            productionInfo.add(keyFramesRotate);
+            productionInfo.add(keyValuesRotate);
+            productionInfo.add(initialRotation);
         } catch (IOException e) {
             System.out.println("The production info file "
                     + PRODUCTION_INFO_FILE_PATH
@@ -115,5 +124,4 @@ public class ProductionInfoLoader {
         }
         return productionInfo;
     }
-
 }

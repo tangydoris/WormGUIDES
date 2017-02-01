@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2017
+ * Bao Lab 2016
  */
 
 package wormguides.controllers;
@@ -550,7 +550,7 @@ public class ContextMenuController extends AnchorPane implements Initializable {
 //                    isPresynaptic,
 //                    isPostsynaptic,
 //                    isElectrical,
-//                    isNeuromuscular);
+//                    isNeuromuscular); 	
             final Rule rule = searchLayer.addConnectomeColorRuleFromContextMenu(
                     funcName,
                     DEFAULT_COLOR,

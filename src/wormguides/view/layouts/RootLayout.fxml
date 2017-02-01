@@ -3,7 +3,6 @@
 <!--
   ~ Bao Lab 2016
   -->
-
 <!--
   ~ Bao Lab 2016
   -->
@@ -34,7 +33,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1100.0" type="BorderPane" xmlns="http://javafx.com/javafx/8">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="rootBorderPane" prefHeight="820.0" prefWidth="1200.0"
+         type="BorderPane" xmlns="http://javafx.com/javafx/8">
     <top>
         <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
            <menus>
@@ -85,14 +85,16 @@
                 <RowConstraints minHeight="20.0" prefHeight="30.0" vgrow="ALWAYS" />
             </rowConstraints>
            <children>
-               <TabPane fx:id="mainTabPane" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+               <TabPane fx:id="mainTabPane" focusTraversable="false" maxHeight="1.7976931348623157E308"
+                        maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" translateZ="100.0">
                    <GridPane.margin>
                        <Insets />
                    </GridPane.margin>
                   <tabs>
                       <Tab fx:id="storiesTab" closable="false" text="Stories">
                          <content>
-                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"
+                                         style="-fx-background-color: #F1F1F1;">
                                 <children>
                                     <VBox layoutX="129.0" layoutY="151.0" prefHeight="735.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                        <children>
@@ -141,13 +143,15 @@
                       </Tab>
                       <Tab fx:id="colorAndDisplayTab" closable="false" text="Coloring and Display">
                          <content>
-                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"
+                                         style="-fx-background-color: #F1F1F1;">
                                 <children>
                                     <TabPane fx:id="colorAndDisplayTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <tabs>
                                            <Tab fx:id="cellsTab" closable="false" text="Find Cells">
                                               <content>
-                                                  <AnchorPane fx:id="searchTabAnchorPane" style="-fx-border-color: transparent;">
+                                                  <AnchorPane fx:id="searchTabAnchorPane"
+                                                              style="-fx-border-color: transparent; -fx-background-color: #F1F1F1;">
                                                      <children>
                                                          <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="1.0" layoutY="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                             <content>
@@ -396,15 +400,15 @@
                                            </Tab>
                                            <Tab fx:id="structuresTab" closable="false" text="Find Structures">
                                               <content>
-                                                  <AnchorPane>
+                                                  <AnchorPane
+                                                          style="-fx-background-color: #F1F1F1; -fx-border-color: transparent;">
                                                      <children>
-                                                         <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0" spacing="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                                         <VBox maxWidth="302.0" prefHeight="739.0" prefWidth="302.0"
+                                                               spacing="5.0" AnchorPane.bottomAnchor="10.0"
+                                                               AnchorPane.leftAnchor="10.0"
+                                                               AnchorPane.rightAnchor="10.0"
+                                                               AnchorPane.topAnchor="10.0">
                                                             <children>
-                                                                <HBox prefHeight="16.0" prefWidth="302.0" VBox.vgrow="NEVER">
-                                                                   <children>
-                                                                       <Region prefHeight="16.0" prefWidth="301.0" />
-                                                                   </children>
-                                                                </HBox>
                                                                 <HBox prefHeight="34.0" prefWidth="291.0" VBox.vgrow="NEVER">
                                                                    <children>
                                                                        <Label prefHeight="45.0" text="Find Structures: ">
@@ -436,15 +440,13 @@
                                                                        <ListView fx:id="structuresSearchListView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                                    </children>
                                                                 </AnchorPane>
-                                                                <HBox>
-                                                                   <children>
-                                                                       <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="36.0" text="(If no structures are selected below, a new rule is added for all search results)" wrapText="true">
-                                                                           <font>
-                                                                               <Font size="14.0" />
-                                                                           </font>
-                                                                       </Label>
-                                                                   </children>
-                                                                </HBox>
+                                                                <Label maxHeight="-Infinity" minHeight="-Infinity"
+                                                                       text="(If no structures are selected below, a new rule is added for all search results)"
+                                                                       wrapText="true">
+                                                                    <font>
+                                                                        <Font size="14.0"/>
+                                                                    </font>
+                                                                </Label>
                                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                                 <Label prefHeight="38.0" prefWidth="122.0" text="Select Structures:">
                                                                     <font>
@@ -457,16 +459,10 @@
                                                                    </children>
                                                                 </AnchorPane>
                                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
-                                                                <HBox prefHeight="24.0" prefWidth="292.0" VBox.vgrow="NEVER">
-                                                                   <children>
-                                                                       <Region prefHeight="22.0" prefWidth="300.0" />
-                                                                   </children>
-                                                                </HBox>
-                                                                <HBox>
-                                                                   <children>
-                                                                       <ColorPicker fx:id="structureRuleColorPicker" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="55.0" HBox.hgrow="ALWAYS" />
-                                                                   </children>
-                                                                </HBox>
+                                                                <ColorPicker fx:id="structureRuleColorPicker"
+                                                                             maxHeight="-Infinity"
+                                                                             maxWidth="1.7976931348623157E308"
+                                                                             minHeight="-Infinity" prefHeight="55.0"/>
                                                                 <Region maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" />
                                                                 <HBox prefHeight="44.0" prefWidth="297.0" VBox.vgrow="NEVER">
                                                                    <children>
@@ -483,7 +479,8 @@
                                            </Tab>
                                            <Tab fx:id="displayTab" closable="false" text="Display Options">
                                               <content>
-                                                  <AnchorPane>
+                                                  <AnchorPane
+                                                          style="-fx-background-color: #F1F1F1; -fx-border-color: transparent;">
                                                      <children>
                                                          <VBox prefWidth="260.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                                             <children>
@@ -562,9 +559,13 @@
                              </AnchorPane>
                              <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="110.0" VBox.vgrow="NEVER">
                                 <children>
-                                    <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefViewportHeight="63.0" prefViewportWidth="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <ScrollPane fx:id="infoPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+                                                translateZ="100.0" AnchorPane.bottomAnchor="0.0"
+                                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                                AnchorPane.topAnchor="0.0">
                                        <content>
-                                           <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="3.0" BorderPane.alignment="CENTER">
+                                           <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                                                 spacing="5.0" BorderPane.alignment="CENTER">
                                                <BorderPane.margin>
                                                    <Insets top="10.0" />
                                                </BorderPane.margin>
@@ -582,7 +583,8 @@
                                                                  <Font name="System Bold" size="14.0" />
                                                              </font>
                                                          </Text>
-                                                         <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                         <Region maxWidth="-Infinity" minWidth="-Infinity"
+                                                                 prefWidth="15.0"/>
                                                          <Text fx:id="moreInfoClickableText" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="[more info]" visible="false">
                                                              <font>
                                                                  <Font name="System Bold" size="14.0" />

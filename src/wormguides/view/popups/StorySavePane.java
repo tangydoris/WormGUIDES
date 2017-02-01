@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2017
+ * Bao Lab 2016
  */
 
 package wormguides.view.popups;
@@ -25,7 +25,8 @@ import static wormguides.util.AppFont.getBoldFont;
 import static wormguides.util.AppFont.getFont;
 
 /**
- * Popup dialog to save the active story before exiting the application
+ * This class is a popup dialog that contains some prompt text and two buttons, yes and no. The Strings for these
+ * three components are set upon initialization.
  */
 public class StorySavePane extends AnchorPane {
 
@@ -33,7 +34,7 @@ public class StorySavePane extends AnchorPane {
     private final Button noBtn;
     private final Button cancelBtn;
 
-    private final Text promptText;
+    private Text promptText;
 
     public StorySavePane(
             final EventHandler<ActionEvent> yesHandler,
@@ -61,6 +62,8 @@ public class StorySavePane extends AnchorPane {
         promptText.wrappingWidthProperty().bind(mainVBox.widthProperty().subtract(10));
         promptText.setTextAlignment(CENTER);
         promptText.setText(prompt);
+
+        mainVBox.getChildren().add(promptText);
 
         // initialize buttons
         yesBtn = new Button();
@@ -98,9 +101,10 @@ public class StorySavePane extends AnchorPane {
         for (Node child : btnHBox.getChildrenUnmodifiable()) {
             child.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
         }
+        mainVBox.getChildren().add(btnHBox);
 
-        mainVBox.getChildren().addAll(promptText, btnHBox);
         mainVBox.setPadding(new Insets(10, 0, 10, 0));
+//        mainVBox.setMinHeight(115.0);
         getChildren().add(mainVBox);
     }
 

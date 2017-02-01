@@ -52,12 +52,14 @@ public class SceneElementsList {
 
     private final Map<String, List<String>> nameCellsMap;
     private final Map<String, String> nameCommentsMap;
+    private final Map<String, String> nameToMarkerMap;
 
     public SceneElementsList(final LineageData lineageData) {
         elementsList = new ArrayList<>();
         root = new TreeItem<>(new StructureTreeNode(true, "root"));
-        nameCellsMap = new HashMap<>();
-        nameCommentsMap = new HashMap<>();
+        nameCellsMap = new HashMap<String, List<String>>();
+        nameCommentsMap = new HashMap<String, String>();
+        nameToMarkerMap = new HashMap<String, String>();
         buildListFromConfig(lineageData);
     }
 
@@ -166,6 +168,14 @@ public class SceneElementsList {
                                     endTime,
                                     tokens[COMMENTS_INDEX]);
                             addSceneElement(element);
+                            if (!element.getAllCells().isEmpty()) {
+                            	nameCellsMap.put(element.getSceneName().toLowerCase(), element.getAllCells());
+                            }
+                            
+                            if (!element.getMarkerName().isEmpty()) {
+                            	nameToMarkerMap.put(element.getSceneName().toLowerCase(), element.getMarkerName());
+                            }
+                            
                             if (!element.getComments().isEmpty()) {
                                 nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
                             }
@@ -340,6 +350,10 @@ public class SceneElementsList {
 
     public Map<String, List<String>> getNameToCellsMap() {
         return nameCellsMap;
+    }
+    
+    public Map<String, String> getNameToMarkerMap() {
+    	return nameToMarkerMap;
     }
 
     public List<SceneElement> getElementsList() {

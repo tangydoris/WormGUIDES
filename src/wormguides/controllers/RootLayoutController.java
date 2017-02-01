@@ -509,7 +509,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void openInfoWindow() {
         if (infoWindow == null) {
             initInfoWindow();
-            casesLists.setInfoWindow(infoWindow);
         }
         infoWindow.showWindow();
     }
@@ -775,8 +774,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // More info clickable text
         moreInfoClickableText.setOnMouseClicked(event -> {
-            openInfoWindow();
-            infoWindow.addName(selectedEntityNameProperty.get());
+        	if (infoWindow == null) initInfoWindow();
+            if (infoWindow.addName(selectedEntityNameProperty.get())) {
+            	openInfoWindow();
+            }
         });
         moreInfoClickableText.setOnMouseEntered(event -> moreInfoClickableText.setCursor(HAND));
         moreInfoClickableText.setOnMouseExited(event -> moreInfoClickableText.setCursor(DEFAULT));
@@ -784,9 +785,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
         // More info in context menu
         bringUpInfoFlag.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                openInfoWindow();
-                infoWindow.addName(selectedEntityNameProperty.get());
-                infoWindow.showWindow();
+            	if (infoWindow == null) initInfoWindow();
+            	if (infoWindow.addName(selectedEntityNameProperty.get())) {
+            		openInfoWindow();
+            	}
             }
         });
     }
@@ -1033,6 +1035,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 defaultEmbryoFlag,
                 lineageData,
                 searchLayer);
+        casesLists.setInfoWindow(infoWindow);
     }
 
     /**
