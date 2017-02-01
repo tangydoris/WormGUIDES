@@ -53,6 +53,7 @@ public class StructuresLayer {
 
     private final Map<String, List<String>> nameToCellsMap;
     private final Map<String, String> nameToCommentsMap;
+    private final Map<String, String> nameToMarkerMap;
     private final Map<String, StructureCellGraphic> structureNameToTreeCellMap;
 
     private final StringProperty selectedStructureNameProperty;
@@ -90,8 +91,9 @@ public class StructuresLayer {
         this.searchLayer = requireNonNull(searchLayer);
 
         this.sceneElementsList = requireNonNull(sceneElementsList);
-        nameToCellsMap = this.sceneElementsList.getNameToCellsMap();
-        nameToCommentsMap = this.sceneElementsList.getNameToCommentsMap();
+        this.nameToCellsMap = this.sceneElementsList.getNameToCellsMap();
+        this.nameToCommentsMap = this.sceneElementsList.getNameToCommentsMap();
+        this.nameToMarkerMap = this.sceneElementsList.getNameToMarkerMap();
 
         this.searchField = requireNonNull(searchField);
         this.searchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -180,13 +182,14 @@ public class StructuresLayer {
                 // search in structure scene names
                 String nameLower = name.toLowerCase();
 
-                boolean appliesToName = true;
+                boolean appliesToName = false;
                 boolean appliesToCell = false;
+                boolean appliesToMarker = false;
                 boolean appliesToComment = false;
 
                 for (String term : terms) {
-                    if (!nameLower.contains(term)) {
-                        appliesToName = false;
+                    if (nameLower.contains(term)) {
+                        appliesToName = true;
                         break;
                     }
                 }
@@ -206,15 +209,18 @@ public class StructuresLayer {
                                         appliesToCell = true;
                                         break;
                                     }
-                                } else {
-                                    if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
-                                        appliesToCell = true;
-                                        break;
-                                    }
                                 }
+                            }
+                            if (cell.toLowerCase().startsWith(terms[0].toLowerCase())) {
+                                appliesToCell = true;
+                                break;
                             }
                         }
                     }
+                }
+
+                if (nameToMarkerMap.get(nameLower).startsWith(terms[0].toLowerCase())) {
+                    appliesToMarker = true;
                 }
 
                 // search in comments if name does not already apply
@@ -230,7 +236,7 @@ public class StructuresLayer {
                     }
                 }
 
-                if (appliesToName || appliesToCell || appliesToComment) {
+                if (appliesToName || appliesToCell || appliesToMarker || appliesToComment) {
                     searchStructuresResultsList.add(name);
                 }
             }

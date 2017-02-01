@@ -20,6 +20,7 @@ import static wormguides.loaders.GeometryLoader.loadOBJ;
  */
 public class SceneElement {
 
+    private final static String MCS = "MCS";
     /** Descriptor or display of object */
     private String sceneName;
     /** Cells contained by this structure */
@@ -36,7 +37,6 @@ public class SceneElement {
     private int endTime;
     private String comments;
     private boolean completeResourceFlag;
-
     /** Coordinates used when element belongs to a note */
     private int x, y, z;
 
@@ -203,9 +203,9 @@ public class SceneElement {
     }
 
     public boolean isMulticellular() {
-        return cellNames.size() > 1;
+        return cellNames.size() > 1 || cellNames.get(0).toLowerCase().equals(MCS.toLowerCase());
     }
-    
+
     public boolean isNoCellStructure() {
     	return cellNames.size() == 0;
     }

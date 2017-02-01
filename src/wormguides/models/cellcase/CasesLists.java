@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.models.cellcase;
@@ -107,9 +103,9 @@ public class CasesLists {
      *         the production information under Cell Shape
      */
     public void makeNonTerminalCase(
-            String cellName,
-            List<String> nuclearProductionInfo,
-            List<String> cellShapeProductionInfo) {
+            final String cellName,
+            final List<String> nuclearProductionInfo,
+            final List<String> cellShapeProductionInfo) {
         addNonTerminalCase(new NonTerminalCellCase(cellName, nuclearProductionInfo, cellShapeProductionInfo));
     }
 
@@ -119,7 +115,7 @@ public class CasesLists {
      * @param nonTerminalCase
      *         the case to be added
      */
-    private void addNonTerminalCase(NonTerminalCellCase nonTerminalCase) {
+    private void addNonTerminalCase(final NonTerminalCellCase nonTerminalCase) {
         cellCases.add(nonTerminalCase);
         // add dom(tab) to InfoWindow
         if (infoWindow != null) {
@@ -127,14 +123,14 @@ public class CasesLists {
         }
     }
 
-    public void makeAnatomyTermCase(AnatomyTerm term) {
+    public void makeAnatomyTermCase(final AnatomyTerm term) {
         if (term.equals(AMPHID_SENSILLA)) {
             AmphidSensillaTerm amphidSensillaCase = new AmphidSensillaTerm(term);
             addAmphidSensillaTermCase(amphidSensillaCase);
         }
     }
 
-    private void addAmphidSensillaTermCase(AmphidSensillaTerm amphidSensillaTermCase) {
+    private void addAmphidSensillaTermCase(final AmphidSensillaTerm amphidSensillaTermCase) {
         if (amphidSensillaTermCase != null) {
             anatomyTermCases.add(amphidSensillaTermCase);
 
