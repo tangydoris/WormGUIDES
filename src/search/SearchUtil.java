@@ -154,6 +154,17 @@ public class SearchUtil {
         return cells;
     }
 
+    public static boolean isMulticellularStructureByName(final String name) {
+        for (SceneElement se : sceneElementsList.getElementsList()) {
+            if (se.getSceneName().toLowerCase().equals(name.toLowerCase())
+                    && se.isMulticellular()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param searched
      *         the search string, terms that are either a structure scene name or part of its comment
@@ -167,8 +178,7 @@ public class SearchUtil {
                     .stream()
                     .filter(SceneElement::isMulticellular)
                     .filter(se -> isMulticellularStructureSearched(se.getSceneName(), searched))
-                    .forEach(se -> se.getAllCells().forEach(cellsSet::add)
-                    );
+                    .forEach(se -> se.getAllCells().forEach(cellsSet::add));
         }
         final List<String> cells = new ArrayList<>(cellsSet);
         sort(cells);

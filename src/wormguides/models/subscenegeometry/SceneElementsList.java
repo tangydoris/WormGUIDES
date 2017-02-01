@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import javafx.scene.control.TreeItem;
 
@@ -34,30 +33,32 @@ import static wormguides.loaders.GeometryLoader.doesResourceExist;
  */
 public class SceneElementsList {
 
-    private final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
-    private final String ASTERISK = "*";
+    private static final String CELL_CONFIG_FILE_NAME = "CellShapesConfig.csv";
+    private static final String ASTERISK = "*";
 
-    private final int NUM_OF_CSV_FIELDS = 8;
-    private final int DESCRIPTION_INDEX = 0;
-    private final int CELLS_INDEX = 1;
-    private final int MARKER_INDEX = 2;
-    private final int IMAGING_SOURCE_INDEX = 3;
-    private final int RESOURCE_LOCATION_INDEX = 4;
-    private final int START_TIME_INDEX = 5;
-    private final int END_TIME_INDEX = 6;
-    private final int COMMENTS_INDEX = 7;
+    private static final int NUM_OF_CSV_FIELDS = 8;
+    private static final int DESCRIPTION_INDEX = 0;
+    private static final int CELLS_INDEX = 1;
+    private static final int MARKER_INDEX = 2;
+    private static final int IMAGING_SOURCE_INDEX = 3;
+    private static final int RESOURCE_LOCATION_INDEX = 4;
+    private static final int START_TIME_INDEX = 5;
+    private static final int END_TIME_INDEX = 6;
+    private static final int COMMENTS_INDEX = 7;
 
     private final List<SceneElement> elementsList;
     private final TreeItem<StructureTreeNode> root;
 
     private final Map<String, List<String>> nameCellsMap;
     private final Map<String, String> nameCommentsMap;
+    private final Map<String, String> nameToMarkerMap;
 
     public SceneElementsList(final LineageData lineageData) {
         elementsList = new ArrayList<>();
         root = new TreeItem<>(new StructureTreeNode(true, "root"));
         nameCellsMap = new HashMap<>();
         nameCommentsMap = new HashMap<>();
+        nameToMarkerMap = new HashMap<>();
         buildListFromConfig(lineageData);
     }
 
@@ -105,7 +106,7 @@ public class SceneElementsList {
             String resourceLocation;
             int startTime;
             int endTime;
-            List<String> cellNames = new ArrayList<>();
+            List<String> cellNames;
             StringTokenizer cellNamesTokenizer;
             TreeItem<StructureTreeNode> currentCategoryNode = root;
             // process each line
@@ -166,6 +167,14 @@ public class SceneElementsList {
                                     endTime,
                                     tokens[COMMENTS_INDEX]);
                             addSceneElement(element);
+                            if (!element.getAllCells().isEmpty()) {
+                                nameCellsMap.put(element.getSceneName().toLowerCase(), element.getAllCells());
+                            }
+
+                            if (!element.getMarkerName().isEmpty()) {
+                                nameToMarkerMap.put(element.getSceneName().toLowerCase(), element.getMarkerName());
+                            }
+                            
                             if (!element.getComments().isEmpty()) {
                                 nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
                             }
@@ -291,16 +300,18 @@ public class SceneElementsList {
     }
 
     public List<SceneElement> getSceneElementsAtTime(final int time) {
-        final List<SceneElement> sceneElements = elementsList.stream()
-                .filter(se -> se.existsAtTime(time))
-                .collect(Collectors.toCollection(ArrayList::new));
-        return sceneElements;
+        final List<SceneElement> elements = new ArrayList<>();
+        elementsList.forEach(element -> {
+            if (element.existsAtTime(time)) {
+                elements.add(element);
+            }
+        });
+        return elements;
     }
 
     public List<String> getAllSceneNames() {
         final Set<String> namesSet = new HashSet<>();
-        elementsList.stream()
-                .forEachOrdered(se -> namesSet.add(se.getSceneName()));
+        elementsList.forEach(se -> namesSet.add(se.getSceneName()));
         final List<String> namesSorted = new ArrayList<>(namesSet);
         sort(namesSorted);
         return namesSorted;
@@ -340,6 +351,10 @@ public class SceneElementsList {
 
     public Map<String, List<String>> getNameToCellsMap() {
         return nameCellsMap;
+    }
+
+    public Map<String, String> getNameToMarkerMap() {
+        return nameToMarkerMap;
     }
 
     public List<SceneElement> getElementsList() {

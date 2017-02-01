@@ -98,6 +98,8 @@ import static javafx.scene.layout.AnchorPane.setBottomAnchor;
 import static javafx.scene.layout.AnchorPane.setLeftAnchor;
 import static javafx.scene.layout.AnchorPane.setRightAnchor;
 import static javafx.scene.layout.AnchorPane.setTopAnchor;
+import static javafx.scene.paint.Color.BLACK;
+import static javafx.scene.paint.Color.GRAY;
 import static javafx.scene.paint.Color.web;
 import static javafx.stage.Modality.NONE;
 import static javafx.stage.StageStyle.UNDECORATED;
@@ -110,6 +112,7 @@ import static acetree.tablelineagedata.AceTreeTableLineageLoader.setOriginToZero
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static partslist.celldeaths.CellDeaths.isInCellDeaths;
 import static search.SearchUtil.getStructureComment;
+import static search.SearchUtil.isMulticellularStructureByName;
 import static search.SearchUtil.isStructureWithComment;
 import static wormguides.loaders.URLLoader.process;
 
@@ -118,9 +121,9 @@ import static wormguides.loaders.URLLoader.process;
  */
 public class RootLayoutController extends BorderPane implements Initializable {
 
-    private final String UNLINEAGED_START = "Nuc";
-    private final String ROOT = "ROOT";
-    private final String FILL_COLOR_HEX = "#272727";
+    private static final String UNLINEAGED_START = "Nuc";
+    private static final String ROOT = "ROOT";
+    private static final String FILL_COLOR_HEX = "#272727";
 
     // Panels stuff
     @FXML
@@ -509,7 +512,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void openInfoWindow() {
         if (infoWindow == null) {
             initInfoWindow();
-            casesLists.setInfoWindow(infoWindow);
         }
         infoWindow.showWindow();
     }
@@ -775,8 +777,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // More info clickable text
         moreInfoClickableText.setOnMouseClicked(event -> {
-            openInfoWindow();
+            if (infoWindow == null) {
+                initInfoWindow();
+            }
             infoWindow.addName(selectedEntityNameProperty.get());
+            openInfoWindow();
         });
         moreInfoClickableText.setOnMouseEntered(event -> moreInfoClickableText.setCursor(HAND));
         moreInfoClickableText.setOnMouseExited(event -> moreInfoClickableText.setCursor(DEFAULT));
@@ -784,9 +789,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
         // More info in context menu
         bringUpInfoFlag.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                openInfoWindow();
+                if (infoWindow == null) {
+                    initInfoWindow();
+                }
                 infoWindow.addName(selectedEntityNameProperty.get());
-                infoWindow.showWindow();
+                openInfoWindow();
             }
         });
     }
@@ -806,16 +813,21 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         displayedName.setText("Active Cell: " + name);
         moreInfoClickableText.setVisible(true);
-        displayedDescription.setText("");
+        if (isMulticellularStructureByName(name)) {
+            moreInfoClickableText.setDisable(true);
+            moreInfoClickableText.setFill(GRAY);
+        } else {
+            moreInfoClickableText.setDisable(false);
+            moreInfoClickableText.setFill(BLACK);
+        }
 
+        displayedDescription.setText("");
         // Note
         displayedDescription.setText(storiesLayer.getNoteComments(name));
-
         // Cell body/structue
         if (isStructureWithComment(name)) {
             displayedDescription.setText(getStructureComment(name));
         }
-
         // Cell lineage name
         else {
             String functionalName = getFunctionalNameByLineageName(name);
@@ -1033,6 +1045,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 defaultEmbryoFlag,
                 lineageData,
                 searchLayer);
+        casesLists.setInfoWindow(infoWindow);
     }
 
     /**
@@ -1211,6 +1224,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             loader.setLocation(MainApp.class.getResource("view/layouts/ContextMenuLayout.fxml"));
             loader.setController(contextMenuController);
             loader.setRoot(contextMenuController);
+
             try {
                 contextMenuStage.setScene(new Scene(loader.load()));
                 contextMenuStage.initModality(NONE);
@@ -1220,6 +1234,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     node.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
                 }
                 contextMenuController.setInfoButtonListener(event -> contextMenuStage.hide());
+
             } catch (IOException e) {
                 System.out.println("Error in initializing context menu");
                 e.printStackTrace();
