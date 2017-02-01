@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2017
+ * Bao Lab 2016
  */
 
 package wormguides.controllers;
@@ -52,18 +52,18 @@ import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 
 public class ContextMenuController extends AnchorPane implements Initializable {
 
-    /** Wait time in miliseconds between showing a different number of periods after loading */
-    private final long WAIT_TIME_MILLI = 750;
+    /** Wait time in miliseconds between showing a different number of periods after loading (for gene option) */
+    private static final long WAIT_TIME_MILLI = 750;
 
-    private final double MAX_MENU_HEIGHT = 200;
+    private static final double MAX_MENU_HEIGHT = 200;
 
-    private final int PRE_SYN_INDEX = 0,
+    private static final int PRE_SYN_INDEX = 0,
             POST_SYN_INDEX = 1,
             ELECTR_INDEX = 2,
             NEURO_INDEX = 3;
 
     /** Default color of the rules that are created by the context menu */
-    private final Color DEFAULT_COLOR = WHITE;
+    private static final Color DEFAULT_COLOR = WHITE;
 
     private final Stage ownStage;
 
@@ -336,15 +336,21 @@ public class ContextMenuController extends AnchorPane implements Initializable {
     }
 
     /**
-     * Sets the listener for the 'more info' button click in the menu. Called by
-     * Window3DController
+     * Sets the listener for the 'more info' button click in the menu
      *
      * @param handler
-     *         the handler (provided by Window3DController) that handles the
-     *         'more info' button click action
+     *         the handler (provided by RootLayoutController) that handles the 'more info' button click action
      */
     public void setInfoButtonListener(EventHandler<MouseEvent> handler) {
         info.setOnMouseClicked(handler);
+    }
+
+    /**
+     * Disables/enables the 'More Info' button from the context menu. The button is disabled for multicellular
+     * structures.
+     */
+    public void disableInfoButton(final boolean disable) {
+        info.setDisable(disable);
     }
 
     /**
@@ -353,8 +359,8 @@ public class ContextMenuController extends AnchorPane implements Initializable {
      * where the menu pops up (whether in the 3D subscene or the sulston tree)
      *
      * @param handler
-     *         the handler (provided by Window3DController or SulstonTreePane) that handles the 'color this cell' button
-     *         click action
+     *         the handler (provided by Window3DController or SulstonTreePane) that handles the 'color this cell'
+     *         button click action
      */
     public void setColorButtonListener(EventHandler<MouseEvent> handler) {
         color.setOnMouseClicked(handler);

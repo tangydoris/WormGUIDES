@@ -145,46 +145,46 @@ import static wormguides.util.AppFont.getSpriteAndOverlayFont;
  */
 public class Window3DController {
 
-    private final double CANNONICAL_ORIENTATION_X = 145.0;
-    private final double CANNONICAL_ORIENTATION_Y = -166.0;
-    private final double CANNONICAL_ORIENTATION_Z = 24.0;
-    private final String CS = ", ";
-    private final String FILL_COLOR_HEX = "#272727",
+    private static final double CANNONICAL_ORIENTATION_X = 145.0;
+    private static final double CANNONICAL_ORIENTATION_Y = -166.0;
+    private static final double CANNONICAL_ORIENTATION_Z = 24.0;
+    private static final String CS = ", ";
+    private static final String FILL_COLOR_HEX = "#272727",
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
     /** The wait timeProperty (in millis) between consecutive timeProperty frames while a movie is playing. */
-    private final long WAIT_TIME_MILLI = 200;
+    private static final long WAIT_TIME_MILLI = 200;
     /**
      * Initial zoom of embryo view. On program startup, the embryo is zoomed in so that the entire embryo is not
      * visible.
      */
-    private final double INITIAL_ZOOM = 2.75;
-    private final double INITIAL_TRANSLATE_X = -14.0,
+    private static final double INITIAL_ZOOM = 2.75;
+    private static final double INITIAL_TRANSLATE_X = -14.0,
             INITIAL_TRANSLATE_Y = 18.0;
-    private final double CAMERA_INITIAL_DISTANCE = -220;
-    private final double CAMERA_NEAR_CLIP = 1,
+    private static final double CAMERA_INITIAL_DISTANCE = -220;
+    private static final double CAMERA_NEAR_CLIP = 1,
             CAMERA_FAR_CLIP = 2000;
-    private final int X_COR_INDEX = 0,
+    private static final int X_COR_INDEX = 0,
             Y_COR_INDEX = 1,
             Z_COR_INDEX = 2;
     /** Text size scale used for the rendering of billboard notes. */
-    private final double BILLBOARD_SCALE = 0.9;
+    private static final double BILLBOARD_SCALE = 0.9;
     /**
      * Scale used for the radii of spheres that represent cells, multiplied with the cell's radius loaded from the
      * nuc files.
      */
-    private final double SIZE_SCALE = 1;
+    private static final double SIZE_SCALE = 1;
     /** The radius of all spheres when 'uniform size' is ticked. */
-    private final double UNIFORM_RADIUS = 4;
+    private static final double UNIFORM_RADIUS = 4;
     /** The y-offset from a sprite to a label label for one cell entity. */
-    private final int LABEL_SPRITE_Y_OFFSET = 5;
+    private static final int LABEL_SPRITE_Y_OFFSET = 5;
     /** Default transparency of 'other' entities on startup */
-    private final double DEFAULT_OTHERS_OPACITY = 0.25;
+    private static final double DEFAULT_OTHERS_OPACITY = 0.25;
     /** Visibility (in range [0, 1]) under which "other" entities are not rendered */
-    private final double VISIBILITY_CUTOFF = 0.01;
+    private static final double VISIBILITY_CUTOFF = 0.01;
     /** Visibility (in range [0, 1]) under which "other" entities are not selectable/labeled */
-    private final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
+    private static final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
 
     // rotation stuff
     private final Rotate rotateX;
@@ -258,7 +258,6 @@ public class Window3DController {
     private final Cylinder orientationIndicator;
     // rotation
     private final double[] keyValuesRotate = {90, 30, 30, 90};
-    //  private final double[] keyValuesRotate = {60, 1, 1, 60};
     private final double[] keyFramesRotate = {1, 16, 321, 359};
 
     private final ProductionInfo productionInfo;
@@ -453,7 +452,7 @@ public class Window3DController {
                 startTime1 = getFirstOccurenceOf(lineageName);
                 endTime1 = getLastOccurenceOf(lineageName);
 
-                // do not change scene is entity does not exist at any timeProperty
+                // do not change scene if entity does not exist at any timeProperty
                 if (startTime1 <= 0 || endTime1 <= 0) {
                     return;
                 }
@@ -463,6 +462,8 @@ public class Window3DController {
                 } else {
                     insertLabelFor(lineageName, entity);
                 }
+
+                insertLabelFor(lineageName, entity);
                 highlightActiveCellLabel(entity);
             }
         });
@@ -764,7 +765,7 @@ public class Window3DController {
                     && othersOpacityProperty.get() < SELECTABILITY_VISIBILITY_CUTOFF) {
                 return;
             }
-            if (!currentLabels.contains(name) && entity != null) {
+            if (!currentLabels.contains(name)) {
                 final Bounds b = entity.getBoundsInParent();
                 if (b != null) {
                     final String funcName = getFunctionalNameByLineageName(name);
@@ -879,17 +880,17 @@ public class Window3DController {
 
                         // compute cross product
                         double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
-                        if (cross.length == 3) {
+                        if (cross != null) {
                             // System.out.println("cross product: <" + cross[0] + ",
                             // " + cross[1] + ", " + cross[2] + ">");
                             quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
                             ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
 
-                            if (eulerAngles.size() == 3) {
-                                // rotateX.setAngle(eulerAngles.get(2));
-                                // rotateY.setAngle(eulerAngles.get(0));
-                            }
+//                            if (eulerAngles.size() == 3) {
+                            // rotateX.setAngle(eulerAngles.get(2));
+                            // rotateY.setAngle(eulerAngles.get(0));
+//                            }
                         }
                     }
                 }
@@ -938,6 +939,7 @@ public class Window3DController {
                         name,
                         event.getScreenX(),
                         event.getScreenY(),
+                        false,
                         false);
 
             } else if (event.getButton() == PRIMARY) {
@@ -977,7 +979,8 @@ public class Window3DController {
                                     name,
                                     event.getScreenX(),
                                     event.getScreenY(),
-                                    true);
+                                    true,
+                                    sceneElementsList.isMulticellStructureName(name));
                         }
 
                     } else if (event.getButton() == PRIMARY) {
@@ -1037,7 +1040,11 @@ public class Window3DController {
         return rotationAngleRadians;
     }
 
-    // http://mathworld.wolfram.com/CrossProduct.html
+    /**
+     * Source: http://mathworld.wolfram.com/CrossProduct.html
+     *
+     * @return length-3 vector containing the cross product of valid inputs, null otherwise
+     */
     private double[] crossProduct(double[] u, double[] v) {
         if (u.length != 3 || v.length != 3) {
             return null;
@@ -1065,10 +1072,14 @@ public class Window3DController {
             final String name,
             final double sceneX,
             final double sceneY,
-            final boolean isStructure) {
+            final boolean isStructure,
+            final boolean isMulticellularStructure) {
 
         contextMenuController.setName(name);
         contextMenuController.setColorButtonText(isStructure);
+        if (isStructure) {
+            contextMenuController.disableInfoButton(isMulticellularStructure);
+        }
 
         String funcName = getFunctionalNameByLineageName(name);
         if (funcName == null) {
@@ -1470,7 +1481,6 @@ public class Window3DController {
                     } else {
                         material = othersMaterial;
                         if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
-                            // TODO test this
                             sphere.setDisable(true);
                         }
                     }
@@ -1551,10 +1561,8 @@ public class Window3DController {
                     // can color them
                     if (structureCells.isEmpty()) {
                         // check if any rules apply to this no-cell structure
-                        boolean ruleApplies = false;
                         for (Rule rule : rulesList) {
                             if (rule.appliesToStructureWithSceneName(sceneElement.getSceneName())) {
-                                ruleApplies = true;
                                 colors.add(rule.getColor());
                             }
                         }
@@ -1593,7 +1601,6 @@ public class Window3DController {
                         } else {
                             meshView.setMaterial(colorHash.getOthersMaterial(othersOpacityProperty.get()));
                             if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
-                                // TODO test this
                                 meshView.setDisable(true);
                             }
                         }
@@ -2068,11 +2075,9 @@ public class Window3DController {
                                 final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
                                 try {
                                     final File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-                                    if (file != null) {
                                         RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
                                         write(renderedImage, "JPEG", file);
                                         movieFiles.addElement(file);
-                                    }
                                 } catch (Exception e) {
                                     System.out.println("Could not write frame of movie to file.");
                                     e.printStackTrace();
@@ -2105,21 +2110,21 @@ public class Window3DController {
             new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
 
             // move the movie to the originally specified location
-            File movJustMade = new File(movieName);
+            final File movJustMade = new File(movieName);
             movJustMade.renameTo(new File(moviePath));
 
             // remove the .movtemp.jpg file
-            File movtempjpg = new File(".movtemp.jpg");
-            if (movtempjpg != null) {
-                movtempjpg.delete();
-            }
+            final File movtempjpg = new File(".movtemp.jpg");
+            movtempjpg.delete();
         }
 
         // remove all of the images in the frame directory
         if (frameDir != null && frameDir.isDirectory()) {
-            File[] frames = frameDir.listFiles();
-            for (File frame : frames) {
-                frame.delete();
+            final File[] frames = frameDir.listFiles();
+            if (frames != null) {
+                for (File frame : frames) {
+                    frame.delete();
+                }
             }
             frameDir.delete();
         }
