@@ -26,7 +26,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.sort;
 
-import static wormguides.loaders.GeometryLoader.doesResourceExist;
+import static wormguides.loaders.GeometryLoader.getEffectiveStartTime;
 
 /**
  * Record of {@link SceneElement}s over the life of the embryo
@@ -109,7 +109,7 @@ public class SceneElementsList {
             List<String> cellNames;
             StringTokenizer cellNamesTokenizer;
             TreeItem<StructureTreeNode> currentCategoryNode = root;
-            // process each line
+            // processUrl each line
             while ((line = reader.readLine()) != null) {
                 final String[] tokens = line.split(",", NUM_OF_CSV_FIELDS);
                 name = tokens[DESCRIPTION_INDEX];
@@ -133,7 +133,12 @@ public class SceneElementsList {
                         startTime = parseInt(tokens[START_TIME_INDEX]);
                         endTime = parseInt(tokens[END_TIME_INDEX]);
 
-                        if (doesResourceExist(resourceLocation, startTime, endTime)) {
+                        // this is extremely slow with the experimental shapes:
+                        // check to see if resource exists in the shape files archive
+                        // only create a scene element if it does
+                        int effectiveStartTime = getEffectiveStartTime(resourceLocation, startTime, endTime);
+                        if (effectiveStartTime != MIN_VALUE) {
+                            startTime = effectiveStartTime;
                             // vector of cell names
                             cellNames = new ArrayList<>();
                             cellNamesTokenizer = new StringTokenizer(tokens[CELLS_INDEX]);
@@ -146,7 +151,7 @@ public class SceneElementsList {
                                 lineageName = name.substring(0, name.indexOf("(")).trim();
                             }
                             if (lineageData.isCellName(lineageName)) {
-                                int effectiveStartTime = lineageData.getFirstOccurrenceOf(lineageName);
+                                effectiveStartTime = lineageData.getFirstOccurrenceOf(lineageName);
                                 int effectiveEndTime = lineageData.getLastOccurrenceOf(lineageName);
                                 // use the later one of the config start time and the effective lineage start time
                                 startTime = effectiveStartTime > startTime ? effectiveStartTime : startTime;
@@ -154,9 +159,6 @@ public class SceneElementsList {
                                 endTime = effectiveEndTime < endTime ? effectiveEndTime : endTime;
                             }
 
-                            // this is extremely slow with the experimental shapes:
-                            // check to see if resource exists in the shape files archive
-                            // only create a scene element if it does
                             final SceneElement element = new SceneElement(
                                     lineageName,
                                     cellNames,

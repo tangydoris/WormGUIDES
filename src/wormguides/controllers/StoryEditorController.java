@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.controllers;
@@ -18,9 +14,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,12 +36,26 @@ import wormguides.stories.Note.Type;
 import wormguides.stories.Story;
 import wormguides.util.StringCellFactory;
 
+import static java.lang.Integer.MIN_VALUE;
+import static java.lang.Integer.parseInt;
+import static java.util.Objects.requireNonNull;
+
+import static javafx.collections.FXCollections.observableArrayList;
+
+import static wormguides.controllers.StoryEditorController.Time.CURRENT;
+import static wormguides.controllers.StoryEditorController.Time.RANGE;
+import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
+import static wormguides.stories.Note.Display.OVERLAY;
+import static wormguides.stories.Note.Display.SPRITE;
+import static wormguides.stories.Note.Type.BLANK;
+import static wormguides.stories.Note.Type.CELL;
+import static wormguides.stories.Note.Type.STRUCTURE;
+
 public class StoryEditorController extends AnchorPane implements Initializable {
 
-    private final String NEW_NOTE_TITLE = "New Note";
-    private final String NEW_NOTE_CONTENTS = "New note contents here";
-    private LineageData cellData;
-    private int frameOffset;
+    private static final String NEW_NOTE_TITLE = "New Note";
+    private static final String NEW_NOTE_CONTENTS = "New note contents here";
+
     @FXML
     private TextField author;
     @FXML
@@ -88,8 +95,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     private ToggleGroup subStructureToggle;
     @FXML
     private ComboBox<String> structuresComboBox;
-    private ObservableList<String> structureComboItems;
-    private StringCellFactory.StringListCellFactory listCellFactory;
+
     @FXML
     private RadioButton axonRadioBtn;
 
@@ -125,19 +131,38 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     private TextField titleField;
     @FXML
     private TextArea contentArea;
-    private Note activeNote;
-    private BooleanProperty update3D;
 
-    // Input nameProperty is the string property that changes with clicking
-    // on an entity in the 3d window
+    private final ObservableList<String> structureComboItems;
+    private StringCellFactory.StringListCellFactory listCellFactory;
+
+    private Note activeNote;
+
+    private final LineageData cellData;
+    private final int frameOffset;
+
+    /**
+     * Constructor
+     *
+     * @param timeOffset
+     *         time offset (in number of frames). This was loaded from production info on startup.
+     * @param data
+     *         underlying lineage data
+     * @param multiCellStructuresList
+     *         list of multicellular structures
+     * @param nameProperty
+     *         string property that changes when an entity is clicked in the subscene
+     * @param cellClickedProperty
+     *         true if a cell is clicked on, false otherwise
+     * @param sceneTimeProperty
+     *         the subscene time
+     */
     public StoryEditorController(
-            int timeOffset,
-            LineageData data,
-            List<String> multiCellStructuresList,
-            StringProperty nameProperty,
-            BooleanProperty cellClickedProperty,
-            IntegerProperty sceneTimeProperty,
-            BooleanProperty update3D) {
+            final int timeOffset,
+            final LineageData data,
+            final List<String> multiCellStructuresList,
+            final StringProperty nameProperty,
+            final BooleanProperty cellClickedProperty,
+            final IntegerProperty sceneTimeProperty) {
 
         super();
 
@@ -145,17 +170,16 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         frameOffset = timeOffset;
 
-        new SimpleBooleanProperty(false);
         noteCreated = new SimpleBooleanProperty(false);
 
         activeStory = null;
         activeNote = null;
 
-        timeProperty = sceneTimeProperty;
+        timeProperty = requireNonNull(sceneTimeProperty);
         timeProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Toggle selected = timeToggle.getSelectedToggle();
-                if (selected == null || selected.getUserData() != Time.CURRENT) {
+                if (selected == null || selected.getUserData() != CURRENT) {
                     setCurrentTimeLabel(timeProperty.get() + frameOffset);
                 }
             }
@@ -163,7 +187,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         activeCellProperty = new SimpleStringProperty();
 
-        sceneActiveCellProperty = nameProperty;
+        sceneActiveCellProperty = requireNonNull(nameProperty);
         sceneActiveCellProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.isEmpty() && cellData.isCellName(newValue)) {
                 activeCellProperty.set(newValue);
@@ -179,11 +203,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             }
         });
 
-        structureComboItems = FXCollections.observableArrayList();
-        structureComboItems.addAll(multiCellStructuresList);
-        // structureComboItems.addAll("Axon", "Dendrite", "Cell Body");
-
-        this.update3D = update3D;
+        structureComboItems = observableArrayList();
+        structureComboItems.addAll(requireNonNull(multiCellStructuresList));
     }
 
     @Override
@@ -196,29 +217,49 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             storyDescription.setText(activeStory.getDescription());
             author.setText(activeStory.getAuthor());
             date.setText(activeStory.getDate());
-
             storyTitle.positionCaret(storyTitle.getText().length());
         };
 
-        // text fields
+        // note fields
         updateNoteFields();
-        titleField.textProperty().addListener(new TitleFieldListener());
-        titleField.focusedProperty().addListener((arg0, oldPropertyValue, newPropertyValue) -> {
-            if (newPropertyValue) { // i.e. out of focus, now refresh the
-                // scene
-                update3D.set(false);
-            } else {
-                update3D.set(true);
+        titleField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            // if field was previously focused and is not anymore
+            if (!newValue && activeNote != null) {
+                activeNote.setTagName(titleField.getText());
+                activeNote.setChanged(true);
+            }
+        });
+        contentArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && activeNote != null) {
+                activeNote.setTagContents(contentArea.getText());
+                activeNote.setChanged(true);
             }
         });
 
-        contentArea.textProperty().addListener(new ContentAreaListener());
-
+        // story fields
         updateStoryFields();
-        storyTitle.textProperty().addListener(new StoryTitleFieldListener());
-        storyDescription.textProperty().addListener(new StoryDescriptionAreaListener());
-        author.textProperty().addListener(new AuthorFieldListener());
-        date.textProperty().addListener(new DateFieldListener());
+        storyTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && activeStory != null) {
+                activeStory.setName(newValue);
+                activeStory.setChanged(true);
+            }
+        });
+        storyDescription.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && activeStory != null) {
+                activeStory.setDescription(newValue);
+                activeStory.setChanged(true);
+            }
+        });
+        author.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && activeStory != null) {
+                activeStory.setAuthor(newValue);
+            }
+        });
+        date.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && activeStory != null) {
+                activeStory.setDate(newValue);
+            }
+        });
 
         // attachment type/note display
         initToggleData();
@@ -227,12 +268,119 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         updateTime();
         updateDisplay();
 
-        timeToggle.selectedToggleProperty().addListener(new TimeToggleListener());
-        startTimeField.textProperty().addListener(new StartTimeFieldListener());
-        endTimeField.textProperty().addListener(new EndTimeFieldListener());
+        timeToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null && newValue != null) {
+                int start = MIN_VALUE;
+                int end = MIN_VALUE;
+                switch ((Time) newValue.getUserData()) {
+                    case CURRENT:
+                        start = timeProperty.get();
+                        end = start;
+                        break;
 
-        attachmentToggle.selectedToggleProperty().addListener(new AttachmentToggleListener());
-        displayToggle.selectedToggleProperty().addListener(new DisplayToggleListener());
+                    case RANGE:
+                        try {
+                            if (!startTimeField.getText().isEmpty()) {
+                                start = parseInt(startTimeField.getText()) - frameOffset;
+                            }
+                            if (!endTimeField.getText().isEmpty()) {
+                                end = parseInt(endTimeField.getText()) - frameOffset;
+                            }
+                        } catch (NumberFormatException e) {
+                            // silently fail
+                        }
+                        break;
+
+                    case GLOBAL: // fall to default case
+
+                    default:
+                        break;
+                }
+                activeNote.setStartAndEndTimes(start, end);
+            }
+        });
+        startTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null) {
+                Toggle selected = timeToggle.getSelectedToggle();
+                if (selected != null && selected.getUserData() == RANGE) {
+                    try {
+                        activeNote.setStartTime(parseInt(newValue) - frameOffset);
+                    } catch (NumberFormatException e) {
+                        // silently fail
+                    }
+                }
+            }
+        });
+        endTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null) {
+                Toggle selected = timeToggle.getSelectedToggle();
+                if (selected != null && selected.getUserData() == RANGE) {
+                    try {
+                        activeNote.setEndTime(parseInt(newValue) - frameOffset);
+                    } catch (NumberFormatException e) {
+                        // silently fail
+                    }
+                }
+            }
+        });
+
+        attachmentToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null) {
+                if (newValue != null) {
+                    switch ((Type) newValue.getUserData()) {
+                        case CELL:
+                            setActiveNoteAttachmentType(CELL);
+                            setActiveNoteCellName(activeCellProperty.get());
+                            setActiveNoteDisplay(SPRITE);
+                            structuresComboBox.setDisable(true);
+                            updateDisplay();
+                            break;
+
+                        case BLANK:
+                            setActiveNoteAttachmentType(BLANK);
+                            setActiveNoteDisplay(OVERLAY);
+                            structuresComboBox.setDisable(true);
+                            updateDisplay();
+                            break;
+
+                        case STRUCTURE:
+                            setActiveNoteAttachmentType(STRUCTURE);
+                            setActiveNoteCellName(structuresComboBox.getSelectionModel().getSelectedItem());
+                            setActiveNoteDisplay(SPRITE);
+                            structuresComboBox.setDisable(false);
+                            updateDisplay();
+                            break;
+
+                        default:
+                            break;
+
+                    }
+                } else {
+                    setActiveNoteAttachmentType(BLANK);
+                }
+            }
+        });
+        displayToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null) {
+                if (newValue != null) {
+                    switch ((Display) newValue.getUserData()) {
+                        case OVERLAY:
+                            setActiveNoteDisplay(OVERLAY);
+                            break;
+                        case SPRITE:
+                            setActiveNoteDisplay(SPRITE);
+                            break;
+                        case BILLBOARD_FRONT:
+                            setActiveNoteDisplay(BILLBOARD_FRONT);
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    setActiveNoteDisplay(Display.BLANK);
+                }
+            }
+        });
 
         listCellFactory = new StringCellFactory.StringListCellFactory();
         structuresComboBox.setItems(structureComboItems);
@@ -248,7 +396,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         activeCellProperty.addListener((observable, oldValue, newValue) -> {
             // only change when active cell toggle is not selected
             Toggle selected = attachmentToggle.getSelectedToggle();
-            if (selected == null || !((Type) selected.getUserData()).equals(Type.CELL)) {
+            if (selected == null || !((Type) selected.getUserData()).equals(CELL)) {
                 setCellLabelName(newValue);
             }
         });
@@ -275,14 +423,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         if (activeNote != null) {
             activeNote.setAttachmentType(type);
 
-            if (type.equals(Type.CELL) && !activeCellProperty.get().isEmpty()) {
+            if (type.equals(CELL) && !activeCellProperty.get().isEmpty()) {
                 activeNote.setCellName(activeCellProperty.get());
             }
         }
-    }
-
-    public void setUpdate3DProperty(BooleanProperty update3D) {
-        this.update3D = update3D;
     }
 
     private String removeFunctionalName(String name) {
@@ -296,25 +440,25 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
     private void initToggleData() {
         // attachment type
-        cellRadioBtn.setUserData(Type.CELL);
-        globalRadioBtn.setUserData(Type.BLANK);
-        structureRadioBtn.setUserData(Type.STRUCTURE);
+        cellRadioBtn.setUserData(CELL);
+        globalRadioBtn.setUserData(BLANK);
+        structureRadioBtn.setUserData(STRUCTURE);
 
         // sub structure
 
         // time
         globalTimeRadioBtn.setUserData(Time.GLOBAL);
-        currentTimeRadioBtn.setUserData(Time.CURRENT);
-        rangeTimeRadioBtn.setUserData(Time.RANGE);
+        currentTimeRadioBtn.setUserData(CURRENT);
+        rangeTimeRadioBtn.setUserData(RANGE);
 
         // display
-        infoPaneRadioBtn.setUserData(Display.OVERLAY);
-        locationRadioBtn.setUserData(Display.SPRITE);
-        upLeftRadioBtn.setUserData(Display.SPRITE);
-        upRightRadioBtn.setUserData(Display.SPRITE);
-        lowLeftRadioBtn.setUserData(Display.SPRITE);
-        lowRightRadioBtn.setUserData(Display.SPRITE);
-        billboardRadioBtn.setUserData(Display.BILLBOARD_FRONT);
+        infoPaneRadioBtn.setUserData(OVERLAY);
+        locationRadioBtn.setUserData(SPRITE);
+        upLeftRadioBtn.setUserData(SPRITE);
+        upRightRadioBtn.setUserData(SPRITE);
+        lowLeftRadioBtn.setUserData(SPRITE);
+        lowRightRadioBtn.setUserData(SPRITE);
+        billboardRadioBtn.setUserData(BILLBOARD_FRONT);
     }
 
     private void assertFXMLNodes() {
@@ -375,7 +519,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 // System.out.println(activeNote.getTagName()+" time -
                 // "+start+", "+end);
 
-                if (start == Integer.MIN_VALUE || end == Integer.MIN_VALUE) {
+                if (start == MIN_VALUE || end == MIN_VALUE) {
                     timeToggle.selectToggle(globalTimeRadioBtn);
                     startTimeField.setText("");
                     endTimeField.setText("");
@@ -413,7 +557,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         String name = activeNote.getCellName();
                         for (String structure : structureComboItems) {
                             if (structure.equalsIgnoreCase(name)) {
-                                name = structure;
                                 structuresComboBox.getSelectionModel().select(structure);
                                 break;
                             }
@@ -438,54 +581,61 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         }
     }
 
-    private void setCurrentTimeLabel(int time) {
+    private void setCurrentTimeLabel(final int time) {
         currentTimeLabel.setText("Current Time (" + time + ")");
     }
 
-    private void setCellLabelName(String name) {
+    private void setCellLabelName(final String name) {
         if (activeCellLabel != null) {
             if (name == null || name.isEmpty()) {
                 activeCellLabel.setText("Active Cell (none)");
             } else {
-                String lineageName = removeFunctionalName(name);
-                activeCellLabel.setText("Active Cell (" + lineageName + ")");
+                activeCellLabel.setText("Active Cell (" + removeFunctionalName(name) + ")");
             }
         }
     }
 
-    private void resetToggle(ToggleGroup group) {
-        Toggle current = group.getSelectedToggle();
-        if (current != null) {
-            current.setSelected(false);
+    /**
+     * Resets a toggle group so that all toggle are unselected
+     *
+     * @param group
+     *         the toggle group to reset
+     */
+    private void resetToggle(final ToggleGroup group) {
+        if (group != null) {
+            final Toggle current = group.getSelectedToggle();
+            if (current != null) {
+                current.setSelected(false);
+            }
         }
     }
 
+    /**
+     * Updates display radio button toggle with the display type of the active note
+     */
     private void updateDisplay() {
-        if (displayToggle != null) {
-            if (activeNote != null) {
+        if (activeNote != null) {
+            switch (activeNote.getTagDisplay()) {
+                case BLANK: // fall to overlay case
 
-                switch (activeNote.getTagDisplay()) {
-                    case BLANK: // fall to overlay case
+                case OVERLAY:
+                    infoPaneRadioBtn.setSelected(true);
+                    break;
 
-                    case OVERLAY:
-                        infoPaneRadioBtn.setSelected(true);
-                        break;
+                case SPRITE:
+                    locationRadioBtn.setSelected(true);
+                    break;
 
-                    case SPRITE:
-                        locationRadioBtn.setSelected(true);
-                        break;
+                case BILLBOARD_FRONT:
+                    billboardRadioBtn.setSelected(true);
+                    break;
 
-                    case BILLBOARD_FRONT:
-                        billboardRadioBtn.setSelected(true);
-                        break;
-
-                    default:
-                        resetToggle(displayToggle);
-                        break;
-                }
-            } else {
-                resetToggle(displayToggle);
+                default:
+                    resetToggle(displayToggle);
+                    break;
             }
+        } else {
+            resetToggle(displayToggle);
         }
     }
 
@@ -520,7 +670,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
     public void setActiveNote(Note note) {
         activeNote = note;
-
         updateNoteFields();
         updateType();
         updateTime();
@@ -552,202 +701,4 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     public enum Time {
         GLOBAL, CURRENT, RANGE
     }
-
-    // ----- Begin listeners ----
-    private class AuthorFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeStory != null) {
-                activeStory.setAuthor(newValue);
-            }
-        }
-    }
-
-    private class DateFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeStory != null) {
-                activeStory.setDate(newValue);
-            }
-        }
-    }
-
-    private class StoryTitleFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeStory != null) {
-                activeStory.setName(newValue);
-                activeStory.setChanged(true);
-            }
-        }
-    }
-
-    private class StoryDescriptionAreaListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeStory != null) {
-                activeStory.setDescription(newValue);
-                activeStory.setChanged(true);
-            }
-        }
-    }
-
-    private class TitleFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeNote != null) {
-                activeNote.setTagName(newValue);
-                activeNote.setChanged(true);
-            }
-        }
-    }
-
-    private class ContentAreaListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeNote != null) {
-                activeNote.setTagContents(newValue);
-                activeNote.setChanged(true);
-            }
-        }
-    }
-
-    private class TimeToggleListener implements ChangeListener<Toggle> {
-        @Override
-        public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-            if (activeNote != null && newValue != null) {
-                int start = Integer.MIN_VALUE;
-                int end = Integer.MIN_VALUE;
-
-                switch ((Time) newValue.getUserData()) {
-
-                    case CURRENT:
-                        start = timeProperty.get();
-                        end = start;
-                        break;
-
-                    case RANGE:
-                        try {
-                            if (!startTimeField.getText().isEmpty()) {
-                                start = Integer.parseInt(startTimeField.getText()) - frameOffset;
-                            }
-                            if (!endTimeField.getText().isEmpty()) {
-                                end = Integer.parseInt(endTimeField.getText()) - frameOffset;
-                            }
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-
-                    case GLOBAL: // fall to default case
-
-                    default:
-                        break;
-                }
-
-                activeNote.setStartAndEndTimes(start, end);
-            }
-        }
-    }
-
-    private class StartTimeFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeNote != null) {
-                Toggle selected = timeToggle.getSelectedToggle();
-                if (selected != null && selected.getUserData() == Time.RANGE) {
-                    try {
-                        activeNote.setStartTime(Integer.parseInt(newValue) - frameOffset);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-    // ----- End listeners ----
-
-    private class EndTimeFieldListener implements ChangeListener<String> {
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            if (activeNote != null) {
-                Toggle selected = timeToggle.getSelectedToggle();
-                if (selected != null && selected.getUserData() == Time.RANGE) {
-                    try {
-                        activeNote.setEndTime(Integer.parseInt(newValue) - frameOffset);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-    // ----- End button actions -----
-
-    private class DisplayToggleListener implements ChangeListener<Toggle> {
-        @Override
-        public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-            if (activeNote != null) {
-                if (newValue != null) {
-                    switch ((Display) newValue.getUserData()) {
-
-                        case OVERLAY:
-                            setActiveNoteDisplay(Display.OVERLAY);
-                            break;
-
-                        case SPRITE:
-                            setActiveNoteDisplay(Display.SPRITE);
-                            break;
-
-                        case BILLBOARD_FRONT:
-                            setActiveNoteDisplay(Display.BILLBOARD_FRONT);
-                            break;
-
-                        default:
-                            break;
-                    }
-                } else {
-                    setActiveNoteDisplay(Display.BLANK);
-                }
-            }
-        }
-    }
-
-    private class AttachmentToggleListener implements ChangeListener<Toggle> {
-        @Override
-        public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-            if (activeNote != null) {
-                if (newValue != null) {
-                    switch ((Type) newValue.getUserData()) {
-
-                        case CELL:
-                            setActiveNoteAttachmentType(Type.CELL);
-                            setActiveNoteCellName(activeCellProperty.get());
-                            setActiveNoteDisplay(Display.SPRITE);
-                            updateDisplay();
-                            break;
-
-                        case BLANK:
-                            setActiveNoteAttachmentType(Type.BLANK);
-                            setActiveNoteDisplay(Display.OVERLAY);
-                            updateDisplay();
-                            break;
-
-                        case STRUCTURE:
-                            setActiveNoteAttachmentType(Type.STRUCTURE);
-                            setActiveNoteDisplay(Display.SPRITE);
-                            updateDisplay();
-                            break;
-
-                        default:
-                            break;
-
-                    }
-                } else {
-                    setActiveNoteAttachmentType(Type.BLANK);
-                }
-            }
-        }
-    }
-
 }

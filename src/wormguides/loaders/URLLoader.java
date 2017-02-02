@@ -45,7 +45,7 @@ public class URLLoader {
      * @param url
      *         subscene parameters and rules URL consisting of a prefix url, rules to be parsed, and view arguments
      */
-    public static void process(
+    public static void processUrl(
             final String url,
             final ObservableList<Rule> rulesList,
             final SearchLayer searchLayer,
@@ -95,9 +95,9 @@ public class URLLoader {
             }
         }
 
-        // process rules
+        // processUrl rules
         parseRules(ruleArgs, rulesList, searchLayer);
-        // process view arguments
+        // processUrl view arguments
         final int previousTime = timeProperty.get();
         parseViewArgs(
                 viewArgs,

@@ -139,7 +139,7 @@ public class Connectome {
                 String cell1 = ns.getCell1();
                 String cell2 = ns.getCell2();
 
-                // process type code
+                // processUrl type code
                 String synapseTypeDescription = ns.getSynapseType().getDescription();
 
                 // find synapse type code for connection, compare to toggle ticks

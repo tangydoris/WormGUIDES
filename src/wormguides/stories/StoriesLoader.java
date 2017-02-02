@@ -27,26 +27,25 @@ public class StoriesLoader {
             STORY_DATE_INDEX = 13,
             STORY_COLOR_URL_INDEX = 14;
 
-    public static final int NAME_INDEX = 0,
-            CONTENTS_INDEX = 1,
-            DISPLAY_INDEX = 2,
-            TYPE_INDEX = 3,
-            LOCATION_INDEX = 4,
-            CELLNAME_INDEX = 5,
-            MARKER_INDEX = 6,
-            IMG_SOURCE_INDEX = 7,
-            RESOURCE_LOCATION_INDEX = 8,
+    public static final int NOTE_NAME_INDEX = 0,
+            NOTE_CONTENTS_INDEX = 1,
+            NOTE_DISPLAY_INDEX = 2,
+            NOTE_TYPE_INDEX = 3,
+            NOTE_LOCATION_INDEX = 4,
+            NOTE_CELLNAME_INDEX = 5,
+            NOTE_MARKER_INDEX = 6,
+            NOTE_IMG_SOURCE_INDEX = 7,
+            NOTE_RESOURCE_LOCATION_INDEX = 8,
             START_TIME_INDEX = 9,
             END_TIME_INDEX = 10,
-            COMMENTS_INDEX = 11;
+            NOTE_COMMENTS_INDEX = 11;
 
     private static final String STORY_LIST_CONFIG = "/wormguides/stories/StoryListConfig.csv";
 
-    public static void loadFromFile(File file, ObservableList<Story> stories, int offset) {
+    public static void loadFromFile(final ObservableList<Story> stories, final File file, final int offset) {
         if (file != null) {
-            try (InputStream stream = new FileInputStream(file)) {
+            try (final InputStream stream = new FileInputStream(file)) {
                 processStream(stream, stories, offset);
-
             } catch (IOException ioe) {
                 System.out.println("Could not read file '" + file.getName() + "' in the system.");
             }
@@ -57,7 +56,7 @@ public class StoriesLoader {
         final URL url = StoriesLoader.class.getResource(STORY_LIST_CONFIG);
 
         if (url != null) {
-            try (InputStream stream = url.openStream()){
+            try (InputStream stream = url.openStream()) {
                 processStream(stream, stories, offset);
 
             } catch (IOException e) {
@@ -66,13 +65,13 @@ public class StoriesLoader {
         }
     }
 
-    private static void processStream(InputStream stream, ObservableList<Story> stories, int offset) {
+    private static void processStream(final InputStream stream, final ObservableList<Story> stories, final int offset) {
         // used for accessing the current story for adding scene elements
         int storyCounter = stories.size() - 1;
 
         try {
-            InputStreamReader streamReader = new InputStreamReader(stream);
-            BufferedReader reader = new BufferedReader(streamReader);
+            final InputStreamReader streamReader = new InputStreamReader(stream);
+            final BufferedReader reader = new BufferedReader(streamReader);
 
             String line;
 
@@ -80,38 +79,46 @@ public class StoriesLoader {
             reader.readLine();
 
             while ((line = reader.readLine()) != null) {
-                String[] split = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
-
+                final String[] split = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                 if (split.length != NUMBER_OF_CSV_FIELDS) {
                     System.out.println("Missing fields in CSV file.");
+                    System.out.println(line);
                     continue;
                 }
 
                 // get rid of quotes in story description/note contents since field might have contained commas
-                String contents = split[CONTENTS_INDEX];
+                String contents = split[NOTE_CONTENTS_INDEX];
                 if (contents.startsWith("\"") && contents.endsWith("\"")) {
-                    split[CONTENTS_INDEX] = contents.substring(1, contents.length() - 1);
+                    split[NOTE_CONTENTS_INDEX] = contents.substring(1, contents.length() - 1);
                 }
 
                 if (isStory(split)) {
-                    Story story = new Story(split[STORY_NAME_INDEX], split[STORY_DESCRIPTION_INDEX],
-                            split[STORY_AUTHOR_INDEX], split[STORY_DATE_INDEX], split[STORY_COLOR_URL_INDEX]);
-                    stories.add(story);
+                    // remove quotes from author line, since a comma might exist in that field
+                    String author= split[STORY_AUTHOR_INDEX];
+                    if (author.startsWith("\"") && author.endsWith("\"")) {
+                        author = author.substring(1, author.length() - 1);
+                    }
+                    stories.add(new Story(
+                            split[STORY_NAME_INDEX],
+                            split[STORY_DESCRIPTION_INDEX],
+                            author,
+                            split[STORY_DATE_INDEX],
+                            split[STORY_COLOR_URL_INDEX]));
                     storyCounter++;
 
                 } else {
-                    Story story = stories.get(storyCounter);
-                    final Note note = new Note(story, split[NAME_INDEX], split[CONTENTS_INDEX]);
+                    final Story story = stories.get(storyCounter);
+                    final Note note = new Note(story, split[NOTE_NAME_INDEX], split[NOTE_CONTENTS_INDEX]);
                     story.addNote(note);
 
                     try {
-                        note.setTagDisplay(split[DISPLAY_INDEX]);
-                        note.setAttachmentType(split[TYPE_INDEX]);
-                        note.setLocation(split[LOCATION_INDEX]);
-                        note.setCellName(split[CELLNAME_INDEX]);
+                        note.setTagDisplay(split[NOTE_DISPLAY_INDEX]);
+                        note.setAttachmentType(split[NOTE_TYPE_INDEX]);
+                        note.setLocation(split[NOTE_LOCATION_INDEX]);
+                        note.setCellName(split[NOTE_CELLNAME_INDEX]);
 
-                        note.setImagingSource(split[IMG_SOURCE_INDEX]);
-                        note.setResourceLocation(split[RESOURCE_LOCATION_INDEX]);
+                        note.setImagingSource(split[NOTE_IMG_SOURCE_INDEX]);
+                        note.setResourceLocation(split[NOTE_RESOURCE_LOCATION_INDEX]);
 
                         String startTime = split[START_TIME_INDEX];
                         String endTime = split[END_TIME_INDEX];
@@ -120,10 +127,9 @@ public class StoriesLoader {
                             note.setEndTime(Integer.parseInt(endTime) - offset);
                         }
 
-                        note.setComments(split[COMMENTS_INDEX]);
+                        note.setComments(split[NOTE_COMMENTS_INDEX]);
 
                     } catch (Exception e) {
-                        System.out.println(e.toString());
                         System.out.println(line);
                         e.printStackTrace();
                     }
@@ -133,19 +139,19 @@ public class StoriesLoader {
             reader.close();
 
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Unable to process file '" + STORY_LIST_CONFIG + "'.");
+            System.out.println("Unable to process Url file.");
 
         } catch (NumberFormatException e) {
-            System.out.println("Number Format Error in file '" + STORY_LIST_CONFIG + "'.");
+            System.out.println("Number format error in file.");
 
         } catch (IOException e) {
-            System.out.println("The config file '" + STORY_LIST_CONFIG + "' wasn't found on the system.");
+            System.out.println("Fonfig file was not found.");
         }
     }
 
     private static boolean isStory(String[] csvLine) {
         try {
-            if (csvLine[DISPLAY_INDEX].isEmpty() && csvLine[TYPE_INDEX].isEmpty()) {
+            if (csvLine[NOTE_DISPLAY_INDEX].isEmpty() && csvLine[NOTE_TYPE_INDEX].isEmpty()) {
                 return true;
             }
         } catch (ArrayIndexOutOfBoundsException e) {

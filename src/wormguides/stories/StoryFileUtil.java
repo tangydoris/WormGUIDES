@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.stories;
@@ -11,8 +11,31 @@ import java.io.IOException;
 
 import javafx.collections.ObservableList;
 
-/*
- * Used for loading/saving wormguides.stories
+import static java.lang.Integer.MIN_VALUE;
+import static java.lang.String.join;
+
+import static wormguides.stories.StoriesLoader.END_TIME_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_CELLNAME_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_COMMENTS_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_CONTENTS_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_DISPLAY_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_IMG_SOURCE_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_LOCATION_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_MARKER_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_NAME_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_RESOURCE_LOCATION_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_TYPE_INDEX;
+import static wormguides.stories.StoriesLoader.NUMBER_OF_CSV_FIELDS;
+import static wormguides.stories.StoriesLoader.START_TIME_INDEX;
+import static wormguides.stories.StoriesLoader.STORY_AUTHOR_INDEX;
+import static wormguides.stories.StoriesLoader.STORY_COLOR_URL_INDEX;
+import static wormguides.stories.StoriesLoader.STORY_DATE_INDEX;
+import static wormguides.stories.StoriesLoader.STORY_DESCRIPTION_INDEX;
+import static wormguides.stories.StoriesLoader.STORY_NAME_INDEX;
+import static wormguides.stories.StoriesLoader.loadFromFile;
+
+/**
+ * Utility methods for loading/saving {@linkplain Story stories}
  */
 public class StoryFileUtil {
 
@@ -34,14 +57,16 @@ public class StoryFileUtil {
             DATE = "Date",
             COLOR = "Color Scheme Url";
 
-    public static void loadFromCSVFile(ObservableList<Story> stories, File file, int offset) {
-        StoriesLoader.loadFromFile(file, stories, offset);
+    public static Story loadFromCSVFile(final ObservableList<Story> stories, final File file, final int offset) {
+        loadFromFile(stories, file, offset);
+        // the newly added story is always last in the list of stories
+        return stories.get(stories.size() - 1);
     }
 
     public static File saveToCSVFile(Story story, File file, int offset) {
-        // false in fire writer means do not append
-        try (FileWriter fstream = new FileWriter(file, false);
-             BufferedWriter out = new BufferedWriter(fstream)) {
+        // false in file writer constructor means do not append
+        try (final FileWriter fstream = new FileWriter(file, false);
+             final BufferedWriter out = new BufferedWriter(fstream)) {
 
             // write headers
             out.append(NAME)
@@ -76,68 +101,62 @@ public class StoryFileUtil {
                     .append(BR);
 
             // write story
-            final String[] storyLine = new String[StoriesLoader.NUMBER_OF_CSV_FIELDS];
-            storyLine[StoriesLoader.STORY_NAME_INDEX] = story.getName();
-            storyLine[StoriesLoader.STORY_DESCRIPTION_INDEX] = story.getDescription();
-            storyLine[StoriesLoader.STORY_AUTHOR_INDEX] = story.getAuthor();
-            storyLine[StoriesLoader.STORY_DATE_INDEX] = story.getDate();
-            storyLine[StoriesLoader.STORY_COLOR_URL_INDEX] = story.getColorURL();
-            out.append(convertToCSV(storyLine))
-                    .append(BR);
+            final String[] storyParams = new String[NUMBER_OF_CSV_FIELDS];
+            for (int i = 0; i < NUMBER_OF_CSV_FIELDS; i++) {
+                storyParams[i] = "";
+            }
+            storyParams[STORY_NAME_INDEX] = quotesForCsv(story.getName());
+            storyParams[STORY_DESCRIPTION_INDEX] = quotesForCsv(story.getDescription());
+            storyParams[STORY_AUTHOR_INDEX] = quotesForCsv(story.getAuthor());
+            storyParams[STORY_DATE_INDEX] = quotesForCsv(story.getDate());
+            storyParams[STORY_COLOR_URL_INDEX] = quotesForCsv(story.getColorURL());
+            out.append(join(",", storyParams)).append(BR);
 
             // notes
             for (Note note : story.getNotes()) {
-                final String[] noteLine = new String[StoriesLoader.NUMBER_OF_CSV_FIELDS];
-                noteLine[StoriesLoader.NAME_INDEX] = note.getTagName();
-                noteLine[StoriesLoader.CONTENTS_INDEX] = note.getTagContents();
-                noteLine[StoriesLoader.DISPLAY_INDEX] = note.getTagDisplay().toString();
-                noteLine[StoriesLoader.TYPE_INDEX] = note.getAttachmentType().toString();
-                noteLine[StoriesLoader.LOCATION_INDEX] = note.getLocationString();
-                noteLine[StoriesLoader.CELLNAME_INDEX] = note.getCellName();
-                noteLine[StoriesLoader.IMG_SOURCE_INDEX] = note.getImgSource();
-                noteLine[StoriesLoader.MARKER_INDEX] = note.getMarker();
-                noteLine[StoriesLoader.RESOURCE_LOCATION_INDEX] = note.getResourceLocation();
+                final String[] noteParams = new String[NUMBER_OF_CSV_FIELDS];
+                for (int i = 0; i < NUMBER_OF_CSV_FIELDS; i++) {
+                    noteParams[i] = "";
+                }
+                noteParams[NOTE_NAME_INDEX] = quotesForCsv(note.getTagName());
+                noteParams[NOTE_CONTENTS_INDEX] = quotesForCsv(note.getTagContents());
+                noteParams[NOTE_DISPLAY_INDEX] = note.getTagDisplay().toString();
+                noteParams[NOTE_TYPE_INDEX] = note.getAttachmentType().toString();
+                noteParams[NOTE_LOCATION_INDEX] = quotesForCsv(note.getLocationString());
+                noteParams[NOTE_CELLNAME_INDEX] = note.getCellName();
+                noteParams[NOTE_IMG_SOURCE_INDEX] = quotesForCsv(note.getImgSource());
+                noteParams[NOTE_MARKER_INDEX] = quotesForCsv(note.getMarker());
+                noteParams[NOTE_RESOURCE_LOCATION_INDEX] = quotesForCsv(note.getResourceLocation());
                 // if time is not specified, do not use Integer.MIN_VALUE, leave it blank
                 int start = note.getStartTime();
                 int end = note.getEndTime();
-                if (start != Integer.MIN_VALUE && end != Integer.MIN_VALUE) {
-                    noteLine[StoriesLoader.START_TIME_INDEX] = Integer.toString(start + offset);
-                    noteLine[StoriesLoader.END_TIME_INDEX] = Integer.toString(end + offset);
+                if ((start != MIN_VALUE) && (end != MIN_VALUE)) {
+                    noteParams[START_TIME_INDEX] = Integer.toString(start + offset);
+                    noteParams[END_TIME_INDEX] = Integer.toString(end + offset);
                 }
-                noteLine[StoriesLoader.COMMENTS_INDEX] = note.getComments();
-                out.append(convertToCSV(noteLine))
-                        .append(BR);
+                noteParams[NOTE_COMMENTS_INDEX] = note.getComments();
+                out.append(join(",", noteParams)).append(BR);
             }
 
         } catch (IOException e) {
-            System.err.println("Error in write to CSV file: " + e.getMessage());
+            System.err.println("Error in writing to CSV file: " + e.getMessage());
         }
 
         return file;
     }
 
-    private static String convertToCSV(final String[] line) {
-        final StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < line.length; i++) {
-            if (line[i] == null) {
-                sb.append("");
-
-            } else if (line[i].contains(CS)) {
-                // values containing commas should be quoted with double quotes
-                sb.append("\"")
-                        .append(line[i])
-                        .append("\"");
-
-            } else {
-                sb.append(line[i]);
-            }
-
-            if (i < line.length - 1) {
-                sb.append(CS);
-            }
+    /**
+     * Inserts quotation marks around a field if it contains commas
+     *
+     * @param field
+     *         the field
+     *
+     * @return the field that is ready for inserting into a CSV line
+     */
+    private static String quotesForCsv(final String field) {
+        if (field != null && field.contains(",")) {
+            return "\"" + field + "\"";
         }
-        return sb.toString();
+        return field;
     }
-
 }

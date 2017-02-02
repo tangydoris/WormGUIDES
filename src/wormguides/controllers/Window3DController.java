@@ -1574,7 +1574,7 @@ public class Window3DController {
                         }
 
                     } else {
-                        // process rules that apply to it
+                        // processUrl rules that apply to it
                         for (Rule rule : rulesList) {
                             // cell nuc, cell body rules should not tag multicellular structures that contain
                             // themselves to avoid ambiguity
@@ -2034,25 +2034,24 @@ public class Window3DController {
         movieFiles.clear();
         count = -1;
 
-        Stage fileChooserStage = new Stage();
+        final Stage fileChooserStage = new Stage();
 
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
 
-        File fakeFile = fileChooser.showSaveDialog(fileChooserStage);
+        final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
 
-        if (fakeFile == null) {
-            System.out.println("null file");
+        if (tempFile == null) {
             return false;
         }
 
         // save the name from the file chooser for later MOV file
-        movieName = fakeFile.getName();
-        moviePath = fakeFile.getAbsolutePath();
+        movieName = tempFile.getName();
+        moviePath = tempFile.getAbsolutePath();
 
         // make a temp directory for the frames at the given save location
-        String path = fakeFile.getAbsolutePath();
+        String path = tempFile.getAbsolutePath();
         if (path.lastIndexOf("/") < 0) {
             path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
         } else {

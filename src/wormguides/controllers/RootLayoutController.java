@@ -114,7 +114,7 @@ import static partslist.celldeaths.CellDeaths.isInCellDeaths;
 import static search.SearchUtil.getStructureComment;
 import static search.SearchUtil.isMulticellularStructureByName;
 import static search.SearchUtil.isStructureWithComment;
-import static wormguides.loaders.URLLoader.process;
+import static wormguides.loaders.URLLoader.processUrl;
 
 /**
  * Controller for RootLayout.fxml that contains all GUI components of the main WormGUIDES application window
@@ -429,7 +429,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     final Optional<ButtonType> result = warning.showAndWait();
                     if (result.get() == warning.getButtonTypeOkay()) {
                         urlLoadStage.hide();
-                        process(
+                        processUrl(
                                 urlLoadWindow.getInputURL(),
                                 rulesList,
                                 searchLayer,
@@ -445,7 +445,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     }
                 } else {
                     urlLoadStage.hide();
-                    process(
+                    processUrl(
                             urlLoadWindow.getInputURL(),
                             rulesList,
                             searchLayer,

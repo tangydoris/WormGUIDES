@@ -55,7 +55,7 @@ public class WormBaseQuery {
 
         if (!requireNonNull(searchedGene).isEmpty()) {
             searchedGene = searchedGene.trim().toLowerCase();
-            // only process the first searched term
+            // only processUrl the first searched term
             final String[] tokens = searchedGene.split(" ");
             if (tokens.length != 0) {
                 searchedGene = tokens[0];

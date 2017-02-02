@@ -78,7 +78,7 @@ public class AceTreeTableLineageLoader {
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: "
+                        System.out.println("Could not processUrl file: "
                                 + ENTRY_PREFIX
                                 + T
                                 + TWO_ZERO_PAD
@@ -90,7 +90,7 @@ public class AceTreeTableLineageLoader {
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: "
+                        System.out.println("Could not processUrl file: "
                                 + ENTRY_PREFIX
                                 + T
                                 + ONE_ZERO_PAD
@@ -102,7 +102,7 @@ public class AceTreeTableLineageLoader {
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + T + i + ENTRY_EXT);
+                        System.out.println("Could not processUrl file: " + ENTRY_PREFIX + T + i + ENTRY_EXT);
                     }
                 }
             }

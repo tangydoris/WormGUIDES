@@ -1,13 +1,12 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.stories;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
@@ -17,6 +16,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import wormguides.models.colorrule.Rule;
+
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * Collection of {@link Note}s. In the application, each story is associated with a list of
@@ -58,20 +60,17 @@ public class Story {
         });
 
         this.notes = FXCollections.observableArrayList(note -> new Observable[]{note.getChangedProperty()});
-        this.notes.addListener(new ListChangeListener<Note>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends Note> c) {
-                while (c.next()) {
-                    // note was edited
-                    if (c.wasUpdated()) {
-                        setChanged(true);
+        this.notes.addListener((ListChangeListener<Note>) c -> {
+            while (c.next()) {
+                // note was edited
+                if (c.wasUpdated()) {
+                    setChanged(true);
 
-                    } else if (c.wasAdded()) {
-                        setChanged(true);
+                } else if (c.wasAdded()) {
+                    setChanged(true);
 
-                    } else if (c.wasRemoved()) {
-                        setChanged(true);
-                    }
+                } else if (c.wasRemoved()) {
+                    setChanged(true);
                 }
             }
         });
@@ -87,15 +86,9 @@ public class Story {
         colorURL = url;
     }
 
-    // Sorts notes by start time
-    public void sortNotes() {
-        if (comparator != null) {
-            setChanged(true);
-        }
-    }
-
     public void setComparator(final Comparator<Note> comparator) {
-        this.comparator = comparator;
+        this.comparator = requireNonNull(comparator);
+        notes.sort(this.comparator);
     }
 
     public BooleanProperty getChangedProperty() {
@@ -114,10 +107,10 @@ public class Story {
         return activeBooleanProperty;
     }
 
-    public ArrayList<Note> getNotesWithEntity() {
-        ArrayList<Note> list = notes.stream()
+    public List<Note> getNotesWithEntity() {
+        List<Note> list = notes.stream()
                 .filter(note -> note != null && note.attachedToCell())
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(toCollection(ArrayList::new));
         return list;
     }
 
@@ -125,10 +118,10 @@ public class Story {
         return !notes.isEmpty();
     }
 
-    public ArrayList<Note> getPossibleNotesAtTime(final int time) {
+    public List<Note> getPossibleNotesAtTime(final int time) {
         return notes.stream()
                 .filter(note -> note.mayExistAtTime(time))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(toCollection(ArrayList::new));
     }
 
     public String getNoteComment(String tagName) {
@@ -170,7 +163,7 @@ public class Story {
 
     public void setChanged(boolean changed) {
         if (comparator != null) {
-            Collections.sort(notes, comparator);
+            notes.sort(comparator);
         }
         changedBooleanProperty.set(changed);
     }
@@ -202,7 +195,7 @@ public class Story {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return name + " - contains " + notes.size() + " notes";
     }
 
