@@ -13,6 +13,17 @@ import javafx.beans.property.SimpleBooleanProperty;
 import wormguides.models.subscenegeometry.SceneElement;
 import wormguides.models.subscenegeometry.SceneElementsList;
 
+import static java.lang.Integer.MIN_VALUE;
+import static java.lang.Integer.parseInt;
+import static java.lang.String.join;
+import static java.util.Objects.requireNonNull;
+
+import static wormguides.stories.Note.Display.OVERLAY;
+import static wormguides.stories.Note.Type.BLANK;
+import static wormguides.stories.Note.Type.CELL;
+import static wormguides.stories.Note.Type.LOCATION;
+import static wormguides.stories.Note.Type.STRUCTURE;
+
 /**
  * This class represents a note that belongs to a story (its parent). A note contains a tag name, tag contents, an
  * attachment type, and a tag display. It may contain a location to which it belongs in the subscene, a cell to which
@@ -43,13 +54,14 @@ public class Note {
     private int startTime, endTime;
     private String comments;
     private Story parent;
-    // True when any field value changes, false otherwise
+
+    /** True when any field value changes, false otherwise */
     private BooleanProperty changedProperty;
-    // True when graphic in wormguides.stories list view is expanded, false otherwise
+    /** True when graphic in wormguides.stories list view is expanded, false otherwise */
     private BooleanProperty listExpandedProperty;
-    // True when graphic in 3d subscene is expanded, false otherwise
+    /** True when graphic in 3d subscene is expanded, false otherwise */
     private BooleanProperty sceneExpandedProperty;
-    // True when graphical representation is selected, false otherwise
+    /** True when graphical representation is selected, false otherwise */
     private BooleanProperty activeProperty;
 
     public Note(final Story parent, final String tagName, final String tagContents) {
@@ -59,33 +71,34 @@ public class Note {
     }
 
     public Note(final Story parent) {
-        this.parent = parent;
-        this.elements = null;
-        this.tagName = "";
-        this.tagContents = "";
-        this.x = this.y = this.z = Integer.MIN_VALUE;
-        this.cellName = "";
-        this.imagingSource = "";
-        this.resourceLocation = "";
-        this.startTime = endTime = Integer.MIN_VALUE;
-        this.comments = "";
-        this.changedProperty = new SimpleBooleanProperty(false);
-        this.changedProperty.addListener((observable, oldValue, newValue) -> {
+        this.parent = requireNonNull(parent);
+        elements = null;
+        tagName = "";
+        tagContents = "";
+        x = y = z = MIN_VALUE;
+        cellName = "";
+        marker = "";
+        imagingSource = "";
+        resourceLocation = "";
+        startTime = endTime = MIN_VALUE;
+        comments = "";
+        changedProperty = new SimpleBooleanProperty(false);
+        changedProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 setChanged(false);
             }
         });
 
-        this.listExpandedProperty = new SimpleBooleanProperty(false);
-        this.sceneExpandedProperty = new SimpleBooleanProperty(false);
-        this.activeProperty = new SimpleBooleanProperty(false);
+        listExpandedProperty = new SimpleBooleanProperty(false);
+        sceneExpandedProperty = new SimpleBooleanProperty(false);
+        activeProperty = new SimpleBooleanProperty(false);
 
-        setTagDisplay(Display.OVERLAY);
-        setAttachmentType(Type.BLANK);
+        setTagDisplay(OVERLAY);
+        setAttachmentType(BLANK);
     }
 
     public String getLocationString() {
-        if (x == Integer.MIN_VALUE || y == Integer.MIN_VALUE || z == Integer.MIN_VALUE) {
+        if (x == MIN_VALUE || y == MIN_VALUE || z == MIN_VALUE) {
             return "";
         }
 
@@ -100,7 +113,7 @@ public class Note {
         return activeProperty.get();
     }
 
-    public void setActive(boolean active) {
+    public void setActive(final boolean active) {
         activeProperty.set(active);
     }
 
@@ -112,7 +125,7 @@ public class Note {
         return sceneExpandedProperty.get();
     }
 
-    public void setExpandedInScene(boolean expanded) {
+    public void setExpandedInScene(final boolean expanded) {
         sceneExpandedProperty.set(expanded);
     }
 
@@ -124,7 +137,7 @@ public class Note {
         return listExpandedProperty.get();
     }
 
-    public void setListExpanded(boolean expanded) {
+    public void setListExpanded(final boolean expanded) {
         listExpandedProperty.set(expanded);
     }
 
@@ -132,7 +145,7 @@ public class Note {
         return changedProperty;
     }
 
-    public void setChanged(boolean changed) {
+    public void setChanged(final boolean changed) {
         changedProperty.set(changed);
     }
 
@@ -144,15 +157,11 @@ public class Note {
         return parent;
     }
 
-    public void setUrl(String url) {
-        if (url != null) {
-        }
-    }
-
-    public void setTagDisplay(final String display) throws TagDisplayEnumException {
+    public void setTagDisplay(String display) throws TagDisplayEnumException {
         if (display != null) {
+            display = display.trim();
             for (Display d : Display.values()) {
-                if (d.equals(display.trim())) {
+                if (d.equals(display)) {
                     setTagDisplay(d);
                     return;
                 }
@@ -161,15 +170,15 @@ public class Note {
         }
     }
 
-    public void setAttachmentType(final String type) throws AttachmentTypeEnumException {
+    public void setAttachmentType(String type) throws AttachmentTypeEnumException {
         if (type != null) {
+            type = type.trim();
             for (Type t : Type.values()) {
-                if (t.equals(type.trim())) {
+                if (t.equals(type)) {
                     setAttachmentType(t);
                     return;
                 }
             }
-
             throw new AttachmentTypeEnumException();
         }
     }
@@ -184,10 +193,9 @@ public class Note {
 
             try {
                 setLocation(
-                        Integer.parseInt(coords[0]),
-                        Integer.parseInt(coords[1]),
-                        Integer.parseInt(coords[2]));
-
+                        parseInt(coords[0]),
+                        parseInt(coords[1]),
+                        parseInt(coords[2]));
             } catch (NumberFormatException e) {
                 throw new LocationStringFormatException();
             }
@@ -437,39 +445,39 @@ public class Note {
      */
     public boolean isWithoutScope() {
         return tagDisplay.equals(Display.BLANK)
-                || !tagDisplay.equals(Display.OVERLAY)
-                && attachmentType.equals(Type.CELL)
+                || !tagDisplay.equals(OVERLAY)
+                && attachmentType.equals(CELL)
                 && !isEntitySpecified();
 
     }
 
     public boolean hasLocationError() {
-        return attachmentType.equals(Type.LOCATION)
+        return attachmentType.equals(LOCATION)
                 && !isLoctionSpecified();
 
     }
 
     public boolean hasEntityNameError() {
-        return !tagDisplay.equals(Display.OVERLAY)
+        return !tagDisplay.equals(OVERLAY)
                 && (attachedToCell() || attachedToStructure())
                 && cellName.isEmpty();
 
     }
 
     public boolean attachedToStructure() {
-        return attachmentType.equals(Type.STRUCTURE);
+        return attachmentType.equals(STRUCTURE);
     }
 
     public boolean attachedToCell() {
-        return attachmentType.equals(Type.CELL);
+        return attachmentType.equals(CELL);
     }
 
     public boolean attachedToLocation() {
-        return attachmentType.equals(Type.LOCATION);
+        return attachmentType.equals(LOCATION);
     }
 
     public boolean attachedToGlobalEvent() {
-        return attachmentType.equals(Type.BLANK);
+        return attachmentType.equals(BLANK);
     }
 
     public boolean isEntitySpecified() {
@@ -505,13 +513,13 @@ public class Note {
      * @return true if location was specified in the CSV file, false otherwise
      */
     public boolean isLoctionSpecified() {
-        return (x != Integer.MIN_VALUE
-                && y != Integer.MIN_VALUE
-                && z != Integer.MIN_VALUE);
+        return (x != MIN_VALUE
+                && y != MIN_VALUE
+                && z != MIN_VALUE);
     }
 
     public boolean isOverlay() {
-        return tagDisplay == Display.OVERLAY;
+        return tagDisplay == OVERLAY;
     }
 
     public boolean isSprite() {
@@ -536,54 +544,85 @@ public class Note {
     }
 
     public String toString() {
-        return "Note[" + "@Name='" + tagName + "' " +
-                "@Type=" + attachmentType + " " +
-                "@Display=" + tagDisplay + " " +
-                "@Time=" + startTime + ", " + endTime + " " +
-                "@Location=" + x + ", " + y + ", " + z + " " +
-                "@Cell='" + cellName + "' " +
-                "@Resource='" + resourceLocation + "']";
+        return "Note["
+                + "@Name='" + tagName + "' "
+                + "@Type=" + attachmentType + " "
+                + "@Display=" + tagDisplay + " "
+                + "@Time=" + startTime + ", " + endTime + " "
+                + "@Location=" + x + ", " + y + ", " + z + " "
+                + "@Cell='" + cellName + "' "
+                + "@Resource='" + resourceLocation + "']";
     }
 
+    /**
+     * Attachment type for a {@link Note}. This defines that a note is attached to.
+     */
     public enum Type {
+
+        /** Attachment to location defined by three coordinate **/
         LOCATION("location"),
+
+        /** Attachment to a cell */
         CELL("cell"),
+
+        /** Attachment to a structure */
         STRUCTURE("structure"),
+
+        /** No attachment - note becomes an overlay */
         BLANK("");
 
         private String type;
 
-        Type(String type) {
+        Type(final String type) {
             this.type = type;
         }
 
         public static String valuesToString() {
-            final ArrayList<String> values = new ArrayList<>();
+            final List<String> values = new ArrayList<>();
             for (Type type : values()) {
                 values.add(type.toString());
             }
-            return String.join(",", values);
+            return join(",", values);
         }
 
         @Override
-		public String toString() {
+        public String toString() {
             return type;
         }
 
-        public boolean equals(String type) {
-            return this.type.equalsIgnoreCase(type.trim());
+        public boolean equals(final String otherType) {
+            return type.equalsIgnoreCase(otherType.trim());
         }
 
-        public boolean equals(Type type) {
+        public boolean equals(final Type type) {
             return this == type;
         }
     }
 
+    /**
+     * Display mode for a {@link Note}
+     */
     public enum Display {
+
+        /** Display as an overlay in the upper-right-hand corner of the 3D subscene **/
         OVERLAY("overlay"),
+
+        /**
+         * Display as a 3D billboard that rotates and translates with the entity the note is attached to (defined by
+         * {@link Type})
+         */
         BILLBOARD("billboard"),
+
+        /**
+         * Display as a front-facing billboard that translates with the entity the note is attached to (defined by
+         * {@link Type})
+         */
         BILLBOARD_FRONT("billboard front"),
+
+        /** Display as a sprite that moves with the entity the note is attached to (defined by {@link Type}) */
         SPRITE("sprite"),
+
+        /** No display, defaults to overlay in the upper-right-hand corner of the 3D subscene */
         BLANK("");
 
         private String display;
@@ -593,20 +632,20 @@ public class Note {
         }
 
         public static String valuesToString() {
-            final ArrayList<String> values = new ArrayList<>();
+            final List<String> values = new ArrayList<>();
             for (Display display : values()) {
                 values.add(display.toString());
             }
-            return String.join(",", values);
+            return join(",", values);
         }
 
         @Override
-		public String toString() {
+        public String toString() {
             return display;
         }
 
-        public boolean equals(final String display) {
-            return this.display.equalsIgnoreCase(display.trim());
+        public boolean equals(final String otherDisplay) {
+            return display.equalsIgnoreCase(otherDisplay.trim());
         }
 
         public boolean equals(final Display display) {
@@ -615,29 +654,29 @@ public class Note {
     }
 
     public class TagDisplayEnumException extends Exception {
-    	// default variable needed for some reason
-		private static final long serialVersionUID = 1L;
+        // default variable needed for some reason
+        private static final long serialVersionUID = 1L;
 
-		public TagDisplayEnumException() {
-            super("Invalid note tag display enum, must be one of the " + "following: " + Display.valuesToString());
+        public TagDisplayEnumException() {
+            super("Invalid note tag display enum, must be one of the following:\n" + Display.valuesToString());
         }
     }
 
     public class AttachmentTypeEnumException extends Exception {
-    	// default variable needed for some reason
-		private static final long serialVersionUID = 1L;
+        // default variable needed for some reason
+        private static final long serialVersionUID = 1L;
 
-		public AttachmentTypeEnumException() {
-            super("Invalid note attachment type enum, must be one of the " + "following: " + Type.valuesToString());
+        public AttachmentTypeEnumException() {
+            super("Invalid note attachment type enum, must be one of the following:\n" + Type.valuesToString());
         }
     }
 
     public class LocationStringFormatException extends Exception {
-    	// default variable needed for some reason
-		private static final long serialVersionUID = 1L;
+        // default variable needed for some reason
+        private static final long serialVersionUID = 1L;
 
-		public LocationStringFormatException() {
-            super("Invalid note location string format, must be 3 " + "integers separated by spaces.");
+        public LocationStringFormatException() {
+            super("Invalid note location string format, must be 3 integers separated by spaces.");
         }
     }
 }

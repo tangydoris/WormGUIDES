@@ -17,6 +17,8 @@ import javafx.scene.shape.TriangleMesh;
 
 import wormguides.MainApp;
 
+import static java.lang.Integer.MIN_VALUE;
+
 /**
  * Builder for scene element mesh geometries to be placed in the 3D subscene
  */
@@ -27,31 +29,32 @@ public class GeometryLoader {
     private static final String FACE_LINE = "f";
 
     /**
-     * Checks to see if a spefified resource exists in the shape files archive. A resource exists if there
+     * Checks to see if a spefified resource exists in the shapes archive.
      *
      * @param resourcePath
      *         the resource path to check, without the .obj extension
      *
-     * @return true if the resource exists, false otherwise
+     * @return the effective start time at which this geometry exists, {@link Integer#MIN_VALUE} if the resource does
+     * not exist
      */
-    public static boolean doesResourceExist(
+    public static int getEffectiveStartTime(
             String resourcePath,
             final int startTime,
             final int endTime) {
         resourcePath = "/" + resourcePath;
         URL url = MainApp.class.getResource(resourcePath + OBJ_EXTENSION);
         if (url != null) {
-            return true;
+            return startTime;
         } else {
             // check for obj file with a time
             for (int time = startTime; time <= endTime; time++) {
                 url = MainApp.class.getResource(resourcePath + "_t" + time + OBJ_EXTENSION);
                 if (url != null) {
-                    return true;
+                    return time;
                 }
             }
         }
-        return false;
+        return MIN_VALUE;
     }
 
     /**

@@ -55,9 +55,8 @@ import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREY;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.text.FontSmoothingType.LCD;
-import static javafx.stage.Modality.NONE;
 
-import static wormguides.loaders.URLLoader.process;
+import static wormguides.loaders.URLLoader.processUrl;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
@@ -70,10 +69,10 @@ import static wormguides.util.URLGenerator.generateInternal;
  */
 public class StoriesLayer {
 
-    private final String NEW_STORY_TITLE = "New Story";
-    private final String NEW_STORY_DESCRIPTION = "New story description here";
-    private final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
-    private final String TEMPLATE_STORY_DESCRIPTION = "Shows all segmented neurons without further annotation.";
+    private static final String NEW_STORY_TITLE = "New Story";
+    private static final String NEW_STORY_DESCRIPTION = "New story description here";
+    private static final String TEMPLATE_STORY_NAME = "Template to Make Your Own Story";
+    private static final String TEMPLATE_STORY_DESCRIPTION = "Shows all segmented neurons without further annotation.";
 
     private final Stage parentStage;
 
@@ -212,7 +211,6 @@ public class StoriesLayer {
 
         for (Story story : stories) {
             story.setComparator(noteComparator);
-            story.sortNotes();
         }
 
         // makes lim-4 story on default embryo, template otherwise
@@ -296,7 +294,9 @@ public class StoriesLayer {
         chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
         final File file = chooser.showOpenDialog(parentStage);
         if (file != null) {
-            loadFromCSVFile(stories, file, movieTimeOffset);
+            final Story newStory = loadFromCSVFile(stories, file, movieTimeOffset);
+            newStory.setComparator(noteComparator);
+            setActiveStory(newStory);
         }
     }
 
@@ -304,11 +304,11 @@ public class StoriesLayer {
      * Saves active story to a file. {@link FileChooser} is used to allow the user to specify a save location and
      * file name.
      *
-     * @return true if story is successfully saved, false otherwise
+     * @return true when the file has been saved, false otherwise.
      */
     public boolean saveActiveStory() {
         final FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Story");
+        chooser.setTitle("Save WormGUIDES Story");
         chooser.setInitialFileName("WormGUIDES Story.csv");
         chooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
         final File file = chooser.showSaveDialog(parentStage);
@@ -318,6 +318,8 @@ public class StoriesLayer {
                 updateColorURL();
                 saveToCSVFile(activeStory, file, movieTimeOffset);
                 System.out.println("File saved to " + file.getAbsolutePath());
+                // all stories become inactive after saving, make story active again
+                setActiveStory(activeStory);
             } else {
                 System.out.println("No active story to save");
             }
@@ -469,12 +471,10 @@ public class StoriesLayer {
      * @return the effective start time of the input note. An Integer object is returned instead of the primitive int
      * so that it can be passed into the note comparator
      */
-    private Integer getEffectiveStartTime(Note note) {
+    private Integer getEffectiveStartTime(final Note note) {
         int time = MIN_VALUE;
-
         if (note != null) {
             if (note.attachedToCell() || note.attachedToStructure()) {
-
                 int entityStartTime;
                 int entityEndTime;
 
@@ -497,16 +497,14 @@ public class StoriesLayer {
                     } else if (entityStartTime <= noteStartTime && noteStartTime < entityEndTime) {
                         time = noteStartTime;
                     }
-                }
-
-                // attached to cell/structure and time not specified
-                else {
+                } else {
+                    // if attached to cell/structure and time is not specified
                     time = entityStartTime;
                 }
+
             } else if (note.isTimeSpecified()) {
                 time = note.getStartTime();
             }
-
         }
 
         return time;
@@ -546,8 +544,7 @@ public class StoriesLayer {
         useInternalRulesFlag.set(true);
 
         activeStory = story;
-        int newTime = startTime;
-        newTime = timeProperty.get();
+        int newTime;
 
         if (activeStory != null) {
             activeStory.setActive(true);
@@ -567,8 +564,7 @@ public class StoriesLayer {
             } else { // if story does come with url, use it
                 useInternalRulesFlag.set(false);
             }
-
-            process(
+            processUrl(
                     activeStory.getColorURL(),
                     activeRulesList,
                     searchLayer,
@@ -581,13 +577,6 @@ public class StoriesLayer {
                     zoomProperty,
                     othersOpacityProperty,
                     rebuildSubsceneFlag);
-
-            if (activeStory.hasNotes()) {
-                newTime = getEffectiveStartTime(activeStory.getNotes().get(0));
-                if (newTime < startTime) {
-                    newTime = startTime;
-                }
-            }
         } else {
             activeStoryProperty.set("");
             useInternalRulesFlag.set(true);
@@ -678,8 +667,7 @@ public class StoriesLayer {
                     sceneElementsList.getAllMulticellSceneNames(),
                     activeCellNameProperty,
                     cellClickedFlag,
-                    timeProperty,
-                    rebuildSubsceneFlag);
+                    timeProperty);
 
             editController.setActiveNote(activeNote);
             editController.setActiveStory(activeStory);
@@ -696,8 +684,6 @@ public class StoriesLayer {
                 editStage.setScene(new Scene(loader.load()));
 
                 editStage.setTitle("Story/Note Editor");
-                editStage.initOwner(parentStage);
-                editStage.initModality(NONE);
                 editStage.setResizable(true);
 
                 editStage.setOnCloseRequest(event -> rebuildSubsceneFlag.set(true));
@@ -728,7 +714,6 @@ public class StoriesLayer {
                 e.printStackTrace();
             }
         }
-
         editStage.show();
         editStage.toFront();
     }

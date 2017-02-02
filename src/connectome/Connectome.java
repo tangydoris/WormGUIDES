@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package connectome;
@@ -92,9 +92,9 @@ public class Connectome {
         }
         return false;
     }
-    
+
     public List<NeuronalSynapse> getSynapseList() {
-    	return synapses;
+        return synapses;
     }
 
     /**
@@ -139,7 +139,7 @@ public class Connectome {
                 String cell1 = ns.getCell1();
                 String cell2 = ns.getCell2();
 
-                // process type code
+                // processUrl type code
                 String synapseTypeDescription = ns.getSynapseType().getDescription();
 
                 // find synapse type code for connection, compare to toggle ticks
