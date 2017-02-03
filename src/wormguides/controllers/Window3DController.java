@@ -145,9 +145,6 @@ import static wormguides.util.AppFont.getSpriteAndOverlayFont;
  */
 public class Window3DController {
 
-    private static final double CANNONICAL_ORIENTATION_X = 145.0;
-    private static final double CANNONICAL_ORIENTATION_Y = -166.0;
-    private static final double CANNONICAL_ORIENTATION_Z = 24.0;
     private static final String CS = ", ";
     private static final String FILL_COLOR_HEX = "#272727",
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
