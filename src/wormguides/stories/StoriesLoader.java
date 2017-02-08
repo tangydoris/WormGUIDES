@@ -105,8 +105,6 @@ public class StoriesLoader {
                 }
 
                 if (lineTokens.size() == NUMBER_OF_CSV_FIELDS) {
-                    System.out.println("processing these line tokens:");
-                    System.out.println(String.join(", ", lineTokens));
                     split = lineTokens.toArray(new String[NUMBER_OF_CSV_FIELDS]);
                     // get rid of quotes in story description/note contents since field might have contained commas
                     String contents = split[NOTE_CONTENTS_INDEX];
@@ -138,7 +136,6 @@ public class StoriesLoader {
                     }
 
                     lineTokens.clear();
-                    System.out.println("line tokens cleared");
                 }
             }
 
