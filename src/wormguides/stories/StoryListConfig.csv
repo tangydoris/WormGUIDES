@@ -1,7 +1,9 @@
 Tag Name,Tag Contents,Tag Display,Attachment Type,xyz Locatoin,Cells,Marker,Imaging Source,Resource Location,Start Time,End Time,Comments,Author,Date,Color Scheme Url
 Development of Early Nerve Ring Neurons,Depicts the development of early nerve ring neurons from birth to nerve ring closure. Neurons depicted express sfGPF driven by the lim-4 promoter. lim-4 expresses in 8 neuronal pairs during mid-embryonic development.,,,,,,,,,,,Mark and Titas,,http://scene.wormguides.org/wormguides/testurlscript?/set/rivl-n$@+#ffff9966/rivr-n$@+#ffffe6b4/sibd-n$@+#ffe6ccff/siav-n$@+#ff99b3ff/view/timeProperty=343/rX=18.25/rY=29.0/rZ=0.0/tX=0.0/tY=0.0/scale=3.0/dim=0.25/browser/
-Birth of SIBDL,First segmented lim-4 positive cell born,sprite,cell,,ABplppaaaaa,,,,256,256,,,,
-Birth of SIAVR,lim-4 positive cell,sprite,cell,,ABprpapappa,,,,261,261,,,,
+Birth of SIBDL,First segmented lim-4 positive
+cell born,sprite,cell,,ABplppaaaaa,,,,256,256,,,,
+Birth of SIAVR,lim-4
+positive cell,sprite,cell,,ABprpapappa,,,,261,261,,,,
 Birth of RIVR,lim-4 positive cell,sprite,cell,,ABprpaapaaa,,,,265,265,,,,
 Birth of SIAVL,lim-4 positive cell,sprite,cell,,ABplpapappa,,,,267,267,,,,
 Birth of RIVL,lim-4 positive cell,sprite,cell,,ABplpaapaaa,,,,269,269,,,,
