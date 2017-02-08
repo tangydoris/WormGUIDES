@@ -86,13 +86,13 @@ import wormguides.stories.Note;
 import wormguides.stories.Note.Display;
 import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
-import wormguides.util.Parameters;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -130,6 +130,20 @@ import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.util.AppFont.getBillboardFont;
 import static wormguides.util.AppFont.getSpriteAndOverlayFont;
+import static wormguides.util.subsceneparameters.Parameters.getBillboardScale;
+import static wormguides.util.subsceneparameters.Parameters.getCameraFarClip;
+import static wormguides.util.subsceneparameters.Parameters.getCameraInitialDistance;
+import static wormguides.util.subsceneparameters.Parameters.getCameraNearClip;
+import static wormguides.util.subsceneparameters.Parameters.getDefaultOthersOpacity;
+import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateX;
+import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateY;
+import static wormguides.util.subsceneparameters.Parameters.getInitialZoom;
+import static wormguides.util.subsceneparameters.Parameters.getLabelSpriteYOffset;
+import static wormguides.util.subsceneparameters.Parameters.getSelectabilityVisibilityCutoff;
+import static wormguides.util.subsceneparameters.Parameters.getSizeScale;
+import static wormguides.util.subsceneparameters.Parameters.getUniformRadius;
+import static wormguides.util.subsceneparameters.Parameters.getVisibilityCutoff;
+import static wormguides.util.subsceneparameters.Parameters.getWaitTimeMilli;
 
 /**
  * The controller for the 3D subscene inside the rootEntitiesGroup layout. This class contains the subscene itself, and
@@ -157,7 +171,7 @@ public class Window3DController {
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-    
+
     private static final int X_COR_INDEX = 0,
             Y_COR_INDEX = 1,
             Z_COR_INDEX = 2;
@@ -400,7 +414,7 @@ public class Window3DController {
         isMeshSearchedFlags = new boolean[1];
 
         selectedIndex = new SimpleIntegerProperty(-1);
-        this.captureVideo = new SimpleBooleanProperty();
+        captureVideo = new SimpleBooleanProperty();
 
         this.selectedNameProperty = requireNonNull(selectedNameProperty);
         this.selectedNameProperty.addListener((observable, oldValue, newValue) -> {
@@ -484,7 +498,7 @@ public class Window3DController {
         renderService = new RenderService();
 
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.zoomProperty.set(Parameters.getInitialZoom());
+        this.zoomProperty.set(getInitialZoom());
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform.setScale(zoomProperty.get());
             repositionSprites();
@@ -520,14 +534,12 @@ public class Window3DController {
         this.rotateYAngleProperty.addListener(getRotateYAngleListener());
         this.rotateZAngleProperty.addListener(getRotateZAngleListener());
 
-        //initializeWithCannonicalOrientation();
-
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
-        this.translateXProperty.set(Parameters.getInitialTranslateX());
+        this.translateXProperty.set(getInitialTranslateX());
         this.translateYProperty = requireNonNull(translateYProperty);
         this.translateYProperty.addListener(getTranslateYListener());
-        this.translateYProperty.set(Parameters.getInitialTranslateY());
+        this.translateYProperty.set(getInitialTranslateY());
 
         quaternion = new Quaternion();
 
@@ -631,7 +643,7 @@ public class Window3DController {
                 opacitySlider.setValue(newVal * 100);
             }
         });
-        this.othersOpacityProperty.setValue(Parameters.getDefaultOthersOpacity());
+        this.othersOpacityProperty.setValue(getDefaultOthersOpacity());
 
         uniformSizeCheckBox.setSelected(true);
         uniformSize = true;
@@ -738,8 +750,8 @@ public class Window3DController {
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
-            if (entity.getMaterial() == colorHash.getOthersMaterial(opacity)
-                    && othersOpacityProperty.get() < Parameters.getSelectabilityVisibilityCutoff()) {
+            if ((entity.getMaterial() == colorHash.getOthersMaterial(opacity))
+                    && (othersOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
                 return;
             }
             if (!currentLabels.contains(name)) {
@@ -765,7 +777,7 @@ public class Window3DController {
                     double vOffset = b.getHeight() / 2;
                     double hOffset = b.getWidth() / 2;
                     x += hOffset;
-                    y -= (vOffset + Parameters.getLabelSpriteYOffset());
+                    y -= (vOffset + getLabelSpriteYOffset());
                     transientLabelText.getTransforms().add(new Translate(x, y));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
@@ -860,9 +872,9 @@ public class Window3DController {
                         if (cross != null) {
                             // System.out.println("cross product: <" + cross[0] + ",
                             // " + cross[1] + ", " + cross[2] + ">");
-                            quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+                            //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
-                            ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+                            //List<Double> eulerAngles = quaternion.toEulerRotation();
 
 //                            if (eulerAngles.size() == 3) {
                             // rotateX.setAngle(eulerAngles.get(2));
@@ -1099,7 +1111,7 @@ public class Window3DController {
                     double z = b.getMaxZ();
                     billboard.getTransforms().addAll(
                             new Translate(x, y, z),
-                            new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
+                            new Scale(getBillboardScale(), getBillboardScale()));
                 }
             }
         }
@@ -1152,10 +1164,10 @@ public class Window3DController {
 
                 if (isLabel) {
                     x += hOffset;
-                    y -= (vOffset + Parameters.getLabelSpriteYOffset());
+                    y -= (vOffset + getLabelSpriteYOffset());
                 } else {
                     x += hOffset;
-                    y += vOffset + Parameters.getLabelSpriteYOffset();
+                    y += vOffset + getLabelSpriteYOffset();
                 }
                 noteOrLabelGraphic.getTransforms().clear();
                 noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
@@ -1404,7 +1416,7 @@ public class Window3DController {
 
     /**
      * Inserts spherical cells into the list of entities that is later added to the subscene. "Other" cells with
-     * visibility under the {@link Parameters#VISIBILITY_CUTOFF} are not rendered.
+     * visibility under the visibility cutoff are not rendered.
      *
      * @param entities
      *         list of subscene entities
@@ -1420,9 +1432,9 @@ public class Window3DController {
             // size the sphere
             double radius;
             if (!uniformSize) {
-                radius = Parameters.getSizeScale() * diameters.get(index) / 2;
+                radius = getSizeScale() * diameters.get(index) / 2;
             } else {
-                radius = Parameters.getSizeScale() * Parameters.getUniformRadius();
+                radius = getSizeScale() * getUniformRadius();
             }
             final Sphere sphere = new Sphere(radius);
 
@@ -1449,7 +1461,7 @@ public class Window3DController {
                     // do not render this "other" cell if visibility is under the cutoff
                     // remove this cell from scene data at current time point
                     double opacity = othersOpacityProperty.get();
-                    if (opacity <= Parameters.getVisibilityCutoff()) {
+                    if (opacity <= getVisibilityCutoff()) {
                         iter.remove();
                         positions.remove(index);
                         diameters.remove(index);
@@ -1457,7 +1469,7 @@ public class Window3DController {
                         continue;
                     } else {
                         material = othersMaterial;
-                        if (opacity <= Parameters.getSelectabilityVisibilityCutoff()) {
+                        if (opacity <= getSelectabilityVisibilityCutoff()) {
                             sphere.setDisable(true);
                         }
                     }
@@ -1496,7 +1508,7 @@ public class Window3DController {
 
     /**
      * Inserts meshes into the list of entities that is later added to the subscene. "Other" scene elements with
-     * visibility under the {@link Parameters#VISIBILITY_CUTOFF} are not rendered.
+     * visibility under the visibility cutoff are not rendered.
      *
      * @param entities
      *         list of subscene entities
@@ -1571,13 +1583,13 @@ public class Window3DController {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
                         final double opacity = othersOpacityProperty.get();
-                        if (opacity <= Parameters.getVisibilityCutoff()) {
+                        if (opacity <= getVisibilityCutoff()) {
                             iter.remove();
                             currentSceneElementMeshes.remove(index--);
                             continue;
                         } else {
                             meshView.setMaterial(colorHash.getOthersMaterial(othersOpacityProperty.get()));
-                            if (opacity <= Parameters.getSelectabilityVisibilityCutoff()) {
+                            if (opacity <= getSelectabilityVisibilityCutoff()) {
                                 meshView.setDisable(true);
                             }
                         }
@@ -1800,7 +1812,7 @@ public class Window3DController {
                     text.getTransforms().addAll(rotateX, rotateY, rotateZ);
                     text.getTransforms().addAll(
                             new Translate(note.getX(), note.getY(), note.getZ()),
-                            new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
+                            new Scale(getBillboardScale(), getBillboardScale()));
                 }
                 // cell attachment
                 else if (note.attachedToCell()) {
@@ -1816,7 +1828,7 @@ public class Window3DController {
                             text.getTransforms().addAll(sphere.getTransforms());
                             text.getTransforms().addAll(
                                     new Translate(offset, offset),
-                                    new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
+                                    new Scale(getBillboardScale(), getBillboardScale()));
                         }
                     }
                 } else if (defaultEmbryoFlag) {
@@ -1828,7 +1840,7 @@ public class Window3DController {
                                 double offset = 5;
                                 text.getTransforms().addAll(
                                         new Translate(offset, offset),
-                                        new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
+                                        new Scale(getBillboardScale(), getBillboardScale()));
                             }
                         }
                     }
@@ -1952,9 +1964,9 @@ public class Window3DController {
         rootEntitiesGroup.getChildren().add(xform);
         xform.getChildren().add(camera);
 
-        camera.setNearClip(Parameters.getCameraNearClip());
-        camera.setFarClip(Parameters.getCameraFarClip());
-        camera.setTranslateZ(Parameters.getCameraInitialDistance());
+        camera.setNearClip(getCameraNearClip());
+        camera.setFarClip(getCameraFarClip());
+        camera.setTranslateZ(getCameraInitialDistance());
 
         subscene.setCamera(camera);
     }
@@ -2039,7 +2051,7 @@ public class Window3DController {
 
 		String frameDirPath = frameDir.getAbsolutePath() + "/";
 
-		captureVideo.set(true);        
+		captureVideo.set(true);
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
@@ -2367,7 +2379,7 @@ public class Window3DController {
                         }
                         runLater(() -> timeProperty.set(timeProperty.get() + 1));
                         try {
-                            Thread.sleep(Parameters.WAIT_TIME_MILLI);
+                            sleep(getWaitTimeMilli());
                         } catch (InterruptedException ie) {
                             break;
                         }
