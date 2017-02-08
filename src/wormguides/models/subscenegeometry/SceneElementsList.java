@@ -109,7 +109,7 @@ public class SceneElementsList {
             List<String> cellNames;
             StringTokenizer cellNamesTokenizer;
             TreeItem<StructureTreeNode> currentCategoryNode = root;
-            // processUrl each line
+            // process each line
             while ((line = reader.readLine()) != null) {
                 final String[] tokens = line.split(",", NUM_OF_CSV_FIELDS);
                 name = tokens[DESCRIPTION_INDEX];
@@ -176,7 +176,7 @@ public class SceneElementsList {
                             if (!element.getMarkerName().isEmpty()) {
                                 nameToMarkerMap.put(element.getSceneName().toLowerCase(), element.getMarkerName());
                             }
-                            
+
                             if (!element.getComments().isEmpty()) {
                                 nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
                             }

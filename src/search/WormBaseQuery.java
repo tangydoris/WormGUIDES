@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package search;
@@ -65,7 +61,7 @@ public class WormBaseQuery {
             try (final BufferedReader pageStream = openUrl("/db/get?name=" + searchedGene + ";class=gene")) {
                 if (pageStream != null) {
                     String restString = "";
-                    String firstQueryLine = "";
+                    String firstQueryLine;
                     while ((firstQueryLine = pageStream.readLine()) != null && restString.isEmpty()) {
                         if (firstQueryLine.contains("wname=\"expression\"")) {
                             final String[] restChunks = pageStream.readLine().split("\"");
@@ -109,7 +105,7 @@ public class WormBaseQuery {
      */
     private static BufferedReader openUrl(String target) {
         target = WORMBASE_URL + target;
-        HttpURLConnection connection = null;
+        final HttpURLConnection connection;
         try {
             final URL url = new URL(target);
             connection = (HttpURLConnection) url.openConnection();

@@ -614,7 +614,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
      * Updates display radio button toggle with the display type of the active note
      */
     private void updateDisplay() {
-        if (activeNote != null) {
+        if (displayToggle != null && activeNote != null) {
             switch (activeNote.getTagDisplay()) {
                 case BLANK: // fall to overlay case
 

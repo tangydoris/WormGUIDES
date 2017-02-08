@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.stories;
@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 import javafx.collections.ObservableList;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.addAll;
 
 /**
  * Loader for stories specified in the internal stories config file
@@ -54,11 +59,9 @@ public class StoriesLoader {
 
     public static void loadConfigFile(ObservableList<Story> stories, int offset) {
         final URL url = StoriesLoader.class.getResource(STORY_LIST_CONFIG);
-
         if (url != null) {
             try (InputStream stream = url.openStream()) {
                 processStream(stream, stories, offset);
-
             } catch (IOException e) {
                 System.out.println("Could not read file '" + STORY_LIST_CONFIG + "' in the system.");
             }
@@ -77,62 +80,62 @@ public class StoriesLoader {
 
             // Skip heading line
             reader.readLine();
+            List<String> lineTokens = new LinkedList<>();
+            String[] split;
 
             while ((line = reader.readLine()) != null) {
-                final String[] split = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                split = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+
                 if (split.length != NUMBER_OF_CSV_FIELDS) {
-                    System.out.println("Missing fields in CSV file.");
-                    System.out.println(line);
-                    continue;
-                }
-
-                // get rid of quotes in story description/note contents since field might have contained commas
-                String contents = split[NOTE_CONTENTS_INDEX];
-                if (contents.startsWith("\"") && contents.endsWith("\"")) {
-                    split[NOTE_CONTENTS_INDEX] = contents.substring(1, contents.length() - 1);
-                }
-
-                if (isStory(split)) {
-                    // remove quotes from author line, since a comma might exist in that field
-                    String author= split[STORY_AUTHOR_INDEX];
-                    if (author.startsWith("\"") && author.endsWith("\"")) {
-                        author = author.substring(1, author.length() - 1);
+                    // if this is the first of incomplete line of params for this one note
+                    // then just add tokens to list of tokens
+                    if (lineTokens.isEmpty()) {
+                        addAll(lineTokens, split);
+                    } else {
+                        // if this is not the first line,
+                        // then modify the previous final token and append the remaining
+                        int lastIndex = lineTokens.size() - 1;
+                        String lastToken = lineTokens.get(lastIndex);
+                        lineTokens.remove(lastIndex);
+                        lineTokens.add(lastToken + split[0]);
+                        lineTokens.addAll(asList(split).subList(1, split.length));
                     }
-                    stories.add(new Story(
-                            split[STORY_NAME_INDEX],
-                            split[STORY_DESCRIPTION_INDEX],
-                            author,
-                            split[STORY_DATE_INDEX],
-                            split[STORY_COLOR_URL_INDEX]));
-                    storyCounter++;
-
                 } else {
-                    final Story story = stories.get(storyCounter);
-                    final Note note = new Note(story, split[NOTE_NAME_INDEX], split[NOTE_CONTENTS_INDEX]);
-                    story.addNote(note);
+                    addAll(lineTokens, split);
+                }
 
-                    try {
-                        note.setTagDisplay(split[NOTE_DISPLAY_INDEX]);
-                        note.setAttachmentType(split[NOTE_TYPE_INDEX]);
-                        note.setLocation(split[NOTE_LOCATION_INDEX]);
-                        note.setCellName(split[NOTE_CELLNAME_INDEX]);
-
-                        note.setImagingSource(split[NOTE_IMG_SOURCE_INDEX]);
-                        note.setResourceLocation(split[NOTE_RESOURCE_LOCATION_INDEX]);
-
-                        String startTime = split[START_TIME_INDEX];
-                        String endTime = split[END_TIME_INDEX];
-                        if (!startTime.isEmpty() && !endTime.isEmpty()) {
-                            note.setStartTime(Integer.parseInt(startTime) - offset);
-                            note.setEndTime(Integer.parseInt(endTime) - offset);
-                        }
-
-                        note.setComments(split[NOTE_COMMENTS_INDEX]);
-
-                    } catch (Exception e) {
-                        System.out.println(line);
-                        e.printStackTrace();
+                if (lineTokens.size() == NUMBER_OF_CSV_FIELDS) {
+                    split = lineTokens.toArray(new String[NUMBER_OF_CSV_FIELDS]);
+                    // get rid of quotes in story description/note contents since field might have contained commas
+                    String contents = split[NOTE_CONTENTS_INDEX];
+                    if (contents.startsWith("\"") && contents.endsWith("\"")) {
+                        split[NOTE_CONTENTS_INDEX] = contents.substring(1, contents.length() - 1);
                     }
+
+                    // if line makes up a story
+                    if (isStory(split)) {
+                        // remove quotes from author line, since a comma might exist in that field
+                        String author = split[STORY_AUTHOR_INDEX];
+                        if (author.startsWith("\"") && author.endsWith("\"")) {
+                            author = author.substring(1, author.length() - 1);
+                        }
+                        stories.add(new Story(
+                                split[STORY_NAME_INDEX],
+                                split[STORY_DESCRIPTION_INDEX],
+                                author,
+                                split[STORY_DATE_INDEX],
+                                split[STORY_COLOR_URL_INDEX]));
+                        storyCounter++;
+
+                    } else {
+                        // if line makes up a note
+                        addNoteToStory(
+                                stories.get(storyCounter),
+                                split,
+                                offset);
+                    }
+
+                    lineTokens.clear();
                 }
             }
 
@@ -147,6 +150,38 @@ public class StoriesLoader {
         } catch (IOException e) {
             System.out.println("Fonfig file was not found.");
         }
+    }
+
+    private static Note addNoteToStory(final Story story, final String[] split, final int offset) {
+
+        final Note note = new Note(story, split[NOTE_NAME_INDEX], split[NOTE_CONTENTS_INDEX]);
+        story.addNote(note);
+
+        try {
+            note.setTagDisplay(split[NOTE_DISPLAY_INDEX]);
+            note.setAttachmentType(split[NOTE_TYPE_INDEX]);
+            note.setLocation(split[NOTE_LOCATION_INDEX]);
+            note.setCellName(split[NOTE_CELLNAME_INDEX]);
+
+            note.setImagingSource(split[NOTE_IMG_SOURCE_INDEX]);
+            note.setResourceLocation(split[NOTE_RESOURCE_LOCATION_INDEX]);
+
+            String startTime = split[START_TIME_INDEX];
+            String endTime = split[END_TIME_INDEX];
+            if (!startTime.isEmpty() && !endTime.isEmpty()) {
+                note.setStartTime(Integer.parseInt(startTime) - offset);
+                note.setEndTime(Integer.parseInt(endTime) - offset);
+            }
+
+            note.setComments(split[NOTE_COMMENTS_INDEX]);
+
+        } catch (Exception e) {
+            System.out.println("Error trying to parse the following note params:");
+            System.out.println(String.join(", ", split));
+            e.printStackTrace();
+        }
+
+        return note;
     }
 
     private static boolean isStory(String[] csvLine) {

@@ -182,7 +182,7 @@ public class Window3DController {
     /** Default transparency of 'other' entities on startup */
     private static final double DEFAULT_OTHERS_OPACITY = 0.25;
     /** Visibility (in range [0, 1]) under which "other" entities are not rendered */
-    private static final double VISIBILITY_CUTOFF = 0.03;
+    private static final double VISIBILITY_CUTOFF = 0.01;
     /** Visibility (in range [0, 1]) under which "other" entities are not selectable/labeled */
     private static final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
 
@@ -256,6 +256,7 @@ public class Window3DController {
     private final Map<Node, Text> entityLabelMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
+
     private final ProductionInfo productionInfo;
     private final Connectome connectome;
     private final BooleanProperty bringUpInfoFlag;
@@ -464,7 +465,7 @@ public class Window3DController {
                 }
 
                 if (timeProperty.get() < startTime1 || timeProperty.get() > endTime1) {
-                    this.timeProperty.set(startTime1);
+                    timeProperty.set(startTime1);
                 } else {
                     insertLabelFor(lineageName, entity);
                 }
@@ -1574,7 +1575,7 @@ public class Window3DController {
                         }
 
                     } else {
-                        // processUrl rules that apply to it
+                        // process rules that apply to it
                         for (Rule rule : rulesList) {
                             // cell nuc, cell body rules should not tag multicellular structures that contain
                             // themselves to avoid ambiguity
@@ -2080,9 +2081,9 @@ public class Window3DController {
                                 final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
                                 try {
                                     final File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-                                        RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                                        write(renderedImage, "JPEG", file);
-                                        movieFiles.addElement(file);
+                                    RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+                                    write(renderedImage, "JPEG", file);
+                                    movieFiles.addElement(file);
                                 } catch (Exception e) {
                                     System.out.println("Could not write frame of movie to file.");
                                     e.printStackTrace();
@@ -2245,7 +2246,7 @@ public class Window3DController {
             hideContextPopups();
             double z = zoomProperty.get();
             /*
-             * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
+			 * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
 			 * As of July 8, 2016
 			 * Noted by: Braden Katzman
 			 *

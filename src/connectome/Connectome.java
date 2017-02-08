@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package connectome;
@@ -92,9 +92,9 @@ public class Connectome {
         }
         return false;
     }
-    
+
     public List<NeuronalSynapse> getSynapseList() {
-    	return synapses;
+        return synapses;
     }
 
     /**
