@@ -87,8 +87,8 @@ public class JpegImagesToMovie implements ControllerListener, DataSinkListener {
 
         // Check for output file extension.
         if (!outputURL.endsWith(".mov") && !outputURL.endsWith(".MOV")) {
-            System.err.println("The output file extension should end with a .mov extension");
-            prUsage();
+//            System.err.println("The output file extension should end with a .mov extension");
+//            prUsage();
         }
 
         // Generate the output media locators.
