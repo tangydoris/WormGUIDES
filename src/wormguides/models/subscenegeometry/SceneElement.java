@@ -21,6 +21,7 @@ import static wormguides.loaders.GeometryLoader.loadOBJ;
 public class SceneElement {
 
     private final static String MCS = "MCS";
+
     /** Descriptor or display of object */
     private String sceneName;
     /** Cells contained by this structure */
