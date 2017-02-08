@@ -89,6 +89,7 @@ import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
+import wormguides.util.Parameters;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
@@ -157,38 +158,10 @@ public class Window3DController {
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-    /** The wait timeProperty (in millis) between consecutive timeProperty frames while a movie is playing. */
-    private static final long WAIT_TIME_MILLI = 200;
-    /**
-     * Initial zoom of embryo view. On program startup, the embryo is zoomed in so that the entire embryo is not
-     * visible.
-     */
-    private static final double INITIAL_ZOOM = 2.75;
-    private static final double INITIAL_TRANSLATE_X = -14.0,
-            INITIAL_TRANSLATE_Y = 18.0;
-    private static final double CAMERA_INITIAL_DISTANCE = -220;
-    private static final double CAMERA_NEAR_CLIP = 1,
-            CAMERA_FAR_CLIP = 2000;
+    
     private static final int X_COR_INDEX = 0,
             Y_COR_INDEX = 1,
             Z_COR_INDEX = 2;
-    /** Text size scale used for the rendering of billboard notes. */
-    private static final double BILLBOARD_SCALE = 0.9;
-    /**
-     * Scale used for the radii of spheres that represent cells, multiplied with the cell's radius loaded from the
-     * nuc files.
-     */
-    private static final double SIZE_SCALE = 1;
-    /** The radius of all spheres when 'uniform size' is ticked. */
-    private static final double UNIFORM_RADIUS = 4;
-    /** The y-offset from a sprite to a label label for one cell entity. */
-    private static final int LABEL_SPRITE_Y_OFFSET = 5;
-    /** Default transparency of 'other' entities on startup */
-    private static final double DEFAULT_OTHERS_OPACITY = 0.25;
-    /** Visibility (in range [0, 1]) under which "other" entities are not rendered */
-    private static final double VISIBILITY_CUTOFF = 0.01;
-    /** Visibility (in range [0, 1]) under which "other" entities are not selectable/labeled */
-    private static final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
 
     // rotation stuff
     private final Rotate rotateX;
@@ -512,7 +485,7 @@ public class Window3DController {
         renderService = new RenderService();
 
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.zoomProperty.set(INITIAL_ZOOM);
+        this.zoomProperty.set(Parameters.getInitialZoom());
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform.setScale(zoomProperty.get());
             repositionSprites();
@@ -552,10 +525,10 @@ public class Window3DController {
 
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
-        this.translateXProperty.set(INITIAL_TRANSLATE_X);
+        this.translateXProperty.set(Parameters.getInitialTranslateX());
         this.translateYProperty = requireNonNull(translateYProperty);
         this.translateYProperty.addListener(getTranslateYListener());
-        this.translateYProperty.set(INITIAL_TRANSLATE_Y);
+        this.translateYProperty.set(Parameters.getInitialTranslateY());
 
         quaternion = new Quaternion();
 
@@ -659,7 +632,7 @@ public class Window3DController {
                 opacitySlider.setValue(newVal * 100);
             }
         });
-        this.othersOpacityProperty.setValue(DEFAULT_OTHERS_OPACITY);
+        this.othersOpacityProperty.setValue(Parameters.getDefaultOthersOpacity());
 
         uniformSizeCheckBox.setSelected(true);
         uniformSize = true;
@@ -767,7 +740,7 @@ public class Window3DController {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
             if (entity.getMaterial() == colorHash.getOthersMaterial(opacity)
-                    && othersOpacityProperty.get() < SELECTABILITY_VISIBILITY_CUTOFF) {
+                    && othersOpacityProperty.get() < Parameters.getSelectabilityVisibilityCutoff()) {
                 return;
             }
             if (!currentLabels.contains(name)) {
@@ -793,7 +766,7 @@ public class Window3DController {
                     double vOffset = b.getHeight() / 2;
                     double hOffset = b.getWidth() / 2;
                     x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+                    y -= (vOffset + Parameters.getLabelSpriteYOffset());
                     transientLabelText.getTransforms().add(new Translate(x, y));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
@@ -1127,7 +1100,7 @@ public class Window3DController {
                     double z = b.getMaxZ();
                     billboard.getTransforms().addAll(
                             new Translate(x, y, z),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                            new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
                 }
             }
         }
@@ -1180,10 +1153,10 @@ public class Window3DController {
 
                 if (isLabel) {
                     x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+                    y -= (vOffset + Parameters.getLabelSpriteYOffset());
                 } else {
                     x += hOffset;
-                    y += vOffset + LABEL_SPRITE_Y_OFFSET;
+                    y += vOffset + Parameters.getLabelSpriteYOffset();
                 }
                 noteOrLabelGraphic.getTransforms().clear();
                 noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
@@ -1448,9 +1421,9 @@ public class Window3DController {
             // size the sphere
             double radius;
             if (!uniformSize) {
-                radius = SIZE_SCALE * diameters.get(index) / 2;
+                radius = Parameters.getSizeScale() * diameters.get(index) / 2;
             } else {
-                radius = SIZE_SCALE * UNIFORM_RADIUS;
+                radius = Parameters.getSizeScale() * Parameters.getUniformRadius();
             }
             final Sphere sphere = new Sphere(radius);
 
@@ -1477,7 +1450,7 @@ public class Window3DController {
                     // do not render this "other" cell if visibility is under the cutoff
                     // remove this cell from scene data at current time point
                     double opacity = othersOpacityProperty.get();
-                    if (opacity <= VISIBILITY_CUTOFF) {
+                    if (opacity <= Parameters.getVisibilityCutoff()) {
                         iter.remove();
                         positions.remove(index);
                         diameters.remove(index);
@@ -1485,7 +1458,7 @@ public class Window3DController {
                         continue;
                     } else {
                         material = othersMaterial;
-                        if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
+                        if (opacity <= Parameters.getSelectabilityVisibilityCutoff()) {
                             sphere.setDisable(true);
                         }
                     }
@@ -1599,13 +1572,13 @@ public class Window3DController {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
                         final double opacity = othersOpacityProperty.get();
-                        if (opacity <= VISIBILITY_CUTOFF) {
+                        if (opacity <= Parameters.getVisibilityCutoff()) {
                             iter.remove();
                             currentSceneElementMeshes.remove(index--);
                             continue;
                         } else {
                             meshView.setMaterial(colorHash.getOthersMaterial(othersOpacityProperty.get()));
-                            if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
+                            if (opacity <= Parameters.getSelectabilityVisibilityCutoff()) {
                                 meshView.setDisable(true);
                             }
                         }
@@ -1828,7 +1801,7 @@ public class Window3DController {
                     text.getTransforms().addAll(rotateX, rotateY, rotateZ);
                     text.getTransforms().addAll(
                             new Translate(note.getX(), note.getY(), note.getZ()),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                            new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
                 }
                 // cell attachment
                 else if (note.attachedToCell()) {
@@ -1844,7 +1817,7 @@ public class Window3DController {
                             text.getTransforms().addAll(sphere.getTransforms());
                             text.getTransforms().addAll(
                                     new Translate(offset, offset),
-                                    new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                                    new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
                         }
                     }
                 } else if (defaultEmbryoFlag) {
@@ -1856,7 +1829,7 @@ public class Window3DController {
                                 double offset = 5;
                                 text.getTransforms().addAll(
                                         new Translate(offset, offset),
-                                        new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                                        new Scale(Parameters.getBillboardScale(), Parameters.getBillboardScale()));
                             }
                         }
                     }
@@ -1980,9 +1953,9 @@ public class Window3DController {
         rootEntitiesGroup.getChildren().add(xform);
         xform.getChildren().add(camera);
 
-        camera.setNearClip(CAMERA_NEAR_CLIP);
-        camera.setFarClip(CAMERA_FAR_CLIP);
-        camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
+        camera.setNearClip(Parameters.getCameraNearClip());
+        camera.setFarClip(Parameters.getCameraFarClip());
+        camera.setTranslateZ(Parameters.getCameraInitialDistance());
 
         subscene.setCamera(camera);
     }
@@ -2384,7 +2357,7 @@ public class Window3DController {
 
     /**
      * This JavaFX {@link Service} of type Void spools a thread to play the subscene movie. It waits the timeProperty
-     * in milliseconds defined in the variable WAIT_TIME_MILLI (defined in the parent class) before rendering the next
+     * in milliseconds defined in the variable WAIT_TIME_MILLI before rendering the next
      * timeProperty frame.
      */
     private final class PlayService extends Service<Void> {
@@ -2399,7 +2372,7 @@ public class Window3DController {
                         }
                         runLater(() -> timeProperty.set(timeProperty.get() + 1));
                         try {
-                            Thread.sleep(WAIT_TIME_MILLI);
+                            Thread.sleep(Parameters.WAIT_TIME_MILLI);
                         } catch (InterruptedException ie) {
                             break;
                         }
