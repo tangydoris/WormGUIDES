@@ -47,6 +47,8 @@ public class InfoWindowDOM {
     private final String postsynapticPartnersTitle = "Postsynaptic: ";
     private final String electricalPartnersTitle = "Electrical: ";
     private final String neuromusclarPartnersTitle = "Neuromusclar: ";
+    private final String HTTP = "http";
+    private final String SPACE = " ";
     private HTMLNode html;
     private String name;
 
@@ -111,12 +113,21 @@ public class InfoWindowDOM {
             tr.addChild(new HTMLNode("td", "", "", se.getMarkerName()));
             tr.addChild(new HTMLNode("td", "", "", Integer.toString(se.getStartTime())));
             tr.addChild(new HTMLNode("td", "", "", Integer.toString(se.getEndTime())));
-            tr.addChild(new HTMLNode("td", "", "", se.getComments()));
+            
+            if (se.getComments().contains(HTTP)) {
+            	tr.addChild(new HTMLNode("td", "", "", reformatDataWithAnchors(se.getComments())));
+            } else {
+            	tr.addChild(new HTMLNode("td", "", "", se.getComments()));
+            }
+            
             sceneElementsListTable.addChild(tr);
         }
 
         sceneElementsListDiv.addChild(sceneElementsListTable);
         body.addChild(sceneElementsListDiv);
+        
+        // add link controller
+        body.addChild(body.addLinkHandlerScript());
 
         // add head and body to html
         html.addChild(head);
@@ -302,6 +313,12 @@ public class InfoWindowDOM {
             HTMLNode tr = new HTMLNode("tr");
             for (List<String> aProductionInfoData : productionInfoData) {
                 String data = aProductionInfoData.get(i);
+                
+                // check for presence of a link
+                if (data.contains(HTTP)) {
+                	data = reformatDataWithAnchors(data);
+                }
+                
                 HTMLNode td = new HTMLNode("td", "", "", data);
                 tr.addChild(td);
             }
@@ -311,6 +328,9 @@ public class InfoWindowDOM {
         productionInfoDiv.addChild(productionInfoTable);
 
         body.addChild(productionInfoDiv);
+        
+        // add link controller
+        body.addChild(body.addLinkHandlerScript());
 
         html.addChild(head);
         html.addChild(body);
@@ -1757,6 +1777,28 @@ public class InfoWindowDOM {
 
     private String formatNumberOfSynapses(String numberOfSynapses) {
         return "(" + numberOfSynapses + ")";
+    }
+    
+    private String reformatDataWithAnchors(String data) {
+    	int lastIdx = 0;
+    	while (lastIdx != -1) {
+    		lastIdx = data.indexOf(HTTP, lastIdx);
+    		if (lastIdx != -1) {
+    			int endLinkIdx = data.indexOf(SPACE, lastIdx);
+    			if (endLinkIdx == -1) endLinkIdx = data.length();
+    			String linkToReformat = data.substring(lastIdx, endLinkIdx);
+    			String anchor = "<a href=\"#\" name=\""
+                        + linkToReformat
+                        + "\" onclick=\"handleLink(this)\">"
+                        + linkToReformat
+                        + "</a>";
+        		data = data.substring(0, lastIdx) + anchor + data.substring(endLinkIdx);
+        		lastIdx += anchor.length();
+    		}
+    	}
+    	
+//    	System.out.println(data);
+    	return data;
     }
 
     public HTMLNode getHTML() {

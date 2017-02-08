@@ -484,7 +484,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
-
+        
         try {
             File output = fileChooser.showSaveDialog(fileChooserStage);
 
@@ -493,8 +493,64 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 System.out.println("error creating file to write searchLayer results");
                 return;
             }
+            
+            /*
+             * create the header line that will format the search criteria corresponding to these
+             * search results
+             */
+            String searchType = "";
+            if (sysRadioBtn.isSelected()) {
+            	searchType = "Lineage Name";
+            } else if (funRadioBtn.isSelected()) {
+            	searchType = "Function Name";
+            } else if (desRadioBtn.isSelected()) {
+            	searchType = "PartsList Desciption";
+            } else if (genRadioBtn.isSelected()) {
+            	searchType = "Gene";
+            } else if (conRadioBtn.isSelected()) {
+            	searchType = "Connectome - ";
+            	if (presynapticCheckBox.isSelected()) {
+            		searchType += "pre-synaptic, ";
+            	}
+            	if (postsynapticCheckBox.isSelected()) {
+            		searchType += "post-synaptic, ";
+            	}
+            	if (electricalCheckBox.isSelected()) {
+            		searchType += "electrical, ";
+            	}
+            	if (neuromuscularCheckBox.isSelected()) {
+            		searchType += "neuromuscular";
+            	}
+            	
+            	if (searchType.substring(searchType.length()-2).equals(", ")) {
+            		searchType = searchType.substring(0, searchType.length()-2);
+            	}
+            } else if (multiRadioBtn.isSelected()) {
+            	searchType = "Multicellular Structure";
+            }
+            
+            String searchOptions = "";
+            
+            if (ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
+            	searchOptions = "ancestors, descdendants";
+            } else if (ancestorCheckBox.isSelected() && !descendantCheckBox.isSelected()) {
+            	searchOptions = "ancestors";
+            } else if (!ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
+            	searchOptions = "descendants";
+            }
+            
+            
+            String searchCriteria = "'" + searchField.getText() + "' (Options: " + searchType;
+            if (!searchOptions.isEmpty()) {
+            	searchCriteria += ", " + searchOptions;
+            }
+            searchCriteria += ")";
 
             FileWriter writer = new FileWriter(output);
+            
+            // write header line to file
+            writer.write(searchCriteria);
+            writer.write(System.lineSeparator());
 
             for (String s : items) {
                 writer.write(s);

@@ -397,6 +397,10 @@ public class InfoWindow {
             WebView cellShapesIndexWebView = new WebView();
             cellShapesIndexWebView.getEngine().loadContent(new InfoWindowDOM(sceneElementsList, true).DOMtoString());
 
+            // link controller
+            final JSObject window = (JSObject) cellShapesIndexWebView.getEngine().executeScript("window");
+            window.setMember("app", linkController);
+            
             VBox root = new VBox();
             root.getChildren().addAll(cellShapesIndexWebView);
             Scene scene = new Scene(new Group());
@@ -481,6 +485,10 @@ public class InfoWindow {
             final WebView productionInfoWebView = new WebView();
             productionInfoWebView.getEngine().loadContent(new InfoWindowDOM(productionInfo).DOMtoString());
             productionInfoWebView.setContextMenuEnabled(false);
+            
+            // link controller
+            final JSObject window = (JSObject) productionInfoWebView.getEngine().executeScript("window");
+            window.setMember("app", linkController);
 
             final VBox root = new VBox();
             root.getChildren().addAll(productionInfoWebView);
