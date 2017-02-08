@@ -77,6 +77,7 @@ import wormguides.resources.ProductionInfo;
 import wormguides.stories.Story;
 import wormguides.util.ColorHash;
 import wormguides.util.StringCellFactory;
+import wormguides.util.subsceneparameters.Parameters;
 import wormguides.view.DraggableTab;
 import wormguides.view.infowindow.InfoWindow;
 import wormguides.view.popups.AboutPane;
@@ -86,6 +87,7 @@ import wormguides.view.urlwindow.URLLoadWarningDialog;
 import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLShareWindow;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.sort;
 
 import static javafx.application.Platform.runLater;
@@ -494,11 +496,67 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 return;
             }
 
+            /*
+             * create the header line that will format the search criteria corresponding to these
+             * search results
+             */
+            String searchType = "";
+            if (sysRadioBtn.isSelected()) {
+            	searchType = "Lineage Name";
+            } else if (funRadioBtn.isSelected()) {
+            	searchType = "Function Name";
+            } else if (desRadioBtn.isSelected()) {
+            	searchType = "PartsList Desciption";
+            } else if (genRadioBtn.isSelected()) {
+            	searchType = "Gene";
+            } else if (conRadioBtn.isSelected()) {
+            	searchType = "Connectome - ";
+            	if (presynapticCheckBox.isSelected()) {
+            		searchType += "pre-synaptic, ";
+            	}
+            	if (postsynapticCheckBox.isSelected()) {
+            		searchType += "post-synaptic, ";
+            	}
+            	if (electricalCheckBox.isSelected()) {
+            		searchType += "electrical, ";
+            	}
+            	if (neuromuscularCheckBox.isSelected()) {
+            		searchType += "neuromuscular";
+            	}
+
+            	if (searchType.substring(searchType.length()-2).equals(", ")) {
+            		searchType = searchType.substring(0, searchType.length()-2);
+            	}
+            } else if (multiRadioBtn.isSelected()) {
+            	searchType = "Multicellular Structure";
+            }
+
+            String searchOptions = "";
+
+            if (ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
+            	searchOptions = "ancestors, descdendants";
+            } else if (ancestorCheckBox.isSelected() && !descendantCheckBox.isSelected()) {
+            	searchOptions = "ancestors";
+            } else if (!ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
+            	searchOptions = "descendants";
+            }
+
+
+            String searchCriteria = "'" + searchField.getText() + "' (Options: " + searchType;
+            if (!searchOptions.isEmpty()) {
+            	searchCriteria += ", " + searchOptions;
+            }
+            searchCriteria += ")";
+
             FileWriter writer = new FileWriter(output);
+
+            // write header line to file
+            writer.write(searchCriteria);
+            writer.write(lineSeparator());
 
             for (String s : items) {
                 writer.write(s);
-                writer.write(System.lineSeparator());
+                writer.write(lineSeparator());
             }
 
             writer.flush();
@@ -1125,6 +1183,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // takes about 6ms
         CellDeaths.init();
+
+        Parameters.init();
 
         initSharedVariables();
 

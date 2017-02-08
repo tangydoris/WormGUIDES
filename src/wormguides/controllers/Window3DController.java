@@ -19,9 +19,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -126,6 +129,20 @@ import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.util.AppFont.getBillboardFont;
 import static wormguides.util.AppFont.getSpriteAndOverlayFont;
+import static wormguides.util.subsceneparameters.Parameters.getBillboardScale;
+import static wormguides.util.subsceneparameters.Parameters.getCameraFarClip;
+import static wormguides.util.subsceneparameters.Parameters.getCameraInitialDistance;
+import static wormguides.util.subsceneparameters.Parameters.getCameraNearClip;
+import static wormguides.util.subsceneparameters.Parameters.getDefaultOthersOpacity;
+import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateX;
+import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateY;
+import static wormguides.util.subsceneparameters.Parameters.getInitialZoom;
+import static wormguides.util.subsceneparameters.Parameters.getLabelSpriteYOffset;
+import static wormguides.util.subsceneparameters.Parameters.getSelectabilityVisibilityCutoff;
+import static wormguides.util.subsceneparameters.Parameters.getSizeScale;
+import static wormguides.util.subsceneparameters.Parameters.getUniformRadius;
+import static wormguides.util.subsceneparameters.Parameters.getVisibilityCutoff;
+import static wormguides.util.subsceneparameters.Parameters.getWaitTimeMilli;
 
 /**
  * The controller for the 3D subscene inside the rootEntitiesGroup layout. This class contains the subscene itself, and
@@ -148,44 +165,15 @@ public class Window3DController {
     private static final double CANNONICAL_ORIENTATION_X = 145.0;
     private static final double CANNONICAL_ORIENTATION_Y = -166.0;
     private static final double CANNONICAL_ORIENTATION_Z = 24.0;
-
     private static final String CS = ", ";
     private static final String FILL_COLOR_HEX = "#272727",
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
             SPRITE_COLOR_HEX = "#ffffff",
             TRANSIENT_LABEL_COLOR_HEX = "#f0f0f0";
-    /** The wait timeProperty (in millis) between consecutive timeProperty frames while a movie is playing. */
-    private static final long WAIT_TIME_MILLI = 200;
-    /**
-     * Initial zoom of embryo view. On program startup, the embryo is zoomed in so that the entire embryo is not
-     * visible.
-     */
-    private static final double INITIAL_ZOOM = 2.75;
-    private static final double INITIAL_TRANSLATE_X = -14.0,
-            INITIAL_TRANSLATE_Y = 18.0;
-    private static final double CAMERA_INITIAL_DISTANCE = -220;
-    private static final double CAMERA_NEAR_CLIP = 1,
-            CAMERA_FAR_CLIP = 2000;
+
     private static final int X_COR_INDEX = 0,
             Y_COR_INDEX = 1,
             Z_COR_INDEX = 2;
-    /** Text size scale used for the rendering of billboard notes. */
-    private static final double BILLBOARD_SCALE = 0.9;
-    /**
-     * Scale used for the radii of spheres that represent cells, multiplied with the cell's radius loaded from the
-     * nuc files.
-     */
-    private static final double SIZE_SCALE = 1;
-    /** The radius of all spheres when 'uniform size' is ticked. */
-    private static final double UNIFORM_RADIUS = 4;
-    /** The y-offset from a sprite to a label label for one cell entity. */
-    private static final int LABEL_SPRITE_Y_OFFSET = 5;
-    /** Default transparency of 'other' entities on startup */
-    private static final double DEFAULT_OTHERS_OPACITY = 0.25;
-    /** Visibility (in range [0, 1]) under which "other" entities are not rendered */
-    private static final double VISIBILITY_CUTOFF = 0.01;
-    /** Visibility (in range [0, 1]) under which "other" entities are not selectable/labeled */
-    private static final double SELECTABILITY_VISIBILITY_CUTOFF = 0.25;
 
     // rotation stuff
     private final Rotate rotateX;
@@ -257,7 +245,6 @@ public class Window3DController {
     private final Map<Node, Text> entityLabelMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
-
     // rotation
     private final double[] keyValuesRotate = {90, 30, 30, 90};
     private final double[] keyFramesRotate = {1, 16, 321, 359};
@@ -426,6 +413,7 @@ public class Window3DController {
         isMeshSearchedFlags = new boolean[1];
 
         selectedIndex = new SimpleIntegerProperty(-1);
+        captureVideo = new SimpleBooleanProperty();
 
         this.selectedNameProperty = requireNonNull(selectedNameProperty);
         this.selectedNameProperty.addListener((observable, oldValue, newValue) -> {
@@ -509,7 +497,7 @@ public class Window3DController {
         renderService = new RenderService();
 
         this.zoomProperty = requireNonNull(zoomProperty);
-        this.zoomProperty.set(INITIAL_ZOOM);
+        this.zoomProperty.set(getInitialZoom());
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform.setScale(zoomProperty.get());
             repositionSprites();
@@ -547,10 +535,10 @@ public class Window3DController {
 
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
-        this.translateXProperty.set(INITIAL_TRANSLATE_X);
+        this.translateXProperty.set(getInitialTranslateX());
         this.translateYProperty = requireNonNull(translateYProperty);
         this.translateYProperty.addListener(getTranslateYListener());
-        this.translateYProperty.set(INITIAL_TRANSLATE_Y);
+        this.translateYProperty.set(getInitialTranslateY());
 
         quaternion = new Quaternion();
 
@@ -654,7 +642,7 @@ public class Window3DController {
                 opacitySlider.setValue(newVal * 100);
             }
         });
-        this.othersOpacityProperty.setValue(DEFAULT_OTHERS_OPACITY);
+        this.othersOpacityProperty.setValue(getDefaultOthersOpacity());
 
         uniformSizeCheckBox.setSelected(true);
         uniformSize = true;
@@ -761,8 +749,8 @@ public class Window3DController {
         if (entity != null) {
             // do not create transient label for "other" entities when their visibility is under the selectability
             // cutoff
-            if (entity.getMaterial() == colorHash.getOthersMaterial(opacity)
-                    && othersOpacityProperty.get() < SELECTABILITY_VISIBILITY_CUTOFF) {
+            if ((entity.getMaterial() == colorHash.getOthersMaterial(opacity))
+                    && (othersOpacityProperty.get() < getSelectabilityVisibilityCutoff())) {
                 return;
             }
             if (!currentLabels.contains(name)) {
@@ -788,7 +776,7 @@ public class Window3DController {
                     double vOffset = b.getHeight() / 2;
                     double hOffset = b.getWidth() / 2;
                     x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+                    y -= (vOffset + getLabelSpriteYOffset());
                     transientLabelText.getTransforms().add(new Translate(x, y));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
@@ -1122,7 +1110,7 @@ public class Window3DController {
                     double z = b.getMaxZ();
                     billboard.getTransforms().addAll(
                             new Translate(x, y, z),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                            new Scale(getBillboardScale(), getBillboardScale()));
                 }
             }
         }
@@ -1175,10 +1163,10 @@ public class Window3DController {
 
                 if (isLabel) {
                     x += hOffset;
-                    y -= (vOffset + LABEL_SPRITE_Y_OFFSET);
+                    y -= (vOffset + getLabelSpriteYOffset());
                 } else {
                     x += hOffset;
-                    y += vOffset + LABEL_SPRITE_Y_OFFSET;
+                    y += vOffset + getLabelSpriteYOffset();
                 }
                 noteOrLabelGraphic.getTransforms().clear();
                 noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
@@ -1427,7 +1415,7 @@ public class Window3DController {
 
     /**
      * Inserts spherical cells into the list of entities that is later added to the subscene. "Other" cells with
-     * visibility under the {@link #VISIBILITY_CUTOFF} are not rendered.
+     * visibility under the visibility cutoff are not rendered.
      *
      * @param entities
      *         list of subscene entities
@@ -1443,9 +1431,9 @@ public class Window3DController {
             // size the sphere
             double radius;
             if (!uniformSize) {
-                radius = SIZE_SCALE * diameters.get(index) / 2;
+                radius = getSizeScale() * diameters.get(index) / 2;
             } else {
-                radius = SIZE_SCALE * UNIFORM_RADIUS;
+                radius = getSizeScale() * getUniformRadius();
             }
             final Sphere sphere = new Sphere(radius);
 
@@ -1472,7 +1460,7 @@ public class Window3DController {
                     // do not render this "other" cell if visibility is under the cutoff
                     // remove this cell from scene data at current time point
                     double opacity = othersOpacityProperty.get();
-                    if (opacity <= VISIBILITY_CUTOFF) {
+                    if (opacity <= getVisibilityCutoff()) {
                         iter.remove();
                         positions.remove(index);
                         diameters.remove(index);
@@ -1480,7 +1468,7 @@ public class Window3DController {
                         continue;
                     } else {
                         material = othersMaterial;
-                        if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
+                        if (opacity <= getSelectabilityVisibilityCutoff()) {
                             sphere.setDisable(true);
                         }
                     }
@@ -1519,7 +1507,7 @@ public class Window3DController {
 
     /**
      * Inserts meshes into the list of entities that is later added to the subscene. "Other" scene elements with
-     * visibility under the {@link #VISIBILITY_CUTOFF} are not rendered.
+     * visibility under the visibility cutoff are not rendered.
      *
      * @param entities
      *         list of subscene entities
@@ -1594,13 +1582,13 @@ public class Window3DController {
                         // do not render this "other" scene element if visibility is under the cutoff
                         // remove scene element and its mesh from scene data at current time point
                         final double opacity = othersOpacityProperty.get();
-                        if (opacity <= VISIBILITY_CUTOFF) {
+                        if (opacity <= getVisibilityCutoff()) {
                             iter.remove();
                             currentSceneElementMeshes.remove(index--);
                             continue;
                         } else {
                             meshView.setMaterial(colorHash.getOthersMaterial(othersOpacityProperty.get()));
-                            if (opacity <= SELECTABILITY_VISIBILITY_CUTOFF) {
+                            if (opacity <= getSelectabilityVisibilityCutoff()) {
                                 meshView.setDisable(true);
                             }
                         }
@@ -1823,7 +1811,7 @@ public class Window3DController {
                     text.getTransforms().addAll(rotateX, rotateY, rotateZ);
                     text.getTransforms().addAll(
                             new Translate(note.getX(), note.getY(), note.getZ()),
-                            new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                            new Scale(getBillboardScale(), getBillboardScale()));
                 }
                 // cell attachment
                 else if (note.attachedToCell()) {
@@ -1839,7 +1827,7 @@ public class Window3DController {
                             text.getTransforms().addAll(sphere.getTransforms());
                             text.getTransforms().addAll(
                                     new Translate(offset, offset),
-                                    new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                                    new Scale(getBillboardScale(), getBillboardScale()));
                         }
                     }
                 } else if (defaultEmbryoFlag) {
@@ -1851,7 +1839,7 @@ public class Window3DController {
                                 double offset = 5;
                                 text.getTransforms().addAll(
                                         new Translate(offset, offset),
-                                        new Scale(BILLBOARD_SCALE, BILLBOARD_SCALE));
+                                        new Scale(getBillboardScale(), getBillboardScale()));
                             }
                         }
                     }
@@ -1975,9 +1963,9 @@ public class Window3DController {
         rootEntitiesGroup.getChildren().add(xform);
         xform.getChildren().add(camera);
 
-        camera.setNearClip(CAMERA_NEAR_CLIP);
-        camera.setFarClip(CAMERA_FAR_CLIP);
-        camera.setTranslateZ(CAMERA_INITIAL_DISTANCE);
+        camera.setNearClip(getCameraNearClip());
+        camera.setFarClip(getCameraFarClip());
+        camera.setTranslateZ(getCameraInitialDistance());
 
         subscene.setCamera(camera);
     }
@@ -2025,110 +2013,107 @@ public class Window3DController {
     }
 
     public boolean captureImagesForMovie() {
-        movieFiles.clear();
-        count = -1;
+		movieFiles.clear();
+		count = 0;
 
-        final Stage fileChooserStage = new Stage();
+		final Stage fileChooserStage = new Stage();
 
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose Save Location");
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+		final FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Save Location");
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
 
-        final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
+		final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
 
-        if (tempFile == null) {
-            return false;
-        }
+		if (tempFile == null) {
+			return false;
+		}
 
-        // save the name from the file chooser for later MOV file
-        movieName = tempFile.getName();
-        moviePath = tempFile.getAbsolutePath();
+		// save the name from the file chooser for later MOV file
+		movieName = tempFile.getName();
+		moviePath = tempFile.getAbsolutePath();
 
-        // make a temp directory for the frames at the given save location
-        String path = tempFile.getAbsolutePath();
-        if (path.lastIndexOf("/") < 0) {
-            path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
-        } else {
-            path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
-        }
+		// make a temp directory for the frames at the given save location
+		String path = tempFile.getAbsolutePath();
+		if (path.lastIndexOf("/") < 0) {
+			path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
+		} else {
+			path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
+		}
 
-        frameDir = new File(path);
+		frameDir = new File(path);
 
-        try {
-            frameDir.mkdir();
-        } catch (SecurityException se) {
-            return false;
-        }
+		try {
+			frameDir.mkdir();
+		} catch (SecurityException se) {
+			return false;
+		}
 
-        String frameDirPath = frameDir.getAbsolutePath() + "/";
+		String frameDirPath = frameDir.getAbsolutePath() + "/";
 
-        captureVideo.set(true);
-        timer = new Timer();
+		captureVideo.set(true);
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (captureVideo.get()) {
+					runLater(() -> {
+                        WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
+                        try {
+                            File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
 
-        timer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (captureVideo.get()) {
-                            runLater(() -> {
-                                final WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
-                                try {
-                                    final File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
-                                        RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
-                                        write(renderedImage, "JPEG", file);
-                                        movieFiles.addElement(file);
-                                } catch (Exception e) {
-                                    System.out.println("Could not write frame of movie to file.");
-                                    e.printStackTrace();
-                                }
-                            });
-
-                        } else {
-                            timer.cancel();
+                            if (file != null) {
+                                RenderedImage renderedImage = SwingFXUtils.fromFXImage(screenCapture, null);
+                                ImageIO.write(renderedImage, "JPEG", file);
+                                movieFiles.addElement(file);
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Could not write frame of movie to file.");
                         }
-                    }
-                },
-                0,
-                1000);
-        return true;
-    }
+                    });
+				} else {
+					timer.cancel();
+				}
+			}
+		},0,1000);
+		return true;
+	}
 
-    public void convertImagesToMovie() {
-        // make our files into JavaPicture
-        javaPictures.clear();
+	public void convertImagesToMovie() {
+		captureVideo.set(false);
+		javaPictures.clear();
 
-        for (File movieFile : movieFiles) {
-            JavaPicture jp = new JavaPicture();
+		for (File movieFile : movieFiles) {
+			JavaPicture jp = new JavaPicture();
 
-            jp.loadImage(movieFile);
+			jp.loadImage(movieFile);
 
-            javaPictures.addElement(jp);
-        }
+			javaPictures.addElement(jp);
+		}
 
-        if (javaPictures.size() > 0) {
-            new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
+		if (javaPictures.size() > 0) {
+			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
 
-            // move the movie to the originally specified location
-            final File movJustMade = new File(movieName);
-            movJustMade.renameTo(new File(moviePath));
+			// move the movie to the originally specified location
+			final File movJustMade = new File(movieName);
+			movJustMade.renameTo(new File(moviePath + ".mov"));
 
-            // remove the .movtemp.jpg file
-            final File movtempjpg = new File(".movtemp.jpg");
-            movtempjpg.delete();
-        }
+			// remove the .movtemp.jpg file
+			final File movtempjpg = new File(".movtemp.jpg");
+			movtempjpg.delete();
+		}
 
-        // remove all of the images in the frame directory
-        if (frameDir != null && frameDir.isDirectory()) {
-            final File[] frames = frameDir.listFiles();
-            if (frames != null) {
-                for (File frame : frames) {
-                    frame.delete();
-                }
-            }
-            frameDir.delete();
-        }
+		// remove all of the images in the frame directory
+		if (frameDir != null && frameDir.isDirectory()) {
+			final File[] frames = frameDir.listFiles();
+			if (frames != null) {
+				for (File frame : frames) {
+					frame.delete();
+				}
+			}
+			frameDir.delete();
+		}
 
-    }
+	}
 
     /**
      * Saves a snapshot of the screen
@@ -2378,7 +2363,7 @@ public class Window3DController {
 
     /**
      * This JavaFX {@link Service} of type Void spools a thread to play the subscene movie. It waits the timeProperty
-     * in milliseconds defined in the variable WAIT_TIME_MILLI (defined in the parent class) before rendering the next
+     * in milliseconds defined in the variable WAIT_TIME_MILLI before rendering the next
      * timeProperty frame.
      */
     private final class PlayService extends Service<Void> {
@@ -2393,7 +2378,7 @@ public class Window3DController {
                         }
                         runLater(() -> timeProperty.set(timeProperty.get() + 1));
                         try {
-                            Thread.sleep(WAIT_TIME_MILLI);
+                            Thread.sleep(getWaitTimeMilli());
                         } catch (InterruptedException ie) {
                             break;
                         }
