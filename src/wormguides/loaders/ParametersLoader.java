@@ -10,10 +10,10 @@ import java.util.StringTokenizer;
 import wormguides.MainApp;
 
 public class ParametersLoader {
-	private static final String PARAMETERS_FILE_PATH = "/wormguides/model/parameters_file/parameters.txt";
+	private static final String PARAMETERS_FILE_PATH = "/wormguides/models/parameters_file/parameters.txt";
 	
 	public static HashMap<String, String> loadParameters() {
-		final URL url = MainApp.class.getResource("/wormguides/model/parameters_file/parameters.txt");
+		final URL url = MainApp.class.getResource(PARAMETERS_FILE_PATH);
 		final HashMap<String, String> param_map = new HashMap<String, String>();
 		
 		try (final InputStreamReader isr = new InputStreamReader(url.openStream());
