@@ -148,6 +148,7 @@ public class Window3DController {
     private static final double CANNONICAL_ORIENTATION_X = 145.0;
     private static final double CANNONICAL_ORIENTATION_Y = -166.0;
     private static final double CANNONICAL_ORIENTATION_Z = 24.0;
+
     private static final String CS = ", ";
     private static final String FILL_COLOR_HEX = "#272727",
             ACTIVE_LABEL_COLOR_HEX = "#ffff66",
@@ -256,6 +257,7 @@ public class Window3DController {
     private final Map<Node, Text> entityLabelMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
+
     // rotation
     private final double[] keyValuesRotate = {90, 30, 30, 90};
     private final double[] keyFramesRotate = {1, 16, 321, 359};
@@ -542,8 +544,6 @@ public class Window3DController {
         this.rotateXAngleProperty.addListener(getRotateXAngleListener());
         this.rotateYAngleProperty.addListener(getRotateYAngleListener());
         this.rotateZAngleProperty.addListener(getRotateZAngleListener());
-
-        //initializeWithCannonicalOrientation();
 
         this.translateXProperty = requireNonNull(translateXProperty);
         this.translateXProperty.addListener(getTranslateXListener());
@@ -885,7 +885,7 @@ public class Window3DController {
                             // " + cross[1] + ", " + cross[2] + ">");
                             quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
-                            ArrayList<Double> eulerAngles = quaternion.toEulerRotation();
+                            List<Double> eulerAngles = quaternion.toEulerRotation();
 
 //                            if (eulerAngles.size() == 3) {
                             // rotateX.setAngle(eulerAngles.get(2));
