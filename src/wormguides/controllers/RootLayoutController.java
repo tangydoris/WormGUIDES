@@ -76,6 +76,7 @@ import wormguides.models.subscenegeometry.StructureTreeNode;
 import wormguides.resources.ProductionInfo;
 import wormguides.stories.Story;
 import wormguides.util.ColorHash;
+import wormguides.util.Parameters;
 import wormguides.util.StringCellFactory;
 import wormguides.view.DraggableTab;
 import wormguides.view.infowindow.InfoWindow;
@@ -1181,6 +1182,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // takes about 6ms
         CellDeaths.init();
+        
+        Parameters.init();
 
         initSharedVariables();
 
