@@ -71,7 +71,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 import acetree.LineageData;
-import com.sun.javafx.scene.CameraHelper;
 import connectome.Connectome;
 import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
@@ -119,6 +118,7 @@ import static javafx.scene.transform.Rotate.X_AXIS;
 import static javafx.scene.transform.Rotate.Y_AXIS;
 import static javafx.scene.transform.Rotate.Z_AXIS;
 
+import static com.sun.javafx.scene.CameraHelper.project;
 import static javax.imageio.ImageIO.write;
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static search.SearchType.LINEAGE;
@@ -766,7 +766,7 @@ public class Window3DController {
                     transientLabelText.setFill(web(TRANSIENT_LABEL_COLOR_HEX));
                     transientLabelText.setOnMouseEntered(Event::consume);
                     transientLabelText.setOnMouseClicked(Event::consume);
-                    final Point2D p = CameraHelper.project(
+                    final Point2D p = project(
                             camera,
                             new Point3D(
                                     (b.getMinX() + b.getMaxX()) / 2,
@@ -774,10 +774,8 @@ public class Window3DController {
                                     (b.getMaxZ() + b.getMinZ()) / 2));
                     double x = p.getX();
                     double y = p.getY();
-                    double vOffset = b.getHeight() / 2;
-                    double hOffset = b.getWidth() / 2;
-                    x += hOffset;
-                    y -= (vOffset + getLabelSpriteYOffset());
+
+                    y -= getLabelSpriteYOffset();
                     transientLabelText.getTransforms().add(new Translate(x, y));
                     // disable text to take away label flickering when mouse is on top top of it
                     transientLabelText.setDisable(true);
@@ -1135,9 +1133,7 @@ public class Window3DController {
     }
 
     /**
-     * Aligns a note graphic to its entity. The graphic is either a {@link Text} or a {@link VBox}. The graphic is
-     * removed if it ends up outside the bounds of the subscene window after a transformation, and only reinserted if
-     * its bounds are within the window again.
+     * Aligns a note graphic to its entity. The graphic is either a {@link Text} or a {@link VBox}.
      *
      * @param noteOrLabelGraphic
      *         graphical representation of a note/notes (could be a {@link Text} or a {@link VBox})
@@ -1150,7 +1146,7 @@ public class Window3DController {
         if (node != null) {
             final Bounds b = node.getBoundsInParent();
             if (b != null) {
-                final Point2D p = CameraHelper.project(
+                final Point2D p = project(
                         camera,
                         new Point3D(
                                 (b.getMinX() + b.getMaxX()) / 2.0,
@@ -1159,16 +1155,12 @@ public class Window3DController {
                 double x = p.getX();
                 double y = p.getY();
 
-                double vOffset = b.getHeight() / 2;
-                double hOffset = b.getWidth() / 2;
-
                 if (isLabel) {
-                    x += hOffset;
-                    y -= (vOffset + getLabelSpriteYOffset());
+                    y -= getLabelSpriteYOffset();
                 } else {
-                    x += hOffset;
-                    y += vOffset + getLabelSpriteYOffset();
+                    y += getLabelSpriteYOffset();
                 }
+
                 noteOrLabelGraphic.getTransforms().clear();
                 noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
             }
