@@ -395,10 +395,7 @@ public class StoriesLayer {
             // set time property to be read by 3d window
             if (!activeNote.getTagName().equals("New Note")) {
                 int startTime = getEffectiveStartTime(activeNote);
-                if (startTime < 1) {
-                    startTime = 1;
-                }
-                if (timeProperty != null) {
+                if (timeProperty != null && startTime >= 1) {
                     timeProperty.set(startTime);
                 }
             }
@@ -478,12 +475,13 @@ public class StoriesLayer {
                 int entityStartTime;
                 int entityEndTime;
 
+                final String cellName = note.getCellName();
                 if (note.attachedToCell()) {
-                    entityStartTime = lineageData.getFirstOccurrenceOf(note.getCellName());
-                    entityEndTime = lineageData.getLastOccurrenceOf(note.getCellName());
+                    entityStartTime = lineageData.getFirstOccurrenceOf(cellName);
+                    entityEndTime = lineageData.getLastOccurrenceOf(cellName);
                 } else {
-                    entityStartTime = sceneElementsList.getFirstOccurrenceOf(note.getCellName());
-                    entityEndTime = sceneElementsList.getLastOccurrenceOf(note.getCellName());
+                    entityStartTime = sceneElementsList.getFirstOccurrenceOf(cellName);
+                    entityEndTime = sceneElementsList.getLastOccurrenceOf(cellName);
                 }
 
                 // attached to cell/structure and time is specified
