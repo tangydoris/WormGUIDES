@@ -137,7 +137,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
     private Note activeNote;
 
-    private final LineageData cellData;
+    private final LineageData lineageData;
     private final int frameOffset;
 
     /**
@@ -166,7 +166,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         super();
 
-        cellData = data;
+        lineageData = data;
 
         frameOffset = timeOffset;
 
@@ -189,7 +189,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         sceneActiveCellProperty = requireNonNull(nameProperty);
         sceneActiveCellProperty.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && !newValue.isEmpty() && cellData.isCellName(newValue)) {
+            if (newValue != null && !newValue.isEmpty() && lineageData.isCellName(newValue)) {
                 activeCellProperty.set(newValue);
             }
         });
@@ -197,8 +197,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         cellClickedProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 activeCellProperty.set(sceneActiveCellProperty.get());
-                // System.out.println("clicked -
-                // "+sceneActiveCellProperty.get());
                 cellClickedProperty.set(false);
             }
         });
@@ -395,7 +393,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         activeCellProperty.addListener((observable, oldValue, newValue) -> {
             // only change when active cell toggle is not selected
-            Toggle selected = attachmentToggle.getSelectedToggle();
+            final Toggle selected = attachmentToggle.getSelectedToggle();
             if (selected == null || !((Type) selected.getUserData()).equals(CELL)) {
                 setCellLabelName(newValue);
             }
