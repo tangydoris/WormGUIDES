@@ -246,14 +246,15 @@ public class Window3DController {
     private final Map<Node, Text> entityLabelMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
-    // rotation
-    private final double[] keyValuesRotate = {90, 30, 30, 90};
-    private final double[] keyFramesRotate = {1, 16, 321, 359};
-
     private final ProductionInfo productionInfo;
     private final Connectome connectome;
     private final BooleanProperty bringUpInfoFlag;
     private final SubsceneSizeListener subsceneSizeListener;
+
+    // rotation - AP
+    private double[] keyValuesRotate;
+    private double[] keyFramesRotate;
+
     // subscene state parameters
     private LinkedList<Sphere> spheres;
     private LinkedList<MeshView> meshes;
@@ -403,6 +404,11 @@ public class Window3DController {
                 timeProperty.set(endTime);
             }
         });
+
+        // set orientation indicator frames and rotation from production info
+        keyFramesRotate = productionInfo.getKeyFramesRotate();
+        keyValuesRotate = productionInfo.getKeyValuesRotate();
+        // double[] initialRotation = productionInfo.getInitialRotation();
 
         spheres = new LinkedList<>();
         meshes = new LinkedList<>();
