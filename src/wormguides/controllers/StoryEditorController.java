@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,9 +39,11 @@ import static java.lang.Integer.MIN_VALUE;
 import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
 
+import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
 
 import static wormguides.controllers.StoryEditorController.Time.CURRENT;
+import static wormguides.controllers.StoryEditorController.Time.GLOBAL;
 import static wormguides.controllers.StoryEditorController.Time.RANGE;
 import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
 import static wormguides.stories.Note.Display.OVERLAY;
@@ -125,7 +126,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     private TextField storyTitle;
     @FXML
     private TextArea storyDescription;
-    private Runnable storyRunnable;
+    private Runnable storyFieldsUpdateRunnable;
+    private Runnable noteFieldsUpdateRunnable;
     private Story activeStory;
     @FXML
     private TextField titleField;
@@ -177,8 +179,8 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         timeProperty = requireNonNull(sceneTimeProperty);
         timeProperty.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                Toggle selected = timeToggle.getSelectedToggle();
+            if (newValue != null && timeToggle != null) {
+                final Toggle selected = timeToggle.getSelectedToggle();
                 if (selected == null || selected.getUserData() != CURRENT) {
                     setCurrentTimeLabel(timeProperty.get() + frameOffset);
                 }
@@ -210,7 +212,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         assertFXMLNodes();
 
         // for story title field unselection/caret position
-        storyRunnable = () -> {
+        storyFieldsUpdateRunnable = () -> {
             storyTitle.setText(activeStory.getName());
             storyDescription.setText(activeStory.getDescription());
             author.setText(activeStory.getAuthor());
@@ -218,19 +220,27 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             storyTitle.positionCaret(storyTitle.getText().length());
         };
 
+        noteFieldsUpdateRunnable = () -> {
+            if (activeNote != null) {
+                titleField.setText(activeNote.getTagName());
+                contentArea.setText(activeNote.getTagContents());
+            } else {
+                titleField.clear();
+                contentArea.clear();
+            }
+        };
+
         // note fields
-        updateNoteFields();
+        runLater(noteFieldsUpdateRunnable);
         titleField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             // if field was previously focused and is not anymore
             if (!newValue && activeNote != null) {
                 activeNote.setTagName(titleField.getText());
-                activeNote.setChanged(true);
             }
         });
         contentArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue && activeNote != null) {
                 activeNote.setTagContents(contentArea.getText());
-                activeNote.setChanged(true);
             }
         });
 
@@ -239,13 +249,11 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         storyTitle.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && activeStory != null) {
                 activeStory.setName(newValue);
-                activeStory.setChanged(true);
             }
         });
         storyDescription.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && activeStory != null) {
                 activeStory.setDescription(newValue);
-                activeStory.setChanged(true);
             }
         });
         author.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -295,6 +303,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         break;
                 }
                 activeNote.setStartAndEndTimes(start, end);
+                activeNote.setChanged(true);
             }
         });
         startTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -303,6 +312,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 if (selected != null && selected.getUserData() == RANGE) {
                     try {
                         activeNote.setStartTime(parseInt(newValue) - frameOffset);
+                        activeNote.setChanged(true);
                     } catch (NumberFormatException e) {
                         // silently fail
                     }
@@ -315,6 +325,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 if (selected != null && selected.getUserData() == RANGE) {
                     try {
                         activeNote.setEndTime(parseInt(newValue) - frameOffset);
+                        activeNote.setChanged(true);
                     } catch (NumberFormatException e) {
                         // silently fail
                     }
@@ -356,6 +367,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 } else {
                     setActiveNoteAttachmentType(BLANK);
                 }
+                activeNote.setChanged(true);
             }
         });
         displayToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
@@ -377,6 +389,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 } else {
                     setActiveNoteDisplay(Display.BLANK);
                 }
+                activeNote.setChanged(true);
             }
         });
 
@@ -385,17 +398,21 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         structuresComboBox.setButtonCell(listCellFactory.getNewStringListCell());
         structuresComboBox.setCellFactory(listCellFactory);
         structuresComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            Toggle selected = attachmentToggle.getSelectedToggle();
-            if (activeNote != null && selected != null && selected.equals(structureRadioBtn)) {
+            final Toggle selected = attachmentToggle.getSelectedToggle();
+            if (selected != null && activeNote != null && selected.equals(structureRadioBtn)) {
                 activeNote.setCellName(newValue);
             }
         });
 
         activeCellProperty.addListener((observable, oldValue, newValue) -> {
-            // only change when active cell toggle is not selected
+            // only change when active cell toggle is not selected and the currently active entity is a named cell
             final Toggle selected = attachmentToggle.getSelectedToggle();
             if (selected == null || !((Type) selected.getUserData()).equals(CELL)) {
-                setCellLabelName(newValue);
+                String activeCellName = "";
+                if (lineageData.isCellName(newValue)) {
+                    activeCellName = newValue;
+                }
+                setCellLabelName(activeCellName);
             }
         });
         if (activeNote != null && activeNote.attachedToCell()) {
@@ -420,7 +437,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     private void setActiveNoteAttachmentType(Type type) {
         if (activeNote != null) {
             activeNote.setAttachmentType(type);
-
             if (type.equals(CELL) && !activeCellProperty.get().isEmpty()) {
                 activeNote.setCellName(activeCellProperty.get());
             }
@@ -445,7 +461,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         // sub structure
 
         // time
-        globalTimeRadioBtn.setUserData(Time.GLOBAL);
+        globalTimeRadioBtn.setUserData(GLOBAL);
         currentTimeRadioBtn.setUserData(CURRENT);
         rangeTimeRadioBtn.setUserData(RANGE);
 
@@ -514,8 +530,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             if (activeNote != null) {
                 int start = activeNote.getStartTime();
                 int end = activeNote.getEndTime();
-                // System.out.println(activeNote.getTagName()+" time -
-                // "+start+", "+end);
 
                 if (start == MIN_VALUE || end == MIN_VALUE) {
                     timeToggle.selectToggle(globalTimeRadioBtn);
@@ -640,7 +654,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     private void updateStoryFields() {
         if (storyTitle != null && storyDescription != null) {
             if (activeStory != null) {
-                Platform.runLater(storyRunnable);
+                runLater(storyFieldsUpdateRunnable);
             } else {
                 storyTitle.clear();
                 storyDescription.clear();
@@ -650,28 +664,18 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         }
     }
 
-    private void updateNoteFields() {
-        if (titleField != null && contentArea != null) {
-            if (activeNote != null) {
-                titleField.setText(activeNote.getTagName());
-                contentArea.setText(activeNote.getTagContents());
-            } else {
-                titleField.clear();
-                contentArea.clear();
-            }
-        }
-    }
-
     public Note getActiveNote() {
         return activeNote;
     }
 
-    public void setActiveNote(Note note) {
+    public void setActiveNote(final Note note) {
         activeNote = note;
-        updateNoteFields();
-        updateType();
-        updateTime();
-        updateDisplay();
+        if (titleField != null && contentArea != null) {
+            runLater(noteFieldsUpdateRunnable);
+            updateType();
+            updateTime();
+            updateDisplay();
+        }
     }
 
     public Story getActiveStory() {

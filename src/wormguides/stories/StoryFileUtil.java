@@ -109,7 +109,7 @@ public class StoryFileUtil {
             storyParams[STORY_DESCRIPTION_INDEX] = quoteForCsv(story.getDescription());
             storyParams[STORY_AUTHOR_INDEX] = quoteForCsv(story.getAuthor());
             storyParams[STORY_DATE_INDEX] = quoteForCsv(story.getDate());
-            storyParams[STORY_COLOR_URL_INDEX] = quoteForCsv(story.getColorURL());
+            storyParams[STORY_COLOR_URL_INDEX] = quoteForCsv(story.getColorUrl());
             out.append(join(",", storyParams)).append(BR);
 
             // notes

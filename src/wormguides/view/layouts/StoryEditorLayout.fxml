@@ -152,7 +152,7 @@
                     <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                         <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity"
                                 prefWidth="30.0"/>
-                        <Label fx:id="activeCellLabel" minWidth="71.0" text="Active Cell">
+                        <Label fx:id="activeCellLabel" minWidth="71.0" text="Active Cell (none)">
                             <font>
                                 <Font size="14.0"/>
                             </font>
@@ -375,7 +375,7 @@
                     <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                         <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity"
                                 prefWidth="15.0"/>
-                        <Label minWidth="78.0" text="Info Pane">
+                        <Label minWidth="78.0" text="Story Pane">
                             <font>
                                 <Font size="14.0"/>
                             </font>
