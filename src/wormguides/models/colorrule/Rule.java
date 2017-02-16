@@ -38,6 +38,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import static javafx.application.Platform.runLater;
+import static javafx.geometry.Insets.EMPTY;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.OverrunStyle.ELLIPSIS;
 import static javafx.scene.layout.HBox.setHgrow;
@@ -47,6 +48,8 @@ import static javafx.scene.paint.Color.LIGHTGREY;
 import static javafx.stage.Modality.NONE;
 
 import static search.SearchType.STRUCTURE_BY_SCENE_NAME;
+import static wormguides.loaders.ImageLoader.getEyeIcon;
+import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
 import static wormguides.models.LineageTree.isAncestor;
 import static wormguides.models.LineageTree.isDescendant;
 import static wormguides.models.colorrule.SearchOption.ANCESTOR;
@@ -64,8 +67,8 @@ import static wormguides.util.AppFont.getFont;
 
 public class Rule {
 
-    /** Length and width of color rule UI buttons */
-    private final int UI_SIDE_LENGTH = 22;
+    /** Length and width (in pixels) of color rule UI buttons */
+    public static final int UI_SIDE_LENGTH = 22;
 
     private final SubmitHandler submitHandler;
 
@@ -79,7 +82,7 @@ public class Rule {
     private final Button deleteBtn;
     private final Tooltip toolTip;
     private final ImageView eyeIcon;
-    private final ImageView eyeInvertIcon;
+    private final ImageView eyeIconInverted;
 
     private BooleanProperty rebuildSubsceneFlag;
 
@@ -201,18 +204,18 @@ public class Rule {
         editBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         editBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         editBtn.setContentDisplay(GRAPHIC_ONLY);
-        editBtn.setPadding(Insets.EMPTY);
+        editBtn.setPadding(EMPTY);
         editBtn.setGraphic(ImageLoader.getEditIcon());
         editBtn.setGraphicTextGap(0);
         editBtn.setOnAction(event -> showEditStage(null));
 
-        eyeIcon = ImageLoader.getEyeIcon();
-        eyeInvertIcon = ImageLoader.getEyeInvertIcon();
+        eyeIcon = getEyeIcon();
+        eyeIconInverted = getEyeInvertIcon();
 
         visibleBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         visibleBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         visibleBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        visibleBtn.setPadding(Insets.EMPTY);
+        visibleBtn.setPadding(EMPTY);
         visibleBtn.setContentDisplay(GRAPHIC_ONLY);
         visibleBtn.setGraphic(eyeIcon);
         visibleBtn.setGraphicTextGap(0);
@@ -225,7 +228,7 @@ public class Rule {
         deleteBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         deleteBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
         deleteBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        deleteBtn.setPadding(Insets.EMPTY);
+        deleteBtn.setPadding(EMPTY);
         deleteBtn.setContentDisplay(GRAPHIC_ONLY);
         deleteBtn.setGraphic(ImageLoader.getCloseIcon());
 
@@ -248,7 +251,7 @@ public class Rule {
      */
     private void blackOutVisibleButton(final boolean isBlackedOut) {
         if (isBlackedOut) {
-            runLater(() -> visibleBtn.setGraphic(eyeInvertIcon));
+            runLater(() -> visibleBtn.setGraphic(eyeIconInverted));
         } else {
             runLater(() -> visibleBtn.setGraphic(eyeIcon));
         }

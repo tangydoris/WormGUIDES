@@ -1713,158 +1713,160 @@ public class Window3DController {
      *         the list of nodes that billboards are added to, which are added to to the subscene. Note overlays
      *         and sprites are added to the pane that contains the subscene.
      */
-    private void addNoteGeometries(List<Node> list) {
+    private void addNoteGeometries(final List<Node> list) {
         for (Note note : currentNotes) {
-            // map notes to their sphere/mesh view
-            Node text = makeNoteGraphic(note);
-            currentGraphicNoteMap.put(text, note);
+            if (note.isVisible()) {
+                // map notes to their sphere/mesh view
+                final Node text = makeNoteGraphic(note);
+                currentGraphicNoteMap.put(text, note);
 
-            text.setOnMouseEntered(event -> spritesPane.setCursor(HAND));
-            text.setOnMouseExited(event -> spritesPane.setCursor(DEFAULT));
+                text.setOnMouseEntered(event -> spritesPane.setCursor(HAND));
+                text.setOnMouseExited(event -> spritesPane.setCursor(DEFAULT));
 
-            // SPRITE
-            if (note.isSprite()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    VBox box = new VBox(3);
-                    box.getChildren().add(text);
-                    // add inivisible location marker to scene at location
-                    // specified by note
-                    Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
-                    rootEntitiesGroup.getChildren().add(marker);
-                    entitySpriteMap.put(marker, box);
-                    // add vbox to sprites pane
-                    spritesPane.getChildren().add(box);
+                // SPRITE
+                if (note.isSprite()) {
+                    // location attachment
+                    if (note.attachedToLocation()) {
+                        VBox box = new VBox(3);
+                        box.getChildren().add(text);
+                        // add inivisible location marker to scene at location
+                        // specified by note
+                        Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+                        rootEntitiesGroup.getChildren().add(marker);
+                        entitySpriteMap.put(marker, box);
+                        // add vbox to sprites pane
+                        spritesPane.getChildren().add(box);
 
-                } else if (note.attachedToCell()) {
-                    // cell attachment
-                    Sphere sphere;
-                    for (int i = 0; i < cellNames.size(); i++) {
-                        sphere = spheres.get(i);
-                        if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
-                            // if another note is already attached to the same
-                            // sphere,
-                            // create a vbox for note positioning
-                            if (!entitySpriteMap.containsKey(sphere)) {
-                                VBox box = new VBox(3);
-                                box.getChildren().add(text);
-                                entitySpriteMap.put(sphere, box);
-                                spritesPane.getChildren().add(box);
-                            } else {
-                                entitySpriteMap.get(sphere).getChildren().add(text);
-                            }
-
-                            break;
-                        }
-                    }
-                } else if (defaultEmbryoFlag) {
-                    // structure attachment
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                MeshView mesh = currentSceneElementMeshes.get(i);
-                                if (!entitySpriteMap.containsKey(mesh)) {
-                                    final VBox box = new VBox(3);
+                    } else if (note.attachedToCell()) {
+                        // cell attachment
+                        Sphere sphere;
+                        for (int i = 0; i < cellNames.size(); i++) {
+                            sphere = spheres.get(i);
+                            if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
+                                // if another note is already attached to the same
+                                // sphere,
+                                // create a vbox for note positioning
+                                if (!entitySpriteMap.containsKey(sphere)) {
+                                    VBox box = new VBox(3);
                                     box.getChildren().add(text);
-                                    entitySpriteMap.put(mesh, box);
+                                    entitySpriteMap.put(sphere, box);
                                     spritesPane.getChildren().add(box);
                                 } else {
-                                    entitySpriteMap.get(mesh).getChildren().add(text);
+                                    entitySpriteMap.get(sphere).getChildren().add(text);
+                                }
+
+                                break;
+                            }
+                        }
+                    } else if (defaultEmbryoFlag) {
+                        // structure attachment
+                        if (note.attachedToStructure()) {
+                            for (int i = 0; i < currentSceneElements.size(); i++) {
+                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+                                    MeshView mesh = currentSceneElementMeshes.get(i);
+                                    if (!entitySpriteMap.containsKey(mesh)) {
+                                        final VBox box = new VBox(3);
+                                        box.getChildren().add(text);
+                                        entitySpriteMap.put(mesh, box);
+                                        spritesPane.getChildren().add(box);
+                                    } else {
+                                        entitySpriteMap.get(mesh).getChildren().add(text);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            // BILLBOARD_FRONT
-            else if (note.isBillboardFront()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
-                    rootEntitiesGroup.getChildren().add(marker);
-                    billboardFrontEntityMap.put(text, marker);
-                }
-                // cell attachment
-                else if (note.attachedToCell()) {
-                    Sphere sphere;
-                    for (int i = 0; i < cellNames.size(); i++) {
-                        sphere = spheres.get(i);
-                        if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
-                            billboardFrontEntityMap.put(text, sphere);
-                        }
+                // BILLBOARD_FRONT
+                else if (note.isBillboardFront()) {
+                    // location attachment
+                    if (note.attachedToLocation()) {
+                        Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+                        rootEntitiesGroup.getChildren().add(marker);
+                        billboardFrontEntityMap.put(text, marker);
                     }
-                }
-                // structure attachment
-                else if (defaultEmbryoFlag) {
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+                    // cell attachment
+                    else if (note.attachedToCell()) {
+                        Sphere sphere;
+                        for (int i = 0; i < cellNames.size(); i++) {
+                            sphere = spheres.get(i);
+                            if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
+                                billboardFrontEntityMap.put(text, sphere);
                             }
                         }
                     }
-                }
-            }
-
-            // BILLBOARD
-            else if (note.isBillboard()) {
-                // location attachment
-                if (note.attachedToLocation()) {
-                    text.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                    text.getTransforms().addAll(
-                            new Translate(note.getX(), note.getY(), note.getZ()),
-                            new Scale(getBillboardScale(), getBillboardScale()));
-                }
-                // cell attachment
-                else if (note.attachedToCell()) {
-                    Sphere sphere;
-                    for (int i = 0; i < cellNames.size(); i++) {
-                        sphere = spheres.get(i);
-                        if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
-                            double offset = 5;
-                            if (!uniformSize) {
-                                offset = sphere.getRadius() + 2;
-                            }
-
-                            text.getTransforms().addAll(sphere.getTransforms());
-                            text.getTransforms().addAll(
-                                    new Translate(offset, offset),
-                                    new Scale(getBillboardScale(), getBillboardScale()));
-                        }
-                    }
-                } else if (defaultEmbryoFlag) {
                     // structure attachment
-                    if (note.attachedToStructure()) {
-                        for (int i = 0; i < currentSceneElements.size(); i++) {
-                            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
+                    else if (defaultEmbryoFlag) {
+                        if (note.attachedToStructure()) {
+                            for (int i = 0; i < currentSceneElements.size(); i++) {
+                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+                                    billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // BILLBOARD
+                else if (note.isBillboard()) {
+                    // location attachment
+                    if (note.attachedToLocation()) {
+                        text.getTransforms().addAll(rotateX, rotateY, rotateZ);
+                        text.getTransforms().addAll(
+                                new Translate(note.getX(), note.getY(), note.getZ()),
+                                new Scale(getBillboardScale(), getBillboardScale()));
+                    }
+                    // cell attachment
+                    else if (note.attachedToCell()) {
+                        Sphere sphere;
+                        for (int i = 0; i < cellNames.size(); i++) {
+                            sphere = spheres.get(i);
+                            if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
                                 double offset = 5;
+                                if (!uniformSize) {
+                                    offset = sphere.getRadius() + 2;
+                                }
+
+                                text.getTransforms().addAll(sphere.getTransforms());
                                 text.getTransforms().addAll(
                                         new Translate(offset, offset),
                                         new Scale(getBillboardScale(), getBillboardScale()));
                             }
                         }
+                    } else if (defaultEmbryoFlag) {
+                        // structure attachment
+                        if (note.attachedToStructure()) {
+                            for (int i = 0; i < currentSceneElements.size(); i++) {
+                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
+                                    text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
+                                    double offset = 5;
+                                    text.getTransforms().addAll(
+                                            new Translate(offset, offset),
+                                            new Scale(getBillboardScale(), getBillboardScale()));
+                                }
+                            }
+                        }
                     }
                 }
-            }
 
-            // add graphic to appropriate place (scene, overlay box, or on top
-            // of scene)
-            final Display display = note.getTagDisplay();
-            if (display != null) {
-                switch (display) {
-                    case SPRITE:
-                        break;
-                    case BILLBOARD_FRONT: // fall to billboard case
-                    case BILLBOARD:
-                        list.add(text);
-                        break;
-                    case OVERLAY: // fall to default case
-                    case BLANK: // fall to default case
-                    default:
-                        storyOverlayVBox.getChildren().add(text);
-                        break;
+                // add graphic to appropriate place (scene, overlay box, or on top
+                // of scene)
+                final Display display = note.getTagDisplay();
+                if (display != null) {
+                    switch (display) {
+                        case SPRITE:
+                            break;
+                        case BILLBOARD_FRONT: // fall to billboard case
+                        case BILLBOARD:
+                            list.add(text);
+                            break;
+                        case OVERLAY: // fall to default case
+                        case BLANK: // fall to default case
+                        default:
+                            storyOverlayVBox.getChildren().add(text);
+                            break;
+                    }
                 }
             }
         }
