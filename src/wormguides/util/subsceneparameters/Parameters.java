@@ -30,9 +30,13 @@ public class Parameters {
     private final static String DEFAULT_OTHERS_OPACITY_KEY = "DEFAULT_OTHERS_OPACITY";
     private final static String VISIBILITY_CUTOFF_KEY = "VISIBILITY_CUTOFF";
     private final static String SELECTABILITY_VISIBILITY_CUTOFF_KEY = "SELECTABILITY_VISIBILITY_CUTOFF";
+    private final static String STORY_OVERLAY_PANE_WIDTH_KEY = "STORY_OVERLAY_PANE_WIDTH";
+    private final static String NOTE_SPRITE_TEXT_WIDTH_KEY = "NOTE_SPRITE_TEXT_WIDTH";
+    private final static String NOTE_BILLBOARD_TEXT_WIDTH_KEY = "NOTE_BILLBOARD_TEXT_WIDTH";
 
     // values
-    private static long waitTimeMilli; /* wait time between consecutive frames while movie is playing */
+    /** Waiting time between rendering consecutive frames while movie is playing */
+    private static long waitTimeMilli;
     private static double initialZoom;
     private static double initialTranslateX;
     private static double initialTranslateY;
@@ -40,16 +44,27 @@ public class Parameters {
     private static double cameraNearClip;
     private static double cameraFarClip;
     private static double billboardScale;
-    private static double sizeScale; /* scale used for radii of spheres, multiplied with cell's radius from nuc */
-    private static int uniformRadius; /* radius of all spheres when 'uniform size' is ticked */
-    private static int labelSpriteYOffset; /* y-offset from sprite to label for one cell entity */
-    private static double defaultOthersOpacity; /* default transparency of 'other' entities on startup */
-    private static double visibilityCutoff; /* visibility under which 'other' entities are not rendered */
-    private static double selectabilityVisibilityCutoff; /* visibility 'other' not selectable */
+    /** Scale used for radii of spheres, multiplied with cell's radius from nuc */
+    private static double sizeScale;
+    /** Radius of all spheres in 'Uniform Size' mode*/
+    private static int uniformRadius;
+    /** Y-offset from sprite to label for one cell entity */
+    private static int labelSpriteYOffset;
+    /** Default transparency of 'other' entities on startup */
+    private static double defaultOthersOpacity;
+    /** Visibility in the range [0, 1] under which 'other' entities are not rendered */
+    private static double visibilityCutoff;
+    /** Visibility in the range [0, 1] 'other' not selectable */
+    private static double selectabilityVisibilityCutoff;
+    /** Width (in pixels) of the stories overlay pane */
+    private static double storyOverlayPaneWidth;
+    /** Wrapping width (in pixels) of the note sprites */
+    private static double noteSpriteTextWidth;
+    /** Wrapping width (in pixels) of the note billboards */
+    private static double noteBillboardTextWidth;
 
     public static void init() {
         final Map<String, String> param_map = loadParameters();
-
         try {
             waitTimeMilli = parseLong(param_map.get(WAIT_TIME_MILLI_KEY));
             initialZoom = parseDouble(param_map.get(INITIAL_ZOOM_KEY));
@@ -65,7 +80,9 @@ public class Parameters {
             defaultOthersOpacity = parseDouble(param_map.get(DEFAULT_OTHERS_OPACITY_KEY));
             visibilityCutoff = parseDouble(param_map.get(VISIBILITY_CUTOFF_KEY));
             selectabilityVisibilityCutoff = parseDouble(param_map.get(SELECTABILITY_VISIBILITY_CUTOFF_KEY));
-
+            storyOverlayPaneWidth = parseDouble(param_map.get(STORY_OVERLAY_PANE_WIDTH_KEY));
+            noteSpriteTextWidth = parseDouble(param_map.get(NOTE_SPRITE_TEXT_WIDTH_KEY));
+            noteBillboardTextWidth = parseDouble(param_map.get(NOTE_BILLBOARD_TEXT_WIDTH_KEY));
         } catch (Exception e) {
             System.out.println("Error in parsing parameters file at " + PARAMETERS_FILE_PATH);
             e.printStackTrace();
@@ -126,5 +143,17 @@ public class Parameters {
 
     public static double getSelectabilityVisibilityCutoff() {
         return selectabilityVisibilityCutoff;
+    }
+
+    public static double getStoryOverlayPaneWidth() {
+        return storyOverlayPaneWidth;
+    }
+
+    public static double getNoteSpriteTextWidth() {
+        return noteSpriteTextWidth;
+    }
+
+    public static double getNoteBillboardTextWidth() {
+        return noteBillboardTextWidth;
     }
 }
