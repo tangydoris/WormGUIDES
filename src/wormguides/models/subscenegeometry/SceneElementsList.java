@@ -133,57 +133,55 @@ public class SceneElementsList {
                         startTime = parseInt(tokens[START_TIME_INDEX]);
                         endTime = parseInt(tokens[END_TIME_INDEX]);
 
-                        // this is extremely slow with the experimental shapes:
-                        // check to see if resource exists in the shape files archive
-                        // only create a scene element if it does
+                        // check for the first time that the .obj resource exists in the shape files archive
                         int effectiveStartTime = getEffectiveStartTime(resourceLocation, startTime, endTime);
-                        if (effectiveStartTime != MIN_VALUE) {
+                        if (effectiveStartTime != startTime) {
                             startTime = effectiveStartTime;
-                            // vector of cell names
-                            cellNames = new ArrayList<>();
-                            cellNamesTokenizer = new StringTokenizer(tokens[CELLS_INDEX]);
-                            while (cellNamesTokenizer.hasMoreTokens()) {
-                                cellNames.add(cellNamesTokenizer.nextToken());
-                            }
-
-                            lineageName = name;
-                            if (name.contains("(")) {
-                                lineageName = name.substring(0, name.indexOf("(")).trim();
-                            }
-                            if (lineageData.isCellName(lineageName)) {
-                                effectiveStartTime = lineageData.getFirstOccurrenceOf(lineageName);
-                                int effectiveEndTime = lineageData.getLastOccurrenceOf(lineageName);
-                                // use the later one of the config start time and the effective lineage start time
-                                startTime = effectiveStartTime > startTime ? effectiveStartTime : startTime;
-                                // use the earlier one of the config start time and the effective lineage start time
-                                endTime = effectiveEndTime < endTime ? effectiveEndTime : endTime;
-                            }
-
-                            final SceneElement element = new SceneElement(
-                                    lineageName,
-                                    cellNames,
-                                    tokens[MARKER_INDEX],
-                                    tokens[IMAGING_SOURCE_INDEX],
-                                    resourceLocation,
-                                    startTime,
-                                    endTime,
-                                    tokens[COMMENTS_INDEX]);
-                            addSceneElement(element);
-                            if (!element.getAllCells().isEmpty()) {
-                                nameCellsMap.put(element.getSceneName().toLowerCase(), element.getAllCells());
-                            }
-
-                            if (!element.getMarkerName().isEmpty()) {
-                                nameToMarkerMap.put(element.getSceneName().toLowerCase(), element.getMarkerName());
-                            }
-
-                            if (!element.getComments().isEmpty()) {
-                                nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
-                            }
-                            // insert structure into tree
-                            currentCategoryNode.getChildren().add(
-                                    new TreeItem<>(new StructureTreeNode(false, element.getSceneName())));
                         }
+                        // vector of cell names
+                        cellNames = new ArrayList<>();
+                        cellNamesTokenizer = new StringTokenizer(tokens[CELLS_INDEX]);
+                        while (cellNamesTokenizer.hasMoreTokens()) {
+                            cellNames.add(cellNamesTokenizer.nextToken());
+                        }
+
+                        lineageName = name;
+                        if (name.contains("(")) {
+                            lineageName = name.substring(0, name.indexOf("(")).trim();
+                        }
+                        if (lineageData.isCellName(lineageName)) {
+                            effectiveStartTime = lineageData.getFirstOccurrenceOf(lineageName);
+                            int effectiveEndTime = lineageData.getLastOccurrenceOf(lineageName);
+                            // use the later one of the config start time and the effective lineage start time
+                            startTime = effectiveStartTime > startTime ? effectiveStartTime : startTime;
+                            // use the earlier one of the config start time and the effective lineage start time
+                            endTime = effectiveEndTime < endTime ? effectiveEndTime : endTime;
+                        }
+
+                        final SceneElement element = new SceneElement(
+                                lineageName,
+                                cellNames,
+                                tokens[MARKER_INDEX],
+                                tokens[IMAGING_SOURCE_INDEX],
+                                resourceLocation,
+                                startTime,
+                                endTime,
+                                tokens[COMMENTS_INDEX]);
+                        addSceneElement(element);
+                        if (!element.getAllCells().isEmpty()) {
+                            nameCellsMap.put(element.getSceneName().toLowerCase(), element.getAllCells());
+                        }
+
+                        if (!element.getMarkerName().isEmpty()) {
+                            nameToMarkerMap.put(element.getSceneName().toLowerCase(), element.getMarkerName());
+                        }
+
+                        if (!element.getComments().isEmpty()) {
+                            nameCommentsMap.put(element.getSceneName().toLowerCase(), element.getComments());
+                        }
+                        // insert structure into tree
+                        currentCategoryNode.getChildren().add(
+                                new TreeItem<>(new StructureTreeNode(false, element.getSceneName())));
                     } catch (NumberFormatException e) {
                         System.out.println("error in reading scene element time for line " + line);
                     }
