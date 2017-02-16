@@ -240,7 +240,7 @@ public class StoriesLayer {
             public ListCell<Story> call(ListView<Story> param) {
                 final ListCell<Story> cell = new ListCell<Story>() {
                     @Override
-                    protected void updateItem(Story story, boolean empty) {
+                    protected void updateItem(final Story story, final boolean empty) {
                         super.updateItem(story, empty);
                         if (!empty) {
                             // create story graphic
@@ -255,7 +255,6 @@ public class StoriesLayer {
                             s.setFocusTraversable(false);
                             s.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
                             storyGraphic.getChildren().add(s);
-
                             setGraphic(storyGraphic);
                         } else {
                             setGraphic(null);
@@ -284,8 +283,8 @@ public class StoriesLayer {
     }
 
     /**
-     * Loades story from file and sets it as active story. Uses a
-     * {@link FileChooser} to allow the user to pick a load location.
+     * Loades story from file and sets it as active story. Uses a {@link FileChooser} to allow the user to pick a
+     * load location.
      */
     public void loadStory() {
         final FileChooser chooser = new FileChooser();
@@ -335,7 +334,7 @@ public class StoriesLayer {
     private void updateColorURL() {
         if (activeStory != null) {
             activeStory.setActive(false);
-            activeStory.setColorURL(generateInternal(
+            activeStory.setColorUrl(generateInternal(
                     new ArrayList<>(activeRulesList),
                     timeProperty.get(),
                     rotateXAngleProperty.get(),
@@ -349,9 +348,8 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link StringProperty} activeStoryProperty that changes when
-     * the active story changes. The value of the String is the name of
-     * the currently active story.
+     * @return The {@link StringProperty} activeStoryProperty that changes when the active story changes. The value
+     * of the String is the name of the currently active story.
      */
     public StringProperty getActiveStoryProperty() {
         return activeStoryProperty;
@@ -384,7 +382,7 @@ public class StoriesLayer {
      * @param note
      *         the note that should become active
      */
-    public void setActiveNoteWithSubsceneRebuild(final Note note) {
+    private void setActiveNoteWithSubsceneRebuild(final Note note) {
         // deactivate the previous active note
         if (activeNote != null) {
             activeNote.setActive(false);
@@ -392,14 +390,14 @@ public class StoriesLayer {
         activeNote = note;
         if (activeNote != null) {
             activeNote.setActive(true);
-            // set time property to be read by 3d window
-            if (!activeNote.getTagName().equals("New Note")) {
-                int startTime = getEffectiveStartTime(activeNote);
-                if (timeProperty != null && startTime >= 1) {
-                    timeProperty.set(startTime);
-                }
+            // set time property to be read by 3d window (initiates subscene rebuild)
+            int startTime = getEffectiveStartTime(activeNote);
+            if (timeProperty != null && startTime >= 1) {
+                timeProperty.set(startTime);
             }
         }
+        // sort notes choronologically and refresh listview rendering
+        activeStory.sortNotes();
         if (editController != null) {
             editController.setActiveNote(activeNote);
         }
@@ -526,7 +524,7 @@ public class StoriesLayer {
         // disable previous active story, copy current rules changes back to story
         if (activeStory != null) {
             activeStory.setActive(false);
-            activeStory.setColorURL(generateInternal(
+            activeStory.setColorUrl(generateInternal(
                     new ArrayList<>(activeRulesList),
                     timeProperty.get(),
                     rotateXAngleProperty.get(),
@@ -548,8 +546,8 @@ public class StoriesLayer {
             activeStory.setActive(true);
             activeStoryProperty.set(activeStory.getName());
             // if story does not come with a url, set its url to the program's internal color rules
-            if (activeStory.getColorURL().isEmpty()) {
-                activeStory.setColorURL(generateInternal(
+            if (activeStory.getColorUrl().isEmpty()) {
+                activeStory.setColorUrl(generateInternal(
                         new ArrayList<>(activeRulesList),
                         timeProperty.get(),
                         rotateXAngleProperty.get(),
@@ -563,7 +561,7 @@ public class StoriesLayer {
                 useInternalRulesFlag.set(false);
             }
             processUrl(
-                    activeStory.getColorURL(),
+                    activeStory.getColorUrl(),
                     activeRulesList,
                     searchLayer,
                     timeProperty,
@@ -667,8 +665,8 @@ public class StoriesLayer {
                     cellClickedFlag,
                     timeProperty);
 
-            editController.setActiveNote(activeNote);
             editController.setActiveStory(activeStory);
+            editController.setActiveNote(activeNote);
 
             editStage = new Stage();
 
@@ -717,9 +715,8 @@ public class StoriesLayer {
     }
 
     /**
-     * Changes the color of the input {@link Text} items by modifying the
-     * java-fx css attribute '-fx-fill' to the specified input color. Used by
-     * {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
+     * Changes the color of the input {@link Text} items by modifying the java-fx css attribute '-fx-fill' to the
+     * specified input color. Used by {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
      *
      * @param color
      *         The {@link Color} to change the texts to
@@ -838,14 +835,11 @@ public class StoriesLayer {
     }
 
     /**
-     * This private class is the graphical representation of a {@link Note} item
-     * and a subclass of the JavaFX class {@link VBox}. When a note is clicked,
-     * the time property is changed so that the 3D subscene navigates to the
-     * note's effective start time. This graphical item is rendered in the
-     * {@link ListCell} of an active story in the {@link ListView} in the
-     * 'Stories' tab. Note titles are also expandable (making the notes
-     * description visible) by clicking on the triangle rendered to the left of
-     * the note's title.
+     * This private class is the graphical representation of a {@link Note} item and a subclass of the JavaFX class
+     * {@link VBox}. When a note is clicked, the time property is changed so that the 3D subscene navigates to the
+     * note's effective start time. This graphical item is rendered in the {@link ListCell} of an active story in the
+     * {@link ListView} in the 'Stories' tab. Note titles are also expandable (making the notes description visible)
+     * by clicking on the triangle rendered to the left of the note's title.
      */
     public class NoteListCellGraphic extends VBox {
 

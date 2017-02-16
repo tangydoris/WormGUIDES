@@ -74,7 +74,6 @@ import acetree.LineageData;
 import connectome.Connectome;
 import wormguides.layers.SearchLayer;
 import wormguides.layers.StoriesLayer;
-import wormguides.models.camerageometry.Quaternion;
 import wormguides.models.camerageometry.Xform;
 import wormguides.models.cellcase.CasesLists;
 import wormguides.models.colorrule.Rule;
@@ -289,7 +288,7 @@ public class Window3DController {
      * Rectangular box that resides in the upper-right-hand corner of the subscene. The active story title and
      * description are shown here.
      */
-    private VBox overlayVBox;
+    private VBox storyOverlayVBox;
     /** Overlay of the subscene. Note sprites are inserted into this overlay. */
     private Pane spritesPane;
     /** Labels that exist in any of the timeProperty frames */
@@ -307,7 +306,7 @@ public class Window3DController {
     private String moviePath;
     private File frameDir;
 
-    private Quaternion quaternion;
+//    private Quaternion quaternion;
 
     /** X-scale of the subscene coordinate axis read from ProductionInfo.csv */
     private double xScale;
@@ -541,7 +540,7 @@ public class Window3DController {
         this.translateYProperty.addListener(getTranslateYListener());
         this.translateYProperty.set(getInitialTranslateY());
 
-        quaternion = new Quaternion();
+//        quaternion = new Quaternion();
 
         this.colorHash = requireNonNull(colorHash);
         colorComparator = new ColorComparator();
@@ -841,7 +840,7 @@ public class Window3DController {
             if (event.isPrimaryButtonDown()) {
                 // how to get Z COORDINATE??
 
-                if (quaternion != null) {
+//                if (quaternion != null) {
                     // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
                     // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
                     // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
@@ -853,10 +852,10 @@ public class Window3DController {
 					 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
 					 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
 					 */
-                    double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
-                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
+//                    double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
+//                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
-                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
+//                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
                         // System.out.println("from origin to old mouse pos: <" +
                         // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
                         // ", " + vectorToOldMousePos[2] + ">");
@@ -866,8 +865,8 @@ public class Window3DController {
                         // System.out.println(" ");
 
                         // compute cross product
-                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
-                        if (cross != null) {
+//                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
+//                        if (cross != null) {
                             // System.out.println("cross product: <" + cross[0] + ",
                             // " + cross[1] + ", " + cross[2] + ">");
                             //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
@@ -878,9 +877,9 @@ public class Window3DController {
                             // rotateX.setAngle(eulerAngles.get(2));
                             // rotateY.setAngle(eulerAngles.get(0));
 //                            }
-                        }
-                    }
-                }
+//                        }
+//                    }
+//                }
 
                 double modifier = 10.0;
                 double modifierFactor = 0.1;
@@ -1339,14 +1338,14 @@ public class Window3DController {
         rootEntitiesGroup.getChildren().add(xform);
 
         // clear note sprites and overlays
-        overlayVBox.getChildren().clear();
+        storyOverlayVBox.getChildren().clear();
 
         final Iterator<Node> iter = spritesPane.getChildren().iterator();
         while (iter.hasNext()) {
             Node node = iter.next();
             if (node instanceof Text) {
                 iter.remove();
-            } else if (node instanceof VBox && node != overlayVBox) {
+            } else if (node instanceof VBox && node != storyOverlayVBox) {
                 iter.remove();
             }
         }
@@ -1853,7 +1852,7 @@ public class Window3DController {
                     case OVERLAY: // fall to default case
                     case BLANK: // fall to default case
                     default:
-                        overlayVBox.getChildren().add(text);
+                        storyOverlayVBox.getChildren().add(text);
                         break;
                 }
             }
@@ -1866,10 +1865,10 @@ public class Window3DController {
 
             if (storiesLayer.getActiveStory() != null) {
                 Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
-                overlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
+                storyOverlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
             } else {
                 Text noStoryTitle = makeNoteOverlayText("none");
-                overlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
+                storyOverlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
             }
         }
     }
@@ -1878,7 +1877,7 @@ public class Window3DController {
         final Text text = new Text(title);
         text.setFill(web(SPRITE_COLOR_HEX));
         text.setFontSmoothingType(LCD);
-        text.setWrappingWidth(overlayVBox.getWidth());
+        text.setWrappingWidth(storyOverlayVBox.getWidth());
         text.setFont(getSpriteAndOverlayFont());
         return text;
     }
@@ -2156,15 +2155,15 @@ public class Window3DController {
         if (parentPane != null) {
             spritesPane = parentPane;
 
-            overlayVBox = new VBox(5);
-            overlayVBox.setPrefWidth(170);
-            overlayVBox.setMaxWidth(overlayVBox.getPrefWidth());
-            overlayVBox.setMinWidth(overlayVBox.getPrefWidth());
+            storyOverlayVBox = new VBox(5);
+            storyOverlayVBox.setPrefWidth(200);
+            storyOverlayVBox.setMaxWidth(storyOverlayVBox.getPrefWidth());
+            storyOverlayVBox.setMinWidth(storyOverlayVBox.getPrefWidth());
 
-            AnchorPane.setTopAnchor(overlayVBox, 5.0);
-            AnchorPane.setRightAnchor(overlayVBox, 5.0);
+            AnchorPane.setTopAnchor(storyOverlayVBox, 5.0);
+            AnchorPane.setRightAnchor(storyOverlayVBox, 5.0);
 
-            spritesPane.getChildren().add(overlayVBox);
+            spritesPane.getChildren().add(storyOverlayVBox);
         }
     }
 

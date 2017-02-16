@@ -101,7 +101,6 @@ public class Note {
         if (x == MIN_VALUE || y == MIN_VALUE || z == MIN_VALUE) {
             return "";
         }
-
         return x + " " + y + " " + z;
     }
 
@@ -233,10 +232,9 @@ public class Note {
         return elements != null && !elements.isEmpty();
     }
 
-    public void setStartAndEndTimes(int start, int end) {
+    public void setStartAndEndTimes(final int start, final int end) {
         startTime = start;
         endTime = end;
-
         if (elements != null) {
             for (SceneElement se : elements) {
                 se.setStartTime(startTime);
@@ -259,11 +257,10 @@ public class Note {
         return tagName;
     }
 
-    public void setTagName(String tagName) {
+    public void setTagName(final String tagName) {
         if (tagName != null) {
             this.tagName = tagName;
         }
-
         if (elements != null) {
             for (SceneElement se : elements) {
                 se.setSceneName(tagName);
@@ -275,7 +272,7 @@ public class Note {
         return tagContents;
     }
 
-    public void setTagContents(String tagContents) {
+    public void setTagContents(final String tagContents) {
         if (tagContents != null) {
             this.tagContents = tagContents;
         }
@@ -285,7 +282,7 @@ public class Note {
         return tagDisplay;
     }
 
-    public void setTagDisplay(Display display) {
+    public void setTagDisplay(final Display display) {
         if (display != null) {
             tagDisplay = display;
         }
@@ -295,7 +292,7 @@ public class Note {
         return attachmentType;
     }
 
-    public void setAttachmentType(Type type) {
+    public void setAttachmentType(final Type type) {
         if (type != null) {
             attachmentType = type;
         }
@@ -320,7 +317,6 @@ public class Note {
     public void setCellName(String name) {
         if (name != null) {
             cellName = name.trim();
-
             if (elements != null) {
                 for (SceneElement se : elements) {
                     se.addCellName(cellName);
@@ -333,7 +329,7 @@ public class Note {
         return marker;
     }
 
-    public void setMarker(String marker) {
+    public void setMarker(final String marker) {
         if (marker != null) {
             this.marker = marker.trim();
 
