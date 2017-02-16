@@ -25,7 +25,7 @@ import static java.lang.Math.round;
  * This class instantiates a {@link TableLineageData} and creates a lineage using Frame objects defined as an private
  * inner class.
  */
-public class AceTreeTableLineageLoader {
+public class AceTreeTableLineageDataLoader {
 
     private static final String ENTRY_PREFIX = "/acetree/nucleifiles/";
 
@@ -71,14 +71,19 @@ public class AceTreeTableLineageLoader {
         try {
             // accounts for first tld.addFrame() added when reading from JAR --> from dir name first entry match
             tableLineageData.addTimeFrame();
+
             URL url;
             for (int i = 1; i <= productionInfo.getTotalTimePoints(); i++) {
                 if (i < 10) {
-                    url = AceTreeTableLineageLoader.class.getResource(ENTRY_PREFIX + T + TWO_ZERO_PAD + i + ENTRY_EXT);
+                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX
+                            + T
+                            + TWO_ZERO_PAD
+                            + i
+                            + ENTRY_EXT);
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: "
+                        System.out.println("Could find file: "
                                 + ENTRY_PREFIX
                                 + T
                                 + TWO_ZERO_PAD
@@ -86,11 +91,15 @@ public class AceTreeTableLineageLoader {
                                 + ENTRY_EXT);
                     }
                 } else if (i >= 10 && i < 100) {
-                    url = AceTreeTableLineageLoader.class.getResource(ENTRY_PREFIX + T + ONE_ZERO_PAD + i + ENTRY_EXT);
+                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX
+                            + T
+                            + ONE_ZERO_PAD
+                            + i
+                            + ENTRY_EXT);
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: "
+                        System.out.println("Could not find file: "
                                 + ENTRY_PREFIX
                                 + T
                                 + ONE_ZERO_PAD
@@ -98,11 +107,15 @@ public class AceTreeTableLineageLoader {
                                 + ENTRY_EXT);
                     }
                 } else if (i >= 100) {
-                    url = AceTreeTableLineageLoader.class.getResource(ENTRY_PREFIX + T + i + ENTRY_EXT);
+                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX + T + i + ENTRY_EXT);
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
-                        System.out.println("Could not process file: " + ENTRY_PREFIX + T + i + ENTRY_EXT);
+                        System.out.println("Could not find file: "
+                                + ENTRY_PREFIX
+                                + T
+                                + i
+                                + ENTRY_EXT);
                     }
                 }
             }
@@ -165,13 +178,14 @@ public class AceTreeTableLineageLoader {
     private static void process(final TableLineageData tableLineageData, final int time, final InputStream input) {
         tableLineageData.addTimeFrame();
 
-        try (InputStreamReader isr = new InputStreamReader(input);
-             BufferedReader reader = new BufferedReader(isr)) {
+        try {
+            final InputStreamReader isr = new InputStreamReader(input);
+            final BufferedReader reader = new BufferedReader(isr);
 
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] tokens = new String[TOKEN_ARRAY_SIZE];
-                StringTokenizer tokenizer = new StringTokenizer(line, ",");
+                final String[] tokens = new String[TOKEN_ARRAY_SIZE];
+                final StringTokenizer tokenizer = new StringTokenizer(line, ",");
                 int k = 0;
                 while (tokenizer.hasMoreTokens()) {
                     tokens[k++] = tokenizer.nextToken().trim();
