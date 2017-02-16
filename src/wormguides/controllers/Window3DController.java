@@ -140,8 +140,11 @@ import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateX
 import static wormguides.util.subsceneparameters.Parameters.getInitialTranslateY;
 import static wormguides.util.subsceneparameters.Parameters.getInitialZoom;
 import static wormguides.util.subsceneparameters.Parameters.getLabelSpriteYOffset;
+import static wormguides.util.subsceneparameters.Parameters.getNoteBillboardTextWidth;
+import static wormguides.util.subsceneparameters.Parameters.getNoteSpriteTextWidth;
 import static wormguides.util.subsceneparameters.Parameters.getSelectabilityVisibilityCutoff;
 import static wormguides.util.subsceneparameters.Parameters.getSizeScale;
+import static wormguides.util.subsceneparameters.Parameters.getStoryOverlayPaneWidth;
 import static wormguides.util.subsceneparameters.Parameters.getUniformRadius;
 import static wormguides.util.subsceneparameters.Parameters.getVisibilityCutoff;
 import static wormguides.util.subsceneparameters.Parameters.getWaitTimeMilli;
@@ -1869,13 +1872,12 @@ public class Window3DController {
 
     private void insertOverlayTitles() {
         if (storiesLayer != null) {
-            Text infoPaneTitle = makeNoteOverlayText("Story Title:");
-
+            final Text infoPaneTitle = makeNoteOverlayText("Story Title:");
             if (storiesLayer.getActiveStory() != null) {
-                Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
+                final Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
                 storyOverlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
             } else {
-                Text noStoryTitle = makeNoteOverlayText("none");
+                final Text noStoryTitle = makeNoteOverlayText("none");
                 storyOverlayVBox.getChildren().addAll(infoPaneTitle, noStoryTitle);
             }
         }
@@ -1891,14 +1893,14 @@ public class Window3DController {
     }
 
     private Text makeNoteSpriteText(String title) {
-        Text text = makeNoteOverlayText(title);
-        text.setWrappingWidth(220);
+        final Text text = makeNoteOverlayText(title);
+        text.setWrappingWidth(getNoteSpriteTextWidth());
         return text;
     }
 
     private Text makeNoteBillboardText(String title) {
-        Text text = new Text(title);
-        text.setWrappingWidth(100);
+        final Text text = new Text(title);
+        text.setWrappingWidth(getNoteBillboardTextWidth());
         text.setFont(getBillboardFont());
         text.setSmooth(false);
         text.setStrokeWidth(2);
@@ -1908,8 +1910,8 @@ public class Window3DController {
         return text;
     }
 
-    private Sphere createLocationMarker(double x, double y, double z) {
-        Sphere sphere = new Sphere(1);
+    private Sphere createLocationMarker(final double x, final double y, final double z) {
+        final Sphere sphere = new Sphere(1);
         sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
         sphere.getTransforms().add(new Translate(x * xScale, y * yScale, z * zScale));
         // make marker transparent
@@ -1917,9 +1919,7 @@ public class Window3DController {
         return sphere;
     }
 
-    // Makes an anchor pane that contains the text to be shown
-    // if isOverlay is true, then the text is larger
-    private Text makeNoteGraphic(Note note) {
+    private Text makeNoteGraphic(final Note note) {
         String title = note.getTagName();
         if (note.isExpandedInScene()) {
             title += ": " + note.getTagContents();
@@ -1949,7 +1949,6 @@ public class Window3DController {
                 default:
                     node = makeNoteOverlayText(title);
                     break;
-
             }
         }
         return node;
@@ -1957,16 +1956,15 @@ public class Window3DController {
 
     private void buildCamera() {
         camera = new PerspectiveCamera(true);
+
         xform = new Xform();
         xform.reset();
-
         rootEntitiesGroup.getChildren().add(xform);
         xform.getChildren().add(camera);
 
         camera.setNearClip(getCameraNearClip());
         camera.setFarClip(getCameraFarClip());
         camera.setTranslateZ(getCameraInitialDistance());
-
         subscene.setCamera(camera);
     }
 
@@ -2164,7 +2162,7 @@ public class Window3DController {
             spritesPane = parentPane;
 
             storyOverlayVBox = new VBox(5);
-            storyOverlayVBox.setPrefWidth(220);
+            storyOverlayVBox.setPrefWidth(getStoryOverlayPaneWidth());
             storyOverlayVBox.setMaxWidth(storyOverlayVBox.getPrefWidth());
             storyOverlayVBox.setMinWidth(storyOverlayVBox.getPrefWidth());
 
