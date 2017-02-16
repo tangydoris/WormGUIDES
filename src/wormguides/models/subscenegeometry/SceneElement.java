@@ -204,14 +204,15 @@ public class SceneElement {
     }
 
     public List<String> getAllCells() {
-        if (cellNames.size() >= 1 && cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT)) {
+        if (cellNames.size() > 0 && cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT)) {
             return cellNames.subList(1, cellNames.size());
         }
         return cellNames;
     }
 
     public boolean isMulticellular() {
-        return cellNames.size() > 1 || cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT);
+        return cellNames.size() > 1
+                || (cellNames.size() > 0 && cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT));
     }
 
     public boolean isNoCellStructure() {

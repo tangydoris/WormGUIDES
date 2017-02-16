@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.view.popups;
@@ -83,11 +83,11 @@ import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 public class SulstonTreePane extends ScrollPane {
 
     // gui stuff
-    private final int TIME_LABEL_OFFSET_X = 20;
-    private final int ZOOM_BUTTON_SIZE = 30;
-    private final double DEFAULT_WINDOW_HEIGHT = 820;
-    private final double DEFAULT_WINDOW_WIDTH = 775;
-    private final Color ZOOM_BUTTONS_SHADOW_COLOR = web("AAAAAA");
+    private static final int TIME_LABEL_OFFSET_X = 20;
+    private static final int ZOOM_BUTTON_SIZE = 30;
+    private static final double DEFAULT_WINDOW_HEIGHT = 820;
+    private static final double DEFAULT_WINDOW_WIDTH = 775;
+    private static final Color ZOOM_BUTTONS_SHADOW_COLOR = web("AAAAAA");
 
     private final LineageData lineageData;
     private final SearchLayer searchLayer;
@@ -657,7 +657,7 @@ public class SulstonTreePane extends ScrollPane {
         // recoloring
         mainPane.getChildren().add(lcell);
         x = (x1 + x2) / 2;
-        length = leftYUse - yStartUse;
+//        length = leftYUse - yStartUse;
 
         // nonerminal case line drawn
         lcell = new Line(x, yStartUse, x, leftYUse);
