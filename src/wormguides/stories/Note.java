@@ -40,8 +40,13 @@ public class Note {
 
     private static final String OBJ_EXT = ".obj";
 
-    // it is possible for a note to have multiple scene elements just by setting its resource location
+    private final Story parent;
+    /**
+     * List of scene elements rendered with the note. It is possible for a note to have multiple scene elements just by
+     * setting its resource location.
+     */
     private List<SceneElement> elements;
+
     private String tagName;
     private String tagContents;
     private Type attachmentType;
@@ -53,16 +58,17 @@ public class Note {
     private String resourceLocation;
     private int startTime, endTime;
     private String comments;
-    private Story parent;
 
     /** True when any field value changes, false otherwise */
-    private BooleanProperty changedProperty;
+    private final BooleanProperty changedProperty;
+    /** True when the note is visible in the subscene, false otherwise */
+    private final BooleanProperty visibleProperty;
     /** True when graphic in wormguides.stories list view is expanded, false otherwise */
-    private BooleanProperty listExpandedProperty;
+    private final BooleanProperty listExpandedProperty;
     /** True when graphic in 3d subscene is expanded, false otherwise */
-    private BooleanProperty sceneExpandedProperty;
+    private final BooleanProperty sceneExpandedProperty;
     /** True when graphical representation is selected, false otherwise */
-    private BooleanProperty activeProperty;
+    private final BooleanProperty activeProperty;
 
     public Note(final Story parent, final String tagName, final String tagContents) {
         this(parent);
@@ -88,9 +94,9 @@ public class Note {
                 setChanged(false);
             }
         });
-
         listExpandedProperty = new SimpleBooleanProperty(false);
         sceneExpandedProperty = new SimpleBooleanProperty(false);
+        visibleProperty = new SimpleBooleanProperty(true);
         activeProperty = new SimpleBooleanProperty(false);
 
         setTagDisplay(OVERLAY);
@@ -114,6 +120,18 @@ public class Note {
 
     public void setActive(final boolean active) {
         activeProperty.set(active);
+    }
+
+    public BooleanProperty getVisibleProperty() {
+        return visibleProperty;
+    }
+
+    public boolean isVisible() {
+        return visibleProperty.get();
+    }
+
+    public void setVisible(final boolean visible) {
+        visibleProperty.set(visible);
     }
 
     public BooleanProperty getSceneExpandedProperty() {

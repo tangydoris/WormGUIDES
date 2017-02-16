@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -51,12 +52,18 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Insets.EMPTY;
 import static javafx.geometry.Orientation.HORIZONTAL;
 import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
+import static javafx.scene.layout.HBox.setHgrow;
+import static javafx.scene.layout.Priority.ALWAYS;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREY;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.text.FontSmoothingType.LCD;
 
+import static wormguides.loaders.ImageLoader.getEyeIcon;
+import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
 import static wormguides.loaders.URLLoader.processUrl;
+import static wormguides.models.colorrule.Rule.UI_SIDE_LENGTH;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
@@ -843,11 +850,10 @@ public class StoriesLayer {
      */
     public class NoteListCellGraphic extends VBox {
 
-        private HBox contentsContainer;
-        private Text expandIcon;
-        private Text title;
-
-        private Text contents;
+        private final HBox contentsContainer;
+        private final Text expandIcon;
+        private final Text title;
+        private final Text contents;
 
         // Input note is the note to which this graphic belongs to
         public NoteListCellGraphic(final Note note, final double width) {
@@ -882,7 +888,28 @@ public class StoriesLayer {
             title.setFont(getBolderFont());
             title.setFontSmoothingType(LCD);
 
-            titleContainer.getChildren().addAll(expandIcon, r1, title);
+            final Region r2 = new Region();
+            setHgrow(r2, ALWAYS);
+
+            final Button visibleButton = new Button();
+            final ImageView eyeIcon = getEyeIcon();
+            final ImageView eyeIconInverted = getEyeInvertIcon();
+            visibleButton.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setPadding(EMPTY);
+            visibleButton.setContentDisplay(GRAPHIC_ONLY);
+            visibleButton.setOnAction(event -> {
+                note.setVisible(!note.isVisible());
+                rebuildSubsceneFlag.set(true);
+            });
+            if (note.isVisible()) {
+                visibleButton.setGraphic(eyeIcon);
+            } else {
+                visibleButton.setGraphic(eyeIconInverted);
+            }
+
+            titleContainer.getChildren().addAll(expandIcon, r1, title, r2, visibleButton);
             titleContainer.setAlignment(CENTER_LEFT);
 
             getChildren().add(titleContainer);
@@ -890,17 +917,17 @@ public class StoriesLayer {
             // note contents graphics
             contentsContainer = new HBox(0);
 
-            final Region r2 = new Region();
-            r2.setPrefWidth(r1.prefWidth(-1) + expandIcon.prefWidth(-1));
-            r2.setMinWidth(USE_PREF_SIZE);
-            r2.setMaxWidth(USE_PREF_SIZE);
+            final Region r3 = new Region();
+            r3.setPrefWidth(expandIcon.prefWidth(-1) + r1.prefWidth(-1));
+            r3.setMinWidth(USE_PREF_SIZE);
+            r3.setMaxWidth(USE_PREF_SIZE);
 
             contents = new Text(note.getTagContents());
-            contents.setWrappingWidth(width - 30 - r2.prefWidth(-1));
+            contents.setWrappingWidth(width - 30 - r3.prefWidth(-1));
             contents.setFont(getFont());
             contents.setFontSmoothingType(LCD);
 
-            contentsContainer.getChildren().addAll(r2, contents);
+            contentsContainer.getChildren().addAll(r3, contents);
             expandNote(note.isListExpanded());
 
             setPickOnBounds(false);
@@ -916,12 +943,22 @@ public class StoriesLayer {
             });
             note.getActiveProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
-                    highlightCell(true);
+                    highlightCell(true, note.isVisible());
                 } else {
-                    highlightCell(false);
+                    highlightCell(false, note.isVisible());
                 }
             });
-            highlightCell(note.isActive());
+            note.getVisibleProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    highlightCell(note.isActive(), true);
+                    visibleButton.setGraphic(eyeIcon);
+                } else {
+                    highlightCell(note.isActive(), false);
+                    visibleButton.setGraphic(eyeIconInverted);
+                }
+            });
+
+            highlightCell(note.isActive(), note.isVisible());
 
             // render note changes
             note.getChangedProperty().addListener((observable, oldValue, newValue) -> {
@@ -937,13 +974,13 @@ public class StoriesLayer {
          * When a cell is highlighted/un-highighted, its text and background
          * colors change.
          *
-         * @param highlight
-         *         The boolean whose value is TRUE when this
-         *         {@link NoteListCellGraphic} is to be highlighted, FALSE
-         *         when it is to be un-highlighted
+         * @param highlighted
+         *         true when this note graphic is to be highlighted, false otherwise
+         * @param isVisible
+         *         true when the note is visible, false otherwise
          */
-        private void highlightCell(boolean highlight) {
-            if (highlight) {
+        private void highlightCell(final boolean highlighted, final boolean isVisible) {
+            if (highlighted) {
                 setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
                         + "-fx-background: -fx-accent;");
                 colorTexts(WHITE, expandIcon, title, contents);
