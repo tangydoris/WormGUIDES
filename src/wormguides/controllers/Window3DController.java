@@ -846,10 +846,10 @@ public class Window3DController {
                 // how to get Z COORDINATE??
 
 //                if (quaternion != null) {
-                // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
-                // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-                // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
-                // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
+                    // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
+                    // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+                    // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
+                    // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 
 					/*
                      * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
@@ -861,26 +861,26 @@ public class Window3DController {
 //                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
 //                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-                // System.out.println("from origin to old mouse pos: <" +
-                // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
-                // ", " + vectorToOldMousePos[2] + ">");
-                // System.out.println("from origin to old mouse pos: <" +
-                // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
-                // ", " + vectorToNewMousePos[2] + ">");
-                // System.out.println(" ");
+                        // System.out.println("from origin to old mouse pos: <" +
+                        // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
+                        // ", " + vectorToOldMousePos[2] + ">");
+                        // System.out.println("from origin to old mouse pos: <" +
+                        // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
+                        // ", " + vectorToNewMousePos[2] + ">");
+                        // System.out.println(" ");
 
-                // compute cross product
+                        // compute cross product
 //                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
 //                        if (cross != null) {
-                // System.out.println("cross product: <" + cross[0] + ",
-                // " + cross[1] + ", " + cross[2] + ">");
-                //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+                            // System.out.println("cross product: <" + cross[0] + ",
+                            // " + cross[1] + ", " + cross[2] + ">");
+                            //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
-                //List<Double> eulerAngles = quaternion.toEulerRotation();
+                            //List<Double> eulerAngles = quaternion.toEulerRotation();
 
 //                            if (eulerAngles.size() == 3) {
-                // rotateX.setAngle(eulerAngles.get(2));
-                // rotateY.setAngle(eulerAngles.get(0));
+                            // rotateX.setAngle(eulerAngles.get(2));
+                            // rotateY.setAngle(eulerAngles.get(0));
 //                            }
 //                        }
 //                    }
@@ -1663,6 +1663,8 @@ public class Window3DController {
         } else {
             text = makeNoteSpriteText(name);
         }
+        text.setOnMouseEntered(event -> text.setCursor(HAND));
+        text.setOnMouseExited(event -> text.setCursor(DEFAULT));
 
         final String tempName = name;
         text.setOnMouseClicked(event -> removeLabelFor(tempName));
@@ -1671,9 +1673,6 @@ public class Window3DController {
         entityLabelMap.put(entity, text);
 
         spritesPane.getChildren().add(text);
-
-        text.setOnMouseEntered(event -> text.setCursor(HAND));
-        text.setOnMouseExited(event -> text.setCursor(DEFAULT));
 
         alignTextWithEntity(text, entity, true);
     }
