@@ -125,11 +125,10 @@ public class SulstonTreePane extends ScrollPane {
     private Text timeIndicator;
     private int ttduration = 0;
 
-
     // =XScale minimal spacing between branches, inter
     private int xsc = 5;
     // left margin
-    private int iXmax = 25;
+    private int iXmax = 30;
     private int iYmin = 19;
 
     private boolean defaultEmbryoFlag;
@@ -580,22 +579,25 @@ public class SulstonTreePane extends ScrollPane {
         int startTime = lineageData.getFirstOccurrenceOf(cellName);
         int endTime = lineageData.getLastOccurrenceOf(cellName);
 
-        if (cellName.equalsIgnoreCase("p0")) {
+        // fill in semi-arbitrary choronological details for early pre-4-cell stage cells
+        if (cellName.equalsIgnoreCase("AB")) {
+            endTime = max(
+                    lineageData.getFirstOccurrenceOf("ABp"),
+                    lineageData.getFirstOccurrenceOf("ABa"))
+                    - 1;
             startTime = -2;
-            endTime = 0;
-        }
-        if (cellName.equalsIgnoreCase("p1")) {
-            startTime = 0;
-            endTime = 1;
-        }
-        if (cellName.equalsIgnoreCase("ab")) {
-            startTime = 0;
-            endTime = 1;
+        } else if (cellName.equalsIgnoreCase("P1")) {
+            endTime = max(
+                    lineageData.getFirstOccurrenceOf("EMS"),
+                    lineageData.getFirstOccurrenceOf("P2"))
+                    - 1;
+            startTime = -2;
+        } else if (cellName.equalsIgnoreCase("P0")) {
+            startTime = -5;
+            endTime = -3;
         }
 
         int length = endTime - startTime;
-        // TODO remove
-        System.out.println(cellName + " start, end, length: " + startTime + ", " + endTime + ", " + length);
 
         int yStartUse = startTime + iYmin;
         nameYStartUseMap.put(cellName, yStartUse);
@@ -618,14 +620,12 @@ public class SulstonTreePane extends ScrollPane {
             hackTooltipStartTiming(tooltip, ttduration);
             install(lcell, tooltip);
             lcell.setId(cellName);
-            // TODO fix this
             lcell.setOnMouseEntered(event -> lcell.setCursor(HAND));
             lcell.setOnMouseExited(event -> lcell.setCursor(DEFAULT));
             lcell.setOnMousePressed(clickHandler);
-            if (done) {
+            if (done && !cell.isLeaf()) {
                 // this is a collapsed node not a terminal cell
                 final Circle circle = new Circle(2, BLACK);
-                // TODO fix this
                 circle.setOnMouseEntered(event -> circle.setCursor(HAND));
                 circle.setOnMouseExited(event -> circle.setCursor(DEFAULT));
                 circle.relocate(x - 2, yStartUse + length - 2);
@@ -640,12 +640,12 @@ public class SulstonTreePane extends ScrollPane {
 
             int offsetx = 2;
             int offsety = 3;
-            String cellnametextstring = cellName;
-            String terminalname = getFunctionalNameByLineageName(cellName);
-            if (!(terminalname == null)) {
-                cellnametextstring = cellnametextstring + " ; " + terminalname;
+            String cellNameTextString = cellName;
+            String terminalName = getFunctionalNameByLineageName(cellName);
+            if (!(terminalName == null)) {
+                cellNameTextString = cellNameTextString + " (" + terminalName + ")";
             }
-            final Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellnametextstring);
+            final Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellNameTextString);
             cellnametext.getTransforms().add(new Rotate(90, x - offsetx, yStartUse + length + offsety));
             cellnametext.setFont(new Font(5));
 
@@ -680,7 +680,6 @@ public class SulstonTreePane extends ScrollPane {
         // recoloring
         mainPane.getChildren().add(lcell);
         x = (x1 + x2) / 2;
-//        length = leftYUse - yStartUse;
 
         // nonerminal case line drawn
         lcell = new Line(x, yStartUse, x, leftYUse);
@@ -688,8 +687,11 @@ public class SulstonTreePane extends ScrollPane {
             lcell.setStroke(lcolor); // first for now
         }
 
-        lcell.setOnMousePressed(clickHandler);// handler for collapse
-        lcell.setId(cellName);
+        final Line lcellTemp = lcell;
+        lcellTemp.setOnMousePressed(clickHandler);// handler for collapse
+        lcellTemp.setOnMouseEntered(event -> lcellTemp.setCursor(HAND));
+        lcellTemp.setOnMouseExited(event -> lcellTemp.setCursor(DEFAULT));
+        lcellTemp.setId(cellName);
         final Tooltip t = new Tooltip(cellName);
         hackTooltipStartTiming(t, ttduration);
         install(lcell, t);

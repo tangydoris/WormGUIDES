@@ -541,7 +541,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
             	searchOptions = "descendants";
             }
 
-
             String searchCriteria = "'" + searchField.getText() + "' (Options: " + searchType;
             if (!searchOptions.isEmpty()) {
             	searchCriteria += ", " + searchOptions;

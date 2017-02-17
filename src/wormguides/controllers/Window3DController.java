@@ -846,10 +846,10 @@ public class Window3DController {
                 // how to get Z COORDINATE??
 
 //                if (quaternion != null) {
-                    // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-                    // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
+                // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
+                // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+                // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
+                // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 
 					/*
                      * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
@@ -861,26 +861,26 @@ public class Window3DController {
 //                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
 //                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
-                        // ", " + vectorToOldMousePos[2] + ">");
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
-                        // ", " + vectorToNewMousePos[2] + ">");
-                        // System.out.println(" ");
+                // System.out.println("from origin to old mouse pos: <" +
+                // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
+                // ", " + vectorToOldMousePos[2] + ">");
+                // System.out.println("from origin to old mouse pos: <" +
+                // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
+                // ", " + vectorToNewMousePos[2] + ">");
+                // System.out.println(" ");
 
-                        // compute cross product
+                // compute cross product
 //                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
 //                        if (cross != null) {
-                            // System.out.println("cross product: <" + cross[0] + ",
-                            // " + cross[1] + ", " + cross[2] + ">");
-                            //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+                // System.out.println("cross product: <" + cross[0] + ",
+                // " + cross[1] + ", " + cross[2] + ">");
+                //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
-                            //List<Double> eulerAngles = quaternion.toEulerRotation();
+                //List<Double> eulerAngles = quaternion.toEulerRotation();
 
 //                            if (eulerAngles.size() == 3) {
-                            // rotateX.setAngle(eulerAngles.get(2));
-                            // rotateY.setAngle(eulerAngles.get(0));
+                // rotateX.setAngle(eulerAngles.get(2));
+                // rotateY.setAngle(eulerAngles.get(0));
 //                            }
 //                        }
 //                    }
@@ -1636,6 +1636,14 @@ public class Window3DController {
         }
     }
 
+    /**
+     * Inserts a name label for the specified 3D entity
+     *
+     * @param name
+     *         name to show on the label
+     * @param entity
+     *         3D shape to label
+     */
     private void insertLabelFor(final String name, final Node entity) {
         // if label is already in scene, make all labels white and highlight that one
         final Text label = entityLabelMap.get(entity);
@@ -1649,7 +1657,7 @@ public class Window3DController {
 
         // otherwise, create a highlight new label
         final String funcName = getFunctionalNameByLineageName(name);
-        Text text;
+        final Text text;
         if (funcName != null) {
             text = makeNoteSpriteText(funcName);
         } else {
@@ -1663,6 +1671,9 @@ public class Window3DController {
         entityLabelMap.put(entity, text);
 
         spritesPane.getChildren().add(text);
+
+        text.setOnMouseEntered(event -> text.setCursor(HAND));
+        text.setOnMouseExited(event -> text.setCursor(DEFAULT));
 
         alignTextWithEntity(text, entity, true);
     }
@@ -2007,50 +2018,50 @@ public class Window3DController {
     }
 
     public boolean captureImagesForMovie() {
-		movieFiles.clear();
-		count = 0;
+        movieFiles.clear();
+        count = 0;
 
-		final Stage fileChooserStage = new Stage();
+        final Stage fileChooserStage = new Stage();
 
-		final FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Choose Save Location");
-		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Save Location");
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
 
-		final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
+        final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
 
-		if (tempFile == null) {
-			return false;
-		}
+        if (tempFile == null) {
+            return false;
+        }
 
-		// save the name from the file chooser for later MOV file
-		movieName = tempFile.getName();
-		moviePath = tempFile.getAbsolutePath();
+        // save the name from the file chooser for later MOV file
+        movieName = tempFile.getName();
+        moviePath = tempFile.getAbsolutePath();
 
-		// make a temp directory for the frames at the given save location
-		String path = tempFile.getAbsolutePath();
-		if (path.lastIndexOf("/") < 0) {
-			path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
-		} else {
-			path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
-		}
+        // make a temp directory for the frames at the given save location
+        String path = tempFile.getAbsolutePath();
+        if (path.lastIndexOf("/") < 0) {
+            path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
+        } else {
+            path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
+        }
 
-		frameDir = new File(path);
+        frameDir = new File(path);
 
-		try {
-			frameDir.mkdir();
-		} catch (SecurityException se) {
-			return false;
-		}
+        try {
+            frameDir.mkdir();
+        } catch (SecurityException se) {
+            return false;
+        }
 
-		String frameDirPath = frameDir.getAbsolutePath() + "/";
+        String frameDirPath = frameDir.getAbsolutePath() + "/";
 
-		captureVideo.set(true);
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (captureVideo.get()) {
-					runLater(() -> {
+        captureVideo.set(true);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (captureVideo.get()) {
+                    runLater(() -> {
                         WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
                         try {
                             File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
@@ -2064,50 +2075,50 @@ public class Window3DController {
                             System.out.println("Could not write frame of movie to file.");
                         }
                     });
-				} else {
-					timer.cancel();
-				}
-			}
-		},0,1000);
-		return true;
-	}
+                } else {
+                    timer.cancel();
+                }
+            }
+        }, 0, 1000);
+        return true;
+    }
 
-	public void convertImagesToMovie() {
-		captureVideo.set(false);
-		javaPictures.clear();
+    public void convertImagesToMovie() {
+        captureVideo.set(false);
+        javaPictures.clear();
 
-		for (File movieFile : movieFiles) {
-			JavaPicture jp = new JavaPicture();
+        for (File movieFile : movieFiles) {
+            JavaPicture jp = new JavaPicture();
 
-			jp.loadImage(movieFile);
+            jp.loadImage(movieFile);
 
-			javaPictures.addElement(jp);
-		}
+            javaPictures.addElement(jp);
+        }
 
-		if (javaPictures.size() > 0) {
-			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
+        if (javaPictures.size() > 0) {
+            new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
 
-			// move the movie to the originally specified location
-			final File movJustMade = new File(movieName);
-			movJustMade.renameTo(new File(moviePath + ".mov"));
+            // move the movie to the originally specified location
+            final File movJustMade = new File(movieName);
+            movJustMade.renameTo(new File(moviePath + ".mov"));
 
-			// remove the .movtemp.jpg file
-			final File movtempjpg = new File(".movtemp.jpg");
-			movtempjpg.delete();
-		}
+            // remove the .movtemp.jpg file
+            final File movtempjpg = new File(".movtemp.jpg");
+            movtempjpg.delete();
+        }
 
-		// remove all of the images in the frame directory
-		if (frameDir != null && frameDir.isDirectory()) {
-			final File[] frames = frameDir.listFiles();
-			if (frames != null) {
-				for (File frame : frames) {
-					frame.delete();
-				}
-			}
-			frameDir.delete();
-		}
+        // remove all of the images in the frame directory
+        if (frameDir != null && frameDir.isDirectory()) {
+            final File[] frames = frameDir.listFiles();
+            if (frames != null) {
+                for (File frame : frames) {
+                    frame.delete();
+                }
+            }
+            frameDir.delete();
+        }
 
-	}
+    }
 
     /**
      * Saves a snapshot of the screen
@@ -2218,7 +2229,7 @@ public class Window3DController {
             hideContextPopups();
             double z = zoomProperty.get();
             /*
-			 * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
+             * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
 			 * As of July 8, 2016
 			 * Noted by: Braden Katzman
 			 *
