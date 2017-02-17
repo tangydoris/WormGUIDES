@@ -62,6 +62,7 @@ import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
 import partslist.celldeaths.CellDeaths;
+import wormguides.util.Parameters;
 import wormguides.MainApp;
 import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchLayer;
@@ -1181,6 +1182,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // takes about 6ms
         CellDeaths.init();
+        
+        Parameters.init();
 
         initSharedVariables();
 

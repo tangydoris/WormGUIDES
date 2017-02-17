@@ -105,11 +105,11 @@ public class StoryFileUtil {
             for (int i = 0; i < NUMBER_OF_CSV_FIELDS; i++) {
                 storyParams[i] = "";
             }
-            storyParams[STORY_NAME_INDEX] = quotesForCsv(story.getName());
-            storyParams[STORY_DESCRIPTION_INDEX] = quotesForCsv(story.getDescription());
-            storyParams[STORY_AUTHOR_INDEX] = quotesForCsv(story.getAuthor());
-            storyParams[STORY_DATE_INDEX] = quotesForCsv(story.getDate());
-            storyParams[STORY_COLOR_URL_INDEX] = quotesForCsv(story.getColorURL());
+            storyParams[STORY_NAME_INDEX] = quoteForCsv(story.getName());
+            storyParams[STORY_DESCRIPTION_INDEX] = quoteForCsv(story.getDescription());
+            storyParams[STORY_AUTHOR_INDEX] = quoteForCsv(story.getAuthor());
+            storyParams[STORY_DATE_INDEX] = quoteForCsv(story.getDate());
+            storyParams[STORY_COLOR_URL_INDEX] = quoteForCsv(story.getColorURL());
             out.append(join(",", storyParams)).append(BR);
 
             // notes
@@ -118,15 +118,15 @@ public class StoryFileUtil {
                 for (int i = 0; i < NUMBER_OF_CSV_FIELDS; i++) {
                     noteParams[i] = "";
                 }
-                noteParams[NOTE_NAME_INDEX] = quotesForCsv(note.getTagName());
-                noteParams[NOTE_CONTENTS_INDEX] = quotesForCsv(note.getTagContents());
+                noteParams[NOTE_NAME_INDEX] = quoteForCsv(note.getTagName());
+                noteParams[NOTE_CONTENTS_INDEX] = quoteForCsv(note.getTagContents());
                 noteParams[NOTE_DISPLAY_INDEX] = note.getTagDisplay().toString();
                 noteParams[NOTE_TYPE_INDEX] = note.getAttachmentType().toString();
-                noteParams[NOTE_LOCATION_INDEX] = quotesForCsv(note.getLocationString());
+                noteParams[NOTE_LOCATION_INDEX] = quoteForCsv(note.getLocationString());
                 noteParams[NOTE_CELLNAME_INDEX] = note.getCellName();
-                noteParams[NOTE_IMG_SOURCE_INDEX] = quotesForCsv(note.getImgSource());
-                noteParams[NOTE_MARKER_INDEX] = quotesForCsv(note.getMarker());
-                noteParams[NOTE_RESOURCE_LOCATION_INDEX] = quotesForCsv(note.getResourceLocation());
+                noteParams[NOTE_IMG_SOURCE_INDEX] = quoteForCsv(note.getImgSource());
+                noteParams[NOTE_MARKER_INDEX] = quoteForCsv(note.getMarker());
+                noteParams[NOTE_RESOURCE_LOCATION_INDEX] = quoteForCsv(note.getResourceLocation());
                 // if time is not specified, do not use Integer.MIN_VALUE, leave it blank
                 int start = note.getStartTime();
                 int end = note.getEndTime();
@@ -153,7 +153,7 @@ public class StoryFileUtil {
      *
      * @return the field that is ready for inserting into a CSV line
      */
-    private static String quotesForCsv(final String field) {
+    private static String quoteForCsv(final String field) {
         if (field != null && field.contains(",")) {
             return "\"" + field + "\"";
         }
