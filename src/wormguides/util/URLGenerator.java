@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.util;
@@ -104,7 +100,7 @@ public class URLGenerator {
             final double dim) {
 
         return "http://scene.wormguides.org/wormguides/testurlscript?"
-                + generateInternalParameterString(
+                + generateParameterString(
                 rules,
                 time,
                 rX,
@@ -131,21 +127,7 @@ public class URLGenerator {
         return generateSetParameters(rules) + generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim);
     }
 
-    private static String generateInternalParameterString(
-            final List<Rule> rules,
-            final int time,
-            final double rX,
-            final double rY,
-            final double rZ,
-            final double tX,
-            final double tY,
-            final double scale,
-            final double dim) {
-
-        return generateInternalSetParameters(rules) + generateViewParameters(time, rX, rY, rZ, tX, tY, scale, dim);
-    }
-
-    private static String generateInternalSetParameters(final List<Rule> rules) {
+    private static String generateSetParameters(final List<Rule> rules) {
         final StringBuilder builder = new StringBuilder("/set");
 
         for (Rule rule : rules) {
@@ -210,88 +192,15 @@ public class URLGenerator {
             }
 
             // color
-            String color = rule.getColor().toString();
-            color = color.substring(color.indexOf("x") + 1, color.length() - 2);
-            builder.append("+#ff").append(color);
+            // get color in its native javafx format: 0x (prefix) 11 (red) 22 (green) 33 (blue) ff (alpha)
+            // 0x112233ff
+            final String colorString = rule.getColor().toString();
+            // append as url format: #ff112233
+            builder.append("+")
+                    .append("#")
+                    .append(colorString.substring(8))
+                    .append(colorString.substring(2, 8));
         }
-        return builder.toString();
-    }
-
-    private static String generateSetParameters(final List<Rule> rules) {
-        final StringBuilder builder = new StringBuilder("/set");
-
-        String ruleText;
-        String color;
-
-        for (Rule rule : rules) {
-            // get the rule's searched text
-            ruleText = rule.getSearchedText();
-            if (!rule.isStructureRuleBySceneName()) {
-                if (ruleText.contains("'")) {
-                    ruleText = ruleText.substring(0, ruleText.lastIndexOf("'"));
-                    ruleText = ruleText.substring(ruleText.indexOf("'") + 1, ruleText.length());
-                }
-            } else {
-                ruleText = ruleText.substring(1, ruleText.lastIndexOf("'")).replace(" ", "=");
-            }
-            builder.append("/").append(ruleText);
-
-            // search types
-            if (rule.getSearchType() == null) {
-                System.out.println(rule.toStringFull());
-            }
-            switch (rule.getSearchType()) {
-                case LINEAGE:
-                    builder.append("-s");
-                    break;
-                case DESCRIPTION:
-                    builder.append("-d");
-                    break;
-                case FUNCTIONAL:
-                    builder.append("-n");
-                    break;
-                case GENE:
-                    builder.append("-g");
-                    break;
-                case CONNECTOME:
-                    builder.append("-c");
-                    break;
-                case NEIGHBOR:
-                    builder.append("-b");
-                    break;
-                case MULTICELLULAR_STRUCTURE_BY_CELLS:
-                    builder.append("-m");
-                    break;
-                case STRUCTURE_BY_SCENE_NAME:
-                    builder.append("-M");
-                    break;
-                default:
-                    break;
-            }
-            // ancestry modifiers
-            // descendant (<)
-            if (rule.isDescendantSelected()) {
-                builder.append("<");
-            }
-            // cell ($)
-            if (rule.isCellSelected()) {
-                builder.append("$");
-            }
-            // ancestor (>)
-            if (rule.isAncestorSelected()) {
-                builder.append(">");
-            }
-            // cell body
-            if (rule.isCellBodySelected()) {
-                builder.append("@");
-            }
-
-            // color
-            color = rule.getColor().toString();
-            color = color.substring(color.indexOf("x") + 1, color.length() - 2);
-            builder.append("+#ff").append(color);
-        }
-
         return builder.toString();
     }
 
@@ -315,5 +224,4 @@ public class URLGenerator {
                 "/scale=" + scale
                 + "/dim=" + dim;
     }
-
 }
