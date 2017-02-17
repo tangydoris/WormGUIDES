@@ -20,7 +20,11 @@ import static wormguides.loaders.GeometryLoader.loadOBJ;
  */
 public class SceneElement {
 
-    private final static String MCS = "MCS";
+    /**
+     * Label used to mark tracts that are multicell structures but have no explicit cell names in the cell shapes
+     * config file
+     */
+    private final static String MULTICELL_TRACT = "MCS";
 
     /** Descriptor or display of object */
     private String sceneName;
@@ -200,11 +204,15 @@ public class SceneElement {
     }
 
     public List<String> getAllCells() {
+        if (cellNames.size() > 0 && cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT)) {
+            return cellNames.subList(1, cellNames.size());
+        }
         return cellNames;
     }
 
     public boolean isMulticellular() {
-        return cellNames.size() > 1 || cellNames.get(0).toLowerCase().equals(MCS.toLowerCase());
+        return cellNames.size() > 1
+                || (cellNames.size() > 0 && cellNames.get(0).equalsIgnoreCase(MULTICELL_TRACT));
     }
 
     public boolean isNoCellStructure() {

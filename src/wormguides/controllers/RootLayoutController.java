@@ -62,7 +62,6 @@ import acetree.LineageData;
 import connectome.Connectome;
 import partslist.PartsList;
 import partslist.celldeaths.CellDeaths;
-import wormguides.util.Parameters;
 import wormguides.MainApp;
 import wormguides.layers.DisplayLayer;
 import wormguides.layers.SearchLayer;
@@ -78,6 +77,7 @@ import wormguides.resources.ProductionInfo;
 import wormguides.stories.Story;
 import wormguides.util.ColorHash;
 import wormguides.util.StringCellFactory;
+import wormguides.util.subsceneparameters.Parameters;
 import wormguides.view.DraggableTab;
 import wormguides.view.infowindow.InfoWindow;
 import wormguides.view.popups.AboutPane;
@@ -87,6 +87,7 @@ import wormguides.view.urlwindow.URLLoadWarningDialog;
 import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLShareWindow;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.sort;
 
 import static javafx.application.Platform.runLater;
@@ -105,11 +106,11 @@ import static javafx.scene.paint.Color.web;
 import static javafx.stage.Modality.NONE;
 import static javafx.stage.StageStyle.UNDECORATED;
 
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgXOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgYOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgZOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.loadNucFiles;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.setOriginToZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgXOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgYOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgZOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.loadNucFiles;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.setOriginToZero;
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static partslist.celldeaths.CellDeaths.isInCellDeaths;
 import static search.SearchUtil.getStructureComment;
@@ -485,7 +486,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
-        
+
         try {
             File output = fileChooser.showSaveDialog(fileChooserStage);
 
@@ -494,7 +495,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 System.out.println("error creating file to write searchLayer results");
                 return;
             }
-            
+
             /*
              * create the header line that will format the search criteria corresponding to these
              * search results
@@ -522,16 +523,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
             	if (neuromuscularCheckBox.isSelected()) {
             		searchType += "neuromuscular";
             	}
-            	
+
             	if (searchType.substring(searchType.length()-2).equals(", ")) {
             		searchType = searchType.substring(0, searchType.length()-2);
             	}
             } else if (multiRadioBtn.isSelected()) {
             	searchType = "Multicellular Structure";
             }
-            
+
             String searchOptions = "";
-            
+
             if (ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
             	searchOptions = "ancestors, descdendants";
             } else if (ancestorCheckBox.isSelected() && !descendantCheckBox.isSelected()) {
@@ -539,8 +540,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             } else if (!ancestorCheckBox.isSelected() && descendantCheckBox.isSelected()) {
             	searchOptions = "descendants";
             }
-            
-            
+
             String searchCriteria = "'" + searchField.getText() + "' (Options: " + searchType;
             if (!searchOptions.isEmpty()) {
             	searchCriteria += ", " + searchOptions;
@@ -548,14 +548,14 @@ public class RootLayoutController extends BorderPane implements Initializable {
             searchCriteria += ")";
 
             FileWriter writer = new FileWriter(output);
-            
+
             // write header line to file
             writer.write(searchCriteria);
-            writer.write(System.lineSeparator());
+            writer.write(lineSeparator());
 
             for (String s : items) {
                 writer.write(s);
-                writer.write(System.lineSeparator());
+                writer.write(lineSeparator());
             }
 
             writer.flush();
@@ -1182,7 +1182,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
         // takes about 6ms
         CellDeaths.init();
-        
+
         Parameters.init();
 
         initSharedVariables();

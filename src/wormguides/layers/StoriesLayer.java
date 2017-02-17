@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -51,12 +52,18 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Insets.EMPTY;
 import static javafx.geometry.Orientation.HORIZONTAL;
 import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
+import static javafx.scene.layout.HBox.setHgrow;
+import static javafx.scene.layout.Priority.ALWAYS;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.GREY;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.text.FontSmoothingType.LCD;
 
+import static wormguides.loaders.ImageLoader.getEyeIcon;
+import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
 import static wormguides.loaders.URLLoader.processUrl;
+import static wormguides.models.colorrule.Rule.UI_SIDE_LENGTH;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
@@ -240,7 +247,7 @@ public class StoriesLayer {
             public ListCell<Story> call(ListView<Story> param) {
                 final ListCell<Story> cell = new ListCell<Story>() {
                     @Override
-                    protected void updateItem(Story story, boolean empty) {
+                    protected void updateItem(final Story story, final boolean empty) {
                         super.updateItem(story, empty);
                         if (!empty) {
                             // create story graphic
@@ -255,7 +262,6 @@ public class StoriesLayer {
                             s.setFocusTraversable(false);
                             s.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
                             storyGraphic.getChildren().add(s);
-
                             setGraphic(storyGraphic);
                         } else {
                             setGraphic(null);
@@ -284,8 +290,8 @@ public class StoriesLayer {
     }
 
     /**
-     * Loades story from file and sets it as active story. Uses a
-     * {@link FileChooser} to allow the user to pick a load location.
+     * Loades story from file and sets it as active story. Uses a {@link FileChooser} to allow the user to pick a
+     * load location.
      */
     public void loadStory() {
         final FileChooser chooser = new FileChooser();
@@ -335,7 +341,7 @@ public class StoriesLayer {
     private void updateColorURL() {
         if (activeStory != null) {
             activeStory.setActive(false);
-            activeStory.setColorURL(generateInternal(
+            activeStory.setColorUrl(generateInternal(
                     new ArrayList<>(activeRulesList),
                     timeProperty.get(),
                     rotateXAngleProperty.get(),
@@ -349,9 +355,8 @@ public class StoriesLayer {
     }
 
     /**
-     * @return The {@link StringProperty} activeStoryProperty that changes when
-     * the active story changes. The value of the String is the name of
-     * the currently active story.
+     * @return The {@link StringProperty} activeStoryProperty that changes when the active story changes. The value
+     * of the String is the name of the currently active story.
      */
     public StringProperty getActiveStoryProperty() {
         return activeStoryProperty;
@@ -384,7 +389,7 @@ public class StoriesLayer {
      * @param note
      *         the note that should become active
      */
-    public void setActiveNoteWithSubsceneRebuild(final Note note) {
+    private void setActiveNoteWithSubsceneRebuild(final Note note) {
         // deactivate the previous active note
         if (activeNote != null) {
             activeNote.setActive(false);
@@ -392,17 +397,14 @@ public class StoriesLayer {
         activeNote = note;
         if (activeNote != null) {
             activeNote.setActive(true);
-            // set time property to be read by 3d window
-            if (!activeNote.getTagName().equals("New Note")) {
-                int startTime = getEffectiveStartTime(activeNote);
-                if (startTime < 1) {
-                    startTime = 1;
-                }
-                if (timeProperty != null) {
-                    timeProperty.set(startTime);
-                }
+            // set time property to be read by 3d window (initiates subscene rebuild)
+            int startTime = getEffectiveStartTime(activeNote);
+            if (timeProperty != null && startTime >= 1) {
+                timeProperty.set(startTime);
             }
         }
+        // sort notes choronologically and refresh listview rendering
+        activeStory.sortNotes();
         if (editController != null) {
             editController.setActiveNote(activeNote);
         }
@@ -478,12 +480,13 @@ public class StoriesLayer {
                 int entityStartTime;
                 int entityEndTime;
 
+                final String cellName = note.getCellName();
                 if (note.attachedToCell()) {
-                    entityStartTime = lineageData.getFirstOccurrenceOf(note.getCellName());
-                    entityEndTime = lineageData.getLastOccurrenceOf(note.getCellName());
+                    entityStartTime = lineageData.getFirstOccurrenceOf(cellName);
+                    entityEndTime = lineageData.getLastOccurrenceOf(cellName);
                 } else {
-                    entityStartTime = sceneElementsList.getFirstOccurrenceOf(note.getCellName());
-                    entityEndTime = sceneElementsList.getLastOccurrenceOf(note.getCellName());
+                    entityStartTime = sceneElementsList.getFirstOccurrenceOf(cellName);
+                    entityEndTime = sceneElementsList.getLastOccurrenceOf(cellName);
                 }
 
                 // attached to cell/structure and time is specified
@@ -528,7 +531,7 @@ public class StoriesLayer {
         // disable previous active story, copy current rules changes back to story
         if (activeStory != null) {
             activeStory.setActive(false);
-            activeStory.setColorURL(generateInternal(
+            activeStory.setColorUrl(generateInternal(
                     new ArrayList<>(activeRulesList),
                     timeProperty.get(),
                     rotateXAngleProperty.get(),
@@ -550,8 +553,8 @@ public class StoriesLayer {
             activeStory.setActive(true);
             activeStoryProperty.set(activeStory.getName());
             // if story does not come with a url, set its url to the program's internal color rules
-            if (activeStory.getColorURL().isEmpty()) {
-                activeStory.setColorURL(generateInternal(
+            if (activeStory.getColorUrl().isEmpty()) {
+                activeStory.setColorUrl(generateInternal(
                         new ArrayList<>(activeRulesList),
                         timeProperty.get(),
                         rotateXAngleProperty.get(),
@@ -565,7 +568,7 @@ public class StoriesLayer {
                 useInternalRulesFlag.set(false);
             }
             processUrl(
-                    activeStory.getColorURL(),
+                    activeStory.getColorUrl(),
                     activeRulesList,
                     searchLayer,
                     timeProperty,
@@ -669,8 +672,8 @@ public class StoriesLayer {
                     cellClickedFlag,
                     timeProperty);
 
-            editController.setActiveNote(activeNote);
             editController.setActiveStory(activeStory);
+            editController.setActiveNote(activeNote);
 
             editStage = new Stage();
 
@@ -719,9 +722,8 @@ public class StoriesLayer {
     }
 
     /**
-     * Changes the color of the input {@link Text} items by modifying the
-     * java-fx css attribute '-fx-fill' to the specified input color. Used by
-     * {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
+     * Changes the color of the input {@link Text} items by modifying the java-fx css attribute '-fx-fill' to the
+     * specified input color. Used by {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
      *
      * @param color
      *         The {@link Color} to change the texts to
@@ -840,22 +842,18 @@ public class StoriesLayer {
     }
 
     /**
-     * This private class is the graphical representation of a {@link Note} item
-     * and a subclass of the JavaFX class {@link VBox}. When a note is clicked,
-     * the time property is changed so that the 3D subscene navigates to the
-     * note's effective start time. This graphical item is rendered in the
-     * {@link ListCell} of an active story in the {@link ListView} in the
-     * 'Stories' tab. Note titles are also expandable (making the notes
-     * description visible) by clicking on the triangle rendered to the left of
-     * the note's title.
+     * This private class is the graphical representation of a {@link Note} item and a subclass of the JavaFX class
+     * {@link VBox}. When a note is clicked, the time property is changed so that the 3D subscene navigates to the
+     * note's effective start time. This graphical item is rendered in the {@link ListCell} of an active story in the
+     * {@link ListView} in the 'Stories' tab. Note titles are also expandable (making the notes description visible)
+     * by clicking on the triangle rendered to the left of the note's title.
      */
     public class NoteListCellGraphic extends VBox {
 
-        private HBox contentsContainer;
-        private Text expandIcon;
-        private Text title;
-
-        private Text contents;
+        private final HBox contentsContainer;
+        private final Text expandIcon;
+        private final Text title;
+        private final Text contents;
 
         // Input note is the note to which this graphic belongs to
         public NoteListCellGraphic(final Note note, final double width) {
@@ -890,7 +888,28 @@ public class StoriesLayer {
             title.setFont(getBolderFont());
             title.setFontSmoothingType(LCD);
 
-            titleContainer.getChildren().addAll(expandIcon, r1, title);
+            final Region r2 = new Region();
+            setHgrow(r2, ALWAYS);
+
+            final Button visibleButton = new Button();
+            final ImageView eyeIcon = getEyeIcon();
+            final ImageView eyeIconInverted = getEyeInvertIcon();
+            visibleButton.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
+            visibleButton.setPadding(EMPTY);
+            visibleButton.setContentDisplay(GRAPHIC_ONLY);
+            visibleButton.setOnAction(event -> {
+                note.setVisible(!note.isVisible());
+                rebuildSubsceneFlag.set(true);
+            });
+            if (note.isVisible()) {
+                visibleButton.setGraphic(eyeIcon);
+            } else {
+                visibleButton.setGraphic(eyeIconInverted);
+            }
+
+            titleContainer.getChildren().addAll(expandIcon, r1, title, r2, visibleButton);
             titleContainer.setAlignment(CENTER_LEFT);
 
             getChildren().add(titleContainer);
@@ -898,17 +917,17 @@ public class StoriesLayer {
             // note contents graphics
             contentsContainer = new HBox(0);
 
-            final Region r2 = new Region();
-            r2.setPrefWidth(r1.prefWidth(-1) + expandIcon.prefWidth(-1));
-            r2.setMinWidth(USE_PREF_SIZE);
-            r2.setMaxWidth(USE_PREF_SIZE);
+            final Region r3 = new Region();
+            r3.setPrefWidth(expandIcon.prefWidth(-1) + r1.prefWidth(-1));
+            r3.setMinWidth(USE_PREF_SIZE);
+            r3.setMaxWidth(USE_PREF_SIZE);
 
             contents = new Text(note.getTagContents());
-            contents.setWrappingWidth(width - 30 - r2.prefWidth(-1));
+            contents.setWrappingWidth(width - 30 - r3.prefWidth(-1));
             contents.setFont(getFont());
             contents.setFontSmoothingType(LCD);
 
-            contentsContainer.getChildren().addAll(r2, contents);
+            contentsContainer.getChildren().addAll(r3, contents);
             expandNote(note.isListExpanded());
 
             setPickOnBounds(false);
@@ -924,12 +943,22 @@ public class StoriesLayer {
             });
             note.getActiveProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
-                    highlightCell(true);
+                    highlightCell(true, note.isVisible());
                 } else {
-                    highlightCell(false);
+                    highlightCell(false, note.isVisible());
                 }
             });
-            highlightCell(note.isActive());
+            note.getVisibleProperty().addListener((observable, oldValue, newValue) -> {
+               if (newValue) {
+                   highlightCell(note.isActive(), true);
+                   visibleButton.setGraphic(eyeIcon);
+               } else {
+                   highlightCell(note.isActive(), false);
+                   visibleButton.setGraphic(eyeIconInverted);
+               }
+            });
+
+            highlightCell(note.isActive(), note.isVisible());
 
             // render note changes
             note.getChangedProperty().addListener((observable, oldValue, newValue) -> {
@@ -945,13 +974,13 @@ public class StoriesLayer {
          * When a cell is highlighted/un-highighted, its text and background
          * colors change.
          *
-         * @param highlight
-         *         The boolean whose value is TRUE when this
-         *         {@link NoteListCellGraphic} is to be highlighted, FALSE
-         *         when it is to be un-highlighted
+         * @param highlighted
+         *         true when this note graphic is to be highlighted, false otherwise
+         * @param isVisible
+         *         true when the note is visible, false otherwise
          */
-        private void highlightCell(boolean highlight) {
-            if (highlight) {
+        private void highlightCell(final boolean highlighted, final boolean isVisible) {
+            if (highlighted) {
                 setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
                         + "-fx-background: -fx-accent;");
                 colorTexts(WHITE, expandIcon, title, contents);

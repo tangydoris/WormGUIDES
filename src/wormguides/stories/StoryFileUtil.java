@@ -14,21 +14,22 @@ import javafx.collections.ObservableList;
 import static java.lang.Integer.MIN_VALUE;
 import static java.lang.String.join;
 
-import static wormguides.stories.StoriesLoader.END_TIME_INDEX;
+import static wormguides.stories.StoriesLoader.COLOR_URL_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_CELLNAME_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_COMMENTS_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_CONTENTS_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_DISPLAY_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_END_TIME_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_IMG_SOURCE_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_LOCATION_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_MARKER_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_NAME_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_RESOURCE_LOCATION_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_START_TIME_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_TYPE_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_VISIBLE_INDEX;
 import static wormguides.stories.StoriesLoader.NUMBER_OF_CSV_FIELDS;
-import static wormguides.stories.StoriesLoader.START_TIME_INDEX;
 import static wormguides.stories.StoriesLoader.STORY_AUTHOR_INDEX;
-import static wormguides.stories.StoriesLoader.STORY_COLOR_URL_INDEX;
 import static wormguides.stories.StoriesLoader.STORY_DATE_INDEX;
 import static wormguides.stories.StoriesLoader.STORY_DESCRIPTION_INDEX;
 import static wormguides.stories.StoriesLoader.STORY_NAME_INDEX;
@@ -53,9 +54,10 @@ public class StoryFileUtil {
             START = "Start Time",
             END = "End Time",
             COMMENTS = "Comments",
+            VISIBLE = "Visible",
             AUTHOR = "Author",
             DATE = "Date",
-            COLOR = "Color Scheme Url";
+            COLOR_URL = "Color Scheme Url";
 
     public static Story loadFromCSVFile(final ObservableList<Story> stories, final File file, final int offset) {
         loadFromFile(stories, file, offset);
@@ -93,11 +95,13 @@ public class StoryFileUtil {
                     .append(CS)
                     .append(COMMENTS)
                     .append(CS)
+                    .append(VISIBLE)
+                    .append(CS)
                     .append(AUTHOR)
                     .append(CS)
                     .append(DATE)
                     .append(CS)
-                    .append(COLOR)
+                    .append(COLOR_URL)
                     .append(BR);
 
             // write story
@@ -109,7 +113,7 @@ public class StoryFileUtil {
             storyParams[STORY_DESCRIPTION_INDEX] = quoteForCsv(story.getDescription());
             storyParams[STORY_AUTHOR_INDEX] = quoteForCsv(story.getAuthor());
             storyParams[STORY_DATE_INDEX] = quoteForCsv(story.getDate());
-            storyParams[STORY_COLOR_URL_INDEX] = quoteForCsv(story.getColorURL());
+            storyParams[COLOR_URL_INDEX] = quoteForCsv(story.getColorUrl());
             out.append(join(",", storyParams)).append(BR);
 
             // notes
@@ -130,11 +134,14 @@ public class StoryFileUtil {
                 // if time is not specified, do not use Integer.MIN_VALUE, leave it blank
                 int start = note.getStartTime();
                 int end = note.getEndTime();
-                if ((start != MIN_VALUE) && (end != MIN_VALUE)) {
-                    noteParams[START_TIME_INDEX] = Integer.toString(start + offset);
-                    noteParams[END_TIME_INDEX] = Integer.toString(end + offset);
+                if (start != MIN_VALUE && end != MIN_VALUE) {
+                    noteParams[NOTE_START_TIME_INDEX] = Integer.toString(start + offset);
+                    noteParams[NOTE_END_TIME_INDEX] = Integer.toString(end + offset);
                 }
                 noteParams[NOTE_COMMENTS_INDEX] = note.getComments();
+                if (!note.isVisible()) {
+                    noteParams[NOTE_VISIBLE_INDEX] = "n";
+                }
                 out.append(join(",", noteParams)).append(BR);
             }
 

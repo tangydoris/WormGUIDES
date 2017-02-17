@@ -11,14 +11,14 @@ import java.util.List;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import wormguides.models.colorrule.Rule;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * Collection of {@link Note}s. In the application, each story is associated with a list of
@@ -38,13 +38,13 @@ public class Story {
     private BooleanProperty changedBooleanProperty;
     private Comparator<Note> comparator;
 
-    private String colorURL;
+    private String colorUrl;
 
     public Story(String name, String description, String url) {
         this(name, description, "", "", url);
     }
 
-    public Story(String name, String description, String author, String date, String url) {
+    public Story(String name, String description, String author, String date, String colorUrl) {
         this.name = name;
         this.description = description;
 
@@ -59,36 +59,38 @@ public class Story {
             }
         });
 
-        this.notes = FXCollections.observableArrayList(note -> new Observable[]{note.getChangedProperty()});
+        this.notes = observableArrayList(note -> new Observable[]{note.getChangedProperty()});
         this.notes.addListener((ListChangeListener<Note>) c -> {
             while (c.next()) {
                 // note was edited
                 if (c.wasUpdated()) {
                     setChanged(true);
-
                 } else if (c.wasAdded()) {
                     setChanged(true);
-
                 } else if (c.wasRemoved()) {
                     setChanged(true);
                 }
             }
         });
 
-        this.colorURL = url;
+        this.colorUrl = colorUrl;
     }
 
-    public String getColorURL() {
-        return colorURL;
+    public String getColorUrl() {
+        return colorUrl;
     }
 
-    public void setColorURL(String url) {
-        colorURL = url;
+    public void setColorUrl(final String colorUrl) {
+        if (colorUrl != null) {
+            this.colorUrl = colorUrl;
+        }
     }
 
     public void setComparator(final Comparator<Note> comparator) {
-        this.comparator = requireNonNull(comparator);
-        notes.sort(this.comparator);
+        this.comparator = comparator;
+        if (this.comparator != null) {
+            notes.sort(this.comparator);
+        }
     }
 
     public BooleanProperty getChangedProperty() {
@@ -137,38 +139,43 @@ public class Story {
         return notes.size();
     }
 
+    public void sortNotes() {
+        if (comparator != null) {
+            notes.sort(comparator);
+        }
+    }
+
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthor(final String author) {
+        if (author != null) {
+            this.author = author;
+        }
     }
 
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(final String date) {
+        if (date != null) {
+            this.date = date;
+        }
     }
 
-    public void addNote(Note note) {
+    public void addNote(final Note note) {
         if (note != null) {
             notes.add(note);
-            setChanged(true);
-
         }
     }
 
-    public void setChanged(boolean changed) {
-        if (comparator != null) {
-            notes.sort(comparator);
-        }
+    public void setChanged(final boolean changed) {
         changedBooleanProperty.set(changed);
     }
 
-    public void removeNote(Note note) {
+    public void removeNote(final Note note) {
         if (note != null) {
             notes.remove(note);
         }
@@ -178,16 +185,20 @@ public class Story {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(final String name) {
+        if (name != null) {
+            this.name = name;
+        }
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(final String description) {
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public ObservableList<Note> getNotes() {

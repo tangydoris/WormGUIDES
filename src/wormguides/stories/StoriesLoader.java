@@ -16,6 +16,7 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 
+import static java.lang.Integer.parseInt;
 import static java.util.Arrays.asList;
 import static java.util.Collections.addAll;
 
@@ -24,13 +25,12 @@ import static java.util.Collections.addAll;
  */
 public class StoriesLoader {
 
-    public static final int NUMBER_OF_CSV_FIELDS = 15;
+    public static final int NUMBER_OF_CSV_FIELDS = 16;
 
     public static final int STORY_NAME_INDEX = 0,
             STORY_DESCRIPTION_INDEX = 1,
-            STORY_AUTHOR_INDEX = 12,
-            STORY_DATE_INDEX = 13,
-            STORY_COLOR_URL_INDEX = 14;
+            STORY_AUTHOR_INDEX = 13,
+            STORY_DATE_INDEX = 14;
 
     public static final int NOTE_NAME_INDEX = 0,
             NOTE_CONTENTS_INDEX = 1,
@@ -41,9 +41,12 @@ public class StoriesLoader {
             NOTE_MARKER_INDEX = 6,
             NOTE_IMG_SOURCE_INDEX = 7,
             NOTE_RESOURCE_LOCATION_INDEX = 8,
-            START_TIME_INDEX = 9,
-            END_TIME_INDEX = 10,
-            NOTE_COMMENTS_INDEX = 11;
+            NOTE_START_TIME_INDEX = 9,
+            NOTE_END_TIME_INDEX = 10,
+            NOTE_COMMENTS_INDEX = 11,
+            NOTE_VISIBLE_INDEX = 12;
+
+    public static final int COLOR_URL_INDEX = 15;
 
     private static final String STORY_LIST_CONFIG = "/wormguides/stories/StoryListConfig.csv";
 
@@ -57,10 +60,10 @@ public class StoriesLoader {
         }
     }
 
-    public static void loadConfigFile(ObservableList<Story> stories, int offset) {
+    public static void loadConfigFile(final ObservableList<Story> stories, final int offset) {
         final URL url = StoriesLoader.class.getResource(STORY_LIST_CONFIG);
         if (url != null) {
-            try (InputStream stream = url.openStream()) {
+            try (final InputStream stream = url.openStream()) {
                 processStream(stream, stories, offset);
             } catch (IOException e) {
                 System.out.println("Could not read file '" + STORY_LIST_CONFIG + "' in the system.");
@@ -68,7 +71,10 @@ public class StoriesLoader {
         }
     }
 
-    private static void processStream(final InputStream stream, final ObservableList<Story> stories, final int offset) {
+    private static void processStream(
+            final InputStream stream,
+            final ObservableList<Story> stories,
+            final int offset) {
         // used for accessing the current story for adding scene elements
         int storyCounter = stories.size() - 1;
 
@@ -80,7 +86,7 @@ public class StoriesLoader {
 
             // Skip heading line
             reader.readLine();
-            List<String> lineTokens = new LinkedList<>();
+            final List<String> lineTokens = new LinkedList<>();
             String[] split;
 
             while ((line = reader.readLine()) != null) {
@@ -95,7 +101,7 @@ public class StoriesLoader {
                         // if this is not the first line,
                         // then modify the previous final token and append the remaining
                         int lastIndex = lineTokens.size() - 1;
-                        String lastToken = lineTokens.get(lastIndex);
+                        final String lastToken = lineTokens.get(lastIndex);
                         lineTokens.remove(lastIndex);
                         lineTokens.add(lastToken + split[0]);
                         lineTokens.addAll(asList(split).subList(1, split.length));
@@ -124,7 +130,7 @@ public class StoriesLoader {
                                 split[STORY_DESCRIPTION_INDEX],
                                 author,
                                 split[STORY_DATE_INDEX],
-                                split[STORY_COLOR_URL_INDEX]));
+                                split[COLOR_URL_INDEX]));
                         storyCounter++;
 
                     } else {
@@ -166,14 +172,19 @@ public class StoriesLoader {
             note.setImagingSource(split[NOTE_IMG_SOURCE_INDEX]);
             note.setResourceLocation(split[NOTE_RESOURCE_LOCATION_INDEX]);
 
-            String startTime = split[START_TIME_INDEX];
-            String endTime = split[END_TIME_INDEX];
+            final String startTime = split[NOTE_START_TIME_INDEX];
+            final String endTime = split[NOTE_END_TIME_INDEX];
             if (!startTime.isEmpty() && !endTime.isEmpty()) {
-                note.setStartTime(Integer.parseInt(startTime) - offset);
-                note.setEndTime(Integer.parseInt(endTime) - offset);
+                note.setStartTime(parseInt(startTime) - offset);
+                note.setEndTime(parseInt(endTime) - offset);
             }
 
             note.setComments(split[NOTE_COMMENTS_INDEX]);
+
+            final String visible = split[NOTE_VISIBLE_INDEX];
+            if (visible.equalsIgnoreCase("n")) {
+                note.setVisible(false);
+            }
 
         } catch (Exception e) {
             System.out.println("Error trying to parse the following note params:");
