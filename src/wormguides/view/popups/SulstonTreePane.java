@@ -58,6 +58,7 @@ import wormguides.models.colorrule.Rule;
 import wormguides.util.ColorHash;
 
 import static java.lang.Math.max;
+import static java.lang.Math.round;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -74,6 +75,8 @@ import static javafx.scene.input.MouseButton.SECONDARY;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.WHITE;
 import static javafx.scene.paint.Color.web;
+import static javafx.scene.text.Font.font;
+import static javafx.scene.text.FontWeight.SEMI_BOLD;
 
 import static javax.imageio.ImageIO.write;
 import static partslist.PartsList.getFunctionalNameByLineageName;
@@ -154,28 +157,30 @@ public class SulstonTreePane extends ScrollPane {
         this.defaultEmbryoFlag = requireNonNull(defaultEmbryoFlag);
 
         hiddenNodes = new ArrayList<>();
+
         clickHandler = event -> {
             final String sourceName = ((Node) event.getSource()).getId();
-            // right click
-            if (event.getButton() == SECONDARY
-                    || (event.getButton() == PRIMARY
-                    && (event.isControlDown()
-                    || event.isMetaDown()))) {
-                showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
-            }
-            // left click
-            else if (event.getButton() == PRIMARY) {
-                // reset the name to activate navigate3d in 3d cell window
-                resetSelectedNameLabeled(sourceName);
-            }
-            // on a double click, also expand the clicked node
-            if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
-                if (hiddenNodes.contains(sourceName)) {
-                    hiddenNodes.remove(sourceName);
-                } else {
-                    hiddenNodes.add(sourceName);
+            if (sourceName != null && !sourceName.isEmpty()) {
+                // right click
+                if (event.getButton() == SECONDARY
+                        || (event.getButton() == PRIMARY && (event.isControlDown() || event.isMetaDown()))) {
+                    showContextMenu(sourceName, event.getScreenX(), event.getScreenY());
                 }
-                updateDrawing();
+                // left click
+                else if (event.getButton() == PRIMARY) {
+                    // reset the name to activate navigate3d in 3d cell window
+                    resetSelectedNameLabeled(sourceName);
+                    timeProperty.set(((int) round(event.getY())) - movieTimeOffset);
+                }
+                // on a double click, expand/contract the clicked node
+                if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
+                    if (hiddenNodes.contains(sourceName)) {
+                        hiddenNodes.remove(sourceName);
+                    } else {
+                        hiddenNodes.add(sourceName);
+                    }
+                    updateDrawing();
+                }
             }
         };
 
@@ -511,12 +516,12 @@ public class SulstonTreePane extends ScrollPane {
         } else {
             timeIndicator = new Text(TIME_LABEL_OFFSET_X, iYmin + timevalue, Integer.toString(timeProperty.get()));
         }
-
-        timeIndicator.setFont(new Font(6));
+        timeIndicator.setFont(font("System", SEMI_BOLD, 6));
         timeIndicator.setStroke(new Color(.5, .5, .5, .5));
         timeIndicator.setId("timeValue");
-        mainPane.getChildren().add(timeIndicatorBar);
-        mainPane.getChildren().add(timeIndicator);
+        mainPane.getChildren().addAll(timeIndicatorBar, timeIndicator);
+        timeIndicatorBar.toBack();
+
         drawTimeTicks();
     }
 
@@ -623,10 +628,9 @@ public class SulstonTreePane extends ScrollPane {
             lcell.setOnMouseEntered(event -> lcell.setCursor(HAND));
             lcell.setOnMouseExited(event -> lcell.setCursor(DEFAULT));
             lcell.setOnMousePressed(clickHandler);
-            if (done) {
+            if (done && !cell.isLeaf()) {
                 // this is a collapsed node not a terminal cell
                 final Circle circle = new Circle(2, BLACK);
-                // TODO fix this
                 circle.setOnMouseEntered(event -> circle.setCursor(HAND));
                 circle.setOnMouseExited(event -> circle.setCursor(DEFAULT));
                 circle.relocate(x - 2, yStartUse + length - 2);
@@ -641,12 +645,12 @@ public class SulstonTreePane extends ScrollPane {
 
             int offsetx = 2;
             int offsety = 3;
-            String cellnametextstring = cellName;
-            String terminalname = getFunctionalNameByLineageName(cellName);
-            if (!(terminalname == null)) {
-                cellnametextstring = cellnametextstring + " ; " + terminalname;
+            String cellNameTextString = cellName;
+            String terminalName = getFunctionalNameByLineageName(cellName);
+            if (!(terminalName == null)) {
+                cellNameTextString = cellNameTextString + " (" + terminalName + ")";
             }
-            final Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellnametextstring);
+            final Text cellnametext = new Text(x - offsetx, yStartUse + length + offsety, cellNameTextString);
             cellnametext.getTransforms().add(new Rotate(90, x - offsetx, yStartUse + length + offsety));
             cellnametext.setFont(new Font(5));
 
