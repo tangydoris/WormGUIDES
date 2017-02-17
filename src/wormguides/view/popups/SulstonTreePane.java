@@ -168,18 +168,19 @@ public class SulstonTreePane extends ScrollPane {
                 }
                 // left click
                 else if (event.getButton() == PRIMARY) {
-                    // reset the name to activate navigate3d in 3d cell window
-                    resetSelectedNameLabeled(sourceName);
-                    timeProperty.set(((int) round(event.getY())) - movieTimeOffset);
-                }
-                // on a double click, expand/contract the clicked node
-                if (event.getButton() == PRIMARY && event.getClickCount() == 2) {
-                    if (hiddenNodes.contains(sourceName)) {
-                        hiddenNodes.remove(sourceName);
+                    // on a double click, expand/contract the clicked node
+                    if (event.getClickCount() == 2) {
+                        if (hiddenNodes.contains(sourceName)) {
+                            hiddenNodes.remove(sourceName);
+                        } else {
+                            hiddenNodes.add(sourceName);
+                        }
+                        updateDrawing();
                     } else {
-                        hiddenNodes.add(sourceName);
+                        // reset the name to activate navigate3d in 3d cell window
+                        resetSelectedNameLabeled(sourceName);
+                        timeProperty.set(((int) round(event.getY())) - movieTimeOffset);
                     }
-                    updateDrawing();
                 }
             }
         };
