@@ -154,7 +154,7 @@ public class StoriesLoader {
             System.out.println("Number format error in file.");
 
         } catch (IOException e) {
-            System.out.println("Fonfig file was not found.");
+            System.out.println("Config file was not found.");
         }
     }
 

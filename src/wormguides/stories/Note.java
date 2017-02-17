@@ -39,6 +39,8 @@ import static wormguides.stories.Note.Type.STRUCTURE;
 public class Note {
 
     private static final String OBJ_EXT = ".obj";
+    private static final String PNG_EXT = ".png";
+    private static final String JPG_EXT = ".jpg";
 
     private final Story parent;
     /**
@@ -367,11 +369,23 @@ public class Note {
         return resourceLocation;
     }
 
+    /**
+     * Set the resource location for this note
+     * Update 02/2017:
+     * 	- Here we check to see if an image file name is in the resource location field. If so,
+     *    we'll enable the flag indicating that this note should not display its text but rather
+     *    render the image contained in this path at the location of attachment
+     * 
+     * @param location
+     */
     public void setResourceLocation(final String location) {
         if (elements == null) {
             elements = new ArrayList<>();
         }
         if (location != null && !location.isEmpty()) {
+        	// first check if this is an obj file
+        	// then check if it is an image file
+        	// then go into the failure mode
             resourceLocation = location.trim();
             String sceneName = resourceLocation;
             if (resourceLocation.lastIndexOf("/") != -1) {
