@@ -106,11 +106,11 @@ import static javafx.scene.paint.Color.web;
 import static javafx.stage.Modality.NONE;
 import static javafx.stage.StageStyle.UNDECORATED;
 
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgXOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgYOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.getAvgZOffsetFromZero;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.loadNucFiles;
-import static acetree.tablelineagedata.AceTreeTableLineageLoader.setOriginToZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgXOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgYOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.getAvgZOffsetFromZero;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.loadNucFiles;
+import static acetree.tablelineagedata.AceTreeTableLineageDataLoader.setOriginToZero;
 import static partslist.PartsList.getFunctionalNameByLineageName;
 import static partslist.celldeaths.CellDeaths.isInCellDeaths;
 import static search.SearchUtil.getStructureComment;

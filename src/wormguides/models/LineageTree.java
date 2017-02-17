@@ -238,7 +238,7 @@ public class LineageTree {
     private void addCell(String cellName) {
         String startingLetter = cellName.substring(0, 1).toLowerCase();
         TreeItem<String> startingNode = null;
-        TreeItem<String> parent = null;
+        TreeItem<String> parent;
         switch (startingLetter) {
             case "a":
                 startingNode = ab;
