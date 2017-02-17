@@ -1655,12 +1655,14 @@ public class Window3DController {
 
         // otherwise, create a highlight new label
         final String funcName = getFunctionalNameByLineageName(name);
-        Text text;
+        final Text text;
         if (funcName != null) {
             text = makeNoteSpriteText(funcName);
         } else {
             text = makeNoteSpriteText(name);
         }
+        text.setOnMouseEntered(event -> text.setCursor(HAND));
+        text.setOnMouseExited(event -> text.setCursor(DEFAULT));
 
         final String tempName = name;
         text.setOnMouseClicked(event -> removeLabelFor(tempName));
