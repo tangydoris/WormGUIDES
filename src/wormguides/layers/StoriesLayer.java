@@ -183,7 +183,8 @@ public class StoriesLayer {
                 story.getActiveProperty()});
         stories.addListener((ListChangeListener<Story>) c -> {
             while (c.next()) {
-                // need this listener to detect change for some reason leave this empty
+                // need this listener to detect change for some reason
+                // leave this empty
             }
         });
 
@@ -327,20 +328,8 @@ public class StoriesLayer {
         // if user clicks save
         if (file != null) {
             if (activeStory != null) {
-                // if the story color scheme is being used, save color rules into the story's URL
-                if (usingStoryColorScheme) {
-                    activeStory.setColorUrl(generateInternal(
-                            activeRulesList,
-                            timeProperty.get(),
-                            rotateXAngleProperty.get(),
-                            rotateYAngleProperty.get(),
-                            rotateZAngleProperty.get(),
-                            translateXProperty.get(),
-                            translateYProperty.get(),
-                            zoomProperty.get(),
-                            othersOpacityProperty.get()));
-                } else {
-                    // otherwise save rules into the note's URL
+                if (activeNote != null && !(usingStoryColorScheme = !activeNote.hasColorScheme())) {
+                    // if the story color scheme is not being used, save rules into the note's URL
                     activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
                     // copy the note's rules and temporarily use the story's color scheme
                     // then put back the copied rules into the active rules list
@@ -358,6 +347,17 @@ public class StoriesLayer {
                             othersOpacityProperty.get()));
                     activeRulesList.clear();
                     activeRulesList.addAll(rulesCopy);
+                } else {
+                    activeStory.setColorUrl(generateInternal(
+                            activeRulesList,
+                            timeProperty.get(),
+                            rotateXAngleProperty.get(),
+                            rotateYAngleProperty.get(),
+                            rotateZAngleProperty.get(),
+                            translateXProperty.get(),
+                            translateYProperty.get(),
+                            zoomProperty.get(),
+                            othersOpacityProperty.get()));
                 }
 
                 saveToCSVFile(activeStory, file, movieTimeOffset);
@@ -409,6 +409,7 @@ public class StoriesLayer {
     private void setActiveNoteWithSubsceneRebuild(final Note note) {
         // deactivate the previous active note
         if (activeNote != null) {
+            usingStoryColorScheme = !activeNote.hasColorScheme();
             // if not using the story color scheme,
             // save the rules back into a URL for the note (they may have been edited)
             if (!usingStoryColorScheme) {
@@ -724,7 +725,7 @@ public class StoriesLayer {
 
                 editController.getNoteCreatedProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue) {
-                        Note newNote = editController.getActiveNote();
+                        final Note newNote = editController.getActiveNote();
                         editController.setNoteCreated(false);
                         activeStory.addNote(newNote);
                         setActiveNoteWithSubsceneRebuild(newNote);
