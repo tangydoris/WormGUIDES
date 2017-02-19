@@ -80,10 +80,24 @@ public class Story {
         return colorUrl;
     }
 
-    public void setColorUrl(final String colorUrl) {
-        if (colorUrl != null) {
-            this.colorUrl = colorUrl;
+    public boolean hasColorScheme() {
+        return colorUrl != null && !colorUrl.isEmpty();
+    }
+
+    /**
+     * @return the active note if there is one, null otherwise
+     */
+    public Note getActiveNore() {
+        for (Note note : notes) {
+            if (note.isActive()) {
+                return note;
+            }
         }
+        return null;
+    }
+
+    public void setColorUrl(final String colorUrl) {
+        this.colorUrl = colorUrl;
     }
 
     public void setComparator(final Comparator<Note> comparator) {

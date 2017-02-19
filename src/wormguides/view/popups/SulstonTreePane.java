@@ -19,10 +19,12 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -185,21 +187,20 @@ public class SulstonTreePane extends ScrollPane {
             }
         };
 
-        this.ownStage = ownStage;
+        this.ownStage = requireNonNull(ownStage);
 
         this.canvas = new AnchorPane();
-        this.mainPane = canvas;
-        this.lineageData = lineageData;
+        this.mainPane = requireNonNull(canvas);
+        this.lineageData = requireNonNull(lineageData);
         this.movieTimeOffset = movieTimeOffset;
 
-        this.timeProperty = timeProperty;
+        this.timeProperty = requireNonNull(timeProperty);
         this.timeProperty.addListener((observable, oldValue, newValue) -> repositionTimeLine());
 
         setUpDefaultView();
 
-        this.rules = rules;
-        this.colorHash = colorHash;
-        this.lineageTreeRoot = lineageTreeRoot;
+        this.colorHash = requireNonNull(colorHash);
+        this.lineageTreeRoot = requireNonNull(lineageTreeRoot);
 
         this.rebuildSubsceneFlag = requireNonNull(rebuildSubsceneFlag);
         this.rebuildSubsceneFlag.addListener((observable, oldValue, newValue) -> {
@@ -207,6 +208,9 @@ public class SulstonTreePane extends ScrollPane {
                 updateColoring();
             }
         });
+
+        this.rules = requireNonNull(rules);
+        this.rules.addListener((ListChangeListener<Rule>) listener -> rebuildSubsceneFlag.set(true));
 
         this.nameXUseMap = new HashMap<>();
         this.nameYStartUseMap = new HashMap<>();
@@ -226,8 +230,6 @@ public class SulstonTreePane extends ScrollPane {
         getChildren().add(contentGroup);
         setPannable(true);
         setPrefSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-
-        addLines(lineageTreeRoot, canvas);
 
         // add controls for zoom
         final DropShadow shadow = new DropShadow();
@@ -294,8 +296,7 @@ public class SulstonTreePane extends ScrollPane {
                 fileChooser.setTitle("Choose Save Location");
                 fileChooser.getExtensionFilters().add(new ExtensionFilter("PNG File", "*.png"));
 
-                WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
-
+                final WritableImage screenCapture = mainPane.snapshot(new SnapshotParameters(), null);
                 // write the image to a file
                 try {
                     final File file = fileChooser.showSaveDialog(fileChooserStage);
@@ -308,8 +309,14 @@ public class SulstonTreePane extends ScrollPane {
                 }
             }
         });
+    }
 
-        updateColoring();
+    /**
+     * Adds the tree drawing as well as timeline marks to the tree window. This is called after the scene for this
+     * tree pane is set by the {@link wormguides.controllers.RootLayoutController}.
+     */
+    public void addDrawing() {
+        addLines(lineageTreeRoot, mainPane);
     }
 
     // stolen from web to hack these tooltips to come up faster
@@ -353,7 +360,10 @@ public class SulstonTreePane extends ScrollPane {
         }
     }
 
-    public void setUpDefaultView() {
+    /**
+     * Sets up the default view of the lineage tree, with specific nodes hidden
+     */
+    private void setUpDefaultView() {
         // empty lines indicate a different level of the lineage tree
         hiddenNodes.add("ABalaa");
         hiddenNodes.add("ABalap");
@@ -499,31 +509,34 @@ public class SulstonTreePane extends ScrollPane {
     }
 
     private void addLines(final TreeItem<String> lineageTreeRoot, final Pane mainPane) {
-        if (lineageTreeRoot != null) {
-            recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
-        }
-        // add timeProperty indicator bar
-        int timevalue = timeProperty.getValue();
-        timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax, iYmin + timevalue);
-        timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
-        timeIndicatorBar.setId("timeProperty");
+        final Scene scene = getScene();
+        if (scene != null && scene.getWindow().isShowing()) {
+            if (lineageTreeRoot != null) {
+                recursiveDraw(mainPane, 400, 10, lineageTreeRoot, 10);
+            }
+            // add timeProperty indicator bar
+            int timevalue = timeProperty.getValue();
+            timeIndicatorBar = new Line(0, iYmin + timevalue, maxX + iXmax, iYmin + timevalue);
+            timeIndicatorBar.setStroke(new Color(.5, .5, .5, .5));
+            timeIndicatorBar.setId("timeProperty");
 
-        // add timeProperty indicator
-        if (defaultEmbryoFlag) {
-            timeIndicator = new Text(
-                    TIME_LABEL_OFFSET_X,
-                    iYmin + timevalue,
-                    Integer.toString(timeProperty.get() + movieTimeOffset));
-        } else {
-            timeIndicator = new Text(TIME_LABEL_OFFSET_X, iYmin + timevalue, Integer.toString(timeProperty.get()));
-        }
-        timeIndicator.setFont(font("System", SEMI_BOLD, 6));
-        timeIndicator.setStroke(new Color(.5, .5, .5, .5));
-        timeIndicator.setId("timeValue");
-        mainPane.getChildren().addAll(timeIndicatorBar, timeIndicator);
-        timeIndicatorBar.toBack();
+            // add timeProperty indicator
+            if (defaultEmbryoFlag) {
+                timeIndicator = new Text(
+                        TIME_LABEL_OFFSET_X,
+                        iYmin + timevalue,
+                        Integer.toString(timeProperty.get() + movieTimeOffset));
+            } else {
+                timeIndicator = new Text(TIME_LABEL_OFFSET_X, iYmin + timevalue, Integer.toString(timeProperty.get()));
+            }
+            timeIndicator.setFont(font("System", SEMI_BOLD, 6));
+            timeIndicator.setStroke(new Color(.5, .5, .5, .5));
+            timeIndicator.setId("timeValue");
+            mainPane.getChildren().addAll(timeIndicatorBar, timeIndicator);
+            timeIndicatorBar.toBack();
 
-        drawTimeTicks();
+            drawTimeTicks();
+        }
     }
 
     // retrieves material for use as texture on lines

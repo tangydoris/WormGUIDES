@@ -40,7 +40,24 @@ public class Note {
 
     private static final String OBJ_EXT = ".obj";
 
-    private final Story parent;
+    /** The parent story */
+    private final Story parentStory;
+
+    /** True when any field value changes, false otherwise */
+    private final BooleanProperty changedProperty;
+
+    /** True when the note is visible in the subscene, false otherwise */
+    private final BooleanProperty visibleProperty;
+
+    /** True when graphic in the stories list view is expanded, false otherwise */
+    private final BooleanProperty listExpandedProperty;
+
+    /** True when graphic in 3d subscene is expanded, false otherwise */
+    private final BooleanProperty sceneExpandedProperty;
+
+    /** True when graphical representation is selected, false otherwise */
+    private final BooleanProperty activeProperty;
+
     /**
      * List of scene elements rendered with the note. It is possible for a note to have multiple scene elements just by
      * setting its resource location.
@@ -58,26 +75,16 @@ public class Note {
     private String resourceLocation;
     private int startTime, endTime;
     private String comments;
+    private String colorUrl;
 
-    /** True when any field value changes, false otherwise */
-    private final BooleanProperty changedProperty;
-    /** True when the note is visible in the subscene, false otherwise */
-    private final BooleanProperty visibleProperty;
-    /** True when graphic in wormguides.stories list view is expanded, false otherwise */
-    private final BooleanProperty listExpandedProperty;
-    /** True when graphic in 3d subscene is expanded, false otherwise */
-    private final BooleanProperty sceneExpandedProperty;
-    /** True when graphical representation is selected, false otherwise */
-    private final BooleanProperty activeProperty;
-
-    public Note(final Story parent, final String tagName, final String tagContents) {
-        this(parent);
+    public Note(final Story parentStory, final String tagName, final String tagContents) {
+        this(parentStory);
         this.tagName = tagName;
         this.tagContents = tagContents;
     }
 
-    public Note(final Story parent) {
-        this.parent = requireNonNull(parent);
+    public Note(final Story parentStory) {
+        this.parentStory = requireNonNull(parentStory);
         elements = null;
         tagName = "";
         tagContents = "";
@@ -101,6 +108,18 @@ public class Note {
 
         setTagDisplay(OVERLAY);
         setAttachmentType(BLANK);
+    }
+
+    public String getColorUrl() {
+        return colorUrl;
+    }
+
+    public boolean hasColorScheme() {
+        return colorUrl != null && !colorUrl.isEmpty();
+    }
+
+    public void setColorUrl(final String colorUrl) {
+        this.colorUrl = colorUrl;
     }
 
     public String getLocationString() {
@@ -170,8 +189,8 @@ public class Note {
         return changedProperty.get();
     }
 
-    public Story getParent() {
-        return parent;
+    public Story getParentStory() {
+        return parentStory;
     }
 
     public void setTagDisplay(String display) throws TagDisplayEnumException {

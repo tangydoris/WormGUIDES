@@ -2,7 +2,7 @@
  * Bao Lab 2017
  */
 
-package wormguides.loaders;
+package wormguides.util.colorurl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,103 +34,23 @@ import static wormguides.models.colorrule.SearchOption.CELL_BODY;
 import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 import static wormguides.models.colorrule.SearchOption.DESCENDANT;
 
-public class URLLoader {
+/** Utility methods that parse a URL specifying the subscene color scheme and parameters */
+public class UrlParser {
 
     /**
-     * Processes a url string and sets the correct view parameters in the 3D subscene. Called by
-     * {@link wormguides.layers.StoriesLayer} and {@link wormguides.controllers.RootLayoutController} for scene
-     * sharing/loading and when changing active/inactive wormguides.stories. Documentation for URL (old and new APIs)
-     * formatting and syntax can be found in URLDocumentation.txt inside the package wormguides.model.
+     * Processes a color scheme URL into a list of rules. View parameters are optional in the URL since they wil be
+     * ignored. This is used for switching between color schemes within a story (in the case that the active note has
+     * its own color scheme).
      *
      * @param url
-     *         subscene parameters and rules URL consisting of a prefix url, rules to be parsed, and view arguments
+     *         the color scheme URL to parse
      */
-    public static void processUrl(
+    public static void processUrlRules(
             final String url,
-            final ObservableList<Rule> rulesList,
-            final SearchLayer searchLayer,
-            final IntegerProperty timeProperty,
-            final DoubleProperty rotateXAngleProperty,
-            final DoubleProperty rotateYAngleProperty,
-            final DoubleProperty rotateZAngleProperty,
-            final DoubleProperty translateXProperty,
-            final DoubleProperty translateYProperty,
-            final DoubleProperty zoomProperty,
-            final DoubleProperty othersOpacityProperty,
-            final BooleanProperty rebuildSubsceneFlag) {
-
-        if (!url.contains("testurlscript?/")) {
-            return;
-        }
-
-        // if no URL is given, revert to internal color rules
-        if (url.isEmpty()) {
-            return;
-        }
-
-        final String[] args = url.split("/");
-        final List<String> ruleArgs = new ArrayList<>();
-        final List<String> viewArgs = new ArrayList<>();
-
-        // add rules and view parameters to their ArrayList's
-        int i = 0;
-        while (i < args.length) {
-            if (args[i].equals("set")) {
-                // do not need the 'set' String
-                i++;
-                // iterate through set parameters until we hit the view parameters
-                while (!args[i].equals("view")) {
-                    ruleArgs.add(args[i].trim());
-                    i++;
-                }
-
-                // iterate through view parameters do not need the 'view' String
-                i++;
-                while (!args[i].equals("iOS") && !args[i].equals("Android") && !args[i].equals("browser")) {
-                    viewArgs.add(args[i]);
-                    i++;
-                }
-            } else {
-                i++;
-            }
-        }
-
-        // process rules
-        parseRules(ruleArgs, rulesList, searchLayer);
-        // process view arguments
-        final int previousTime = timeProperty.get();
-        parseViewArgs(
-                viewArgs,
-                timeProperty,
-                rotateXAngleProperty,
-                rotateYAngleProperty,
-                rotateZAngleProperty,
-                translateXProperty,
-                translateYProperty,
-                zoomProperty,
-                othersOpacityProperty);
-        // no need to rebuild subscene again if we are not at a different timepoint than before
-        // setting the time property triggers a subscene rebuild
-        if (timeProperty.get() == previousTime) {
-            rebuildSubsceneFlag.set(true);
-        }
-    }
-
-    /**
-     * Parses a list of rules and adds each to the application's active rules list
-     *
-     * @param ruleStrings
-     *         the string representations of rules
-     * @param rulesList
-     *         the observable rules list
-     * @param searchLayer
-     *         the search layer to add color rules
-     */
-    private static void parseRules(
-            final List<String> ruleStrings,
             final ObservableList<Rule> rulesList,
             final SearchLayer searchLayer) {
 
+        final List<String> ruleStrings = parseRuleArgs(url);
         rulesList.clear();
 
         final List<String> types = new ArrayList<>();
@@ -279,6 +199,126 @@ public class URLLoader {
                 System.out.println("Invalid color rule format");
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Parses the rule arguments from a URL into a list
+     *
+     * @param url
+     *         the URL to parse
+     *
+     * @return list of parsed rule arguments
+     */
+    private static List<String> parseRuleArgs(final String url) {
+        final List<String> parsedRuleArgs = new ArrayList<>();
+
+        if (!url.contains("testurlscript?/")) {
+            return parsedRuleArgs;
+        }
+        // if no URL is given, revert to internal color rules
+        if (url.isEmpty()) {
+            return parsedRuleArgs;
+        }
+
+        final String[] args = url.split("/");
+
+        // extract rule args
+        int i = 0;
+        while (!args[i].equalsIgnoreCase("set")) {
+            i++;
+        }
+        // skip the "set" token
+        i++;
+        // iterate through set parameters until we hit the view parameters
+        while (i < args.length && !args[i].equals("view")) {
+            parsedRuleArgs.add(args[i]);
+            i++;
+        }
+        return parsedRuleArgs;
+    }
+
+    /**
+     * Parses the view arguments from a URL into a list
+     *
+     * @param url
+     *         the URL to parse
+     *
+     * @return list of parsed view arguments
+     */
+    private static List<String> parseViewArgs(final String url) {
+        final List<String> parsedViewArgs = new ArrayList<>();
+
+        if (!url.contains("testurlscript?/")) {
+            return parsedViewArgs;
+        }
+        // if no URL is given, revert to internal color rules
+        if (url.isEmpty()) {
+            return parsedViewArgs;
+        }
+
+        final String[] args = url.split("/");
+
+        // extract rule args
+        int i = 0;
+        while (!args[i].equalsIgnoreCase("view")) {
+            i++;
+        }
+        i++;
+        // iterate through set parameters until we hit the view parameters
+        while (i < args.length
+                && !args[i].equalsIgnoreCase("iOS")
+                && !args[i].equalsIgnoreCase("Android")
+                && !args[i].equalsIgnoreCase("browser")) {
+            parsedViewArgs.add(args[i]);
+            i++;
+        }
+        return parsedViewArgs;
+    }
+
+    /**
+     * Processes a URL string and sets the correct view parameters in the 3D subscene. Called by
+     * {@link wormguides.layers.StoriesLayer} and {@link wormguides.controllers.RootLayoutController} for scene
+     * sharing/loading and when changing active/inactive wormguides.stories. Documentation for URL (old and new APIs)
+     * formatting and syntax can be found in URLDocumentation.txt inside the package wormguides.model.
+     *
+     * @param url
+     *         subscene parameters and rules URL consisting of a prefix url, rules to be parsed, and view arguments
+     */
+    public static void processUrl(
+            final String url,
+            final ObservableList<Rule> rulesList,
+            final SearchLayer searchLayer,
+            final IntegerProperty timeProperty,
+            final DoubleProperty rotateXAngleProperty,
+            final DoubleProperty rotateYAngleProperty,
+            final DoubleProperty rotateZAngleProperty,
+            final DoubleProperty translateXProperty,
+            final DoubleProperty translateYProperty,
+            final DoubleProperty zoomProperty,
+            final DoubleProperty othersOpacityProperty,
+            final BooleanProperty rebuildSubsceneFlag) {
+
+        processUrlRules(url, rulesList, searchLayer);
+
+        // process view arguments
+        final List<String> viewArgs = parseViewArgs(url);
+        final int previousTime = timeProperty.get();
+        parseViewArgs(
+                viewArgs,
+                timeProperty,
+                rotateXAngleProperty,
+                rotateYAngleProperty,
+                rotateZAngleProperty,
+                translateXProperty,
+                translateYProperty,
+                zoomProperty,
+                othersOpacityProperty);
+
+        // no need to rebuild subscene again if we are not at a different timepoint than before
+        // setting the time property triggers a subscene rebuild
+        if (timeProperty.get() == previousTime) {
+            rebuildSubsceneFlag.set(true);
         }
     }
 

@@ -2,16 +2,14 @@
  * Bao Lab 2017
  */
 
-package wormguides.util;
+package wormguides.util.colorurl;
 
 import java.util.List;
 
 import wormguides.models.colorrule.Rule;
 
-/**
- * Generator for a color scheme and scene parameters URL.
- */
-public class URLGenerator {
+/** Utility methods to generate a URL specifying the subscene color scheme and parameters */
+public class UrlGenerator {
 
     public static String generateIOS(
             final List<Rule> rules,
@@ -111,6 +109,11 @@ public class URLGenerator {
                 scale,
                 dim)
                 + "/browser/";
+    }
+
+    public static String generateInternalWithoutViewArgs(final List<Rule> rules) {
+        return "http://scene.wormguides.org/wormguides/testurlscript?"
+                + generateSetParameters(rules);
     }
 
     private static String generateParameterString(

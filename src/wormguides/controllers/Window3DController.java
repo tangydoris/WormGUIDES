@@ -1681,7 +1681,6 @@ public class Window3DController {
         for (Node shape3D : entityLabelMap.keySet()) {
             entityLabelMap.get(shape3D).setFill(web(SPRITE_COLOR_HEX));
         }
-
         if (entity != null && entityLabelMap.get(entity) != null) {
             entityLabelMap.get(entity).setFill(web(ACTIVE_LABEL_COLOR_HEX));
         }
