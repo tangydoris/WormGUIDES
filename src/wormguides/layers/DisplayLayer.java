@@ -62,20 +62,17 @@ public class DisplayLayer {
 
 
         this.currentRulesList = rulesList;
-        this.currentRulesList.addListener(new ListChangeListener<Rule>() {
-            @Override
-            public void onChanged(Change<? extends Rule> change) {
-                while (change.next()) {
-                    if (!change.wasUpdated()) {
-                        // added to current list
-                        for (Rule rule : change.getAddedSubList()) {
-                            buttonMap.put(rule, rule.getDeleteButton());
-                            rule.getDeleteButton().setOnAction(event -> {
-                                currentRulesList.remove(rule);
-                                buttonMap.remove(rule);
-                                rebuildSubsceneFlag.set(true);
-                            });
-                        }
+        this.currentRulesList.addListener((ListChangeListener<Rule>) change -> {
+            while (change.next()) {
+                if (!change.wasUpdated()) {
+                    // added to current list
+                    for (Rule rule : change.getAddedSubList()) {
+                        buttonMap.put(rule, rule.getDeleteButton());
+                        rule.getDeleteButton().setOnAction(event -> {
+                            currentRulesList.remove(rule);
+                            buttonMap.remove(rule);
+                            rebuildSubsceneFlag.set(true);
+                        });
                     }
                 }
             }
@@ -103,7 +100,7 @@ public class DisplayLayer {
             public ListCell<Rule> call(ListView<Rule> param) {
                 final ListCell<Rule> cell = new ListCell<Rule>() {
                     @Override
-                    protected void updateItem(Rule item, boolean empty) {
+                    protected void updateItem(final Rule item, final boolean empty) {
                         super.updateItem(item, empty);
                         if (item != null) {
                             setGraphic(item.getGraphic());

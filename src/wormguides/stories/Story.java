@@ -40,11 +40,16 @@ public class Story {
 
     private String colorUrl;
 
-    public Story(String name, String description, String url) {
+    public Story(final String name, final String description, final String url) {
         this(name, description, "", "", url);
     }
 
-    public Story(String name, String description, String author, String date, String colorUrl) {
+    public Story(
+            final String name,
+            final String description,
+            final String author,
+            final String date,
+            final String colorUrl) {
         this.name = name;
         this.description = description;
 

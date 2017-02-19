@@ -3,7 +3,6 @@
 <!--
   ~ Bao Lab 2016
   -->
-
 <!--
   ~ Bao Lab 2016
   -->
@@ -34,7 +33,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1100.0" type="BorderPane" xmlns="http://javafx.com/javafx/8">
+<fx:root fx:id="rootBorderPane" prefHeight="800.0" prefWidth="1100.0" type="BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <top>
         <MenuBar fx:id="menu" translateZ="100.0" BorderPane.alignment="CENTER">
            <menus>
@@ -101,7 +100,7 @@
                                                    <Font size="14.0" />
                                                </font>
                                            </Label>
-                                           <ListView fx:id="storiesListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                           <ListView fx:id="storiesListView" minHeight="500.0" minWidth="310.0" VBox.vgrow="ALWAYS" />
                                            <HBox>
                                               <children>
                                                   <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
@@ -513,7 +512,7 @@
                                                                         <Font size="14.0" />
                                                                     </font>
                                                                 </Label>
-                                                                <ListView fx:id="rulesListView" focusTraversable="false" prefHeight="289.0" prefWidth="290.0" VBox.vgrow="ALWAYS" />
+                                                                <ListView fx:id="rulesListView" focusTraversable="false" minWidth="310.0" VBox.vgrow="ALWAYS" />
                                                             </children>
                                                          </VBox>
                                                      </children>
