@@ -65,7 +65,7 @@ public class StoryFileUtil {
         return stories.get(stories.size() - 1);
     }
 
-    public static File saveToCSVFile(Story story, File file, int offset) {
+    public static File saveToCSVFile(final Story story, final File file, final int offset) {
         // false in file writer constructor means do not append
         try (final FileWriter fstream = new FileWriter(file, false);
              final BufferedWriter out = new BufferedWriter(fstream)) {
@@ -142,7 +142,11 @@ public class StoryFileUtil {
                 if (!note.isVisible()) {
                     noteParams[NOTE_VISIBLE_INDEX] = "n";
                 }
-                out.append(join(",", noteParams)).append(BR);
+                if (note.hasColorScheme()) {
+                    noteParams[COLOR_URL_INDEX] = note.getColorUrl();
+                }
+                out.append(join(",", noteParams))
+                        .append(BR);
             }
 
         } catch (IOException e) {

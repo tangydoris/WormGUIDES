@@ -29,7 +29,7 @@ import static javafx.scene.layout.HBox.setHgrow;
 import static javafx.scene.layout.Priority.ALWAYS;
 
 import static wormguides.util.AppFont.getFont;
-import static wormguides.util.URLGenerator.generateAndroid;
+import static wormguides.util.colorurl.UrlGenerator.generateAndroid;
 
 public class URLShareWindow extends AnchorPane {
 

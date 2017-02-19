@@ -723,7 +723,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         return activeStory;
     }
 
-    public void setActiveStory(Story story) {
+    public void setActiveStory(final Story story) {
         activeStory = story;
         updateStoryFields();
     }

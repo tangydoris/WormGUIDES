@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -88,6 +89,7 @@ import wormguides.view.urlwindow.URLLoadWindow;
 import wormguides.view.urlwindow.URLShareWindow;
 
 import static java.lang.System.lineSeparator;
+import static java.time.Duration.between;
 import static java.util.Collections.sort;
 
 import static javafx.application.Platform.runLater;
@@ -116,7 +118,7 @@ import static partslist.celldeaths.CellDeaths.isInCellDeaths;
 import static search.SearchUtil.getStructureComment;
 import static search.SearchUtil.isMulticellularStructureByName;
 import static search.SearchUtil.isStructureWithComment;
-import static wormguides.loaders.URLLoader.processUrl;
+import static wormguides.util.colorurl.UrlParser.processUrl;
 
 /**
  * Controller for RootLayout.fxml that contains all GUI components of the main WormGUIDES application window
@@ -368,7 +370,8 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void viewTreeAction() {
         if (sulstonTreeStage == null) {
             sulstonTreeStage = new Stage();
-            final SulstonTreePane sp = new SulstonTreePane(
+            // TODO fix this
+            final SulstonTreePane treePane = new SulstonTreePane(
                     sulstonTreeStage,
                     searchLayer,
                     lineageData,
@@ -382,10 +385,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
                     selectedNameLabeledProperty,
                     rebuildSubsceneFlag,
                     defaultEmbryoFlag);
-            sulstonTreeStage.setScene(new Scene(sp));
+            sulstonTreeStage.setScene(new Scene(treePane));
             sulstonTreeStage.setTitle("LineageTree");
             sulstonTreeStage.initModality(NONE);
             sulstonTreeStage.show();
+            treePane.addDrawing();
             mainStage.show();
         } else {
             sulstonTreeStage.show();
@@ -476,30 +480,24 @@ public class RootLayoutController extends BorderPane implements Initializable {
 
     @FXML
     public void saveSearchResultsAction() {
-        ObservableList<String> items = searchResultsListView.getItems();
+        final ObservableList<String> items = searchResultsListView.getItems();
         if (!(items.size() > 0)) {
             System.out.println("no searchLayer results to write to file");
         }
 
-        Stage fileChooserStage = new Stage();
+        final Stage fileChooserStage = new Stage();
 
-        FileChooser fileChooser = new FileChooser();
+        final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Save Location");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("TXT File", "*.txt"));
-
         try {
-            File output = fileChooser.showSaveDialog(fileChooserStage);
-
+            final File output = fileChooser.showSaveDialog(fileChooserStage);
             // check
             if (output == null) {
                 System.out.println("error creating file to write searchLayer results");
                 return;
             }
-
-            /*
-             * create the header line that will format the search criteria corresponding to these
-             * search results
-             */
+            // create the header line that will format the search criteria corresponding to these search results
             String searchType = "";
             if (sysRadioBtn.isSelected()) {
             	searchType = "Lineage Name";
@@ -523,7 +521,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
             	if (neuromuscularCheckBox.isSelected()) {
             		searchType += "neuromuscular";
             	}
-
             	if (searchType.substring(searchType.length()-2).equals(", ")) {
             		searchType = searchType.substring(0, searchType.length()-2);
             	}
@@ -547,7 +544,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
             }
             searchCriteria += ")";
 
-            FileWriter writer = new FileWriter(output);
+            final FileWriter writer = new FileWriter(output);
 
             // write header line to file
             writer.write(searchCriteria);
@@ -557,9 +554,9 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 writer.write(s);
                 writer.write(lineSeparator());
             }
-
             writer.flush();
             writer.close();
+
         } catch (IOException e) {
             System.out.println("IOException thrown writing searchLayer results to file");
         }
@@ -1018,7 +1015,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
         rulesListView.setCellFactory(displayLayer.getRuleCellFactory());
     }
 
-    private void initLineageTree(List<String> allCellNames) {
+    private void initLineageTree(final List<String> allCellNames) {
         if (!defaultEmbryoFlag) {
             // remove unlineaged cells
             for (int i = 0; i < allCellNames.size(); i++) {
@@ -1078,8 +1075,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 movieTimeOffset,
                 defaultEmbryoFlag);
 
+        displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
+        displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
+
         storiesLayer.getActiveStoryProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
+            if (newValue == null || newValue.isEmpty()) {
                 displayedStory.setText("Active Story: none");
                 displayedStoryDescription.setText("");
             } else {
@@ -1087,9 +1087,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
             }
         });
-
-        displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
-        displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
     }
 
     private void initInfoWindow() {
@@ -1149,6 +1146,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle bundle) {
         productionInfo = new ProductionInfo();
+
         if (defaultEmbryoFlag) {
             movieTimeOffset = productionInfo.getMovieTimeOffset();
         } else {
@@ -1162,7 +1160,11 @@ public class RootLayoutController extends BorderPane implements Initializable {
             defaultEmbryoFlag = false;
             setOriginToZero(lineageData, defaultEmbryoFlag);
         } else {
+            // takes about 2800ms (dictates noticeable part of startup time)
+            final Instant start = Instant.now();
             lineageData = loadNucFiles(productionInfo);
+            final Instant end = Instant.now();
+            System.out.println("Nuc files loaded in " + between(start, end).toMillis() + "ms");
             defaultEmbryoFlag = true;
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }
@@ -1199,15 +1201,23 @@ public class RootLayoutController extends BorderPane implements Initializable {
     }
 
     private void initializeWithLineageData() {
+        // takes about 65ms
         initLineageTree(lineageData.getAllCellNames());
 
+        // takes ~170ms
         sceneElementsList = new SceneElementsList(lineageData);
+
+        // takes ~20ms
         connectome = new Connectome();
 
+        // takes ~140ms
         initSearchLayer();
         searchLayer.initDatabases(lineageData, sceneElementsList, connectome, casesLists, productionInfo);
 
+        // takes ~120ms
         initStoriesLayer();
+
+        // takes ~5ms
         initStructuresLayer();
 
         initContextMenuStage();
@@ -1219,8 +1229,10 @@ public class RootLayoutController extends BorderPane implements Initializable {
         sizeSubscene();
         sizeInfoPane();
 
+        // takes ~700ms
         viewTreeAction();
 
+        // takes ~50ms
         initWindow3DController();
 
         setLabels();

@@ -62,14 +62,15 @@ import static javafx.scene.text.FontSmoothingType.LCD;
 
 import static wormguides.loaders.ImageLoader.getEyeIcon;
 import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
-import static wormguides.loaders.URLLoader.processUrl;
 import static wormguides.models.colorrule.Rule.UI_SIDE_LENGTH;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
 import static wormguides.util.AppFont.getBolderFont;
 import static wormguides.util.AppFont.getFont;
-import static wormguides.util.URLGenerator.generateInternal;
+import static wormguides.util.colorurl.UrlGenerator.generateInternal;
+import static wormguides.util.colorurl.UrlGenerator.generateInternalWithoutViewArgs;
+import static wormguides.util.colorurl.UrlParser.processUrlRules;
 
 /**
  * Controller of the list view in the 'Stories' tab
@@ -115,6 +116,11 @@ public class StoriesLayer {
     private Note activeNote;
     private Comparator<Note> noteComparator;
     private double width;
+
+    /**
+     * True when using the color scheme of a story, false when using that of a note
+     */
+    private boolean usingStoryColorScheme;
 
     public StoriesLayer(
             final Stage parentStage,
@@ -220,8 +226,8 @@ public class StoriesLayer {
             story.setComparator(noteComparator);
         }
 
-        // makes lim-4 story on default embryo, template otherwise
         setActiveStory(stories.get(0));
+        usingStoryColorScheme = true;
 
         requireNonNull(storiesListView);
         storiesListView.setItems(stories);
@@ -321,37 +327,47 @@ public class StoriesLayer {
         // if user clicks save
         if (file != null) {
             if (activeStory != null) {
-                updateColorURL();
+                // if the story color scheme is being used, save color rules into the story's URL
+                if (usingStoryColorScheme) {
+                    activeStory.setColorUrl(generateInternal(
+                            activeRulesList,
+                            timeProperty.get(),
+                            rotateXAngleProperty.get(),
+                            rotateYAngleProperty.get(),
+                            rotateZAngleProperty.get(),
+                            translateXProperty.get(),
+                            translateYProperty.get(),
+                            zoomProperty.get(),
+                            othersOpacityProperty.get()));
+                } else {
+                    // otherwise save rules into the note's URL
+                    activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+                    // copy the note's rules and temporarily use the story's color scheme
+                    // then put back the copied rules into the active rules list
+                    final List<Rule> rulesCopy = new ArrayList<>(activeRulesList);
+                    processUrlRules(activeStory.getColorUrl(), activeRulesList, searchLayer);
+                    activeStory.setColorUrl(generateInternal(
+                            activeRulesList,
+                            timeProperty.get(),
+                            rotateXAngleProperty.get(),
+                            rotateYAngleProperty.get(),
+                            rotateZAngleProperty.get(),
+                            translateXProperty.get(),
+                            translateYProperty.get(),
+                            zoomProperty.get(),
+                            othersOpacityProperty.get()));
+                    activeRulesList.clear();
+                    activeRulesList.addAll(rulesCopy);
+                }
+
                 saveToCSVFile(activeStory, file, movieTimeOffset);
                 System.out.println("File saved to " + file.getAbsolutePath());
-                // all stories become inactive after saving, make story active again
-                setActiveStory(activeStory);
+                return true;
             } else {
                 System.out.println("No active story to save");
             }
-            return true;
         }
         return false;
-    }
-
-    /**
-     * Because the Color URL is set on New Note, we need to update the color URL before saving to account for
-     * additions and deletions
-     */
-    private void updateColorURL() {
-        if (activeStory != null) {
-            activeStory.setActive(false);
-            activeStory.setColorUrl(generateInternal(
-                    new ArrayList<>(activeRulesList),
-                    timeProperty.get(),
-                    rotateXAngleProperty.get(),
-                    rotateYAngleProperty.get(),
-                    rotateZAngleProperty.get(),
-                    translateXProperty.get(),
-                    translateYProperty.get(),
-                    zoomProperty.get(),
-                    othersOpacityProperty.get()));
-        }
     }
 
     /**
@@ -384,7 +400,8 @@ public class StoriesLayer {
 
     /**
      * Sets the active note to the input note parameter. Makes the current note inactive, then makes the input note
-     * active.
+     * active. If the previously active note had a color scheme URL, the rules are saved back into the note as a new
+     * URL.
      *
      * @param note
      *         the note that should become active
@@ -392,19 +409,45 @@ public class StoriesLayer {
     private void setActiveNoteWithSubsceneRebuild(final Note note) {
         // deactivate the previous active note
         if (activeNote != null) {
+            // if not using the story color scheme,
+            // save the rules back into a URL for the note (they may have been edited)
+            if (!usingStoryColorScheme) {
+                activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            } else {
+                activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            }
             activeNote.setActive(false);
         }
         activeNote = note;
+        // if there is a newly active note
         if (activeNote != null) {
             activeNote.setActive(true);
-            // set time property to be read by 3d window (initiates subscene rebuild)
-            int startTime = getEffectiveStartTime(activeNote);
-            if (timeProperty != null && startTime >= 1) {
-                timeProperty.set(startTime);
-            }
+            usingStoryColorScheme = !activeNote.hasColorScheme();
+            // set the time to the start of the note
+            timeProperty.set(getEffectiveStartTime(activeNote));
+        } else {
+            // use story color scheme if there is no newly active note
+            usingStoryColorScheme = true;
         }
+
+        // load appropriate color scheme
+        if (usingStoryColorScheme) {
+            processUrlRules(
+                    activeStory.getColorUrl(),
+                    activeRulesList,
+                    searchLayer);
+        } else {
+            processUrlRules(
+                    activeNote.getColorUrl(),
+                    activeRulesList,
+                    searchLayer);
+        }
+        rebuildSubsceneFlag.set(true);
+
         // sort notes choronologically and refresh listview rendering
         activeStory.sortNotes();
+
+        // update story/note editor
         if (editController != null) {
             editController.setActiveNote(activeNote);
         }
@@ -528,34 +571,27 @@ public class StoriesLayer {
      *         story to make active
      */
     public void setActiveStory(final Story story) {
-        // disable previous active story, copy current rules changes back to story
+        // disable previous active story, copy current rules changes back to story/note
         if (activeStory != null) {
+            if (usingStoryColorScheme) {
+                activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            } else {
+                activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            }
             activeStory.setActive(false);
-            activeStory.setColorUrl(generateInternal(
-                    new ArrayList<>(activeRulesList),
-                    timeProperty.get(),
-                    rotateXAngleProperty.get(),
-                    rotateYAngleProperty.get(),
-                    rotateZAngleProperty.get(),
-                    translateXProperty.get(),
-                    translateYProperty.get(),
-                    zoomProperty.get(),
-                    othersOpacityProperty.get()));
         }
 
         activeNote = null;
         useInternalRulesFlag.set(true);
 
         activeStory = story;
-        int newTime;
-
         if (activeStory != null) {
             activeStory.setActive(true);
             activeStoryProperty.set(activeStory.getName());
-            // if story does not come with a url, set its url to the program's internal color rules
-            if (activeStory.getColorUrl().isEmpty()) {
+            // if story does not come with a url, set its url to contain the internal color rules
+            if (!activeStory.hasColorScheme()) {
                 activeStory.setColorUrl(generateInternal(
-                        new ArrayList<>(activeRulesList),
+                        activeRulesList,
                         timeProperty.get(),
                         rotateXAngleProperty.get(),
                         rotateYAngleProperty.get(),
@@ -564,23 +600,18 @@ public class StoriesLayer {
                         translateYProperty.get(),
                         zoomProperty.get(),
                         othersOpacityProperty.get()));
-            } else { // if story does come with url, use it
-                useInternalRulesFlag.set(false);
             }
-            processUrl(
+            useInternalRulesFlag.set(false);
+            usingStoryColorScheme = true;
+            processUrlRules(
                     activeStory.getColorUrl(),
                     activeRulesList,
-                    searchLayer,
-                    timeProperty,
-                    rotateXAngleProperty,
-                    rotateYAngleProperty,
-                    rotateZAngleProperty,
-                    translateXProperty,
-                    translateYProperty,
-                    zoomProperty,
-                    othersOpacityProperty,
-                    rebuildSubsceneFlag);
+                    searchLayer);
+            if (activeStory.hasNotes()) {
+                timeProperty.set(getEffectiveStartTime(activeStory.getNotes().get(0)));
+            }
         } else {
+            // if there is no newly active story
             activeStoryProperty.set("");
             useInternalRulesFlag.set(true);
             rebuildSubsceneFlag.set(true);
@@ -949,13 +980,13 @@ public class StoriesLayer {
                 }
             });
             note.getVisibleProperty().addListener((observable, oldValue, newValue) -> {
-               if (newValue) {
-                   highlightCell(note.isActive(), true);
-                   visibleButton.setGraphic(eyeIcon);
-               } else {
-                   highlightCell(note.isActive(), false);
-                   visibleButton.setGraphic(eyeIconInverted);
-               }
+                if (newValue) {
+                    highlightCell(note.isActive(), true);
+                    visibleButton.setGraphic(eyeIcon);
+                } else {
+                    highlightCell(note.isActive(), false);
+                    visibleButton.setGraphic(eyeIconInverted);
+                }
             });
 
             highlightCell(note.isActive(), note.isVisible());

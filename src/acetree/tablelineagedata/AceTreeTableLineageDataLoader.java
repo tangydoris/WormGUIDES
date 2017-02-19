@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package acetree.tablelineagedata;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import acetree.LineageData;
+import wormguides.MainApp;
 import wormguides.resources.ProductionInfo;
 
 import static java.lang.Double.parseDouble;
@@ -33,14 +34,14 @@ public class AceTreeTableLineageDataLoader {
 
     private static final String ENTRY_EXT = "-nuclei";
 
-    private static final int TOKEN_ARRAY_SIZE = 21;
+    private static final int NUMBER_OF_TOKENS = 21;
 
-    private static final int VALID = 1,
-            XCOR = 5,
-            YCOR = 6,
-            ZCOR = 7,
-            DIAMETER = 8,
-            ID = 9;
+    private static final int VALID_INDEX = 1,
+            XCOR_INDEX = 5,
+            YCOR_INDEX = 6,
+            ZCOR_INDEX = 7,
+            DIAMETER_INDEX = 8,
+            ID_INDEX = 9;
 
     private static final String ONE_ZERO_PAD = "0";
 
@@ -71,51 +72,17 @@ public class AceTreeTableLineageDataLoader {
         try {
             // accounts for first tld.addFrame() added when reading from JAR --> from dir name first entry match
             tableLineageData.addTimeFrame();
-
             URL url;
+            String urlString;
             for (int i = 1; i <= productionInfo.getTotalTimePoints(); i++) {
-                if (i < 10) {
-                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX
-                            + T
-                            + TWO_ZERO_PAD
-                            + i
-                            + ENTRY_EXT);
-                    if (url != null) {
-                        process(tableLineageData, i, url.openStream());
-                    } else {
-                        System.out.println("Could find file: "
-                                + ENTRY_PREFIX
-                                + T
-                                + TWO_ZERO_PAD
-                                + i
-                                + ENTRY_EXT);
-                    }
-                } else if (i >= 10 && i < 100) {
-                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX
-                            + T
-                            + ONE_ZERO_PAD
-                            + i
-                            + ENTRY_EXT);
+                urlString = getResourceAtTime(i);
+                if (urlString != null) {
+                    url = MainApp.class.getResource(urlString);
                     if (url != null) {
                         process(tableLineageData, i, url.openStream());
                     } else {
                         System.out.println("Could not find file: "
-                                + ENTRY_PREFIX
-                                + T
-                                + ONE_ZERO_PAD
-                                + i
-                                + ENTRY_EXT);
-                    }
-                } else if (i >= 100) {
-                    url = AceTreeTableLineageDataLoader.class.getResource(ENTRY_PREFIX + T + i + ENTRY_EXT);
-                    if (url != null) {
-                        process(tableLineageData, i, url.openStream());
-                    } else {
-                        System.out.println("Could not find file: "
-                                + ENTRY_PREFIX
-                                + T
-                                + i
-                                + ENTRY_EXT);
+                                + urlString);
                     }
                 }
             }
@@ -125,8 +92,38 @@ public class AceTreeTableLineageDataLoader {
 
         // translate all cells to center around (0,0,0)
         setOriginToZero(tableLineageData, true);
-
         return tableLineageData;
+    }
+
+    /**
+     * @param i
+     *         the time of the nuc file
+     *
+     * @return the URL for the resource of that nuc file
+     */
+    private static String getResourceAtTime(final int i) {
+        String resourceUrlString = null;
+        if (i >= 1) {
+            if (i < 10) {
+                resourceUrlString = ENTRY_PREFIX
+                        + T
+                        + TWO_ZERO_PAD
+                        + i
+                        + ENTRY_EXT;
+            } else if (i < 100) {
+                resourceUrlString = ENTRY_PREFIX
+                        + T
+                        + ONE_ZERO_PAD
+                        + i
+                        + ENTRY_EXT;
+            } else {
+                resourceUrlString = ENTRY_PREFIX
+                        + T
+                        + i
+                        + ENTRY_EXT;
+            }
+        }
+        return resourceUrlString;
     }
 
     public static int getAvgXOffsetFromZero() {
@@ -178,20 +175,19 @@ public class AceTreeTableLineageDataLoader {
     private static void process(final TableLineageData tableLineageData, final int time, final InputStream input) {
         tableLineageData.addTimeFrame();
 
-        try {
-            final InputStreamReader isr = new InputStreamReader(input);
-            final BufferedReader reader = new BufferedReader(isr);
+        try (InputStreamReader isr = new InputStreamReader(input);
+             BufferedReader reader = new BufferedReader(isr)) {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                final String[] tokens = new String[TOKEN_ARRAY_SIZE];
-                final StringTokenizer tokenizer = new StringTokenizer(line, ",");
+                String[] tokens = new String[NUMBER_OF_TOKENS];
+                StringTokenizer tokenizer = new StringTokenizer(line, ",");
                 int k = 0;
                 while (tokenizer.hasMoreTokens()) {
                     tokens[k++] = tokenizer.nextToken().trim();
                 }
 
-                if (parseInt(tokens[VALID]) == 1) {
+                if (parseInt(tokens[VALID_INDEX]) == 1) {
                     makeNucleus(tableLineageData, time, tokens);
                 }
             }
@@ -204,11 +200,11 @@ public class AceTreeTableLineageDataLoader {
         try {
             tableLineageData.addNucleus(
                     time,
-                    tokens[ID],
-                    parseInt(tokens[XCOR]),
-                    parseInt(tokens[YCOR]),
-                    round(parseDouble(tokens[ZCOR])),
-                    parseInt(tokens[DIAMETER]));
+                    tokens[ID_INDEX],
+                    parseInt(tokens[XCOR_INDEX]),
+                    parseInt(tokens[YCOR_INDEX]),
+                    round(parseDouble(tokens[ZCOR_INDEX])),
+                    parseInt(tokens[DIAMETER_INDEX]));
         } catch (NumberFormatException nfe) {
             System.out.println("Incorrect format in nucleus file for time " + time + ".");
         }

@@ -186,6 +186,8 @@ public class StoriesLoader {
                 note.setVisible(false);
             }
 
+            note.setColorUrl(split[COLOR_URL_INDEX]);
+
         } catch (Exception e) {
             System.out.println("Error trying to parse the following note params:");
             System.out.println(String.join(", ", split));
