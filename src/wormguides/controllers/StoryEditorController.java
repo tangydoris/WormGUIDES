@@ -142,6 +142,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     @FXML
     private TextArea contentArea;
 
+    @FXML
+    private Button createNoteColorSchemeButton;
+
     private final ObservableList<String> structureComboItems;
     private StringCellFactory.StringListCellFactory listCellFactory;
 
@@ -716,6 +719,11 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             updateType();
             updateTime();
             updateDisplay();
+            if (note == null || note.hasColorScheme()) {
+                createNoteColorSchemeButton.setDisable(true);
+            } else {
+                createNoteColorSchemeButton.setDisable(false);
+            }
         }
     }
 
@@ -733,11 +741,27 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     }
 
     // ----- Begin button actions -----
+
+    /**
+     * Creates a new note for the active story
+     */
     @FXML
     protected void newNote() {
         if (activeStory != null) {
             setActiveNote(new Note(activeStory, NEW_NOTE_TITLE, NEW_NOTE_CONTENTS));
             setNoteCreated(true);
+        }
+    }
+
+    /**
+     * Creates a color scheme for the active note by copying the story's scheme to it. The user can then edit the
+     * rules in the context of the note without affecting the color scheme of the story.
+     */
+    @FXML
+    protected void createColorSchemeForActiveNote() {
+        if (activeStory != null && activeNote != null) {
+            activeNote.setColorUrl(activeStory.getColorUrl());
+            createNoteColorSchemeButton.setDisable(true);
         }
     }
 
