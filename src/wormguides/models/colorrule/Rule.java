@@ -14,49 +14,33 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import search.SearchType;
 import wormguides.MainApp;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
-import wormguides.loaders.ImageLoader;
+import wormguides.view.RuleGraphic;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 import static javafx.application.Platform.runLater;
-import static javafx.geometry.Insets.EMPTY;
-import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
-import static javafx.scene.control.OverrunStyle.ELLIPSIS;
-import static javafx.scene.layout.HBox.setHgrow;
-import static javafx.scene.layout.Priority.ALWAYS;
-import static javafx.scene.layout.Priority.SOMETIMES;
-import static javafx.scene.paint.Color.LIGHTGREY;
 import static javafx.stage.Modality.NONE;
 
 import static search.SearchType.STRUCTURE_BY_SCENE_NAME;
-import static wormguides.loaders.ImageLoader.getEyeIcon;
-import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
 import static wormguides.models.LineageTree.isAncestor;
 import static wormguides.models.LineageTree.isDescendant;
 import static wormguides.models.colorrule.SearchOption.ANCESTOR;
 import static wormguides.models.colorrule.SearchOption.CELL_BODY;
 import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
 import static wormguides.models.colorrule.SearchOption.DESCENDANT;
-import static wormguides.util.AppFont.getFont;
 
 /**
  * This class is the color rule that determines the coloring/striping of cell, cell bodies, and multicellular
@@ -67,22 +51,11 @@ import static wormguides.util.AppFont.getFont;
 
 public class Rule {
 
-    /** Length and width (in pixels) of color rule UI buttons */
-    public static final int UI_SIDE_LENGTH = 22;
-
     private final SubmitHandler submitHandler;
 
     private final SearchType searchType;
 
-    private final HBox hbox;
-    private final Label label;
-    private final Rectangle colorRectangle;
-    private final Button editBtn;
-    private final Button visibleBtn;
-    private final Button deleteBtn;
-    private final Tooltip toolTip;
-    private final ImageView eyeIcon;
-    private final ImageView eyeIconInverted;
+    private final RuleGraphic graphic;
 
     private BooleanProperty rebuildSubsceneFlag;
 
@@ -151,94 +124,35 @@ public class Rule {
 
         this.rebuildSubsceneFlag = requireNonNull(rebuildSubsceneFlag);
 
+        searchType = type;
+        setOptions(options);
+
         ruleChanged = new SimpleBooleanProperty(false);
+        graphic = new RuleGraphic(this, ruleChanged);
         ruleChanged.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 if (editController != null) {
-                    setColorButton(editController.getColor());
+                    graphic.setColorButton(editController.getColor());
                 }
                 rebuildSubsceneFlag.set(true);
                 ruleChanged.set(false);
             }
         });
 
-        hbox = new HBox();
-        label = new Label();
-        colorRectangle = new Rectangle(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        editBtn = new Button();
-        visibleBtn = new Button();
-        deleteBtn = new Button();
-        toolTip = new Tooltip();
-
-        searchType = type;
-        setOptions(options);
-        setColor(color);
-        setSearchedText(searched);
-
         submitHandler = new SubmitHandler();
 
         cells = new ArrayList<>();
         cellsSet = false;
 
-        hbox.setSpacing(3);
-        hbox.setPadding(new Insets(3));
-        hbox.setPrefWidth(275);
-        hbox.setMinWidth(hbox.getPrefWidth());
-
-        label.setFont(getFont());
-        label.setPrefHeight(UI_SIDE_LENGTH);
-        label.setMaxHeight(UI_SIDE_LENGTH);
-        label.setMinHeight(UI_SIDE_LENGTH);
-        setHgrow(label, ALWAYS);
-        label.textOverrunProperty().set(ELLIPSIS);
-
-        final Region r = new Region();
-        setHgrow(r, SOMETIMES);
-
-        colorRectangle.setHeight(UI_SIDE_LENGTH);
-        colorRectangle.setWidth(UI_SIDE_LENGTH);
-        colorRectangle.setStroke(LIGHTGREY);
-        setColorButton(color);
-
-        editBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        editBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        editBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        editBtn.setContentDisplay(GRAPHIC_ONLY);
-        editBtn.setPadding(EMPTY);
-        editBtn.setGraphic(ImageLoader.getEditIcon());
-        editBtn.setGraphicTextGap(0);
-        editBtn.setOnAction(event -> showEditStage(null));
-
-        eyeIcon = getEyeIcon();
-        eyeIconInverted = getEyeInvertIcon();
-
-        visibleBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        visibleBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        visibleBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        visibleBtn.setPadding(EMPTY);
-        visibleBtn.setContentDisplay(GRAPHIC_ONLY);
-        visibleBtn.setGraphic(eyeIcon);
-        visibleBtn.setGraphicTextGap(0);
-        visibleBtn.setOnAction(event -> {
-            visible = !visible;
-            blackOutVisibleButton(!visible);
-            ruleChanged.set(true);
-        });
-
-        deleteBtn.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        deleteBtn.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        deleteBtn.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-        deleteBtn.setPadding(EMPTY);
-        deleteBtn.setContentDisplay(GRAPHIC_ONLY);
-        deleteBtn.setGraphic(ImageLoader.getCloseIcon());
-
-        toolTip.setText(toStringFull());
-        toolTip.setFont(getFont());
-        label.setTooltip(toolTip);
-
-        hbox.getChildren().addAll(label, r, colorRectangle, editBtn, visibleBtn, deleteBtn);
-
         visible = true;
+
+        setColor(color);
+        setSearchedText(searched);
+        graphic.resetTooltip(toStringFull());
+    }
+
+    public void resetLabel(final String labelText) {
+        graphic.resetLabel(labelText);
     }
 
     /**
@@ -250,11 +164,17 @@ public class Rule {
      *         button is blacked out when the rule is not applied to the subscene entities
      */
     private void blackOutVisibleButton(final boolean isBlackedOut) {
-        if (isBlackedOut) {
-            runLater(() -> visibleBtn.setGraphic(eyeIconInverted));
-        } else {
-            runLater(() -> visibleBtn.setGraphic(eyeIcon));
-        }
+        runLater(() -> graphic.setVisibleButton(!isBlackedOut));
+    }
+
+    /**
+     * Sets the rule's visibility
+     *
+     * @param isVisible
+     *         true if the rule is visible, false otherwise
+     */
+    public void setVisible(final boolean isVisible) {
+        visible = isVisible;
     }
 
     /**
@@ -267,7 +187,7 @@ public class Rule {
         if (editStage == null) {
             initEditStage(stage, rebuildSubsceneFlag);
         }
-        editController.setHeading(label.getText());
+        editController.setHeading(graphic.getLabelText());
         editStage.show();
         ((Stage) editStage.getScene().getWindow()).toFront();
     }
@@ -364,26 +284,6 @@ public class Rule {
         }
     }
 
-    /**
-     * Changes the color of the rectangle displayed next to the rule name in the rule's graphical representation.
-     *
-     * @param color
-     *         color that the rectangle in the graphical representation of the rule should be changed to
-     */
-    private void setColorButton(Color color) {
-        colorRectangle.setFill(color);
-    }
-
-    /**
-     * Resets the label in the graphical representation of the rule.
-     *
-     * @param labelString
-     *         text for the new label
-     */
-    public void resetLabel(String labelString) {
-        label.setText(labelString);
-    }
-
     public void setOptions(SearchOption... options) {
         setOptions(new ArrayList<>(asList(options)));
     }
@@ -398,9 +298,11 @@ public class Rule {
      * @param name
      *         user-searched name
      */
-    public void setSearchedText(String name) {
-        text = name;
-        label.setText(toStringFull());
+    public void setSearchedText(final String name) {
+        if (name != null) {
+            text = name;
+            graphic.resetLabel(toStringFull());
+        }
     }
 
     public String getSearchedTextLowerCase() {
@@ -418,17 +320,19 @@ public class Rule {
      *         color that the rule should apply to the cell(s), cell body(ies), and/or multicellular structures it
      *         affects
      */
-    public void setColor(Color color) {
-        this.color = color;
-        setColorButton(color);
+    public void setColor(final Color color) {
+        if (color != null) {
+            this.color = color;
+            graphic.setColorButton(color);
+        }
     }
 
     public HBox getGraphic() {
-        return hbox;
+        return graphic;
     }
 
     public Button getDeleteButton() {
-        return deleteBtn;
+        return graphic.getDeleteButton();
     }
 
     public boolean isCellSelected() {
@@ -544,7 +448,7 @@ public class Rule {
         if (!visible || !options.contains(CELL_BODY)) {
             return false;
         }
-        
+
         for (String cell : cells) {
             if (cell.equalsIgnoreCase(name)) {
                 return true;
@@ -582,14 +486,15 @@ public class Rule {
             if (editController != null) {
                 setColor(editController.getColor());
                 editStage.hide();
-                
+
                 // because the multicellular name based rule is not a check option, we need to override this function
                 // to avoid overwriting the multicellular search option
                 if (searchType != STRUCTURE_BY_SCENE_NAME) {
                     setOptions(editController.getOptions());
                 }
-                label.setText(toStringFull());
-                toolTip.setText(toStringFull());
+                final String fullRuleString = toStringFull();
+                graphic.resetLabel(fullRuleString);
+                graphic.resetTooltip(fullRuleString);
                 ruleChanged.set(true);
             }
         }

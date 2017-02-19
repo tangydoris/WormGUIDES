@@ -62,7 +62,6 @@ import static javafx.scene.text.FontSmoothingType.LCD;
 
 import static wormguides.loaders.ImageLoader.getEyeIcon;
 import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
-import static wormguides.models.colorrule.Rule.UI_SIDE_LENGTH;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
@@ -71,6 +70,7 @@ import static wormguides.util.AppFont.getFont;
 import static wormguides.util.colorurl.UrlGenerator.generateInternal;
 import static wormguides.util.colorurl.UrlGenerator.generateInternalWithoutViewArgs;
 import static wormguides.util.colorurl.UrlParser.processUrlRules;
+import static wormguides.view.RuleGraphic.UI_SIDE_LENGTH;
 
 /**
  * Controller of the list view in the 'Stories' tab
