@@ -13,7 +13,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import wormguides.stories.Note;
 import wormguides.stories.Story;
 
 import static javafx.geometry.Insets.EMPTY;
@@ -44,7 +43,7 @@ public class StoryGraphic extends VBox {
     private final Text title;
     private final Text description;
 
-    private boolean isClickedHandlerSet;
+    private final Separator separator;
 
     public StoryGraphic(final Story story) {
         super();
@@ -73,15 +72,9 @@ public class StoryGraphic extends VBox {
             if (newValue) {
                 // if story is active
                 makeDisabled(false);
-                // disable any active notes in the newly active story to get rid of old highlighting
-                for (Note note : story.getNotes()) {
-                    note.setActive(false);
-                    addNoteGraphic(note.getGraphic());
-                }
             } else {
                 // is story is inactive
                 makeDisabled(true);
-                clearNotes();
             }
         });
         if (story.isActive()) {
@@ -92,33 +85,25 @@ public class StoryGraphic extends VBox {
 
         notesVBox = new VBox();
 
-        final Separator s = new Separator(HORIZONTAL);
-        s.setFocusTraversable(false);
-        s.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
+        separator = new Separator(HORIZONTAL);
+        separator.setFocusTraversable(false);
+        separator.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
 
-        getChildren().addAll(notesVBox, s);
-
-        isClickedHandlerSet = false;
+        getChildren().addAll(notesVBox, separator);
 
         widthProperty().addListener(((observable, oldValue, newValue) -> {
             final int newWidth = newValue.intValue();
             title.setWrappingWidth(newWidth - 10);
             description.setWrappingWidth(newWidth - 10);
+            notesVBox.setPrefWidth(newWidth);
+            notesVBox.setMaxWidth(USE_PREF_SIZE);
+            notesVBox.setMinWidth(USE_PREF_SIZE);
         }));
         title.setWrappingWidth(PREF_WIDTH - 10);
         description.setWrappingWidth(PREF_WIDTH - 10);
-
         notesVBox.setPrefWidth(PREF_WIDTH);
         notesVBox.setMaxWidth(USE_PREF_SIZE);
         notesVBox.setMinWidth(USE_PREF_SIZE);
-    }
-
-    /**
-     * Removes the note graphics from this story graphic. Even though the notes are removed graphically, the story's
-     * notes remain unchanged.
-     */
-    public void clearNotes() {
-        notesVBox.getChildren().clear();
     }
 
     /**
@@ -128,8 +113,8 @@ public class StoryGraphic extends VBox {
      * @param noteGraphic
      *         note graphic to remove
      */
-    private void addNoteGraphic(final NoteGraphic noteGraphic) {
-        noteGraphic.setWidth(PREF_WIDTH);
+    public void addNoteGraphic(final NoteGraphic noteGraphic) {
+        noteGraphic.setWidth(widthProperty());
         notesVBox.getChildren().add(noteGraphic);
     }
 
@@ -155,16 +140,9 @@ public class StoryGraphic extends VBox {
         }
     }
 
-    public boolean isClickedHandlerSet() {
-        return isClickedHandlerSet;
-    }
-
     public void setStoryClickedHandler(final EventHandler<MouseEvent> handler) {
         if (handler != null) {
-            isClickedHandlerSet = true;
             storyHeadingVBox.setOnMouseClicked(handler);
-        } else {
-            isClickedHandlerSet = false;
         }
     }
 

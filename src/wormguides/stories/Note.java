@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import wormguides.models.subscenegeometry.SceneElement;
 import wormguides.models.subscenegeometry.SceneElementsList;
-import wormguides.view.graphicalrepresentations.NoteGraphic;
 
 import static java.lang.Integer.MIN_VALUE;
 import static java.lang.Integer.parseInt;
@@ -58,8 +57,6 @@ public class Note {
 
     /** True when graphical representation is selected, false otherwise */
     private final BooleanProperty activeProperty;
-
-    private final NoteGraphic graphic;
 
     /**
      * List of scene elements rendered with the note. It is possible for a note to have multiple scene elements just by
@@ -118,12 +115,6 @@ public class Note {
 
         setTagDisplay(OVERLAY);
         setAttachmentType(BLANK);
-
-        graphic = new NoteGraphic(this);
-    }
-
-    public NoteGraphic getGraphic() {
-        return graphic;
     }
 
     public String getColorUrl() {
@@ -313,7 +304,6 @@ public class Note {
     public void setTagName(final String tagName) {
         if (tagName != null) {
             this.tagName = tagName;
-            graphic.setTagName(tagName);
         }
         if (elements != null) {
             for (SceneElement se : elements) {
@@ -329,7 +319,6 @@ public class Note {
     public void setTagContents(final String tagContents) {
         if (tagContents != null) {
             this.tagContents = tagContents;
-            graphic.setTagContents(tagContents);
         }
     }
 

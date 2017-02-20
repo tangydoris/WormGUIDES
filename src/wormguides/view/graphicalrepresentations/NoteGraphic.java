@@ -1,7 +1,9 @@
 package wormguides.view.graphicalrepresentations;
 
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -45,8 +47,6 @@ public class NoteGraphic extends VBox {
     private final Text expandIcon;
     private final Text noteTitle;
     private final Text noteContents;
-
-    private boolean isClickedHandlerSet;
 
     public NoteGraphic(final Note note) {
         super();
@@ -147,16 +147,24 @@ public class NoteGraphic extends VBox {
                 noteContents.setText(note.getTagContents());
             }
         });
-
-        isClickedHandlerSet = false;
     }
 
-    public void setWidth(final int width) {
-        setPrefWidth(width);
-        setMinWidth(USE_PREF_SIZE);
-        setMaxWidth(USE_PREF_SIZE);
-        noteTitle.setWrappingWidth(width - visibleButton.prefWidth(-1) - expandIcon.prefWidth(-1) - 15);
-        noteContents.setWrappingWidth(width - expandIcon.prefWidth(-1) - 15);
+    /**
+     * @param intersectedNode
+     *         the clicked node
+     *
+     * @return true if the expand icon was clicked, false otherwise
+     */
+    public boolean isExpandIconClicked(final Node intersectedNode) {
+        return intersectedNode == expandIcon;
+    }
+
+    public void setWidth(final ReadOnlyDoubleProperty storyWidthProperty) {
+        storyWidthProperty.addListener((observable, oldValue, newValue) -> {
+           final int newWidth = newValue.intValue();
+            noteTitle.setWrappingWidth(newWidth - UI_SIDE_LENGTH - 25);
+            noteContents.setWrappingWidth(newWidth - 25);
+        });
     }
 
     public void setTagName(final String titleText) {
@@ -178,16 +186,9 @@ public class NoteGraphic extends VBox {
         return expandIcon;
     }
 
-    public boolean isClickedHandlerSet() {
-        return isClickedHandlerSet;
-    }
-
     public void setClickedHandler(final EventHandler<MouseEvent> handler) {
         if (handler != null) {
-            isClickedHandlerSet = true;
             setOnMouseClicked(handler);
-        } else {
-            isClickedHandlerSet = false;
         }
     }
 
