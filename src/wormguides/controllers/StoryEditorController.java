@@ -224,7 +224,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
         // for story title field unselection/caret position
         storyFieldsUpdateRunnable = () -> {
-            storyTitle.setText(activeStory.getName());
+            storyTitle.setText(activeStory.getTitle());
             storyDescription.setText(activeStory.getDescription());
             author.setText(activeStory.getAuthor());
             date.setText(activeStory.getDate());
@@ -259,7 +259,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         updateStoryFields();
         storyTitle.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && activeStory != null) {
-                activeStory.setName(newValue);
+                activeStory.setTitle(newValue);
             }
         });
         storyDescription.textProperty().addListener((observable, oldValue, newValue) -> {

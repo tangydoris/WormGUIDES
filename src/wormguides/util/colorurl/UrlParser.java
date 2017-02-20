@@ -26,7 +26,7 @@ import static search.SearchType.CONNECTOME;
 import static search.SearchType.DESCRIPTION;
 import static search.SearchType.FUNCTIONAL;
 import static search.SearchType.LINEAGE;
-import static search.SearchType.MULTICELLULAR_STRUCTURE_BY_CELLS;
+import static search.SearchType.MULTICELLULAR_STRUCTURE_CELLS;
 import static search.SearchType.NEIGHBOR;
 import static search.SearchUtil.isGeneFormat;
 import static wormguides.models.colorrule.SearchOption.ANCESTOR;
@@ -57,7 +57,7 @@ public class UrlParser {
         final List<SearchOption> options = new ArrayList<>();
         StringBuilder sb;
         boolean noTypeSpecified;
-        String wholeColorString = "";
+        String wholeColorString;
         String name;
         for (String ruleString : ruleStrings) {
             types.clear();
@@ -171,9 +171,9 @@ public class UrlParser {
                 }
                 if (types.contains("-m")) {
                     searchLayer.addColorRule(
-                            MULTICELLULAR_STRUCTURE_BY_CELLS,
+                            MULTICELLULAR_STRUCTURE_CELLS,
                             name,
-                            web(wholeColorString),
+                            web(colorHex, alpha),
                             options);
                 }
                 if (types.contains("-M")) {

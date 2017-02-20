@@ -1879,7 +1879,7 @@ public class Window3DController {
         if (storiesLayer != null) {
             final Text infoPaneTitle = makeNoteOverlayText("Story Title:");
             if (storiesLayer.getActiveStory() != null) {
-                final Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
+                final Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getTitle());
                 storyOverlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
             } else {
                 final Text noStoryTitle = makeNoteOverlayText("none");
@@ -2115,7 +2115,6 @@ public class Window3DController {
             }
             frameDir.delete();
         }
-
     }
 
     /**

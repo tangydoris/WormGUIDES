@@ -1074,7 +1074,7 @@ public class RootLayoutController extends BorderPane implements Initializable {
                 movieTimeOffset,
                 defaultEmbryoFlag);
 
-        displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getName());
+        displayedStory.setText("Active Story: " + storiesLayer.getActiveStory().getTitle());
         displayedStoryDescription.setText(storiesLayer.getActiveStoryDescription());
 
         storiesLayer.getActiveStoryProperty().addListener((observable, oldValue, newValue) -> {

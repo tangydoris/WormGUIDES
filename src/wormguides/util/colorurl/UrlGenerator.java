@@ -159,7 +159,7 @@ public class UrlGenerator {
                     case FUNCTIONAL:
                         builder.append("-n");
                         break;
-                    case MULTICELLULAR_STRUCTURE_BY_CELLS:
+                    case MULTICELLULAR_STRUCTURE_CELLS:
                         builder.append("-m");
                         break;
                     case GENE:

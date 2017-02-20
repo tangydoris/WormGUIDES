@@ -19,17 +19,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Separator;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -44,33 +38,21 @@ import wormguides.models.colorrule.Rule;
 import wormguides.models.subscenegeometry.SceneElementsList;
 import wormguides.stories.Note;
 import wormguides.stories.Story;
+import wormguides.view.graphicalrepresentations.NoteGraphic;
+import wormguides.view.graphicalrepresentations.StoryGraphic;
 
 import static java.lang.Integer.MIN_VALUE;
 import static java.util.Objects.requireNonNull;
 
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Insets.EMPTY;
-import static javafx.geometry.Orientation.HORIZONTAL;
-import static javafx.geometry.Pos.CENTER_LEFT;
-import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
-import static javafx.scene.layout.HBox.setHgrow;
-import static javafx.scene.layout.Priority.ALWAYS;
-import static javafx.scene.paint.Color.BLACK;
-import static javafx.scene.paint.Color.GREY;
-import static javafx.scene.paint.Color.WHITE;
-import static javafx.scene.text.FontSmoothingType.LCD;
 
-import static wormguides.loaders.ImageLoader.getEyeIcon;
-import static wormguides.loaders.ImageLoader.getEyeInvertIcon;
 import static wormguides.stories.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
-import static wormguides.util.AppFont.getBolderFont;
-import static wormguides.util.AppFont.getFont;
 import static wormguides.util.colorurl.UrlGenerator.generateInternal;
 import static wormguides.util.colorurl.UrlGenerator.generateInternalWithoutViewArgs;
 import static wormguides.util.colorurl.UrlParser.processUrlRules;
-import static wormguides.view.RuleGraphic.UI_SIDE_LENGTH;
 
 /**
  * Controller of the list view in the 'Stories' tab
@@ -186,6 +168,7 @@ public class StoriesLayer {
                 // need this listener to detect change for some reason
                 // leave this empty
             }
+            rebuildSubsceneFlag.set(true);
         });
 
         newStoryButton.setOnAction(event -> {
@@ -254,21 +237,39 @@ public class StoriesLayer {
             public ListCell<Story> call(ListView<Story> param) {
                 final ListCell<Story> cell = new ListCell<Story>() {
                     @Override
-                    protected void updateItem(final Story story, final boolean empty) {
-                        super.updateItem(story, empty);
-                        if (!empty) {
-                            // create story graphic
-                            final StoryListCellGraphic storyGraphic = new StoryListCellGraphic(story, width);
-                            // add list view for notes inside story graphic
-                            if (story.isActive()) {
-                                for (Note note : story.getNotes()) {
-                                    storyGraphic.getChildren().add(new NoteListCellGraphic(note, width));
+                    protected void updateItem(final Story item, final boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!empty && item != null) {
+                            final StoryGraphic storyGraphic = item.getGraphic();
+                            if (!storyGraphic.isClickedHandlerSet()) {
+                                storyGraphic.setStoryClickedHandler(event -> {
+                                    item.setActive(!item.isActive());
+                                    if (item.isActive()) {
+                                        setActiveStory(item);
+                                    } else {
+                                        setActiveStory(null);
+                                    }
+                                });
+                            }
+                            // add notes inside story graphic if story is active
+                            if (item.isActive()) {
+                                for (Note note : item.getNotes()) {
+                                    final NoteGraphic noteGraphic = note.getGraphic();
+                                    if (!noteGraphic.isClickedHandlerSet()) {
+                                        noteGraphic.setClickedHandler(event -> {
+                                            if (event.getPickResult().getIntersectedNode()
+                                                    != noteGraphic.getExpandIcon()) {
+                                                note.setActive(!note.isActive());
+                                                if (note.isActive()) {
+                                                    setActiveNoteWithSubsceneRebuild(note);
+                                                } else {
+                                                    setActiveNoteWithSubsceneRebuild(null);
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                             }
-                            final Separator s = new Separator(HORIZONTAL);
-                            s.setFocusTraversable(false);
-                            s.setStyle("-fx-focus-color: -fx-outer-border; -fx-faint-focus-color: transparent;");
-                            storyGraphic.getChildren().add(s);
                             setGraphic(storyGraphic);
                         } else {
                             setGraphic(null);
@@ -588,7 +589,7 @@ public class StoriesLayer {
         activeStory = story;
         if (activeStory != null) {
             activeStory.setActive(true);
-            activeStoryProperty.set(activeStory.getName());
+            activeStoryProperty.set(activeStory.getTitle());
             // if story does not come with a url, set its url to contain the internal color rules
             if (!activeStory.hasColorScheme()) {
                 activeStory.setColorUrl(generateInternal(
@@ -755,16 +756,20 @@ public class StoriesLayer {
 
     /**
      * Changes the color of the input {@link Text} items by modifying the java-fx css attribute '-fx-fill' to the
-     * specified input color. Used by {@link StoryListCellGraphic} and {@link NoteListCellGraphic} items.
+     * specified input color. Used by story and note graphic items.
      *
      * @param color
-     *         The {@link Color} to change the texts to
+     *         color to change the texts to
      * @param texts
-     *         The listing of {@link Text} items whose color is to be changed
+     *         texts whose color should change
      */
-    public void colorTexts(Color color, Text... texts) {
-        for (Text text : texts) {
-            text.setStyle("-fx-fill:" + color.toString().toLowerCase().replace("0x", "#"));
+    public static void colorTexts(final Color color, final Text... texts) {
+        if (color != null && texts != null) {
+            for (Text text : texts) {
+                if (text != null) {
+                    text.setStyle("-fx-fill:" + color.toString().toLowerCase().replace("0x", "#"));
+                }
+            }
         }
     }
 
@@ -777,7 +782,7 @@ public class StoriesLayer {
         Story story;
         for (int i = 0; i < stories.size(); i++) {
             story = stories.get(i);
-            sb.append(story.getName())
+            sb.append(story.getTitle())
                     .append(": ")
                     .append(story.getNumberOfNotes())
                     .append(" notes\n");
@@ -795,247 +800,5 @@ public class StoriesLayer {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Graphical representation of a {@link Story}. It makes an inactive story become active when the title/description
-     * is clicked, and makes an active story become inactive when it is clicked. This graphical item is rendered in
-     * the {@link ListCell} of the {@link ListView} in the 'Stories' tab.
-     */
-    private class StoryListCellGraphic extends VBox {
-
-        private Text title;
-        private Text description;
-
-        public StoryListCellGraphic(final Story story, final double width) {
-            super();
-
-            setPadding(EMPTY);
-
-            setPrefWidth(width);
-            setMaxWidth(width);
-            setMinWidth(width);
-
-            VBox container = new VBox(5);
-            container.setPickOnBounds(false);
-            container.setPadding(new Insets(5));
-
-            title = new Text(story.getName());
-            title.setFont(getBolderFont());
-            title.setWrappingWidth(width - 15);
-            title.setFontSmoothingType(LCD);
-
-            description = new Text(story.getDescription());
-            description.setFont(getFont());
-            description.setWrappingWidth(width - 30);
-            description.setFontSmoothingType(LCD);
-
-            container.getChildren().addAll(title, description);
-            getChildren().addAll(container);
-
-            container.setOnMouseClicked(event -> {
-                story.setActive(!story.isActive());
-
-                if (story.isActive()) {
-                    setActiveStory(story);
-                } else {
-                    setActiveStory(null);
-                }
-            });
-
-            story.getActiveProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    // if story is active
-                    makeDisabled(false);
-                    // disable any active notes in the newly active story to get rid of old highlighting
-                    for (Note note : story.getNotes()) {
-                        note.setActive(false);
-                    }
-                } else {
-                    // is story is inactive
-                    makeDisabled(true);
-                }
-            });
-
-            if (story.isActive()) {
-                makeDisabled(false);
-            } else {
-                makeDisabled(true);
-            }
-        }
-
-        public void makeDisabled(boolean disabled) {
-            if (!disabled) {
-                colorTexts(BLACK, title, description);
-            } else {
-                colorTexts(GREY, title, description);
-            }
-        }
-    }
-
-    /**
-     * This private class is the graphical representation of a {@link Note} item and a subclass of the JavaFX class
-     * {@link VBox}. When a note is clicked, the time property is changed so that the 3D subscene navigates to the
-     * note's effective start time. This graphical item is rendered in the {@link ListCell} of an active story in the
-     * {@link ListView} in the 'Stories' tab. Note titles are also expandable (making the notes description visible)
-     * by clicking on the triangle rendered to the left of the note's title.
-     */
-    public class NoteListCellGraphic extends VBox {
-
-        private final HBox contentsContainer;
-        private final Text expandIcon;
-        private final Text title;
-        private final Text contents;
-
-        // Input note is the note to which this graphic belongs to
-        public NoteListCellGraphic(final Note note, final double width) {
-            super();
-
-            setPrefWidth(width);
-            setMaxWidth(USE_PREF_SIZE);
-            setMinWidth(USE_PREF_SIZE);
-
-            setPadding(new Insets(3));
-
-            // note heading (its title) graphics
-            final HBox titleContainer = new HBox(0);
-
-            expandIcon = new Text("▶");
-            expandIcon.setPickOnBounds(true);
-            expandIcon.setFont(getFont());
-            expandIcon.setFontSmoothingType(LCD);
-            expandIcon.toFront();
-            expandIcon.setOnMouseClicked(event -> {
-                note.setListExpanded(!note.isListExpanded());
-                expandNote(note.isListExpanded());
-            });
-
-            final Region r1 = new Region();
-            r1.setPrefWidth(5);
-            r1.setMinWidth(USE_PREF_SIZE);
-            r1.setMaxWidth(USE_PREF_SIZE);
-
-            title = new Text(note.getTagName());
-            title.setWrappingWidth(width - 30 - r1.prefWidth(-1) - expandIcon.prefWidth(-1));
-            title.setFont(getBolderFont());
-            title.setFontSmoothingType(LCD);
-
-            final Region r2 = new Region();
-            setHgrow(r2, ALWAYS);
-
-            final Button visibleButton = new Button();
-            final ImageView eyeIcon = getEyeIcon();
-            final ImageView eyeIconInverted = getEyeInvertIcon();
-            visibleButton.setPrefSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-            visibleButton.setMinSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-            visibleButton.setMaxSize(UI_SIDE_LENGTH, UI_SIDE_LENGTH);
-            visibleButton.setPadding(EMPTY);
-            visibleButton.setContentDisplay(GRAPHIC_ONLY);
-            visibleButton.setOnAction(event -> {
-                note.setVisible(!note.isVisible());
-                rebuildSubsceneFlag.set(true);
-            });
-            if (note.isVisible()) {
-                visibleButton.setGraphic(eyeIcon);
-            } else {
-                visibleButton.setGraphic(eyeIconInverted);
-            }
-
-            titleContainer.getChildren().addAll(expandIcon, r1, title, r2, visibleButton);
-            titleContainer.setAlignment(CENTER_LEFT);
-
-            getChildren().add(titleContainer);
-
-            // note contents graphics
-            contentsContainer = new HBox(0);
-
-            final Region r3 = new Region();
-            r3.setPrefWidth(expandIcon.prefWidth(-1) + r1.prefWidth(-1));
-            r3.setMinWidth(USE_PREF_SIZE);
-            r3.setMaxWidth(USE_PREF_SIZE);
-
-            contents = new Text(note.getTagContents());
-            contents.setWrappingWidth(width - 30 - r3.prefWidth(-1));
-            contents.setFont(getFont());
-            contents.setFontSmoothingType(LCD);
-
-            contentsContainer.getChildren().addAll(r3, contents);
-            expandNote(note.isListExpanded());
-
-            setPickOnBounds(false);
-            setOnMouseClicked(event -> {
-                if (event.getPickResult().getIntersectedNode() != expandIcon) {
-                    note.setActive(!note.isActive());
-                    if (note.isActive()) {
-                        setActiveNoteWithSubsceneRebuild(note);
-                    } else {
-                        setActiveNoteWithSubsceneRebuild(null);
-                    }
-                }
-            });
-            note.getActiveProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    highlightCell(true, note.isVisible());
-                } else {
-                    highlightCell(false, note.isVisible());
-                }
-            });
-            note.getVisibleProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    highlightCell(note.isActive(), true);
-                    visibleButton.setGraphic(eyeIcon);
-                } else {
-                    highlightCell(note.isActive(), false);
-                    visibleButton.setGraphic(eyeIconInverted);
-                }
-            });
-
-            highlightCell(note.isActive(), note.isVisible());
-
-            // render note changes
-            note.getChangedProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    title.setText(note.getTagName());
-                    contents.setText(note.getTagContents());
-                }
-            });
-        }
-
-        /**
-         * Highlights/un-highlights a cell according to the input parameter.
-         * When a cell is highlighted/un-highighted, its text and background
-         * colors change.
-         *
-         * @param highlighted
-         *         true when this note graphic is to be highlighted, false otherwise
-         * @param isVisible
-         *         true when the note is visible, false otherwise
-         */
-        private void highlightCell(final boolean highlighted, final boolean isVisible) {
-            if (highlighted) {
-                setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
-                        + "-fx-background: -fx-accent;");
-                colorTexts(WHITE, expandIcon, title, contents);
-            } else {
-                setStyle("-fx-background-color: white;");
-                colorTexts(BLACK, expandIcon, title, contents);
-            }
-        }
-
-        /**
-         * Expands/hides a notes description according to the input parameter.
-         *
-         * @param expanded
-         *         true when the note should be expanded (showing the description), false otherwise
-         */
-        private void expandNote(boolean expanded) {
-            if (expanded) {
-                getChildren().add(contentsContainer);
-                expandIcon.setText(expandIcon.getText().replace("▶", "▼"));
-            } else {
-                getChildren().remove(contentsContainer);
-                expandIcon.setText(expandIcon.getText().replace("▼", "▶"));
-            }
-        }
     }
 }

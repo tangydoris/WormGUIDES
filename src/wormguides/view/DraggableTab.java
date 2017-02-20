@@ -148,12 +148,9 @@ public class DraggableTab extends Tab {
                     newStage.setOnHiding(t1 -> tabPanes.remove(pane));
                     getTabPane().getTabs().remove(DraggableTab.this);
                     pane.getTabs().add(DraggableTab.this);
-                    pane.getTabs().addListener(new ListChangeListener<Tab>() {
-                        @Override
-                        public void onChanged(ListChangeListener.Change<? extends Tab> change) {
-                            if (pane.getTabs().isEmpty()) {
-                                newStage.hide();
-                            }
+                    pane.getTabs().addListener((ListChangeListener<Tab>) change -> {
+                        if (pane.getTabs().isEmpty()) {
+                            newStage.hide();
                         }
                     });
                     newStage.setScene(new Scene(pane));

@@ -57,7 +57,7 @@ import static search.SearchType.DESCRIPTION;
 import static search.SearchType.FUNCTIONAL;
 import static search.SearchType.GENE;
 import static search.SearchType.LINEAGE;
-import static search.SearchType.MULTICELLULAR_STRUCTURE_BY_CELLS;
+import static search.SearchType.MULTICELLULAR_STRUCTURE_CELLS;
 import static search.SearchType.STRUCTURE_BY_SCENE_NAME;
 import static search.SearchUtil.getAncestorsList;
 import static search.SearchUtil.getCellsInMulticellularStructure;
@@ -252,7 +252,7 @@ public class SearchLayer {
         connectomeRadioButton.setUserData(CONNECTOME);
 
         multicellRadioButton.setToggleGroup(searchTypeToggleGroup);
-        multicellRadioButton.setUserData(MULTICELLULAR_STRUCTURE_BY_CELLS);
+        multicellRadioButton.setUserData(MULTICELLULAR_STRUCTURE_CELLS);
 
         searchTypeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             // if toggle was previously on 'gene' then cancel whatever wormbase search was issued
@@ -303,8 +303,9 @@ public class SearchLayer {
             final boolean isPostsynapticTicked,
             final boolean isElectricalTicked,
             final boolean isNeuromuscularTicked) {
-        final StringBuilder sb = createLabelForConnectomeRule(funcName,
-        		isPresynapticTicked, isPostsynapticTicked, isElectricalTicked, isNeuromuscularTicked);
+        final StringBuilder sb = createLabelForConnectomeRule(
+                funcName,
+                isPresynapticTicked, isPostsynapticTicked, isElectricalTicked, isNeuromuscularTicked);
 
         final Rule rule = new Rule(rebuildSubsceneFlag, sb.toString(), color, CONNECTOME, CELL_NUCLEUS);
         rule.setCells(connectome.queryConnectivity(
@@ -326,7 +327,7 @@ public class SearchLayer {
             final boolean isElectricalTicked,
             final boolean isNeuromuscularTicked) {
 
-    	final StringBuilder sb = new StringBuilder("'");
+        final StringBuilder sb = new StringBuilder("'");
         sb.append(funcName.toLowerCase()).append("' Connectome");
 
         final List<String> types = new ArrayList<>();
@@ -549,8 +550,9 @@ public class SearchLayer {
                     labelBuilder.append(searched);
                 }
             } else if (searchType == CONNECTOME) {
-            	labelBuilder = createLabelForConnectomeRule(searched,
-            				presynapticCheckBox.isSelected(),
+                labelBuilder = createLabelForConnectomeRule(
+                        searched,
+                        presynapticCheckBox.isSelected(),
                             postsynapticCheckBox.isSelected(),
                             neuromuscularCheckBox.isSelected(),
                             electricalCheckBox.isSelected());
@@ -600,7 +602,7 @@ public class SearchLayer {
                     }
                     break;
 
-                case MULTICELLULAR_STRUCTURE_BY_CELLS:
+                case MULTICELLULAR_STRUCTURE_CELLS:
                     cells = getCellsInMulticellularStructure(searched);
                     break;
 

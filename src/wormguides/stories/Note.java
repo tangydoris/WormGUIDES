@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import wormguides.models.subscenegeometry.SceneElement;
 import wormguides.models.subscenegeometry.SceneElementsList;
+import wormguides.view.graphicalrepresentations.NoteGraphic;
 
 import static java.lang.Integer.MIN_VALUE;
 import static java.lang.Integer.parseInt;
@@ -58,6 +59,8 @@ public class Note {
     /** True when graphical representation is selected, false otherwise */
     private final BooleanProperty activeProperty;
 
+    private final NoteGraphic graphic;
+
     /**
      * List of scene elements rendered with the note. It is possible for a note to have multiple scene elements just by
      * setting its resource location.
@@ -77,10 +80,17 @@ public class Note {
     private String comments;
     private String colorUrl;
 
-    public Note(final Story parentStory, final String tagName, final String tagContents) {
+    public Note(
+            final Story parentStory,
+            final String tagName,
+            final String tagContents) {
         this(parentStory);
-        this.tagName = tagName;
-        this.tagContents = tagContents;
+        if (tagName != null) {
+            setTagName(tagName);
+        }
+        if (tagContents != null) {
+            setTagContents(tagContents);
+        }
     }
 
     public Note(final Story parentStory) {
@@ -108,6 +118,12 @@ public class Note {
 
         setTagDisplay(OVERLAY);
         setAttachmentType(BLANK);
+
+        graphic = new NoteGraphic(this);
+    }
+
+    public NoteGraphic getGraphic() {
+        return graphic;
     }
 
     public String getColorUrl() {
@@ -297,6 +313,7 @@ public class Note {
     public void setTagName(final String tagName) {
         if (tagName != null) {
             this.tagName = tagName;
+            graphic.setTagName(tagName);
         }
         if (elements != null) {
             for (SceneElement se : elements) {
@@ -312,6 +329,7 @@ public class Note {
     public void setTagContents(final String tagContents) {
         if (tagContents != null) {
             this.tagContents = tagContents;
+            graphic.setTagContents(tagContents);
         }
     }
 

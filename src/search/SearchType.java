@@ -33,7 +33,7 @@ public enum SearchType {
     CONNECTOME("Connectome"),
 
     /** Search for cells contained in specified multicellular structure(s) */
-    MULTICELLULAR_STRUCTURE_BY_CELLS("Multicellular Structure Cells"),
+    MULTICELLULAR_STRUCTURE_CELLS("Multicellular Structure Cells"),
 
     /** Search structure(s) with a specified scene name */
     STRUCTURE_BY_SCENE_NAME("Structure Scene Name"),
