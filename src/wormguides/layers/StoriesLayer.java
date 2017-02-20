@@ -52,7 +52,7 @@ import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
 import static wormguides.util.colorurl.UrlGenerator.generateInternal;
 import static wormguides.util.colorurl.UrlGenerator.generateInternalWithoutViewArgs;
-import static wormguides.util.colorurl.UrlParser.processUrlRules;
+import static wormguides.util.colorurl.UrlParser.parseUrlRules;
 
 /**
  * Controller of the list view in the 'Stories' tab
@@ -98,11 +98,6 @@ public class StoriesLayer {
     private Note activeNote;
     private Comparator<Note> noteComparator;
     private double width;
-
-    /**
-     * True when using the color scheme of a story, false when using that of a note
-     */
-    private boolean usingStoryColorScheme;
 
     public StoriesLayer(
             final Stage parentStage,
@@ -183,7 +178,6 @@ public class StoriesLayer {
             if (activeStory != null) {
                 stories.remove(activeStory);
                 setActiveStory(null);
-                setActiveNoteWithSubsceneRebuild(null);
             }
         });
 
@@ -211,7 +205,6 @@ public class StoriesLayer {
         }
 
         setActiveStory(stories.get(0));
-        usingStoryColorScheme = true;
 
         requireNonNull(storiesListView);
         storiesListView.setItems(stories);
@@ -240,34 +233,31 @@ public class StoriesLayer {
                     protected void updateItem(final Story item, final boolean empty) {
                         super.updateItem(item, empty);
                         if (!empty && item != null) {
-                            final StoryGraphic storyGraphic = item.getGraphic();
-                            if (!storyGraphic.isClickedHandlerSet()) {
-                                storyGraphic.setStoryClickedHandler(event -> {
-                                    item.setActive(!item.isActive());
-                                    if (item.isActive()) {
-                                        setActiveStory(item);
-                                    } else {
-                                        setActiveStory(null);
-                                    }
-                                });
-                            }
+                            final StoryGraphic storyGraphic = new StoryGraphic(item);
+                            storyGraphic.setStoryClickedHandler(event -> {
+                                item.setActive(!item.isActive());
+                                if (item.isActive()) {
+                                    setActiveStory(item);
+                                } else {
+                                    setActiveStory(null);
+                                }
+                            });
                             // add notes inside story graphic if story is active
                             if (item.isActive()) {
-                                for (Note note : item.getNotes()) {
-                                    final NoteGraphic noteGraphic = note.getGraphic();
-                                    if (!noteGraphic.isClickedHandlerSet()) {
-                                        noteGraphic.setClickedHandler(event -> {
-                                            if (event.getPickResult().getIntersectedNode()
-                                                    != noteGraphic.getExpandIcon()) {
-                                                note.setActive(!note.isActive());
-                                                if (note.isActive()) {
-                                                    setActiveNoteWithSubsceneRebuild(note);
-                                                } else {
-                                                    setActiveNoteWithSubsceneRebuild(null);
-                                                }
+                                for (final Note note : item.getNotes()) {
+                                    final NoteGraphic noteGraphic = new NoteGraphic(note);
+                                    noteGraphic.setClickedHandler(event -> {
+                                        if (!noteGraphic.isExpandIconClicked(
+                                                event.getPickResult().getIntersectedNode())) {
+                                            note.setActive(!note.isActive());
+                                            if (note.isActive()) {
+                                                setActiveNoteWithSubsceneRebuild(note);
+                                            } else {
+                                                setActiveNoteWithSubsceneRebuild(null);
                                             }
-                                        });
-                                    }
+                                        }
+                                    });
+                                    storyGraphic.addNoteGraphic(noteGraphic);
                                 }
                             }
                             setGraphic(storyGraphic);
@@ -329,13 +319,13 @@ public class StoriesLayer {
         // if user clicks save
         if (file != null) {
             if (activeStory != null) {
-                if (activeNote != null && !(usingStoryColorScheme = !activeNote.hasColorScheme())) {
+                if (activeNote != null && activeNote.hasColorScheme()) {
                     // if the story color scheme is not being used, save rules into the note's URL
                     activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
                     // copy the note's rules and temporarily use the story's color scheme
                     // then put back the copied rules into the active rules list
                     final List<Rule> rulesCopy = new ArrayList<>(activeRulesList);
-                    processUrlRules(activeStory.getColorUrl(), activeRulesList, searchLayer);
+                    parseUrlRules(activeStory.getColorUrl(), activeRulesList, searchLayer);
                     activeStory.setColorUrl(generateInternal(
                             activeRulesList,
                             timeProperty.get(),
@@ -408,43 +398,49 @@ public class StoriesLayer {
      *         the note that should become active
      */
     private void setActiveNoteWithSubsceneRebuild(final Note note) {
-        // deactivate the previous active note
-        if (activeNote != null) {
-            usingStoryColorScheme = !activeNote.hasColorScheme();
-            // if not using the story color scheme,
-            // save the rules back into a URL for the note (they may have been edited)
-            if (!usingStoryColorScheme) {
-                activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
-            } else {
-                activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
-            }
-            activeNote.setActive(false);
-        }
-        activeNote = note;
-        // if there is a newly active note
-        if (activeNote != null) {
-            activeNote.setActive(true);
-            usingStoryColorScheme = !activeNote.hasColorScheme();
-            // set the time to the start of the note
-            timeProperty.set(getEffectiveStartTime(activeNote));
+        boolean wasUsingNoteUrl = activeNote != null && activeNote.hasColorScheme();
+        boolean willUseNoteUrl = note != null && note.hasColorScheme();
+        if (wasUsingNoteUrl) {
+            activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
         } else {
-            // use story color scheme if there is no newly active note
-            usingStoryColorScheme = true;
+            if (willUseNoteUrl) {
+                // save the scheme to the story if the old note has no color scheme and the new one does
+                activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            } else {
+                // no need to do anything if we stay in the story context
+            }
         }
 
-        // load appropriate color scheme
-        if (usingStoryColorScheme) {
-            processUrlRules(
-                    activeStory.getColorUrl(),
-                    activeRulesList,
-                    searchLayer);
-        } else {
-            processUrlRules(
-                    activeNote.getColorUrl(),
-                    activeRulesList,
-                    searchLayer);
+        // deactivate the previously active note
+        if (activeNote != null) {
+            activeNote.setActive(false);
         }
-        rebuildSubsceneFlag.set(true);
+
+        activeNote = note;
+        // activate the newly active note
+        if (activeNote != null) {
+            activeNote.setActive(true);
+
+            if (activeNote.hasColorScheme()) {
+                parseUrlRules(
+                        activeNote.getColorUrl(),
+                        activeRulesList,
+                        searchLayer);
+            } else if (wasUsingNoteUrl && !willUseNoteUrl) {
+                parseUrlRules(
+                        activeStory.getColorUrl(),
+                        activeRulesList,
+                        searchLayer);
+            }
+
+            final int noteStartTime = getEffectiveStartTime(activeNote);
+            // only need one of these changes to trigger a subscene rebuild
+            if (noteStartTime == timeProperty.get()) {
+                rebuildSubsceneFlag.set(true);
+            } else {
+                timeProperty.set(getEffectiveStartTime(activeNote));
+            }
+        }
 
         // sort notes choronologically and refresh listview rendering
         activeStory.sortNotes();
@@ -575,10 +571,12 @@ public class StoriesLayer {
     public void setActiveStory(final Story story) {
         // disable previous active story, copy current rules changes back to story/note
         if (activeStory != null) {
-            if (usingStoryColorScheme) {
-                activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
-            } else {
-                activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+            if (activeNote != null) {
+                if (!activeNote.hasColorScheme()) {
+                    activeStory.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+                } else {
+                    activeNote.setColorUrl(generateInternalWithoutViewArgs(activeRulesList));
+                }
             }
             activeStory.setActive(false);
         }
@@ -604,8 +602,7 @@ public class StoriesLayer {
                         othersOpacityProperty.get()));
             }
             useInternalRulesFlag.set(false);
-            usingStoryColorScheme = true;
-            processUrlRules(
+            parseUrlRules(
                     activeStory.getColorUrl(),
                     activeRulesList,
                     searchLayer);

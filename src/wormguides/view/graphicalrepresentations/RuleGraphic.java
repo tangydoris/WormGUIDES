@@ -1,6 +1,7 @@
 /*
  * Bao Lab 2017
  */
+
 package wormguides.view.graphicalrepresentations;
 
 import javafx.beans.property.BooleanProperty;
@@ -101,7 +102,7 @@ public class RuleGraphic extends HBox {
         visibleBtn.setGraphicTextGap(0);
         visibleBtn.setOnAction(event -> {
             rule.setVisible(!rule.isVisible());
-            setVisibleButton(rule.isVisible());
+            blackOutVisibleButton(!rule.isVisible());
             ruleChanged.set(true);
         });
 
@@ -121,14 +122,14 @@ public class RuleGraphic extends HBox {
     /**
      * Sets the graphic for the visible eye icon
      *
-     * @param isRuleVisible
+     * @param isRuleInvisible
      *         true if the rule is visible, false otherwise
      */
-    public void setVisibleButton(final boolean isRuleVisible) {
-        if (isRuleVisible) {
-            visibleBtn.setGraphic(eyeIcon);
-        } else {
+    public void blackOutVisibleButton(final boolean isRuleInvisible) {
+        if (isRuleInvisible) {
             visibleBtn.setGraphic(eyeIconInverted);
+        } else {
+            visibleBtn.setGraphic(eyeIcon);
         }
     }
 

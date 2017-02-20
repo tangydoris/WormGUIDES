@@ -45,7 +45,7 @@ public class UrlParser {
      * @param url
      *         the color scheme URL to parse
      */
-    public static void processUrlRules(
+    public static void parseUrlRules(
             final String url,
             final ObservableList<Rule> rulesList,
             final SearchLayer searchLayer) {
@@ -299,7 +299,7 @@ public class UrlParser {
             final DoubleProperty othersOpacityProperty,
             final BooleanProperty rebuildSubsceneFlag) {
 
-        processUrlRules(url, rulesList, searchLayer);
+        parseUrlRules(url, rulesList, searchLayer);
 
         // process view arguments
         final List<String> viewArgs = parseViewArgs(url);

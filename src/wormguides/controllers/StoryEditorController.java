@@ -239,6 +239,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 titleField.clear();
                 contentArea.clear();
             }
+            updateType();
+            updateTime();
+            updateDisplay();
         };
 
         // note fields
@@ -597,6 +600,9 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         }
     }
 
+    /**
+     * Updates the attachment type toggle (resets toggles if there is no active note)
+     */
     private void updateType() {
         if (attachmentToggle != null) {
             if (activeNote != null) {
@@ -630,6 +636,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         break;
                 }
             } else {
+                setCellLabelName(sceneActiveCellProperty.get());
                 resetToggle(attachmentToggle);
                 resetToggle(subStructureToggle);
                 structuresComboBox.getSelectionModel().clearSelection();
@@ -716,9 +723,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         activeNote = note;
         if (titleField != null && contentArea != null) {
             runLater(noteFieldsUpdateRunnable);
-            updateType();
-            updateTime();
-            updateDisplay();
             if (note == null || note.hasColorScheme()) {
                 createNoteColorSchemeButton.setDisable(true);
             } else {

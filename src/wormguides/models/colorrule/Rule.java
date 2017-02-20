@@ -160,11 +160,11 @@ public class Rule {
      * entities
      *
      * @param isBlackedOut
-     *         true if the visibility button should be blacked out, false otherwise. The visibility
-     *         button is blacked out when the rule is not applied to the subscene entities
+     *         true if the visibility button should be blacked out, false otherwise. The visibility button is blacked
+     *         out when the rule is not applied to the subscene entities
      */
     private void blackOutVisibleButton(final boolean isBlackedOut) {
-        runLater(() -> graphic.setVisibleButton(!isBlackedOut));
+        runLater(() -> graphic.blackOutVisibleButton(isBlackedOut));
     }
 
     /**

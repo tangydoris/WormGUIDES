@@ -15,7 +15,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import wormguides.models.colorrule.Rule;
-import wormguides.view.graphicalrepresentations.StoryGraphic;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -27,8 +26,6 @@ import static javafx.collections.FXCollections.observableArrayList;
  * of a story config file.
  */
 public class Story {
-
-    private final StoryGraphic graphic;
 
     private String title;
     private String description;
@@ -82,12 +79,6 @@ public class Story {
         });
 
         this.colorUrl = colorUrl;
-
-        graphic = new StoryGraphic(this);
-    }
-
-    public StoryGraphic getGraphic() {
-        return graphic;
     }
 
     public String getColorUrl() {
@@ -216,7 +207,6 @@ public class Story {
     public void setTitle(final String title) {
         if (title != null) {
             this.title = title;
-            graphic.setTitle(title);
         }
     }
 
@@ -227,7 +217,6 @@ public class Story {
     public void setDescription(final String description) {
         if (description != null) {
             this.description = description;
-            graphic.setDescription(description);
         }
     }
 
