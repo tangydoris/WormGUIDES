@@ -109,7 +109,7 @@ public class StoryFileUtil {
             for (int i = 0; i < NUMBER_OF_CSV_FIELDS; i++) {
                 storyParams[i] = "";
             }
-            storyParams[STORY_NAME_INDEX] = quoteForCsv(story.getName());
+            storyParams[STORY_NAME_INDEX] = quoteForCsv(story.getTitle());
             storyParams[STORY_DESCRIPTION_INDEX] = quoteForCsv(story.getDescription());
             storyParams[STORY_AUTHOR_INDEX] = quoteForCsv(story.getAuthor());
             storyParams[STORY_DATE_INDEX] = quoteForCsv(story.getDate());

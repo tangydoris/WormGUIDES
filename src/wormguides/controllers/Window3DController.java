@@ -1642,6 +1642,14 @@ public class Window3DController {
         }
     }
 
+    /**
+     * Inserts a name label for the specified 3D entity
+     *
+     * @param name
+     *         name to show on the label
+     * @param entity
+     *         3D shape to label
+     */
     private void insertLabelFor(final String name, final Node entity) {
         // if label is already in scene, make all labels white and highlight that one
         final Text label = entityLabelMap.get(entity);
@@ -1877,7 +1885,7 @@ public class Window3DController {
         if (storiesLayer != null) {
             final Text infoPaneTitle = makeNoteOverlayText("Story Title:");
             if (storiesLayer.getActiveStory() != null) {
-                final Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getName());
+                final Text storyTitle = makeNoteOverlayText(storiesLayer.getActiveStory().getTitle());
                 storyOverlayVBox.getChildren().addAll(infoPaneTitle, storyTitle);
             } else {
                 final Text noStoryTitle = makeNoteOverlayText("none");
@@ -2014,50 +2022,50 @@ public class Window3DController {
     }
 
     public boolean captureImagesForMovie() {
-		movieFiles.clear();
-		count = 0;
+        movieFiles.clear();
+        count = 0;
 
-		final Stage fileChooserStage = new Stage();
+        final Stage fileChooserStage = new Stage();
 
-		final FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Choose Save Location");
-		fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Save Location");
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("MOV File", "*.mov"));
 
-		final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
+        final File tempFile = fileChooser.showSaveDialog(fileChooserStage);
 
-		if (tempFile == null) {
-			return false;
-		}
+        if (tempFile == null) {
+            return false;
+        }
 
-		// save the name from the file chooser for later MOV file
-		movieName = tempFile.getName();
-		moviePath = tempFile.getAbsolutePath();
+        // save the name from the file chooser for later MOV file
+        movieName = tempFile.getName();
+        moviePath = tempFile.getAbsolutePath();
 
-		// make a temp directory for the frames at the given save location
-		String path = tempFile.getAbsolutePath();
-		if (path.lastIndexOf("/") < 0) {
-			path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
-		} else {
-			path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
-		}
+        // make a temp directory for the frames at the given save location
+        String path = tempFile.getAbsolutePath();
+        if (path.lastIndexOf("/") < 0) {
+            path = path.substring(0, path.lastIndexOf("\\") + 1) + "tempFrameDir";
+        } else {
+            path = path.substring(0, path.lastIndexOf("/") + 1) + "tempFrameDir";
+        }
 
-		frameDir = new File(path);
+        frameDir = new File(path);
 
-		try {
-			frameDir.mkdir();
-		} catch (SecurityException se) {
-			return false;
-		}
+        try {
+            frameDir.mkdir();
+        } catch (SecurityException se) {
+            return false;
+        }
 
-		String frameDirPath = frameDir.getAbsolutePath() + "/";
+        String frameDirPath = frameDir.getAbsolutePath() + "/";
 
-		captureVideo.set(true);
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (captureVideo.get()) {
-					runLater(() -> {
+        captureVideo.set(true);
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (captureVideo.get()) {
+                    runLater(() -> {
                         WritableImage screenCapture = subscene.snapshot(new SnapshotParameters(), null);
                         try {
                             File file = new File(frameDirPath + "movieFrame" + count++ + ".JPEG");
@@ -2071,50 +2079,49 @@ public class Window3DController {
                             System.out.println("Could not write frame of movie to file.");
                         }
                     });
-				} else {
-					timer.cancel();
-				}
-			}
-		},0,1000);
-		return true;
-	}
+                } else {
+                    timer.cancel();
+                }
+            }
+        }, 0, 1000);
+        return true;
+    }
 
-	public void convertImagesToMovie() {
-		captureVideo.set(false);
-		javaPictures.clear();
+    public void convertImagesToMovie() {
+        captureVideo.set(false);
+        javaPictures.clear();
 
-		for (File movieFile : movieFiles) {
-			JavaPicture jp = new JavaPicture();
+        for (File movieFile : movieFiles) {
+            JavaPicture jp = new JavaPicture();
 
-			jp.loadImage(movieFile);
+            jp.loadImage(movieFile);
 
-			javaPictures.addElement(jp);
-		}
+            javaPictures.addElement(jp);
+        }
 
-		if (javaPictures.size() > 0) {
-			new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
+        if (javaPictures.size() > 0) {
+            new JpegImagesToMovie((int) subscene.getWidth(), (int) subscene.getHeight(), 2, movieName, javaPictures);
 
-			// move the movie to the originally specified location
-			final File movJustMade = new File(movieName);
-			movJustMade.renameTo(new File(moviePath + ".mov"));
+            // move the movie to the originally specified location
+            final File movJustMade = new File(movieName);
+            movJustMade.renameTo(new File(moviePath + ".mov"));
 
-			// remove the .movtemp.jpg file
-			final File movtempjpg = new File(".movtemp.jpg");
-			movtempjpg.delete();
-		}
+            // remove the .movtemp.jpg file
+            final File movtempjpg = new File(".movtemp.jpg");
+            movtempjpg.delete();
+        }
 
-		// remove all of the images in the frame directory
-		if (frameDir != null && frameDir.isDirectory()) {
-			final File[] frames = frameDir.listFiles();
-			if (frames != null) {
-				for (File frame : frames) {
-					frame.delete();
-				}
-			}
-			frameDir.delete();
-		}
-
-	}
+        // remove all of the images in the frame directory
+        if (frameDir != null && frameDir.isDirectory()) {
+            final File[] frames = frameDir.listFiles();
+            if (frames != null) {
+                for (File frame : frames) {
+                    frame.delete();
+                }
+            }
+            frameDir.delete();
+        }
+    }
 
     /**
      * Saves a snapshot of the screen
@@ -2225,7 +2232,7 @@ public class Window3DController {
             hideContextPopups();
             double z = zoomProperty.get();
             /*
-			 * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
+             * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
 			 * As of July 8, 2016
 			 * Noted by: Braden Katzman
 			 *

@@ -25,7 +25,7 @@ import search.SearchType;
 import wormguides.MainApp;
 import wormguides.controllers.RuleEditorController;
 import wormguides.layers.SearchLayer;
-import wormguides.view.RuleGraphic;
+import wormguides.view.graphicalrepresentations.RuleGraphic;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;

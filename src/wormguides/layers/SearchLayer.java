@@ -57,7 +57,7 @@ import static search.SearchType.DESCRIPTION;
 import static search.SearchType.FUNCTIONAL;
 import static search.SearchType.GENE;
 import static search.SearchType.LINEAGE;
-import static search.SearchType.MULTICELLULAR_STRUCTURE_BY_CELLS;
+import static search.SearchType.MULTICELLULAR_STRUCTURE_CELLS;
 import static search.SearchType.STRUCTURE_BY_SCENE_NAME;
 import static search.SearchUtil.getAncestorsList;
 import static search.SearchUtil.getCellsInMulticellularStructure;
@@ -252,7 +252,7 @@ public class SearchLayer {
         connectomeRadioButton.setUserData(CONNECTOME);
 
         multicellRadioButton.setToggleGroup(searchTypeToggleGroup);
-        multicellRadioButton.setUserData(MULTICELLULAR_STRUCTURE_BY_CELLS);
+        multicellRadioButton.setUserData(MULTICELLULAR_STRUCTURE_CELLS);
 
         searchTypeToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             // if toggle was previously on 'gene' then cancel whatever wormbase search was issued
@@ -602,7 +602,7 @@ public class SearchLayer {
                     }
                     break;
 
-                case MULTICELLULAR_STRUCTURE_BY_CELLS:
+                case MULTICELLULAR_STRUCTURE_CELLS:
                     cells = getCellsInMulticellularStructure(searched);
                     break;
 

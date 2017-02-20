@@ -102,7 +102,7 @@ public class DisplayLayer {
                     @Override
                     protected void updateItem(final Rule item, final boolean empty) {
                         super.updateItem(item, empty);
-                        if (item != null) {
+                        if (!empty && item != null) {
                             setGraphic(item.getGraphic());
                         } else {
                             setGraphic(null);

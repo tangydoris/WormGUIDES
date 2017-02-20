@@ -15,6 +15,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import wormguides.models.colorrule.Rule;
+import wormguides.view.graphicalrepresentations.StoryGraphic;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -27,15 +28,17 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 public class Story {
 
-    private String name;
+    private final StoryGraphic graphic;
+
+    private String title;
     private String description;
 
     private String author;
     private String date;
 
     private ObservableList<Note> notes;
-    private BooleanProperty activeBooleanProperty;
-    private BooleanProperty changedBooleanProperty;
+    private BooleanProperty activeProperty;
+    private BooleanProperty changedProperty;
     private Comparator<Note> comparator;
 
     private String colorUrl;
@@ -50,15 +53,15 @@ public class Story {
             final String author,
             final String date,
             final String colorUrl) {
-        this.name = name;
+        this.title = name;
         this.description = description;
 
         this.author = author;
         this.date = date;
 
-        this.activeBooleanProperty = new SimpleBooleanProperty(false);
-        this.changedBooleanProperty = new SimpleBooleanProperty(false);
-        this.changedBooleanProperty.addListener((observable, oldValue, newValue) -> {
+        this.activeProperty = new SimpleBooleanProperty(false);
+        this.changedProperty = new SimpleBooleanProperty(false);
+        this.changedProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 setChanged(false);
             }
@@ -79,6 +82,12 @@ public class Story {
         });
 
         this.colorUrl = colorUrl;
+
+        graphic = new StoryGraphic(this);
+    }
+
+    public StoryGraphic getGraphic() {
+        return graphic;
     }
 
     public String getColorUrl() {
@@ -113,19 +122,19 @@ public class Story {
     }
 
     public BooleanProperty getChangedProperty() {
-        return changedBooleanProperty;
+        return changedProperty;
     }
 
     public boolean isActive() {
-        return activeBooleanProperty.get();
+        return activeProperty.get();
     }
 
     public void setActive(final boolean isActive) {
-        activeBooleanProperty.set(isActive);
+        activeProperty.set(isActive);
     }
 
     public BooleanProperty getActiveProperty() {
-        return activeBooleanProperty;
+        return activeProperty;
     }
 
     public List<Note> getNotesWithEntity() {
@@ -191,7 +200,7 @@ public class Story {
     }
 
     public void setChanged(final boolean changed) {
-        changedBooleanProperty.set(changed);
+        changedProperty.set(changed);
     }
 
     public void removeNote(final Note note) {
@@ -200,13 +209,14 @@ public class Story {
         }
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(final String name) {
-        if (name != null) {
-            this.name = name;
+    public void setTitle(final String title) {
+        if (title != null) {
+            this.title = title;
+            graphic.setTitle(title);
         }
     }
 
@@ -217,6 +227,7 @@ public class Story {
     public void setDescription(final String description) {
         if (description != null) {
             this.description = description;
+            graphic.setDescription(description);
         }
     }
 
@@ -226,7 +237,7 @@ public class Story {
 
     @Override
     public String toString() {
-        return name + " - contains " + notes.size() + " notes";
+        return title + " - contains " + notes.size() + " notes";
     }
 
 }
