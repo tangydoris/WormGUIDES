@@ -245,11 +245,12 @@ public class StoriesLayer {
                             // add notes inside story graphic if story is active
                             if (item.isActive()) {
                                 for (final Note note : item.getNotes()) {
-                                    final NoteGraphic noteGraphic = new NoteGraphic(note);
+                                    final NoteGraphic noteGraphic = new NoteGraphic(note, rebuildSubsceneFlag);
                                     noteGraphic.setClickedHandler(event -> {
                                         if (!noteGraphic.isExpandIconClicked(
                                                 event.getPickResult().getIntersectedNode())) {
                                             note.setActive(!note.isActive());
+                                            // TODO fix listview rendering on note switch
                                             if (note.isActive()) {
                                                 setActiveNoteWithSubsceneRebuild(note);
                                             } else {
@@ -416,8 +417,8 @@ public class StoriesLayer {
             activeNote.setActive(false);
         }
 
+        // make new note active
         activeNote = note;
-        // activate the newly active note
         if (activeNote != null) {
             activeNote.setActive(true);
 
@@ -441,9 +442,6 @@ public class StoriesLayer {
                 timeProperty.set(getEffectiveStartTime(activeNote));
             }
         }
-
-        // sort notes choronologically and refresh listview rendering
-        activeStory.sortNotes();
 
         // update story/note editor
         if (editController != null) {
@@ -586,6 +584,9 @@ public class StoriesLayer {
 
         activeStory = story;
         if (activeStory != null) {
+            // sort notes choronologically
+            activeStory.sortNotes();
+
             activeStory.setActive(true);
             activeStoryProperty.set(activeStory.getTitle());
             // if story does not come with a url, set its url to contain the internal color rules
@@ -617,6 +618,8 @@ public class StoriesLayer {
         }
 
         if (editController != null) {
+            // there is no active note on a story context switch
+            editController.setActiveNote(null);
             editController.setActiveStory(activeStory);
         }
     }

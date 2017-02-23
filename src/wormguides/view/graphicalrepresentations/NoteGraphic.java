@@ -1,5 +1,6 @@
 package wormguides.view.graphicalrepresentations;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -48,9 +49,10 @@ public class NoteGraphic extends VBox {
     private final Text noteTitle;
     private final Text noteContents;
 
-    public NoteGraphic(final Note note) {
+    public NoteGraphic(final Note note, final BooleanProperty rebuildSubsceneFlag) {
         super();
         requireNonNull(note);
+        requireNonNull(rebuildSubsceneFlag);
 
         setHgrow(this, ALWAYS);
 
@@ -84,7 +86,7 @@ public class NoteGraphic extends VBox {
         visibleButton.setContentDisplay(GRAPHIC_ONLY);
         visibleButton.setOnAction(event -> {
             note.setVisible(!note.isVisible());
-            note.setChanged(true);
+            rebuildSubsceneFlag.set(true);
         });
         if (note.isVisible()) {
             visibleButton.setGraphic(eyeIcon);
@@ -123,22 +125,21 @@ public class NoteGraphic extends VBox {
 
         note.getActiveProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                highlightCell(true, note.isVisible());
+                highlightCell(true);
             } else {
-                highlightCell(false, note.isVisible());
+                highlightCell(false);
             }
         });
+
         note.getVisibleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                highlightCell(note.isActive(), true);
                 visibleButton.setGraphic(eyeIcon);
             } else {
-                highlightCell(note.isActive(), false);
                 visibleButton.setGraphic(eyeIconInverted);
             }
         });
 
-        highlightCell(note.isActive(), note.isVisible());
+        highlightCell(note.isActive());
 
         // render note changes
         note.getChangedProperty().addListener((observable, oldValue, newValue) -> {
@@ -161,7 +162,7 @@ public class NoteGraphic extends VBox {
 
     public void setWidth(final ReadOnlyDoubleProperty storyWidthProperty) {
         storyWidthProperty.addListener((observable, oldValue, newValue) -> {
-           final int newWidth = newValue.intValue();
+            final int newWidth = newValue.intValue();
             noteTitle.setWrappingWidth(newWidth - UI_SIDE_LENGTH - 25);
             noteContents.setWrappingWidth(newWidth - 25);
         });
@@ -203,10 +204,8 @@ public class NoteGraphic extends VBox {
      *
      * @param highlighted
      *         true when this note graphic is to be highlighted, false otherwise
-     * @param isVisible
-     *         true when the note is visible, false otherwise
      */
-    private void highlightCell(final boolean highlighted, final boolean isVisible) {
+    private void highlightCell(final boolean highlighted) {
         if (highlighted) {
             setStyle("-fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar; "
                     + "-fx-background: -fx-accent;");

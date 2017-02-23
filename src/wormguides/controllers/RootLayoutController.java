@@ -370,7 +370,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void viewTreeAction() {
         if (sulstonTreeStage == null) {
             sulstonTreeStage = new Stage();
-            // TODO fix this
             final SulstonTreePane treePane = new SulstonTreePane(
                     sulstonTreeStage,
                     searchLayer,
@@ -1147,12 +1146,6 @@ public class RootLayoutController extends BorderPane implements Initializable {
     public void initialize(URL url, ResourceBundle bundle) {
         productionInfo = new ProductionInfo();
 
-        if (defaultEmbryoFlag) {
-            movieTimeOffset = productionInfo.getMovieTimeOffset();
-        } else {
-            movieTimeOffset = 0;
-        }
-
         casesLists = new CasesLists();
 
         if (bundle != null) {
@@ -1168,11 +1161,16 @@ public class RootLayoutController extends BorderPane implements Initializable {
             defaultEmbryoFlag = true;
             lineageData.setIsSulstonModeFlag(productionInfo.getIsSulstonFlag());
         }
+        
+        // set values based on default vs. other model
         if (defaultEmbryoFlag) {
             startTime = productionInfo.getDefaultStartTime();
+            movieTimeOffset = productionInfo.getMovieTimeOffset();
         } else {
             startTime = 0;
+            movieTimeOffset = 0;
         }
+        
         endTime = lineageData.getNumberOfTimePoints() - 1;
         movieTimeOffset = productionInfo.getMovieTimeOffset();
 
