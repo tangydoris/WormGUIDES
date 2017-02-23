@@ -52,6 +52,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -109,6 +110,7 @@ import static javafx.scene.input.MouseEvent.MOUSE_ENTERED_TARGET;
 import static javafx.scene.input.MouseEvent.MOUSE_MOVED;
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
+import static javafx.scene.input.ScrollEvent.SCROLL;
 import static javafx.scene.layout.AnchorPane.setRightAnchor;
 import static javafx.scene.layout.AnchorPane.setTopAnchor;
 import static javafx.scene.paint.Color.RED;
@@ -573,6 +575,9 @@ public class Window3DController {
         subscene.setOnMousePressed(mouseHandler);
         subscene.setOnMouseReleased(mouseHandler);
 
+        final EventHandler<ScrollEvent> mouseScrollHandler = this::handleScrollEvent;
+        subscene.setOnScroll(mouseScrollHandler);
+
         setNotesPane(parentPane);
 
         this.casesLists = requireNonNull(casesLists);
@@ -666,6 +671,8 @@ public class Window3DController {
 
         requireNonNull(searchResultsUpdateService).setOnSucceeded(event -> updateLocalSearchResults());
         this.searchResultsList = requireNonNull(searchResultsList);
+
+        captureVideo = new SimpleBooleanProperty();
     }
 
     /**
@@ -689,8 +696,8 @@ public class Window3DController {
         middleTransformGroup.getChildren().add(t);
 
         t = makeNoteBillboardText("R     L");
-        t.setTranslateX(-42);
-        t.setTranslateY(32);
+        t.setTranslateX(-52);
+        t.setTranslateY(42);
         t.setRotate(90);
         middleTransformGroup.getChildren().add(t);
 
@@ -704,7 +711,7 @@ public class Window3DController {
         middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 
         // set the location of the indicator in the bottom right corner of the screen
-        orientationIndicator.getTransforms().add(new Translate(310, 210, 800));
+        orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
 
         // add rotation variables
         orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
@@ -796,6 +803,37 @@ public class Window3DController {
         spritesPane.getChildren().remove(transientLabelText);
     }
 
+    /**
+     * Triggers zoom in and out on mouse wheel scroll
+     * <p>
+     * DeltaY indicates the direction of scroll:
+     * -Y: zoom out
+     * +Y: zoom in
+     *
+     * @param se
+     *         the scroll event
+     */
+    public void handleScrollEvent(final ScrollEvent se) {
+        final EventType<ScrollEvent> type = se.getEventType();
+        if (type == SCROLL) {
+            double z = zoomProperty.get();
+            if (se.getDeltaY() < 0) {
+                // zoom out
+                if (z < 24.75) {
+                    zoomProperty.set(z + 0.25);
+                }
+            } else if (se.getDeltaY() > 0) {
+                // zoom in
+                if (z > 0.25) {
+                    z -= 0.25;
+                } else if (z < 0) {
+                    z = 0;
+                }
+                zoomProperty.set(z);
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public void handleMouseEvent(final MouseEvent me) {
         final EventType<MouseEvent> type = (EventType<MouseEvent>) me.getEventType();
@@ -846,10 +884,10 @@ public class Window3DController {
                 // how to get Z COORDINATE??
 
 //                if (quaternion != null) {
-                    // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-                    // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
+                // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
+                // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
+                // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
+                // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
 
 					/*
                      * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
@@ -861,26 +899,26 @@ public class Window3DController {
 //                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
 
 //                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
-                        // ", " + vectorToOldMousePos[2] + ">");
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
-                        // ", " + vectorToNewMousePos[2] + ">");
-                        // System.out.println(" ");
+                // System.out.println("from origin to old mouse pos: <" +
+                // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
+                // ", " + vectorToOldMousePos[2] + ">");
+                // System.out.println("from origin to old mouse pos: <" +
+                // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
+                // ", " + vectorToNewMousePos[2] + ">");
+                // System.out.println(" ");
 
-                        // compute cross product
+                // compute cross product
 //                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
 //                        if (cross != null) {
-                            // System.out.println("cross product: <" + cross[0] + ",
-                            // " + cross[1] + ", " + cross[2] + ">");
-                            //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
+                // System.out.println("cross product: <" + cross[0] + ",
+                // " + cross[1] + ", " + cross[2] + ">");
+                //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
 
-                            //List<Double> eulerAngles = quaternion.toEulerRotation();
+                //List<Double> eulerAngles = quaternion.toEulerRotation();
 
 //                            if (eulerAngles.size() == 3) {
-                            // rotateX.setAngle(eulerAngles.get(2));
-                            // rotateY.setAngle(eulerAngles.get(0));
+                // rotateX.setAngle(eulerAngles.get(2));
+                // rotateY.setAngle(eulerAngles.get(0));
 //                            }
 //                        }
 //                    }
@@ -2235,7 +2273,7 @@ public class Window3DController {
 			 * The API does not recognize that the camera orientation has changed and thus the back of back face
 			 * culled shapes appear, surrounded w/ artifacts.
 			 */
-            if (z >= 0.25) {
+            if (z > 0.25) {
                 z -= 0.25;
             } else if (z < 0) {
                 z = 0;
