@@ -711,6 +711,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 storyDescription.clear();
                 author.clear();
                 date.clear();
+                setActiveNote(null);
             }
         }
     }

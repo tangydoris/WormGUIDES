@@ -52,6 +52,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -109,6 +110,7 @@ import static javafx.scene.input.MouseEvent.MOUSE_ENTERED_TARGET;
 import static javafx.scene.input.MouseEvent.MOUSE_MOVED;
 import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 import static javafx.scene.input.MouseEvent.MOUSE_RELEASED;
+import static javafx.scene.input.ScrollEvent.SCROLL;
 import static javafx.scene.layout.AnchorPane.setRightAnchor;
 import static javafx.scene.layout.AnchorPane.setTopAnchor;
 import static javafx.scene.paint.Color.RED;
@@ -578,6 +580,9 @@ public class Window3DController {
         subscene.setOnMouseEntered(mouseHandler);
         subscene.setOnMousePressed(mouseHandler);
         subscene.setOnMouseReleased(mouseHandler);
+        
+        final EventHandler<ScrollEvent> mouseScrollHandler = this::handleScrollEvent;
+        subscene.setOnScroll(mouseScrollHandler);
 
         setNotesPane(parentPane);
 
@@ -672,6 +677,8 @@ public class Window3DController {
 
         requireNonNull(searchResultsUpdateService).setOnSucceeded(event -> updateLocalSearchResults());
         this.searchResultsList = requireNonNull(searchResultsList);
+        
+        this.captureVideo = new SimpleBooleanProperty();
     }
 
     /**
@@ -695,8 +702,8 @@ public class Window3DController {
         middleTransformGroup.getChildren().add(t);
 
         t = makeNoteBillboardText("R     L");
-        t.setTranslateX(-42);
-        t.setTranslateY(32);
+        t.setTranslateX(-52);
+        t.setTranslateY(42);
         t.setRotate(90);
         middleTransformGroup.getChildren().add(t);
 
@@ -710,7 +717,7 @@ public class Window3DController {
         middleTransformGroup.getTransforms().add(new Scale(3, 3, 3));
 
         // set the location of the indicator in the bottom right corner of the screen
-        orientationIndicator.getTransforms().add(new Translate(310, 210, 800));
+        orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
 
         // add rotation variables
         orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
@@ -800,6 +807,35 @@ public class Window3DController {
      */
     private void removeTransientLabel() {
         spritesPane.getChildren().remove(transientLabelText);
+    }
+    
+    /**
+     * Triggers zoom in and out on mouse wheel scroll
+     * DeltaY indicates the direction of scroll:
+     *  -Y: zoom out
+     *  +Y: zoom in
+     * 
+     * @param se
+     */
+    public void handleScrollEvent(final ScrollEvent se) {
+    	final EventType<ScrollEvent> type = (EventType<ScrollEvent>) se.getEventType();
+    	if (type == SCROLL) {
+    		double z = zoomProperty.get();
+    		if (se.getDeltaY() < 0) {
+    			// zoom out
+    			if (z < 24.75) {
+    				zoomProperty.set(z + 0.25);
+    			}
+    		} else if (se.getDeltaY() > 0) {
+    			// zoom in
+                if (z > 0.25) {
+                    z -= 0.25;
+                } else if (z < 0) {
+                    z = 0;
+                }
+                zoomProperty.set(z);
+    		}
+    	}
     }
 
     @SuppressWarnings("unchecked")
@@ -2241,7 +2277,7 @@ public class Window3DController {
 			 * The API does not recognize that the camera orientation has changed and thus the back of back face
 			 * culled shapes appear, surrounded w/ artifacts.
 			 */
-            if (z >= 0.25) {
+            if (z > 0.25) {
                 z -= 0.25;
             } else if (z < 0) {
                 z = 0;
