@@ -115,7 +115,7 @@ public class SceneElementsList {
                 name = tokens[DESCRIPTION_INDEX];
                 if (isCategoryLine(tokens)) {
                     // add cetegory to tree
-                    if (name.equalsIgnoreCase(currentCategoryNode.getValue().getNodeText())) {
+                    if (name.equalsIgnoreCase(currentCategoryNode.getValue().getText())) {
                         // the ending of a category
                         currentCategoryNode = currentCategoryNode.getParent();
                     } else {

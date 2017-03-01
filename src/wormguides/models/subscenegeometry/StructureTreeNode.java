@@ -1,9 +1,5 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.models.subscenegeometry;
@@ -28,7 +24,7 @@ public class StructureTreeNode {
      * Constructure
      *
      * @param isCategory
-     *         true if the leaf node is a category heading, false otherwise
+     *         true if the tree node is a category heading, false otherwise
      * @param nodeText
      *         the value shown on the structure tree node, whether it is the category name or structure name
      */
@@ -40,14 +36,14 @@ public class StructureTreeNode {
     /**
      * @return the text in the structure tree node
      */
-    public String getNodeText() {
+    public String getText() {
         return nodeText;
     }
 
     /**
      * @return true if the leaf node is a category heading, false otherwise
      */
-    public boolean isCategoryNode() {
-        return isCategory;
+    public boolean isLeafNode() {
+        return !isCategory;
     }
 }

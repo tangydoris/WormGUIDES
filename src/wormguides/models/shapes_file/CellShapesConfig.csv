@@ -33,10 +33,12 @@ Amphids,,,,,,,
 Amphid Commissure Right,ABprpaappaa ABprpaappap,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_unc s2,wormguides/models/obj_files/bundle_right,300,400,multicellular structure right test comment
 Amphid Commissure Left,ABplpaappaa ABplpaappap,cnd-1,L:\fanl\_BV220_cnd-1_unc\20150827_LF_BV220_unc s2,wormguides/models/obj_files/bundle_left,300,400,multicellular structure left test comment
 Amphids,,,,,,,
+lim4 Bodies,,,,,,,
 lim4_bundle_left,ABplpapappa ABplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/lim4_bundle_left,295,400,
 lim4_bundle_right,ABprpapappa ABprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/lim4_bundle_right,295,400,
 lim4_nerve_ring_left_early,ABplpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/lim4_nerve_ring_left_early,295,400,
 lim4_nerve_ring_right_early,ABprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/lim4_nerve_ring_right_early,295,400,
 lim4_nerve_ring,ABplpaapaaa ABprpaapaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/lim4_nerve_ring,295,400,
+lim4 Bodies,,,,,,,
 sibdl_single,ABplppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/sibdl_single,295,400,
 sibdr_single,ABprppaaaaa,lim-4,L:\fanl\_BV286_lim-4\LF_BV286_20151107\ s1,wormguides/models/obj_files/sibdr_single,295,400,
