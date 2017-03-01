@@ -1,17 +1,15 @@
 /*
- * Bao Lab 2016
- */
-
-/*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package wormguides.layers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -102,7 +101,7 @@ public class StructuresLayer {
                 searchStructuresResultsList.clear();
             } else {
                 selectedStructureNameProperty.set("");
-                deselectAllStructures();
+                clearStructureTreeNodeSelection();
                 searchAndUpdateResults(newValue.toLowerCase());
             }
         });
@@ -118,21 +117,48 @@ public class StructuresLayer {
                 .addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
                         final StructureTreeNode selectedNode = newValue.getValue();
-                        if (!selectedNode.isCategoryNode()) {
+                        if (selectedNode.isLeafNode()) {
                             searchField.clear();
-                            selectedStructureNameProperty.set(selectedNode.getNodeText());
+                            selectedStructureNameProperty.set(selectedNode.getText());
                         }
                     }
                 });
 
         requireNonNull(rebuildSceneFlag);
         requireNonNull(addStructureRuleButton).setOnAction(event -> {
-            final String name = selectedStructureNameProperty.get();
-            if (!name.isEmpty()) {
-                addStructureRule(name, selectedColor);
-                deselectAllStructures();
+            // if a category/structure is highlighted in the tree view, add rule(s) for that
+            final StructureTreeNode selectedNode = allStructuresTreeView.getSelectionModel()
+                    .getSelectedItem()
+                    .getValue();
+            if (selectedNode != null) {
+                if (selectedNode.isLeafNode()) {
+                    addStructureRule(selectedNode.getText(), selectedColor);
+                } else {
+                    final List<String> structuresToAdd = new ArrayList<>();
+                    // add all descendants of selected node that are structures by breadth first search
+                    // structures of children categories are added as well
+                    final Queue<TreeItem<StructureTreeNode>> nodeQueue = new LinkedList<>();
+                    nodeQueue.addAll(allStructuresTreeView.getSelectionModel()
+                            .getSelectedItem()
+                            .getChildren());
+                    TreeItem<StructureTreeNode> treeItem;
+                    StructureTreeNode node;
+                    while (!nodeQueue.isEmpty()) {
+                        treeItem = nodeQueue.remove();
+                        node = treeItem.getValue();
+                        if (node.isLeafNode()) {
+                            structuresToAdd.add(node.getText());
+                        } else {
+                            nodeQueue.addAll(treeItem.getChildren());
+                        }
+                    }
+                    for (String structure : structuresToAdd) {
+                        addStructureRule(structure, selectedColor);
+                    }
+                }
+                clearStructureTreeNodeSelection();
             } else {
-                // if no name is selected, add all results from search
+                // otherwise add rule(s) for all structures in the search results
                 for (String string : searchStructuresResultsList) {
                     addStructureRule(string, selectedColor);
                 }
@@ -140,17 +166,18 @@ public class StructuresLayer {
             }
             rebuildSceneFlag.set(true);
         });
+
         requireNonNull(colorPicker).setOnAction(event -> selectedColor = ((ColorPicker) event.getSource()).getValue());
     }
 
     /**
      * Deselects any structure in the tree that was active
      */
-    private void deselectAllStructures() {
+    private void clearStructureTreeNodeSelection() {
         allStructuresTreeView.getSelectionModel().clearSelection();
     }
 
-    public void addStructureRule(String name, Color color) {
+    public void addStructureRule(String name, final Color color) {
         if (name == null || color == null) {
             return;
         }
@@ -288,8 +315,8 @@ public class StructuresLayer {
 
         public StructureCellGraphic(final StructureTreeNode treeNode) {
             super();
-            label = new Label(requireNonNull(treeNode).getNodeText());
-            if (treeNode.isCategoryNode()) {
+            label = new Label(requireNonNull(treeNode).getText());
+            if (treeNode.isLeafNode()) {
                 label.setFont(getBolderFont());
             } else {
                 label.setFont(getFont());
