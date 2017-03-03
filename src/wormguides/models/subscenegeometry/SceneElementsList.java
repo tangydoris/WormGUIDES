@@ -26,6 +26,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.sort;
 
+import static partslist.PartsList.getFunctionalNameByLineageName;
 import static wormguides.loaders.GeometryLoader.getEffectiveStartTime;
 
 /**
@@ -102,7 +103,6 @@ public class SceneElementsList {
 
             String line;
             String name;
-            String lineageName;
             String resourceLocation;
             int startTime;
             int endTime;
@@ -145,21 +145,26 @@ public class SceneElementsList {
                             cellNames.add(cellNamesTokenizer.nextToken());
                         }
 
-                        lineageName = name;
-                        if (name.contains("(")) {
-                            lineageName = name.substring(0, name.indexOf("(")).trim();
+                        if (name.contains("(")
+                                && name.contains(")")
+                                && (name.indexOf("(") < name.indexOf(")"))) {
+                            name = name.substring(0, name.indexOf("(")).trim();
                         }
-                        if (lineageData.isCellName(lineageName)) {
-                            effectiveStartTime = lineageData.getFirstOccurrenceOf(lineageName);
-                            int effectiveEndTime = lineageData.getLastOccurrenceOf(lineageName);
+                        if (lineageData.isCellName(name)) {
+                            effectiveStartTime = lineageData.getFirstOccurrenceOf(name);
+                            int effectiveEndTime = lineageData.getLastOccurrenceOf(name);
                             // use the later one of the config start time and the effective lineage start time
                             startTime = effectiveStartTime > startTime ? effectiveStartTime : startTime;
                             // use the earlier one of the config start time and the effective lineage start time
                             endTime = effectiveEndTime < endTime ? effectiveEndTime : endTime;
+                            final String functionalName;
+                            if ((functionalName = getFunctionalNameByLineageName(name)) != null) {
+                                name = functionalName;
+                            }
                         }
 
                         final SceneElement element = new SceneElement(
-                                lineageName,
+                                name,
                                 cellNames,
                                 tokens[MARKER_INDEX],
                                 tokens[IMAGING_SOURCE_INDEX],

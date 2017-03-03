@@ -815,10 +815,10 @@ public class Window3DController {
      *  -Y: zoom out
      *  +Y: zoom in
      * 
-     * @param se
+     * @param se the scroll event
      */
     public void handleScrollEvent(final ScrollEvent se) {
-    	final EventType<ScrollEvent> type = (EventType<ScrollEvent>) se.getEventType();
+    	final EventType<ScrollEvent> type = se.getEventType();
     	if (type == SCROLL) {
     		double z = zoomProperty.get();
     		if (se.getDeltaY() < 0) {
@@ -968,6 +968,10 @@ public class Window3DController {
             if (event.getButton() == SECONDARY
                     || (event.getButton() == PRIMARY
                     && (event.isMetaDown() || event.isControlDown()))) {
+                final String functionalName;
+                if ((functionalName = getFunctionalNameByLineageName(name)) != null) {
+                    name = functionalName;
+                }
                 showContextMenu(
                         name,
                         event.getScreenX(),
@@ -1008,6 +1012,10 @@ public class Window3DController {
                     if (event.getButton() == SECONDARY
                             || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
                         if (sceneElementsList.isStructureSceneName(name)) {
+                            final String functionalName;
+                            if ((functionalName = getFunctionalNameByLineageName(name)) != null) {
+                                name = functionalName;
+                            }
                             showContextMenu(
                                     name,
                                     event.getScreenX(),
@@ -1090,7 +1098,9 @@ public class Window3DController {
     }
 
     private String normalizeName(String name) {
-        if (name.contains("(")) {
+        if (name.contains("(")
+                && name.contains(")")
+                && (name.indexOf("(") < name.indexOf(")"))) {
             name = name.substring(0, name.indexOf("("));
         }
         return name.trim();

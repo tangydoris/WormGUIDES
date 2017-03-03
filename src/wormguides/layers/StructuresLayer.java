@@ -177,6 +177,14 @@ public class StructuresLayer {
         allStructuresTreeView.getSelectionModel().clearSelection();
     }
 
+    /**
+     * Utilizes the search layer to add a structure color rule by the specified name.
+     *
+     * @param name
+     *         the name of the structure
+     * @param color
+     *         the color
+     */
     public void addStructureRule(String name, final Color color) {
         if (name == null || color == null) {
             return;
@@ -200,14 +208,14 @@ public class StructuresLayer {
             return;
         }
 
-        String[] terms = searched.toLowerCase().split(" ");
+        final String[] terms = searched.toLowerCase().split(" ");
         searchStructuresResultsList.clear();
 
         for (String name : sceneElementsList.getAllSceneNames()) {
 
             if (!searchStructuresResultsList.contains(name)) {
                 // search in structure scene names
-                String nameLower = name.toLowerCase();
+                final String nameLower = name.toLowerCase();
 
                 boolean appliesToName = false;
                 boolean appliesToCell = false;
@@ -222,7 +230,7 @@ public class StructuresLayer {
                 }
 
                 // search in cells
-                List<String> cells = nameToCellsMap.get(nameLower);
+                final List<String> cells = nameToCellsMap.get(nameLower);
                 if (cells != null) {
                     for (String cell : cells) {
                         // use the first term
