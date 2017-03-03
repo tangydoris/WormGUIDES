@@ -805,33 +805,31 @@ public class Window3DController {
 
     /**
      * Triggers zoom in and out on mouse wheel scroll
-     * <p>
      * DeltaY indicates the direction of scroll:
-     * -Y: zoom out
-     * +Y: zoom in
+     *  -Y: zoom out
+     *  +Y: zoom in
      *
-     * @param se
-     *         the scroll event
+     * @param se the scroll event
      */
     public void handleScrollEvent(final ScrollEvent se) {
-        final EventType<ScrollEvent> type = se.getEventType();
-        if (type == SCROLL) {
-            double z = zoomProperty.get();
-            if (se.getDeltaY() < 0) {
-                // zoom out
-                if (z < 24.75) {
-                    zoomProperty.set(z + 0.25);
-                }
-            } else if (se.getDeltaY() > 0) {
-                // zoom in
+    	final EventType<ScrollEvent> type = se.getEventType();
+    	if (type == SCROLL) {
+    		double z = zoomProperty.get();
+    		if (se.getDeltaY() < 0) {
+    			// zoom out
+    			if (z < 24.75) {
+    				zoomProperty.set(z + 0.25);
+    			}
+    		} else if (se.getDeltaY() > 0) {
+    			// zoom in
                 if (z > 0.25) {
                     z -= 0.25;
                 } else if (z < 0) {
                     z = 0;
                 }
                 zoomProperty.set(z);
-            }
-        }
+    		}
+    	}
     }
 
     @SuppressWarnings("unchecked")
@@ -964,6 +962,10 @@ public class Window3DController {
             if (event.getButton() == SECONDARY
                     || (event.getButton() == PRIMARY
                     && (event.isMetaDown() || event.isControlDown()))) {
+                final String functionalName;
+                if ((functionalName = getFunctionalNameByLineageName(name)) != null) {
+                    name = functionalName;
+                }
                 showContextMenu(
                         name,
                         event.getScreenX(),
@@ -1004,6 +1006,10 @@ public class Window3DController {
                     if (event.getButton() == SECONDARY
                             || (event.getButton() == PRIMARY && (event.isMetaDown() || event.isControlDown()))) {
                         if (sceneElementsList.isStructureSceneName(name)) {
+                            final String functionalName;
+                            if ((functionalName = getFunctionalNameByLineageName(name)) != null) {
+                                name = functionalName;
+                            }
                             showContextMenu(
                                     name,
                                     event.getScreenX(),
@@ -1086,7 +1092,9 @@ public class Window3DController {
     }
 
     private String normalizeName(String name) {
-        if (name.contains("(")) {
+        if (name.contains("(")
+                && name.contains(")")
+                && (name.indexOf("(") < name.indexOf(")"))) {
             name = name.substring(0, name.indexOf("("));
         }
         return name.trim();
