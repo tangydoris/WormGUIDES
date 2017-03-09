@@ -1,5 +1,5 @@
 /*
- * Bao Lab 2016
+ * Bao Lab 2017
  */
 
 package connectome;
@@ -31,7 +31,7 @@ public class ConnectomeLoader {
 
     private static final String nmj_neuromuscular = "NMJ";
 
-    private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
+    private static final String headerLine = "Cell 1,Cell 2,Attachment,Nbr";
 
     private static final String filePath = "/connectome/NeuronConnect.csv";
 

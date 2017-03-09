@@ -30,8 +30,8 @@ import javafx.scene.layout.AnchorPane;
 
 import acetree.LineageData;
 import wormguides.stories.Note;
+import wormguides.stories.Note.Attachment;
 import wormguides.stories.Note.Display;
-import wormguides.stories.Note.Type;
 import wormguides.stories.Story;
 import wormguides.util.StringCellFactory;
 
@@ -48,9 +48,9 @@ import static wormguides.controllers.StoryEditorController.Time.RANGE;
 import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
 import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.stories.Note.Display.SPRITE;
-import static wormguides.stories.Note.Type.BLANK;
-import static wormguides.stories.Note.Type.CELL;
-import static wormguides.stories.Note.Type.STRUCTURE;
+import static wormguides.stories.Note.Attachment.BLANK;
+import static wormguides.stories.Note.Attachment.CELL;
+import static wormguides.stories.Note.Attachment.STRUCTURE;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 
@@ -356,7 +356,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         attachmentToggle.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (activeNote != null) {
                 if (newValue != null) {
-                    switch ((Type) newValue.getUserData()) {
+                    switch ((Attachment) newValue.getUserData()) {
                         case CELL:
                             setActiveNoteAttachmentType(CELL);
                             setActiveNoteCellName(activeCellProperty.get());
@@ -428,7 +428,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         activeCellProperty.addListener((observable, oldValue, newValue) -> {
             // only change when active cell toggle is not selected and the currently active entity is a named cell
             final Toggle selected = attachmentToggle.getSelectedToggle();
-            if (selected == null || !((Type) selected.getUserData()).equals(CELL)) {
+            if (selected == null || !((Attachment) selected.getUserData()).equals(CELL)) {
                 String activeCellName = "";
                 if (lineageData.isCellName(newValue)) {
                     activeCellName = newValue;
@@ -481,10 +481,10 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         }
     }
 
-    private void setActiveNoteAttachmentType(Type type) {
+    private void setActiveNoteAttachmentType(final Attachment attachment) {
         if (activeNote != null) {
-            activeNote.setAttachmentType(type);
-            if (type.equals(CELL) && !activeCellProperty.get().isEmpty()) {
+            activeNote.setAttachmentType(attachment);
+            if (attachment.equals(CELL) && !activeCellProperty.get().isEmpty()) {
                 activeNote.setCellName(activeCellProperty.get());
             }
         }

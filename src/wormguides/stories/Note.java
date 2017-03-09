@@ -19,10 +19,10 @@ import static java.lang.String.join;
 import static java.util.Objects.requireNonNull;
 
 import static wormguides.stories.Note.Display.OVERLAY;
-import static wormguides.stories.Note.Type.BLANK;
-import static wormguides.stories.Note.Type.CELL;
-import static wormguides.stories.Note.Type.LOCATION;
-import static wormguides.stories.Note.Type.STRUCTURE;
+import static wormguides.stories.Note.Attachment.BLANK;
+import static wormguides.stories.Note.Attachment.CELL;
+import static wormguides.stories.Note.Attachment.LOCATION;
+import static wormguides.stories.Note.Attachment.STRUCTURE;
 
 /**
  * This class represents a note that belongs to a story (its parent). A note contains a tag name, tag contents, an
@@ -33,7 +33,7 @@ import static wormguides.stories.Note.Type.STRUCTURE;
  * dictated by {@link Note.Display}. If blank, the note is without scope and does not appear in the subscene.
  * <p>
  * Notes can be attached to entities such as cells, multicellular structures, or a location in the 3D subscene. This
- * is dictated by {@link Note.Type}. If a note is attached to a cell, structure, or location, but the cell,
+ * is dictated by {@link Attachment}. If a note is attached to a cell, structure, or location, but the cell,
  * structure, or location is not specified, the note is without scope and does not appear in the subscene.
  */
 public class Note {
@@ -68,7 +68,7 @@ public class Note {
 
     private String tagName;
     private String tagContents;
-    private Type attachmentType;
+    private Attachment attachmentType;
     private Display tagDisplay;
     private int x, y, z;
     private String cellName;
@@ -78,19 +78,6 @@ public class Note {
     private int startTime, endTime;
     private String comments;
     private String colorUrl;
-
-    public Note(
-            final Story parentStory,
-            final String tagName,
-            final String tagContents) {
-        this(parentStory);
-        if (tagName != null) {
-            setTagName(tagName);
-        }
-        if (tagContents != null) {
-            setTagContents(tagContents);
-        }
-    }
 
     public Note(final Story parentStory) {
         this.parentStory = requireNonNull(parentStory);
@@ -117,6 +104,19 @@ public class Note {
 
         setTagDisplay(OVERLAY);
         setAttachmentType(BLANK);
+    }
+
+    public Note(
+            final Story parentStory,
+            final String tagName,
+            final String tagContents) {
+        this(parentStory);
+        if (tagName != null) {
+            setTagName(tagName);
+        }
+        if (tagContents != null) {
+            setTagContents(tagContents);
+        }
     }
 
     public String getColorUrl() {
@@ -218,7 +218,7 @@ public class Note {
     public void setAttachmentType(String type) throws AttachmentTypeEnumException {
         if (type != null) {
             type = type.trim();
-            for (Type t : Type.values()) {
+            for (Attachment t : Attachment.values()) {
                 if (t.equals(type)) {
                     setAttachmentType(t);
                     return;
@@ -231,11 +231,9 @@ public class Note {
     public void setLocation(final String location) throws LocationStringFormatException {
         if (location != null && !location.isEmpty()) {
             final String[] coords = location.trim().split(" ");
-
             if (coords.length != 3) {
                 throw new LocationStringFormatException();
             }
-
             try {
                 setLocation(
                         parseInt(coords[0]),
@@ -334,13 +332,13 @@ public class Note {
         }
     }
 
-    public Type getAttachmentType() {
+    public Attachment getAttachmentType() {
         return attachmentType;
     }
 
-    public void setAttachmentType(final Type type) {
-        if (type != null) {
-            attachmentType = type;
+    public void setAttachmentType(final Attachment attachment) {
+        if (attachment != null) {
+            attachmentType = attachment;
         }
     }
 
@@ -588,7 +586,7 @@ public class Note {
     }
 
     public boolean isAttachmentTypeEnum(String type) {
-        for (Type t : Type.values()) {
+        for (Attachment t : Attachment.values()) {
             if (t.equals(type)) {
                 return true;
             }
@@ -599,7 +597,7 @@ public class Note {
     public String toString() {
         return "Note["
                 + "@Name='" + tagName + "' "
-                + "@Type=" + attachmentType + " "
+                + "@Attachment=" + attachmentType + " "
                 + "@Display=" + tagDisplay + " "
                 + "@Time=" + startTime + ", " + endTime + " "
                 + "@Location=" + x + ", " + y + ", " + z + " "
@@ -610,7 +608,7 @@ public class Note {
     /**
      * Attachment type for a {@link Note}. This defines that a note is attached to.
      */
-    public enum Type {
+    public enum Attachment {
 
         /** Attachment to location defined by three coordinate **/
         LOCATION("location"),
@@ -626,14 +624,14 @@ public class Note {
 
         private String type;
 
-        Type(final String type) {
+        Attachment(final String type) {
             this.type = type;
         }
 
         public static String valuesToString() {
             final List<String> values = new ArrayList<>();
-            for (Type type : values()) {
-                values.add(type.toString());
+            for (Attachment attachment : values()) {
+                values.add(attachment.toString());
             }
             return join(",", values);
         }
@@ -647,8 +645,8 @@ public class Note {
             return type.equalsIgnoreCase(otherType.trim());
         }
 
-        public boolean equals(final Type type) {
-            return this == type;
+        public boolean equals(final Attachment attachment) {
+            return this == attachment;
         }
     }
 
@@ -662,17 +660,17 @@ public class Note {
 
         /**
          * Display as a 3D billboard that rotates and translates with the entity the note is attached to (defined by
-         * {@link Type})
+         * {@link Attachment})
          */
         BILLBOARD("billboard"),
 
         /**
          * Display as a front-facing billboard that translates with the entity the note is attached to (defined by
-         * {@link Type})
+         * {@link Attachment})
          */
         BILLBOARD_FRONT("billboard front"),
 
-        /** Display as a sprite that moves with the entity the note is attached to (defined by {@link Type}) */
+        /** Display as a sprite that moves with the entity the note is attached to (defined by {@link Attachment}) */
         SPRITE("sprite"),
 
         /** No display, defaults to overlay in the upper-right-hand corner of the 3D subscene */
@@ -720,7 +718,7 @@ public class Note {
         private static final long serialVersionUID = 1L;
 
         public AttachmentTypeEnumException() {
-            super("Invalid note attachment type enum, must be one of the following:\n" + Type.valuesToString());
+            super("Invalid note attachment type enum, must be one of the following:\n" + Attachment.valuesToString());
         }
     }
 

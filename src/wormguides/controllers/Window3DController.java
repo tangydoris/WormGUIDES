@@ -553,8 +553,6 @@ public class Window3DController {
         this.translateYProperty.addListener(getTranslateYListener());
         this.translateYProperty.set(getInitialTranslateY());
 
-//        quaternion = new Quaternion();
-
         this.colorHash = requireNonNull(colorHash);
         colorComparator = new ColorComparator();
         opacityComparator = new OpacityComparator();
@@ -2013,12 +2011,10 @@ public class Window3DController {
 
     private void buildCamera() {
         camera = new PerspectiveCamera(true);
-
         xform = new Xform();
         xform.reset();
         rootEntitiesGroup.getChildren().add(xform);
         xform.getChildren().add(camera);
-
         camera.setNearClip(getCameraNearClip());
         camera.setFarClip(getCameraFarClip());
         camera.setTranslateZ(getCameraInitialDistance());
