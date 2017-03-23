@@ -13,6 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static java.lang.Integer.parseInt;
+
+import static connectome.SynapseType.EJ_ELECTRICAL;
+import static connectome.SynapseType.NMJ_NEUROMUSCULAR;
+import static connectome.SynapseType.R_POSTSYNAPTIC;
+import static connectome.SynapseType.S_PRESYNAPTIC;
+
 /**
  * Loader to read NeuronConnect.csv and create a connectome object.
  * @see Connectome
@@ -31,7 +38,7 @@ public class ConnectomeLoader {
 
     private static final String nmj_neuromuscular = "NMJ";
 
-    private static final String headerLine = "Cell 1,Cell 2,Attachment,Nbr";
+    private static final String headerLine = "Cell 1,Cell 2,Type,Nbr";
 
     private static final String filePath = "/connectome/NeuronConnect.csv";
 
@@ -39,9 +46,8 @@ public class ConnectomeLoader {
         final List<NeuronalSynapse> connectome = new ArrayList<>();
 
         final URL url = ConnectomeLoader.class.getResource(filePath);
-        try (InputStream stream = url.openStream();
-             InputStreamReader streamReader = new InputStreamReader(stream);
-             BufferedReader reader = new BufferedReader(streamReader)) {
+        try (final InputStreamReader streamReader = new InputStreamReader(url.openStream());
+             final BufferedReader reader = new BufferedReader(streamReader)) {
 
             if (url != null) {
                 String line;
@@ -77,31 +83,31 @@ public class ConnectomeLoader {
                         }
 
                         // unchecked -> number format exception unhandled
-                        Integer numberOfSynapses = Integer.parseInt(numberOfSynapsesStr);
+                        Integer numberOfSynapses = parseInt(numberOfSynapsesStr);
 
                         SynapseType synapseType;
                         switch (synapseTypeStr) {
                             case s_presynapticV1:
-                                synapseType = SynapseType.S_PRESYNAPTIC;
+                                synapseType = S_PRESYNAPTIC;
                                 synapseType.setMonadic();
                                 break;
                             case s_presynapticV2:
-                                synapseType = SynapseType.S_PRESYNAPTIC;
+                                synapseType = S_PRESYNAPTIC;
                                 synapseType.setPoyadic();
                                 break;
                             case r_postsynapticV1:
-                                synapseType = SynapseType.R_POSTSYNAPTIC;
+                                synapseType = R_POSTSYNAPTIC;
                                 synapseType.setMonadic();
                                 break;
                             case r_postsynapticV2:
-                                synapseType = SynapseType.R_POSTSYNAPTIC;
+                                synapseType = R_POSTSYNAPTIC;
                                 synapseType.setPoyadic();
                                 break;
                             case ej_electrical:
-                                synapseType = SynapseType.EJ_ELECTRICAL;
+                                synapseType = EJ_ELECTRICAL;
                                 break;
                             case nmj_neuromuscular:
-                                synapseType = SynapseType.NMJ_NEUROMUSCULAR;
+                                synapseType = NMJ_NEUROMUSCULAR;
                                 break;
                             default:
                                 synapseType = null;
@@ -112,13 +118,11 @@ public class ConnectomeLoader {
                                 && cell_2.length() != 0
                                 && synapseType != null
                                 && numberOfSynapsesStr.length() >= 0) {
-
-                            NeuronalSynapse neuronalSynapse = new NeuronalSynapse(
+                            connectome.add(new NeuronalSynapse(
                                     cell_1,
                                     cell_2,
                                     synapseType,
-                                    numberOfSynapses);
-                            connectome.add(neuronalSynapse);
+                                    numberOfSynapses));
                         }
                     }
                 }
