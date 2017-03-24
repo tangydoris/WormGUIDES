@@ -192,7 +192,7 @@ public class Window3DController {
     private final BooleanProperty playingMovieProperty;
     private final PlayService playService;
     private final RenderService renderService;
-    /** Local version of the serach results that only contains lineage names */
+    /** Search results local to window 3d that only contains lineage names */
     private final List<String> localSearchResults;
     // color rules stuff
     private final ColorHash colorHash;

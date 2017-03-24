@@ -3,7 +3,7 @@ Desktop version of the WormGUIDES iPad and Android apps.
 
 Source code can be found at https://github.com/tangydoris/WormGUIDES.
 
-Version currently uses JRE 1.8 version 77+. Source built using JRE 1.8 version 77 downloaded from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html<br>
+This application uses JRE 1.8 version 77+. Source built using JRE 1.8 version 77 downloaded from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html. At least update 77 is needed for transparency rendering of colors. Update 66 can be used, but only supports different transparencies for the shade white.<br>
 The documentation for the shared URL paramters can be found in URLDocumentation.txt.
 <br><br><br>
 
