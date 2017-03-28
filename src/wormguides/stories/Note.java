@@ -398,17 +398,18 @@ public class Note {
      * Update 02/2017: Check to see if an image file name is in the resource location field. If so, we'll enable the
      * flag indicating that this note should not display its text but rather render the image contained in this path
      * at the location of attachment
-     * 
-     * @param location the resource location
+     *
+     * @param location
+     *         the resource location
      */
     public void setResourceLocation(final String location) {
         if (elements == null) {
             elements = new ArrayList<>();
         }
         if (location != null && !location.isEmpty()) {
-        	// first check if this is an obj file
-        	// then check if it is an image file
-        	// then go into the failure mode
+            // first check if this is an obj file
+            // then check if it is an image file
+            // then go into the failure mode
             resourceLocation = location.trim();
             String sceneName = resourceLocation;
             if (resourceLocation.lastIndexOf("/") != -1) {
@@ -622,10 +623,10 @@ public class Note {
         /** No attachment - note becomes an overlay */
         BLANK("");
 
-        private String type;
+        private final String type;
 
         Attachment(final String type) {
-            this.type = type;
+            this.type = type.trim();
         }
 
         public static String valuesToString() {
@@ -659,27 +660,55 @@ public class Note {
         OVERLAY("overlay"),
 
         /**
-         * Display as a 3D billboard that rotates and translates with the entity the note is attached to (defined by
+         * Display as a 3D billboard that rotates and translates with the entity that the note is attached to
+         * (defined by
          * {@link Attachment})
          */
         BILLBOARD("billboard"),
 
         /**
-         * Display as a front-facing billboard that translates with the entity the note is attached to (defined by
+         * Display as a front-facing billboard that translates with the entity that the note is attached to (defined by
          * {@link Attachment})
          */
         BILLBOARD_FRONT("billboard front"),
 
-        /** Display as a sprite that moves with the entity the note is attached to (defined by {@link Attachment}) */
+        /**
+         * Display as a sprite that moves with the entity that the note is attached to (defined by
+         * {@link Attachment})
+         */
         SPRITE("sprite"),
+
+        /**
+         * Display as a sprite offset to the upper left of the entity that the note is attached to. A line is drawn from
+         * the note to the left side of the entity.
+         */
+        CALLOUT_UPPER_LEFT("callout UL"),
+
+        /**
+         * Display as a sprite offset to the lower left of the entity that the note is attached to. A line is drawn from
+         * the note to the left side of the entity.
+         */
+        CALLOUT_LOWER_LEFT("callout LL"),
+
+        /**
+         * Display as a sprite to offset the upper right of the entity that the note is attached to. A line is drawn
+         * from the note to the right side of the entity.
+         */
+        CALLOUT_UPPER_RIGHT("callout UR"),
+
+        /**
+         * Display as a sprite to the offset lower right of the entity that the note is attached to. A line is drawn
+         * from the note to the right side of the entity.
+         */
+        CALLOUT_LOWER_RIGHT("callout LR"),
 
         /** No display, defaults to overlay in the upper-right-hand corner of the 3D subscene */
         BLANK("");
 
-        private String display;
+        private final String display;
 
-        Display(String display) {
-            this.display = display;
+        Display(final String display) {
+            this.display = display.trim();
         }
 
         public static String valuesToString() {

@@ -46,6 +46,10 @@ import static wormguides.controllers.StoryEditorController.Time.CURRENT;
 import static wormguides.controllers.StoryEditorController.Time.GLOBAL;
 import static wormguides.controllers.StoryEditorController.Time.RANGE;
 import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_RIGHT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_RIGHT;
 import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.stories.Note.Display.SPRITE;
 import static wormguides.stories.Note.Attachment.BLANK;
@@ -122,14 +126,15 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     @FXML
     private RadioButton billboardRadioBtn;
     @FXML
-    private RadioButton upLeftRadioBtn;
+    private RadioButton calloutUpperLeftRadioBtn;
     @FXML
-    private RadioButton upRightRadioBtn;
+    private RadioButton calloutUpperRightRadioBtn;
     @FXML
-    private RadioButton lowLeftRadioBtn;
+    private RadioButton calloutLowerLeftRadioBtn;
     @FXML
-    private RadioButton lowRightRadioBtn;
+    private RadioButton calloutLowerRightRadioBtn;
     private BooleanProperty noteCreated;
+
     @FXML
     private TextField storyTitle;
     @FXML
@@ -220,8 +225,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        assertFXMLNodes();
-
         // for story title field unselection/caret position
         storyFieldsUpdateRunnable = () -> {
             storyTitle.setText(activeStory.getTitle());
@@ -404,6 +407,19 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         case BILLBOARD_FRONT:
                             setActiveNoteDisplay(BILLBOARD_FRONT);
                             break;
+                        case CALLOUT_UPPER_LEFT:
+                            // TODO implement all callouts
+                            setActiveNoteDisplay(CALLOUT_UPPER_LEFT);
+                            break;
+                        case CALLOUT_UPPER_RIGHT:
+                            setActiveNoteDisplay(CALLOUT_UPPER_RIGHT);
+                            break;
+                        case CALLOUT_LOWER_LEFT:
+                            setActiveNoteDisplay(CALLOUT_LOWER_LEFT);
+                            break;
+                        case CALLOUT_LOWER_RIGHT:
+                            setActiveNoteDisplay(CALLOUT_LOWER_RIGHT);
+                            break;
                         default:
                             break;
                     }
@@ -515,51 +531,11 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         // display
         infoPaneRadioBtn.setUserData(OVERLAY);
         locationRadioBtn.setUserData(SPRITE);
-        upLeftRadioBtn.setUserData(SPRITE);
-        upRightRadioBtn.setUserData(SPRITE);
-        lowLeftRadioBtn.setUserData(SPRITE);
-        lowRightRadioBtn.setUserData(SPRITE);
+        calloutUpperLeftRadioBtn.setUserData(CALLOUT_UPPER_LEFT);
+        calloutUpperRightRadioBtn.setUserData(CALLOUT_UPPER_RIGHT);
+        calloutLowerLeftRadioBtn.setUserData(CALLOUT_LOWER_LEFT);
+        calloutLowerRightRadioBtn.setUserData(CALLOUT_LOWER_RIGHT);
         billboardRadioBtn.setUserData(BILLBOARD_FRONT);
-    }
-
-    private void assertFXMLNodes() {
-        assert (activeCellLabel != null);
-
-        assert (author != null);
-        assert (date != null);
-
-        assert (titleField != null);
-        assert (contentArea != null);
-
-        assert (storyTitle != null);
-        assert (storyDescription != null);
-
-        assert (delete != null);
-
-        assert (startTimeField != null);
-        assert (endTimeField != null);
-        assert (currentTimeLabel != null);
-
-        assert (attachmentToggle != null);
-        assert (cellRadioBtn != null);
-        assert (globalRadioBtn != null);
-        assert (structureRadioBtn != null);
-        assert (structuresComboBox != null);
-        assert (axonRadioBtn != null);
-        assert (dendriteRadioBtn != null);
-        assert (cellBodyRadioBtn != null);
-
-        // assert (calloutToggle!=null);
-        // assert (calloutTick!=null);
-        assert (upLeftRadioBtn != null);
-        assert (upRightRadioBtn != null);
-        assert (lowLeftRadioBtn != null);
-        assert (lowRightRadioBtn != null);
-
-        assert (displayToggle != null);
-        assert (infoPaneRadioBtn != null);
-        assert (locationRadioBtn != null);
-        assert (billboardRadioBtn != null);
     }
 
     public void setNoteCreated(boolean created) {

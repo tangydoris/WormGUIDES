@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+
 <fx:root prefHeight="830.0" prefWidth="400.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
     <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="30.0" layoutY="83.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <padding>
@@ -159,7 +160,7 @@
                                             <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                                         </children>
                                     </HBox>
-                                    <Label minWidth="119.0" text="Note is related to:">
+                                    <Label minWidth="119.0" text="Note is attached to:">
                                         <font>
                                             <Font size="14.0" />
                                         </font>
@@ -426,7 +427,7 @@
                                     <HBox maxWidth="1.7976931348623157E308">
                                         <children>
                                             <Region maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                            <Label disable="true" minWidth="47.0" text="Callout">
+                                            <Label minWidth="47.0" text="Callout">
                                                 <font>
                                                     <Font size="14.0" />
                                                 </font>
@@ -436,54 +437,59 @@
                                             </Label>
                                         </children>
                                     </HBox>
-                                    <HBox>
+                                    <HBox spacing="15.0">
                                         <children>
-                                            <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
-                                            <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="71.0" text="Upper Left">
+                                            <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="50.0" />
+                                            <Label maxHeight="1.7976931348623157E308" minWidth="71.0" text="Upper Left">
                                                 <font>
                                                     <Font size="14.0" />
                                                 </font>
                                             </Label>
-                                            <RadioButton fx:id="upLeftRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
+                                            <RadioButton fx:id="calloutUpperLeftRadioBtn" contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
                                                 <font>
                                                     <Font size="14.0" />
                                                 </font>
                                             </RadioButton>
-                                            <Region maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                            <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="35.0" text="Right">
+                                            <Label maxHeight="1.7976931348623157E308" minWidth="35.0" text="Upper Right">
                                                 <font>
                                                     <Font size="14.0" />
                                                 </font>
                                             </Label>
-                                            <RadioButton fx:id="upRightRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
-                                                <font>
-                                                    <Font size="14.0" />
-                                                </font>
-                                            </RadioButton>
-                                            <Region maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" HBox.hgrow="ALWAYS" />
-                                            <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="71.0" text="Lower Left">
-                                                <font>
-                                                    <Font size="14.0" />
-                                                </font>
-                                            </Label>
-                                            <RadioButton fx:id="lowLeftRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
-                                                <font>
-                                                    <Font size="14.0" />
-                                                </font>
-                                            </RadioButton>
-                                            <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                                            <Label disable="true" maxHeight="1.7976931348623157E308" minWidth="35.0" text="Right">
-                                                <font>
-                                                    <Font size="14.0" />
-                                                </font>
-                                            </Label>
-                                            <RadioButton fx:id="lowRightRadioBtn" contentDisplay="TEXT_ONLY" disable="true" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
+                                            <RadioButton fx:id="calloutUpperRightRadioBtn" contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle">
                                                 <font>
                                                     <Font size="14.0" />
                                                 </font>
                                             </RadioButton>
                                         </children>
                                     </HBox>
+                           <HBox layoutX="16.0" layoutY="589.0" spacing="15.0">
+                              <children>
+                                 <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="50.0" />
+                                 <Label maxHeight="1.7976931348623157E308" minWidth="71.0" text="Lower Left">
+                                    <font>
+                                       <Font size="14.0" />
+                                    </font>
+                                 </Label>
+                                 <RadioButton fx:id="calloutLowerLeftRadioBtn" contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT">
+                                    <toggleGroup>
+                                       <ToggleGroup fx:id="displayToggle1" />
+                                    </toggleGroup>
+                                    <font>
+                                       <Font size="14.0" />
+                                    </font>
+                                 </RadioButton>
+                                 <Label maxHeight="1.7976931348623157E308" minWidth="35.0" text="Lower Right">
+                                    <font>
+                                       <Font size="14.0" />
+                                    </font>
+                                 </Label>
+                                 <RadioButton fx:id="calloutLowerRightRadioBtn" contentDisplay="TEXT_ONLY" mnemonicParsing="false" textAlignment="RIGHT" toggleGroup="$displayToggle1">
+                                    <font>
+                                       <Font size="14.0" />
+                                    </font>
+                                 </RadioButton>
+                              </children>
+                           </HBox>
                                     <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="240.0">
                                         <children>
                                             <Region maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="15.0" />

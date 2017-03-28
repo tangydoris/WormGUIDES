@@ -18,5 +18,13 @@ Note Display Type: specifies what the note is displayed as in the 3D window
                         entity that the note is attached to, except the front (with text legible) always faces the user
 "sprite"            -> display as a sprite that remains constant in size and front-facing on a plane on top of the
                         3D window, this moves with the entity in the subscene that the note is attached to
+"callout UL"        -> display as a sprite offset to the upper left of the entity that the note is attached to. A line
+                        is drawn from the note to the left side of the entity
+"callout UR"        -> display as a sprite offset to the upper right of the entity that the note is attached to. A line
+                        is drawn from the note to the left side of the entity
+"callout LL"        -> display as a sprite offset to the lower left of the entity that the note is attached to. A line
+                        is drawn from the note to the left side of the entity
+"callout LR"        -> display as a sprite offset to the lower right of the entity that the note is attached to. A line
+                        is drawn from the note to the left side of the entity
 "overlay"           -> display in the story pane in the upper-right-hand corner of the 3D window
 ""                  -> no display type, defaults to the overlay display
