@@ -281,8 +281,8 @@ public class SearchLayer {
     /**
      * Adds a giant connectome rule that contains all the cell results retrieved based on the input query parameters
      *
-     * @param linegeName
-     *         the searched lineage name
+     * @param funcName
+     *         the functional name of the cell
      * @param color
      *         color to apply to cell entities
      * @param isPresynapticTicked
@@ -309,7 +309,7 @@ public class SearchLayer {
 
         final Rule rule = new Rule(rebuildSubsceneFlag, sb.toString(), color, CONNECTOME, CELL_NUCLEUS);
         rule.setCells(connectome.queryConnectivity(
-        		funcName,
+                funcName,
                 isPresynapticTicked,
                 isPostsynapticTicked,
                 isElectricalTicked,
@@ -321,8 +321,9 @@ public class SearchLayer {
         return rule;
     }
 
-    private StringBuilder createLabelForConnectomeRule(String funcName,
-    		final boolean isPresynapticTicked,
+    private StringBuilder createLabelForConnectomeRule(
+            String funcName,
+            final boolean isPresynapticTicked,
             final boolean isPostsynapticTicked,
             final boolean isElectricalTicked,
             final boolean isNeuromuscularTicked) {
@@ -428,21 +429,32 @@ public class SearchLayer {
         addColorRule(FUNCTIONAL, "da3", web("0xe6b34d"), CELL_NUCLEUS);
         addColorRule(FUNCTIONAL, "da4", web("0xe6b34d"), CELL_NUCLEUS);
         addColorRule(FUNCTIONAL, "da5", web("0xe6b34d"), CELL_NUCLEUS);
-        
-        // 12/28/2016 --> added because mutlicellular structures are not colored via individual cell rules in this version
+
+        // 12/28/2016 --> added because mutlicellular structures are not colored via individual cell rules in this
+        // version
         // TODO
         /*
-         * I'm unclear as to how the rules here are percolated to the actual rules this that's displayed. I know that the 
-         * blank story does URL parsing to set the 4 default rules, but this is less known to me. I added these rules below
-         * and saw no difference and to test whether or not it was code that I had written today to cause the problem, I added
-         * a second rule to those above. I added another rule for siav with the same syntax and gave it a different color ond
-         * it didn't result in another siav rule in the display panel so if you remember how these rules listed above actually
-         * end up being active rules, we need those applied to these rules below to have the same default view in this version
+         * I'm unclear as to how the rules here are percolated to the actual rules this that's displayed. I know that
+          * the
+         * blank story does URL parsing to set the 4 default rules, but this is less known to me. I added these rules
+          * below
+         * and saw no difference and to test whether or not it was code that I had written today to cause the
+         * problem, I added
+         * a second rule to those above. I added another rule for siav with the same syntax and gave it a different
+         * color ond
+         * it didn't result in another siav rule in the display panel so if you remember how these rules listed above
+          * actually
+         * end up being active rules, we need those applied to these rules below to have the same default view in
+         * this version
          * 
-         * For the blank story template to look the same as it was before, we need to add explicit structure rules that have the
-         * colors of the original view because in this version, only structure rules can color multicellular structures. I know
-         * that the 4 default rules under the story that it is initialized with are made via that URL string so if you could add
-         * the explicit structures rules that would be great. I figured that would be faster than me figuring out the syntax of
+         * For the blank story template to look the same as it was before, we need to add explicit structure rules
+         * that have the
+         * colors of the original view because in this version, only structure rules can color multicellular
+         * structures. I know
+         * that the 4 default rules under the story that it is initialized with are made via that URL string so if
+         * you could add
+         * the explicit structures rules that would be great. I figured that would be faster than me figuring out the
+          * syntax of
          * the URLs and trying to make them myself because I have very little knowledge of how those work currently.
          */
         addStructureRuleBySceneName("lim4_bundle_left", web("0xe6ccff"));
@@ -537,10 +549,7 @@ public class SearchLayer {
         return rule;
     }
 
-    /*
-     * TODO fix this
-     */
-    private String createRuleLabel(String searched, SearchType searchType) {
+    private String createRuleLabel(String searched, final SearchType searchType) {
         searched = searched.trim().toLowerCase();
         StringBuilder labelBuilder = new StringBuilder();
         if (searchType != null) {
@@ -553,11 +562,11 @@ public class SearchLayer {
                 labelBuilder = createLabelForConnectomeRule(
                         searched,
                         presynapticCheckBox.isSelected(),
-                            postsynapticCheckBox.isSelected(),
-                            neuromuscularCheckBox.isSelected(),
-                            electricalCheckBox.isSelected());
+                        postsynapticCheckBox.isSelected(),
+                        neuromuscularCheckBox.isSelected(),
+                        electricalCheckBox.isSelected());
             } else {
-            	labelBuilder.append("'").append(searched).append("' ").append(searchType.toString());
+                labelBuilder.append("'").append(searched).append("' ").append(searchType.toString());
             }
         } else {
             labelBuilder.append(searched);
@@ -886,10 +895,10 @@ public class SearchLayer {
     private final class ShowLoadingService extends Service<Void> {
 
         /** Time between changes in the number of ellipses periods during loading */
-        private final long WAIT_TIME_MILLIS = 1000;
+        private static final long WAIT_TIME_MILLIS = 1000;
 
         /** Maximum number of ellipses periods to show, plus 1 */
-        private final int MODULUS = 5;
+        private static final int MODULUS = 5;
 
         /** Changing number of ellipses periods to display during loading */
         private int count = 0;

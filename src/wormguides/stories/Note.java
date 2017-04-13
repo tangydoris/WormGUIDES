@@ -18,11 +18,18 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.join;
 import static java.util.Objects.requireNonNull;
 
-import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.stories.Note.Attachment.BLANK;
 import static wormguides.stories.Note.Attachment.CELL;
 import static wormguides.stories.Note.Attachment.LOCATION;
 import static wormguides.stories.Note.Attachment.STRUCTURE;
+import static wormguides.stories.Note.Display.BILLBOARD;
+import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_RIGHT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_RIGHT;
+import static wormguides.stories.Note.Display.OVERLAY;
+import static wormguides.stories.Note.Display.SPRITE;
 
 /**
  * This class represents a note that belongs to a story (its parent). A note contains a tag name, tag contents, an
@@ -79,6 +86,19 @@ public class Note {
     private String comments;
     private String colorUrl;
 
+    /**
+     * Horizontal offset from left/right side of the entity that the note is attached to (only applicable to notes
+     * that are callouts). Upper/lower left callouts get offset more to the left of the entity by this while
+     * upper/lower right callouts get offset more to the right.
+     */
+    private double calloutHorizontalOffset;
+    /**
+     * Vertical offset from the top/bottom of the entity that the note is attached to (only applicable to notes
+     * that are callouts). Upper left/right callouts get offset higher above the entity by this while lower
+     * left/right callouts get offset lower below.
+     */
+    private double calloutVerticalOffset;
+
     public Note(final Story parentStory) {
         this.parentStory = requireNonNull(parentStory);
         elements = null;
@@ -104,6 +124,9 @@ public class Note {
 
         setTagDisplay(OVERLAY);
         setAttachmentType(BLANK);
+
+        calloutHorizontalOffset = 0.0;
+        calloutVerticalOffset = 0.0;
     }
 
     public Note(
@@ -342,6 +365,22 @@ public class Note {
         }
     }
 
+    public double getCalloutHorizontalOffset() {
+        return calloutHorizontalOffset;
+    }
+
+    public void setCalloutHorizontalOffset(final double horizontalOffset) {
+        calloutHorizontalOffset = horizontalOffset;
+    }
+
+    public double getCalloutVerticalOffset() {
+        return calloutVerticalOffset;
+    }
+
+    public void setCalloutVerticalOffset(final double verticalOffset) {
+        calloutVerticalOffset = verticalOffset;
+    }
+
     public int getX() {
         return x;
     }
@@ -498,14 +537,12 @@ public class Note {
     public boolean isWithoutScope() {
         return tagDisplay.equals(Display.BLANK)
                 || !tagDisplay.equals(OVERLAY)
-                && attachmentType.equals(CELL)
-                && !isEntitySpecified();
+                && (attachmentType.equals(CELL) && !isEntitySpecified());
 
     }
 
     public boolean hasLocationError() {
-        return attachmentType.equals(LOCATION)
-                && !isLoctionSpecified();
+        return attachmentType.equals(LOCATION) && !isLoctionSpecified();
 
     }
 
@@ -562,7 +599,7 @@ public class Note {
     }
 
     /**
-     * @return true if location was specified in the CSV file, false otherwise
+     * @return true if a location is specified for this note, false otherwise
      */
     public boolean isLoctionSpecified() {
         return (x != MIN_VALUE
@@ -575,24 +612,22 @@ public class Note {
     }
 
     public boolean isSprite() {
-        return tagDisplay == Display.SPRITE;
+        return tagDisplay == SPRITE;
+    }
+
+    public boolean isCallout() {
+        return tagDisplay == CALLOUT_LOWER_LEFT
+                || tagDisplay == CALLOUT_LOWER_RIGHT
+                || tagDisplay == CALLOUT_UPPER_LEFT
+                || tagDisplay == CALLOUT_UPPER_RIGHT;
     }
 
     public boolean isBillboard() {
-        return tagDisplay == Display.BILLBOARD;
+        return tagDisplay == BILLBOARD;
     }
 
     public boolean isBillboardFront() {
-        return tagDisplay == Display.BILLBOARD_FRONT;
-    }
-
-    public boolean isAttachmentTypeEnum(String type) {
-        for (Attachment t : Attachment.values()) {
-            if (t.equals(type)) {
-                return true;
-            }
-        }
-        return false;
+        return tagDisplay == BILLBOARD_FRONT;
     }
 
     public String toString() {

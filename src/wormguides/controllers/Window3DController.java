@@ -66,6 +66,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -130,7 +131,12 @@ import static search.SearchUtil.getFirstOccurenceOf;
 import static search.SearchUtil.getLastOccurenceOf;
 import static wormguides.models.colorrule.SearchOption.CELL_BODY;
 import static wormguides.models.colorrule.SearchOption.CELL_NUCLEUS;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_LOWER_RIGHT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_LEFT;
+import static wormguides.stories.Note.Display.CALLOUT_UPPER_RIGHT;
 import static wormguides.stories.Note.Display.OVERLAY;
+import static wormguides.stories.Note.Display.SPRITE;
 import static wormguides.util.AppFont.getBillboardFont;
 import static wormguides.util.AppFont.getSpriteAndOverlayFont;
 import static wormguides.util.subsceneparameters.Parameters.getBillboardScale;
@@ -250,6 +256,14 @@ public class Window3DController {
     private final HashMap<Node, Node> billboardFrontEntityMap;
     /** Map of a cell entity to its label */
     private final Map<Node, Text> entityLabelMap;
+    /** Map of upper left note callouts attached to cell */
+    private final HashMap<Node, List<Text>> entityCalloutULMap;
+    /** Map of upper right note callouts attached to cell */
+    private final HashMap<Node, List<Text>> entityCalloutURMap;
+    /** Map of lower left note callouts attached to cell */
+    private final HashMap<Node, List<Text>> entityCalloutLLMap;
+    /** Map of lower right note callouts attached to cell */
+    private final HashMap<Node, List<Text>> entityCalloutLRMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
     private final ProductionInfo productionInfo;
@@ -513,7 +527,7 @@ public class Window3DController {
         this.zoomProperty.set(getInitialZoom());
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform.setScale(zoomProperty.get());
-            repositionSprites();
+            repositionSpritesAndLabels();
             repositionNoteBillboardFronts();
         });
         xform.setScale(zoomProperty.get());
@@ -567,6 +581,10 @@ public class Window3DController {
         currentNoteMeshMap = new HashMap<>();
         entitySpriteMap = new HashMap<>();
         billboardFrontEntityMap = new HashMap<>();
+        entityCalloutULMap = new HashMap<>();
+        entityCalloutURMap = new HashMap<>();
+        entityCalloutLLMap = new HashMap<>();
+        entityCalloutLRMap = new HashMap<>();
 
         allLabels = new ArrayList<>();
         currentLabels = new ArrayList<>();
@@ -578,7 +596,7 @@ public class Window3DController {
         subscene.setOnMouseEntered(mouseHandler);
         subscene.setOnMousePressed(mouseHandler);
         subscene.setOnMouseReleased(mouseHandler);
-        
+
         final EventHandler<ScrollEvent> mouseScrollHandler = this::handleScrollEvent;
         subscene.setOnScroll(mouseScrollHandler);
 
@@ -675,7 +693,7 @@ public class Window3DController {
 
         requireNonNull(searchResultsUpdateService).setOnSucceeded(event -> updateLocalSearchResults());
         this.searchResultsList = requireNonNull(searchResultsList);
-        
+
         this.captureVideo = new SimpleBooleanProperty();
     }
 
@@ -806,34 +824,35 @@ public class Window3DController {
     private void removeTransientLabel() {
         spritesPane.getChildren().remove(transientLabelText);
     }
-    
+
     /**
      * Triggers zoom in and out on mouse wheel scroll
      * DeltaY indicates the direction of scroll:
-     *  -Y: zoom out
-     *  +Y: zoom in
-     * 
-     * @param se the scroll event
+     * -Y: zoom out
+     * +Y: zoom in
+     *
+     * @param se
+     *         the scroll event
      */
     public void handleScrollEvent(final ScrollEvent se) {
-    	final EventType<ScrollEvent> type = se.getEventType();
-    	if (type == SCROLL) {
-    		double z = zoomProperty.get();
-    		if (se.getDeltaY() < 0) {
-    			// zoom out
-    			if (z < 24.75) {
-    				zoomProperty.set(z + 0.25);
-    			}
-    		} else if (se.getDeltaY() > 0) {
-    			// zoom in
+        final EventType<ScrollEvent> type = se.getEventType();
+        if (type == SCROLL) {
+            double z = zoomProperty.get();
+            if (se.getDeltaY() < 0) {
+                // zoom out
+                if (z < 24.75) {
+                    zoomProperty.set(z + 0.25);
+                }
+            } else if (se.getDeltaY() > 0) {
+                // zoom in
                 if (z > 0.25) {
                     z -= 0.25;
                 } else if (z < 0) {
                     z = 0;
                 }
                 zoomProperty.set(z);
-    		}
-    	}
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -878,54 +897,11 @@ public class Window3DController {
             xform.setTranslateY(translateY);
             translateXProperty.set(translateX);
             translateYProperty.set(translateY);
-            repositionSprites();
+            repositionSpritesAndLabels();
             repositionNoteBillboardFronts();
 
         } else {
             if (event.isPrimaryButtonDown()) {
-                // how to get Z COORDINATE??
-
-//                if (quaternion != null) {
-                    // double[] vectorToOldMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mouseOldX, mouseOldY, mouseOldZ);
-                    // double[] vectorToNewMousePos = vectorBWPoints(newOriginX,
-                    // newOriginY, newOriginZ, mousePosX, mousePosY, mousePosZ);
-
-					/*
-                     * double[] vectorToOldMousePos = vectorBWPoints(mouseOldX,
-					 * mouseOldY, mouseOldZ, newOriginX, newOriginY, newOriginZ);
-					 * double[] vectorToNewMousePos = vectorBWPoints(mousePosX,
-					 * mousePosY, mousePosZ, newOriginX, newOriginY, newOriginZ);
-					 */
-//                    double[] vectorToOldMousePos = vectorBWPoints(mouseOldX, mouseOldY, mouseOldZ, 0, 0, 0);
-//                    double[] vectorToNewMousePos = vectorBWPoints(mousePosX, mousePosY, mousePosZ, 0, 0, 0);
-
-//                    if (vectorToOldMousePos.length == 3 && vectorToNewMousePos.length == 3) {
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToOldMousePos[0] + ", " + vectorToOldMousePos[1] +
-                        // ", " + vectorToOldMousePos[2] + ">");
-                        // System.out.println("from origin to old mouse pos: <" +
-                        // vectorToNewMousePos[0] + ", " + vectorToNewMousePos[1] +
-                        // ", " + vectorToNewMousePos[2] + ">");
-                        // System.out.println(" ");
-
-                        // compute cross product
-//                        double[] cross = crossProduct(vectorToNewMousePos, vectorToOldMousePos);
-//                        if (cross != null) {
-                            // System.out.println("cross product: <" + cross[0] + ",
-                            // " + cross[1] + ", " + cross[2] + ">");
-                            //quaternion.updateOnRotate(angleOfRotation, cross[0], cross[1], cross[2]);
-
-                            //List<Double> eulerAngles = quaternion.toEulerRotation();
-
-//                            if (eulerAngles.size() == 3) {
-                            // rotateX.setAngle(eulerAngles.get(2));
-                            // rotateY.setAngle(eulerAngles.get(0));
-//                            }
-//                        }
-//                    }
-//                }
-
                 double modifier = 10.0;
                 double modifierFactor = 0.1;
 
@@ -936,7 +912,7 @@ public class Window3DController {
                         (rotateYAngleProperty.get() + mouseDeltaX * modifierFactor * modifier * 2.0)
                                 % 360 + 540) % 360 - 180);
 
-                repositionSprites();
+                repositionSpritesAndLabels();
                 repositionNoteBillboardFronts();
             }
         }
@@ -1173,15 +1149,32 @@ public class Window3DController {
      * Repositions sprites (labels and note sprites) by projecting the sphere's 3D coordinate onto the front of the
      * subscene
      */
-    private void repositionSprites() {
-        if (entitySpriteMap != null) {
-            for (Node entity : entitySpriteMap.keySet()) {
-                alignTextWithEntity(entitySpriteMap.get(entity), entity, false);
+    private void repositionSpritesAndLabels() {
+        // TODO take out default coloring rule for "amphid_left" and "m3cDL" in story config url
+        for (Node entity : entityLabelMap.keySet()) {
+            alignTextWithEntity(entityLabelMap.get(entity), entity, null);
+        }
+        for (Node entity : entitySpriteMap.keySet()) {
+            alignTextWithEntity(entitySpriteMap.get(entity), entity, SPRITE);
+        }
+        for (Node entity : entityCalloutULMap.keySet()) {
+            for (Node calloutGraphic : entityCalloutULMap.get(entity)) {
+                alignTextWithEntity(calloutGraphic, entity, CALLOUT_UPPER_LEFT);
             }
         }
-        if (entityLabelMap != null) {
-            for (Node entity : entityLabelMap.keySet()) {
-                alignTextWithEntity(entityLabelMap.get(entity), entity, true);
+        for (Node entity : entityCalloutLLMap.keySet()) {
+            for (Node calloutGraphic : entityCalloutLLMap.get(entity)) {
+                alignTextWithEntity(calloutGraphic, entity, CALLOUT_LOWER_LEFT);
+            }
+        }
+        for (Node entity : entityCalloutURMap.keySet()) {
+            for (Node calloutGraphic : entityCalloutURMap.get(entity)) {
+                alignTextWithEntity(calloutGraphic, entity, CALLOUT_UPPER_RIGHT);
+            }
+        }
+        for (Node entity : entityCalloutLRMap.keySet()) {
+            for (Node calloutGraphic : entityCalloutLRMap.get(entity)) {
+                alignTextWithEntity(calloutGraphic, entity, CALLOUT_LOWER_RIGHT);
             }
         }
     }
@@ -1190,15 +1183,18 @@ public class Window3DController {
      * Aligns a note graphic to its entity. The graphic is either a {@link Text} or a {@link VBox}.
      *
      * @param noteOrLabelGraphic
-     *         graphical representation of a note/notes (could be a {@link Text} or a {@link VBox})
-     * @param node
-     *         entity that the note graphic should attach to
-     * @param isLabel
-     *         true if a label is being aligned, false otherwise
+     *         the graphical representation of a note/notes (could be a {@link Text} or a {@link VBox})
+     * @param entity
+     *         the entity that the note graphic should attach to
+     * @param noteDisplay
+     *         the display type of the note, null if the graphic is a label
      */
-    private void alignTextWithEntity(final Node noteOrLabelGraphic, final Node node, final boolean isLabel) {
-        if (node != null) {
-            final Bounds b = node.getBoundsInParent();
+    private void alignTextWithEntity(
+            final Node noteOrLabelGraphic,
+            final Node entity,
+            final Display noteDisplay) {
+        if (entity != null) {
+            final Bounds b = entity.getBoundsInParent();
             if (b != null) {
                 final Point2D p = project(
                         camera,
@@ -1209,16 +1205,67 @@ public class Window3DController {
                 double x = p.getX();
                 double y = p.getY();
 
-                if (isLabel) {
-                    y -= getLabelSpriteYOffset();
-                } else {
-                    y += getLabelSpriteYOffset();
-                }
+                double height = b.getHeight();
+                double width = b.getWidth();
 
-                noteOrLabelGraphic.getTransforms().clear();
-                noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+                if (noteDisplay == null) {
+                    // graphic is a label
+                    y -= getLabelSpriteYOffset();
+                    noteOrLabelGraphic.getTransforms().clear();
+                    noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+                } else {
+                    // TODO draw line from callout to nearest side
+                    final double offset = 5.0;
+                    // graphic is a note
+                    switch (noteDisplay) {
+                        case SPRITE:
+                            noteOrLabelGraphic.getTransforms().clear();
+                            noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+                            break;
+                        case CALLOUT_UPPER_LEFT:
+                            y -= (height + offset);
+                            x -= (width + offset + (getNoteSpriteTextWidth() / 2));
+                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            break;
+                        case CALLOUT_LOWER_LEFT:
+                            y += (height + offset);
+                            x -= (width + offset + (getNoteSpriteTextWidth() / 2));
+                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            break;
+                        case CALLOUT_UPPER_RIGHT:
+                            y -= (height + offset);
+                            x += (width + offset);
+                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            break;
+                        case CALLOUT_LOWER_RIGHT:
+                            y += (height + offset);
+                            x += (width + offset);
+                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            break;
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * Adds a translation to the list of transforms for a callout. All of the callout's previous translations are
+     * cleared except for the one that defines the horizontal/vertical offsets from the note.
+     *
+     * @param transforms the list of transforms for a callout
+     * @param translation the translation to add
+     */
+    private void addCalloutSubsceneTranslation(final List<Transform> transforms, final Translate translation) {
+        for (int i = 0; i < transforms.size(); i++) {
+            if (i > 0) {
+                transforms.remove(i);
+            }
+        }
+        transforms.add(translation);
+    }
+
+    private void drawCalloutLine(final Text callout, final Bounds entityBounds, final Display display) {
+        // TODO implement
     }
 
     private int getIndexByCellName(final String name) {
@@ -1325,12 +1372,16 @@ public class Window3DController {
         // End label stuff
 
         // Story stuff
-        // Notes are indexed starting from 1 (or 1+offset shown to user)
+        // Notes are indexed starting from 1 (1 + offset is shown to the user)
         if (storiesLayer != null) {
             currentNotes.clear();
             currentNoteMeshMap.clear();
             currentGraphicNoteMap.clear();
             entitySpriteMap.clear();
+            entityCalloutULMap.clear();
+            entityCalloutLLMap.clear();
+            entityCalloutURMap.clear();
+            entityCalloutLRMap.clear();
             billboardFrontEntityMap.clear();
 
             currentNotes = storiesLayer.getNotesAtTime(requestedTime);
@@ -1412,7 +1463,7 @@ public class Window3DController {
 
     private void addEntitiesAndNotes() {
         final List<Shape3D> entities = new ArrayList<>();
-        final List<Node> notes = new ArrayList<>();
+        final List<Node> noteGraphics = new ArrayList<>();
 
         // add cell and cell body geometries
         addEntities(entities);
@@ -1423,7 +1474,7 @@ public class Window3DController {
         insertOverlayTitles();
 
         if (!currentNotes.isEmpty()) {
-            addNoteGeometries(notes);
+            addNoteGeometries(noteGraphics);
         }
 
         // add labels
@@ -1439,11 +1490,11 @@ public class Window3DController {
             highlightActiveCellLabel(activeEntity);
         }
 
-        if (!notes.isEmpty()) {
-            rootEntitiesGroup.getChildren().addAll(notes);
+        if (!noteGraphics.isEmpty()) {
+            rootEntitiesGroup.getChildren().addAll(noteGraphics);
         }
 
-        repositionSprites();
+        repositionSpritesAndLabels();
         repositionNoteBillboardFronts();
     }
 
@@ -1668,7 +1719,13 @@ public class Window3DController {
         }
     }
 
-    private void removeLabelFor(String name) {
+    /**
+     * Removes the label from the entity with the specified name
+     *
+     * @param name
+     *         the name of the entity to be unlabeled
+     */
+    private void removeLabelFor(final String name) {
         allLabels.remove(name);
         currentLabels.remove(name);
 
@@ -1679,7 +1736,13 @@ public class Window3DController {
         }
     }
 
-    private void removeLabelFrom(Node entity) {
+    /**
+     * Removes the label from the specified entity
+     *
+     * @param entity
+     *         the entity to be unlabeled
+     */
+    private void removeLabelFrom(final Node entity) {
         if (entity != null) {
             spritesPane.getChildren().remove(entityLabelMap.get(entity));
             entityLabelMap.remove(entity);
@@ -1724,7 +1787,7 @@ public class Window3DController {
 
         spritesPane.getChildren().add(text);
 
-        alignTextWithEntity(text, entity, true);
+        alignTextWithEntity(text, entity, null);
     }
 
     private void highlightActiveCellLabel(Shape3D entity) {
@@ -1760,7 +1823,33 @@ public class Window3DController {
     }
 
     /**
-     * Inserts note geometries into the subscene.
+     * Inserts a note into the list of Text nodes mapped to a specific subscene entity if the list already exists.
+     * Creates a list and then adds the note if it does not.
+     *
+     * @param noteGraphic
+     *         the Text object
+     * @param subsceneEntity
+     *         the subscene entity
+     * @param entityCalloutMap
+     *         the callout map specific to the callout position
+     */
+    private void addNoteGraphicToEntityCalloutMap(
+            final Text noteGraphic,
+            final Node subsceneEntity,
+            final Map<Node, List<Text>> entityCalloutMap) {
+        if (entityCalloutMap.get(subsceneEntity) == null) {
+            final List<Text> noteGraphicsList = new ArrayList<>();
+            entityCalloutMap.put(subsceneEntity, noteGraphicsList);
+            noteGraphicsList.add(noteGraphic);
+        } else {
+            entityCalloutMap.get(subsceneEntity).add(noteGraphic);
+        }
+    }
+
+    /**
+     * Inserts note geometries into the subscene. The callout notes objects are tracked in their own maps to their
+     * respective entities, but are graphically inserted into the subscene separately later because they have to keep
+     * track of their horizontal/vertical offsets from the entity.
      *
      * @param list
      *         the list of nodes that billboards are added to, which are added to to the subscene. Note overlays
@@ -1770,103 +1859,140 @@ public class Window3DController {
         for (Note note : currentNotes) {
             if (note.isVisible()) {
                 // map notes to their sphere/mesh view
-                final Node text = makeNoteGraphic(note);
-                currentGraphicNoteMap.put(text, note);
+                final Node noteGraphic = makeNoteGraphic(note);
+                currentGraphicNoteMap.put(noteGraphic, note);
 
-                text.setOnMouseEntered(event -> spritesPane.setCursor(HAND));
-                text.setOnMouseExited(event -> spritesPane.setCursor(DEFAULT));
+                noteGraphic.setOnMouseEntered(event -> spritesPane.setCursor(HAND));
+                noteGraphic.setOnMouseExited(event -> spritesPane.setCursor(DEFAULT));
 
-                // SPRITE
-                if (note.isSprite()) {
+                // callouts
+                if (note.isCallout()) {
+                    Shape3D subsceneEntity = null;
+                    if (note.attachedToCell()) {
+                        subsceneEntity = getSubsceneSphereWithName(note.getCellName());
+                    } else if (note.attachedToStructure() && defaultEmbryoFlag) {
+                        subsceneEntity = getSubsceneMeshWithName(note.getCellName());
+                    }
+                    if (subsceneEntity != null) {
+                        switch (note.getTagDisplay()) {
+                            case CALLOUT_UPPER_LEFT:
+                                if (noteGraphic instanceof Text) {
+                                    addNoteGraphicToEntityCalloutMap(
+                                            (Text) noteGraphic,
+                                            subsceneEntity,
+                                            entityCalloutULMap);
+                                }
+                                spritesPane.getChildren().add(noteGraphic);
+                                noteGraphic.getTransforms().add(new Translate(
+                                        -note.getCalloutHorizontalOffset(),
+                                        -note.getCalloutVerticalOffset()));
+                                break;
+                            case CALLOUT_LOWER_LEFT:
+                                if (noteGraphic instanceof Text) {
+                                    addNoteGraphicToEntityCalloutMap(
+                                            (Text) noteGraphic,
+                                            subsceneEntity,
+                                            entityCalloutLLMap);
+                                }
+                                spritesPane.getChildren().add(noteGraphic);
+                                noteGraphic.getTransforms().add(new Translate(
+                                        -note.getCalloutHorizontalOffset(),
+                                        note.getCalloutVerticalOffset()));
+                                break;
+                            case CALLOUT_UPPER_RIGHT:
+                                if (noteGraphic instanceof Text) {
+                                    addNoteGraphicToEntityCalloutMap(
+                                            (Text) noteGraphic,
+                                            subsceneEntity,
+                                            entityCalloutURMap);
+                                }
+                                spritesPane.getChildren().add(noteGraphic);
+                                noteGraphic.getTransforms().add(new Translate(
+                                        note.getCalloutHorizontalOffset(),
+                                        -note.getCalloutVerticalOffset()));
+                                break;
+                            case CALLOUT_LOWER_RIGHT:
+                                if (noteGraphic instanceof Text) {
+                                    addNoteGraphicToEntityCalloutMap(
+                                            (Text) noteGraphic,
+                                            subsceneEntity,
+                                            entityCalloutLRMap);
+                                }
+                                spritesPane.getChildren().add(noteGraphic);
+                                noteGraphic.getTransforms().add(new Translate(
+                                        note.getCalloutHorizontalOffset(),
+                                        note.getCalloutVerticalOffset()));
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                } else if (note.isSprite()) {
+                    // sprites
                     // location attachment
                     if (note.attachedToLocation()) {
-                        VBox box = new VBox(3);
-                        box.getChildren().add(text);
+                        final VBox box = new VBox(3);
+                        box.setPrefWidth(getNoteSpriteTextWidth());
+                        box.getChildren().add(noteGraphic);
                         // add inivisible location marker to scene at location
                         // specified by note
-                        Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+                        final Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
                         rootEntitiesGroup.getChildren().add(marker);
                         entitySpriteMap.put(marker, box);
                         // add vbox to sprites pane
                         spritesPane.getChildren().add(box);
-
-                    } else if (note.attachedToCell()) {
-                        // cell attachment
-                        Sphere sphere;
-                        for (int i = 0; i < cellNames.size(); i++) {
-                            sphere = spheres.get(i);
-                            if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
-                                // if another note is already attached to the same
-                                // sphere,
-                                // create a vbox for note positioning
-                                if (!entitySpriteMap.containsKey(sphere)) {
-                                    VBox box = new VBox(3);
-                                    box.getChildren().add(text);
-                                    entitySpriteMap.put(sphere, box);
-                                    spritesPane.getChildren().add(box);
-                                } else {
-                                    entitySpriteMap.get(sphere).getChildren().add(text);
-                                }
-
-                                break;
-                            }
+                    } else {
+                        Node subsceneEntity = null;
+                        if (note.attachedToCell()) {
+                            // cell attachment
+                            subsceneEntity = getSubsceneSphereWithName(note.getCellName());
+                        } else if (note.attachedToStructure() && defaultEmbryoFlag) {
+                            // structure attachment
+                            subsceneEntity = getSubsceneMeshWithName(note.getCellName());
                         }
-                    } else if (defaultEmbryoFlag) {
-                        // structure attachment
-                        if (note.attachedToStructure()) {
-                            for (int i = 0; i < currentSceneElements.size(); i++) {
-                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                    MeshView mesh = currentSceneElementMeshes.get(i);
-                                    if (!entitySpriteMap.containsKey(mesh)) {
-                                        final VBox box = new VBox(3);
-                                        box.getChildren().add(text);
-                                        entitySpriteMap.put(mesh, box);
-                                        spritesPane.getChildren().add(box);
-                                    } else {
-                                        entitySpriteMap.get(mesh).getChildren().add(text);
-                                    }
-                                }
+                        if (subsceneEntity != null) {
+                            // if another non-callout note is already attached to the subscene entity,
+                            // create a vbox for note stacking
+                            if (!entitySpriteMap.containsKey(subsceneEntity)) {
+                                final VBox box = new VBox(3);
+                                box.getChildren().add(noteGraphic);
+                                entitySpriteMap.put(subsceneEntity, box);
+                                spritesPane.getChildren().add(box);
+                            } else {
+                                // otherwise add note to the existing vbox for that entity
+                                entitySpriteMap.get(subsceneEntity).getChildren().add(noteGraphic);
                             }
                         }
                     }
-                }
 
-                // BILLBOARD_FRONT
-                else if (note.isBillboardFront()) {
+                } else if (note.isBillboardFront()) {
                     // location attachment
                     if (note.attachedToLocation()) {
                         Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
                         rootEntitiesGroup.getChildren().add(marker);
-                        billboardFrontEntityMap.put(text, marker);
+                        billboardFrontEntityMap.put(noteGraphic, marker);
                     }
                     // cell attachment
                     else if (note.attachedToCell()) {
-                        Sphere sphere;
-                        for (int i = 0; i < cellNames.size(); i++) {
-                            sphere = spheres.get(i);
-                            if (cellNames.get(i).equalsIgnoreCase(note.getCellName()) && sphere != null) {
-                                billboardFrontEntityMap.put(text, sphere);
-                            }
-                        }
+                        billboardFrontEntityMap.put(noteGraphic, getSubsceneSphereWithName(note.getCellName()));
                     }
                     // structure attachment
-                    else if (defaultEmbryoFlag) {
-                        if (note.attachedToStructure()) {
-                            for (int i = 0; i < currentSceneElements.size(); i++) {
-                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                    billboardFrontEntityMap.put(text, currentSceneElementMeshes.get(i));
-                                }
+                    else if (note.attachedToStructure() && defaultEmbryoFlag) {
+                        for (int i = 0; i < currentSceneElements.size(); i++) {
+                            if (currentSceneElements.get(i)
+                                    .getSceneName()
+                                    .equalsIgnoreCase(note.getCellName())) {
+                                billboardFrontEntityMap.put(noteGraphic, currentSceneElementMeshes.get(i));
                             }
                         }
                     }
-                }
 
-                // BILLBOARD
-                else if (note.isBillboard()) {
+                } else if (note.isBillboard()) {
                     // location attachment
                     if (note.attachedToLocation()) {
-                        text.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                        text.getTransforms().addAll(
+                        noteGraphic.getTransforms().addAll(rotateX, rotateY, rotateZ);
+                        noteGraphic.getTransforms().addAll(
                                 new Translate(note.getX(), note.getY(), note.getZ()),
                                 new Scale(getBillboardScale(), getBillboardScale()));
                     }
@@ -1881,48 +2007,84 @@ public class Window3DController {
                                     offset = sphere.getRadius() + 2;
                                 }
 
-                                text.getTransforms().addAll(sphere.getTransforms());
-                                text.getTransforms().addAll(
+                                noteGraphic.getTransforms().addAll(sphere.getTransforms());
+                                noteGraphic.getTransforms().addAll(
                                         new Translate(offset, offset),
                                         new Scale(getBillboardScale(), getBillboardScale()));
                             }
                         }
-                    } else if (defaultEmbryoFlag) {
+                    } else if (note.attachedToStructure() && defaultEmbryoFlag) {
                         // structure attachment
-                        if (note.attachedToStructure()) {
-                            for (int i = 0; i < currentSceneElements.size(); i++) {
-                                if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(note.getCellName())) {
-                                    text.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
-                                    double offset = 5;
-                                    text.getTransforms().addAll(
-                                            new Translate(offset, offset),
-                                            new Scale(getBillboardScale(), getBillboardScale()));
-                                }
+                        for (int i = 0; i < currentSceneElements.size(); i++) {
+                            if (currentSceneElements.get(i)
+                                    .getSceneName()
+                                    .equalsIgnoreCase(note.getCellName())) {
+                                noteGraphic.getTransforms().addAll(currentSceneElementMeshes.get(i).getTransforms());
+                                double offset = 5;
+                                noteGraphic.getTransforms().addAll(
+                                        new Translate(offset, offset),
+                                        new Scale(getBillboardScale(), getBillboardScale()));
                             }
                         }
                     }
                 }
 
-                // add graphic to appropriate place (scene, overlay box, or on top
-                // of scene)
+                // add graphic to appropriate place (the subscene itself, overlay box, or on sprites pane
+                // overlaid on the subscene)
                 final Display display = note.getTagDisplay();
                 if (display != null) {
                     switch (display) {
-                        case SPRITE:
+                        case CALLOUT_UPPER_LEFT: // all callouts call to sprite case
+                        case CALLOUT_UPPER_RIGHT:
+                        case CALLOUT_LOWER_LEFT:
+                        case CALLOUT_LOWER_RIGHT:
+                        case SPRITE: // do nothing
                             break;
                         case BILLBOARD_FRONT: // fall to billboard case
                         case BILLBOARD:
-                            list.add(text);
+                            list.add(noteGraphic);
                             break;
                         case OVERLAY: // fall to default case
                         case BLANK: // fall to default case
                         default:
-                            storyOverlayVBox.getChildren().add(text);
+                            storyOverlayVBox.getChildren().add(noteGraphic);
                             break;
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @param sceneName
+     *         the scene name of the scene element mesh
+     *
+     * @return the mesh view representing the scene element with that scene name, null if none were found in the
+     * current time frame
+     */
+    private MeshView getSubsceneMeshWithName(final String sceneName) {
+        for (int i = 0; i < currentSceneElements.size(); i++) {
+            if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(sceneName)) {
+                return currentSceneElementMeshes.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param lineageName
+     *         the lineage name of the cell
+     *
+     * @return the sphere representing the cell with that lineage name, null if none were found in the current time
+     * frame
+     */
+    private Sphere getSubsceneSphereWithName(final String lineageName) {
+        for (int i = 0; i < cellNames.size(); i++) {
+            if (cellNames.get(i).equalsIgnoreCase(lineageName) && spheres.get(i) != null) {
+                return spheres.get(i);
+            }
+        }
+        return null;
     }
 
     private void insertOverlayTitles() {
@@ -1947,13 +2109,13 @@ public class Window3DController {
         return text;
     }
 
-    private Text makeNoteSpriteText(String title) {
+    private Text makeNoteSpriteText(final String title) {
         final Text text = makeNoteOverlayText(title);
         text.setWrappingWidth(getNoteSpriteTextWidth());
         return text;
     }
 
-    private Text makeNoteBillboardText(String title) {
+    private Text makeNoteBillboardText(final String title) {
         final Text text = new Text(title);
         text.setWrappingWidth(getNoteBillboardTextWidth());
         text.setFont(getBillboardFont());
@@ -1979,12 +2141,20 @@ public class Window3DController {
         if (note.isExpandedInScene()) {
             title += ": " + note.getTagContents();
         } else {
-            title += "\n[more...]";
+            title += " [more...]";
         }
 
         Text node = null;
         if (note.getTagDisplay() != null) {
             switch (note.getTagDisplay()) {
+                case CALLOUT_UPPER_LEFT: // fall to sprite case
+
+                case CALLOUT_UPPER_RIGHT: // fall to sprite case
+
+                case CALLOUT_LOWER_LEFT: // fall to sprite case
+
+                case CALLOUT_LOWER_RIGHT: // fall to sprite case
+
                 case SPRITE:
                     node = makeNoteSpriteText(title);
                     break;
@@ -2449,7 +2619,7 @@ public class Window3DController {
     private final class SubsceneSizeListener implements ChangeListener<Number> {
         @Override
         public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-            repositionSprites();
+            repositionSpritesAndLabels();
             repositionNoteBillboardFronts();
         }
     }

@@ -1,5 +1,5 @@
-Note Attachment/Dislpay types documentation. The keywords in qoutes are the terms that should be used in the
-StoryListConfig csv config file
+Note Attachment/Dislpay types documentation. The listed keywords (in qoutes) are the terms that should be used in their
+corresponding fields in the StoryListConfig csv config file. All keywords are case-insensitive.
 
 Note Attachment Type: specifies the entity that the note is attached to
 "cell"          -> attachment to a cell, the cell's lineage name should be specified under the Cells column in the
