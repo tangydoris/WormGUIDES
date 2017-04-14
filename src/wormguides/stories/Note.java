@@ -122,7 +122,7 @@ public class Note {
         visibleProperty = new SimpleBooleanProperty(true);
         activeProperty = new SimpleBooleanProperty(false);
 
-        setTagDisplay(OVERLAY);
+        setDisplay(OVERLAY);
         setAttachmentType(BLANK);
 
         calloutHorizontalOffset = 0.0;
@@ -230,7 +230,7 @@ public class Note {
             display = display.trim();
             for (Display d : Display.values()) {
                 if (d.equals(display)) {
-                    setTagDisplay(d);
+                    setDisplay(d);
                     return;
                 }
             }
@@ -349,7 +349,7 @@ public class Note {
         return tagDisplay;
     }
 
-    public void setTagDisplay(final Display display) {
+    public void setDisplay(final Display display) {
         if (display != null) {
             tagDisplay = display;
         }

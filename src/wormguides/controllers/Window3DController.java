@@ -528,6 +528,7 @@ public class Window3DController {
         this.zoomProperty.addListener((observable, oldValue, newValue) -> {
             xform.setScale(zoomProperty.get());
             repositionSpritesAndLabels();
+            repositionCallouts();
             repositionNoteBillboardFronts();
         });
         xform.setScale(zoomProperty.get());
@@ -898,6 +899,7 @@ public class Window3DController {
             translateXProperty.set(translateX);
             translateYProperty.set(translateY);
             repositionSpritesAndLabels();
+            repositionCallouts();
             repositionNoteBillboardFronts();
 
         } else {
@@ -913,6 +915,7 @@ public class Window3DController {
                                 % 360 + 540) % 360 - 180);
 
                 repositionSpritesAndLabels();
+                repositionCallouts();
                 repositionNoteBillboardFronts();
             }
         }
@@ -1146,8 +1149,7 @@ public class Window3DController {
     }
 
     /**
-     * Repositions sprites (labels and note sprites) by projecting the sphere's 3D coordinate onto the front of the
-     * subscene
+     * Repositions labels and note sprites on the overlaid sprites pane
      */
     private void repositionSpritesAndLabels() {
         // TODO take out default coloring rule for "amphid_left" and "m3cDL" in story config url
@@ -1157,6 +1159,12 @@ public class Window3DController {
         for (Node entity : entitySpriteMap.keySet()) {
             alignTextWithEntity(entitySpriteMap.get(entity), entity, SPRITE);
         }
+    }
+
+    /**
+     * Repositions callouts on the overlaid sprites pane
+     */
+    private void repositionCallouts() {
         for (Node entity : entityCalloutULMap.keySet()) {
             for (Node calloutGraphic : entityCalloutULMap.get(entity)) {
                 alignTextWithEntity(calloutGraphic, entity, CALLOUT_UPPER_LEFT);
@@ -1391,7 +1399,7 @@ public class Window3DController {
                 // display/attachment
                 // type combination
                 if (note.hasLocationError() || note.hasEntityNameError()) {
-                    note.setTagDisplay(OVERLAY);
+                    note.setDisplay(OVERLAY);
                 }
 
                 if (defaultEmbryoFlag) {
@@ -1495,6 +1503,7 @@ public class Window3DController {
         }
 
         repositionSpritesAndLabels();
+        repositionCallouts();
         repositionNoteBillboardFronts();
     }
 
@@ -2620,6 +2629,7 @@ public class Window3DController {
         @Override
         public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
             repositionSpritesAndLabels();
+            repositionCallouts();
             repositionNoteBillboardFronts();
         }
     }

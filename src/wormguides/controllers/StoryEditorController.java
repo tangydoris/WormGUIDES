@@ -22,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -134,6 +135,16 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     @FXML
     private RadioButton calloutLowerRightRadioBtn;
     private BooleanProperty noteCreated;
+
+    // callout stuff
+    @FXML
+    private Label calloutHOffsetLabel;
+    @FXML
+    private Label calloutVOffsetLabel;
+    @FXML
+    private Slider calloutHOffsetSlider;
+    @FXML
+    private Slider calloutVOffsetSlider;
 
     @FXML
     private TextField storyTitle;
@@ -363,7 +374,6 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         case CELL:
                             setActiveNoteAttachmentType(CELL);
                             setActiveNoteCellName(activeCellProperty.get());
-                            setActiveNoteDisplay(SPRITE);
                             setDisableStructureOptions(true);
                             updateDisplay();
                             break;
@@ -371,6 +381,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         case BLANK:
                             setActiveNoteAttachmentType(BLANK);
                             setActiveNoteDisplay(OVERLAY);
+                            setCellLabelName(sceneActiveCellProperty.get());
                             setDisableStructureOptions(true);
                             updateDisplay();
                             break;
@@ -378,12 +389,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                         case STRUCTURE:
                             setActiveNoteAttachmentType(STRUCTURE);
                             setActiveNoteCellName(structuresComboBox.getSelectionModel().getSelectedItem());
-                            setActiveNoteDisplay(SPRITE);
+                            setCellLabelName(sceneActiveCellProperty.get());
                             setDisableStructureOptions(false);
                             updateDisplay();
                             break;
 
                         default:
+                            setCellLabelName(sceneActiveCellProperty.get());
                             break;
 
                     }
@@ -400,25 +412,52 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                     switch ((Display) newValue.getUserData()) {
                         case OVERLAY:
                             setActiveNoteDisplay(OVERLAY);
+                            calloutHOffsetLabel.setDisable(true);
+                            calloutHOffsetSlider.setDisable(true);
+                            calloutVOffsetLabel.setDisable(true);
+                            calloutVOffsetSlider.setDisable(true);
                             break;
                         case SPRITE:
                             setActiveNoteDisplay(SPRITE);
+                            calloutHOffsetLabel.setDisable(true);
+                            calloutHOffsetSlider.setDisable(true);
+                            calloutVOffsetLabel.setDisable(true);
+                            calloutVOffsetSlider.setDisable(true);
                             break;
                         case BILLBOARD_FRONT:
                             setActiveNoteDisplay(BILLBOARD_FRONT);
+                            calloutHOffsetLabel.setDisable(true);
+                            calloutHOffsetSlider.setDisable(true);
+                            calloutVOffsetLabel.setDisable(true);
+                            calloutVOffsetSlider.setDisable(true);
                             break;
                         case CALLOUT_UPPER_LEFT:
-                            // TODO implement all callouts
                             setActiveNoteDisplay(CALLOUT_UPPER_LEFT);
-                            break;
-                        case CALLOUT_UPPER_RIGHT:
-                            setActiveNoteDisplay(CALLOUT_UPPER_RIGHT);
+                            calloutHOffsetLabel.setDisable(false);
+                            calloutHOffsetSlider.setDisable(false);
+                            calloutVOffsetLabel.setDisable(false);
+                            calloutVOffsetSlider.setDisable(false);
                             break;
                         case CALLOUT_LOWER_LEFT:
                             setActiveNoteDisplay(CALLOUT_LOWER_LEFT);
+                            calloutHOffsetLabel.setDisable(false);
+                            calloutHOffsetSlider.setDisable(false);
+                            calloutVOffsetLabel.setDisable(false);
+                            calloutVOffsetSlider.setDisable(false);
+                            break;
+                        case CALLOUT_UPPER_RIGHT:
+                            setActiveNoteDisplay(CALLOUT_UPPER_RIGHT);
+                            calloutHOffsetLabel.setDisable(false);
+                            calloutHOffsetSlider.setDisable(false);
+                            calloutVOffsetLabel.setDisable(false);
+                            calloutVOffsetSlider.setDisable(false);
                             break;
                         case CALLOUT_LOWER_RIGHT:
                             setActiveNoteDisplay(CALLOUT_LOWER_RIGHT);
+                            calloutHOffsetLabel.setDisable(false);
+                            calloutHOffsetSlider.setDisable(false);
+                            calloutVOffsetLabel.setDisable(false);
+                            calloutVOffsetSlider.setDisable(false);
                             break;
                         default:
                             break;
@@ -427,6 +466,17 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                     setActiveNoteDisplay(Display.BLANK);
                 }
                 activeNote.setChanged(true);
+            }
+        });
+
+        calloutHOffsetSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null && activeNote.isCallout()) {
+                activeNote.setCalloutHorizontalOffset(newValue.intValue());
+            }
+        });
+        calloutVOffsetSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (activeNote != null && activeNote.isCallout()) {
+                activeNote.setCalloutVerticalOffset(newValue.intValue());
             }
         });
 
@@ -493,7 +543,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
 
     private void setActiveNoteDisplay(Display display) {
         if (activeNote != null) {
-            activeNote.setTagDisplay(display);
+            activeNote.setDisplay(display);
         }
     }
 
@@ -656,19 +706,63 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         if (displayToggle != null && activeNote != null) {
             switch (activeNote.getTagDisplay()) {
                 case BLANK: // fall to overlay case
-
                 case OVERLAY:
                     infoPaneRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(true);
+                    calloutHOffsetSlider.setDisable(true);
+                    calloutVOffsetLabel.setDisable(true);
+                    calloutVOffsetSlider.setDisable(true);
                     break;
-
                 case SPRITE:
                     locationRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(true);
+                    calloutHOffsetSlider.setDisable(true);
+                    calloutVOffsetLabel.setDisable(true);
+                    calloutVOffsetSlider.setDisable(true);
                     break;
-
                 case BILLBOARD_FRONT:
                     billboardRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(true);
+                    calloutHOffsetSlider.setDisable(true);
+                    calloutVOffsetLabel.setDisable(true);
+                    calloutVOffsetSlider.setDisable(true);
                     break;
-
+                case CALLOUT_UPPER_LEFT:
+                    calloutUpperLeftRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(false);
+                    calloutHOffsetSlider.setDisable(false);
+                    calloutVOffsetLabel.setDisable(false);
+                    calloutVOffsetSlider.setDisable(false);
+                    calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
+                    calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
+                    break;
+                case CALLOUT_LOWER_LEFT:
+                    calloutLowerLeftRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(false);
+                    calloutHOffsetSlider.setDisable(false);
+                    calloutVOffsetLabel.setDisable(false);
+                    calloutVOffsetSlider.setDisable(false);
+                    calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
+                    calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
+                    break;
+                case CALLOUT_UPPER_RIGHT:
+                    calloutUpperRightRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(false);
+                    calloutHOffsetSlider.setDisable(false);
+                    calloutVOffsetLabel.setDisable(false);
+                    calloutVOffsetSlider.setDisable(false);
+                    calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
+                    calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
+                    break;
+                case CALLOUT_LOWER_RIGHT:
+                    calloutLowerRightRadioBtn.setSelected(true);
+                    calloutHOffsetLabel.setDisable(false);
+                    calloutHOffsetSlider.setDisable(false);
+                    calloutVOffsetLabel.setDisable(false);
+                    calloutVOffsetSlider.setDisable(false);
+                    calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
+                    calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
+                    break;
                 default:
                     resetToggle(displayToggle);
                     break;
@@ -717,7 +811,7 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         updateStoryFields();
     }
 
-    public void addDeleteButtonListener(EventHandler<ActionEvent> handler) {
+    public void addDeleteButtonListener(final EventHandler<ActionEvent> handler) {
         delete.setOnAction(handler);
     }
 
