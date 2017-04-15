@@ -60,6 +60,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
@@ -256,14 +257,16 @@ public class Window3DController {
     private final HashMap<Node, Node> billboardFrontEntityMap;
     /** Map of a cell entity to its label */
     private final Map<Node, Text> entityLabelMap;
-    /** Map of upper left note callouts attached to cell */
+    /** Map of upper left note callouts attached to a cell/structure */
     private final HashMap<Node, List<Text>> entityCalloutULMap;
-    /** Map of upper right note callouts attached to cell */
+    /** Map of upper right note callouts attached to a cell/structure */
     private final HashMap<Node, List<Text>> entityCalloutURMap;
-    /** Map of lower left note callouts attached to cell */
+    /** Map of lower left note callouts attached to a cell/structure */
     private final HashMap<Node, List<Text>> entityCalloutLLMap;
-    /** Map of lower right note callouts attached to cell */
+    /** Map of lower right note callouts attached to a cell/structure */
     private final HashMap<Node, List<Text>> entityCalloutLRMap;
+    /* Map of all callout Texts to their Lines */
+    private final HashMap<Text, Line> calloutLineMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
     private final ProductionInfo productionInfo;
@@ -586,6 +589,8 @@ public class Window3DController {
         entityCalloutURMap = new HashMap<>();
         entityCalloutLLMap = new HashMap<>();
         entityCalloutLRMap = new HashMap<>();
+
+        calloutLineMap = new HashMap<>();
 
         allLabels = new ArrayList<>();
         currentLabels = new ArrayList<>();
@@ -1222,8 +1227,10 @@ public class Window3DController {
                     noteOrLabelGraphic.getTransforms().clear();
                     noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
                 } else {
-                    // TODO draw line from callout to nearest side
-                    final double offset = 5.0;
+                    final double calloutOffset = 10.0;
+                    final double calloutLineOffset = 10.0;
+                    double calloutX;
+                    double calloutY;
                     // graphic is a note
                     switch (noteDisplay) {
                         case SPRITE:
@@ -1231,24 +1238,72 @@ public class Window3DController {
                             noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
                             break;
                         case CALLOUT_UPPER_LEFT:
-                            y -= (height + offset);
-                            x -= (width + offset + (getNoteSpriteTextWidth() / 2));
-                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            calloutY = y - (height + calloutOffset);
+                            calloutX = x - (width + calloutOffset + (getNoteSpriteTextWidth()));
+                            addCalloutSubsceneTranslation(
+                                    noteOrLabelGraphic.getTransforms(),
+                                    new Translate(calloutX, calloutY));
+                            if (noteOrLabelGraphic instanceof Text) {
+                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
+                                if (calloutBounds != null) {
+                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
+                                    line.setStartX(x);
+                                    line.setStartY(y);
+                                    line.setEndX(calloutBounds.getMaxX());
+                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                                }
+                            }
                             break;
                         case CALLOUT_LOWER_LEFT:
-                            y += (height + offset);
-                            x -= (width + offset + (getNoteSpriteTextWidth() / 2));
-                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            calloutY = y + (height + calloutOffset);
+                            calloutX = x - (width + calloutOffset + (getNoteSpriteTextWidth()));
+                            addCalloutSubsceneTranslation(
+                                    noteOrLabelGraphic.getTransforms(),
+                                    new Translate(calloutX, calloutY));
+                            if (noteOrLabelGraphic instanceof Text) {
+                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
+                                if (calloutBounds != null) {
+                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
+                                    line.setStartX(x);
+                                    line.setStartY(y);
+                                    line.setEndX(calloutBounds.getMaxX());
+                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                                }
+                            }
                             break;
                         case CALLOUT_UPPER_RIGHT:
-                            y -= (height + offset);
-                            x += (width + offset);
-                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            calloutY = y - (height + calloutOffset);
+                            calloutX = x + (width + calloutOffset);
+                            addCalloutSubsceneTranslation(
+                                    noteOrLabelGraphic.getTransforms(),
+                                    new Translate(calloutX, calloutY));
+                            if (noteOrLabelGraphic instanceof Text) {
+                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
+                                if (calloutBounds != null) {
+                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
+                                    line.setStartX(x);
+                                    line.setStartY(y);
+                                    line.setEndX(calloutBounds.getMinX());
+                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                                }
+                            }
                             break;
                         case CALLOUT_LOWER_RIGHT:
-                            y += (height + offset);
-                            x += (width + offset);
-                            addCalloutSubsceneTranslation(noteOrLabelGraphic.getTransforms(), new Translate(x, y));
+                            calloutY = y + (height + calloutOffset);
+                            calloutX = x + (width + calloutOffset);
+                            addCalloutSubsceneTranslation(
+                                    noteOrLabelGraphic.getTransforms(),
+                                    new Translate(calloutX, calloutY));
+                            if (noteOrLabelGraphic instanceof Text) {
+                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
+                                if (calloutBounds != null) {
+                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
+                                    line.setStartX(x);
+                                    line.setStartY(y);
+                                    line.setEndX(calloutBounds.getMinX());
+                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                                }
+                            }
                             break;
                     }
                 }
@@ -1260,8 +1315,10 @@ public class Window3DController {
      * Adds a translation to the list of transforms for a callout. All of the callout's previous translations are
      * cleared except for the one that defines the horizontal/vertical offsets from the note.
      *
-     * @param transforms the list of transforms for a callout
-     * @param translation the translation to add
+     * @param transforms
+     *         the list of transforms for a callout
+     * @param translation
+     *         the translation to add
      */
     private void addCalloutSubsceneTranslation(final List<Transform> transforms, final Translate translation) {
         for (int i = 0; i < transforms.size(); i++) {
@@ -1270,10 +1327,6 @@ public class Window3DController {
             }
         }
         transforms.add(translation);
-    }
-
-    private void drawCalloutLine(final Text callout, final Bounds entityBounds, final Display display) {
-        // TODO implement
     }
 
     private int getIndexByCellName(final String name) {
@@ -1460,6 +1513,8 @@ public class Window3DController {
             if (node instanceof Text) {
                 iter.remove();
             } else if (node instanceof VBox && node != storyOverlayVBox) {
+                iter.remove();
+            } else if (node instanceof Line) {
                 iter.remove();
             }
         }
@@ -1890,11 +1945,17 @@ public class Window3DController {
                                             (Text) noteGraphic,
                                             subsceneEntity,
                                             entityCalloutULMap);
+                                    spritesPane.getChildren().add(noteGraphic);
+                                    noteGraphic.getTransforms().add(new Translate(
+                                            -note.getCalloutHorizontalOffset(),
+                                            -note.getCalloutVerticalOffset()));
+                                    final Line line = new Line(0, 0, 0, 0);
+                                    line.setStyle("-fx-stroke-width: 2; -fx-stroke: #DDDDDD;");
+                                    spritesPane.getChildren().add(line);
+                                    // map callout text to its line so they can be repositioned together during
+                                    // note-entity alignment
+                                    calloutLineMap.put((Text) noteGraphic, line);
                                 }
-                                spritesPane.getChildren().add(noteGraphic);
-                                noteGraphic.getTransforms().add(new Translate(
-                                        -note.getCalloutHorizontalOffset(),
-                                        -note.getCalloutVerticalOffset()));
                                 break;
                             case CALLOUT_LOWER_LEFT:
                                 if (noteGraphic instanceof Text) {
@@ -1902,11 +1963,15 @@ public class Window3DController {
                                             (Text) noteGraphic,
                                             subsceneEntity,
                                             entityCalloutLLMap);
+                                    spritesPane.getChildren().add(noteGraphic);
+                                    noteGraphic.getTransforms().add(new Translate(
+                                            -note.getCalloutHorizontalOffset(),
+                                            note.getCalloutVerticalOffset()));
+                                    final Line line = new Line(0, 0, 0, 0);
+                                    line.setStyle("-fx-stroke-width: 2; -fx-stroke: #FFFFFF;");
+                                    spritesPane.getChildren().add(line);
+                                    calloutLineMap.put((Text) noteGraphic, line);
                                 }
-                                spritesPane.getChildren().add(noteGraphic);
-                                noteGraphic.getTransforms().add(new Translate(
-                                        -note.getCalloutHorizontalOffset(),
-                                        note.getCalloutVerticalOffset()));
                                 break;
                             case CALLOUT_UPPER_RIGHT:
                                 if (noteGraphic instanceof Text) {
@@ -1914,11 +1979,15 @@ public class Window3DController {
                                             (Text) noteGraphic,
                                             subsceneEntity,
                                             entityCalloutURMap);
+                                    spritesPane.getChildren().add(noteGraphic);
+                                    noteGraphic.getTransforms().add(new Translate(
+                                            note.getCalloutHorizontalOffset(),
+                                            -note.getCalloutVerticalOffset()));
+                                    final Line line = new Line(0, 0, 0, 0);
+                                    line.setStyle("-fx-stroke-width: 2; -fx-stroke: #DDDDDD;");
+                                    spritesPane.getChildren().add(line);
+                                    calloutLineMap.put((Text) noteGraphic, line);
                                 }
-                                spritesPane.getChildren().add(noteGraphic);
-                                noteGraphic.getTransforms().add(new Translate(
-                                        note.getCalloutHorizontalOffset(),
-                                        -note.getCalloutVerticalOffset()));
                                 break;
                             case CALLOUT_LOWER_RIGHT:
                                 if (noteGraphic instanceof Text) {
@@ -1926,11 +1995,15 @@ public class Window3DController {
                                             (Text) noteGraphic,
                                             subsceneEntity,
                                             entityCalloutLRMap);
+                                    spritesPane.getChildren().add(noteGraphic);
+                                    noteGraphic.getTransforms().add(new Translate(
+                                            note.getCalloutHorizontalOffset(),
+                                            note.getCalloutVerticalOffset()));
+                                    final Line line = new Line(0, 0, 0, 0);
+                                    line.setStyle("-fx-stroke-width: 2; -fx-stroke: #DDDDDD;");
+                                    spritesPane.getChildren().add(line);
+                                    calloutLineMap.put((Text) noteGraphic, line);
                                 }
-                                spritesPane.getChildren().add(noteGraphic);
-                                noteGraphic.getTransforms().add(new Translate(
-                                        note.getCalloutHorizontalOffset(),
-                                        note.getCalloutVerticalOffset()));
                                 break;
                             default:
                                 break;

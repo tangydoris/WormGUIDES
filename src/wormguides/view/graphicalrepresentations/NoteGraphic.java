@@ -36,10 +36,11 @@ import static wormguides.util.AppFont.getFont;
 import static wormguides.view.graphicalrepresentations.RuleGraphic.UI_SIDE_LENGTH;
 
 /**
- * Graphical representation of a {@link Note}. When a note is clicked, the time property is changed so that the 3D
- * subscene navigates to the note's effective start time. This graphical item is rendered in the {@link ListCell} of
- * an active story in the  {@link ListView} in the 'Stories' tab. Note titles are also expandable (making the notes
- * description visible)  by clicking on the triangle rendered to the left of the note's noteTitle.
+ * Graphical representation of a {@link Note} in the stories list in the application's left panel. When a note is
+ * clicked, the time property is changed so that the 3D subscene navigates to the note's effective start time. This
+ * graphical item is rendered in the {@link ListCell} of an active story in the  {@link ListView} in the 'Stories'
+ * tab. Note titles are also expandable (making the notes description visible)  by clicking on the triangle rendered
+ * to the left of the note's noteTitle.
  */
 public class NoteGraphic extends VBox {
 

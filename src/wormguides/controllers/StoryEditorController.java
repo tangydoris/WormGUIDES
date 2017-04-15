@@ -46,6 +46,9 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static wormguides.controllers.StoryEditorController.Time.CURRENT;
 import static wormguides.controllers.StoryEditorController.Time.GLOBAL;
 import static wormguides.controllers.StoryEditorController.Time.RANGE;
+import static wormguides.stories.Note.Attachment.BLANK;
+import static wormguides.stories.Note.Attachment.CELL;
+import static wormguides.stories.Note.Attachment.STRUCTURE;
 import static wormguides.stories.Note.Display.BILLBOARD_FRONT;
 import static wormguides.stories.Note.Display.CALLOUT_LOWER_LEFT;
 import static wormguides.stories.Note.Display.CALLOUT_LOWER_RIGHT;
@@ -53,9 +56,6 @@ import static wormguides.stories.Note.Display.CALLOUT_UPPER_LEFT;
 import static wormguides.stories.Note.Display.CALLOUT_UPPER_RIGHT;
 import static wormguides.stories.Note.Display.OVERLAY;
 import static wormguides.stories.Note.Display.SPRITE;
-import static wormguides.stories.Note.Attachment.BLANK;
-import static wormguides.stories.Note.Attachment.CELL;
-import static wormguides.stories.Note.Attachment.STRUCTURE;
 
 public class StoryEditorController extends AnchorPane implements Initializable {
 
@@ -522,6 +522,19 @@ public class StoryEditorController extends AnchorPane implements Initializable {
     }
 
     /**
+     * Disables/enables the labels and sliders for adjusting the horizontal and vertical offsets for callouts
+     *
+     * @param disable
+     *         true when the callout offset adjustment components should be disabled, false otherwise
+     */
+    private void setDisableCalloutOffsetOptions(final boolean disable) {
+        calloutHOffsetLabel.setDisable(disable);
+        calloutHOffsetSlider.setDisable(disable);
+        calloutVOffsetLabel.setDisable(disable);
+        calloutVOffsetSlider.setDisable(disable);
+    }
+
+    /**
      * Disables/enables the fields for inputing a time range and its labels.
      *
      * @param disable
@@ -535,13 +548,13 @@ public class StoryEditorController extends AnchorPane implements Initializable {
         endTimeField.setDisable(disable);
     }
 
-    private void setActiveNoteCellName(String name) {
+    private void setActiveNoteCellName(final String name) {
         if (activeNote != null) {
             activeNote.setCellName(name);
         }
     }
 
-    private void setActiveNoteDisplay(Display display) {
+    private void setActiveNoteDisplay(final Display display) {
         if (activeNote != null) {
             activeNote.setDisplay(display);
         }
@@ -708,58 +721,37 @@ public class StoryEditorController extends AnchorPane implements Initializable {
                 case BLANK: // fall to overlay case
                 case OVERLAY:
                     infoPaneRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(true);
-                    calloutHOffsetSlider.setDisable(true);
-                    calloutVOffsetLabel.setDisable(true);
-                    calloutVOffsetSlider.setDisable(true);
+                    setDisableCalloutOffsetOptions(true);
                     break;
                 case SPRITE:
                     locationRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(true);
-                    calloutHOffsetSlider.setDisable(true);
-                    calloutVOffsetLabel.setDisable(true);
-                    calloutVOffsetSlider.setDisable(true);
+                    setDisableCalloutOffsetOptions(true);
                     break;
                 case BILLBOARD_FRONT:
                     billboardRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(true);
-                    calloutHOffsetSlider.setDisable(true);
-                    calloutVOffsetLabel.setDisable(true);
-                    calloutVOffsetSlider.setDisable(true);
+                    setDisableCalloutOffsetOptions(true);
                     break;
                 case CALLOUT_UPPER_LEFT:
                     calloutUpperLeftRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(false);
-                    calloutHOffsetSlider.setDisable(false);
-                    calloutVOffsetLabel.setDisable(false);
-                    calloutVOffsetSlider.setDisable(false);
+                    setDisableCalloutOffsetOptions(false);
                     calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
                     calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
                     break;
                 case CALLOUT_LOWER_LEFT:
                     calloutLowerLeftRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(false);
-                    calloutHOffsetSlider.setDisable(false);
-                    calloutVOffsetLabel.setDisable(false);
-                    calloutVOffsetSlider.setDisable(false);
+                    setDisableCalloutOffsetOptions(false);
                     calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
                     calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
                     break;
                 case CALLOUT_UPPER_RIGHT:
                     calloutUpperRightRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(false);
-                    calloutHOffsetSlider.setDisable(false);
-                    calloutVOffsetLabel.setDisable(false);
-                    calloutVOffsetSlider.setDisable(false);
+                    setDisableCalloutOffsetOptions(false);
                     calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
                     calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
                     break;
                 case CALLOUT_LOWER_RIGHT:
                     calloutLowerRightRadioBtn.setSelected(true);
-                    calloutHOffsetLabel.setDisable(false);
-                    calloutHOffsetSlider.setDisable(false);
-                    calloutVOffsetLabel.setDisable(false);
-                    calloutVOffsetSlider.setDisable(false);
+                    setDisableCalloutOffsetOptions(false);
                     calloutHOffsetSlider.setValue(activeNote.getCalloutHorizontalOffset());
                     calloutVOffsetSlider.setValue(activeNote.getCalloutVerticalOffset());
                     break;
