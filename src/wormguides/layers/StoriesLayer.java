@@ -250,7 +250,6 @@ public class StoriesLayer {
                                         if (!noteGraphic.isExpandIconClicked(
                                                 event.getPickResult().getIntersectedNode())) {
                                             note.setActive(!note.isActive());
-                                            // TODO fix listview rendering on note switch
                                             if (note.isActive()) {
                                                 setActiveNoteWithSubsceneRebuild(note);
                                             } else {

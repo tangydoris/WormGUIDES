@@ -469,14 +469,17 @@ public class StoryEditorController extends AnchorPane implements Initializable {
             }
         });
 
-        calloutHOffsetSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (activeNote != null && activeNote.isCallout()) {
-                activeNote.setCalloutHorizontalOffset(newValue.intValue());
+        calloutHOffsetSlider.valueChangingProperty().addListener((observable, wasChanging, isStillChanging) -> {
+            if (!isStillChanging && activeNote != null && activeNote.isCallout()) {
+                activeNote.setCalloutHorizontalOffset((int) calloutHOffsetSlider.getValue());
+                activeNote.setChanged(true);
             }
         });
-        calloutVOffsetSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (activeNote != null && activeNote.isCallout()) {
-                activeNote.setCalloutVerticalOffset(newValue.intValue());
+
+        calloutVOffsetSlider.valueChangingProperty().addListener((observable, wasChanging, isStillChanging) -> {
+            if (!isStillChanging && activeNote != null && activeNote.isCallout()) {
+                activeNote.setCalloutVerticalOffset((int) calloutVOffsetSlider.getValue());
+                activeNote.setChanged(true);
             }
         });
 

@@ -1228,7 +1228,6 @@ public class Window3DController {
                     noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
                 } else {
                     final double calloutOffset = 10.0;
-                    final double calloutLineOffset = 10.0;
                     double calloutX;
                     double calloutY;
                     // graphic is a note
@@ -1243,16 +1242,7 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (noteOrLabelGraphic instanceof Text) {
-                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
-                                if (calloutBounds != null) {
-                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
-                                    line.setStartX(x);
-                                    line.setStartY(y);
-                                    line.setEndX(calloutBounds.getMaxX());
-                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                                }
-                            }
+                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_LEFT);
                             break;
                         case CALLOUT_LOWER_LEFT:
                             calloutY = y + (height + calloutOffset);
@@ -1260,16 +1250,7 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (noteOrLabelGraphic instanceof Text) {
-                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
-                                if (calloutBounds != null) {
-                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
-                                    line.setStartX(x);
-                                    line.setStartY(y);
-                                    line.setEndX(calloutBounds.getMaxX());
-                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                                }
-                            }
+                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_LEFT);
                             break;
                         case CALLOUT_UPPER_RIGHT:
                             calloutY = y - (height + calloutOffset);
@@ -1277,16 +1258,7 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (noteOrLabelGraphic instanceof Text) {
-                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
-                                if (calloutBounds != null) {
-                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
-                                    line.setStartX(x);
-                                    line.setStartY(y);
-                                    line.setEndX(calloutBounds.getMinX());
-                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                                }
-                            }
+                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_RIGHT);
                             break;
                         case CALLOUT_LOWER_RIGHT:
                             calloutY = y + (height + calloutOffset);
@@ -1294,16 +1266,64 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            if (noteOrLabelGraphic instanceof Text) {
-                                final Bounds calloutBounds = noteOrLabelGraphic.getBoundsInParent();
-                                if (calloutBounds != null) {
-                                    final Line line = calloutLineMap.get(noteOrLabelGraphic);
-                                    line.setStartX(x);
-                                    line.setStartY(y);
-                                    line.setEndX(calloutBounds.getMinX());
-                                    line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                                }
-                            }
+                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_RIGHT);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Realigns the line for a callout by setting its starting coordinates at the entity and ending coordinates at
+     * the callout
+     *
+     * @param calloutGraphic
+     *         the callout, not null
+     * @param entityBounds
+     *         the bounds for the entity that the callout is attached to, not null
+     * @param display
+     *         the display type for the type of callout, not null
+     */
+    private void realignCalloutLine(
+            final Node calloutGraphic,
+            final Bounds entityBounds,
+            final double entityCenterX,
+            final double entityCenterY,
+            final Display display) {
+        // TODO implement
+        if (calloutGraphic != null && calloutGraphic instanceof Text && entityBounds != null && display != null) {
+            if (calloutGraphic instanceof Text) {
+                final double calloutLineOffset = 10.0;
+                final Bounds calloutBounds = calloutGraphic.getBoundsInParent();
+                final Line line = calloutLineMap.get(calloutGraphic);
+                if (calloutBounds != null) {
+                    switch (display) {
+                        case CALLOUT_UPPER_LEFT:
+                            line.setStartX(entityCenterX);
+                            line.setStartY(entityCenterY);
+                            line.setEndX(calloutBounds.getMaxX());
+                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                            break;
+                        case CALLOUT_LOWER_LEFT:
+                            line.setStartX(entityCenterX);
+                            line.setStartY(entityCenterY);
+                            line.setEndX(calloutBounds.getMaxX());
+                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                            break;
+                        case CALLOUT_UPPER_RIGHT:
+                            line.setStartX(entityCenterX);
+                            line.setStartY(entityCenterY);
+                            line.setEndX(calloutBounds.getMinX());
+                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                            break;
+                        case CALLOUT_LOWER_RIGHT:
+                            line.setStartX(entityCenterX);
+                            line.setStartY(entityCenterY);
+                            line.setEndX(calloutBounds.getMinX());
+                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -2525,19 +2545,13 @@ public class Window3DController {
         return event -> {
             hideContextPopups();
             double z = zoomProperty.get();
-            /*
-             * Workaround to avoid JavaFX bug --> stop zoomProperty at 0
-			 * As of July 8, 2016
-			 * Noted by: Braden Katzman
-			 *
-			 * JavaFX has a bug when zoomProperty gets below 0. The camera flips around and faces the scene instead of
-			 * passing through it
-			 * The API does not recognize that the camera orientation has changed and thus the back of back face
-			 * culled shapes appear, surrounded w/ artifacts.
-			 */
             if (z > 0.25) {
                 z -= 0.25;
             } else if (z < 0) {
+                // normalize zoom by making 0 its minimum
+                // javafx has a bug where for a zoom below 0, the camera flips and does not pass through the scene
+                // The API does not recognize that the camera orientation has changed and thus the back of back face
+			    // culled shapes appear, surrounded w/ artifacts.
                 z = 0;
             }
             zoomProperty.set(z);
