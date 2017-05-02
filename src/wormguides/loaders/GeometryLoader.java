@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
 import wormguides.MainApp;
+import wormguides.models.subscenegeometry.SceneElementMeshView;
 
 import static java.lang.Integer.MIN_VALUE;
 
@@ -65,8 +65,8 @@ public class GeometryLoader {
      *
      * @return the 3D mesh
      */
-    public static MeshView loadOBJ(String resourcePath) {
-        MeshView meshView = null;
+    public static SceneElementMeshView loadOBJ(String resourcePath) {
+        SceneElementMeshView meshView = null;
         resourcePath = "/" + resourcePath + OBJ_EXTENSION;
         final URL url = MainApp.class.getResource(resourcePath);
 
@@ -119,7 +119,8 @@ public class GeometryLoader {
                             break;
                     }
                 }
-                meshView = new MeshView(createMesh(coords, faces));
+                meshView = new SceneElementMeshView(createMesh(coords, faces));
+                meshView.pickOutMarkerPoints(coords);
             } catch (IOException e) {
                 System.out.println("The file " + resourcePath + " wasn't found on the system.");
             }

@@ -21,8 +21,8 @@ import static wormguides.loaders.GeometryLoader.loadOBJ;
 public class SceneElement {
 
     /**
-     * Label used to mark tracts that are multicell structures but have no explicit cell names in the cell shapes
-     * config file
+     * Label used to mark tracts that are multi-cellular structures but have no explicit cell names in the cell shapes
+     * config file (at /wormguides/models/shapes_file/CellShapesConfig.csv)
      */
     private final static String MULTICELL_TRACT = "MCS";
 
@@ -42,8 +42,13 @@ public class SceneElement {
     private int endTime;
     private String comments;
     private boolean completeResourceFlag;
-    /** Coordinates used when element belongs to a note */
-    private int x, y, z;
+
+    /** X-coordinate of scene element's position when element belongs to a note */
+    private int x;
+    /** Y-coordinate of scene element's position when element belongs to a note */
+    private int y;
+    /** Z-coordinate of scene element's position when element belongs to a note */
+    private int z;
 
     /**
      * Constructor
@@ -78,10 +83,10 @@ public class SceneElement {
         this.sceneName = requireNonNull(sceneName);
         this.cellNames = requireNonNull(cellNames);
         this.markerName = requireNonNull(markerName);
-        this.embryoName = ""; // will fill this field in later?
+        embryoName = ""; // will fill this field in later?
         this.imagingSource = requireNonNull(imagingSource);
         this.resourceLocation = requireNonNull(resourceLocation);
-        this.completeResourceFlag = isResourceComplete();
+        completeResourceFlag = isResourceComplete();
 
         this.startTime = startTime;
         this.endTime = endTime;
@@ -106,7 +111,26 @@ public class SceneElement {
         cellNames.addAll(editedNames);
     }
 
-    // Geometry used for notes in wormguides.stories
+    /**
+     * Constructor used by {@linkplain wormguides.stories.Story stories}
+     *
+     * @param sceneName
+     *         the scene name
+     * @param cellName
+     *         the cell contained in the structure
+     * @param markerName
+     *         the marker name
+     * @param imagingSource
+     *         the imagine source
+     * @param resourceLocation
+     *         resource specifying the .obj file location
+     * @param startTime
+     *         the first time point in which this structure appears
+     * @param endTime
+     *         the last time point in which this structure appears
+     * @param comments
+     *         the structure comments
+     */
     public SceneElement(
             final String sceneName,
             final String cellName,
@@ -120,14 +144,14 @@ public class SceneElement {
         this.sceneName = sceneName;
         this.cellNames = new ArrayList<>();
         this.cellNames.add(cellName);
-        this.markerName = markerName;
+        this.markerName = requireNonNull(markerName);
         this.embryoName = ""; // will fill this field in later?
-        this.imagingSource = imagingSource;
-        this.resourceLocation = resourceLocation;
+        this.imagingSource = requireNonNull(imagingSource);
+        this.resourceLocation = requireNonNull(resourceLocation);
         this.startTime = startTime;
         this.endTime = endTime;
-        this.comments = comments;
-        this.completeResourceFlag = isResourceComplete();
+        this.comments = requireNonNull(comments);
+        completeResourceFlag = isResourceComplete();
     }
 
     /**
@@ -137,7 +161,16 @@ public class SceneElement {
         return resourceLocation.endsWith(".obj");
     }
 
-    public MeshView buildGeometry(int time) {
+    /**
+     * Builds the scene element mesh view for the specified time
+     *
+     * @param time
+     *         the time
+     *
+     * @return scene element mesh view containing the actual {@link MeshView} object as well as marker points on the
+     * geometry from which a callout note line can be drawn
+     */
+    public SceneElementMeshView buildGeometry(int time) {
         // check if complete resource
         if (completeResourceFlag) {
             return loadOBJ(resourceLocation);
@@ -216,7 +249,7 @@ public class SceneElement {
     }
 
     public boolean isNoCellStructure() {
-    	return cellNames.size() == 0;
+        return cellNames.size() == 0;
     }
 
     public boolean existsAtTime(int time) {

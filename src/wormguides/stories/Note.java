@@ -18,6 +18,8 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.join;
 import static java.util.Objects.requireNonNull;
 
+import static partslist.PartsList.getLineageNamesByFunctionalName;
+import static partslist.PartsList.isFunctionalName;
 import static wormguides.stories.Note.Attachment.BLANK;
 import static wormguides.stories.Note.Attachment.CELL;
 import static wormguides.stories.Note.Attachment.LOCATION;
@@ -92,6 +94,7 @@ public class Note {
      * upper/lower right callouts get offset more to the right.
      */
     private double calloutHorizontalOffset;
+
     /**
      * Vertical offset from the top/bottom of the entity that the note is attached to (only applicable to notes
      * that are callouts). Upper left/right callouts get offset higher above the entity by this while lower
@@ -397,9 +400,12 @@ public class Note {
         return cellName;
     }
 
-    public void setCellName(String name) {
+    public void setCellName(final String name) {
         if (name != null) {
             cellName = name.trim();
+            if (isFunctionalName(cellName)) {
+                cellName = getLineageNamesByFunctionalName(cellName).get(0);
+            }
             if (elements != null) {
                 for (SceneElement se : elements) {
                     se.addCellName(cellName);

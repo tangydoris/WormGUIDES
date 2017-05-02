@@ -81,6 +81,7 @@ import wormguides.models.camerageometry.Xform;
 import wormguides.models.cellcase.CasesLists;
 import wormguides.models.colorrule.Rule;
 import wormguides.models.subscenegeometry.SceneElement;
+import wormguides.models.subscenegeometry.SceneElementMeshView;
 import wormguides.models.subscenegeometry.SceneElementsList;
 import wormguides.resources.ProductionInfo;
 import wormguides.stories.Note;
@@ -189,6 +190,11 @@ public class Window3DController {
             Y_COR_INDEX = 1,
             Z_COR_INDEX = 2;
 
+    /** Y offset of the callout line segment endpoint from the actual callout {@link Text} **/
+    private static final int CALLOUT_LINE_Y_OFFSET = 10;
+    /** X offset of the callout line segment endpoint from the actual callout {@link Text} **/
+    private static final int CALLOUT_LINE_X_OFFSET = 0;
+
     // rotation stuff
     private final Rotate rotateX;
     private final Rotate rotateY;
@@ -250,7 +256,7 @@ public class Window3DController {
     /** Map of current note graphics to their note objects */
     private final HashMap<Node, Note> currentGraphicNoteMap;
     /** Map of current notes to their scene elements */
-    private final HashMap<Note, MeshView> currentNoteMeshMap;
+    private final HashMap<Note, SceneElementMeshView> currentNoteMeshMap;
     /** Map of note sprites attached to cell, or cell and timeProperty */
     private final HashMap<Node, VBox> entitySpriteMap;
     /** Map of front-facing billboards attached to cell, or cell and timeProperty */
@@ -280,7 +286,7 @@ public class Window3DController {
 
     // subscene state parameters
     private LinkedList<Sphere> spheres;
-    private LinkedList<MeshView> meshes;
+    private LinkedList<SceneElementMeshView> meshes;
     private LinkedList<String> cellNames;
     private LinkedList<String> meshNames;
     private boolean[] isCellSearchedFlags;
@@ -288,7 +294,7 @@ public class Window3DController {
     private LinkedList<Double[]> positions;
     private LinkedList<Double> diameters;
     private List<SceneElement> sceneElementsAtCurrentTime;
-    private List<MeshView> currentSceneElementMeshes;
+    private List<SceneElementMeshView> currentSceneElementMeshes;
     private List<SceneElement> currentSceneElements;
     private PerspectiveCamera camera;
     private Xform xform;
@@ -640,8 +646,9 @@ public class Window3DController {
         // set up the scaling value to convert from microns to pixel values, we set x,y = 1 and z = ratio of z to
         // original y note that xScale and yScale are not the same
         if (xScale != yScale) {
-            System.err.println("xScale does not equal yScale - using ratio of Z to X for zScale value in pixels\n"
-                    + "X, Y should be the same value");
+            System.err.println(
+                    "xScale does not equal yScale - using ratio of Z to X for zScale value in pixels\n"
+                            + "X, Y should be the same value");
         }
         this.xScale = 1;
         this.yScale = 1;
@@ -742,7 +749,7 @@ public class Window3DController {
         orientationIndicator.getTransforms().add(new Translate(270, 200, 800));
 
         // add rotation variables
-        orientationIndicator.getTransforms().addAll(rotateZ, rotateY, rotateX);
+        orientationIndicator.getTransforms().addAll(rotateX, rotateY, rotateZ);
 
         // add the directional symbols to the group
         orientationIndicator.getChildren().add(middleTransformGroup);
@@ -978,9 +985,9 @@ public class Window3DController {
         }
 
         // Structure
-        else if (node instanceof MeshView) {
+        else if (node instanceof SceneElementMeshView) {
             boolean found = false; // this will indicate whether this meshview is a scene element
-            MeshView curr;
+            SceneElementMeshView curr;
             for (int i = 0; i < currentSceneElementMeshes.size(); i++) {
                 curr = currentSceneElementMeshes.get(i);
                 if (curr.equals(node)) {
@@ -1157,7 +1164,6 @@ public class Window3DController {
      * Repositions labels and note sprites on the overlaid sprites pane
      */
     private void repositionSpritesAndLabels() {
-        // TODO take out default coloring rule for "amphid_left" and "m3cDL" in story config url
         for (Node entity : entityLabelMap.keySet()) {
             alignTextWithEntity(entityLabelMap.get(entity), entity, null);
         }
@@ -1217,20 +1223,20 @@ public class Window3DController {
                                 (b.getMaxZ() + b.getMinZ()) / 2.0));
                 double x = p.getX();
                 double y = p.getY();
-
                 double height = b.getHeight();
                 double width = b.getWidth();
 
+                // if graphic is a label
                 if (noteDisplay == null) {
-                    // graphic is a label
                     y -= getLabelSpriteYOffset();
                     noteOrLabelGraphic.getTransforms().clear();
                     noteOrLabelGraphic.getTransforms().add(new Translate(x, y));
+
                 } else {
+                    // if graphic is a note
                     final double calloutOffset = 10.0;
                     double calloutX;
                     double calloutY;
-                    // graphic is a note
                     switch (noteDisplay) {
                         case SPRITE:
                             noteOrLabelGraphic.getTransforms().clear();
@@ -1242,7 +1248,14 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_LEFT);
+                            if (entity instanceof Sphere) {
+                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_LEFT);
+                            } else if (entity instanceof SceneElementMeshView) {
+                                realignCalloutLineToSceneElementMesh(
+                                        noteOrLabelGraphic,
+                                        (SceneElementMeshView) entity,
+                                        CALLOUT_UPPER_LEFT);
+                            }
                             break;
                         case CALLOUT_LOWER_LEFT:
                             calloutY = y + (height + calloutOffset);
@@ -1250,7 +1263,14 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_LEFT);
+                            if (entity instanceof Sphere) {
+                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_LEFT);
+                            } else if (entity instanceof SceneElementMeshView) {
+                                realignCalloutLineToSceneElementMesh(
+                                        noteOrLabelGraphic,
+                                        (SceneElementMeshView) entity,
+                                        CALLOUT_LOWER_LEFT);
+                            }
                             break;
                         case CALLOUT_UPPER_RIGHT:
                             calloutY = y - (height + calloutOffset);
@@ -1258,7 +1278,14 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_RIGHT);
+                            if (entity instanceof Sphere) {
+                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_UPPER_RIGHT);
+                            } else if (entity instanceof SceneElementMeshView) {
+                                realignCalloutLineToSceneElementMesh(
+                                        noteOrLabelGraphic,
+                                        (SceneElementMeshView) entity,
+                                        CALLOUT_UPPER_RIGHT);
+                            }
                             break;
                         case CALLOUT_LOWER_RIGHT:
                             calloutY = y + (height + calloutOffset);
@@ -1266,7 +1293,14 @@ public class Window3DController {
                             addCalloutSubsceneTranslation(
                                     noteOrLabelGraphic.getTransforms(),
                                     new Translate(calloutX, calloutY));
-                            realignCalloutLine(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_RIGHT);
+                            if (entity instanceof Sphere) {
+                                realignCalloutLineToSphere(noteOrLabelGraphic, b, x, y, CALLOUT_LOWER_RIGHT);
+                            } else if (entity instanceof SceneElementMeshView) {
+                                realignCalloutLineToSceneElementMesh(
+                                        noteOrLabelGraphic,
+                                        (SceneElementMeshView) entity,
+                                        CALLOUT_LOWER_RIGHT);
+                            }
                             break;
                     }
                 }
@@ -1275,57 +1309,168 @@ public class Window3DController {
     }
 
     /**
-     * Realigns the line for a callout by setting its starting coordinates at the entity and ending coordinates at
-     * the callout
+     * Realigns the line segment for a scene element mesh entity's callout note by setting one end point a marker
+     * point on the mesh closest to the callout and the other at the callout
+     *
+     * @param calloutGraphic
+     *         the callout, not null
+     * @param meshView
+     *         the scene element mesh view, not null
+     * @param display
+     *         the display type specifying the type of callout, not null
+     */
+    private void realignCalloutLineToSceneElementMesh(
+            final Node calloutGraphic,
+            final SceneElementMeshView meshView,
+            final Display display) {
+        if (calloutGraphic != null
+                && calloutGraphic instanceof Text
+                && meshView != null
+                && display != null) {
+            final Bounds calloutBounds = calloutGraphic.getBoundsInParent();
+            final Line line = calloutLineMap.get(calloutGraphic);
+            if (calloutBounds != null) {
+                // create invisible spherical markers (similar to the markers for notes with a location attachment)
+                final List<Sphere> sphereMarkers = new ArrayList<>();
+                // transform marker points as the rest of the subscene entities
+                meshView.getMarkerCoordinates().forEach(marker -> {
+                    final Sphere markerSphere = createLocationMarker(marker[0], marker[1], marker[2]);
+                    sphereMarkers.add(markerSphere);
+                    rootEntitiesGroup.getChildren().add(markerSphere);
+                });
+                // create projected 2d points from the marker sphere centers
+                final List<Point2D> markerPoints2D = new ArrayList<>();
+                sphereMarkers.forEach(marker -> {
+                    final Bounds b = marker.getBoundsInParent();
+                    if (b != null) {
+                        markerPoints2D.add(project(
+                                camera,
+                                new Point3D(b.getMinX(), b.getMinY(), b.getMinZ())));
+                    }
+                });
+                switch (display) {
+                    case CALLOUT_UPPER_LEFT:
+                        // find point with minimum x value and minimum y value
+                        Point2D upperLeftPoint = null;
+                        for (Point2D marker : markerPoints2D) {
+                            if (upperLeftPoint == null) {
+                                upperLeftPoint = marker;
+                            } else if (marker.getX() < upperLeftPoint.getX()
+                                    && marker.getY() < upperLeftPoint.getY()) {
+                                upperLeftPoint = marker;
+                            }
+                        }
+                        line.setStartX(upperLeftPoint.getX());
+                        line.setStartY(upperLeftPoint.getY());
+                        line.setEndX(calloutBounds.getMaxX() + CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_LOWER_LEFT:
+                        // find point with minimum x value and maximum y value
+                        Point2D lowerLeftPoint = null;
+                        for (Point2D marker : markerPoints2D) {
+                            if (lowerLeftPoint == null) {
+                                lowerLeftPoint = marker;
+                            } else if (marker.getX() < lowerLeftPoint.getX()
+                                    && marker.getY() > lowerLeftPoint.getY()) {
+                                lowerLeftPoint = marker;
+                            }
+                        }
+                        line.setStartX(lowerLeftPoint.getX());
+                        line.setStartY(lowerLeftPoint.getY());
+                        line.setEndX(calloutBounds.getMaxX() + CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_UPPER_RIGHT:
+                        // find point with maximum x value and minimum y value
+                        Point2D upperRightPoint = null;
+                        for (Point2D marker : markerPoints2D) {
+                            if (upperRightPoint == null) {
+                                upperRightPoint = marker;
+                            } else if (marker.getX() > upperRightPoint.getX()
+                                    && marker.getY() < upperRightPoint.getY()) {
+                                upperRightPoint = marker;
+                            }
+                        }
+                        line.setStartX(upperRightPoint.getX());
+                        line.setStartY(upperRightPoint.getY());
+                        line.setEndX(calloutBounds.getMinX() - CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_LOWER_RIGHT:
+                        // find point with maximum x value and maximum y value
+                        Point2D lowerRightPoint = null;
+                        for (Point2D marker : markerPoints2D) {
+                            if (lowerRightPoint == null) {
+                                lowerRightPoint = marker;
+                            } else if (marker.getX() > lowerRightPoint.getX()
+                                    && marker.getY() > lowerRightPoint.getY()) {
+                                lowerRightPoint = marker;
+                            }
+                        }
+                        line.setStartX(lowerRightPoint.getX());
+                        line.setStartY(lowerRightPoint.getY());
+                        line.setEndX(calloutBounds.getMinX() - CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Realigns the line segment for a spherical entity's callout note by setting one endpoint at the sphere's center
+     * and the other at the callout
      *
      * @param calloutGraphic
      *         the callout, not null
      * @param entityBounds
      *         the bounds for the entity that the callout is attached to, not null
      * @param display
-     *         the display type for the type of callout, not null
+     *         the display type specifying the type of callout, not null
      */
-    private void realignCalloutLine(
+    private void realignCalloutLineToSphere(
             final Node calloutGraphic,
             final Bounds entityBounds,
             final double entityCenterX,
             final double entityCenterY,
             final Display display) {
-        // TODO implement
-        if (calloutGraphic != null && calloutGraphic instanceof Text && entityBounds != null && display != null) {
-            if (calloutGraphic instanceof Text) {
-                final double calloutLineOffset = 10.0;
-                final Bounds calloutBounds = calloutGraphic.getBoundsInParent();
-                final Line line = calloutLineMap.get(calloutGraphic);
-                if (calloutBounds != null) {
-                    switch (display) {
-                        case CALLOUT_UPPER_LEFT:
-                            line.setStartX(entityCenterX);
-                            line.setStartY(entityCenterY);
-                            line.setEndX(calloutBounds.getMaxX());
-                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                            break;
-                        case CALLOUT_LOWER_LEFT:
-                            line.setStartX(entityCenterX);
-                            line.setStartY(entityCenterY);
-                            line.setEndX(calloutBounds.getMaxX());
-                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                            break;
-                        case CALLOUT_UPPER_RIGHT:
-                            line.setStartX(entityCenterX);
-                            line.setStartY(entityCenterY);
-                            line.setEndX(calloutBounds.getMinX());
-                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                            break;
-                        case CALLOUT_LOWER_RIGHT:
-                            line.setStartX(entityCenterX);
-                            line.setStartY(entityCenterY);
-                            line.setEndX(calloutBounds.getMinX());
-                            line.setEndY(calloutBounds.getMinY() + calloutLineOffset);
-                            break;
-                        default:
-                            break;
-                    }
+        if (calloutGraphic != null
+                && calloutGraphic instanceof Text
+                && entityBounds != null
+                && display != null) {
+            final Bounds calloutBounds = calloutGraphic.getBoundsInParent();
+            final Line line = calloutLineMap.get(calloutGraphic);
+            if (calloutBounds != null) {
+                switch (display) {
+                    case CALLOUT_UPPER_LEFT:
+                        line.setStartX(entityCenterX);
+                        line.setStartY(entityCenterY);
+                        line.setEndX(calloutBounds.getMaxX() + CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_LOWER_LEFT:
+                        line.setStartX(entityCenterX);
+                        line.setStartY(entityCenterY);
+                        line.setEndX(calloutBounds.getMaxX() + CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_UPPER_RIGHT:
+                        line.setStartX(entityCenterX);
+                        line.setStartY(entityCenterY);
+                        line.setEndX(calloutBounds.getMinX() - CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    case CALLOUT_LOWER_RIGHT:
+                        line.setStartX(entityCenterX);
+                        line.setStartY(entityCenterY);
+                        line.setEndX(calloutBounds.getMinX() - CALLOUT_LINE_X_OFFSET);
+                        line.setEndY(calloutBounds.getMinY() + CALLOUT_LINE_Y_OFFSET);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -1415,10 +1560,13 @@ public class Window3DController {
 
             sceneElementsAtCurrentTime = sceneElementsList.getSceneElementsAtTime(requestedTime);
             for (SceneElement se : sceneElementsAtCurrentTime) {
-                final MeshView mesh = se.buildGeometry(requestedTime - 1);
+                final SceneElementMeshView mesh = se.buildGeometry(requestedTime - 1);
                 if (mesh != null) {
                     mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                    mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * zScale));
+                    mesh.getTransforms().add(new Translate(
+                            -offsetX * xScale,
+                            -offsetY * yScale,
+                            -offsetZ * zScale));
                     // add rendered mesh to meshes list
                     currentSceneElementMeshes.add(mesh);
                     // add scene element to rendered scene element reference for on-click responsiveness
@@ -1479,12 +1627,14 @@ public class Window3DController {
                     // make mesh views for scene elements from note resources
                     if (note.hasSceneElements()) {
                         for (SceneElement se : note.getSceneElements()) {
-                            MeshView mesh = se.buildGeometry(requestedTime);
-
+                            final SceneElementMeshView mesh = se.buildGeometry(requestedTime);
                             if (mesh != null) {
                                 mesh.setMaterial(colorHash.getNoteSceneElementMaterial());
                                 mesh.getTransforms().addAll(rotateX, rotateY, rotateZ);
-                                mesh.getTransforms().add(new Translate(-offsetX, -offsetY, -offsetZ * zScale));
+                                mesh.getTransforms().add(new Translate(
+                                        -offsetX * xScale,
+                                        -offsetY * yScale,
+                                        -offsetZ * zScale));
                                 currentNoteMeshMap.put(note, mesh);
                             }
                         }
@@ -1705,7 +1855,7 @@ public class Window3DController {
             // consult rules/search results
             final ListIterator<SceneElement> iter = currentSceneElements.listIterator();
             SceneElement sceneElement;
-            MeshView meshView;
+            SceneElementMeshView meshView;
             int index = -1;
             while (iter.hasNext()) {
                 index++;
@@ -2037,8 +2187,7 @@ public class Window3DController {
                         final VBox box = new VBox(3);
                         box.setPrefWidth(getNoteSpriteTextWidth());
                         box.getChildren().add(noteGraphic);
-                        // add inivisible location marker to scene at location
-                        // specified by note
+                        // add inivisible location marker to scene at location specified by note
                         final Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
                         rootEntitiesGroup.getChildren().add(marker);
                         entitySpriteMap.put(marker, box);
@@ -2069,18 +2218,13 @@ public class Window3DController {
                     }
 
                 } else if (note.isBillboardFront()) {
-                    // location attachment
                     if (note.attachedToLocation()) {
-                        Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
+                        final Sphere marker = createLocationMarker(note.getX(), note.getY(), note.getZ());
                         rootEntitiesGroup.getChildren().add(marker);
                         billboardFrontEntityMap.put(noteGraphic, marker);
-                    }
-                    // cell attachment
-                    else if (note.attachedToCell()) {
+                    } else if (note.attachedToCell()) {
                         billboardFrontEntityMap.put(noteGraphic, getSubsceneSphereWithName(note.getCellName()));
-                    }
-                    // structure attachment
-                    else if (note.attachedToStructure() && defaultEmbryoFlag) {
+                    } else if (note.attachedToStructure() && defaultEmbryoFlag) {
                         for (int i = 0; i < currentSceneElements.size(); i++) {
                             if (currentSceneElements.get(i)
                                     .getSceneName()
@@ -2108,7 +2252,6 @@ public class Window3DController {
                                 if (!uniformSize) {
                                     offset = sphere.getRadius() + 2;
                                 }
-
                                 noteGraphic.getTransforms().addAll(sphere.getTransforms());
                                 noteGraphic.getTransforms().addAll(
                                         new Translate(offset, offset),
@@ -2164,7 +2307,7 @@ public class Window3DController {
      * @return the mesh view representing the scene element with that scene name, null if none were found in the
      * current time frame
      */
-    private MeshView getSubsceneMeshWithName(final String sceneName) {
+    private SceneElementMeshView getSubsceneMeshWithName(final String sceneName) {
         for (int i = 0; i < currentSceneElements.size(); i++) {
             if (currentSceneElements.get(i).getSceneName().equalsIgnoreCase(sceneName)) {
                 return currentSceneElementMeshes.get(i);
@@ -2232,7 +2375,10 @@ public class Window3DController {
     private Sphere createLocationMarker(final double x, final double y, final double z) {
         final Sphere sphere = new Sphere(1);
         sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
-        sphere.getTransforms().add(new Translate(x * xScale, y * yScale, z * zScale));
+        sphere.getTransforms().add(new Translate(
+                (-offsetX + x) * xScale,
+                (-offsetY + y) * yScale,
+                (-offsetZ + z) * zScale));
         // make marker transparent
         sphere.setMaterial(colorHash.getOthersMaterial(0));
         return sphere;
@@ -2551,7 +2697,7 @@ public class Window3DController {
                 // normalize zoom by making 0 its minimum
                 // javafx has a bug where for a zoom below 0, the camera flips and does not pass through the scene
                 // The API does not recognize that the camera orientation has changed and thus the back of back face
-			    // culled shapes appear, surrounded w/ artifacts.
+                // culled shapes appear, surrounded w/ artifacts.
                 z = 0;
             }
             zoomProperty.set(z);

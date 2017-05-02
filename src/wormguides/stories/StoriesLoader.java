@@ -25,28 +25,29 @@ import static java.util.Collections.addAll;
  */
 public class StoriesLoader {
 
-    public static final int NUMBER_OF_CSV_FIELDS = 16;
+    public static final int NUMBER_OF_CSV_FIELDS = 17;
 
     public static final int STORY_NAME_INDEX = 0,
             STORY_DESCRIPTION_INDEX = 1,
-            STORY_AUTHOR_INDEX = 13,
-            STORY_DATE_INDEX = 14;
+            STORY_AUTHOR_INDEX = 14,
+            STORY_DATE_INDEX = 15;
 
     public static final int NOTE_NAME_INDEX = 0,
             NOTE_CONTENTS_INDEX = 1,
             NOTE_DISPLAY_INDEX = 2,
-            NOTE_TYPE_INDEX = 3,
-            NOTE_LOCATION_INDEX = 4,
-            NOTE_CELLNAME_INDEX = 5,
-            NOTE_MARKER_INDEX = 6,
-            NOTE_IMG_SOURCE_INDEX = 7,
-            NOTE_RESOURCE_LOCATION_INDEX = 8,
-            NOTE_START_TIME_INDEX = 9,
-            NOTE_END_TIME_INDEX = 10,
-            NOTE_COMMENTS_INDEX = 11,
-            NOTE_VISIBLE_INDEX = 12;
+            NOTE_CALLOUT_OFFSETS_INDEX = 3,
+            NOTE_TYPE_INDEX = 4,
+            NOTE_LOCATION_INDEX = 5,
+            NOTE_CELLNAME_INDEX = 6,
+            NOTE_MARKER_INDEX = 7,
+            NOTE_IMG_SOURCE_INDEX = 8,
+            NOTE_RESOURCE_LOCATION_INDEX = 9,
+            NOTE_START_TIME_INDEX = 10,
+            NOTE_END_TIME_INDEX = 11,
+            NOTE_COMMENTS_INDEX = 12,
+            NOTE_VISIBLE_INDEX = 13;
 
-    public static final int COLOR_URL_INDEX = 15;
+    public static final int COLOR_URL_INDEX = 16;
 
     private static final String STORY_LIST_CONFIG = "/wormguides/stories/StoryListConfig.csv";
 
@@ -134,7 +135,7 @@ public class StoriesLoader {
                         storyCounter++;
 
                     } else {
-                        // if line makes up a note
+                        // if line makes up a note, create the note and add it to story
                         addNoteToStory(
                                 stories.get(storyCounter),
                                 split,
@@ -144,7 +145,6 @@ public class StoriesLoader {
                     lineTokens.clear();
                 }
             }
-
             reader.close();
 
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -159,7 +159,6 @@ public class StoriesLoader {
     }
 
     private static Note addNoteToStory(final Story story, final String[] split, final int offset) {
-
         final Note note = new Note(story, split[NOTE_NAME_INDEX], split[NOTE_CONTENTS_INDEX]);
         story.addNote(note);
 
@@ -187,6 +186,17 @@ public class StoriesLoader {
             }
 
             note.setColorUrl(split[COLOR_URL_INDEX]);
+
+            if (!split[NOTE_CALLOUT_OFFSETS_INDEX].isEmpty()) {
+                // remove quotes inserted from Excel
+                String offsetsString = split[NOTE_CALLOUT_OFFSETS_INDEX];
+                if (offsetsString.startsWith("\"") && offsetsString.endsWith("\"")) {
+                    offsetsString = offsetsString.substring(1, offsetsString.length() - 1);
+                }
+                final String[] offsetTokens = offsetsString.split(",");
+                note.setCalloutHorizontalOffset(parseInt(offsetTokens[0].trim()));
+                note.setCalloutVerticalOffset(parseInt(offsetTokens[1].trim()));
+            }
 
         } catch (Exception e) {
             System.out.println("Error trying to parse the following note params:");

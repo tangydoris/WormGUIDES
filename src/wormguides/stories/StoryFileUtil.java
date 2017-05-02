@@ -15,6 +15,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static java.lang.String.join;
 
 import static wormguides.stories.StoriesLoader.COLOR_URL_INDEX;
+import static wormguides.stories.StoriesLoader.NOTE_CALLOUT_OFFSETS_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_CELLNAME_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_COMMENTS_INDEX;
 import static wormguides.stories.StoriesLoader.NOTE_CONTENTS_INDEX;
@@ -45,8 +46,9 @@ public class StoryFileUtil {
             NAME = "Tag Name",
             CONTENTS = "Tag Contents",
             DISPLAY = "Tag Display",
+            CALlOUT_OFFSETS = quoteForCsv("Callout Offsets (horizontal, vertical)"),
             ATTACHMENT = "Attachment Type",
-            LOCATION = "xyz Locatoin",
+            LOCATION = "XYZ Location",
             CELLS = "Cells",
             MARKER = "Marker",
             SOURCE = "Imaging Source",
@@ -76,6 +78,8 @@ public class StoryFileUtil {
                     .append(CONTENTS)
                     .append(CS)
                     .append(DISPLAY)
+                    .append(CS)
+                    .append(CALlOUT_OFFSETS)
                     .append(CS)
                     .append(ATTACHMENT)
                     .append(CS)
@@ -144,6 +148,12 @@ public class StoryFileUtil {
                 }
                 if (note.hasColorScheme()) {
                     noteParams[COLOR_URL_INDEX] = note.getColorUrl();
+                }
+                if (note.isCallout()) {
+                    noteParams[NOTE_CALLOUT_OFFSETS_INDEX] = quoteForCsv(
+                            note.getCalloutHorizontalOffset()
+                            + ", "
+                            + note.getCalloutVerticalOffset());
                 }
                 out.append(join(",", noteParams))
                         .append(BR);
