@@ -1345,7 +1345,10 @@ public class Window3DController {
                     if (b != null) {
                         markerPoints2D.add(project(
                                 camera,
-                                new Point3D(b.getMinX(), b.getMinY(), b.getMinZ())));
+                                new Point3D(
+                                        (b.getMinX() + b.getMaxX()) / 2,
+                                        (b.getMinY() + b.getMaxY()) / 2,
+                                        (b.getMinZ() + b.getMaxZ()) / 2)));
                     }
                 });
                 switch (display) {
@@ -2373,7 +2376,7 @@ public class Window3DController {
     }
 
     private Sphere createLocationMarker(final double x, final double y, final double z) {
-        final Sphere sphere = new Sphere(1);
+        final Sphere sphere = new Sphere(0.05);
         sphere.getTransforms().addAll(rotateX, rotateY, rotateZ);
         sphere.getTransforms().add(new Translate(
                 (-offsetX + x) * xScale,

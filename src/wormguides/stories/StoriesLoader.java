@@ -16,6 +16,7 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 
+import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.util.Arrays.asList;
 import static java.util.Collections.addAll;
@@ -194,8 +195,8 @@ public class StoriesLoader {
                     offsetsString = offsetsString.substring(1, offsetsString.length() - 1);
                 }
                 final String[] offsetTokens = offsetsString.split(",");
-                note.setCalloutHorizontalOffset(parseInt(offsetTokens[0].trim()));
-                note.setCalloutVerticalOffset(parseInt(offsetTokens[1].trim()));
+                note.setCalloutHorizontalOffset((int) parseDouble(offsetTokens[0].trim()));
+                note.setCalloutVerticalOffset((int) parseDouble(offsetTokens[1].trim()));
             }
 
         } catch (Exception e) {

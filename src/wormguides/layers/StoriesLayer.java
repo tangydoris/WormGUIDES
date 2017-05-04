@@ -87,6 +87,9 @@ public class StoriesLayer {
     private final ObservableList<Rule> activeRulesList;
     private final ObservableList<Story> stories;
 
+    private final Button deleteStoryButton;
+    private final Button editStoryButton;
+
     private final int startTime;
     private final int endTime;
     private int movieTimeOffset;
@@ -121,7 +124,7 @@ public class StoriesLayer {
             final LineageData lineageData,
             final Button newStoryButton,
             final Button deleteStoryButton,
-            final Button editNoteButton,
+            final Button editStoryButton,
             final int startTime,
             final int endTime,
             final int movieTimeOffset,
@@ -174,14 +177,16 @@ public class StoriesLayer {
             bringUpEditor();
         });
 
-        deleteStoryButton.setOnAction(event -> {
+        this.deleteStoryButton = requireNonNull(deleteStoryButton);
+        this.deleteStoryButton.setOnAction(event -> {
             if (activeStory != null) {
                 stories.remove(activeStory);
                 setActiveStory(null);
             }
         });
 
-        editNoteButton.setOnAction(event -> bringUpEditor());
+        this.editStoryButton = requireNonNull(editStoryButton);
+        this.editStoryButton.setOnAction(event -> bringUpEditor());
 
         width = 0;
 
@@ -583,6 +588,10 @@ public class StoriesLayer {
 
         activeStory = story;
         if (activeStory != null) {
+            // enable delete/edit story buttons
+            deleteStoryButton.setDisable(false);
+            editStoryButton.setDisable(false);
+
             // sort notes choronologically
             activeStory.sortNotes();
 
@@ -611,6 +620,10 @@ public class StoriesLayer {
             }
         } else {
             // if there is no newly active story
+            // disable delete/edit story buttons
+            deleteStoryButton.setDisable(true);
+            editStoryButton.setDisable(true);
+
             activeStoryProperty.set("");
             useInternalRulesFlag.set(true);
             rebuildSubsceneFlag.set(true);

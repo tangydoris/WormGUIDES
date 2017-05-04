@@ -93,14 +93,14 @@ public class Note {
      * that are callouts). Upper/lower left callouts get offset more to the left of the entity by this while
      * upper/lower right callouts get offset more to the right.
      */
-    private double calloutHorizontalOffset;
+    private int calloutHorizontalOffset;
 
     /**
      * Vertical offset from the top/bottom of the entity that the note is attached to (only applicable to notes
      * that are callouts). Upper left/right callouts get offset higher above the entity by this while lower
      * left/right callouts get offset lower below.
      */
-    private double calloutVerticalOffset;
+    private int calloutVerticalOffset;
 
     public Note(final Story parentStory) {
         this.parentStory = requireNonNull(parentStory);
@@ -128,8 +128,8 @@ public class Note {
         setDisplay(OVERLAY);
         setAttachmentType(BLANK);
 
-        calloutHorizontalOffset = 0.0;
-        calloutVerticalOffset = 0.0;
+        calloutHorizontalOffset = 0;
+        calloutVerticalOffset = 0;
     }
 
     public Note(
@@ -368,19 +368,19 @@ public class Note {
         }
     }
 
-    public double getCalloutHorizontalOffset() {
+    public int getCalloutHorizontalOffset() {
         return calloutHorizontalOffset;
     }
 
-    public void setCalloutHorizontalOffset(final double horizontalOffset) {
+    public void setCalloutHorizontalOffset(final int horizontalOffset) {
         calloutHorizontalOffset = horizontalOffset;
     }
 
-    public double getCalloutVerticalOffset() {
+    public int getCalloutVerticalOffset() {
         return calloutVerticalOffset;
     }
 
-    public void setCalloutVerticalOffset(final double verticalOffset) {
+    public void setCalloutVerticalOffset(final int verticalOffset) {
         calloutVerticalOffset = verticalOffset;
     }
 
