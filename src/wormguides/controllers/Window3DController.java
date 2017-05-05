@@ -81,7 +81,6 @@ import wormguides.models.camerageometry.Xform;
 import wormguides.models.cellcase.CasesLists;
 import wormguides.models.colorrule.Rule;
 import wormguides.models.subscenegeometry.SceneElement;
-import wormguides.models.subscenegeometry.SceneElementMeshView;
 import wormguides.models.subscenegeometry.SceneElementsList;
 import wormguides.resources.ProductionInfo;
 import wormguides.stories.Note;
@@ -90,6 +89,7 @@ import wormguides.util.ColorComparator;
 import wormguides.util.ColorHash;
 import wormguides.util.subscenesaving.JavaPicture;
 import wormguides.util.subscenesaving.JpegImagesToMovie;
+import wormguides.view.graphicalrepresentations.SceneElementMeshView;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
@@ -264,15 +264,17 @@ public class Window3DController {
     /** Map of a cell entity to its label */
     private final Map<Node, Text> entityLabelMap;
     /** Map of upper left note callouts attached to a cell/structure */
-    private final HashMap<Node, List<Text>> entityCalloutULMap;
+    private final Map<Node, List<Text>> entityCalloutULMap;
     /** Map of upper right note callouts attached to a cell/structure */
-    private final HashMap<Node, List<Text>> entityCalloutURMap;
+    private final Map<Node, List<Text>> entityCalloutURMap;
     /** Map of lower left note callouts attached to a cell/structure */
-    private final HashMap<Node, List<Text>> entityCalloutLLMap;
+    private final Map<Node, List<Text>> entityCalloutLLMap;
     /** Map of lower right note callouts attached to a cell/structure */
-    private final HashMap<Node, List<Text>> entityCalloutLRMap;
-    /* Map of all callout Texts to their Lines */
-    private final HashMap<Text, Line> calloutLineMap;
+    private final Map<Node, List<Text>> entityCalloutLRMap;
+    /** Map of all callout texts to their lines */
+    private final Map<Text, Line> calloutLineMap;
+    /** Map of all scene elements (meshes?) that have a callout note to their spherical marker points */
+    private final Map<SceneElementMeshView, List<Sphere>> sceneElementCaloutMarkersMap;
     // orientation indicator
     private final Cylinder orientationIndicator;
     private final ProductionInfo productionInfo;
@@ -597,6 +599,7 @@ public class Window3DController {
         entityCalloutLRMap = new HashMap<>();
 
         calloutLineMap = new HashMap<>();
+        sceneElementCaloutMarkersMap = new HashMap<>();
 
         allLabels = new ArrayList<>();
         currentLabels = new ArrayList<>();
@@ -1330,17 +1333,24 @@ public class Window3DController {
             final Bounds calloutBounds = calloutGraphic.getBoundsInParent();
             final Line line = calloutLineMap.get(calloutGraphic);
             if (calloutBounds != null) {
+                // TODO no need to remake sphere markers
                 // create invisible spherical markers (similar to the markers for notes with a location attachment)
-                final List<Sphere> sphereMarkers = new ArrayList<>();
-                // transform marker points as the rest of the subscene entities
-                meshView.getMarkerCoordinates().forEach(marker -> {
-                    final Sphere markerSphere = createLocationMarker(marker[0], marker[1], marker[2]);
-                    sphereMarkers.add(markerSphere);
-                    rootEntitiesGroup.getChildren().add(markerSphere);
-                });
+                // if not created already
+                List<Sphere> markers = sceneElementCaloutMarkersMap.get(meshView);
+                if (markers == null) {
+                    markers = new ArrayList<>();
+                    final List<Sphere> markersPointer = markers;
+                    // transform marker points as the rest of the subscene entities
+                    meshView.getMarkerCoordinates().forEach(marker -> {
+                        final Sphere markerSphere = createLocationMarker(marker[0], marker[1], marker[2]);
+                        markersPointer.add(markerSphere);
+                        rootEntitiesGroup.getChildren().add(markerSphere);
+                    });
+                    sceneElementCaloutMarkersMap.put(meshView, markers);
+                }
                 // create projected 2d points from the marker sphere centers
                 final List<Point2D> markerPoints2D = new ArrayList<>();
-                sphereMarkers.forEach(marker -> {
+                markers.forEach(marker -> {
                     final Bounds b = marker.getBoundsInParent();
                     if (b != null) {
                         markerPoints2D.add(project(
@@ -1614,6 +1624,8 @@ public class Window3DController {
             entityCalloutLLMap.clear();
             entityCalloutURMap.clear();
             entityCalloutLRMap.clear();
+            calloutLineMap.clear();
+            sceneElementCaloutMarkersMap.clear();
             billboardFrontEntityMap.clear();
 
             currentNotes = storiesLayer.getNotesAtTime(requestedTime);

@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import javafx.scene.shape.TriangleMesh;
 
 import wormguides.MainApp;
-import wormguides.models.subscenegeometry.SceneElementMeshView;
+import wormguides.view.graphicalrepresentations.SceneElementMeshView;
 
 import static java.lang.Integer.MIN_VALUE;
 

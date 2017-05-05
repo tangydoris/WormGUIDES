@@ -1,4 +1,4 @@
-package wormguides.models.subscenegeometry;
+package wormguides.view.graphicalrepresentations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class SceneElementMeshView extends MeshView {
      * Number of marker points to pick out from the vertices of the mesh view. As the number of mark points
      * increases, the line drawn to the callout note is able to get closer to the point on the mesh closest to it.
      **/
-    private final static int NUMBER_OF_MARKER_POINTS = 16;
+    private final static int NUMBER_OF_MARKER_POINTS = 32;
 
     /** The list of marker points **/
     private final List<double[]> markerCoordinates;
