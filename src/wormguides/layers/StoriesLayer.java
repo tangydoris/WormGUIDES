@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Insets.EMPTY;
 
-import static wormguides.stories.StoriesLoader.loadConfigFile;
+import static wormguides.loaders.StoriesLoader.loadConfigFile;
 import static wormguides.stories.StoryFileUtil.loadFromCSVFile;
 import static wormguides.stories.StoryFileUtil.saveToCSVFile;
 import static wormguides.util.colorurl.UrlGenerator.generateInternal;

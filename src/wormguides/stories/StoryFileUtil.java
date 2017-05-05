@@ -14,27 +14,27 @@ import javafx.collections.ObservableList;
 import static java.lang.Integer.MIN_VALUE;
 import static java.lang.String.join;
 
-import static wormguides.stories.StoriesLoader.COLOR_URL_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_CALLOUT_OFFSETS_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_CELLNAME_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_COMMENTS_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_CONTENTS_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_DISPLAY_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_END_TIME_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_IMG_SOURCE_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_LOCATION_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_MARKER_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_NAME_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_RESOURCE_LOCATION_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_START_TIME_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_TYPE_INDEX;
-import static wormguides.stories.StoriesLoader.NOTE_VISIBLE_INDEX;
-import static wormguides.stories.StoriesLoader.NUMBER_OF_CSV_FIELDS;
-import static wormguides.stories.StoriesLoader.STORY_AUTHOR_INDEX;
-import static wormguides.stories.StoriesLoader.STORY_DATE_INDEX;
-import static wormguides.stories.StoriesLoader.STORY_DESCRIPTION_INDEX;
-import static wormguides.stories.StoriesLoader.STORY_NAME_INDEX;
-import static wormguides.stories.StoriesLoader.loadFromFile;
+import static wormguides.loaders.StoriesLoader.COLOR_URL_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_CALLOUT_OFFSETS_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_CELLNAME_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_COMMENTS_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_CONTENTS_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_DISPLAY_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_END_TIME_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_IMG_SOURCE_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_LOCATION_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_MARKER_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_NAME_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_RESOURCE_LOCATION_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_START_TIME_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_TYPE_INDEX;
+import static wormguides.loaders.StoriesLoader.NOTE_VISIBLE_INDEX;
+import static wormguides.loaders.StoriesLoader.NUMBER_OF_CSV_FIELDS;
+import static wormguides.loaders.StoriesLoader.STORY_AUTHOR_INDEX;
+import static wormguides.loaders.StoriesLoader.STORY_DATE_INDEX;
+import static wormguides.loaders.StoriesLoader.STORY_DESCRIPTION_INDEX;
+import static wormguides.loaders.StoriesLoader.STORY_NAME_INDEX;
+import static wormguides.loaders.StoriesLoader.loadFromFile;
 
 /**
  * Utility methods for loading/saving {@linkplain Story stories}

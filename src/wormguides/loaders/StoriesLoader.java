@@ -2,7 +2,7 @@
  * Bao Lab 2017
  */
 
-package wormguides.stories;
+package wormguides.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javafx.collections.ObservableList;
+
+import wormguides.stories.Note;
+import wormguides.stories.Story;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
